@@ -1,0 +1,12 @@
+# use glob syntax.
+syntax: glob
+
+*.elc
+*.pyc
+*~
+
+tg2env/include
+tg2env/lib
+tg2env/local
+
+
