@@ -1,0 +1,63 @@
+<!--
+    Genshi template master file, this is here
+    to permit to extensions and pluggable applications
+    to always have a reliable master template
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      py:strip="">
+<head py:match="head" py:attrs="select('@*')">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="${response.charset}" />
+  <title py:if="False">Your generic title goes here</title>
+  <meta py:replace="select('*')"/>
+  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap.min.css')}" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-responsive.min.css')}" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
+</head>
+
+<body py:match="body" py:attrs="select('@*')">
+  <div class="container">
+
+    <!-- Navbar -->
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#"><img src="${tg.url('/img/turbogears_logo.png')}" alt="TurboGears 2"/> ${getattr(tmpl_context, 'project_name', 'turbogears2')}</a>
+          <ul class="nav nav-pills">
+            <li class="${('', 'active')[defined('page') and page=='index']}"><a href="${tg.url('/')}">Welcome</a></li>
+            <li class="${('', 'active')[defined('page') and page=='about']}"><a href="${tg.url('/about')}">About</a></li>
+            <li class="${('', 'active')[defined('page') and page=='data']}"><a href="${tg.url('/data')}">Serving Data</a></li>
+            <li class="${('', 'active')[defined('page') and page=='environ']}"><a href="${tg.url('/environ')}">WSGI Environment</a></li>
+          </ul>
+          <ul class="nav pull-right" py:if="tg.auth_stack_enabled">
+            <li py:if="not request.identity"><a href="${tg.url('/login')}">Login</a></li>
+            <li py:if="request.identity"><a href="${tg.url('/logout_handler')}">Logout</a></li>
+            <li py:if="request.identity"><a href="${tg.url('/admin')}">Admin</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    <py:with vars="flash=tg.flash_obj.render('flash', use_js=False)">
+      <div class="row"><div class="span8 offset2">
+        <div py:if="flash" py:replace="Markup(flash)" />
+      </div></div>
+    </py:with>
+
+    <!-- Main included content -->
+    <div py:replace="select('*|text()')"/>
+
+    <!-- Footer included from an external template -->
+    <footer class="footer hidden-tablet hidden-phone">
+      <a class="pull-right" href="http://www.turbogears.org"><img style="vertical-align:middle;" src="${tg.url('/img/under_the_hood_blue.png')}" alt="TurboGears 2" /></a>
+      <p>Copyright &copy; ${getattr(tmpl_context, 'project_name', 'TurboGears2')} ${h.current_year()}</p>
+    </footer>
+  </div>
+
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+</body>
+</html>
