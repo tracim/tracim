@@ -36,6 +36,18 @@
           padding-right: 20px;
         }
       }
+      
+div.pod-toolbar {
+  visibility: hidden;
+}
+tr:Hover td div.pod-toolbar {
+  visibility: visible;
+}
+
+h3:Hover div.pod-toolbar {
+  visibility: visible;
+}
+
     </style>
 </head>
 <body class="${self.body_class()}">
@@ -57,9 +69,11 @@
 <script src="/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.js"></script>
 
 <style>
-#addFolderNode {
-  width: 800px;
-  margin-left: -400px;
+tr:Hover td div.pod-toolbar {
+  visibility: hidden;
+}
+tr:Hover td div.pod-toolbar {
+  visibility: visible;
 }
 </style>
 
@@ -76,8 +90,87 @@
 
             <script>
               $(document).ready(function() {
-                $('#data_content').wysihtml5();
+               
+                $('#data_content').wysihtml5({
+                  "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+                  "emphasis": true, //Italics, bold, etc. Default true
+                  "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                  "html": true, //Button which allows you to edit the generated HTML. Default false
+                  "link": false, //Button to insert a link. Default true
+                  "image": false, //Button to insert an image. Default true,
+                  // "color": true //Button to change color of font  
+                });
+                
+                $('#data_content').css("width", "30em");
+                $('#data_content').css("height", "12em");
+
+                $('#data_content_edit').wysihtml5({
+                  "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+                  "emphasis": true, //Italics, bold, etc. Default true
+                  "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                  "html": true, //Button which allows you to edit the generated HTML. Default false
+                  "link": false, //Button to insert a link. Default true
+                  "image": false, //Button to insert an image. Default true,
+                  // "color": true //Button to change color of font  
+                });
+                
+                $('#data_content_edit').css("width", "30em");
+                $('#data_content_edit').css("height", "12em");
+                
+                          $('#current_node_textarea').wysihtml5({
+            "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+            "emphasis": true, //Italics, bold, etc. Default true
+            "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+            "html": true, //Button which allows you to edit the generated HTML. Default false
+            "link": false, //Button to insert a link. Default true
+            "image": false, //Button to insert an image. Default true,
+            // "color": true //Button to change color of font  
+          });
+                $('#current_node_textarea').css('margin-bottom', '0');
+                $('#current_node_textarea').css("min-height", "12em");
+                $('#current_node_textarea').addClass("span5");
+
+
+                /* Edit title form */
+                $("#current-document-title-edit-form" ).css("display", "none");
+                $("#current-document-title" ).dblclick(function() {
+                  $("#current-document-title" ).css("display", "none");
+                  $("#current-document-title-edit-form" ).css("display", "block");
+                });
+                $("#current-document-title-edit-cancel-button" ).click(function() {
+                  $("#current-document-title" ).css("display", "block");
+                  $("#current-document-title-edit-form" ).css("display", "none");
+                });
+                $('#current-document-title-save-cancel-button').on('click', function(e){
+                  // We don't want this to act as a link so cancel the link action
+                  e.preventDefault();
+                  $('#current-document-title-edit-form').submit();
+                });
+
+                /* Edit content form */
+                $("#current-document-content-edit-form" ).css("display", "none");
+                $("#current-document-content-edit-button" ).click(function() {
+                  $("#current-document-content" ).css("display", "none");
+                  $("#current-document-content-edit-form" ).css("display", "block");
+                });
+                $("#current-document-content" ).dblclick(function() {
+                  $("#current-document-content" ).css("display", "none");
+                  $("#current-document-content-edit-form" ).css("display", "block");
+                });
+                $("#current-document-content-edit-cancel-button" ).click(function() {
+                  $("#current-document-content" ).css("display", "block");
+                  $("#current-document-content-edit-form" ).css("display", "none");
+                });
+                $('#current-document-content-edit-save-button').on('click', function(e){
+                  // We don't want this to act as a link so cancel the link action
+                  e.preventDefault();
+                  $('#current-document-content-edit-form').submit();
+                });
+
+                /* Force delete content form */
+
               });
+              
             </script>
 </body>
 
@@ -166,5 +259,6 @@
     </div><!-- /.navbar-inner -->
   </div><!-- /.navbar -->
 </%def>
+
 
 </html>
