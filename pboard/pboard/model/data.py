@@ -18,7 +18,8 @@ pb_node_table = Table('pb_nodes', metadata,
     Column('node_id', Integer, Sequence('pb_nodes__node_id__sequence'), primary_key=True),
     Column('parent_id', Integer, ForeignKey('pb_nodes.node_id'), nullable=True, default=None),
     Column('node_order', Integer, nullable=True, default=1),
-    Column('node_type', Unicode(16), unique=False, nullable=False, default=u'data'),
+    Column('node_type',   Unicode(16), unique=False, nullable=False, default=u'data'),
+    Column('node_status', Unicode(16), unique=False, nullable=False, default=u'open'),
 
     Column('created_at', DateTime, unique=False, nullable=False),
     Column('updated_at', DateTime, unique=False, nullable=False),
@@ -38,6 +39,41 @@ pb_node_table = Table('pb_nodes', metadata,
 - data_source_url
 - data_status_id
 """
+
+class PBNodeStatusItem(object):
+  def __init__(self, psStatusId, psStatusLabel, psStatusFamily, psForegroundColor): #, psBackgroundColor):
+    self._sStatusId     = psStatusId
+    self._sStatusLabel  = psStatusLabel
+    self._sStatusFamily = psStatusFamily
+    self._sForegroundColor = psForegroundColor
+    # self._sBackgroundColor = psBackgroundColor
+  
+  @property
+  def label(self):
+    return self._sStatusLabel
+    
+  def getId(self):
+    return self._sStatusId
+
+
+class PBNodeStatus(object):
+    
+  StatusList = dict()
+  StatusList['immortal'] = PBNodeStatusItem('immortal',  'Information', 'normal', 'rgb(51,51,51)')
+  StatusList['open']     = PBNodeStatusItem('open',      'Open',        'normal', 'rgb(91,183,91)')
+  StatusList['standby']  = PBNodeStatusItem('standby',   'in Standby',  'normal', 'rgb(250, 167, 50)')
+  StatusList['hot']      = PBNodeStatusItem('hot',       'Hot',         'normal', 'rgb(218, 79, 73)')
+  StatusList['done']     = PBNodeStatusItem('done',      'Done',        'closed', 'rgb(51, 51, 51)')
+  StatusList['closed']   = PBNodeStatusItem('closed',    'Closed',      'closed', 'rgb(51, 51, 51)')
+  StatusList['archived'] = PBNodeStatusItem('archived',  'Archived',    'invisible', 'rgb(51, 51, 51)')
+  StatusList['deleted']  = PBNodeStatusItem('deleted',   'Deleted',     'invisible', 'rgb(51, 51, 51)')
+
+  @classmethod
+  def getList(cls):
+    return PBNodeStatus.StatusList.iteritems()
+    
+  def getStatusItem(cls, psStatusId):
+    return PBNodeStatus.StatusList[psStatusId]
 
 class PBNodeType(object):
   Node    = 'node'
@@ -111,6 +147,8 @@ class PBNode(object):
   def getFormattedTime(self, poDateTime, psDateTimeFormat = '%H:%M'):
     return poDateTime.strftime(psDateTimeFormat)
 
+  def getStatus(self):
+    return PBNodeStatus.getStatusItem(self.node_status)
 
 from sqlalchemy.orm import mapper
 mapper(PBNode, pb_node_table)
