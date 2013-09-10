@@ -121,7 +121,7 @@ class RootController(BaseController):
         liNodeId = max(int(node), 1)
         print "{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}", liNodeId
         # liNodeId = 5
-        loCurrentNode = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==liNodeId).one()
+        loCurrentNode    = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==liNodeId).one()
         return dict(root_node_list=loRootNodeList, current_node=loCurrentNode)
 
     @expose()
@@ -137,20 +137,35 @@ class RootController(BaseController):
       redirect(came_from)
 
     @expose()
-    def create_document(self, data_label='', parent_id=None, data_content='', came_from=lurl('/dashboard'), **kw):
+    def create_document(self, parent_id=None):
       loNewNode = pld.createNode()
-      loNewNode.data_label   = data_label
-      loNewNode.data_content = data_content
+      loNewNode.data_label   = 'New document'
+      loNewNode.data_content = 'insert content...'
       if int(parent_id)==0:
         loNewNode.parent_id = None
       else:
         loNewNode.parent_id = parent_id
-      print "PARENT ID IS NONE? ", parent_id==None  #FIXME
-      print "PARENT ID IS ZERO? ", parent_id==0     #FIXME
-      print "PARENT ID IS 'ZERO'? ", parent_id=='0' #FIXME
-      print "PARENT ID IS EMPTY? ", parent_id==''   #FIXME
-      #loNewNode.node_id
-      #pld.getNode(node_id)
-      #pld.moveNodeLower(loNode)
-      redirect(came_from)
+
+      DBSession.flush()
+      redirect(lurl('/dashboard?node=%i'%(loNewNode.node_id)))
+
+    @expose()
+    def edit_label(self, node_id, data_label):
+      loNewNode = pld.getNode(node_id)
+      loNewNode.data_label   = data_label
+      redirect(lurl('/dashboard?node=%s'%(node_id)))
+
+    @expose()
+    def edit_content(self, node_id, data_content, **kw):
+      loNewNode = pld.getNode(node_id)
+      loNewNode.data_content = data_content
+      redirect(lurl('/dashboard?node=%s'%(node_id)))
+
+    @expose()
+    def force_delete_node(self, node_id=None):
+      loNode     = pld.getNode(node_id)
+      liParentId = loNode.parent_id
+      if loNode.getChildNb()<=0:
+        DBSession.delete(loNode)
+      redirect(lurl('/dashboard?node=%i'%(liParentId)))
 
