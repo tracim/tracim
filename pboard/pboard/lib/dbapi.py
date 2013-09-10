@@ -78,3 +78,6 @@ def moveNodeLower(loNode):
         break
     loPreviousItem = loItem
 
+def deleteNode(loNode):
+  DBSession.delete(loNode)
+  return
