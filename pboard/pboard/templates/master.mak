@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/style.css')}" />
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/glyphicons.css')}" />
 
+    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-datetimepicker.min.css')}" />
+
     <style>
       /* Wrapper for page content to push down footer */
       #wrap {
@@ -37,15 +39,38 @@
         }
       }
       
+
 div.pod-toolbar {
   visibility: hidden;
+  position: absolute;
+  right: 1.2em;
+  top: 0;
 }
-tr:Hover td div.pod-toolbar {
+
+.pod-toolbar-parent {
+  border-bottom: 1px dotted #CCC;
+}
+.pod-toolbar-parent:Hover {
+  background-color: #EFEFEF;
+}
+.pod-toolbar-parent:Hover > div.pod-toolbar {
   visibility: visible;
+}
+.pod-status {
+  position: absolute;
+  width: 1.2em;
+  text-align: center;
+  right: 0;
+  top: 0;
 }
 
 h3:Hover div.pod-toolbar {
   visibility: visible;
+}
+
+body { padding-top: 60px; }
+@media screen and (max-width: 768px) {
+    body { padding-top: 0px; }
 }
 
     </style>
@@ -67,6 +92,7 @@ h3:Hover div.pod-toolbar {
 
 <script src="/bootstrap-wysihtml5-0.0.2/libs/js/wysihtml5-0.3.0_rc2.js"></script>
 <script src="/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.js"></script>
+<script src="/javascript/bootstrap-datetimepicker.min.js"></script>
 
 <style>
 tr:Hover td div.pod-toolbar {
@@ -75,6 +101,11 @@ tr:Hover td div.pod-toolbar {
 tr:Hover td div.pod-toolbar {
   visibility: visible;
 }
+
+.pod-status-grey-light  { background-color: #DDD; }
+.pod-status-grey-middle { background-color: #BBB; }
+.pod-status-grey-dark   { background-color: #AAA; }
+
 </style>
 
   
@@ -90,21 +121,9 @@ tr:Hover td div.pod-toolbar {
 
             <script>
               $(document).ready(function() {
-               
-                $('#data_content').wysihtml5({
-                  "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
-                  "emphasis": true, //Italics, bold, etc. Default true
-                  "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-                  "html": true, //Button which allows you to edit the generated HTML. Default false
-                  "link": false, //Button to insert a link. Default true
-                  "image": false, //Button to insert an image. Default true,
-                  // "color": true //Button to change color of font  
-                });
-                
-                $('#data_content').css("width", "30em");
-                $('#data_content').css("height", "12em");
 
-                $('#data_content_edit').wysihtml5({
+                
+                $('#current_node_textarea').wysihtml5({
                   "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
                   "emphasis": true, //Italics, bold, etc. Default true
                   "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
@@ -113,19 +132,6 @@ tr:Hover td div.pod-toolbar {
                   "image": false, //Button to insert an image. Default true,
                   // "color": true //Button to change color of font  
                 });
-                
-                $('#data_content_edit').css("width", "30em");
-                $('#data_content_edit').css("height", "12em");
-                
-                          $('#current_node_textarea').wysihtml5({
-            "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
-            "emphasis": true, //Italics, bold, etc. Default true
-            "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-            "html": true, //Button which allows you to edit the generated HTML. Default false
-            "link": false, //Button to insert a link. Default true
-            "image": false, //Button to insert an image. Default true,
-            // "color": true //Button to change color of font  
-          });
                 $('#current_node_textarea').css('margin-bottom', '0');
                 $('#current_node_textarea').css("min-height", "12em");
                 $('#current_node_textarea').addClass("span5");
@@ -167,7 +173,34 @@ tr:Hover td div.pod-toolbar {
                   $('#current-document-content-edit-form').submit();
                 });
 
-                /* Force delete content form */
+
+                /* Add event form hide/show behavior */
+                $("#current-document-add-event-button" ).click(function() {
+                  $("#current-document-add-event-form" ).css("display", "block");
+                  $("#current-document-add-event-button" ).css("display", "none");
+                });
+                $('#current-document-add-event-cancel-button').on('click', function(e){
+                  $("#current-document-add-event-form" ).css("display", "none");
+                  $("#current-document-add-event-button" ).css("display", "block");
+                });
+                $('#current-document-add-event-save-button').on('click', function(e){
+                  e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#current-document-add-event-form').submit();
+                });
+
+
+
+
+/*                $('.date-picker-input').datepicker({
+                  format: 'mm-dd-yyyy'
+                });
+*/
+                $(function() {
+                  $('.datetime-picker-input-div').datetimepicker({
+                    language: 'fr-FR',
+                    pickSeconds: false
+                  });
+                });
 
               });
               
@@ -201,10 +234,10 @@ tr:Hover td div.pod-toolbar {
 </%def>
 
 <%def name="main_menu()">
-  <div class="navbar">
+  <div id="pod-navbar" class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
-        <a class="brand" href="#"><img src="${tg.url('/img/turbogears_logo.png')}" alt="TurboGears 2"/> <strong>pod</strong></a>
+        <a class="brand" href="#"><!--img src="${tg.url('/img/turbogears_logo.png')}" alt="TurboGears 2"/--> <strong>pod</strong></a>
         <div class="nav-collapse">
           <ul class="nav">
             <li class="active"><a href="${tg.url('/dashboard')}"><i class="icon-home icon-white"></i> Dashboard</a></li>

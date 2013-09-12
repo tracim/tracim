@@ -14,7 +14,10 @@ from pboard.lib.base import BaseController
 from pboard.controllers.error import ErrorController
 
 import pboard.model as pbm
+import pboard.controllers as pbc
 from pboard.lib import dbapi as pld
+from pboard.controllers import api as pbca
+
 __all__ = ['RootController']
 
 
@@ -37,6 +40,8 @@ class RootController(BaseController):
 
     error = ErrorController()
 
+    api = pbca.PODApiController()
+    
     def _before(self, *args, **kw):
         tmpl_context.project_name = "pboard"
 
@@ -122,7 +127,8 @@ class RootController(BaseController):
         print "{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}", liNodeId
         # liNodeId = 5
         loCurrentNode    = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==liNodeId).one()
-        return dict(root_node_list=loRootNodeList, current_node=loCurrentNode)
+        loNodeStatusList = pbmd.PBNodeStatus.getList()
+        return dict(root_node_list=loRootNodeList, current_node=loCurrentNode, node_status_list = loNodeStatusList)
 
     @expose()
     def move_node_upper(self, node_id=0, came_from=lurl('/dashboard')):
@@ -156,6 +162,12 @@ class RootController(BaseController):
       redirect(lurl('/dashboard?node=%s'%(node_id)))
 
     @expose()
+    def edit_status(self, node_id, node_status):
+      loNewNode = pld.getNode(node_id)
+      loNewNode.node_status = node_status
+      redirect(lurl('/dashboard?node=%s'%(node_id)))
+
+    @expose()
     def edit_content(self, node_id, data_content, **kw):
       loNewNode = pld.getNode(node_id)
       loNewNode.data_content = data_content
@@ -167,5 +179,7 @@ class RootController(BaseController):
       liParentId = loNode.parent_id
       if loNode.getChildNb()<=0:
         DBSession.delete(loNode)
-      redirect(lurl('/dashboard?node=%i'%(liParentId)))
+      redirect(lurl('/dashboard?node=%i'%(liParentId or 0)))
+
+
 

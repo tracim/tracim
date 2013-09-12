@@ -19,7 +19,7 @@ pb_node_table = Table('pb_nodes', metadata,
     Column('parent_id', Integer, ForeignKey('pb_nodes.node_id'), nullable=True, default=None),
     Column('node_order', Integer, nullable=True, default=1),
     Column('node_type',   Unicode(16), unique=False, nullable=False, default=u'data'),
-    Column('node_status', Unicode(16), unique=False, nullable=False, default=u'open'),
+    Column('node_status', Unicode(16), unique=False, nullable=False, default=u'new'),
 
     Column('created_at', DateTime, unique=False, nullable=False),
     Column('updated_at', DateTime, unique=False, nullable=False),
@@ -27,6 +27,7 @@ pb_node_table = Table('pb_nodes', metadata,
     Column('data_label',   Unicode(1024), unique=False, nullable=False, default=u''),
     Column('data_content', Text(), unique=False, nullable=False, default=u''),
     Column('data_datetime', DateTime, unique=False, nullable=False),
+    Column('data_reminder_datetime', DateTime, unique=False, nullable=True),
 )
 """
 - node_type
@@ -41,38 +42,73 @@ pb_node_table = Table('pb_nodes', metadata,
 """
 
 class PBNodeStatusItem(object):
-  def __init__(self, psStatusId, psStatusLabel, psStatusFamily, psForegroundColor): #, psBackgroundColor):
+  def __init__(self, psStatusId, psStatusLabel, psStatusFamily, psIconId, psCssClass): #, psBackgroundColor):
     self._sStatusId     = psStatusId
     self._sStatusLabel  = psStatusLabel
     self._sStatusFamily = psStatusFamily
-    self._sForegroundColor = psForegroundColor
+    self._sIconId   = psIconId
+    self._sCssClass = psCssClass
     # self._sBackgroundColor = psBackgroundColor
   
-  @property
-  def label(self):
+  def getLabel(self):
     return self._sStatusLabel
+    
+  @property
+  def icon(self):
+    return self._sIconId
     
   def getId(self):
     return self._sStatusId
 
+  @property
+  def css(self):
+    return self._sCssClass
+
+  @property
+  def status_id(self):
+    return self._sStatusId
+    
+  @property
+  def icon_id(self):
+    return self._sIconId
+
+  @property
+  def label(self):
+    return self._sStatusLabel
 
 class PBNodeStatus(object):
     
   StatusList = dict()
-  StatusList['immortal'] = PBNodeStatusItem('immortal',  'Information', 'normal', 'rgb(51,51,51)')
-  StatusList['open']     = PBNodeStatusItem('open',      'Open',        'normal', 'rgb(91,183,91)')
-  StatusList['standby']  = PBNodeStatusItem('standby',   'in Standby',  'normal', 'rgb(250, 167, 50)')
-  StatusList['hot']      = PBNodeStatusItem('hot',       'Hot',         'normal', 'rgb(218, 79, 73)')
-  StatusList['done']     = PBNodeStatusItem('done',      'Done',        'closed', 'rgb(51, 51, 51)')
-  StatusList['closed']   = PBNodeStatusItem('closed',    'Closed',      'closed', 'rgb(51, 51, 51)')
-  StatusList['archived'] = PBNodeStatusItem('archived',  'Archived',    'invisible', 'rgb(51, 51, 51)')
-  StatusList['deleted']  = PBNodeStatusItem('deleted',   'Deleted',     'invisible', 'rgb(51, 51, 51)')
+  StatusList['immortal']   = PBNodeStatusItem('immortal',   'Information', 'normal', 'icon-g-circle-info',            'pod-status-grey-light')
+  StatusList['new']        = PBNodeStatusItem('new',        'New',         'open',   'icon-g-lightbulb icon-g-white', 'btn-success')
+  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress', 'open',   ' icon-g-roundabout icon-g-white', 'btn-info')
+  StatusList['standby']    = PBNodeStatusItem('standby',    'In Standby',  'open',   'icon-g-clock icon-g-white', 'btn-warning')
+  StatusList['hot']        = PBNodeStatusItem('hot',        'Hot',         'open',   'icon-g-warning-sign icon-g-white', 'btn-danger')
+  StatusList['done']       = PBNodeStatusItem('done',       'Done',        'closed', 'icon-g-ok-2', 'pod-status-grey-light')
+  StatusList['closed']     = PBNodeStatusItem('closed',     'Closed',      'closed', 'icon-g-lightbulb', 'pod-status-grey-middle')
+  StatusList['archived']   = PBNodeStatusItem('archived',   'Archived',    'invisible', 'icon-g-wallet', 'pod-status-grey-dark')
+  StatusList['deleted']    = PBNodeStatusItem('deleted',    'Deleted',     'invisible', 'icon-g-bin',                    'pod-status-grey-dark')
 
   @classmethod
   def getList(cls):
-    return PBNodeStatus.StatusList.iteritems()
+    return [
+      PBNodeStatus.StatusList['immortal'],
+      PBNodeStatus.StatusList['new'],
+      PBNodeStatus.StatusList['inprogress'],
+      PBNodeStatus.StatusList['standby'],
+      PBNodeStatus.StatusList['hot'],
+      PBNodeStatus.StatusList['done'],
+      PBNodeStatus.StatusList['closed'],
+      PBNodeStatus.StatusList['archived'],
+      PBNodeStatus.StatusList['deleted']
+    ]
     
+    PBNodeStatus.StatusList.values()
+    
+  @classmethod
   def getStatusItem(cls, psStatusId):
+    print "====> ID=", psStatusId
+    print "====> ITEM=", PBNodeStatus.StatusList[psStatusId]
     return PBNodeStatus.StatusList[psStatusId]
 
 class PBNodeType(object):
@@ -149,6 +185,15 @@ class PBNode(object):
 
   def getStatus(self):
     return PBNodeStatus.getStatusItem(self.node_status)
+
+  def getTruncatedLabel(self, piCharNb):
+    lsTruncatedLabel = u''
+    liMaxLength = int(piCharNb)
+    if len(self.data_label)>liMaxLength:
+      lsTruncatedLabel = self.data_label[0:liMaxLength-1]+u'…'
+    else:
+      lsTruncatedLabel = self.data_label
+    return lsTruncatedLabel
 
 from sqlalchemy.orm import mapper
 mapper(PBNode, pb_node_table)
