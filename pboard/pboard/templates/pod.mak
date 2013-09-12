@@ -14,4 +14,6 @@
 <%def name='AddButton(piId, pbWithLabel=False, psLabel=None)'>
   ${Button(piId, pbWithLabel, 'btn', psLabel or _('New'), 'icon-g-circle-plus', psLabel or _('New'))}
 </%def>
-
+<%def name='Badge(psLabel, psCssClass="")'>
+  <span class='badge ${psCssClass}'>${psLabel}</span>
+</%def>
