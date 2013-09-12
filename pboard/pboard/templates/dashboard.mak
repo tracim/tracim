@@ -136,11 +136,8 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
             ${POD.SaveButton('current-document-title-save-cancel-button')}
           </div>
         </form>
-
-
-</div>
+      </div>
       <div class="span5">
-      
       <p>
         <div id='current-document-content' class="">
           ${current_node.getContentWithTags()|n}
@@ -158,6 +155,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
     <div class="span4">
       <div class="tabbable">
         <ul class="nav nav-tabs">
+            <li class=""><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
             <li class="active">
               <a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i></a>
             </li>
@@ -167,6 +165,11 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
             <li><a href="#contacts" data-toggle="tab" title="Users"><i class="icon-g-user""></i> </a></li>
         </ul>
         <div class="tab-content">
+            <div class="tab-pane" id="tags">
+              % for tag in current_node.getTagList():
+                ${POD.Badge(tag)}
+              % endfor
+            </div>
             <div class="tab-pane active" id="events">
 
 ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}

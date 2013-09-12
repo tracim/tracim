@@ -2,6 +2,7 @@
 """
 """
 import os
+import re
 from datetime import datetime
 from hashlib import sha256
 __all__ = ['User', 'Group', 'Permission']
@@ -195,14 +196,23 @@ class PBNode(object):
       lsTruncatedLabel = self.data_label
     return lsTruncatedLabel
 
+  def getTagList(self):
+    loPattern = re.compile('(^|\s|@)@(\w+)')
+    loResults = re.findall(loPattern, self.data_content)
+    lsResultList = []
+    for loResult in loResults:
+      lsResultList.append(loResult[1].replace('@', '').replace('_', ' '))
+    return lsResultList
+
   @classmethod
   def addTagReplacement(cls, matchobj):
-    if matchobj.group(0) == '-': return ' '
-    else: return "<span class='badge'>%s</span>" %(matchobj.group(0))
+    return " <span class='badge'>%s</span> " %(matchobj.group(0).replace('@', '').replace('_', ' '))
 
   def getContentWithTags(self):
-    import re
-    return re.sub('@(\w+)', PBNode.addTagReplacement, self.data_content)
+    lsTemporaryResult = re.sub('(^|\s)@@(\w+)', '', self.data_content) # tags with @@ are explicitly removed from the body
+    return re.sub('(^|\s)@(\w+)', PBNode.addTagReplacement, lsTemporaryResult) # then, 'normal tags are transformed as labels'
+    # FIXME - D.A. - 2013-09-12
+    # Does not match @@ at end of content.
 
 
 
