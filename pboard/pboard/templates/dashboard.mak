@@ -101,16 +101,6 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         
         
         
-        <form style='display: none;' id="current-document-title-edit-form" method='post' action='${tg.url('/edit_label')}'>
-          <div class="input-prepend input-append">
-            <input type='hidden' name='node_id' value='${current_node.node_id}'/>
-            ${POD.CancelButton('current-document-title-edit-cancel-button')}
-            <input type='text' name='data_label' value='${current_node.data_label}' class="span2" />
-            ${POD.SaveButton('current-document-title-save-cancel-button')}
-          </div>
-        </form>
-
-
       <div class="btn-group">
         <button class="btn">Status</button>
         <a class="btn ${current_node.getStatus().css}" href="#"><i class="${current_node.getStatus().icon}"></i> ${current_node.getStatus().getLabel()}</a>
@@ -138,12 +128,22 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
       
             <!--</div> PAGE HEADER -->
       <h3 id="current-document-title">${current_node.data_label}</h3>
+        <form style='display: none; margin-top: 1em;' id="current-document-title-edit-form" method='post' action='${tg.url('/edit_label')}'>
+          <div class="input-prepend input-append">
+            <input type='hidden' name='node_id' value='${current_node.node_id}'/>
+            ${POD.CancelButton('current-document-title-edit-cancel-button')}
+            <input type='text' name='data_label' value='${current_node.data_label}' class="span2" />
+            ${POD.SaveButton('current-document-title-save-cancel-button')}
+          </div>
+        </form>
+
+
 </div>
       <div class="span5">
       
       <p>
         <div id='current-document-content' class="">
-          ${current_node.data_content|n}
+          ${current_node.getContentWithTags()|n}
         </div>
         <form style='display: none;' id="current-document-content-edit-form" method='post' action='${tg.url('/edit_content')}'>
           <input type='hidden' name='node_id' value='${current_node.node_id}'/>

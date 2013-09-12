@@ -195,6 +195,17 @@ class PBNode(object):
       lsTruncatedLabel = self.data_label
     return lsTruncatedLabel
 
+  @classmethod
+  def addTagReplacement(cls, matchobj):
+    if matchobj.group(0) == '-': return ' '
+    else: return "<span class='badge'>%s</span>" %(matchobj.group(0))
+
+  def getContentWithTags(self):
+    import re
+    return re.sub('@(\w+)', PBNode.addTagReplacement, self.data_content)
+
+
+
 from sqlalchemy.orm import mapper
 mapper(PBNode, pb_node_table)
 
