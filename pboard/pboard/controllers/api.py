@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Sample controller with all its actions protected."""
+from datetime import datetime
 from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates
@@ -33,7 +34,7 @@ class PODApiController(BaseController):
       loNewNode.node_type     = pmd.PBNodeType.Event
       loNewNode.data_label    = data_label
       loNewNode.data_content  = ''
-      loNewNode.data_datetime = data_datetime
+      loNewNode.data_datetime = datetime.strptime(data_datetime, '%d/%m/%Y %H:%M')
       if add_reminder:
         loNewNode.data_reminder_datetime = data_reminder_datetime
 
