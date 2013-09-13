@@ -55,6 +55,10 @@ class PBNodeStatusItem(object):
     return self._sStatusLabel
     
   @property
+  def status_family(self):
+    return self._sStatusFamily
+    
+  @property
   def icon(self):
     return self._sIconId
     
@@ -81,8 +85,8 @@ class PBNodeStatus(object):
     
   StatusList = dict()
   StatusList['immortal']   = PBNodeStatusItem('immortal',   'Information', 'normal', 'icon-g-circle-info',            'pod-status-grey-light')
-  StatusList['new']        = PBNodeStatusItem('new',        'New',         'open',   'icon-g-lightbulb icon-g-white', 'btn-success')
-  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress', 'open',   ' icon-g-roundabout icon-g-white', 'btn-info')
+  StatusList['new']        = PBNodeStatusItem('new',        'New',         'open',   'icon-g-lightbulb icon-g-white', 'btn-info')
+  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress', 'open',   ' icon-g-roundabout icon-g-white', 'btn-success')
   StatusList['standby']    = PBNodeStatusItem('standby',    'In Standby',  'open',   'icon-g-clock icon-g-white', 'btn-warning')
   StatusList['hot']        = PBNodeStatusItem('hot',        'Hot',         'open',   'icon-g-warning-sign icon-g-white', 'btn-danger')
   StatusList['done']       = PBNodeStatusItem('done',       'Done',        'closed', 'icon-g-ok-2', 'pod-status-grey-light')

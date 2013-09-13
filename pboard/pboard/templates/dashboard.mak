@@ -38,7 +38,13 @@
       % for node in node_list:
         <div class="pod-toolbar-parent" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
           <a href="?node=${node.node_id}" title="${node.data_label}">
+            % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
+              <strike>
+            % endif
             <i class='${node.getIconClass()}'></i> ${node.getTruncatedLabel(32-0.8*(indentation+1))}
+            % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
+              </strike>
+            % endif
           </a>
           <div class="pod-toolbar">
             <a href="${tg.url('/move_node_upper?node_id=%i'%(node.node_id))}" title="${_('Move up')}"><i class="icon-g-up-arrow"></i></a>
