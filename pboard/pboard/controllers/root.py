@@ -118,68 +118,15 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         redirect(came_from)
         
-    @expose('pboard.templates.dashboard')
-    def dashboard(self, node=0, came_from=lurl('/')):
+    @expose('pboard.templates.document')
+    def document(self, node=0, came_from=lurl('/')):
         """show the user dashboard"""
         import pboard.model.data as pbmd
         loRootNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
-        liNodeId = max(int(node), 1)
-        print "{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}", liNodeId
-        # liNodeId = 5
+        liNodeId         = max(int(node), 1) # show node #1 if no selected node
         loCurrentNode    = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==liNodeId).one()
         loNodeStatusList = pbmd.PBNodeStatus.getList()
         return dict(root_node_list=loRootNodeList, current_node=loCurrentNode, node_status_list = loNodeStatusList)
-
-    @expose()
-    def move_node_upper(self, node_id=0, came_from=lurl('/dashboard')):
-      loNode = pld.getNode(node_id)
-      pld.moveNodeUpper(loNode)
-      redirect(came_from)
-
-    @expose()
-    def move_node_lower(self, node_id=0, came_from=lurl('/dashboard')):
-      loNode = pld.getNode(node_id)
-      pld.moveNodeLower(loNode)
-      redirect(came_from)
-
-    @expose()
-    def create_document(self, parent_id=None):
-      loNewNode = pld.createNode()
-      loNewNode.data_label   = 'New document'
-      loNewNode.data_content = 'insert content...'
-      if int(parent_id)==0:
-        loNewNode.parent_id = None
-      else:
-        loNewNode.parent_id = parent_id
-
-      DBSession.flush()
-      redirect(lurl('/dashboard?node=%i'%(loNewNode.node_id)))
-
-    @expose()
-    def edit_label(self, node_id, data_label):
-      loNewNode = pld.getNode(node_id)
-      loNewNode.data_label   = data_label
-      redirect(lurl('/dashboard?node=%s'%(node_id)))
-
-    @expose()
-    def edit_status(self, node_id, node_status):
-      loNewNode = pld.getNode(node_id)
-      loNewNode.node_status = node_status
-      redirect(lurl('/dashboard?node=%s'%(node_id)))
-
-    @expose()
-    def edit_content(self, node_id, data_content, **kw):
-      loNewNode = pld.getNode(node_id)
-      loNewNode.data_content = data_content
-      redirect(lurl('/dashboard?node=%s'%(node_id)))
-
-    @expose()
-    def force_delete_node(self, node_id=None):
-      loNode     = pld.getNode(node_id)
-      liParentId = loNode.parent_id
-      if loNode.getChildNb()<=0:
-        DBSession.delete(loNode)
-      redirect(lurl('/dashboard?node=%i'%(liParentId or 0)))
 
 
 

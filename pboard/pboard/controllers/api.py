@@ -39,7 +39,7 @@ class PODApiController(BaseController):
         loNewNode.data_reminder_datetime = data_reminder_datetime
 
       pm.DBSession.flush()
-      redirect(lurl('/dashboard?node=%i'%(loNewNode.parent_id)))
+      redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
     def set_parent_node(self, node_id, new_parent_id, **kw):
@@ -47,6 +47,56 @@ class PODApiController(BaseController):
       if new_parent_id!='':
         loNewNode.parent_id = int(new_parent_id)
       pm.DBSession.flush()
-      redirect(lurl('/dashboard?node=%s'%(node_id)))
+      redirect(lurl('/document/%s'%(node_id)))
 
+    @expose()
+    def move_node_upper(self, node_id=0, came_from=lurl('/dashboard')):
+      loNode = pld.getNode(node_id)
+      pld.moveNodeUpper(loNode)
+      redirect(came_from)
+
+    @expose()
+    def move_node_lower(self, node_id=0, came_from=lurl('/dashboard')):
+      loNode = pld.getNode(node_id)
+      pld.moveNodeLower(loNode)
+      redirect(came_from)
+
+    @expose()
+    def create_document(self, parent_id=None):
+      loNewNode = pld.createNode()
+      loNewNode.data_label   = 'New document'
+      loNewNode.data_content = 'insert content...'
+      if int(parent_id)==0:
+        loNewNode.parent_id = None
+      else:
+        loNewNode.parent_id = parent_id
+
+      DBSession.flush()
+      redirect(lurl('/document/%i'%(loNewNode.node_id)))
+
+    @expose()
+    def edit_label(self, node_id, data_label):
+      loNewNode = pld.getNode(node_id)
+      loNewNode.data_label   = data_label
+      redirect(lurl('/document/%s'%(node_id)))
+
+    @expose()
+    def edit_status(self, node_id, node_status):
+      loNewNode = pld.getNode(node_id)
+      loNewNode.node_status = node_status
+      redirect(lurl('/document/%s'%(node_id)))
+
+    @expose()
+    def edit_content(self, node_id, data_content, **kw):
+      loNewNode = pld.getNode(node_id)
+      loNewNode.data_content = data_content
+      redirect(lurl('/document/%s'%(node_id)))
+
+    @expose()
+    def force_delete_node(self, node_id=None):
+      loNode     = pld.getNode(node_id)
+      liParentId = loNode.parent_id
+      if loNode.getChildNb()<=0:
+        DBSession.delete(loNode)
+      redirect(lurl('/document/%i'%(liParentId or 0)))
 

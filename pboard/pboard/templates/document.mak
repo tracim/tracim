@@ -4,7 +4,7 @@
 
 <%def name="node_treeview_for_set_parent_menu(node_id, node_list, indentation=-1)">
   % if indentation==-1:
-    <li><a href="${tg.url('/api/set_parent_node?node_id=%i&new_parent_id=0'%(current_node.node_id))}">${_('Root')}</a>
+    <li><a href="${tg.url('/api/set_parent_node?node_id=%i&new_parent_id=0'%(current_node.node_id))}">${_('Home')}</a>
       ${node_treeview_for_set_parent_menu(node_id, node_list, 0)}
     </li>
   % else:
@@ -29,7 +29,7 @@
         ${_('Root')}
       </a>
       <div class="pod-toolbar">
-        <a href="${tg.url('/create_document?parent_id=0')}" title="${_('Add child document')}"><i class="icon-g-circle-plus"></i></a>
+        <a href="${tg.url('/api/create_document?parent_id=0')}" title="${_('Add child document')}"><i class="icon-g-circle-plus"></i></a>
       </div>
     </div>
     ${node_treeview(node_list, 0)}
@@ -47,9 +47,9 @@
             % endif
           </a>
           <div class="pod-toolbar">
-            <a href="${tg.url('/move_node_upper?node_id=%i'%(node.node_id))}" title="${_('Move up')}"><i class="icon-g-up-arrow"></i></a>
-            <a href="${tg.url('/move_node_lower?node_id=%i'%(node.node_id))}" title="${_('Move down')}"><i class="icon-g-down-arrow"></i></a>
-            <a href="${tg.url('/create_document?parent_id=%i'%(node.node_id))}" title="${_('Add child document')}"><i class="icon-g-circle-plus"></i></a>
+            <a href="${tg.url('/api/move_node_upper?node_id=%i'%(node.node_id))}" title="${_('Move up')}"><i class="icon-g-up-arrow"></i></a>
+            <a href="${tg.url('/api/move_node_lower?node_id=%i'%(node.node_id))}" title="${_('Move down')}"><i class="icon-g-down-arrow"></i></a>
+            <a href="${tg.url('/api/create_document?parent_id=%i'%(node.node_id))}" title="${_('Add child document')}"><i class="icon-g-circle-plus"></i></a>
           </div>
           <div class="pod-status ${node.getStatus().css}" title='${node.getStatus().label}'>
              <i class='${node.getStatus().icon}'></i>
@@ -129,12 +129,12 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         </ul>
 
 
-        <a href='${tg.url('/force_delete_node?node_id=%i'%(current_node.node_id))}' id='current-document-force-delete-button' class="btn" onclick="return confirm('${_('Delete current document?')}');"><i class="icon-g-remove"></i> ${_('Delete')}</a>
+        <a href='${tg.url('/api/force_delete_node?node_id=%i'%(current_node.node_id))}' id='current-document-force-delete-button' class="btn" onclick="return confirm('${_('Delete current document?')}');"><i class="icon-g-remove"></i> ${_('Delete')}</a>
       </div>
       
             <!--</div> PAGE HEADER -->
       <h3 id="current-document-title">#${current_node.node_id} - ${current_node.data_label}</h3>
-        <form style='display: none; margin-top: 1em;' id="current-document-title-edit-form" method='post' action='${tg.url('/edit_label')}'>
+        <form style='display: none; margin-top: 1em;' id="current-document-title-edit-form" method='post' action='${tg.url('/api/edit_label')}'>
           <div class="input-prepend input-append">
             <input type='hidden' name='node_id' value='${current_node.node_id}'/>
             ${POD.CancelButton('current-document-title-edit-cancel-button')}
@@ -148,7 +148,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         <div id='current-document-content' class="">
           ${current_node.getContentWithTags()|n}
         </div>
-        <form style='display: none;' id="current-document-content-edit-form" method='post' action='${tg.url('/edit_content')}'>
+        <form style='display: none;' id="current-document-content-edit-form" method='post' action='${tg.url('/api/edit_content')}'>
           <input type='hidden' name='node_id' value='${current_node.node_id}'/>
           <textarea id="current_node_textarea" name='data_content' spellcheck="false" wrap="off" autofocus placeholder="Enter something ...">
             ${current_node.data_content|n}

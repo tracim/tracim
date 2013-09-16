@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 """
+
+Search activity on the dashboard:
+select node_id, node_type, created_at as last_action, data_label, 'new data' as label from pb_nodes where updated_at=created_at
+union
+select node_id, node_type, updated_at as last_action, data_label, 'updated data' as label from pb_nodes where updated_at>created_at
+union
+select node_id, node_type, data_datetime as last_action, data_label, 'event' as label from pb_nodes where node_type='event'
+order by last_action desc
+
 """
 import os
 import re
