@@ -133,7 +133,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
       </div>
       
             <!--</div> PAGE HEADER -->
-      <h3 id="current-document-title">${current_node.data_label}</h3>
+      <h3 id="current-document-title">#${current_node.node_id} - ${current_node.data_label}</h3>
         <form style='display: none; margin-top: 1em;' id="current-document-title-edit-form" method='post' action='${tg.url('/edit_label')}'>
           <div class="input-prepend input-append">
             <input type='hidden' name='node_id' value='${current_node.node_id}'/>
@@ -204,6 +204,11 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
         <span class="add-on"><i data-time-icon="icon-g-clock" data-date-icon="icon-g-calendar"></i></span>
       </div>
     </label>
+    <label>
+      <div>
+        <textarea id="add_event_data_content_textarea" name='data_content' spellcheck="false" wrap="off" autofocus placeholder="${_('detail...')}"></textarea>
+      </div>
+    </label>
     <label class="checkbox">
       <input disabled name='add_reminder' type="checkbox"> add a reminder
     </label>
@@ -213,6 +218,7 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
         <span class="add-on"><i data-time-icon="icon-g-clock" data-date-icon="icon-g-calendar"></i></span>
       </div>
     </label>
+
 
     ${POD.CancelButton('current-document-add-event-cancel-button', True)}
     ${POD.SaveButton('current-document-add-event-save-button', True)}
@@ -237,12 +243,9 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
                 </thead>
                 % for event in current_node.getEvents():
                   <tr title="Last updated: ${event.updated_at}">
-                     <td>${event.getFormattedDate(event.data_datetime)}</td>
-                     <td>${event.getFormattedTime(event.data_datetime)}</td>
-                     <td>${event.data_label}</td>
-                     <td>
-                       <a href=""><i class="icon-g-edit"></i></a>
-                     </td>
+                    <td>${event.getFormattedDate(event.data_datetime)}</td>
+                    <td>${event.getFormattedTime(event.data_datetime)}</td>
+                    <td>${event.data_label}</td>
                   </tr>
                 % endfor
               </table>
