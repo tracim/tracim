@@ -27,13 +27,13 @@ class PODApiController(BaseController):
         return dict(page='index')
     
     @expose()
-    def create_event(self, parent_id=None, data_label=u'',data_datetime=None,data_reminder_datetime=None,add_reminder=False, **kw):
+    def create_event(self, parent_id=None, data_label=u'', data_datetime=None, data_content=u'', data_reminder_datetime=None, add_reminder=False, **kw):
 
       loNewNode = pld.createNode()
       loNewNode.parent_id     = int(parent_id)
       loNewNode.node_type     = pmd.PBNodeType.Event
       loNewNode.data_label    = data_label
-      loNewNode.data_content  = ''
+      loNewNode.data_content  = data_content
       loNewNode.data_datetime = datetime.strptime(data_datetime, '%d/%m/%Y %H:%M')
       if add_reminder:
         loNewNode.data_reminder_datetime = data_reminder_datetime
