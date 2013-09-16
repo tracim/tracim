@@ -172,9 +172,21 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         </ul>
         <div class="tab-content">
             <div class="tab-pane" id="tags">
-              % for tag in current_node.getTagList():
-                ${POD.Badge(tag)}
-              % endfor
+              <div class="well">
+                <p>
+                  <i>
+                    ${_('Tags are automatically extracted from document content:')}
+                    <ul>
+                      <li>${_('<code>@visible_keyword</code> is a visible keyword generating a tag.')|n}</li>
+                      <li>
+                        ${_('<code>@invisible_keyword</code> is an <u>invisible</u> keyword generating a tag.')|n}</li>
+                    </ul>
+                  </i>
+                </p>
+                % for tag in current_node.getTagList():
+                  ${POD.Badge(tag)}
+                % endfor
+              </div>
             </div>
             <div class="tab-pane active" id="events">
 
@@ -207,6 +219,9 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
   </fieldset>
 </form>
 
+            % if len(current_node.getEvents())<=0:
+              <p><i>${_('No history for the moment.')}</i></p>
+            % else:
               <table class="table table-striped table-hover table-condensed">
                 <thead>
                   <tr>
@@ -220,17 +235,18 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
                     </th>
                   </tr>
                 </thead>
-              % for event in current_node.getEvents():
-                <tr title="Last updated: ${event.updated_at}">
-                   <td>${event.getFormattedDate(event.data_datetime)}</td>
-                   <td>${event.getFormattedTime(event.data_datetime)}</td>
-                   <td>${event.data_label}</td>
-                   <td>
-                     <a href=""><i class="icon-g-edit"></i></a>
-                   </td>
-                </tr>
-              % endfor
+                % for event in current_node.getEvents():
+                  <tr title="Last updated: ${event.updated_at}">
+                     <td>${event.getFormattedDate(event.data_datetime)}</td>
+                     <td>${event.getFormattedTime(event.data_datetime)}</td>
+                     <td>${event.data_label}</td>
+                     <td>
+                       <a href=""><i class="icon-g-edit"></i></a>
+                     </td>
+                  </tr>
+                % endfor
               </table>
+            % endif
             </div>
             <div class="tab-pane" id="contacts">
               % for contact in current_node.getContacts():
