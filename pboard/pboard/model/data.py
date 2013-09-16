@@ -11,6 +11,7 @@ from sqlalchemy import Table, ForeignKey, Column, Sequence
 from sqlalchemy.types import Unicode, Integer, DateTime, Text
 from sqlalchemy.orm import relation, synonym
 
+import tg
 from pboard.model import DeclarativeBase, metadata, DBSession
 
 # This is the association table for the many-to-many relationship between
@@ -199,8 +200,13 @@ class PBNode(object):
   def addTagReplacement(cls, matchobj):
     return " <span class='badge'>%s</span> " %(matchobj.group(0).replace('@', '').replace('_', ' '))
 
+  @classmethod
+  def addDocLinkReplacement(cls, matchobj):
+    return " <a href='%s'>%s</a> " %(tg.url('/dashboard?node=%s')%(matchobj.group(1)), matchobj.group(0))
+
   def getContentWithTags(self):
     lsTemporaryResult = re.sub('(^|\s)@@(\w+)', '', self.data_content) # tags with @@ are explicitly removed from the body
+    lsTemporaryResult = re.sub('#([0-9]*)', PBNode.addDocLinkReplacement, lsTemporaryResult) # tags with @@ are explicitly removed from the body
     return re.sub('(^|\s)@(\w+)', PBNode.addTagReplacement, lsTemporaryResult) # then, 'normal tags are transformed as labels'
     # FIXME - D.A. - 2013-09-12
     # Does not match @@ at end of content.
