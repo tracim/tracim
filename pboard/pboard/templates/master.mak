@@ -128,13 +128,27 @@ tr:Hover td div.pod-toolbar {
                   "emphasis": true, //Italics, bold, etc. Default true
                   "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
                   "html": true, //Button which allows you to edit the generated HTML. Default false
-                  "link": false, //Button to insert a link. Default true
-                  "image": false, //Button to insert an image. Default true,
+                  "link": true, //Button to insert a link. Default true
+                  "image": true, //Button to insert an image. Default true,
                   // "color": true //Button to change color of font  
                 });
                 $('#current_node_textarea').css('margin-bottom', '0');
                 $('#current_node_textarea').css("min-height", "12em");
                 $('#current_node_textarea').addClass("span5");
+
+                $('#add_event_data_content_textarea').wysihtml5({
+                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
+                  "emphasis": true, //Italics, bold, etc. Default true
+                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                  "html": true, //Button which allows you to edit the generated HTML. Default false
+                  "link": true, //Button to insert a link. Default true
+                  "image": true, //Button to insert an image. Default true,
+                  // "color": true //Button to change color of font  
+                });
+                $('#add_event_data_content_textarea').css('margin-bottom', '0');
+                $('#add_event_data_content_textarea').css("height", "4em");
+                $('#add_event_data_content_textarea').addClass("span3");
+
 
 
                 /* Edit title form */
