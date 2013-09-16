@@ -85,9 +85,10 @@ class PBNodeStatus(object):
     
   StatusList = dict()
   StatusList['immortal']   = PBNodeStatusItem('immortal',   'Information', 'normal', 'icon-g-circle-info',            'pod-status-grey-light')
-  StatusList['new']        = PBNodeStatusItem('new',        'New',         'open',   'icon-g-lightbulb icon-g-white', 'btn-info')
-  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress', 'open',   ' icon-g-roundabout icon-g-white', 'btn-success')
-  StatusList['standby']    = PBNodeStatusItem('standby',    'In Standby',  'open',   'icon-g-clock icon-g-white', 'btn-warning')
+  StatusList['new']        = PBNodeStatusItem('new',        'New',         'open',   'icon-g-lightbulb icon-g-white', 'btn-success')
+  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress', 'open',   ' icon-g-roundabout icon-g-white', 'btn-info')
+  StatusList['actiontodo'] = PBNodeStatusItem('actiontodo', 'Waiting for action',       'open',   'icon-g-clock icon-g-white', 'btn-info')
+  StatusList['standby']    = PBNodeStatusItem('standby',    'Waiting for answer',  'open',   'icon-g-clock icon-g-white', 'btn-warning')
   StatusList['hot']        = PBNodeStatusItem('hot',        'Hot',         'open',   'icon-g-warning-sign icon-g-white', 'btn-danger')
   StatusList['done']       = PBNodeStatusItem('done',       'Done',        'closed', 'icon-g-ok-2', 'pod-status-grey-light')
   StatusList['closed']     = PBNodeStatusItem('closed',     'Closed',      'closed', 'icon-g-lightbulb', 'pod-status-grey-middle')
@@ -99,6 +100,7 @@ class PBNodeStatus(object):
     return [
       PBNodeStatus.StatusList['immortal'],
       PBNodeStatus.StatusList['new'],
+      PBNodeStatus.StatusList['actiontodo'],
       PBNodeStatus.StatusList['inprogress'],
       PBNodeStatus.StatusList['standby'],
       PBNodeStatus.StatusList['hot'],
@@ -112,8 +114,6 @@ class PBNodeStatus(object):
     
   @classmethod
   def getStatusItem(cls, psStatusId):
-    print "====> ID=", psStatusId
-    print "====> ITEM=", PBNodeStatus.StatusList[psStatusId]
     return PBNodeStatus.StatusList[psStatusId]
 
 class PBNodeType(object):
@@ -130,18 +130,11 @@ class PBNode(object):
 
   def getChildrenOfType(self, plNodeTypeList, plSortingCriteria):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
-    print "NODE = ", self.node_id
-    print "######"
-    print plNodeTypeList
-    print "######"
-    print "######"
-    
     return DBSession.query(PBNode).filter(PBNode.parent_id==self.node_id).filter(PBNode.node_type.in_(plNodeTypeList)).order_by(plSortingCriteria).all()
   
   
   def getChildNb(self):
     liChildNb = DBSession.query(PBNode).filter(PBNode.parent_id==self.node_id).filter(PBNode.node_type==PBNodeType.Data).count()
-    print "CHILDREN of ", self.node_id, " are ", liChildNb
     return liChildNb
 
   def getChildren(self):
@@ -153,12 +146,6 @@ class PBNode(object):
     return self.getChildrenOfType([PBNodeType.Contact], PBNode.data_label.asc())
 
   def getEvents(self):
-    """print "---------------------------"
-    print self.getChildrenOfType((PBNodeType.Event,), PBNode.data_datetime.desc())
-    print "---------------------------"
-    print "---------------------------"
-    return self.getChildrenOfType((PBNodeType.Event,), PBNode.data_datetime.desc())
-    """
     return DBSession.query(PBNode).filter(PBNode.parent_id==self.node_id).filter(PBNode.node_type==PBNodeType.Event).order_by(PBNode.data_datetime.desc()).all()
     return []
     
