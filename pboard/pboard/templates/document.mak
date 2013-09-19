@@ -36,8 +36,8 @@
   % else:
     % if len(node_list)>0:
       % for node in node_list:
-        <div class="pod-toolbar-parent" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
-          <a href="?node=${node.node_id}" title="${node.data_label}">
+        <div class="pod-toolbar-parent ${'pod-status-active' if node.node_id==current_node.node_id else ''}" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
+          <a href="${tg.url('/document/%s'%(node.node_id))}" title="${node.data_label}">
             % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
               <strike>
             % endif
@@ -83,22 +83,6 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
 
   <div class="row">
     <div class="span3">
-      <div class="btn-group">
-        <button class="btn">${_('Documents')}</button>
-        <button class="btn" title="${_('Show current filtering state')}"><i class="  icon-g-eye-open"></i></button>
-        
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" title='${_('Adjust filtering')}'><i class=" icon-g-adjust"></i></a>
-                <ul class="dropdown-menu">
-          % for node_status in node_status_list:
-            <li>
-              <a class="${node_status.css}" href="${tg.url('/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, node_status.status_id))}">
-                <i class="${node_status.icon_id}"></i> ${node_status.label}
-              </a>
-            </li>
-          % endfor
-        </ul>
-      </div>
-      <p></p>
       <div>
         ${node_treeview(root_node_list)}
       </div>
@@ -114,7 +98,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         <ul class="dropdown-menu">
           % for node_status in node_status_list:
             <li>
-              <a class="${node_status.css}" href="${tg.url('/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, node_status.status_id))}">
+              <a class="${node_status.css}" href="${tg.url('/api/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, node_status.status_id))}">
                 <i class="${node_status.icon_id}"></i> ${node_status.label}
               </a>
             </li>
@@ -252,10 +236,34 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
             % endif
             </div>
             <div class="tab-pane" id="contacts">
+            
+              <!-- ADD CONTACT FORM -->
+              ${POD.AddButton('current-document-add-contact-button', True, _(' Add contact'))}
+              <form style='display: none;' id='current-document-add-contact-form' action='${tg.url('/api/create_contact')}' method='post' class="well">
+                <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
+                <fieldset>
+                  <legend>Add an event</legend>
+                  <label>
+                    <input type="text" name='data_label' placeholder="Title"/>
+                  </label>
+                  <label>
+                    <div>
+                      <textarea id="add_contact_data_content_textarea" name='data_content' spellcheck="false" wrap="off" autofocus placeholder="${_('detail...')}"></textarea>
+                    </div>
+                  </label>
+                  ${POD.CancelButton('current-document-add-contact-cancel-button', True)}
+                  ${POD.SaveButton('current-document-add-contact-save-button', True)}
+                </fieldset>
+              </form>
+
+              <!-- LIST OF CONTACT NODES -->
               % for contact in current_node.getContacts():
                 <div class="well">
                   <legend class="text-info">${contact.data_label}</legend>
-                  <div>${contact.data_content|n}</div>
+                  <div>
+                    <a style='float: right;' href="" title='${_('Search on google maps')}'><i class='icon-g-google-maps'></i></a>
+                    ${contact.data_content|n}
+                  </div>
                 </div>
               % endfor
             </div>

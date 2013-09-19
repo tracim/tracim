@@ -42,6 +42,18 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
+    def create_contact(self, parent_id=None, data_label=u'', data_content=u'', **kw):
+
+      loNewNode = pld.createNode()
+      loNewNode.parent_id     = int(parent_id)
+      loNewNode.node_type     = pmd.PBNodeType.Contact
+      loNewNode.data_label    = data_label
+      loNewNode.data_content  = data_content
+
+      pm.DBSession.flush()
+      redirect(lurl('/document/%i'%(loNewNode.parent_id)))
+
+    @expose()
     def set_parent_node(self, node_id, new_parent_id, **kw):
       loNewNode = pld.getNode(node_id)
       if new_parent_id!='':
@@ -71,7 +83,7 @@ class PODApiController(BaseController):
       else:
         loNewNode.parent_id = parent_id
 
-      DBSession.flush()
+      pm.DBSession.flush()
       redirect(lurl('/document/%i'%(loNewNode.node_id)))
 
     @expose()
@@ -97,6 +109,6 @@ class PODApiController(BaseController):
       loNode     = pld.getNode(node_id)
       liParentId = loNode.parent_id
       if loNode.getChildNb()<=0:
-        DBSession.delete(loNode)
+        pm.DBSession.delete(loNode)
       redirect(lurl('/document/%i'%(liParentId or 0)))
 

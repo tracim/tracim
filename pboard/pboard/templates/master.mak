@@ -105,6 +105,7 @@ tr:Hover td div.pod-toolbar {
 .pod-status-grey-light  { background-color: #DDD; }
 .pod-status-grey-middle { background-color: #BBB; }
 .pod-status-grey-dark   { background-color: #AAA; }
+.pod-status-active      { background-color: #FEE; }
 
 </style>
 
@@ -136,6 +137,7 @@ tr:Hover td div.pod-toolbar {
                 $('#current_node_textarea').css("min-height", "12em");
                 $('#current_node_textarea').addClass("span5");
 
+                /* ADD EVENT FORM */
                 $('#add_event_data_content_textarea').wysihtml5({
                   "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
                   "emphasis": true, //Italics, bold, etc. Default true
@@ -149,6 +151,19 @@ tr:Hover td div.pod-toolbar {
                 $('#add_event_data_content_textarea').css("height", "4em");
                 $('#add_event_data_content_textarea').addClass("span3");
 
+                /* ADD CONTACT FORM */
+                $('#add_contact_data_content_textarea').wysihtml5({
+                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
+                  "emphasis": true, //Italics, bold, etc. Default true
+                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                  "html": true, //Button which allows you to edit the generated HTML. Default false
+                  "link": true, //Button to insert a link. Default true
+                  "image": true, //Button to insert an image. Default true,
+                  // "color": true //Button to change color of font  
+                });
+                $('#add_contact_data_content_textarea').css('margin-bottom', '0');
+                $('#add_contact_data_content_textarea').css("height", "4em");
+                $('#add_contact_data_content_textarea').addClass("span3");
 
 
                 /* Edit title form */
@@ -202,6 +217,19 @@ tr:Hover td div.pod-toolbar {
                   $('#current-document-add-event-form').submit();
                 });
 
+                /* Add contact form hide/show behavior */
+                $("#current-document-add-contact-button" ).click(function() {
+                  $("#current-document-add-contact-form" ).css("display", "block");
+                  $("#current-document-add-contact-button" ).css("display", "none");
+                });
+                $('#current-document-add-contact-cancel-button').on('click', function(e){
+                  $("#current-document-add-contact-form" ).css("display", "none");
+                  $("#current-document-add-contact-button" ).css("display", "block");
+                });
+                $('#current-document-add-contact-save-button').on('click', function(e){
+                  e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#current-document-add-contact-form').submit();
+                });
 
 
 
@@ -255,9 +283,9 @@ tr:Hover td div.pod-toolbar {
         <div class="nav-collapse">
           <ul class="nav">
             <li class="active"><a href="${tg.url('/dashboard')}"><i class="icon-home icon-white"></i> Dashboard</a></li>
+            <li><a>Link</a></li>
             <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
+
           % if request.identity:
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
