@@ -122,8 +122,6 @@ tr:Hover td div.pod-toolbar {
 
             <script>
               $(document).ready(function() {
-
-                
                 $('#current_node_textarea').wysihtml5({
                   "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
                   "emphasis": true, //Italics, bold, etc. Default true
@@ -164,6 +162,35 @@ tr:Hover td div.pod-toolbar {
                 $('#add_contact_data_content_textarea').css('margin-bottom', '0');
                 $('#add_contact_data_content_textarea').css("height", "4em");
                 $('#add_contact_data_content_textarea').addClass("span3");
+
+
+                /* ADD COMMENT FORM */
+                $('#add_comment_data_content_textarea').wysihtml5({
+                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
+                  "emphasis": true, //Italics, bold, etc. Default true
+                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                  "html": true, //Button which allows you to edit the generated HTML. Default false
+                  "link": true, //Button to insert a link. Default true
+                  "image": true, //Button to insert an image. Default true,
+                  // "color": true //Button to change color of font  
+                });
+                $('#add_comment_data_content_textarea').css('margin-bottom', '0');
+                $('#add_comment_data_content_textarea').css("height", "4em");
+                $('#add_comment_data_content_textarea').addClass("span3");
+
+                /* ADD FILE FORM */
+                $('#add_file_data_content_textarea').wysihtml5({
+                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
+                  "emphasis": true, //Italics, bold, etc. Default true
+                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                  "html": true, //Button which allows you to edit the generated HTML. Default false
+                  "link": true, //Button to insert a link. Default true
+                  "image": true, //Button to insert an image. Default true,
+                  // "color": true //Button to change color of font  
+                });
+                $('#add_file_data_content_textarea').css('margin-bottom', '0');
+                $('#add_file_data_content_textarea').css("height", "4em");
+                $('#add_file_data_content_textarea').addClass("span3");
 
 
                 /* Edit title form */
@@ -231,12 +258,35 @@ tr:Hover td div.pod-toolbar {
                   $('#current-document-add-contact-form').submit();
                 });
 
-
-
-/*                $('.date-picker-input').datepicker({
-                  format: 'mm-dd-yyyy'
+                /* Add comment form hide/show behavior */
+                $("#current-document-add-comment-button" ).click(function() {
+                  $("#current-document-add-comment-form" ).css("display", "block");
+                  $("#current-document-add-comment-button" ).css("display", "none");
                 });
-*/
+                $('#current-document-add-comment-cancel-button').on('click', function(e){
+                  $("#current-document-add-comment-form" ).css("display", "none");
+                  $("#current-document-add-comment-button" ).css("display", "block");
+                });
+                $('#current-document-add-comment-save-button').on('click', function(e){
+                  e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#current-document-add-comment-form').submit();
+                });
+
+                /* Add file form hide/show behavior */
+                $("#current-document-add-file-button" ).click(function() {
+                  $("#current-document-add-file-form" ).css("display", "block");
+                  $("#current-document-add-file-button" ).css("display", "none");
+                });
+                $('#current-document-add-file-cancel-button').on('click', function(e){
+                  $("#current-document-add-file-form" ).css("display", "none");
+                  $("#current-document-add-file-button" ).css("display", "block");
+                });
+                $('#current-document-add-file-save-button').on('click', function(e){
+                  e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#current-document-add-file-form').submit();
+                });
+
+
                 $(function() {
                   $('.datetime-picker-input-div').datetimepicker({
                     language: 'fr-FR',
@@ -244,8 +294,55 @@ tr:Hover td div.pod-toolbar {
                   });
                 });
 
+/*
+                // Allow to go directly to required tab on load
+                // Javascript to enable link to tab
+                var url = document.location.toString();
+                if (url.match('#')) {
+                  $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+                } 
+
+                // Change hash for page-reload
+                $('.nav-tabs a').on('shown', function (e) {
+                  window.location.hash = e.target.hash;
+                })
+*/
+                #################################
+                ##
+                ## The following JS code allow t
+                ##
+                ##
+                // Javascript to enable link to tab
+                var hash = document.location.hash;
+                var prefix = "tab-";
+                if (hash) {
+                    $('.nav-tabs a[href='+hash.replace(prefix,"")+']').tab('show');
+                } 
+
+                // Change hash for page-reload
+                $('.nav-tabs a').on('shown', function (e) {
+                    window.location.hash = e.target.hash.replace("#", "#" + prefix);
+                });
+
+                $('a.toggle-child-menu-items').on('click', function (e) {
+                  parent_id    = $(this).parent().attr('id');
+                  child        = $('#'+parent_id+'-children');
+                  togglebutton = $(this).children('i:first')
+                  if(child.css('display')=='none'){
+                    child.css("display", "block");
+                    togglebutton.removeClass('icon-g-folder-plus');
+                    togglebutton.attr('class', 'icon-g-folder-open');
+                    console.log("class is: "+togglebutton.attr('class'));
+                  } else {
+                    child.css("display", "none");
+                    togglebutton.removeClass('icon-g-folder-open');
+                    togglebutton.addClass('icon-g-folder-plus');
+                    console.log("class is: "+togglebutton.attr('class'));
+                  }
+                  
+                });
               });
-              
+
             </script>
 </body>
 

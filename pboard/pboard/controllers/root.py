@@ -122,11 +122,36 @@ class RootController(BaseController):
     def document(self, node=0, came_from=lurl('/')):
         """show the user dashboard"""
         import pboard.model.data as pbmd
-        loRootNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
+        
+        # loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
+        print "===> AAA"
+        loRootNodeList = pld.buildTreeListForMenu()
+        print "===> BBB"
         liNodeId         = max(int(node), 1) # show node #1 if no selected node
         loCurrentNode    = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==liNodeId).one()
+        print "===> CCC"
         loNodeStatusList = pbmd.PBNodeStatus.getList()
+        print "===> DDD"
         return dict(root_node_list=loRootNodeList, current_node=loCurrentNode, node_status_list = loNodeStatusList)
+
+
+    @expose()
+    def fill_treepath(self):
+        """show the user dashboard"""
+        import pboard.model.data as pbmd
+        
+        loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).order_by(pbmd.PBNode.parent_id).all()
+        for loNode in loRootNodeList:
+          if loNode.parent_id==None:
+            loNode.node_depth = 0
+            loNode.parent_tree_path = '/'
+          else:
+            loNode.node_depth = loNode._oParent.node_depth+1
+            loNode.parent_tree_path = '%s%i/'%(loNode._oParent.parent_tree_path,loNode.parent_id)
+        
+        pbm.DBSession.flush()
+        
+        return 
 
 
 

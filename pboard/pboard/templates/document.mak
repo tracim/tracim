@@ -13,7 +13,7 @@
       % for new_parent_node in node_list:
         <li>
           <a href="${tg.url('/api/set_parent_node?node_id=%i&new_parent_id=%i'%(node_id, new_parent_node.node_id))}">${new_parent_node.getTruncatedLabel(40-indentation*2)}</a>
-          ${node_treeview_for_set_parent_menu(node_id, new_parent_node.getChildren(), indentation+1)}
+          ${node_treeview_for_set_parent_menu(node_id, new_parent_node.getStaticChildList(), indentation+1)}
         </li>
       % endfor
       </ul>
@@ -36,12 +36,13 @@
   % else:
     % if len(node_list)>0:
       % for node in node_list:
-        <div class="pod-toolbar-parent ${'pod-status-active' if node.node_id==current_node.node_id else ''}" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
+        <div id='pod-menu-item-${node.node_id}' class="pod-toolbar-parent ${'pod-status-active' if node.node_id==current_node.node_id else ''}" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
+          <a class="toggle-child-menu-items"><i class='${node.getIconClass()}'></i></a>
           <a href="${tg.url('/document/%s'%(node.node_id))}" title="${node.data_label}">
             % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
               <strike>
             % endif
-            <i class='${node.getIconClass()}'></i> ${node.getTruncatedLabel(32-0.8*(indentation+1))}
+                ${node.getTruncatedLabel(32-0.8*(indentation+1))}
             % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
               </strike>
             % endif
@@ -55,7 +56,7 @@
              <i class='${node.getStatus().icon}'></i>
           </div>
         </div>
-        ${node_treeview(node.getChildren(), indentation+1)}
+        <div id="pod-menu-item-${node.node_id}-children">${node_treeview(node.getStaticChildList(), indentation+1)}</div>
       % endfor
     % endif
   % endif
@@ -109,7 +110,8 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         ${POD.EditButton('current-document-content-edit-button', True)}
         <a class="btn" href="#" data-toggle="dropdown"><i class="icon-g-move"></i> ${_('Move to')} <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          ${node_treeview_for_set_parent_menu(current_node.node_id, root_node_list)}
+          AGAGA
+          {node_treeview_for_set_parent_menu(current_node.node_id, root_node_list)}
         </ul>
 
 
@@ -145,16 +147,18 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
     <div class="span4">
       <div class="tabbable">
         <ul class="nav nav-tabs">
-            <li class=""><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
-            <li class="active">
-              <a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i></a>
-            </li>
-            <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="icon-g-phone""></i> </a></li>
+            <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
+            <li><a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i></a></li>
+            <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="icon-g-user""></i> </a></li>
             <li><a href="#comments" data-toggle="tab" title="Comments"><i class="icon-g-comments"></i> </a></li>
             <li><a href="#files" data-toggle="tab" title="Files"><i class="icon-g-attach"></i> </a></li>
-            <li><a href="#contacts" data-toggle="tab" title="Users"><i class="icon-g-user""></i> </a></li>
         </ul>
         <div class="tab-content">
+            ################################
+            ##
+            ## PANEL SHOWING LIST OF TAGS
+            ##
+            ################################
             <div class="tab-pane" id="tags">
               <div class="well">
                 <p>
@@ -172,42 +176,46 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
                 % endfor
               </div>
             </div>
+            ################################
+            ##
+            ## PANEL SHOWING LIST OF EVENTS
+            ##
+            ################################
             <div class="tab-pane active" id="events">
+              ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
+              <form style='display: none;' id='current-document-add-event-form' action='${tg.url('/api/create_event')}' method='post' class="well">
+                <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
+                <fieldset>
+                  <legend>Add an event</legend>
+                  <label>
+                    <input type="text" name='data_label' placeholder="Event"/>
+                  </label>
+                  <label>
+                    <div class="datetime-picker-input-div input-append date">
+                      <input name='data_datetime' data-format="dd/MM/yyyy hh:mm" type="text" placeholder="date and time"/>
+                      <span class="add-on"><i data-time-icon="icon-g-clock" data-date-icon="icon-g-calendar"></i></span>
+                    </div>
+                  </label>
+                  <label>
+                    <div>
+                      <textarea id="add_event_data_content_textarea" name='data_content' spellcheck="false" wrap="off" autofocus placeholder="${_('detail...')}"></textarea>
+                    </div>
+                  </label>
+                  <label class="checkbox">
+                    <input disabled name='add_reminder' type="checkbox"> add a reminder
+                  </label>
+                  <label>
+                    <div class="datetime-picker-input-div input-append date">
+                      <input disabled name='data_reminder_datetime' data-format="dd/MM/yyyy hh:mm" type="text" placeholder="date and time"/>
+                      <span class="add-on"><i data-time-icon="icon-g-clock" data-date-icon="icon-g-calendar"></i></span>
+                    </div>
+                  </label>
 
-${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
-<form style='display: none;' id='current-document-add-event-form' action='${tg.url('/api/create_event')}' method='post' class="well">
-  <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
-  <fieldset>
-    <legend>Add an event</legend>
-    <label>
-      <input type="text" name='data_label' placeholder="Event"/>
-    </label>
-    <label>
-      <div class="datetime-picker-input-div input-append date">
-        <input name='data_datetime' data-format="dd/MM/yyyy hh:mm" type="text" placeholder="date and time"/>
-        <span class="add-on"><i data-time-icon="icon-g-clock" data-date-icon="icon-g-calendar"></i></span>
-      </div>
-    </label>
-    <label>
-      <div>
-        <textarea id="add_event_data_content_textarea" name='data_content' spellcheck="false" wrap="off" autofocus placeholder="${_('detail...')}"></textarea>
-      </div>
-    </label>
-    <label class="checkbox">
-      <input disabled name='add_reminder' type="checkbox"> add a reminder
-    </label>
-    <label>
-      <div class="datetime-picker-input-div input-append date">
-        <input disabled name='data_reminder_datetime' data-format="dd/MM/yyyy hh:mm" type="text" placeholder="date and time"/>
-        <span class="add-on"><i data-time-icon="icon-g-clock" data-date-icon="icon-g-calendar"></i></span>
-      </div>
-    </label>
 
-
-    ${POD.CancelButton('current-document-add-event-cancel-button', True)}
-    ${POD.SaveButton('current-document-add-event-save-button', True)}
-  </fieldset>
-</form>
+                  ${POD.CancelButton('current-document-add-event-cancel-button', True)}
+                  ${POD.SaveButton('current-document-add-event-save-button', True)}
+                </fieldset>
+              </form>
 
             % if len(current_node.getEvents())<=0:
               <p><i>${_('No history for the moment.')}</i></p>
@@ -235,6 +243,11 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
               </table>
             % endif
             </div>
+            ##############################
+            ## 
+            ## PANEL SHOWING LIST OF CONTACTS
+            ##
+            ##############################
             <div class="tab-pane" id="contacts">
             
               <!-- ADD CONTACT FORM -->
@@ -242,7 +255,7 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
               <form style='display: none;' id='current-document-add-contact-form' action='${tg.url('/api/create_contact')}' method='post' class="well">
                 <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
                 <fieldset>
-                  <legend>Add an event</legend>
+                  <legend>${_('Add a contact')}</legend>
                   <label>
                     <input type="text" name='data_label' placeholder="Title"/>
                   </label>
@@ -266,9 +279,103 @@ ${POD.AddButton('current-document-add-event-button', True, _(' Add event'))}
                   </div>
                 </div>
               % endfor
+
+
             </div>
-            <div class="tab-pane" id="comments">${current_node.data_content|n}</div>
-            <div class="tab-pane" id="files">Files</div>
+            ################################
+            ##
+            ## PANEL SHOWING LIST OF COMMENTS
+            ##
+            ################################
+            <div class="tab-pane" id="comments">
+              <!-- ADD COMMENT FORM -->
+              ${POD.AddButton('current-document-add-comment-button', True, _(' Add comment'))}
+              <form style='display: none;' id='current-document-add-comment-form' action='${tg.url('/api/create_comment')}' method='post' class="well">
+                <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
+                <fieldset>
+                  <legend>${_('Add a comment')}</legend>
+                  <label>
+                    <input type="text" name='data_label' placeholder="Title"/>
+                  </label>
+                  <label>
+                    <div>
+                      <textarea id="add_comment_data_content_textarea" name='data_content' spellcheck="false" wrap="off" autofocus placeholder="${_('comment...')}"></textarea>
+                    </div>
+                  </label>
+                  ${POD.CancelButton('current-document-add-comment-cancel-button', True)}
+                  ${POD.SaveButton('current-document-add-comment-save-button', True)}
+                </fieldset>
+              </form>
+
+              <!-- LIST OF COMMENTS -->
+            % if len(current_node.getComments())<=0:
+              <p><i>${_('No comments.')}</i></p>
+            % else:
+              <table class="table table-striped table-hover table-condensed">
+                % for comment in current_node.getComments():
+                  <tr title="Last updated: ${event.updated_at}">
+                    <td>
+                      <b>${comment.data_label}</b><br/>
+                      <i>commented by comment.author the ${comment.getFormattedDate(comment.updated_at)} at ${comment.getFormattedTime(comment.updated_at)}</i></br>
+                      <p>
+                        ${comment.data_content|n}
+                      </p>
+                    </td>
+                  </tr>
+                % endfor
+              </table>
+            % endif
+            </div>
+            ################################
+            ##
+            ## PANEL SHOWING LIST OF FILES
+            ##
+            ################################
+            <div class="tab-pane" id="files">
+              <!-- ADD FILE FORM -->
+              ${POD.AddButton('current-document-add-file-button', True, _(' Add file'))}
+              <form style='display: none;' id='current-document-add-file-form' enctype="multipart/form-data" action='${tg.url('/api/create_file')}' method='post' class="well">
+                <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
+                <fieldset>
+                  <legend>${_('Add a file')}</legend>
+                  <label>
+                    <input type="text" name='data_label' placeholder="Title"/>
+                  </label>
+                  <label>
+                    <input type="file" name='data_file' placeholder="choose a file..."/>
+                  </label>
+                  <label>
+                    <div>
+                      <textarea id="add_file_data_content_textarea" name='data_content' spellcheck="false" wrap="off" autofocus placeholder="${_('comment...')}"></textarea>
+                    </div>
+                  </label>
+                  ${POD.CancelButton('current-document-add-file-cancel-button', True)}
+                  ${POD.SaveButton('current-document-add-file-save-button', True)}
+                </fieldset>
+              </form>
+
+              <!-- LIST OF FILES -->
+            % if len(current_node.getFiles())<=0:
+              <p><i>${_('No files.')}</i></p>
+            % else:
+              <table class="table table-striped table-hover table-condensed">
+                % for current_file in current_node.getFiles():
+                  <tr title="Last updated: ${event.updated_at}">
+                    <td>
+                      <img src="${tg.url('/api/get_file_content_thumbnail/%s'%(current_file.node_id))}" class="img-polaroid">
+                    </td>
+                    <td>
+                      <b>${current_file.data_label}</b><br/>
+                      <i>commented by comment.author the ${current_file.getFormattedDate(comment.updated_at)} at ${current_file.getFormattedTime(comment.updated_at)}</i></br>
+                      <p>
+                        ${current_file.data_content|n}
+                      </p>
+                    </td>
+                  </tr>
+                % endfor
+              </table>
+            % endif
+            </div>
         </div>
       </div>
     </div>

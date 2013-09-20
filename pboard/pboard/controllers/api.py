@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """Sample controller with all its actions protected."""
 from datetime import datetime
+
+import cStringIO as csio
+import Image as pil
+
+import tg
 from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates
@@ -52,6 +57,59 @@ class PODApiController(BaseController):
 
       pm.DBSession.flush()
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
+
+    @expose()
+    def create_comment(self, parent_id=None, data_label=u'', data_content=u'', **kw):
+
+      loNewNode = pld.createNode()
+      loNewNode.parent_id     = int(parent_id)
+      loNewNode.node_type     = pmd.PBNodeType.Comment
+      loNewNode.data_label    = data_label
+      loNewNode.data_content  = data_content
+
+      pm.DBSession.flush()
+      redirect(lurl('/document/%i'%(loNewNode.parent_id)))
+
+    @expose()
+    def create_file(self, parent_id=None, data_label=u'', data_content=u'', data_file=None, **kw):
+
+      loNewNode = pld.createNode()
+      loNewNode.parent_id     = int(parent_id)
+      loNewNode.node_type     = pmd.PBNodeType.File
+      loNewNode.data_label    = data_label
+      loNewNode.data_content  = data_content
+
+      loNewNode.data_file_name      = data_file.filename
+      loNewNode.data_file_mime_type = data_file.type
+      loNewNode.data_file_content   = data_file.file.read()
+
+      pm.DBSession.flush()
+      redirect(lurl('/document/%i'%(loNewNode.parent_id)))
+
+    @expose()
+    def get_file_content(self, node_id=None, **kw):
+      if node_id==None:
+        return
+      else:
+        loFile = pld.getNode(node_id)
+        tg.response.headers['Content-type'] = str(loFile.data_file_mime_type)
+        return loFile.data_file_content
+
+    @expose()
+    def get_file_content_thumbnail(self, node_id=None, **kw):
+      if node_id==None:
+        return
+      else:
+        loFile = pld.getNode(node_id)
+        
+        loJpegBytes = csio.StringIO(loFile.data_file_content)
+        loImage     = pil.open(loJpegBytes)
+        loImage.thumbnail([140,140], pil.ANTIALIAS)
+        
+        loResultBuffer = StringIO()
+        loImage.save(loResultBuffer,"JPEG")
+        tg.response.headers['Content-type'] = str(loFile.data_file_mime_type)
+        return loResultBuffer.getvalue()
 
     @expose()
     def set_parent_node(self, node_id, new_parent_id, **kw):
