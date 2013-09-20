@@ -324,6 +324,13 @@ tr:Hover td div.pod-toolbar {
                     window.location.hash = e.target.hash.replace("#", "#" + prefix);
                 });
 
+              
+                #################################
+                ##
+                ## Show/hide behavior
+                ## for the main menu
+                ##
+                ##
                 $('a.toggle-child-menu-items').on('click', function (e) {
                   parent_id    = $(this).parent().attr('id');
                   child        = $('#'+parent_id+'-children');
@@ -339,7 +346,97 @@ tr:Hover td div.pod-toolbar {
                     togglebutton.addClass('icon-g-folder-plus');
                     console.log("class is: "+togglebutton.attr('class'));
                   }
+                });
+
+                #################################
+                ##
+                ## large / small view of the document
+                ## (toggle visibility of the left panel)
+                ##
+                ##
+                $('a#view-size-toggle-button-small').on('click', function (e) {
+                  console.log("Toggle view mode");
+                  $('#view-size-toggle-button-small').css('display', 'none');
+                  $('#view-size-toggle-button-medium').css('display', 'block');
+                  $('#view-size-toggle-button-large').css('display', 'none');
+              
+                  left_panel_id     = '#application-left-panel'; // is span3 by default (to be hidden in fullscreen mode)
+                  main_panel_id     = '#application-main-panel'; // is span9 by default (to be 12 in fullscreen mode)
+                  docu_panel_id     = '#application-document-panel'; // is span5 by default (to be span8 in fullscreen mode)
+                  metadata_panel_id = '#application-metadata-panel';
                   
+                  left_panel = $(left_panel_id);
+                  main_panel = $(main_panel_id);
+                  docu_panel = $(docu_panel_id);
+                  metadata_panel = $(metadata_panel_id);
+
+                  console.log("Toggle from small (default) to medium (no left tab)");
+                  left_panel.css('display', 'block');
+                  metadata_panel.css('display', 'block');
+                  main_panel.removeClass('span9');
+                  main_panel.removeClass('span12');
+                  main_panel.addClass('span9');
+                  
+                  docu_panel.removeClass('span5');
+                  docu_panel.removeClass('span8');
+                  docu_panel.removeClass('span12');
+                  docu_panel.addClass('span5');
+                });
+
+                $('a#view-size-toggle-button-medium').on('click', function (e) {
+                  console.log("Toggle view mode to: MEDIUM");
+                  $('#view-size-toggle-button-small').css('display', 'none');
+                  $('#view-size-toggle-button-medium').css('display', 'none');
+                  $('#view-size-toggle-button-large').css('display', 'block');
+
+                  left_panel_id     = '#application-left-panel'; // is span3 by default (to be hidden in fullscreen mode)
+                  main_panel_id     = '#application-main-panel'; // is span9 by default (to be 12 in fullscreen mode)
+                  docu_panel_id     = '#application-document-panel'; // is span5 by default (to be span8 in fullscreen mode)
+                  metadata_panel_id = '#application-metadata-panel';
+                  
+                  left_panel = $(left_panel_id);
+                  main_panel = $(main_panel_id);
+                  docu_panel = $(docu_panel_id);
+                  metadata_panel = $(metadata_panel_id);
+
+                  left_panel.css('display', 'none');
+                  metadata_panel.css('display', 'block');
+                  
+                  main_panel.removeClass('span12');
+                  main_panel.addClass('span9');
+                  
+                  docu_panel.removeClass('span5');
+                  docu_panel.removeClass('span12');
+                  docu_panel.addClass('span8');
+
+                });
+
+                $('a#view-size-toggle-button-large').on('click', function (e) {
+                  console.log("Toggle view mode to: LARGE");
+                  $('#view-size-toggle-button-small').css('display', 'block');
+                  $('#view-size-toggle-button-medium').css('display', 'none');
+                  $('#view-size-toggle-button-large').css('display', 'none');
+
+                  left_panel_id     = '#application-left-panel'; // is span3 by default (to be hidden in fullscreen mode)
+                  main_panel_id     = '#application-main-panel'; // is span9 by default (to be 12 in fullscreen mode)
+                  docu_panel_id     = '#application-document-panel'; // is span5 by default (to be span8 in fullscreen mode)
+                  metadata_panel_id = '#application-metadata-panel';
+                  
+                  left_panel = $(left_panel_id);
+                  main_panel = $(main_panel_id);
+                  docu_panel = $(docu_panel_id);
+                  metadata_panel = $(metadata_panel_id);
+
+                  left_panel.css('display', 'none');
+                  metadata_panel.css('display', 'none');
+                  
+                  main_panel.removeClass('span9');
+                  main_panel.addClass('span12');
+                  
+                  docu_panel.removeClass('span5');
+                  docu_panel.removeClass('span8');
+                  docu_panel.addClass('span12');
+
                 });
               });
 
@@ -380,7 +477,11 @@ tr:Hover td div.pod-toolbar {
         <div class="nav-collapse">
           <ul class="nav">
             <li class="active"><a href="${tg.url('/dashboard')}"><i class="icon-home icon-white"></i> Dashboard</a></li>
-            <li><a>Link</a></li>
+            <li>
+              <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
+              <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
+              <a title="${_('Toggle view mode: large')}" id='view-size-toggle-button-large' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
+            </li>
             <li><a href="#">Link</a></li>
 
           % if request.identity:

@@ -23,16 +23,17 @@
 
 <%def name="node_treeview(node_list, indentation=-1)">
   % if indentation==-1:
-    <div class="pod-toolbar-parent" style="padding-left: 0.5em; position: relative;">
+    <div id='pod-menu-item-0' class="pod-toolbar-parent" style="padding-left: 0.5em; position: relative;">
+      <a class="toggle-child-menu-items"><i class='icon-g-folder-open'></i></a>
       <a href="?node=0" title="${_('Root')}">
-        <i class='icon-g-folder-open'></i>
         ${_('Root')}
       </a>
       <div class="pod-toolbar">
         <a href="${tg.url('/api/create_document?parent_id=0')}" title="${_('Add child document')}"><i class="icon-g-circle-plus"></i></a>
       </div>
     </div>
-    ${node_treeview(node_list, 0)}
+    <div id="pod-menu-item-0-children">${node_treeview(node_list, 0)}</div>
+    
   % else:
     % if len(node_list)>0:
       % for node in node_list:
@@ -83,12 +84,12 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
 </%def>
 
   <div class="row">
-    <div class="span3">
+    <div id='application-left-panel' class="span3">
       <div>
         ${node_treeview(root_node_list)}
       </div>
     </div>
-    <div class="span9">
+    <div id='application-main-panel' class="span9">
         
         
         
@@ -110,8 +111,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         ${POD.EditButton('current-document-content-edit-button', True)}
         <a class="btn" href="#" data-toggle="dropdown"><i class="icon-g-move"></i> ${_('Move to')} <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          AGAGA
-          {node_treeview_for_set_parent_menu(current_node.node_id, root_node_list)}
+          ${node_treeview_for_set_parent_menu(current_node.node_id, root_node_list)}
         </ul>
 
 
@@ -129,7 +129,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
           </div>
         </form>
       </div>
-      <div class="span5">
+      <div id='application-document-panel' class="span5">
       <p>
         <div id='current-document-content' class="">
           ${current_node.getContentWithTags()|n}
@@ -144,7 +144,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         </form>
       </p>
     </div>
-    <div class="span4">
+    <div id='application-metadata-panel' class="span4">
       <div class="tabbable">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
