@@ -150,7 +150,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
             <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
             <li><a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i></a></li>
             <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="icon-g-user""></i> </a></li>
-            <li><a href="#comments" data-toggle="tab" title="Comments"><i class="icon-g-comments"></i> </a></li>
+            <li><a href="#comments" data-toggle="tab" title="Comments"><i class="icon-g-conversation"></i> </a></li>
             <li><a href="#files" data-toggle="tab" title="Files"><i class="icon-g-attach"></i> </a></li>
         </ul>
         <div class="tab-content">
@@ -313,10 +313,10 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
             % else:
               <table class="table table-striped table-hover table-condensed">
                 % for comment in current_node.getComments():
-                  <tr title="Last updated: ${event.updated_at}">
+                  <tr title="Last updated: ${comment.updated_at}">
                     <td>
+                      <i>The ${comment.getFormattedDate(comment.updated_at)} at ${comment.getFormattedTime(comment.updated_at)}, comment.author wrote: </i><br/>
                       <b>${comment.data_label}</b><br/>
-                      <i>commented by comment.author the ${comment.getFormattedDate(comment.updated_at)} at ${comment.getFormattedTime(comment.updated_at)}</i></br>
                       <p>
                         ${comment.data_content|n}
                       </p>
@@ -360,13 +360,13 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
             % else:
               <table class="table table-striped table-hover table-condensed">
                 % for current_file in current_node.getFiles():
-                  <tr title="Last updated: ${event.updated_at}">
+                  <tr title="Last updated: ${current_file.updated_at}">
                     <td>
                       <img src="${tg.url('/api/get_file_content_thumbnail/%s'%(current_file.node_id))}" class="img-polaroid">
                     </td>
                     <td>
                       <b>${current_file.data_label}</b><br/>
-                      <i>commented by comment.author the ${current_file.getFormattedDate(comment.updated_at)} at ${current_file.getFormattedTime(comment.updated_at)}</i></br>
+                      <i>commented by comment.author the ${current_file.getFormattedDate(current_file.updated_at)} at ${current_file.getFormattedTime(current_file.updated_at)}</i></br>
                       <p>
                         ${current_file.data_content|n}
                       </p>

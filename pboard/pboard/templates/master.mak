@@ -476,13 +476,13 @@ tr:Hover td div.pod-toolbar {
         <a class="brand" href="#"><!--img src="${tg.url('/img/turbogears_logo.png')}" alt="TurboGears 2"/--> <strong>pod</strong></a>
         <div class="nav-collapse">
           <ul class="nav">
-            <li class="active"><a href="${tg.url('/dashboard')}"><i class="icon-home icon-white"></i> Dashboard</a></li>
+            <li class="active"><a href="${tg.url('/document')}"><i class="icon-g-book-open"></i> ${_('Documents')}</a></li>
             <li>
               <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
               <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
               <a title="${_('Toggle view mode: large')}" id='view-size-toggle-button-large' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
             </li>
-            <li><a href="#">Link</a></li>
+            <li><a href="${tg.url('/iconset')}"><i class="icon-g-show-thumbnails"></i> ${_('Icons')}</a></li>
 
           % if request.identity:
             <li class="dropdown">
