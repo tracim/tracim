@@ -12,6 +12,7 @@ order by last_action desc
 """
 import os
 import re
+import datetime as datetimeroot
 from datetime import datetime
 from hashlib import sha256
 __all__ = ['User', 'Group', 'Permission']
@@ -143,6 +144,8 @@ class PBNodeType(object):
   Comment = 'comment'
 
 
+MINIMUM_DATE = datetimeroot.date(datetimeroot.MINYEAR, 1, 1)
+
 class PBNode(DeclarativeBase):
 
   def __init__(self):
@@ -188,14 +191,15 @@ class PBNode(DeclarativeBase):
 
   _oParent = relationship('PBNode', remote_side=[node_id], backref='_lAllChildren')
 
-  def getChildrenOfType(self, plNodeTypeList, plSortingCriteria):
+  def getChildrenOfType(self, plNodeTypeList, poKeySortingMethod=None, pbDoReverseSorting=False):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
     llChildren = []
     for child in self._lAllChildren:
       if child.node_type in plNodeTypeList:
         llChildren.append(child)
+    if poKeySortingMethod!=None:
+      llChildren = sorted(llChildren, key=poKeySortingMethod, reverse=pbDoReverseSorting)
     return llChildren
-    # return DBSession.query(PBNode).filter(PBNode.parent_id==self.node_id).filter(PBNode.node_type.in_(plNodeTypeList)).order_by(plSortingCriteria).all()
   
   def getChildNbOfType(self, plNodeTypeList):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
@@ -211,20 +215,36 @@ class PBNode(DeclarativeBase):
 
   def getChildren(self):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
-    return self.getChildrenOfType([PBNodeType.Node, PBNodeType.Folder, PBNodeType.Data], PBNode.node_order.asc())
+    return self.getChildrenOfType([PBNodeType.Node, PBNodeType.Folder, PBNodeType.Data])
 
   def getContacts(self):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
-    return self.getChildrenOfType([PBNodeType.Contact], PBNode.data_label.asc())
+    return self.getChildrenOfType([PBNodeType.Contact], PBNode.getSortingKeyForContact)
+
+  def getContactNb(self):
+    """return all children nodes of type 'data' or 'node' or 'folder'"""
+    return self.getChildNbOfType([PBNodeType.Contact])
+
+  @classmethod
+  def getSortingKeyBasedOnDataDatetime(cls, poDataNode):
+    return poDataNode.data_datetime or MINIMUM_DATE
+    
+  @classmethod
+  def getSortingKeyForContact(cls, poDataNode):
+    return poDataNode.data_label or ''
+
+  @classmethod
+  def getSortingKeyForComment(cls, poDataNode):
+    return poDataNode.data_datetime or ''
 
   def getEvents(self):
-    return self.getChildrenOfType([PBNodeType.Event], PBNode.data_datetime.desc())
+    return self.getChildrenOfType([PBNodeType.Event], PBNode.getSortingKeyBasedOnDataDatetime, True)
     
   def getFiles(self):
-    return self.getChildrenOfType([PBNodeType.File], PBNode.data_datetime.desc())
+    return self.getChildrenOfType([PBNodeType.File])
 
   def getComments(self):
-    return self.getChildrenOfType([PBNodeType.Comment], PBNode.data_datetime.desc())
+    return self.getChildrenOfType([PBNodeType.Comment], PBNode.getSortingKeyBasedOnDataDatetime, True)
 
   def getIconClass(self):
     laIconClass = dict()

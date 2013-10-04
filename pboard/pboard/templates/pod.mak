@@ -17,3 +17,9 @@
 <%def name='Badge(psLabel, psCssClass="")'>
   <span class='badge ${psCssClass}'>${psLabel}</span>
 </%def>
+
+<%def name='ItemNb(plItemList)'>
+  % if len(plItemList)>0:
+  <sup class="pod-item-nb-sup-block"> ${len(plItemList)}</sup>
+  % endif
+</%def>

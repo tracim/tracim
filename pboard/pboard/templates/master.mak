@@ -64,6 +64,11 @@ div.pod-toolbar {
   top: 0;
 }
 
+.pod-item-nb-sup-block {
+  color: #3a87ad;
+  font-weight: bold;
+}
+
 h3:Hover div.pod-toolbar {
   visibility: visible;
 }

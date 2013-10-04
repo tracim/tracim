@@ -148,10 +148,10 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
       <div class="tabbable">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
-            <li><a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i></a></li>
-            <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="icon-g-user""></i> </a></li>
-            <li><a href="#comments" data-toggle="tab" title="Comments"><i class="icon-g-conversation"></i> </a></li>
-            <li><a href="#files" data-toggle="tab" title="Files"><i class="icon-g-attach"></i> </a></li>
+            <li><a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i>${POD.ItemNb(current_node.getEvents())}</a></li>
+            <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="icon-g-user""></i>${POD.ItemNb(current_node.getContacts())}</a></li>
+            <li><a href="#comments" data-toggle="tab" title="Comments"><i class="icon-g-conversation"></i>${POD.ItemNb(current_node.getComments())}</a></li>
+            <li><a href="#files" data-toggle="tab" title="Files"><i class="icon-g-attach"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
         </ul>
         <div class="tab-content">
             ################################
