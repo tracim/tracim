@@ -88,7 +88,7 @@ def deleteNode(loNode):
   return
 
 def buildTreeListForMenu():
-  loNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).all()
+  loNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).order_by(pbmd.PBNode.node_id).all()
   loTreeList = []
   loTmpDict = {}
   for loNode in loNodeList:
@@ -98,6 +98,12 @@ def buildTreeListForMenu():
       loTreeList.append(loNode)
     else:
       # append the node to the parent list
+      print "here he go ", loNode.parent_id
+      print loTmpDict
+      # FIXME - D.A - 2013-10-08
+      # The following line may raise an exception
+      # We suppose that the parent node has already been added
+      # this *should* be the case, but the code does not check it
       loTmpDict[loNode.parent_id].appendStaticChild(loNode)
 
   print "=================="
