@@ -120,16 +120,16 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
-    def move_node_upper(self, node_id=0, came_from=lurl('/dashboard')):
+    def move_node_upper(self, node_id=0):
       loNode = pld.getNode(node_id)
       pld.moveNodeUpper(loNode)
-      redirect(came_from)
+      redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
-    def move_node_lower(self, node_id=0, came_from=lurl('/dashboard')):
+    def move_node_lower(self, node_id=0):
       loNode = pld.getNode(node_id)
       pld.moveNodeLower(loNode)
-      redirect(came_from)
+      redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
     def create_document(self, parent_id=None):
