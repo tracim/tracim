@@ -106,7 +106,5 @@ def buildTreeListForMenu():
         loTmpDict[loNode.parent_id] = getNode(loNode.parent_id)
       loTmpDict[loNode.parent_id].appendStaticChild(loNode)
 
-  print "=================="
-  print loTmpDict[101].getStaticChildList()
   return loTreeList
 

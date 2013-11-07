@@ -445,6 +445,8 @@ tr:Hover td div.pod-toolbar {
                 });
               });
 
+$('.item-with-data-popoverable').popover({ html: true});
+
             </script>
 </body>
 
@@ -453,9 +455,10 @@ tr:Hover td div.pod-toolbar {
     flash=tg.flash_obj.render('flash', use_js=False)
   %>
   % if flash:
-    <div class="row"><div class="span8 offset2">
+    <div class="row">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
       ${flash | n}
-    </div></div>
+    </div>
   % endif
   ${self.body()}
 </%def>
@@ -478,25 +481,40 @@ tr:Hover td div.pod-toolbar {
   <div id="pod-navbar" class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
-        <a class="brand" href="#"><!--img src="${tg.url('/img/turbogears_logo.png')}" alt="TurboGears 2"/--> <strong>pod</strong></a>
         <div class="nav-collapse">
           <ul class="nav">
-            <li class="active"><a href="${tg.url('/document')}"><i class="icon-g-book-open"></i> ${_('Documents')}</a></li>
+            <li>
+              <a href="${tg.url('/')}">
+                <i class="icon-g-home"></i>
+                Home
+              </a>
+            </li>
+            <li>
+              <a href="${tg.url('/document')}"><i class="icon-g-book-open"></i> ${_('Documents')}</a>
+            </li>
             <li>
               <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
               <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
               <a title="${_('Toggle view mode: large')}" id='view-size-toggle-button-large' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
             </li>
-            <li><a href="${tg.url('/iconset')}"><i class="icon-g-show-thumbnails"></i> ${_('Icons')}</a></li>
+
+            <li>
+            % if current_node is UNDEFINED:
+              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=0')}"><i class="icon-g-refresh"></i> Reindex documents</a>
+            % else:
+              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=%i'%(current_node.node_id))}"><i class="icon-g-refresh"></i> Reindex documents</a>
+            % endif
+            </li>
 
           % if request.identity:
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li class="${('', 'active')[page=='admin']}"><a href="${tg.url('/admin')}">Manage</a></li>
-                <li class="${('', 'active')[page=='about']}"><a href="${tg.url('/about')}">About</a></li>
-                <li class="${('', 'active')[page=='data']}"><a href="${tg.url('/data')}">Serving Data</a></li>
-                <li class="${('', 'active')[page=='environ']}"><a href="${tg.url('/environ')}">WSGI Environment</a></li>
+                <li><a href="${tg.url('/admin')}">Manage</a></li>
+                <li><a href="${tg.url('/about')}">About</a></li>
+                <li><a href="${tg.url('/data')}">Serving Data</a></li>
+                <li><a href="${tg.url('/environ')}">WSGI Environment</a></li>
+                <li><a href="${tg.url('/iconset')}"><i class="icon-g-show-thumbnails"></i> ${_('Icons')}</a></li>
               </ul>
             </li>
           % endif

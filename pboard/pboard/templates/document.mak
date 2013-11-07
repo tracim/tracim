@@ -118,7 +118,6 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
         <a href='${tg.url('/api/force_delete_node?node_id=%i'%(current_node.node_id))}' id='current-document-force-delete-button' class="btn" onclick="return confirm('${_('Delete current document?')}');"><i class="icon-g-remove"></i> ${_('Delete')}</a>
       </div>
       
-            <!--</div> PAGE HEADER -->
       <h3 id="current-document-title">#${current_node.node_id} - ${current_node.data_label}</h3>
         <form style='display: none; margin-top: 1em;' id="current-document-title-edit-form" method='post' action='${tg.url('/api/edit_label')}'>
           <div class="input-prepend input-append">
@@ -147,8 +146,8 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
     <div id='application-metadata-panel' class="span4">
       <div class="tabbable">
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
-            <li><a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i>${POD.ItemNb(current_node.getEvents())}</a></li>
+            ## DEBUG - D.A. - 2013-11-07 -  <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
+            <li class="active"><a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i>${POD.ItemNb(current_node.getEvents())}</a></li>
             <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="icon-g-user""></i>${POD.ItemNb(current_node.getContacts())}</a></li>
             <li><a href="#comments" data-toggle="tab" title="Comments"><i class="icon-g-conversation"></i>${POD.ItemNb(current_node.getComments())}</a></li>
             <li><a href="#files" data-toggle="tab" title="Files"><i class="icon-g-attach"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
@@ -159,6 +158,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
             ## PANEL SHOWING LIST OF TAGS
             ##
             ################################
+            <!-- DEBUG - D.A. - 2013-11-07 - Not using tags for th moment
             <div class="tab-pane" id="tags">
               <div class="well">
                 <p>
@@ -176,6 +176,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
                 % endfor
               </div>
             </div>
+            -->
             ################################
             ##
             ## PANEL SHOWING LIST OF EVENTS
@@ -234,7 +235,7 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
                   </tr>
                 </thead>
                 % for event in current_node.getEvents():
-                  <tr title="Last updated: ${event.updated_at}">
+                  <tr class="item-with-data-popoverable" data-content="${event.data_content}" rel="popover" data-placement="left" data-trigger="hover">
                     <td>${event.getFormattedDate(event.data_datetime)}</td>
                     <td>${event.getFormattedTime(event.data_datetime)}</td>
                     <td>${event.data_label}</td>

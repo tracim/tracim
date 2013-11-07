@@ -170,3 +170,19 @@ class PODApiController(BaseController):
         pm.DBSession.delete(loNode)
       redirect(lurl('/document/%i'%(liParentId or 0)))
 
+    @expose()
+    def reindex_nodes(self, back_to_node_id=0):
+      """show the user dashboard"""
+      loRootNodeList   = pm.DBSession.query(pmd.PBNode).order_by(pmd.PBNode.parent_id).all()
+      for loNode in loRootNodeList:
+        if loNode.parent_id==None:
+          loNode.node_depth = 0
+          loNode.parent_tree_path = '/'
+        else:
+          loNode.node_depth = loNode._oParent.node_depth+1
+          loNode.parent_tree_path = '%s%i/'%(loNode._oParent.parent_tree_path,loNode.parent_id)
+      
+      pm.DBSession.flush()
+      flash(_('Documents re-indexed'), 'info')
+      redirect(lurl('/document/%s'%(back_to_node_id)))
+

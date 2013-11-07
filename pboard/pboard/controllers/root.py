@@ -18,6 +18,8 @@ import pboard.controllers as pbc
 from pboard.lib import dbapi as pld
 from pboard.controllers import api as pbca
 
+import pboard.model.data as pbmd
+
 __all__ = ['RootController']
 
 
@@ -48,7 +50,7 @@ class RootController(BaseController):
     @expose('pboard.templates.index')
     def index(self):
         """Handle the front-page."""
-        return dict(page='index')
+        return dict()
 
     @expose('pboard.templates.about')
     def about(self):
@@ -133,25 +135,4 @@ class RootController(BaseController):
         loNodeStatusList = pbmd.PBNodeStatus.getList()
         print "===> DDD"
         return dict(root_node_list=loRootNodeList, current_node=loCurrentNode, node_status_list = loNodeStatusList)
-
-
-    @expose()
-    def fill_treepath(self):
-        """show the user dashboard"""
-        import pboard.model.data as pbmd
-        
-        loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).order_by(pbmd.PBNode.parent_id).all()
-        for loNode in loRootNodeList:
-          if loNode.parent_id==None:
-            loNode.node_depth = 0
-            loNode.parent_tree_path = '/'
-          else:
-            loNode.node_depth = loNode._oParent.node_depth+1
-            loNode.parent_tree_path = '%s%i/'%(loNode._oParent.parent_tree_path,loNode.parent_id)
-        
-        pbm.DBSession.flush()
-        
-        return 
-
-
 

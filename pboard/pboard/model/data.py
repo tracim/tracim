@@ -169,7 +169,7 @@ class PBNode(DeclarativeBase):
   node_id          = Column(Integer, Sequence('pb_nodes__node_id__sequence'), primary_key=True)
   parent_id        = Column(Integer, ForeignKey('pb_nodes.node_id'), nullable=True, default=None)
   node_depth       = Column(Integer, unique=False, nullable=False, default=0)
-  parent_tree_path = Column(Unicode(255), unique=False, nullable=False, default=u'data')
+  parent_tree_path = Column(Unicode(255), unique=False, nullable=False, default=u'')
 
   node_order  = Column(Integer, nullable=True, default=1)
   node_type   = Column(Unicode(16), unique=False, nullable=False, default=u'data')
