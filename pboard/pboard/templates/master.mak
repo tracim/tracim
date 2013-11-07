@@ -547,9 +547,12 @@ $('.item-with-data-popoverable').popover({ html: true});
             % endif
           </ul>
 
-          <form class="navbar-search pull-right" action="">
-            <input type="text" class="search-query span2" placeholder="Search">
-          </form>
+          #####################
+          ## FIXME - D.A. - 2013-11-07 - Make search available
+          ## 
+          ## <form class="navbar-search pull-right" action="">
+          ##   <input type="text" class="search-query span2" placeholder="Search">
+          ## </form>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
     </div><!-- /.navbar-inner -->
