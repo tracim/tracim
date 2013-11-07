@@ -60,6 +60,11 @@ class Group(DeclarativeBase):
     def __unicode__(self):
         return self.group_name
 
+    @classmethod
+    def by_group_name(cls, group_name):
+        """Return the user object whose email address is ``email``."""
+        return DBSession.query(cls).filter_by(group_name=group_name).first()
+
 class User(DeclarativeBase):
     """
     User definition.

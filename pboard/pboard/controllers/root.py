@@ -18,6 +18,8 @@ from pboard.lib import dbapi as pld
 from pboard.controllers import api as pbca
 from pboard.controllers import debug as pbcd
 
+from pboard import model as pm
+
 import pboard.model.data as pbmd
 
 __all__ = ['RootController']
@@ -42,6 +44,8 @@ class RootController(BaseController):
     api   = pbca.PODApiController()
     debug = pbcd.DebugController()
     error = ErrorController()
+
+    public_api = pbca.PODPublicApiController()
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "pboard"
@@ -90,12 +94,29 @@ class RootController(BaseController):
     @require(predicates.in_group('user', msg=l_('Please login to access this page')))
     def document(self, node=0, came_from=lurl('/')):
         """show the user dashboard"""
-        import pboard.model.data as pbmd
-        
+        loCurrentUser   = pld.PODStaticController.getCurrentUser()
+        loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
+
         # loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
-        loRootNodeList = pld.buildTreeListForMenu()
-        liNodeId         = max(int(node), 1) # show node #1 if no selected node
-        loCurrentNode    = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==liNodeId).one()
-        loNodeStatusList = pbmd.PBNodeStatus.getList()
+        loRootNodeList = loApiController.buildTreeListForMenu()
+        liNodeId         = int(node)
+        
+        loCurrentNode    = None
+        loNodeStatusList = None
+        try:
+          loCurrentNode    = loApiController.getNode(liNodeId)
+          loNodeStatusList = pbmd.PBNodeStatus.getList()
+        except Exception, e:
+          flash(_('Document not found'), 'error')
+        
+        # FIXME - D.A - 2013-11-07 - Currently, the code build a new item if no item found for current user
+        # the correct behavior should be to redirect to setup page
+        if loCurrentNode is None:
+          loCurrentNode = loApiController.getNode(0) # try to get an item
+          if loCurrentNode is None:
+            flash(_('Your first document has been automatically created'), 'info')
+            loCurrentNode = loApiController.createDummyNode()
+            pm.DBSession.flush()
+
         return dict(root_node_list=loRootNodeList, current_node=loCurrentNode, node_status_list = loNodeStatusList)
 
