@@ -5,7 +5,6 @@ from tg import expose, flash, require, url, lurl, request, redirect, tmpl_contex
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates
 from pboard import model
-from pboard.controllers.secure import SecureController
 from pboard.model import DBSession, metadata
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
@@ -17,6 +16,7 @@ import pboard.model as pbm
 import pboard.controllers as pbc
 from pboard.lib import dbapi as pld
 from pboard.controllers import api as pbca
+from pboard.controllers import debug as pbcd
 
 import pboard.model.data as pbmd
 
@@ -37,13 +37,12 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    secc = SecureController()
     admin = AdminController(model, DBSession, config_type=TGAdminConfig)
 
+    api   = pbca.PODApiController()
+    debug = pbcd.DebugController()
     error = ErrorController()
 
-    api = pbca.PODApiController()
-    
     def _before(self, *args, **kw):
         tmpl_context.project_name = "pboard"
 
@@ -52,39 +51,6 @@ class RootController(BaseController):
         """Handle the front-page."""
         return dict()
 
-    @expose('pboard.templates.about')
-    def about(self):
-        """Handle the 'about' page."""
-        return dict(page='about')
-
-    @expose('pboard.templates.environ')
-    def environ(self):
-        """This method showcases TG's access to the wsgi environment."""
-        return dict(page='environ', environment=request.environ)
-
-    @expose('pboard.templates.data')
-    @expose('json')
-    def data(self, **kw):
-        """This method showcases how you can use the same controller for a data page and a display page"""
-        return dict(page='data', params=kw)
-        
-    @expose('pboard.templates.iconset')
-    def iconset(self, **kw):
-        """This method showcases how you can use the same controller for a data page and a display page"""
-        return dict(page='data', params=kw)
-        
-        
-    @expose('pboard.templates.index')
-    @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-    def manage_permission_only(self, **kw):
-        """Illustrate how a page for managers only works."""
-        return dict(page='managers stuff')
-
-    @expose('pboard.templates.index')
-    @require(predicates.is_user('editor', msg=l_('Only for the editor')))
-    def editor_user_only(self, **kw):
-        """Illustrate how a page exclusive for the editor works."""
-        return dict(page='editor stuff')
 
     @expose('pboard.templates.login')
     def login(self, came_from=lurl('/')):
@@ -121,18 +87,15 @@ class RootController(BaseController):
         redirect(came_from)
         
     @expose('pboard.templates.document')
+    @require(predicates.in_group('user', msg=l_('Please login to access this page')))
     def document(self, node=0, came_from=lurl('/')):
         """show the user dashboard"""
         import pboard.model.data as pbmd
         
         # loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
-        print "===> AAA"
         loRootNodeList = pld.buildTreeListForMenu()
-        print "===> BBB"
         liNodeId         = max(int(node), 1) # show node #1 if no selected node
         loCurrentNode    = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==liNodeId).one()
-        print "===> CCC"
         loNodeStatusList = pbmd.PBNodeStatus.getList()
-        print "===> DDD"
         return dict(root_node_list=loRootNodeList, current_node=loCurrentNode, node_status_list = loNodeStatusList)
 

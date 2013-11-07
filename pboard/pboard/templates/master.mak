@@ -39,6 +39,11 @@
         }
       }
       
+      /* vertical align icons in legend nodes */
+      legend > i {
+        vertical-align: baseline !important;
+      }
+      
 
 div.pod-toolbar {
   visibility: hidden;
@@ -76,6 +81,10 @@ h3:Hover div.pod-toolbar {
 body { padding-top: 60px; }
 @media screen and (max-width: 768px) {
     body { padding-top: 0px; }
+}
+
+ul.nav li.dropdown:hover > ul.dropdown-menu {
+    display: block;    
 }
 
     </style>
@@ -447,6 +456,27 @@ tr:Hover td div.pod-toolbar {
 
 $('.item-with-data-popoverable').popover({ html: true});
 
+      /** Make calculator available on all pages */
+      $(document).ready(function() {
+        $('#keyboard span').on('click', function (e) {
+          current_value = $(this).text()
+          if(current_value=='C') {
+            $('#calculation').val('');
+            $('#result').val('');
+          } else if(current_value=='=') {
+            string = $('#calculation').val().replace(/[^0-9+-/\*\%\(\)]/gi, ''); // replace('/[^0-9()*/-+]/g', "");
+            console.log("Compute value of "+string)
+            calculation = eval(string);
+            console.log("Result is: "+calculation)
+            $('#result').val(calculation)
+          } else {
+            field = $('#calculation')
+            field.oldval = field.val();
+            field.val(field.oldval+current_value)
+          }
+        });
+      });
+
             </script>
 </body>
 
@@ -489,34 +519,94 @@ $('.item-with-data-popoverable').popover({ html: true});
                 Home
               </a>
             </li>
+          % if request.identity:
             <li>
               <a href="${tg.url('/document')}"><i class="icon-g-book-open"></i> ${_('Documents')}</a>
             </li>
-            <li>
-              <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
-              <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
-              <a title="${_('Toggle view mode: large')}" id='view-size-toggle-button-large' style="display: none;"><i class='icon-g-eye-open'></i> ${_('View mode')}</a>
+
+            <li title=" ${_('Toggle view mode [narrow, medium, large]')}">
+              <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' style="display: none;"><i class='icon-g-eye-open'></i></a>
+              <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='icon-g-eye-open'></i></a>
+              <a title="${_('Toggle view mode: large')}" id='view-size-toggle-button-large' style="display: none;"><i class='icon-g-eye-open'></i></a>
             </li>
 
-            <li>
+            <li title="Rebuild document index">
             % if current_node is UNDEFINED:
-              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=0')}"><i class="icon-g-refresh"></i> Reindex documents</a>
+              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=0')}"><i class="icon-g-refresh"></i></a>
             % else:
-              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=%i'%(current_node.node_id))}"><i class="icon-g-refresh"></i> Reindex documents</a>
+              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=%i'%(current_node.node_id))}"><i class="icon-g-refresh"></i></a>
             % endif
             </li>
 
-          % if request.identity:
+            <li class="dropdown" title="Calculator">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-g-calculator"></i></a>
+              <ul class="dropdown-menu pull-left">
+                <li class="text-center">
+                  <fieldset>
+                    <legend><i class="icon-g-calculator"></i> Calculator</legend>
+                    <table id='keyboard' style="margin:0.2em;">
+                      <tr>
+                        <td colspan="5">
+                          <input type='text' class="text-right" id='calculation'/><br/>
+                          <input type='text' class="text-right" readonly id='result'/>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><span class='btn'>7</span></td>
+                        <td><span class='btn'>8</span></td>
+                        <td><span class='btn'>9</span></td>
+                        <td><span class='btn'>(</span></td>
+                        <td><span class='btn'>)</span></td>
+                      </tr>
+                      <tr>
+                        <td><span class='btn'>4</span></td>
+                        <td><span class='btn'>5</span></td>
+                        <td><span class='btn'>6</span></td>
+                        <td><span class='btn'>-</span></td>
+                        <td><span class='btn'>+</span></td>
+                      </tr>
+                      <tr>
+                        <td><span class='btn'>1</span></td>
+                        <td><span class='btn'>2</span></td>
+                        <td><span class='btn'>3</span></td>
+                        <td><span class='btn'>/</span></td>
+                        <td><span class='btn'>*</span></td>
+                      </tr>
+                      <tr>
+                        <td><span class='btn'>.</span></td>
+                        <td><span class='btn'>0</span></td>
+                        <td><span class='btn'>%</span></td>
+                        <td><span class='btn btn-success'>=</span></td>
+                        <td><span class='btn btn-danger'>C</span></td>
+                      </tr>
+                    </table>
+                  </fieldset>
+                  <p></p>
+               </ul>
+            </li>
+
+
+          % endif
+          
+          % if request.identity and request.identity['repoze.who.userid']=='damien@accorsi.info':
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="${tg.url('/admin')}">Manage</a></li>
-                <li><a href="${tg.url('/about')}">About</a></li>
-                <li><a href="${tg.url('/data')}">Serving Data</a></li>
-                <li><a href="${tg.url('/environ')}">WSGI Environment</a></li>
-                <li><a href="${tg.url('/iconset')}"><i class="icon-g-show-thumbnails"></i> ${_('Icons')}</a></li>
               </ul>
             </li>
+            
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-g-adjust"></i> Debug <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="${tg.url('/debug/iconset')}">icon set</a></li>
+                <li><a href="${tg.url('/debug/environ')}">request.environ</a></li>
+                <li><a href="${tg.url('/debug/identity')}">request.identity</a></li>
+              </ul>
+            </li>
+            
+            
+            
           % endif
           </ul>
           <ul class="nav pull-right">
@@ -527,23 +617,30 @@ $('.item-with-data-popoverable').popover({ html: true});
                   <li class="text-center">
                     <form action="${tg.url('/login_handler')}">
                       <fieldset>
-                        <legend>Sign in</legend>
-                      <input class="span2" type="text" id="login" name="login" placeholder="email...">
-                      <input class="span2" type="password" id="password" name="password" placeholder="password...">
-                      <div class="span2 control-group">
-                        Remember me <input type="checkbox" id="loginremember" name="remember" value="2252000"/>
-                      </div>
-                      <input type="submit" id="submit" value="Login" />
+                        <legend><i class="icon-g-keys" style="vertical-align: baseline !important;"></i> Login</legend>
+                        <input class="span2" type="text" id="login" name="login" placeholder="email...">
+                        <input class="span2" type="password" id="password" name="password" placeholder="password...">
+                        <div class="span2 control-group">
+                          Remember me <input type="checkbox" id="loginremember" name="remember" value="2252000"/>
+                        </div>
+                        <input type="submit" id="submit" value="Login" />
                       </fieldset>
                     </form>
-                   <li class="divider"></li>
-                   <li><a href="">Register</a></li>
                  </ul>
               </li>
             % else:
-              <li>
-                <a href="${tg.url('/logout_handler')}"><i class="icon-off"></i> Logout</a>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user"></i> ${request.identity['user']}</a>
+                <ul class="dropdown-menu pull-right">
+                  <li class="text-center">
+                    <fieldset>
+                      <legend><i class="icon-g-keys"></i> Logout</legend>
+                      <a class="btn btn-danger" href="${tg.url('/logout_handler')}">Logout <i class="icon-off icon-white"></i> </a>
+                    </fieldset>
+                    <p></p>
+                 </ul>
               </li>
+              
             % endif
           </ul>
 

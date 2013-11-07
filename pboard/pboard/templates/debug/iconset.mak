@@ -1,35 +1,25 @@
 <%inherit file="local:templates.master"/>
 
+<%def name="title()">
+  debug: icon set
+</%def>
 
-        <style>
-            body{
-                padding-top: 60px;
-            }
-            #icon_grid li{
-                width: 23%;
-            }
-        </style>
+    <style>
+        body{
+            padding-top: 60px;
+        }
+        #icon_grid li{
+            width: 23%;
+        }
+    </style>
 
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container">
-                    <a class="brand" href="./index.html">Glyphicons</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="container">
-            
-            <div class="hero-unit">
-                List Of icons
-            </div>
-            
-            <div id="icon_grid">
-                <ul class="inline">
-
-                </ul>
-            </div>
-        </div>
+    <div class="container">
+      <h1>List of icons</h1>
+      <div id="icon_grid">
+        <ul class="inline">
+        </ul>
+      </div>
+    </div>
 
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
