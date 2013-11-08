@@ -30,15 +30,15 @@ class PODPublicApiController(BaseController):
     def create_account(self, email=u'', password=u'', retyped_password=u'', **kw):
       if email==u'' or password==u'' or retyped_password==u'':
         flash(_('Account creation error: please fill all the fields'), 'error')
-        # redirect(lurl('/'))
+        redirect(lurl('/'))
       elif password!=retyped_password:
         flash(_('Account creation error: passwords do not match'), 'error')
-        # redirect(lurl('/'))
+        redirect(lurl('/'))
       else:
         loExistingUser = pld.PODStaticController.getUserByEmailAddress(email)
         if loExistingUser!=None:
           flash(_('Account creation error: account already exist: %s') % (email), 'error')
-          # redirect(lurl('/'))
+          redirect(lurl('/'))
         
         loNewAccount = pld.PODStaticController.createUser()
         loNewAccount.email_address = email
@@ -48,7 +48,7 @@ class PODPublicApiController(BaseController):
         loUserGroup.users.append(loNewAccount)
         pm.DBSession.flush()
         flash(_('Account successfully created: %s') % (email), 'info')
-        # redirect(lurl('/'))
+        redirect(lurl('/'))
 
 
 class PODApiController(BaseController):
