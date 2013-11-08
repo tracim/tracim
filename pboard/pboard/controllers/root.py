@@ -104,8 +104,8 @@ class RootController(BaseController):
         loCurrentNode    = None
         loNodeStatusList = None
         try:
-          loCurrentNode    = loApiController.getNode(liNodeId)
           loNodeStatusList = pbmd.PBNodeStatus.getList()
+          loCurrentNode    = loApiController.getNode(liNodeId)
         except Exception, e:
           flash(_('Document not found'), 'error')
         
@@ -113,7 +113,9 @@ class RootController(BaseController):
         # the correct behavior should be to redirect to setup page
         if loCurrentNode is None:
           loCurrentNode = loApiController.getNode(0) # try to get an item
-          if loCurrentNode is None:
+          if loCurrentNode is not None:
+            flash(_('Document not found. Randomly showing item #%i')%(loCurrentNode.node_id), 'warning')
+          else:
             flash(_('Your first document has been automatically created'), 'info')
             loCurrentNode = loApiController.createDummyNode()
             pm.DBSession.flush()
