@@ -134,9 +134,14 @@ class PODApiController(BaseController):
       else:
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
         loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
-        
         loFile = loApiController.getNode(node_id)
-        tg.response.headers['Content-type'] = str(loFile.data_file_mime_type)
+
+        lsContentType = "application/x-download"
+        if loFile.data_file_mime_type!='':
+          tg.response.headers['Content-type'] = str(loFile.data_file_mime_type)
+
+        tg.response.headers['Content-Type']        = lsContentType
+        tg.response.headers['Content-Disposition'] = str('attachment; filename="%s"'%(loFile.data_file_name))
         return loFile.data_file_content
 
     @expose()
