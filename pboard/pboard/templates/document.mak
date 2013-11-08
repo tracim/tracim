@@ -361,7 +361,8 @@ POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
                   % for current_file in current_node.getFiles():
                     <tr title="Last updated: ${current_file.updated_at}">
                       <td>
-                        <img src="${tg.url('/api/get_file_content_thumbnail/%s'%(current_file.node_id))}" class="img-polaroid">
+                        <a href="${tg.url('/api/get_file_content/%s'%(current_file.node_id))}" title="${_("Download file")}"><i class="icon-g-attach"></i></a>
+                        ## FIXME - SHOW THUMBNAIL WHEN IT WILL BE OK<img src="${tg.url('/api/get_file_content_thumbnail/%s'%(current_file.node_id))}" class="img-polaroid">
                       </td>
                       <td>
                         <b>${current_file.data_label}</b><br/>
