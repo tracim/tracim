@@ -93,7 +93,7 @@ class PODUserFilteredApiController(object):
         # We suppose that the parent node has already been added
         # this *should* be the case, but the code does not check it
         if loTmpDict.has_key(loNode.parent_id)==False:
-          loTmpDict[loNode.parent_id] = getNode(loNode.parent_id)
+          loTmpDict[loNode.parent_id] = self.getNode(loNode.parent_id)
         loTmpDict[loNode.parent_id].appendStaticChild(loNode)
   
     return loTreeList
