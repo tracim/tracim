@@ -14,7 +14,24 @@
     </style>
 
     <div class="container">
-      <h1>List of icons</h1>
+      <h1>icon set</h1>
+      <h2>Sizes</h2>
+      <div>
+        normal <i class="fa fa-bullseye"></i>
+        fa-2x <i class="fa fa-2x fa-picture-o"></i>
+        fa-3x <i class="fa fa-3x fa-picture-o"></i>
+        fa-4x <i class="fa fa-4x fa-picture-o"></i>
+        fa-5x <i class="fa fa-5x fa-picture-o"></i>
+      </div>
+      <h2>Orientation</h2>
+      <div>
+        normal <i class="fa fa-picture-o"></i>
+        90° <i class="fa fa-rotate-90 fa-picture-o"></i>
+        180° <i class="fa fa-rotate-180 fa-picture-o"></i>
+        270° <i class="fa fa-rotate-270 fa-picture-o"></i>
+        spin <i class="fa fa-spin fa-picture-o"></i>
+      </div>
+      <h2>Icons</h2>
       <div id="icon_grid">
         <ul class="inline">
         </ul>
@@ -22,7 +39,6 @@
     </div>
 
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script>
       $(document).ready(function() {
         function matchStyle(className) {
@@ -45,12 +61,26 @@
           return result;
         }
 
-        var $iconList = matchStyle('.icon-g-');
-        var $grid = $('#icon_grid ul');
+        // var $iconList = matchStyle('.icon-g-');
+        var $iconList = matchStyle('.fa-');
+        var $completeIconList = new Array();
         for (var key in $iconList) {
-          var icon = $iconList[key];
-          icon = icon.replace('.', '');
-          $grid.append($('<li>').append($('<i>').addClass(icon)).append(" " + icon));
+          styleExploded = $iconList[key].trim().split(', ')
+          for (var subkey in styleExploded) {
+            var $currentStyle = styleExploded[subkey];
+            console.log("Found style "+$currentStyle)
+            $currentStyle.trim()
+            $completeIconList.push($currentStyle)
+          
+          }
+        }
+        $completeIconList.sort()
+        
+        var $grid = $('#icon_grid ul');
+        for (var key in $completeIconList) {
+          var icon = $completeIconList[key];
+          icon = icon.replace('.', '').replace(':before', '');
+          $grid.append($('<li>').append($('<i>').addClass("fa fa-1x "+icon)).append(" " + icon));
         }
       });</script>
 
