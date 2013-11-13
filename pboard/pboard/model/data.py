@@ -102,16 +102,16 @@ class PBNodeStatusItem(object):
 class PBNodeStatus(object):
     
   StatusList = dict()
-  StatusList['immortal']   = PBNodeStatusItem('immortal',   'Information', 'normal', 'icon-g-circle-info',            'pod-status-grey-light')
-  StatusList['new']        = PBNodeStatusItem('new',        'New',         'open',   'icon-g-lightbulb icon-g-white', 'btn-success')
-  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress', 'open',   ' icon-g-roundabout icon-g-white', 'btn-info')
-  StatusList['actiontodo'] = PBNodeStatusItem('actiontodo', 'Waiting for action',       'open',   'icon-g-clock icon-g-white', 'btn-info')
-  StatusList['standby']    = PBNodeStatusItem('standby',    'Waiting for answer',  'open',   'icon-g-clock icon-g-white', 'btn-warning')
-  StatusList['hot']        = PBNodeStatusItem('hot',        'Hot',         'open',   'icon-g-warning-sign icon-g-white', 'btn-danger')
-  StatusList['done']       = PBNodeStatusItem('done',       'Done',        'closed', 'icon-g-ok-2', 'pod-status-grey-light')
-  StatusList['closed']     = PBNodeStatusItem('closed',     'Closed',      'closed', 'icon-g-lightbulb', 'pod-status-grey-middle')
-  StatusList['archived']   = PBNodeStatusItem('archived',   'Archived',    'invisible', 'icon-g-wallet', 'pod-status-grey-dark')
-  StatusList['deleted']    = PBNodeStatusItem('deleted',    'Deleted',     'invisible', 'icon-g-bin',                    'pod-status-grey-dark')
+  StatusList['immortal']   = PBNodeStatusItem('immortal',   'Information',         'normal',    'fa fa-info-circle',        'pod-status-grey-light')
+  StatusList['new']        = PBNodeStatusItem('new',        'New',                 'open',      'fa fa-lightbulb-o',        'btn-success')
+  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress',         'open',      'fa fa-gears fa-inverse',   'btn-info')
+  StatusList['actiontodo'] = PBNodeStatusItem('actiontodo', 'Waiting for action',  'open',      'fa fa-spinner fa-inverse', 'btn-info')
+  StatusList['standby']    = PBNodeStatusItem('standby',    'Waiting for answer',  'open',      'fa fa-spinner fa-inverse', 'btn-warning')
+  StatusList['hot']        = PBNodeStatusItem('hot',        'Hot',                 'open',      'fa fa-warning fa-inverse', 'btn-danger')
+  StatusList['done']       = PBNodeStatusItem('done',       'Done',                'closed',    'fa fa-check-square-o',     'pod-status-grey-light')
+  StatusList['closed']     = PBNodeStatusItem('closed',     'Closed',              'closed',    'fa fa-lightbulb-o',        'pod-status-grey-middle')
+  StatusList['archived']   = PBNodeStatusItem('archived',   'Archived',            'invisible', 'fa fa-archive',            'pod-status-grey-dark')
+  StatusList['deleted']    = PBNodeStatusItem('deleted',    'Deleted',             'invisible', 'fa fa-trash-o',            'pod-status-grey-dark')
 
   @classmethod
   def getList(cls):
@@ -249,9 +249,9 @@ class PBNode(DeclarativeBase):
 
   def getIconClass(self):
     laIconClass = dict()
-    laIconClass['node']   = 'icon-g-folder-open'
-    laIconClass['folder'] = 'icon-g-folder-open'
-    laIconClass['data']   = 'icon-g-file'
+    laIconClass['node']   = 'fa fa-folder-open'
+    laIconClass['folder'] = 'fa fa-folder-open'
+    laIconClass['data']   = 'fa fa-file-text-o'
 
     laIconClass['file']   = 'icon-file'
     laIconClass['event']  = 'icon-time' # icon-calendar
