@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/glyphicons.css')}" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/bootstrap-datetimepicker.min.css')}" />
-
+    <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/external/font-awesome-4.0.3/css/font-awesome.min.css')}" />
     <style>
       /* Wrapper for page content to push down footer */
       #wrap {
@@ -84,12 +84,91 @@ body { padding-top: 60px; }
 }
 
 ul.nav li.dropdown:hover > ul.dropdown-menu {
-    display: block;    
+    display: block;
 }
 
     </style>
 </head>
 <body class="${self.body_class()}">
+  <script src="http://code.jquery.com/jquery.js"></script>
+
+##########################
+##
+## HERE COMES THE FULLSCREEN CODE FOR RICH TEXT EDITING
+##
+## FIXME - D.A. - 2013-11-13 - This code is testing, to remove later
+<style>
+  .full-size-overlay {
+    height:100%;
+    width:100%;
+    position:fixed;
+    left:0;
+    top:0;
+    z-index:0 !important;
+    background-color:white;
+    
+    filter: alpha(opacity=90); /* internet explorer */
+    -khtml-opacity: 0.9;      /* khtml, old safari */
+    -moz-opacity: 0.9;       /* mozilla, netscape */
+    opacity: 0.9;           /* fx, safari, opera */
+  }
+  
+  .full-size-overlay-inner {
+    margin: 3.5em 0.5em 0.5em 0.5em;
+    overflow: auto;
+    max-height: 85%;
+  }
+
+</style>
+<script>
+
+  function toggleFullScreen(outerWidgetId, innerWidgetId) {
+    if($(outerWidgetId).hasClass('full-size-overlay')) {
+      // Toggle from fullscreen to "normal"
+      $(outerWidgetId).removeClass('full-size-overlay');
+      $(innerWidgetId).removeClass('full-size-overlay-inner');
+      $('.pod-toggle-full-screen-button > i').removeClass('fa-compress')
+      $('.pod-toggle-full-screen-button > i').addClass('fa-expand')
+    } else {
+      $(outerWidgetId).addClass('full-size-overlay');
+      $(innerWidgetId).addClass('full-size-overlay-inner');
+      $('.pod-toggle-full-screen-button > i').removeClass('fa-expand')
+      $('.pod-toggle-full-screen-button > i').addClass('fa-compress')
+    }
+  }
+
+  function initToolbarBootstrapBindings(richTextEditorId) {
+    // $('a[title]').tooltip({container:'body'});
+    $(richTextEditorId+' > .dropdown-menu input').click(function() {return false;})
+      .change(function () {$(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');})
+      .keydown('esc', function () {this.value='';$(this).change();});
+
+    $('[data-role=magic-overlay]').each(function () { 
+      var overlay = $(this), target = $(overlay.data('target')); 
+      overlay.css('opacity', 0).css('position', 'absolute').offset(target.offset()).width(target.outerWidth()).height(target.outerHeight());
+    });
+    if ("onwebkitspeechchange" in document.createElement("input")) {
+      var editorOffset = $(richTextEditorId).offset();
+      $('#voiceBtn').css('position','absolute').offset({top: editorOffset.top, left: editorOffset.left+$(richTextEditorId).innerWidth()-35});
+    } else {
+      $('#voiceBtn').hide();
+    }
+  };
+  function showErrorAlert (reason, detail) {
+    var msg='';
+    if (reason==='unsupported-file-type') { msg = "Unsupported format " +detail; }
+    else {
+      console.log("error uploading file", reason, detail);
+    }
+    $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>'+ 
+     '<strong>File upload error</strong> '+msg+' </div>').prependTo('#alerts');
+  };
+
+</script>
+##
+## END OF FULLSCREEN CODE FOR RICH TEXT EDITING
+##
+##########################
 
   <div class="container">
     ${self.main_menu()}
@@ -97,16 +176,29 @@ ul.nav li.dropdown:hover > ul.dropdown-menu {
     ${self.footer()}
   </div>
 
-  <script src="http://code.jquery.com/jquery.js"></script>
-  <script src="${tg.url('/javascript/bootstrap.min.js')}"></script>
+##  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="${tg.url('/javascript/external/bootstrap.min.js')}"></script>
+  
+  <link href="${tg.url('/css/external/google-code-prettify/prettify.css')}" rel="stylesheet">
+##  <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+##  <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
+## <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+
+##  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <script src="${tg.url('/javascript/external/jquery.hotkeys.js')}"></script>
+##  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+  <script src="${tg.url('/javascript/external/google-code-prettify/prettify.js')}"></script>
+##  <link href="index.css" rel="stylesheet">
+  <script src="${tg.url('/javascript/external/bootstrap-wysiwyg.js')}"></script>
 
 <!-- WYSIWYG Text editor -->
-<link rel="stylesheet" type="text/css" href="/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.css"></link>
+## FIXME D.A. 2013-11-13 <link rel="stylesheet" type="text/css" href="/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.css"></link>
 <!--link rel="stylesheet" type="text/css" href="/bootstrap-wysihtml5-0.0.2/libs/css/bootstrap.min.css"></link-->
 
-<script src="/bootstrap-wysihtml5-0.0.2/libs/js/wysihtml5-0.3.0_rc2.js"></script>
-<script src="/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.js"></script>
-<script src="/javascript/bootstrap-datetimepicker.min.js"></script>
+## FIXME D.A. 2013-11-13 <script src="/bootstrap-wysihtml5-0.0.2/libs/js/wysihtml5-0.3.0_rc2.js"></script>
+## FIXME<script src="/bootstrap-wysihtml5-0.0.2/bootstrap-wysihtml5-0.0.2.js"></script>
+<script src="/javascript/external/bootstrap-datetimepicker.min.js"></script>
 
 <style>
 tr:Hover td div.pod-toolbar {
@@ -136,94 +228,46 @@ tr:Hover td div.pod-toolbar {
 
             <script>
               $(document).ready(function() {
-                $('#current_node_textarea').wysihtml5({
-                  "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
-                  "emphasis": true, //Italics, bold, etc. Default true
-                  "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-                  "html": true, //Button which allows you to edit the generated HTML. Default false
-                  "link": true, //Button to insert a link. Default true
-                  "image": true, //Button to insert an image. Default true,
-                  // "color": true //Button to change color of font  
-                });
-                $('#current_node_textarea').css('margin-bottom', '0');
-                $('#current_node_textarea').css("min-height", "12em");
-                $('#current_node_textarea').addClass("span5");
+## FIXME                $('#current_node_textarea').wysihtml5({
+## FIXME                  "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+## FIXME                  "emphasis": true, //Italics, bold, etc. Default true
+## FIXME                  "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+## FIXME                  "html": true, //Button which allows you to edit the generated HTML. Default false
+## FIXME                  "link": true, //Button to insert a link. Default true
+## FIXME                  "image": true, //Button to insert an image. Default true,
+## FIXME                  // "color": true //Button to change color of font  
+## FIXME                });
+## FIXME                $('#current_node_textarea').css('margin-bottom', '0');
+## FIXME                $('#current_node_textarea').css("min-height", "12em");
+## FIXME                $('#current_node_textarea').addClass("span5");
 
-                /* ADD EVENT FORM */
-                $('#add_event_data_content_textarea').wysihtml5({
-                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
-                  "emphasis": true, //Italics, bold, etc. Default true
-                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-                  "html": true, //Button which allows you to edit the generated HTML. Default false
-                  "link": true, //Button to insert a link. Default true
-                  "image": true, //Button to insert an image. Default true,
-                  // "color": true //Button to change color of font  
-                });
-                $('#add_event_data_content_textarea').css('margin-bottom', '0');
-                $('#add_event_data_content_textarea').css("height", "4em");
-                $('#add_event_data_content_textarea').addClass("span3");
+###################
+##
+## HERE
+##
+###################
 
-                /* ADD CONTACT FORM */
-                $('#add_contact_data_content_textarea').wysihtml5({
-                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
-                  "emphasis": true, //Italics, bold, etc. Default true
-                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-                  "html": true, //Button which allows you to edit the generated HTML. Default false
-                  "link": true, //Button to insert a link. Default true
-                  "image": true, //Button to insert an image. Default true,
-                  // "color": true //Button to change color of font  
-                });
-                $('#add_contact_data_content_textarea').css('margin-bottom', '0');
-                $('#add_contact_data_content_textarea').css("height", "4em");
-                $('#add_contact_data_content_textarea').addClass("span3");
+##
+## RE-IMPLEMENT THIS SOON !!!
+##
+##                /* Edit title form */
+##                $("#current-document-title-edit-form" ).css("display", "none");
+##                $("#current-document-title" ).dblclick(function() {
+##                  $("#current-document-title" ).css("display", "none");
+##                  $("#current-document-title-edit-form" ).css("display", "block");
+##                });
+##                $("#current-document-title-edit-cancel-button" ).click(function() {
+##                  $("#current-document-title" ).css("display", "block");
+##                  $("#current-document-title-edit-form" ).css("display", "none");
+##                });
+##                $('#current-document-title-save-cancel-button').on('click', function(e){
+##                  // We don't want this to act as a link so cancel the link action
+##                  e.preventDefault();
+##                  $('#current-document-title-edit-form').submit();
+##                });
 
 
-                /* ADD COMMENT FORM */
-                $('#add_comment_data_content_textarea').wysihtml5({
-                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
-                  "emphasis": true, //Italics, bold, etc. Default true
-                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-                  "html": true, //Button which allows you to edit the generated HTML. Default false
-                  "link": true, //Button to insert a link. Default true
-                  "image": true, //Button to insert an image. Default true,
-                  // "color": true //Button to change color of font  
-                });
-                $('#add_comment_data_content_textarea').css('margin-bottom', '0');
-                $('#add_comment_data_content_textarea').css("height", "4em");
-                $('#add_comment_data_content_textarea').addClass("span3");
-
-                /* ADD FILE FORM */
-                $('#add_file_data_content_textarea').wysihtml5({
-                  "font-styles": false, //Font styling, e.g. h1, h2, etc. Default true
-                  "emphasis": true, //Italics, bold, etc. Default true
-                  "lists": false, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
-                  "html": true, //Button which allows you to edit the generated HTML. Default false
-                  "link": true, //Button to insert a link. Default true
-                  "image": true, //Button to insert an image. Default true,
-                  // "color": true //Button to change color of font  
-                });
-                $('#add_file_data_content_textarea').css('margin-bottom', '0');
-                $('#add_file_data_content_textarea').css("height", "4em");
-                $('#add_file_data_content_textarea').addClass("span3");
-
-
-                /* Edit title form */
-                $("#current-document-title-edit-form" ).css("display", "none");
-                $("#current-document-title" ).dblclick(function() {
-                  $("#current-document-title" ).css("display", "none");
-                  $("#current-document-title-edit-form" ).css("display", "block");
-                });
-                $("#current-document-title-edit-cancel-button" ).click(function() {
-                  $("#current-document-title" ).css("display", "block");
-                  $("#current-document-title-edit-form" ).css("display", "none");
-                });
-                $('#current-document-title-save-cancel-button').on('click', function(e){
-                  // We don't want this to act as a link so cancel the link action
-                  e.preventDefault();
-                  $('#current-document-title-edit-form').submit();
-                });
-
-                /* Edit content form */
+                /* EDIT CONTENT FORM */
                 $("#current-document-content-edit-form" ).css("display", "none");
                 $("#current-document-content-edit-button" ).click(function() {
                   $("#current-document-content" ).css("display", "none");
@@ -240,11 +284,17 @@ tr:Hover td div.pod-toolbar {
                 $('#current-document-content-edit-save-button').on('click', function(e){
                   // We don't want this to act as a link so cancel the link action
                   e.preventDefault();
+                  $('#current_node_textarea_wysiwyg').cleanHtml();
+                  $('#current_node_textarea').val($('#current_node_textarea_wysiwyg').html());
                   $('#current-document-content-edit-form').submit();
                 });
 
-
-                /* Add event form hide/show behavior */
+                /* ADD EVENT => FORM */
+                $('#add_event_data_content_textarea').wysiwyg();
+                $('#add_event_data_content_textarea').css('margin-bottom', '0');
+                $('#add_event_data_content_textarea').css("height", "4em");
+                $('#add_event_data_content_textarea').addClass("span3");
+                /* ADD EVENT => SHOW/HIDE/SUBMIT BUTTONS */
                 $("#current-document-add-event-button" ).click(function() {
                   $("#current-document-add-event-form" ).css("display", "block");
                   $("#current-document-add-event-button" ).css("display", "none");
@@ -255,10 +305,17 @@ tr:Hover td div.pod-toolbar {
                 });
                 $('#current-document-add-event-save-button').on('click', function(e){
                   e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#add_event_data_content_textarea_wysiwyg').cleanHtml();
+                  $('#add_event_data_content_textarea').val($('#add_event_data_content_textarea_wysiwyg').html());
                   $('#current-document-add-event-form').submit();
                 });
 
-                /* Add contact form hide/show behavior */
+                /* ADD CONTACT => FORM */
+                $('#add_contact_data_content_textarea').wysiwyg();
+                $('#add_contact_data_content_textarea').css('margin-bottom', '0');
+                $('#add_contact_data_content_textarea').css("height", "4em");
+                $('#add_contact_data_content_textarea').addClass("span3");
+                /* ADD CONTACT => SHOW/HIDE/SUBMIT BUTTONS */
                 $("#current-document-add-contact-button" ).click(function() {
                   $("#current-document-add-contact-form" ).css("display", "block");
                   $("#current-document-add-contact-button" ).css("display", "none");
@@ -269,10 +326,18 @@ tr:Hover td div.pod-toolbar {
                 });
                 $('#current-document-add-contact-save-button').on('click', function(e){
                   e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#add_contact_data_content_textarea_wysiwyg').cleanHtml();
+                  $('#add_contact_data_content_textarea').val($('#add_contact_data_content_textarea_wysiwyg').html());
                   $('#current-document-add-contact-form').submit();
                 });
 
-                /* Add comment form hide/show behavior */
+
+                /* ADD COMMENT => FORM */
+                $('#add_comment_data_content_textarea').wysiwyg();
+                $('#add_comment_data_content_textarea').css('margin-bottom', '0');
+                $('#add_comment_data_content_textarea').css("height", "4em");
+                $('#add_comment_data_content_textarea').addClass("span3");
+                /* ADD COMMENT => SHOW/HIDE/SUBMIT BUTTONS */
                 $("#current-document-add-comment-button" ).click(function() {
                   $("#current-document-add-comment-form" ).css("display", "block");
                   $("#current-document-add-comment-button" ).css("display", "none");
@@ -283,10 +348,17 @@ tr:Hover td div.pod-toolbar {
                 });
                 $('#current-document-add-comment-save-button').on('click', function(e){
                   e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#add_comment_data_content_textarea_wysiwyg').cleanHtml();
+                  $('#add_comment_data_content_textarea').val($('#add_comment_data_content_textarea_wysiwyg').html());
                   $('#current-document-add-comment-form').submit();
                 });
 
-                /* Add file form hide/show behavior */
+                /* ADD FILE => FORM */
+                $('#add_file_data_content_textarea').wysiwyg();
+                $('#add_file_data_content_textarea').css('margin-bottom', '0');
+                $('#add_file_data_content_textarea').css("height", "4em");
+                $('#add_file_data_content_textarea').addClass("span3");
+                /* ADD FILE => SHOW/HIDE/SUBMIT BUTTONS */
                 $("#current-document-add-file-button" ).click(function() {
                   $("#current-document-add-file-form" ).css("display", "block");
                   $("#current-document-add-file-button" ).css("display", "none");
@@ -297,6 +369,8 @@ tr:Hover td div.pod-toolbar {
                 });
                 $('#current-document-add-file-save-button').on('click', function(e){
                   e.preventDefault(); // We don't want this to act as a link so cancel the link action
+                  $('#add_file_data_content_textarea_wysiwyg').cleanHtml();
+                  $('#add_file_data_content_textarea').val($('#add_file_data_content_textarea_wysiwyg').html());
                   $('#current-document-add-file-form').submit();
                 });
 
@@ -454,7 +528,10 @@ tr:Hover td div.pod-toolbar {
                 });
               });
 
-$('.item-with-data-popoverable').popover({ html: true});
+              // ALLOW TO SHOW POPOVER WITH SPECIFIC DATA
+              $('.item-with-data-popoverable').popover({ html: true});
+
+
 
       /** Make calculator available on all pages */
       $(document).ready(function() {
@@ -478,6 +555,39 @@ $('.item-with-data-popoverable').popover({ html: true});
       });
 
             </script>
+  <style>
+    .pod-rich-text-zone {
+      overflow:auto;
+      min-height:3em;
+      max-height: 10%;
+      border: 1px solid #CCC;
+      padding: 0.5em;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+      border-radius: 4px;
+      background-color: white;
+    }
+    
+    .pod-input-like-shadow {
+      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+      -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+      -ms-transition: border linear 0.2s, box-shadow linear 0.2s;
+      -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+      transition: border linear 0.2s, box-shadow linear 0.2s;
+    }
+    .pod-input-like-shadow:focus {
+      border-color: rgba(82, 168, 236, 0.8);
+      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+      outline: 0;
+      outline: thin dotted \9;
+    }
+
+  </style>
+
 </body>
 
 <%def name="content_wrapper()">
@@ -515,75 +625,81 @@ $('.item-with-data-popoverable').popover({ html: true});
           <ul class="nav">
             <li>
               <a href="${tg.url('/')}">
-                <i class="icon-g-home"></i>
-                Home
+                <i class="fa fa-home"></i>
+                <strong>pod</strong>
               </a>
             </li>
           % if request.identity:
             <li>
-              <a href="${tg.url('/document')}"><i class="icon-g-book-open"></i> ${_('Documents')}</a>
+              <a href="${tg.url('/dashboard')}">
+                <i class="fa fa-dashboard"></i>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="${tg.url('/document')}"><i class="fa fa-file-text-o"></i> ${_('Documents')}</a>
             </li>
 
             <li title=" ${_('Toggle view mode [narrow, medium, large]')}">
-              <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' style="display: none;"><i class='icon-g-eye-open'></i></a>
-              <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='icon-g-eye-open'></i></a>
-              <a title="${_('Toggle view mode: large')}" id='view-size-toggle-button-large' style="display: none;"><i class='icon-g-eye-open'></i></a>
+              <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' style="display: none;"><i class='fa fa-eye'></i></a>
+              <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='fa fa-eye'></i></a>
+              <a title="${_('Toggle view mode: large')}" id='view-size-toggle-button-large' style="display: none;"><i class='fa fa-eye'></i></a>
             </li>
 
             <li title="Rebuild document index">
             % if current_node is UNDEFINED:
-              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=0')}"><i class="icon-g-refresh"></i></a>
+              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=0')}"><i class="fa fa-refresh"></i></a>
             % else:
-              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=%i'%(current_node.node_id))}"><i class="icon-g-refresh"></i></a>
+              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=%i'%(current_node.node_id))}"><i class="fa fa-refresh"></i></a>
             % endif
             </li>
 
-            <li class="dropdown" title="Calculator">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-g-calculator"></i></a>
-              <ul class="dropdown-menu pull-left">
-                <li class="text-center">
-                  <fieldset>
-                    <legend><i class="icon-g-calculator"></i> Calculator</legend>
-                    <table id='keyboard' style="margin:0.2em;">
-                      <tr>
-                        <td colspan="5">
-                          <input type='text' class="text-right" id='calculation'/><br/>
-                          <input type='text' class="text-right" readonly id='result'/>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><span class='btn'>7</span></td>
-                        <td><span class='btn'>8</span></td>
-                        <td><span class='btn'>9</span></td>
-                        <td><span class='btn'>(</span></td>
-                        <td><span class='btn'>)</span></td>
-                      </tr>
-                      <tr>
-                        <td><span class='btn'>4</span></td>
-                        <td><span class='btn'>5</span></td>
-                        <td><span class='btn'>6</span></td>
-                        <td><span class='btn'>-</span></td>
-                        <td><span class='btn'>+</span></td>
-                      </tr>
-                      <tr>
-                        <td><span class='btn'>1</span></td>
-                        <td><span class='btn'>2</span></td>
-                        <td><span class='btn'>3</span></td>
-                        <td><span class='btn'>/</span></td>
-                        <td><span class='btn'>*</span></td>
-                      </tr>
-                      <tr>
-                        <td><span class='btn'>.</span></td>
-                        <td><span class='btn'>0</span></td>
-                        <td><span class='btn'>%</span></td>
-                        <td><span class='btn btn-success'>=</span></td>
-                        <td><span class='btn btn-danger'>C</span></td>
-                      </tr>
-                    </table>
-                  </fieldset>
-                  <p></p>
-               </ul>
-            </li>
+##            <li class="dropdown" title="Calculator">
+##              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-g-calculator"></i></a>
+##              <ul class="dropdown-menu pull-left">
+##                <li class="text-center">
+##                  <fieldset>
+##                    <legend><i class="icon-g-calculator"></i> Calculator</legend>
+##                    <table id='keyboard' style="margin:0.2em;">
+##                      <tr>
+##                        <td colspan="5">
+##                          <input type='text' class="text-right" id='calculation'/><br/>
+##                          <input type='text' class="text-right" readonly id='result'/>
+##                        </td>
+##                      </tr>
+##                      <tr>
+##                        <td><span class='btn'>7</span></td>
+##                        <td><span class='btn'>8</span></td>
+##                        <td><span class='btn'>9</span></td>
+##                        <td><span class='btn'>(</span></td>
+##                        <td><span class='btn'>)</span></td>
+##                      </tr>
+##                      <tr>
+##                        <td><span class='btn'>4</span></td>
+##                        <td><span class='btn'>5</span></td>
+##                        <td><span class='btn'>6</span></td>
+##                        <td><span class='btn'>-</span></td>
+##                        <td><span class='btn'>+</span></td>
+##                      </tr>
+##                      <tr>
+##                        <td><span class='btn'>1</span></td>
+##                        <td><span class='btn'>2</span></td>
+##                        <td><span class='btn'>3</span></td>
+##                        <td><span class='btn'>/</span></td>
+##                        <td><span class='btn'>*</span></td>
+##                      </tr>
+##                      <tr>
+##                        <td><span class='btn'>.</span></td>
+##                        <td><span class='btn'>0</span></td>
+##                        <td><span class='btn'>%</span></td>
+##                        <td><span class='btn btn-success'>=</span></td>
+##                        <td><span class='btn btn-danger'>C</span></td>
+##                      </tr>
+##                    </table>
+##                  </fieldset>
+##                  <p></p>
+##               </ul>
+##            </li>
 
 
           % endif
@@ -592,16 +708,16 @@ $('.item-with-data-popoverable').popover({ html: true});
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="${tg.url('/admin')}">Manage</a></li>
+                <li><a href="${tg.url('/admin')}"><i class="fa fa-magic"></i> Manage</a></li>
               </ul>
             </li>
             
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-g-adjust"></i> Debug <b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cogs "></i> Debug <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="${tg.url('/debug/iconset')}">icon set</a></li>
-                <li><a href="${tg.url('/debug/environ')}">request.environ</a></li>
-                <li><a href="${tg.url('/debug/identity')}">request.identity</a></li>
+                <li><a href="${tg.url('/debug/iconset')}"><i class="fa fa-picture-o"></i> icon set</a></li>
+                <li><a href="${tg.url('/debug/environ')}"><i class="fa fa-globe"></i>     request.environ</a></li>
+                <li><a href="${tg.url('/debug/identity')}"><i class="fa fa-user-md"></i>  request.identity</a></li>
               </ul>
             </li>
             
@@ -612,12 +728,12 @@ $('.item-with-data-popoverable').popover({ html: true});
           <ul class="nav pull-right">
             % if not request.identity:
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user"></i> Login</a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Login</a>
                 <ul class="dropdown-menu pull-right">
                   <li class="text-center">
                     <form action="${tg.url('/login_handler')}">
                       <fieldset>
-                        <legend><i class="icon-g-keys" style="vertical-align: baseline !important;"></i> Login</legend>
+                        <legend><i class="fa fa-key" style="vertical-align: baseline !important;"></i> Login</legend>
                         <input class="span2" type="text" id="login" name="login" placeholder="email...">
                         <input class="span2" type="password" id="password" name="password" placeholder="password...">
                         <div class="span2 control-group">
@@ -630,12 +746,12 @@ $('.item-with-data-popoverable').popover({ html: true});
               </li>
             % else:
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user"></i> ${request.identity['user']}</a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> ${request.identity['user']}</a>
                 <ul class="dropdown-menu pull-right">
                   <li class="text-center">
                     <fieldset>
-                      <legend><i class="icon-g-keys"></i> Logout</legend>
-                      <a class="btn btn-danger" href="${tg.url('/logout_handler')}">Logout <i class="icon-off icon-white"></i> </a>
+                      <legend><i class="fa fa-key"></i> Logout</legend>
+                      <a class="btn btn-danger" href="${tg.url('/logout_handler')}">Logout <i class="fa fa-power-off"></i> </a>
                     </fieldset>
                     <p></p>
                  </ul>
