@@ -1,7 +1,7 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  Learning TurboGears 2.3: Information about TG and WSGI
+pod :: debug :: request.identity
 </%def>
 
 <h2>Identity object</h2>

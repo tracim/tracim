@@ -2,7 +2,7 @@
 <%namespace name="POD" file="pboard.templates.pod"/>
 
 <%def name="title()">
-pod > dashobard
+pod :: your dashboard
 </%def>
 
   <div class="row">

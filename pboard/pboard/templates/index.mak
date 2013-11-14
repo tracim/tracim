@@ -1,33 +1,51 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  Welcome to TurboGears 2.3, standing on the shoulders of giants, since 2007
+  pod :: take notes, list tasks, write documents, manage projects
 </%def>
 
   <div class="row">
-    <div class="span9 hidden-phone hidden-tablet">
-      <div class="hero-unit">
-        <h1>pod <small>your information compagnion</small></h1>
+    <div class="span9">
+      <div class="row">
+        <div class="well">
+          <h1>pod <small>your information compagnion</small></h1>
+        </div>
       </div>
 
-      <div class="row">
-        <div class="span2 alert alert-success">
-          <p><button><i class="icon-g-cardio"></i> <strong>Track</strong> projects</button></p>
-          <p><button><i class="icon-g-edit"></i> <strong>Take</strong> notes</button></p>
-          <p><button><i class="icon-g-attach"></i> <strong>Keep</strong> files</button></p>
-          <span><button><i class="icon-g-ok"></i> <strong>Manage</strong> status</button></span>
+      <div class="row hidden-phone hidden-tablet">
+        <div class="span3 text-right">
+          <p>Take <strong>notes</strong> <i class="pod-blue fa-2x fa-fw fa fa-pencil" style="vertical-align: middle;"></i></p>
+          <p>List <strong>tasks</strong> <i class="pod-blue fa-2x fa-fw fa fa-list" style="vertical-align: middle;"></i></p>
+          <p>Write <strong>documents</strong> <i class="pod-blue fa-2x fa-fw fa fa-file-text-o" style="vertical-align: middle;"></i></p>
+          <p>Change <strong>Status</strong> <i class="pod-blue fa-2x fa-fw fa fa-check-square-o" style="vertical-align: middle;"></i> </p>
         </div>
-        <div class="span6 well well-small">
-          <h5>
-            <i class="fa fa-users fa-2x"></i>
-            Use cases
-          </h5>
-          <ul>
-            <li>Search a job</li>
-            <li>Manage clients</li>
-            <li>Track tasks</li>
-            <li>...</li>
-          </ul>
+        <div class="span1 text-center" title="${_('What for?')}">
+          <i class="fa fa-angle-double-right fa-5x"></i><br/>
+        </div>
+
+        <div class="span5">
+          <div class="well text-center">
+            <div class="row">
+            % for id, (icon, label) in enumerate((('fa-search', 'Search'), ('fa-dashboard', 'Track'), ('fa-sort-alpha-asc', 'Organize'), ('fa-users', 'Manage'))):
+              <div class="span1">
+                % for i in range(id):
+                  <br/>
+                % endfor
+                <i class="pod-blue fa-3x fa-fw fa ${icon}"></i>
+                <br/>
+                <strong>${label}</strong>
+              </div>
+            % endfor
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row hidden-phone hidden-tablet">
+        <div class="span5 offset4 text-center" style="vertical-align: top;">
+          <strong>
+            jobs, projects, prospects, clients, knowledge, ...
+          </strong>
         </div>
       </div>
     </div>

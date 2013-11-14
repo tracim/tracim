@@ -1,7 +1,7 @@
 <%inherit file="local:templates.master"/>
 
 <%def name="title()">
-  debug: environment object
+pod :: debug :: request.environment
 </%def>
 
 <h2>The WSGI nature of the framework</h2>

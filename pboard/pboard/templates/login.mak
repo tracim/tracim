@@ -1,5 +1,8 @@
 <%inherit file="local:templates.master"/>
-<%def name="title()">Login Form</%def>
+<%def name="title()">
+  pod :: login
+</%def>
+
 <div id="loginform">
 <form action="${tg.url('/login_handler', params=dict(came_from=came_from, __logins=login_counter))}" method="POST" class="loginfields">
     <h2><span>Login</span></h2>

@@ -1,3 +1,4 @@
+<%namespace name="POD" file="pboard.templates.pod"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,6 +81,7 @@ h3:Hover div.pod-toolbar {
 
 .pod-blue {color: #3a87ad !important; }
 .pod-red {color: #F00 !important; }
+.pod-grey {color: #999 !important; }
 
 body { padding-top: 60px; }
 @media screen and (max-width: 768px) {
@@ -493,8 +495,8 @@ tr:Hover td div.pod-toolbar {
                   left_panel.css('display', 'none');
                   metadata_panel.css('display', 'block');
                   
-                  main_panel.removeClass('span12');
-                  main_panel.addClass('span9');
+                  main_panel.removeClass('span9');
+                  main_panel.addClass('span12');
                   
                   docu_panel.removeClass('span5');
                   docu_panel.removeClass('span12');
@@ -626,7 +628,8 @@ tr:Hover td div.pod-toolbar {
       <div class="container">
         <div class="nav-collapse">
           <ul class="nav">
-            <li>
+            <li class="">
+##            ${POD.isCurrentPage('home', page)}
               <a href="${tg.url('/')}">
                 <i class="fa fa-home"></i>
                 <strong>pod</strong>

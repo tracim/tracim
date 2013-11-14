@@ -2,7 +2,7 @@
 <%namespace name="POD" file="pboard.templates.pod"/>
 
 <%def name="title()">
-POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
+pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} / ${current_node.getStatus().label}]
 </%def>
 
 <%def name="node_treeview_for_set_parent_menu(node_id, node_list, indentation=-1)">
