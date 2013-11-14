@@ -19,7 +19,7 @@
         </div>
         <div class="span6 well well-small">
           <h5>
-            <i class="icon-g-group"></i>
+            <i class="fa fa-users fa-2x"></i>
             Use cases
           </h5>
           <ul>
@@ -43,5 +43,4 @@
       </form>
     </div>
   </div>
-
 
