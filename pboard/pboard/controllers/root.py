@@ -90,6 +90,18 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         redirect(came_from)
         
+    @expose('pboard.templates.dashboard')
+    @require(predicates.in_group('user', msg=l_('Please login to access this page')))
+    def dashboard(self):
+      loCurrentUser   = pld.PODStaticController.getCurrentUser()
+      loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
+
+      loLastModifiedNodes = loApiController.getLastModifiedNodes(10)
+      loWhatsHotNodes     = loApiController.getNodesByStatus('hot', 5)
+      loActionToDoNodes   = loApiController.getNodesByStatus('actiontodo', 5)
+      return dict(last_modified_nodes=loLastModifiedNodes, whats_hot_nodes=loWhatsHotNodes, action_to_do_nodes = loActionToDoNodes)
+
+
     @expose('pboard.templates.document')
     @require(predicates.in_group('user', msg=l_('Please login to access this page')))
     def document(self, node=0, came_from=lurl('/')):

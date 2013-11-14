@@ -46,6 +46,7 @@ class PODUserFilteredApiController(object):
     self._iExtraUserIdList     = piExtraUserIdList
     self._iUserIdFilteringList = None
   
+
   def _getUserIdListForFiltering(self):
     if self._iUserIdFilteringList==None:
       self._iUserIdFilteringList = list()
@@ -53,6 +54,7 @@ class PODUserFilteredApiController(object):
       for liUserId in self._iExtraUserIdList:
         self._iUserIdFilteringList.append(liUserId)
     return self._iUserIdFilteringList
+
 
   def createNode(self):
     loNode          = pbmd.PBNode()
@@ -62,11 +64,13 @@ class PODUserFilteredApiController(object):
   
     query.filter(User.name.in_(['ed', 'wendy', 'jack']))
 
+
   def createDummyNode(self):
     loNewNode = self.createNode()
     loNewNode.data_label   = 'New document'
     loNewNode.data_content = 'insert content...'
     return loNewNode
+
 
   def getNode(self, liNodeId):
     liOwnerIdList = self._getUserIdListForFiltering()
@@ -74,6 +78,20 @@ class PODUserFilteredApiController(object):
       return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).first()
     else:
       return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.node_id==liNodeId).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).one()
+
+
+  def getLastModifiedNodes(self, piMaxNodeNb):
+    """
+    Returns a list of nodes order by modification time and limited to piMaxNodeNb nodes
+    """
+    liOwnerIdList = self._getUserIdListForFiltering()
+    return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
+
+
+  def getNodesByStatus(self, psNodeStatus, piMaxNodeNb=5):
+    liOwnerIdList = self._getUserIdListForFiltering()
+    return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_status==psNodeStatus).order_by(pbmd.PBNode.updated_at).limit(piMaxNodeNb).all()
+
 
   def buildTreeListForMenu(self):
     liOwnerIdList = self._getUserIdListForFiltering()

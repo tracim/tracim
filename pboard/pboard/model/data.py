@@ -263,8 +263,24 @@ class PBNode(DeclarativeBase):
     else:
       return laIconClass[self.node_type]
       
-      
-  def getFormattedDateTime(self, poDateTime, psDateTimeFormat = '%d/%m/%Y @ %H:%M'):
+  def getUserFriendlyNodeType(self):
+    laNodeTypesLng = dict()
+    laNodeTypesLng['node']   = 'Document' # FIXME - D.A. - 2013-11-14 - Make text translatable
+    laNodeTypesLng['folder'] = 'Document'
+    laNodeTypesLng['data']   = 'Document'
+
+    laNodeTypesLng['file']   = 'File'
+    laNodeTypesLng['event']  = 'Event'
+    laNodeTypesLng['contact'] = 'Contact'
+    laNodeTypesLng['comment'] = 'Comment'
+
+    if self.node_type==PBNodeType.Data and self.getStaticChildNb()>0:
+      return laNodeTypesLng['folder']
+    else:
+      return laNodeTypesLng[self.node_type]
+
+    
+  def getFormattedDateTime(self, poDateTime, psDateTimeFormat = '%d/%m/%Y ~ %H:%M'):
     return poDateTime.strftime(psDateTimeFormat)
 
   def getFormattedDate(self, poDateTime, psDateTimeFormat = '%d/%m/%Y'):

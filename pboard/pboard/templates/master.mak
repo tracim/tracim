@@ -78,14 +78,17 @@ h3:Hover div.pod-toolbar {
   visibility: visible;
 }
 
+.pod-blue {color: #3a87ad !important; }
+.pod-red {color: #F00 !important; }
+
 body { padding-top: 60px; }
 @media screen and (max-width: 768px) {
     body { padding-top: 0px; }
 }
 
-ul.nav li.dropdown:hover > ul.dropdown-menu {
-    display: block;
-}
+## ul.nav li.dropdown:hover > ul.dropdown-menu {
+##     display: block;
+## }
 
     </style>
 </head>
