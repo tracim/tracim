@@ -8,7 +8,7 @@ import Image as pil
 import tg
 from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
-from tg import predicates
+from tg import predicates as tgp
 
 
 from pboard.lib.base import BaseController
@@ -20,12 +20,6 @@ __all__ = ['PODPublicApiController', 'PODApiController']
 
 class PODPublicApiController(BaseController):
 
-    @expose('pboard.templates.index')
-    def index(self):
-        """Let the user know that's visiting a protected controller."""
-        flash(_("Secure Controller here"))
-        return dict(page='index')
-    
     @expose()
     def create_account(self, email=u'', password=u'', retyped_password=u'', **kw):
       if email==u'' or password==u'' or retyped_password==u'':
@@ -54,15 +48,7 @@ class PODPublicApiController(BaseController):
 class PODApiController(BaseController):
     """Sample controller-wide authorization"""
     
-    # The predicate that must be met for all the actions in this controller:
-    # allow_only = has_permission('manage',
-    #                             msg=l_('Only for people with the "manage" permission'))
-    
-    @expose('pboard.templates.index')
-    def index(self):
-        """Let the user know that's visiting a protected controller."""
-        flash(_("Secure Controller here"))
-        return dict(page='index')
+    allow_only = tgp.in_group('user', msg=l_('You need to login in order to access this ressource'))
     
     @expose()
     def create_event(self, parent_id=None, data_label=u'', data_datetime=None, data_content=u'', data_reminder_datetime=None, add_reminder=False, **kw):
@@ -210,15 +196,6 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.node_id)))
 
     @expose()
-    def edit_label(self, node_id, data_label):
-      loCurrentUser   = pld.PODStaticController.getCurrentUser()
-      loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
-      
-      loNode = loApiController.getNode(node_id)
-      loNode.data_label = data_label
-      redirect(lurl('/document/%s'%(node_id)))
-
-    @expose()
     def edit_status(self, node_id, node_status):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -228,11 +205,12 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
-    def edit_content(self, node_id, data_content, **kw):
+    def edit_label_and_content(self, node_id, data_label, data_content):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
       loNode = loApiController.getNode(node_id)
+      loNode.data_label   = data_label
       loNode.data_content = data_content
       redirect(lurl('/document/%s'%(node_id)))
 
