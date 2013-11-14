@@ -1,6 +1,9 @@
 <%inherit file="local:templates.master"/>
 <%namespace name="POD" file="pboard.templates.pod"/>
 
+<%def name="title()">
+POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
+</%def>
 
 <%def name="node_treeview_for_set_parent_menu(node_id, node_list, indentation=-1)">
   % if indentation==-1:
@@ -77,10 +80,6 @@
         ${node_treeview_in_select_field(node.getChildren(), indentation+1, selected_id)}
       % endfor
     % endif
-</%def>
-
-<%def name="title()">
-POD :: ${current_node.getTruncatedLabel(40)} [${current_node.getStatus().label}]
 </%def>
 
   <div class="row">
