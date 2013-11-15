@@ -314,7 +314,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                     % for comment in current_node.getComments():
                       <tr title="Last updated: ${comment.updated_at}">
                         <td>
-                          <i>The ${comment.getFormattedDate(comment.updated_at)} at ${comment.getFormattedTime(comment.updated_at)}, comment.author wrote: </i><br/>
+                          <i>The ${comment.getFormattedDate(comment.updated_at)} at ${comment.getFormattedTime(comment.updated_at)}: </i><br/>
                           <b>${comment.data_label}</b><br/>
                           <p>
                             ${comment.data_content|n}
