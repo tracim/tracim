@@ -21,19 +21,19 @@ from pboard.model import DeclarativeBase, metadata, DBSession
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions.
-group_permission_table = Table('tg_group_permission', metadata,
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+group_permission_table = Table('pod_group_permission', metadata,
+    Column('group_id', Integer, ForeignKey('pod_group.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('permission_id', Integer, ForeignKey('tg_permission.permission_id',
+    Column('permission_id', Integer, ForeignKey('pod_permission.permission_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
 # This is the association table for the many-to-many relationship between
 # groups and members - this is, the memberships.
-user_group_table = Table('tg_user_group', metadata,
-    Column('user_id', Integer, ForeignKey('tg_user.user_id',
+user_group_table = Table('pod_user_group', metadata,
+    Column('user_id', Integer, ForeignKey('pod_user.user_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+    Column('group_id', Integer, ForeignKey('pod_group.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
@@ -46,7 +46,7 @@ class Group(DeclarativeBase):
 
     """
 
-    __tablename__ = 'tg_group'
+    __tablename__ = 'pod_group'
 
     group_id = Column(Integer, autoincrement=True, primary_key=True)
     group_name = Column(Unicode(16), unique=True, nullable=False)
@@ -73,7 +73,7 @@ class User(DeclarativeBase):
     least the ``email_address`` column.
 
     """
-    __tablename__ = 'tg_user'
+    __tablename__ = 'pod_user'
 
     user_id = Column(Integer, autoincrement=True, primary_key=True)
     email_address = Column(Unicode(255), unique=True, nullable=False)
@@ -160,7 +160,7 @@ class Permission(DeclarativeBase):
 
     """
 
-    __tablename__ = 'tg_permission'
+    __tablename__ = 'pod_permission'
 
 
     permission_id = Column(Integer, autoincrement=True, primary_key=True)

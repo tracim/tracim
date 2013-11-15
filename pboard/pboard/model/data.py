@@ -1,15 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
 
-Search activity on the dashboard:
-select node_id, node_type, created_at as last_action, data_label, 'new data' as label from pb_nodes where updated_at=created_at
-union
-select node_id, node_type, updated_at as last_action, data_label, 'updated data' as label from pb_nodes where updated_at>created_at
-union
-select node_id, node_type, data_datetime as last_action, data_label, 'event' as label from pb_nodes where node_type='event'
-order by last_action desc
-
-"""
 import os
 import re
 import datetime as datetimeroot
@@ -28,9 +18,9 @@ from pboard.model import DeclarativeBase, metadata, DBSession
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions.
-"""pb_node_table = Table('pb_nodes', metadata,
-    Column('node_id', Integer, Sequence('pb_nodes__node_id__sequence'), primary_key=True),
-    Column('parent_id', Integer, ForeignKey('pb_nodes.node_id'), nullable=True, default=None),
+"""pod_node_table = Table('pod_nodes', metadata,
+    Column('node_id', Integer, Sequence('pod_nodes__node_id__sequence'), primary_key=True),
+    Column('parent_id', Integer, ForeignKey('pod_nodes.node_id'), nullable=True, default=None),
     Column('node_order', Integer, nullable=True, default=1),
     Column('node_type',   Unicode(16), unique=False, nullable=False, default=u'data'),
     Column('node_status', Unicode(16), unique=False, nullable=False, default=u'new'),
@@ -165,12 +155,12 @@ class PBNode(DeclarativeBase):
   def getStaticChildNb(self):
     return len(self._lStaticChildList)
 
-  __tablename__ = 'pb_nodes'
-  node_id          = Column(Integer, Sequence('pb_nodes__node_id__sequence'), primary_key=True)
-  parent_id        = Column(Integer, ForeignKey('pb_nodes.node_id'), nullable=True, default=None)
+  __tablename__ = 'pod_nodes'
+  node_id          = Column(Integer, Sequence('pod_nodes__node_id__sequence'), primary_key=True)
+  parent_id        = Column(Integer, ForeignKey('pod_nodes.node_id'), nullable=True, default=None)
   node_depth       = Column(Integer, unique=False, nullable=False, default=0)
   parent_tree_path = Column(Unicode(255), unique=False, nullable=False, default=u'')
-  owner_id         = Column(Integer, ForeignKey('tg_user.user_id'), nullable=True, default=None)
+  owner_id         = Column(Integer, ForeignKey('pod_user.user_id'), nullable=True, default=None)
 
   node_order  = Column(Integer, nullable=True, default=1)
   node_type   = Column(Unicode(16), unique=False, nullable=False, default=u'data')
@@ -329,7 +319,7 @@ class PBNode(DeclarativeBase):
 """from sqlalchemy.orm import mapper
 mapper(
   PBNode,
-  pb_node_table,
+  pod_node_table,
   properties = {'_lAllChildren' : relationship(PBNode, backref=backref('_oParent', remote_side=PBNode.parent_id)) }
 )"""
 
