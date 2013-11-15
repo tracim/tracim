@@ -19,7 +19,7 @@
           <p>Write <strong>documents</strong> <i class="pod-blue fa-2x fa-fw fa fa-file-text-o" style="vertical-align: middle;"></i></p>
           <p>Change <strong>Status</strong> <i class="pod-blue fa-2x fa-fw fa fa-check-square-o" style="vertical-align: middle;"></i> </p>
         </div>
-        <div class="span1 text-center" title="${_('What for?')}">
+        <div class="span1 text-center">
           <i class="fa fa-angle-double-right fa-5x"></i><br/>
         </div>
 
@@ -40,14 +40,6 @@
           </div>
         </div>
       </div>
-
-      <div class="row hidden-phone hidden-tablet">
-        <div class="span5 offset4 text-center" style="vertical-align: top;">
-          <strong>
-            jobs, projects, prospects, clients, knowledge, ...
-          </strong>
-        </div>
-      </div>
     </div>
     <div class="span3">
       <form class="well" action="${tg.url('/public_api/create_account')}">
@@ -61,4 +53,11 @@
       </form>
     </div>
   </div>
+
+  <div class="row">
+    <div class="span12 hidden-phone hidden-tablet text-center pod-blue" style="margin: 0.5em;">
+      <i>${_("pod: search a job, manage projects, track and manage clients and prospects, document processes and knowledge, ...")}</i>
+    </div>
+  </div>
+
 
