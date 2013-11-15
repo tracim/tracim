@@ -191,7 +191,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                       <label>
                         <div>
                           <input type="hidden" id="add_event_data_content_textarea" name='data_content' />
-                          ${POD.RichTextEditor('add_event_data_content_textarea_wysiwyg', '', 'boldanditalic')}
+                          ${POD.RichTextEditor('add_event_data_content_textarea_wysiwyg', '', 'boldanditalic|undoredo|fullscreen')}
                         </div>
                       </label>
                       <label class="checkbox">
@@ -259,7 +259,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                       <label>
                         <div>
                           <input type="hidden" id="add_contact_data_content_textarea" name='data_content' />
-                          ${POD.RichTextEditor('add_contact_data_content_textarea_wysiwyg', '', 'boldanditalic')}
+                          ${POD.RichTextEditor('add_contact_data_content_textarea_wysiwyg', '', 'boldanditalic|undoredo|fullscreen')}
                         </div>
                       </label>
                       ${POD.CancelButton('current-document-add-contact-cancel-button', True)}
@@ -298,7 +298,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                       <label>
                         <div>
                           <input type="hidden" id="add_comment_data_content_textarea" name='data_content' />
-                          ${POD.RichTextEditor('add_comment_data_content_textarea_wysiwyg', '', 'boldanditalic')}
+                          ${POD.RichTextEditor('add_comment_data_content_textarea_wysiwyg', '', 'boldanditalic|undoredo|fullscreen')}
                         </div>
                       </label>
                       ${POD.CancelButton('current-document-add-comment-cancel-button', True)}
@@ -346,7 +346,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                       <label>
                         <div>
                           <input type="hidden" id="add_file_data_content_textarea" name='data_content' />
-                          ${POD.RichTextEditor('add_file_data_content_textarea_wysiwyg', '', 'boldanditalic')}
+                          ${POD.RichTextEditor('add_file_data_content_textarea_wysiwyg', '', 'boldanditalic|undoredo|fullscreen')}
                         </div>
                       </label>
                       ${POD.CancelButton('current-document-add-file-cancel-button', True)}
