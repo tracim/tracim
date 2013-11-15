@@ -16,6 +16,8 @@ from pboard.model import auth as pbma
 import pboard.model as pbm
 
 import tg
+
+FIXME_ERROR_CODE=-1
 class PODStaticController(object):
 
   @classmethod
@@ -145,7 +147,7 @@ class PODUserFilteredApiController(object):
     for loItem in loSiblingNodes:
       if loItem==loNode:
         if loPreviousItem==None:
-          # FIXME
+          return FIXME_ERROR_CODE # FIXME - D.A. Do not use hard-coded error codes
           print "No previous node"
         else:
           liPreviousItemOrder       = loPreviousItem.node_order
@@ -165,6 +167,7 @@ class PODUserFilteredApiController(object):
     for loItem in reversed(loSiblingNodes):
       if loItem==loNode:
         if loPreviousItem==None:
+          return FIXME_ERROR_CODE # FIXME - D.A. Do not use hard-coded error codes
           # FIXME
           print "No previous node"
         else:
