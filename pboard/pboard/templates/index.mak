@@ -45,10 +45,10 @@
       <form class="well" action="${tg.url('/public_api/create_account')}">
         <fieldset>
           <legend>Sign up</legend>
-          <input type="text" id="email" placeholder="Email"><br/>
-          <input type="text" id="password" placeholder="Password"><br/>
-          <input type="text" id="retyped_password" placeholder="Retype your password"><br/>
-          <input type="submit" id="submit" value="Sign up" /><br/>
+          <input type="text"     name="email"            id="email" placeholder="Email"><br/>
+          <input type="password" name="password"         id="password" placeholder="Password"><br/>
+          <input type="password" name="retyped_password" id="retyped_password" placeholder="Retype your password"><br/>
+          <input type="submit"   id="submit" value="Sign up" /><br/>
         </fieldset>
       </form>
     </div>
