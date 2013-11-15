@@ -253,10 +253,10 @@ class PBNode(DeclarativeBase):
     laIconClass['folder'] = 'fa fa-folder-open'
     laIconClass['data']   = 'fa fa-file-text-o'
 
-    laIconClass['file']   = 'icon-file'
-    laIconClass['event']  = 'icon-time' # icon-calendar
-    laIconClass['contact'] = 'icon-user'
-    laIconClass['comment'] = 'icon-comment'
+    laIconClass['file']   = 'fa fa-file-text-o'
+    laIconClass['event']  = 'fa fa-calendar'
+    laIconClass['contact'] = 'fa fa-user'
+    laIconClass['comment'] = 'fa fa-comments-o'
 
     if self.node_type==PBNodeType.Data and self.getStaticChildNb()>0:
       return laIconClass['folder']
