@@ -10,6 +10,7 @@ from tg import expose, flash, require, url, lurl, request, redirect, tmpl_contex
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates as tgp
 
+from tg.i18n import ugettext as _, lazy_ugettext as l_
 
 from pboard.lib.base import BaseController
 from pboard.lib   import dbapi as pld
@@ -17,6 +18,8 @@ from pboard.model import data as pmd
 from pboard import model as pm
 
 __all__ = ['PODPublicApiController', 'PODApiController']
+
+FIXME_ERROR_CODE=-1
 
 class PODPublicApiController(BaseController):
 
@@ -167,7 +170,8 @@ class PODApiController(BaseController):
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
       loNode = loApiController.getNode(node_id)
-      loApiController.moveNodeUpper(loNode)
+      if loApiController.moveNodeUpper(loNode)==FIXME_ERROR_CODE:
+        flash(_('Document #%s can\'t move upper.')%(node_id))
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
@@ -176,7 +180,8 @@ class PODApiController(BaseController):
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
       loNode = loApiController.getNode(node_id)
-      loApiController.moveNodeLower(loNode)
+      if loApiController.moveNodeLower(loNode)==FIXME_ERROR_CODE:
+        flash(_('Document #%s can\'t move lower.')%(node_id))
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
@@ -222,6 +227,11 @@ class PODApiController(BaseController):
       liParentId = loNode.parent_id
       if loNode.getChildNb()<=0:
         pm.DBSession.delete(loNode)
+        flash(_('Document #%s has been deleted')%(node_id))
+      else:
+        flash(_('Document #%s can\'t be deleted because it is not empty.')%(node_id), 'error')
+        redirect(lurl('/document/%s'%(node_id)))
+
       redirect(lurl('/document/%i'%(liParentId or 0)))
 
     @expose()
