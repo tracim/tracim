@@ -73,6 +73,8 @@ h3:Hover div.pod-toolbar {
 .pod-blue {color: #3a87ad !important; }
 .pod-red {color: #F00 !important; }
 .pod-grey {color: #999 !important; }
+.pod-dark-grey {color: #333333 !important; }
+
 
 body { padding-top: 60px; }
 @media screen and (max-width: 768px) {

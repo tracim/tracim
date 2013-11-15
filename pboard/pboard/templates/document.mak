@@ -137,11 +137,11 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
         <div id='application-metadata-panel' class="span4">
           <div class="tabbable">
             <ul class="nav nav-tabs">
-                ## DEBUG - D.A. - 2013-11-07 -  <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
-                <li class="active"><a href="#events" data-toggle="tab" title="History"><i class="icon-g-history"></i>${POD.ItemNb(current_node.getEvents())}</a></li>
-                <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="icon-g-user""></i>${POD.ItemNb(current_node.getContacts())}</a></li>
-                <li><a href="#comments" data-toggle="tab" title="Comments"><i class="icon-g-conversation"></i>${POD.ItemNb(current_node.getComments())}</a></li>
-                <li><a href="#files" data-toggle="tab" title="Files"><i class="icon-g-attach"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
+                ## FIXME - D.A. - 2013-11-07 - TO REMOVE OR TO REACTIVATE  <li class="active"><a href="#tags" data-toggle="tab" title="${_('Tags')}"><i class='icon-g-tags'></i></a></li>
+                <li class="active"><a href="#events" data-toggle="tab" title="History"><i class="pod-dark-grey fa fa-calendar"></i>${POD.ItemNb(current_node.getEvents())}</a></li>
+                <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="pod-dark-grey fa fa-user"></i>${POD.ItemNb(current_node.getContacts())}</a></li>
+                <li><a href="#comments" data-toggle="tab" title="Comments"><i class="pod-dark-grey fa fa-comments-o"></i>${POD.ItemNb(current_node.getComments())}</a></li>
+                <li><a href="#files" data-toggle="tab" title="Files"><i class="pod-dark-grey fa fa-files-o"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
             </ul>
             <div class="tab-content">
                 ################################
@@ -272,7 +272,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                     <div class="well">
                       <legend class="text-info">${contact.data_label}</legend>
                       <div>
-                        <a style='float: right;' href="" title='${_('Search on google maps')}'><i class='icon-g-google-maps'></i></a>
+                        ## FIXME - D.A. - 2013-11-15 - Implement localisation stuff <a style='float: right;' href="" title='${_('Search on google maps')}'><i class='icon-g-google-maps'></i></a>
                         ${contact.data_content|n}
                       </div>
                     </div>
