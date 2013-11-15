@@ -96,7 +96,13 @@
           </a>
         </div>
       % endif
-        <input type="text" data-edit="inserttext" id="voiceBtn" x-webkit-speech="">
+##
+## FIXME - D.A. - 2013-11-15 - FIX THIS
+## The voiceBtn button input field is visible in case we add the rich text editor multiple times in the same page
+## This is probably due to the use of #voiceBtn id (which should be unique... and which is not)
+## This fix will be required for mobile phone compatible user interface
+## See bug #13 - https://bitbucket.org/lebouquetin/pod/issue/13/voicebtn-input-widget-shown-in-meta-data
+##        <input type="text" data-edit="inserttext" id="voiceBtn" x-webkit-speech="">
       </div>
 </%def>
 
