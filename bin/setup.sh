@@ -52,7 +52,16 @@ python setup.py develop
 echo
 echo
 
-# pip install psycopg2
-# pip install pillow
+echo
+echo
+echo "-------------------------"
+echo "- install dependencies"
+echo "-------------------------"
+echo "-> psycopg2"
+echo "-> pillow"
+pip install psycopg2
+pip install pillow
+echo
+echo
 
 cd ${OLD_PATH}
