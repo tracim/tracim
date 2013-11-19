@@ -98,12 +98,10 @@ pboard/templates/login.mak
 pboard/templates/master.mak
 pboard/templates/pod.mak
 pboard/templates/simple_mako.mak
-pboard/templates/__pycache__/__init__.cpython-32.pyc
 pboard/templates/debug/__init__.py
 pboard/templates/debug/environ.mak
 pboard/templates/debug/iconset.mak
 pboard/templates/debug/identity.mak
-pboard/templates/debug/__pycache__/__init__.cpython-32.pyc
 pboard/tests/__init__.py
 pboard/tests/functional/__init__.py
 pboard/tests/functional/test_authentication.py
