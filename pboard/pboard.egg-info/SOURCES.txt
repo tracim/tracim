@@ -54,7 +54,6 @@ pboard/public/img/glyphicons.png
 pboard/public/img/turbogears_logo.png
 pboard/public/img/turbogears_logo_big.png
 pboard/public/img/under_the_hood_blue.png
-pboard/public/javascript/bootstrap.min.js
 pboard/public/javascript/external/bootstrap-datetimepicker.min.js
 pboard/public/javascript/external/bootstrap-wysiwyg.js
 pboard/public/javascript/external/bootstrap.js
@@ -99,10 +98,12 @@ pboard/templates/login.mak
 pboard/templates/master.mak
 pboard/templates/pod.mak
 pboard/templates/simple_mako.mak
+pboard/templates/__pycache__/__init__.cpython-32.pyc
 pboard/templates/debug/__init__.py
 pboard/templates/debug/environ.mak
 pboard/templates/debug/iconset.mak
 pboard/templates/debug/identity.mak
+pboard/templates/debug/__pycache__/__init__.cpython-32.pyc
 pboard/tests/__init__.py
 pboard/tests/functional/__init__.py
 pboard/tests/functional/test_authentication.py

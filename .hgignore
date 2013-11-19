@@ -5,8 +5,6 @@ syntax: glob
 *.pyc
 *~
 
-tg2env/include
-tg2env/lib
-tg2env/local
+tg2env/
 pboard/data
 
