@@ -5,5 +5,3 @@ zope.sqlalchemy >= 0.4
 sqlalchemy
 alembic
 repoze.who
-psycopg2
-pillow
