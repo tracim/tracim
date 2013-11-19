@@ -21,7 +21,8 @@ from pboard.lib import app_globals, helpers
 
 base_config = AppConfig()
 base_config.renderers = []
-base_config.prefer_toscawidgets2 = True
+base_config.use_toscawidgets = False
+base_config.use_toscawidgets2 = False
 
 base_config.package = pboard
 

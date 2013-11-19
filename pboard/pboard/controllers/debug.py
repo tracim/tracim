@@ -7,8 +7,6 @@ from tg import predicates
 from pboard import model
 from pboard.controllers.secure import SecureController
 from pboard.model import DBSession, metadata
-from tgext.admin.tgadminconfig import TGAdminConfig
-from tgext.admin.controller import AdminController
 
 from pboard.lib.base import BaseController
 from pboard.controllers.error import ErrorController

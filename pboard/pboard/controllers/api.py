@@ -2,8 +2,16 @@
 """Sample controller with all its actions protected."""
 from datetime import datetime
 
-import cStringIO as csio
-import Image as pil
+# TODO - D.A. - 2013-11-19
+# Check if the new import (ie import io instead of cStringIO)
+# is working correctly
+#import io as csio
+
+# INFO - D.A. - 2013-11-19
+# The PIL import is now taken from the pillow
+# which is the python3 port of PIL
+#
+from PIL import Image as pil
 
 import tg
 from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
@@ -24,8 +32,8 @@ FIXME_ERROR_CODE=-1
 class PODPublicApiController(BaseController):
 
     @expose()
-    def create_account(self, email=u'', password=u'', retyped_password=u'', **kw):
-      if email==u'' or password==u'' or retyped_password==u'':
+    def create_account(self, email='', password='', retyped_password='', **kw):
+      if email=='' or password=='' or retyped_password=='':
         flash(_('Account creation error: please fill all the fields'), 'error')
         redirect(lurl('/'))
       elif password!=retyped_password:
@@ -54,7 +62,7 @@ class PODApiController(BaseController):
     allow_only = tgp.in_group('user', msg=l_('You need to login in order to access this ressource'))
     
     @expose()
-    def create_event(self, parent_id=None, data_label=u'', data_datetime=None, data_content=u'', data_reminder_datetime=None, add_reminder=False, **kw):
+    def create_event(self, parent_id=None, data_label='', data_datetime=None, data_content='', data_reminder_datetime=None, add_reminder=False, **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
@@ -71,7 +79,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_contact(self, parent_id=None, data_label=u'', data_content=u'', **kw):
+    def create_contact(self, parent_id=None, data_label='', data_content='', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
@@ -85,7 +93,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_comment(self, parent_id=None, data_label=u'', data_content=u'', **kw):
+    def create_comment(self, parent_id=None, data_label='', data_content='', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
@@ -99,7 +107,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_file(self, parent_id=None, data_label=u'', data_content=u'', data_file=None, **kw):
+    def create_file(self, parent_id=None, data_label='', data_content='', data_file=None, **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       

@@ -745,7 +745,7 @@ tr:Hover td div.pod-toolbar {
               </li>
             % else:
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> ${request.identity['user']}</a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> ${request.identity['user'].display_name}</a>
                 <ul class="dropdown-menu pull-right">
                   <li class="text-center">
                     <fieldset>

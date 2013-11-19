@@ -1,5 +1,5 @@
 <%def name="Button(piId, pbWithLabel, psButtonCssClass, psButtonTitle, psButtonIcon, psButtonLabel)" >
-  <button id='${piId}' type="button" class="${psButtonCssClass}" title="${psButtonTitle}"><i class="${psButtonIcon}"></i>${u'' if (pbWithLabel==False) else u' %s'%(psButtonLabel)}</button>
+  <button id='${piId}' type="button" class="${psButtonCssClass}" title="${psButtonTitle}"><i class="${psButtonIcon}"></i>${'' if (pbWithLabel==False) else ' %s'%(psButtonLabel)}</button>
 </%def>
 
 <%def name="SaveButton(piId, pbWithLabel=False)" >

@@ -28,19 +28,17 @@ except ImportError:
 testpkgs=['WebTest >= 1.2.3',
                'nose',
                'coverage',
+               'gearbox'
                ]
 
 install_requires=[
-    "TurboGears2 >= 2.3.0b3",
-    "Babel",
+    "TurboGears2 >= 2.3.1",
     "Genshi",
     "Mako",
     "zope.sqlalchemy >= 0.4",
     "sqlalchemy",
     "alembic",
     "repoze.who",
-    "tw2.forms",
-    "tgext.admin >= 0.5.1",
     ]
 
 setup(

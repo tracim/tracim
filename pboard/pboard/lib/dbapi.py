@@ -112,7 +112,7 @@ class PODUserFilteredApiController(object):
         # The following line may raise an exception
         # We suppose that the parent node has already been added
         # this *should* be the case, but the code does not check it
-        if loTmpDict.has_key(loNode.parent_id)==False:
+        if loNode.parent_id in loTmpDict.keys():
           loTmpDict[loNode.parent_id] = self.getNode(loNode.parent_id)
         loTmpDict[loNode.parent_id].appendStaticChild(loNode)
   
@@ -148,7 +148,7 @@ class PODUserFilteredApiController(object):
       if loItem==loNode:
         if loPreviousItem==None:
           return FIXME_ERROR_CODE # FIXME - D.A. Do not use hard-coded error codes
-          print "No previous node"
+          print("No previous node")
         else:
           liPreviousItemOrder       = loPreviousItem.node_order
           loPreviousItem.node_order = loNode.node_order
@@ -169,7 +169,7 @@ class PODUserFilteredApiController(object):
         if loPreviousItem==None:
           return FIXME_ERROR_CODE # FIXME - D.A. Do not use hard-coded error codes
           # FIXME
-          print "No previous node"
+          print("No previous node")
         else:
           liPreviousItemOrder       = loPreviousItem.node_order
           loPreviousItem.node_order = loNode.node_order

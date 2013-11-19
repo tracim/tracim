@@ -22,19 +22,19 @@ from pboard.model import DeclarativeBase, metadata, DBSession
     Column('node_id', Integer, Sequence('pod_nodes__node_id__sequence'), primary_key=True),
     Column('parent_id', Integer, ForeignKey('pod_nodes.node_id'), nullable=True, default=None),
     Column('node_order', Integer, nullable=True, default=1),
-    Column('node_type',   Unicode(16), unique=False, nullable=False, default=u'data'),
-    Column('node_status', Unicode(16), unique=False, nullable=False, default=u'new'),
+    Column('node_type',   Unicode(16), unique=False, nullable=False, default='data'),
+    Column('node_status', Unicode(16), unique=False, nullable=False, default='new'),
 
     Column('created_at', DateTime, unique=False, nullable=False),
     Column('updated_at', DateTime, unique=False, nullable=False),
 
-    Column('data_label',   Unicode(1024), unique=False, nullable=False, default=u''),
-    Column('data_content', Text(), unique=False, nullable=False, default=u''),
+    Column('data_label',   Unicode(1024), unique=False, nullable=False, default=''),
+    Column('data_content', Text(), unique=False, nullable=False, default=''),
     Column('data_datetime', DateTime, unique=False, nullable=False),
     Column('data_reminder_datetime', DateTime, unique=False, nullable=True),
     
-    Column('data_file_name', Unicode(255), unique=False, nullable=False, default=u''),
-    Column('data_file_mime_type', Unicode(255), unique=False, nullable=False, default=u''),
+    Column('data_file_name', Unicode(255), unique=False, nullable=False, default=''),
+    Column('data_file_mime_type', Unicode(255), unique=False, nullable=False, default=''),
     Column('data_file_content', LargeBinary(), unique=False, nullable=False, default=None),
 )
 """
@@ -146,7 +146,7 @@ class PBNode(DeclarativeBase):
     self._lStaticChildList = []
 
   def appendStaticChild(self, loNode):
-    print "%s has child %s" % (self.node_id, loNode.node_id)
+    print("%s has child %s" % (self.node_id, loNode.node_id))
     self._lStaticChildList.append(loNode)
 
   def getStaticChildList(self):
@@ -159,24 +159,24 @@ class PBNode(DeclarativeBase):
   node_id          = Column(Integer, Sequence('pod_nodes__node_id__sequence'), primary_key=True)
   parent_id        = Column(Integer, ForeignKey('pod_nodes.node_id'), nullable=True, default=None)
   node_depth       = Column(Integer, unique=False, nullable=False, default=0)
-  parent_tree_path = Column(Unicode(255), unique=False, nullable=False, default=u'')
+  parent_tree_path = Column(Unicode(255), unique=False, nullable=False, default='')
   owner_id         = Column(Integer, ForeignKey('pod_user.user_id'), nullable=True, default=None)
 
   node_order  = Column(Integer, nullable=True, default=1)
-  node_type   = Column(Unicode(16), unique=False, nullable=False, default=u'data')
-  node_status = Column(Unicode(16), unique=False, nullable=False, default=u'new')
+  node_type   = Column(Unicode(16), unique=False, nullable=False, default='data')
+  node_status = Column(Unicode(16), unique=False, nullable=False, default='new')
 
   created_at = Column(DateTime, unique=False, nullable=False)
   updated_at = Column(DateTime, unique=False, nullable=False)
 
-  data_label   = Column(Unicode(1024), unique=False, nullable=False, default=u'')
-  data_content = Column(Text(),        unique=False, nullable=False, default=u'')
+  data_label   = Column(Unicode(1024), unique=False, nullable=False, default='')
+  data_content = Column(Text(),        unique=False, nullable=False, default='')
   
   data_datetime          = Column(DateTime, unique=False, nullable=False)
   data_reminder_datetime = Column(DateTime, unique=False, nullable=True)
   
-  data_file_name      = Column(Unicode(255),  unique=False, nullable=False, default=u'')
-  data_file_mime_type = Column(Unicode(255),  unique=False, nullable=False, default=u'')
+  data_file_name      = Column(Unicode(255),  unique=False, nullable=False, default='')
+  data_file_mime_type = Column(Unicode(255),  unique=False, nullable=False, default='')
   data_file_content   = Column(LargeBinary(), unique=False, nullable=False, default=None)
 
 
@@ -283,10 +283,10 @@ class PBNode(DeclarativeBase):
     return PBNodeStatus.getStatusItem(self.node_status)
 
   def getTruncatedLabel(self, piCharNb):
-    lsTruncatedLabel = u''
+    lsTruncatedLabel = ''
     liMaxLength = int(piCharNb)
     if len(self.data_label)>liMaxLength:
-      lsTruncatedLabel = self.data_label[0:liMaxLength-1]+u'…'
+      lsTruncatedLabel = self.data_label[0:liMaxLength-1]+'…'
     else:
       lsTruncatedLabel = self.data_label
     return lsTruncatedLabel

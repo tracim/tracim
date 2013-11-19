@@ -1,5 +1,0 @@
-#!/home/daccorsi/sources/protos/pboard/tg2env/bin/python
-# EASY-INSTALL-SCRIPT: 'Mako==0.9.0','mako-render'
-__requires__ = 'Mako==0.9.0'
-import pkg_resources
-pkg_resources.run_script('Mako==0.9.0', 'mako-render')
