@@ -99,7 +99,7 @@
     <div class="span8 offset2">
       <div class="text-center">
         <p style="margin: 1em 0 0 0;">
-          <a class="btn btn-success" href="mailto:pod+alphatest@accorsi.info?subject=feedback about pod software">
+          <a class="btn btn-success" href="mailto:damien.accorsi+pod@free.fr?subject=feedback about pod software">
             <i class="fa fa-envelope-o"></i>
             <strong>${_("email us")}</strong>
           </a> ${_("and we will reply to you.")}
