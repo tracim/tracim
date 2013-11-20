@@ -89,6 +89,11 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
       </div>
     </div>
     <div id='application-main-panel' class="span9">
+    % if current_node.parent_id!=None and current_node.parent_id!=0:
+      <div class="btn-group">
+        <a class="btn " href="${tg.url('/document/%i'%current_node.parent_id)}" title="${_("Go to parent document")}"><i class="fa fa-hand-o-left"></i></a>
+      </div>
+    % endif
       <div class="btn-group">
         <button class="btn">Status</button>
         <a class="btn ${current_node.getStatus().css}" href="#"><i class="${current_node.getStatus().icon}"></i> ${current_node.getStatus().getLabel()}</a>
@@ -141,7 +146,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 <li class="active"><a href="#events" data-toggle="tab" title="History"><i class="pod-dark-grey fa fa-calendar"></i>${POD.ItemNb(current_node.getEvents())}</a></li>
                 <li><a href="#contacts" data-toggle="tab" title="Contacts"><i class="pod-dark-grey fa fa-user"></i>${POD.ItemNb(current_node.getContacts())}</a></li>
                 <li><a href="#comments" data-toggle="tab" title="Comments"><i class="pod-dark-grey fa fa-comments-o"></i>${POD.ItemNb(current_node.getComments())}</a></li>
-                <li><a href="#files" data-toggle="tab" title="Files"><i class="pod-dark-grey fa fa-files-o"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
+                <li><a href="#files" data-toggle="tab" title="Files"><i class="pod-dark-grey fa  fa-file-text-o"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
             </ul>
             <div class="tab-content">
                 ################################
@@ -270,7 +275,12 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                   <!-- LIST OF CONTACT NODES -->
                   % for contact in current_node.getContacts():
                     <div class="well">
-                      <legend class="text-info">${contact.data_label}</legend>
+                      <legend class="text-info">
+                        ${contact.data_label}
+                        ## TODO - 2013-11-20 - Use the right form in order to update meta-data
+                        <a class="pull-right" href="${tg.url('/document/%i'%contact.node_id)}"><i class="fa fa-edit"></i></a>
+                      </legend>
+                      
                       <div>
                         ## FIXME - D.A. - 2013-11-15 - Implement localisation stuff <a style='float: right;' href="" title='${_('Search on google maps')}'><i class='icon-g-google-maps'></i></a>
                         ${contact.data_content|n}
@@ -315,7 +325,10 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                       <tr title="Last updated: ${comment.updated_at}">
                         <td>
                           <i>The ${comment.getFormattedDate(comment.updated_at)} at ${comment.getFormattedTime(comment.updated_at)}: </i><br/>
-                          <b>${comment.data_label}</b><br/>
+                          <b>${comment.data_label}</b>
+                          ## TODO - 2013-11-20 - Use the right form in order to update meta-data
+                          <a class="pull-right" href="${tg.url('/document/%i'%comment.node_id)}"><i class="fa fa-edit"></i></a>
+                          <br/>
                           <p>
                             ${comment.data_content|n}
                           </p>
@@ -362,12 +375,19 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                     % for current_file in current_node.getFiles():
                       <tr title="Last updated: ${current_file.updated_at}">
                         <td>
-                          <a href="${tg.url('/api/get_file_content/%s'%(current_file.node_id))}" title="${_("Download file")}"><i class="icon-g-attach"></i></a>
+                          <a href="${tg.url('/api/get_file_content/%s'%(current_file.node_id))}" title="${_("Download file")}">
+                            <i class="fa fa-2x fa-file-text-o"></i>
+                          </a>
                           ## FIXME - SHOW THUMBNAIL WHEN IT WILL BE OK<img src="${tg.url('/api/get_file_content_thumbnail/%s'%(current_file.node_id))}" class="img-polaroid">
                         </td>
                         <td>
-                          <b>${current_file.data_label}</b><br/>
-                          <i>commented by comment.author the ${current_file.getFormattedDate(current_file.updated_at)} at ${current_file.getFormattedTime(current_file.updated_at)}</i></br>
+                          <b>${current_file.data_label}</b>
+                          <a class="pull-right" href="${tg.url('/api/get_file_content/%s'%(current_file.node_id))}" title="${_("Download file")}">
+                            <i class="fa fa-download"></i>
+                          </a>
+                          <a class="pull-right" href="${tg.url('/document/%i'%current_file.node_id)}" title="${_("Edit title or comment")}"><i class="fa fa-edit"></i></a>
+
+                          <br/>
                           <p>
                             ${current_file.data_content|n}
                           </p>
