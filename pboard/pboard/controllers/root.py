@@ -63,6 +63,12 @@ class RootController(BaseController):
         return dict()
 
 
+    @expose('pboard.templates.about')
+    def about(self):
+        """Handle the about-page."""
+        return dict()
+
+
     @expose('pboard.templates.login')
     def login(self, came_from=lurl('/')):
         """Start the user login."""
