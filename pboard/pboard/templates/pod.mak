@@ -24,6 +24,20 @@
   % endif
 </%def>
 
+<%def name='SignUpForm(psCssMinHeight="1em")'>
+  <div class="span3">
+    <form class="well" style="min-height: ${psCssMinHeight};" action="${tg.url('/public_api/create_account')}">
+      <fieldset>
+        <legend>Want to try?</legend>
+        <input type="text"     name="email"            id="email" placeholder="Email"><br/>
+        <input type="password" name="password"         id="password" placeholder="Password"><br/>
+        <input type="password" name="retyped_password" id="retyped_password" placeholder="Retype your password"><br/>
+        <input type="submit"   id="submit" value="Create account" class="btn btn-success" style="width: 95%;"/><br/>
+      </fieldset>
+    </form>
+  </div>
+</%def>
+
 <%def name='RichTextEditorToolbar(psRichTextEditorNodeId, psMenuOptions="styles|boldanditalic|lists|justifiers|links|images|undoredo|fullscreen")'>
       <div class="btn-toolbar" data-role="${psRichTextEditorNodeId}-toolbar" data-target="${psRichTextEditorNodeId}">
       % if psMenuOptions.find('styles')>=0:

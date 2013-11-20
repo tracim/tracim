@@ -54,8 +54,10 @@
 <%def name="title()">  </%def>
 
 <%def name="footer()">
-  <div class="footer hidden-tablet hidden-phone">
-    <p>Copyright &copy; pod project ${h.current_year()}</p>
+  <div class="footer hidden-tablet hidden-phone text-center">
+    <p class="pod-blue"><i>${_("Using pod, you can: search a job, manage projects, track and manage clients and prospects, document processes and knowledge, ...")}</i></p>
+    <hr style="width: 50%; margin: 0.5em auto;"/>
+    <p>Copyright &copy; 2013 - ${h.current_year()} pod project.</p>
   </div>
 </%def>
 
@@ -146,7 +148,7 @@
 
 
           % endif
-          
+
           % if request.identity and request.identity['repoze.who.userid']=='damien@accorsi.info':
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
@@ -169,6 +171,11 @@
           % endif
           </ul>
           <ul class="nav pull-right">
+            <li>
+              <a href="${tg.url('/about')}"><i class="fa fa-question"></i> ${_('About')}</a>
+            </li>
+
+
             % if not request.identity:
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Login</a>
