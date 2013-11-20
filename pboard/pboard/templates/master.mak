@@ -71,7 +71,10 @@
 ##            ${POD.isCurrentPage('home', page)}
               <a href="${tg.url('/')}">
                 <i class="fa fa-home"></i>
-                <strong>pod</strong>
+                <strong>
+                  pod
+                </strong>
+                <sup class="pod-blue">alpha</sup>
               </a>
             </li>
           % if request.identity:
@@ -171,8 +174,8 @@
           % endif
           </ul>
           <ul class="nav pull-right">
-            <li>
-              <a href="${tg.url('/about')}"><i class="fa fa-question"></i> ${_('About')}</a>
+            <li title="${_('Help / About')}">
+              <a href="${tg.url('/about')}"><i class="fa fa-question-circle"></i></a>
             </li>
 
 
