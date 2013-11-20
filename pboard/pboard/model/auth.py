@@ -121,7 +121,8 @@ class User(DeclarativeBase):
 
         # Make sure the hashed password is a unicode object at the end of the
         # process because SQLAlchemy _wants_ unicode objects for Unicode cols
-        password = password.decode('utf-8')
+        # FIXME - D.A. - 2013-11-20 - The following line has been removed since using python3. Is this normal ?!
+        # password = password.decode('utf-8')
 
         return password
 
