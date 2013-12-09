@@ -95,17 +95,24 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
       </div>
     % endif
       <div class="btn-group">
-        <button class="btn">Status</button>
-        <a class="btn ${current_node.getStatus().css}" href="#"><i class="${current_node.getStatus().icon}"></i> ${current_node.getStatus().getLabel()}</a>
-        <a class="btn ${current_node.getStatus().css} dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+        <button class="btn"  data-toggle="dropdown" href="#">${_("Change status")}</button>
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
         <ul class="dropdown-menu">
-          % for node_status in node_status_list:
-            <li>
-              <a class="${node_status.css}" href="${tg.url('/api/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, node_status.status_id))}">
-                <i class="${node_status.icon_id}"></i> ${node_status.label}
-              </a>
-            </li>
-          % endfor
+        % for node_status in node_status_list:
+          % if node_status.status_id==current_node.getStatus().status_id:
+          <li title="${h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id)}">
+            <a class="${node_status.css}" href="#"  style="color: #999;">
+              <i class="${node_status.icon_id}"></i> ${node_status.label}
+            </a>
+          </li>
+          % else:
+          <li title="${h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id)}">
+            <a class="${node_status.css}" href="${tg.url('/api/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, node_status.status_id))}">
+              <i class="${node_status.icon_id}"></i> ${node_status.label}
+            </a>
+          </li>
+          % endif
+        % endfor
         </ul>
       </div>
       <div class="btn-group">
@@ -115,15 +122,18 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
           ${node_treeview_for_set_parent_menu(current_node.node_id, root_node_list)}
         </ul>
 
-
-        <a href='${tg.url('/api/force_delete_node?node_id=%i'%(current_node.node_id))}' id='current-document-force-delete-button' class="btn" onclick="return confirm('${_('Delete current document?')}');"><i class="icon-g-remove"></i> ${_('Delete')}</a>
+        <a href='${tg.url('/api/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, 'deleted'))}' id='current-document-force-delete-button' class="btn" onclick="return confirm('${_('Delete current document?')}');"><i class="fa fa-trash-o"></i> ${_('Delete')}</a>
+        
       </div>
 
       <div class="row">
         <div id='application-document-panel' class="span5">
           <p>
             <div id='current-document-content' class="">
-              <h3 id="current-document-title">#${current_node.node_id} - ${current_node.data_label}</h3>
+              <h3 id="current-document-title">#${current_node.node_id} - ${current_node.data_label}
+                <span class="label ${current_node.getStatus().css}" href="#">${current_node.getStatus().label}</a>
+              
+              </h3>
               ${current_node.getContentWithTags()|n}
             </div>
             <form style='display: none;' id="current-document-content-edit-form" method='post' action='${tg.url('/api/edit_label_and_content')}'>

@@ -5,13 +5,15 @@ import re
 import datetime as datetimeroot
 from datetime import datetime
 from hashlib import sha256
-__all__ = ['User', 'Group', 'Permission']
 
 from sqlalchemy import Table, ForeignKey, Column, Sequence
 from sqlalchemy.types import Unicode, Integer, DateTime, Text, LargeBinary
 from sqlalchemy.orm import relation, synonym, relationship
 from sqlalchemy.orm import backref
+import sqlalchemy.orm as sqlao
 from sqlalchemy import orm as sqlao
+
+from tg.i18n import ugettext as _, lazy_ugettext as l_
 
 import tg
 from pboard.model import DeclarativeBase, metadata, DBSession
@@ -92,29 +94,52 @@ class PBNodeStatusItem(object):
 class PBNodeStatus(object):
     
   StatusList = dict()
-  StatusList['immortal']   = PBNodeStatusItem('immortal',   'Information',         'normal',    'fa fa-info-circle',        'pod-status-grey-light')
-  StatusList['new']        = PBNodeStatusItem('new',        'New',                 'open',      'fa fa-lightbulb-o',        'btn-success')
-  StatusList['inprogress'] = PBNodeStatusItem('inprogress', 'In progress',         'open',      'fa fa-gears fa-inverse',   'btn-info')
-  StatusList['actiontodo'] = PBNodeStatusItem('actiontodo', 'Action to do',        'open',      'fa fa-spinner fa-inverse', 'btn-info')
-  StatusList['standby']    = PBNodeStatusItem('standby',    'Waiting for news',    'open',      'fa fa-spinner fa-inverse', 'btn-warning')
-  StatusList['hot']        = PBNodeStatusItem('hot',        'Hot',                 'open',      'fa fa-warning fa-inverse', 'btn-danger')
-  StatusList['done']       = PBNodeStatusItem('done',       'Done',                'closed',    'fa fa-check-square-o',     'pod-status-grey-light')
-  StatusList['closed']     = PBNodeStatusItem('closed',     'Closed',              'closed',    'fa fa-lightbulb-o',        'pod-status-grey-middle')
-  StatusList['archived']   = PBNodeStatusItem('archived',   'Archived',            'invisible', 'fa fa-archive',            'pod-status-grey-dark')
-  StatusList['deleted']    = PBNodeStatusItem('deleted',    'Deleted',             'invisible', 'fa fa-trash-o',            'pod-status-grey-dark')
+  StatusList['information'] = PBNodeStatusItem('information', 'Information',         'normal', 'fa fa-info-circle',            'pod-status-grey-light')
+  StatusList['automatic']   = PBNodeStatusItem('automatic',   'Automatic',           'open',   'fa fa-flash',                  'pod-status-grey-light')
+  StatusList['new']         = PBNodeStatusItem('new',         'New',                 'open',   'fa fa-lightbulb-o fa-inverse', 'btn-success')
+  StatusList['inprogress']  = PBNodeStatusItem('inprogress',  'In progress',         'open',   'fa fa-gears fa-inverse',       'btn-info')
+  StatusList['standby']     = PBNodeStatusItem('standby',     'In standby',          'open',   'fa fa-spinner fa-inverse',     'btn-warning')
+  StatusList['done']        = PBNodeStatusItem('done',        'Done',                'closed', 'fa fa-check-square-o',         'pod-status-grey-light')
+  StatusList['closed']      = PBNodeStatusItem('closed',      'Closed',              'closed', 'fa fa-lightbulb-o',            'pod-status-grey-middle')
+  StatusList['deleted']     = PBNodeStatusItem('deleted',     'Deleted',             'closed', 'fa fa-trash-o',                'pod-status-grey-dark')
+
+  @classmethod
+  def getChoosableList(cls):
+    return [
+      PBNodeStatus.StatusList['information'],
+      PBNodeStatus.StatusList['automatic'],
+      PBNodeStatus.StatusList['new'],
+      PBNodeStatus.StatusList['inprogress'],
+      PBNodeStatus.StatusList['standby'],
+      PBNodeStatus.StatusList['done'],
+      PBNodeStatus.StatusList['closed'],
+    ]
+
+  @classmethod
+  def getVisibleIdsList(cls):
+    return ['information', 'automatic', 'new', 'inprogress', 'standby', 'done' ]
+
+  @classmethod
+  def getVisibleList(cls):
+    return [
+      PBNodeStatus.StatusList['information'],
+      PBNodeStatus.StatusList['automatic'],
+      PBNodeStatus.StatusList['new'],
+      PBNodeStatus.StatusList['inprogress'],
+      PBNodeStatus.StatusList['standby'],
+      PBNodeStatus.StatusList['done'],
+    ]
 
   @classmethod
   def getList(cls):
     return [
-      PBNodeStatus.StatusList['immortal'],
+      PBNodeStatus.StatusList['information'],
+      PBNodeStatus.StatusList['automatic'],
       PBNodeStatus.StatusList['new'],
-      PBNodeStatus.StatusList['actiontodo'],
       PBNodeStatus.StatusList['inprogress'],
       PBNodeStatus.StatusList['standby'],
-      PBNodeStatus.StatusList['hot'],
       PBNodeStatus.StatusList['done'],
       PBNodeStatus.StatusList['closed'],
-      PBNodeStatus.StatusList['archived'],
       PBNodeStatus.StatusList['deleted']
     ]
     
@@ -162,8 +187,8 @@ class PBNode(DeclarativeBase):
   parent_tree_path = Column(Unicode(255), unique=False, nullable=False, default='')
   owner_id         = Column(Integer, ForeignKey('pod_user.user_id'), nullable=True, default=None)
 
-  node_order  = Column(Integer, nullable=True, default=1)
-  node_type   = Column(Unicode(16), unique=False, nullable=False, default='data')
+  node_order   = Column(Integer, nullable=True, default=1)
+  node_type    = Column(Unicode(16), unique=False, nullable=False, default='data')
   node_status = Column(Unicode(16), unique=False, nullable=False, default='new')
 
   created_at = Column(DateTime, unique=False, nullable=False)
@@ -177,7 +202,7 @@ class PBNode(DeclarativeBase):
   
   data_file_name      = Column(Unicode(255),  unique=False, nullable=False, default='')
   data_file_mime_type = Column(Unicode(255),  unique=False, nullable=False, default='')
-  data_file_content   = Column(LargeBinary(), unique=False, nullable=False, default=None)
+  data_file_content   = sqlao.deferred(Column(LargeBinary(), unique=False, nullable=False, default=None))
 
 
   _oParent = relationship('PBNode', remote_side=[node_id], backref='_lAllChildren')
@@ -280,7 +305,19 @@ class PBNode(DeclarativeBase):
     return poDateTime.strftime(psDateTimeFormat)
 
   def getStatus(self):
-    return PBNodeStatus.getStatusItem(self.node_status)
+    loStatus = PBNodeStatus.getStatusItem(self.node_status)
+    if loStatus.status_id!='automatic':
+      return loStatus
+    else:
+      # Compute the status:
+      # - if at least one child is 'new' or 'in progress' or 'in standby' => status is inprogress
+      # - else if all status are 'done', 'closed' or 'deleted' => 'done'
+      lsRealStatusId = 'done'
+      for loChild in self.getChildren():
+        if loChild.getStatus().status_id in ('new', 'inprogress', 'standby'):
+          lsRealStatusId = 'inprogress'
+          break
+      return PBNodeStatus.getStatusItem(lsRealStatusId)
 
   def getTruncatedLabel(self, piCharNb):
     lsTruncatedLabel = ''

@@ -123,13 +123,13 @@ class RootController(BaseController):
         loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
         # loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
-        loRootNodeList = loApiController.buildTreeListForMenu()
+        loRootNodeList = loApiController.buildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
         liNodeId         = int(node)
         
         loCurrentNode    = None
         loNodeStatusList = None
         try:
-          loNodeStatusList = pbmd.PBNodeStatus.getList()
+          loNodeStatusList = pbmd.PBNodeStatus.getChoosableList()
           loCurrentNode    = loApiController.getNode(liNodeId)
         except Exception as e:
           flash(_('Document not found'), 'error')

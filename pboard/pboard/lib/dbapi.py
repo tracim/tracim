@@ -95,10 +95,10 @@ class PODUserFilteredApiController(object):
     return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_status==psNodeStatus).order_by(pbmd.PBNode.updated_at).limit(piMaxNodeNb).all()
 
 
-  def buildTreeListForMenu(self):
+  def buildTreeListForMenu(self, plViewableStatusId):
     liOwnerIdList = self._getUserIdListForFiltering()
     
-    loNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).order_by(pbmd.PBNode.node_id).all()
+    loNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).filter(pbmd.PBNode.node_status.in_(plViewableStatusId)).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).order_by(pbmd.PBNode.node_id).all()
     loTreeList = []
     loTmpDict = {}
     for loNode in loNodeList:
@@ -112,7 +112,7 @@ class PODUserFilteredApiController(object):
         # The following line may raise an exception
         # We suppose that the parent node has already been added
         # this *should* be the case, but the code does not check it
-        if loNode.parent_id in loTmpDict.keys():
+        if loNode.parent_id not in loTmpDict.keys():
           loTmpDict[loNode.parent_id] = self.getNode(loNode.parent_id)
         loTmpDict[loNode.parent_id].appendStaticChild(loNode)
   
