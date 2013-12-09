@@ -26,7 +26,7 @@
 
 <%def name='SignUpForm(psCssMinHeight="1em")'>
   <div class="span3">
-    <form class="well" style="min-height: ${psCssMinHeight};" action="${tg.url('/public_api/create_account')}">
+    <form class="well" method="POST" style="min-height: ${psCssMinHeight};" action="${tg.url('/public_api/create_account')}">
       <fieldset>
         <legend>Want to try?</legend>
         <input type="text"     name="email"            id="email" placeholder="Email"><br/>
