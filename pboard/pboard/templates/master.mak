@@ -212,13 +212,13 @@
               
             % endif
           </ul>
+          <form class="navbar-search pull-right form-search" action="${tg.url('/search')}">
+            <div class="input-append">
+              <input name="keywords" type="text" class="span2 search-query" placeholder="Search" value="${context.get('search_string', '')}">
+              <button title="${_('Search')}" class="btn" type="submit"><i class="fa fa-search"></i></button>
+            </div>
+          </form>
 
-          #####################
-          ## FIXME - D.A. - 2013-11-07 - Make search available
-          ## 
-          ## <form class="navbar-search pull-right" action="">
-          ##   <input type="text" class="search-query span2" placeholder="Search">
-          ## </form>
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
     </div><!-- /.navbar-inner -->

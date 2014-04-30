@@ -1,7 +1,7 @@
 #!/bin/bash
-POD_DB_USER='pod_master'
-POD_DB_USER_PASSWORD='pod_master_password'
-POD_DB_NAME='pod'
+POD_DB_USER='pod_protov1_dev'
+POD_DB_USER_PASSWORD='pod_protov1_dev_password'
+POD_DB_NAME='pod_protov1_dev'
 
 # DB_HOST='127.0.0.1'
 # DB_PORT='5432'

@@ -61,6 +61,8 @@ echo "-> psycopg2"
 echo "-> pillow"
 pip install psycopg2
 pip install pillow
+pip install beautifulsoup4
+
 echo
 echo
 

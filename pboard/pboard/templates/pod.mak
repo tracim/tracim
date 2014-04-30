@@ -1,18 +1,55 @@
+<%def name="IconCssClass(psNodeType)" >
+  % if psNodeType=='data':
+    fa fa-file-text-o
+  % elif  psNodeType=='folder':
+    fa fa-folder-open
+  % elif  psNodeType=='node':
+    fa fa-file-text-o
+  % elif  psNodeType=='file':
+    fa fa-paperclip
+  % elif  psNodeType=='event':
+    fa fa-calendar
+  % elif  psNodeType=='contact':
+    fa fa-user
+  % elif  psNodeType=='comment':
+    fa fa-comments-o
+  % endif
+</%def>
+
+<%def name="DocumentTypeLabel(psNodeType)" ><%
+  labels = dict()
+  labels['data'] = 'document'
+  labels['folder'] = 'folder'
+  labels['node'] = 'node'
+  labels['file'] = 'file'
+  labels['event'] = 'event'
+  labels['contact'] = 'contact'
+  labels['comment'] = 'comment'
+  return labels[psNodeType]
+%></%def>
+
+<%def name="DocumentUrl(piNodeId, psHighlight)" >${tg.url('/document/%i?highlight=%s'%(piNodeId, psHighlight))}</%def>
+<%def name="DocumentUrlWithAnchor(piNodeId, psHighlight, psAnchor)" >${tg.url('/document/%i?highlight=%s#%s'%(piNodeId, psHighlight, psAnchor))}</%def>
+
 <%def name="Button(piId, pbWithLabel, psButtonCssClass, psButtonTitle, psButtonIcon, psButtonLabel)" >
   <button id='${piId}' type="button" class="${psButtonCssClass}" title="${psButtonTitle}"><i class="${psButtonIcon}"></i>${'' if (pbWithLabel==False) else ' %s'%(psButtonLabel)}</button>
 </%def>
 
 <%def name="SaveButton(piId, pbWithLabel=False)" >
-  ${Button(piId, pbWithLabel, 'btn btn-success', _('Save'), ' icon-g-ok-2 icon-g-white', _('Save'))}
+  ${Button(piId, pbWithLabel, 'btn btn-small btn-success', _('Save'), ' icon-g-ok-2 icon-g-white', _('Save'))}
 </%def>
 <%def name="EditButton(piId, pbWithLabel=False)" >
-  ${Button(piId, pbWithLabel, 'btn', _('Edit'), 'icon-g-edit', _('Edit'))}
+  ${Button(piId, pbWithLabel, 'btn btn-small', _('Edit'), 'fa fa-edit', _('Edit'))}
 </%def>
 <%def name='CancelButton(piId, pbWithLabel=False)'>
-  ${Button(piId, pbWithLabel, 'btn ', _('Cancel'), 'icon-g-ban', _('Cancel'))}
+  ${Button(piId, pbWithLabel, 'btn btn-small', _('Cancel'), 'icon-g-ban', _('Cancel'))}
 </%def>
-<%def name='AddButton(piId, pbWithLabel=False, psLabel=None)'>
-  ${Button(piId, pbWithLabel, 'btn', psLabel or _('New'), 'icon-g-circle-plus', psLabel or _('New'))}
+<%def name='AddButton(piId, pbWithLabel=False, psLabel=None, pbIsCallToAction=True)'>
+% if pbIsCallToAction:
+  ${Button(piId, pbWithLabel, 'btn btn-small btn-success', psLabel or _('New'), 'fa fa-plus', psLabel or _('New'))}
+% else:
+  ${Button(piId, pbWithLabel, 'btn btn-small', psLabel or _('New'), 'fa fa-plus', psLabel or _('New'))}
+% endif
 </%def>
 <%def name='Badge(psLabel, psCssClass="")'>
   <span class='badge ${psCssClass}'>${psLabel}</span>
@@ -41,15 +78,23 @@
 <%def name='RichTextEditorToolbar(psRichTextEditorNodeId, psMenuOptions="styles|boldanditalic|lists|justifiers|links|images|undoredo|fullscreen")'>
       <div class="btn-toolbar" data-role="${psRichTextEditorNodeId}-toolbar" data-target="${psRichTextEditorNodeId}">
       % if psMenuOptions.find('styles')>=0:
+      
         <div class="btn-group">
-          <a class="btn" data-edit="formatBlock p"   title="Normal paragraph">§</h1></a></li>
-          <a class="btn" data-edit="formatBlock pre" title="Fixed width (code)">C</h1></a>
-          <a class="btn" data-edit="formatBlock h1"  title="Title - level 1">h1</a>
-          <a class="btn" data-edit="formatBlock h2"  title="Title - level 2">h2</a>
-          <a class="btn" data-edit="formatBlock h3"  title="Title - level 3">h3</a>
-          <a class="btn" data-edit="formatBlock h4"  title="Title - level 4">h4</a>
-          <a class="btn" data-edit="formatBlock h5"  title="Title - level 5">h5</a>
-          <a class="btn" data-edit="formatBlock h6"  title="Title - level 6">h6</a>
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="fa fa-font"></i>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+          <!-- dropdown menu links -->
+            <li><a data-edit="formatBlock p"   title="Normal paragraph"><p style="margin: 0">text body</p></a></li>
+            <li><a data-edit="formatBlock pre" title="Fixed width (code)"><pre style="margin: 0">quote</pre></a></li>
+            <li><a data-edit="formatBlock h1"  title="Title - level 1"><h1 style="margin: 0">heading 1</h1></a></li>
+            <li><a data-edit="formatBlock h2"  title="Title - level 2"><h2 style="margin: 0">heading 2</h2></a></li>
+            <li><a data-edit="formatBlock h3"  title="Title - level 3"><h3 style="margin: 0">heading 3</h3></a></li>
+            <li><a data-edit="formatBlock h4"  title="Title - level 4"><h4 style="margin: 0">heading 4</h4></a></li>
+            <li><a data-edit="formatBlock h5"  title="Title - level 5"><h5 style="margin: 0">heading 5</h5></a></li>
+            <li><a data-edit="formatBlock h6"  title="Title - level 6"><h6 style="margin: 0">heading 6</h6></a></li>
+          </ul>
         </div>
       % endif
       % if psMenuOptions.find('boldanditalic')>=0:
@@ -76,22 +121,30 @@
           <a class="btn" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
         </div>
       % endif
-      % if psMenuOptions.find('links')>=0:
-        <div class="btn-group">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" title="Hyperlink"><i class="fa fa-link"></i></a>
-          <div class="dropdown-menu input-append">
-            <input class="span2" placeholder="URL" type="text" data-edit="createLink"/>
-            <button class="btn" type="button">Add</button>
-          </div>
-          <a class="btn" data-edit="unlink" title="Remove Hyperlink"><i class="fa fa-cut"></i></a>
-        </div>
-      % endif
-      % if psMenuOptions.find('images')>=0:
-        <div class="btn-group">
-          <a class="btn" title="Insert picture (or just drag & drop)" id="pictureBtn"><i class="fa fa-picture-o"></i></a>
-          <input type="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" />
-        </div>
-      % endif
+#######
+##
+## LINK MENU ; NOT WORKING FOR NOW (links are auto-generated at render time)
+##
+##      % if psMenuOptions.find('links')>=0:
+##        <div class="btn-group">
+##          <a class="btn dropdown-toggle" data-toggle="dropdown" title="Hyperlink"><i class="fa fa-link"></i></a>
+##          <div class="dropdown-menu input-append">
+##            <input class="span2" placeholder="URL" type="text" data-edit="createLink"/>
+##            <button class="btn" type="button">Add</button>
+##          </div>
+##          <a class="btn" data-edit="unlink" title="Remove Hyperlink"><i class="fa fa-cut"></i></a>
+##        </div>
+##      % endif
+#######
+##
+## IMAGES MENU ; NOT WORKING FOR NOW
+##
+##      % if psMenuOptions.find('images')>=0:
+##        <div class="btn-group">
+##          <a class="btn" title="Insert picture (or just drag & drop)" id="pictureBtn"><i class="fa fa-picture-o"></i></a>
+##          <input type="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" />
+##        </div>
+##      % endif
       % if psMenuOptions.find('undoredo')>=0:
         <div class="btn-group">
           <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="fa fa-undo"></i></a>
@@ -122,9 +175,9 @@
 
 <%def name='RichTextEditor(psRichTextEditorNodeId, psRichTextEditorContent="", psMenuOptions="styles|boldanditalic|lists|justifiers|links|images|undoredo|fullscreen")'>
   <div id="${psRichTextEditorNodeId}-widget" class="rich-text-editor-widget">
+    ${RichTextEditorToolbar(psRichTextEditorNodeId, psMenuOptions)}
     <div id="${psRichTextEditorNodeId}-widget-inner" class="rich-text-editor-widget-inner">
       <div id="${psRichTextEditorNodeId}-alert-container"></div>
-      ${RichTextEditorToolbar(psRichTextEditorNodeId, psMenuOptions)}
       <div id="${psRichTextEditorNodeId}" class="pod-rich-text-zone pod-input-like-shadow">
         ${psRichTextEditorContent|n}
       </div>

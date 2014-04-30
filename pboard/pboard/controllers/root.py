@@ -106,18 +106,18 @@ class RootController(BaseController):
     @expose('pboard.templates.dashboard')
     @require(predicates.in_group('user', msg=l_('Please login to access this page')))
     def dashboard(self):
-      loCurrentUser   = pld.PODStaticController.getCurrentUser()
-      loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
+        loCurrentUser   = pld.PODStaticController.getCurrentUser()
+        loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
-      loLastModifiedNodes = loApiController.getLastModifiedNodes(10)
-      loWhatsHotNodes     = loApiController.getNodesByStatus('hot', 5)
-      loActionToDoNodes   = loApiController.getNodesByStatus('actiontodo', 5)
-      return dict(last_modified_nodes=loLastModifiedNodes, whats_hot_nodes=loWhatsHotNodes, action_to_do_nodes = loActionToDoNodes)
+        loLastModifiedNodes = loApiController.getLastModifiedNodes(10)
+        loWhatsHotNodes     = loApiController.getNodesByStatus('hot', 5)
+        loActionToDoNodes   = loApiController.getNodesByStatus('actiontodo', 5)
+        return dict(last_modified_nodes=loLastModifiedNodes, whats_hot_nodes=loWhatsHotNodes, action_to_do_nodes = loActionToDoNodes)
 
 
     @expose('pboard.templates.document')
     @require(predicates.in_group('user', msg=l_('Please login to access this page')))
-    def document(self, node=0, came_from=lurl('/')):
+    def document(self, node=0, came_from=lurl('/'), highlight=''):
         """show the user dashboard"""
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
         loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -125,7 +125,7 @@ class RootController(BaseController):
         # loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
         loRootNodeList = loApiController.buildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
         liNodeId         = int(node)
-        
+
         loCurrentNode    = None
         loNodeStatusList = None
         try:
@@ -133,12 +133,12 @@ class RootController(BaseController):
           loCurrentNode    = loApiController.getNode(liNodeId)
         except Exception as e:
           flash(_('Document not found'), 'error')
-        
+
         # FIXME - D.A - 2013-11-07 - Currently, the code build a new item if no item found for current user
         # the correct behavior should be to redirect to setup page
         if loCurrentNode is not None and "%s"%loCurrentNode.node_id!=node:
           redirect(tg.url('/document/%i'%loCurrentNode.node_id))
-          
+
         if loCurrentNode is None:
           loCurrentNode = loApiController.getNode(0) # try to get an item
           if loCurrentNode is not None:
@@ -150,5 +150,22 @@ class RootController(BaseController):
             pm.DBSession.flush()
             redirect(tg.url('/document/%i'%loCurrentNode.node_id))
 
-        return dict(root_node_list=loRootNodeList, current_node=loCurrentNode, node_status_list = loNodeStatusList)
+        return dict(
+            root_node_list=loRootNodeList,
+            current_node=loCurrentNode,
+            node_status_list = loNodeStatusList,
+            keywords = highlight
+        )
+
+    @expose('pboard.templates.search')
+    @require(predicates.in_group('user', msg=l_('Please login to access this page')))
+    def search(self, keywords=''):
+        loCurrentUser   = pld.PODStaticController.getCurrentUser()
+        loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
+
+        loFoundNodes = loApiController.searchNodesByText(keywords.split())
+
+        return dict(search_string=keywords, found_nodes=loFoundNodes)
+
+
 
