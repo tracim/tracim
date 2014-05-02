@@ -1,23 +1,18 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
+import pboard
 
 import tg
 from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates
-from pboard import model
-from pboard.model import DBSession, metadata
-# FIXME - D.A. - 2013-11-19
-# python3 port is not yet available for the tgext.admin module
-#
-# from tgext.admin.tgadminconfig import TGAdminConfig
-# from tgext.admin.controller import AdminController
+
+import tgext.admin.tgadminconfig as tgat
+import tgext.admin.controller as tgac
 
 from pboard.lib.base import BaseController
 from pboard.controllers.error import ErrorController
 
-import pboard.model as pbm
-import pboard.controllers as pbc
 from pboard.lib import dbapi as pld
 from pboard.controllers import api as pbca
 from pboard.controllers import debug as pbcd
@@ -43,10 +38,12 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    # FIXME - D.A. - 2013-11-19
-    # python3 port is not yet available for the tgext.admin module
-    #
-    # admin = AdminController(model, DBSession, config_type=TGAdminConfig)
+
+    admin = tgac.AdminController(
+        pm,
+        pm.DBSession,
+        config_type = tgat.TGAdminConfig
+    )
 
     api   = pbca.PODApiController()
     debug = pbcd.DebugController()
