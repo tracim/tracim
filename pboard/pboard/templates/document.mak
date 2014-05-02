@@ -1,31 +1,9 @@
 <%inherit file="local:templates.master"/>
 <%namespace name="POD" file="pboard.templates.pod"/>
+<%namespace name="DOC" file="pboard.templates.document-widgets"/>
 
 <%def name="title()">
 pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} / ${current_node.getStatus().label}]
-</%def>
-
-<%def name="node_treeview_for_set_parent_menu(node_id, node_list, indentation=-1)">
-  % if indentation==-1:
-    <li>
-      <a href="${tg.url('/api/set_parent_node?node_id=%i&new_parent_id=0'%(current_node.node_id))}">
-        <i class="fa fa-file-text-o"></i> ${_('Home')}
-      </a>
-      ${node_treeview_for_set_parent_menu(node_id, node_list, 0)}
-    </li>
-  % else:
-    % if len(node_list)>0:
-      <ul style="list-style: none;">
-      % for new_parent_node in node_list:
-        <li>
-          <a href="${tg.url('/api/set_parent_node?node_id=%i&new_parent_id=%i'%(node_id, new_parent_node.node_id))}"><i class="fa fa-file-text-o"></i> ${new_parent_node.getTruncatedLabel(40-indentation*2)}
-          </a>
-          ${node_treeview_for_set_parent_menu(node_id, new_parent_node.getStaticChildList(), indentation+1)}
-        </li>
-      % endfor
-      </ul>
-    % endif
-  % endif
 </%def>
 
 <%def name="node_treeview(node_list, indentation=-1)">
@@ -91,13 +69,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
 ## HERE COMES THE BREADCRUMB
 ##
   <div class="row">
-<ul class="breadcrumb span12">
-  <li><span class="divider"> / Documents /</span></li>
-  % for breadcrumb_node in current_node.getBreadCrumbNodes():
-    <li><a href="${tg.url('/document/%s'%(breadcrumb_node.node_id))}">${breadcrumb_node.getTruncatedLabel(30)}</a> <span class="divider">/</span></li>
-  % endfor
-  <li class="active">${current_node.data_label}</li>
-</ul>
+    ${DOC.BreadCrumb(current_node)}
   </div>
 
   <div class="row">
@@ -111,148 +83,27 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
       <div class="row">
         <div id='application-document-panel' class="span5">
           <div id='current-document-content' class="">
-######
-##
-## CURRENT DOCUMENT TOOLBAR - START
-##
-            <div id="current-document-toobar">
-              <div class="btn-group">
-          % if current_node.parent_id!=None and current_node.parent_id!=0:
-                ${POD.EditButton('current-document-content-edit-button', True)}
-          % endif
-      ##        </div>
-      ##        <div class="btn-group">
-                <button class="btn btn-small"  data-toggle="dropdown" href="#"> 
-                  <i class="fa  fa-signal"></i>
-                  ${_("Change status")}
-                </button>
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                % for node_status in node_status_list:
-                  % if node_status.status_id==current_node.getStatus().status_id:
-                  <li title="${h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id)}">
-                    <a class="${node_status.css}" href="#"  style="color: #999;">
-                      <i class="${node_status.icon_id}"></i> ${node_status.label}
-                    </a>
-                  </li>
-                  % else:
-                  <li title="${h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id)}">
-                    <a class="${node_status.css}" href="${tg.url('/api/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, node_status.status_id))}">
-                      <i class="${node_status.icon_id}"></i> ${node_status.label}
-                    </a>
-                  </li>
-                  % endif
-                % endfor
-                </ul>
-              </div>
-              <div class="btn-group">
-                <button class="btn btn-small btn-success"  data-toggle="dropdown" href="#">
-                  <i class="fa fa-plus"></i> ${_('Add')}
-                </button>
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                
-                  <li>
-                    <div class="btn-success strong" ><strong><i class="fa fa-magic"></i> Add New...</strong><br/></div>
-                    <div class="pod-grey"><i>create a totally new item...</i></div>
-                  </li>
-
-                  <li><a><i class="fa fa-file-text-o"></i> Document</a></li>
-                  <li><a><i class="fa fa-paperclip"></i> File</a></li>
-                  <li><a><i class="fa fa-calendar"></i> Event</a></li>
-                  <li><a><i class="fa fa-user"></i> Contact</a></li>
-                  <li><a><i class="fa fa-comments-o"></i> Comment</a></li>
-
-                  <li class="divider" role="presentation"></li>
-
-                  <li>
-                    <div class="btn-warning strong" ><strong><i class="fa fa-link"></i> Add Existing...</strong><br/></div>
-                    <div class="pod-grey"><i>link to an existing item...</i></div>
-                  </li>
-                  <li><a><i class="fa fa-file-text-o"></i> Document</a></li>
-                  <li><a><i class="fa fa-paperclip"></i> File</a></li>
-                  <li><a><i class="fa fa-calendar"></i> Event</a></li>
-                  <li><a><i class="fa fa-user"></i> Contact</a></li>
-                  <li><a><i class="fa fa-comments-o"></i> Comment</a></li>
-
-                </ul>
-              </div>
-              <div class="btn-group ">
-                <a
-                  class="btn btn-small btn-warning"
-                  href="#"
-                  data-toggle="dropdown"
-                  title="${_('Move to')}"
-                  ><i class="fa fa-arrows"></i></a>
-                <ul class="dropdown-menu">
-                  <li >
-                    <div class="btn-warning strong" ><strong><i class="fa fa-magic"></i> ${_("Move the document...")}</strong><br/></div>
-                    <div class="pod-grey"><i>move the document to...</i></div>
-                  </li>
-                  ${node_treeview_for_set_parent_menu(current_node.node_id, root_node_list)}
-                </ul>
-                <a
-                  class="btn btn-small btn-danger"
-                  href='${tg.url('/api/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, 'deleted'))}'
-                  id='current-document-force-delete-button' onclick="return confirm('${_('Delete current document?')}');"
-                  title="${_('Delete')}"
-                  ><i class="fa fa-trash-o"></i></a>
-              </div>
-            </div>
-##
-## CURRENT DOCUMENT TOOLBAR - END
-##
-######
-
-######
-##
-## CURRENT DOCUMENT CONTENT - START
-##
-            <h3 id="current-document-title">#${current_node.node_id} - ${current_node.data_label}
-              <span class="label ${current_node.getStatus().css}" href="#">${current_node.getStatus().label}</a>
-            </h3>
-            % if len(keywords)>0 and keywords!='':
-                ${current_node.getContentWithHighlightedKeywords(keywords.split(), current_node.getContentWithTags())|n}
-            % else:
-                ${current_node.getContentWithTags()|n}
-            % endif
+            ######
+            ##
+            ## CURRENT DOCUMENT TOOLBAR - START
+            ##
+            ## The Toolbar is a div with a specific id
+            ##
+            ${DOC.Toolbar(current_node, node_status_list, root_node_list, 'current-document-toobar')}
+            ${DOC.ShowTitle(current_node, keywords, 'current-document-title')}
+            ${DOC.ShowContent(current_node, keywords)}
           </div>
-          <form style='display: none;' id="current-document-content-edit-form" method='post' action='${tg.url('/api/edit_label_and_content')}'>
-            <div>
-              ${POD.CancelButton('current-document-content-edit-cancel-button-top', True)}
-              ${POD.SaveButton('current-document-content-edit-save-button-top', True)}
-            </div>
-            <div style="padding: 0.5em 0 0 0">
-              <input type='hidden' name='node_id' value='${current_node.node_id}'/>
-              <input type="hidden" name='data_content' id="current_node_textarea" />
-              <input type='text' name='data_label' value='${current_node.data_label}' class="span4" placeholder="document title" />
-            </div>
-            <div>
-              ${POD.RichTextEditor('current_node_textarea_wysiwyg', current_node.data_content)}
-            </div>
-            <div class="pull-right">
-              ${POD.CancelButton('current-document-content-edit-cancel-button', True)}
-              ${POD.SaveButton('current-document-content-edit-save-button', True)}
-            </div>
-          </form>
+          ${DOC.EditForm(current_node)}
         </div>
-        ## FIXME - D.A - 2013-11-07 - The following div should be span4 instead of span3 but some bug make it impossible
         <div id='application-metadata-panel' class="span4">
           <div class="tabbable">
-            <ul class="nav nav-tabs">
-                <li><a href="#subdocuments" data-toggle="tab" title="${_('Subdocuments')}"><i class='pod-dark-grey fa fa-file-text-o'></i>
-                
-                ${POD.ItemNb(current_node.getChildren())}</a></li>
-                
-                <li class="active"><a href="#events" data-toggle="tab" title="${_('Calendar')}"><i class="pod-dark-grey fa fa-calendar"></i>${POD.ItemNb(current_node.getEvents())}</a></li>
-                <li><a href="#contacts" data-toggle="tab" title="${_('Address book')}"><i class="pod-dark-grey fa fa-user"></i>${POD.ItemNb(current_node.getContacts())}</a></li>
-                <li><a href="#comments" data-toggle="tab" title="${_('Comment thread')}"><i class="pod-dark-grey fa fa-comments-o"></i>${POD.ItemNb(current_node.getComments())}</a></li>
-                <li><a href="#files" data-toggle="tab" title="${_('Attachments')}"><i class="pod-dark-grey fa  fa-paperclip"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
-                
-                <li class="pull-right"><a href="#accessmanagement" data-toggle="tab" title="${_('Access Management')}"><i class="pod-dark-grey fa fa-key"></i>${POD.ItemNb(current_node.getFiles())}</a></li>
-                 
+            <ul class="nav nav-tabs" style="margin-bottom: 0.5em;">
+                <li>${DOC.MetadataTab('#subdocuments', 'tab', _('Subdocuments'), 'fa-file-text-o', current_node.getChildren())}</li>
+                <li class="active">${DOC.MetadataTab('#events', 'tab', _('Calendar'), 'fa-calendar', current_node.getEvents())}</li>
+                <li>${DOC.MetadataTab('#contacts', 'tab', _('Address book'), 'fa-user', current_node.getContacts())}</li>
+                <li>${DOC.MetadataTab('#comments', 'tab', _('Comment thread'), 'fa-comments-o', current_node.getComments())}</li>
+                <li>${DOC.MetadataTab('#files', 'tab', _('Attachments'), 'fa-paperclip', current_node.getFiles())}</li>
+                <li class="pull-right">${DOC.MetadataTab('#accessmanagement', 'tab', _('Access Management'), 'fa-key', [])}</li>
             </ul>
             <div class="tab-content">
                 ################################
@@ -262,11 +113,13 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ################################
                 <!-- DEBUG - D.A. - 2013-11-07 - Not using tags for th moment -->
                 <div class="tab-pane" id="subdocuments">
+                  <p><strong>Sub-documents</strong></p> 
                 % if len(current_node.getChildren())<=0:
                   <p class="pod-grey">
                     ${_("There is currently no child documents.")}<br/>
                   </p>
                   <p>
+                    
                     <a class="btn btn-success btn-small" href="${tg.url('/api/create_document?parent_id=%i'%current_node.node_id)}">
                       <i class="fa fa-plus"></i> ${_("Add one")}
                     </a>
@@ -274,7 +127,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 % else:
                   <p>
                     <a class="btn btn-success btn-small" href="${tg.url('/api/create_document?parent_id=%i'%current_node.node_id)}">
-                      <i class="fa fa-plus"></i> ${_("Add new document")}
+                      <i class="fa fa-plus"></i> ${_("Add one")}
                     </a>
                   </p>
 
@@ -297,6 +150,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ##
                 ################################
                 <div class="tab-pane active" id="events">
+                  <p><strong>Calendar</strong></p> 
                 % if len(current_node.getEvents())<=0:
                   <p class="pod-grey">${_("The calendar is empty.")}<br/></p>
                   <p>${POD.AddButton('current-document-add-event-button', True, _(' Add first event'))}</p>
@@ -373,6 +227,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ##
                 ##############################
                 <div class="tab-pane" id="contacts">
+                  <p><strong>${_('Address book')}</strong></p> 
                 % if len(current_node.getContacts())<=0:
                   <p class="pod-grey">${_("The address book is empty.")}<br/></p>
                   <p>${POD.AddButton('current-document-add-contact-button', True, _(' Add first contact'), True)}</p>
@@ -414,8 +269,6 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                       </div>
                     </div>
                   % endfor
-
-
                 </div>
                 ################################
                 ##
@@ -423,6 +276,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ##
                 ################################
                 <div class="tab-pane" id="comments">
+                  <p><strong>${_('Comment thread')}</strong></p> 
                 % if len(current_node.getComments())<=0:
                   <p class="pod-grey">${_("The comment thread is empty.")}<br/></p>
                   <p>${POD.AddButton('current-document-add-comment-button', True, _('Add first comment'), True)}</p>
@@ -475,6 +329,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ##
                 ################################
                 <div class="tab-pane" id="files">
+                  <p><strong>${_('Attachments')}</strong></p> 
                 % if len(current_node.getFiles())<=0:
                   <p class="pod-grey">${_("There is currently no attachment.")}<br/></p>
                   <p>${POD.AddButton('current-document-add-file-button', True, _(' Attach first file'))}</p>
@@ -538,9 +393,6 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 <div class="tab-pane" id="accessmanagement">
                   blabla
                 </div>
-                
-                
-                
               </div>
             </div>
           </div>
