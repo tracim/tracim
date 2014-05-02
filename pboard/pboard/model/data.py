@@ -355,7 +355,7 @@ class PBNode(DeclarativeBase):
   def getTruncatedContentAsText(self, piCharNb):
     lsPlainText = ''.join(bs4.BeautifulSoup(self.data_content).findAll(text=True))
     lsTruncatedContent = ''
-    
+
     liMaxLength = int(piCharNb)
     if len(lsPlainText)>liMaxLength:
       lsTruncatedContent = lsPlainText[0:liMaxLength-1]+'…'

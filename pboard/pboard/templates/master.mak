@@ -168,7 +168,15 @@
                 <li><a href="${tg.url('/debug/identity')}"><i class="fa fa-user-md"></i>  request.identity</a></li>
               </ul>
             </li>
-            
+            <li>
+              <form class="navbar-search  form-search" action="${tg.url('/search')}">
+                <div class="input-append">
+                  <input name="keywords" type="text" class="span2 search-query" placeholder="Search" value="${context.get('search_string', '')}">
+                  <button title="${_('Search')}" class="btn" type="submit"><i class="fa fa-search"></i></button>
+                </div>
+              </form>
+            </li>
+
             
             
           % endif
@@ -209,15 +217,8 @@
                     <p></p>
                  </ul>
               </li>
-              
             % endif
           </ul>
-          <form class="navbar-search pull-right form-search" action="${tg.url('/search')}">
-            <div class="input-append">
-              <input name="keywords" type="text" class="span2 search-query" placeholder="Search" value="${context.get('search_string', '')}">
-              <button title="${_('Search')}" class="btn" type="submit"><i class="fa fa-search"></i></button>
-            </div>
-          </form>
 
         </div><!-- /.nav-collapse -->
       </div><!-- /.container -->
