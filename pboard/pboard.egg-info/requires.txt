@@ -1,7 +1,0 @@
-TurboGears2 >= 2.3.1
-Genshi
-Mako
-zope.sqlalchemy >= 0.4
-sqlalchemy
-alembic
-repoze.who

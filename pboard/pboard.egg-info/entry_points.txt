@@ -1,6 +1,0 @@
-[paste.app_factory]
-main = pboard.config.middleware:make_app
-
-[gearbox.plugins]
-turbogears-devtools = tg.devtools
-
