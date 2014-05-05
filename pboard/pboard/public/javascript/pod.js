@@ -6,6 +6,7 @@
       $('.pod-toggle-full-screen-button > i').removeClass('fa-compress')
       $('.pod-toggle-full-screen-button > i').addClass('fa-expand')
     } else {
+      // Toggle from normal to fullscreen
       $(outerWidgetId).addClass('full-size-overlay');
       $(innerWidgetId).addClass('full-size-overlay-inner');
       $('.pod-toggle-full-screen-button > i').removeClass('fa-expand')
@@ -94,16 +95,18 @@
     $("#current-document-content-edit-button" ).click(function() {
       $("#current-document-content" ).css("display", "none");
       $("#current-document-content-edit-form" ).css("display", "block");
+      $("#current-document-toobar").css("display", "none");
     });
     $("#current-document-content" ).dblclick(function() {
       $("#current-document-content" ).css("display", "none");
       $("#current-document-content-edit-form" ).css("display", "block");
     });
-    $("#current-document-content-edit-cancel-button" ).click(function() {
+    $("#current-document-content-edit-cancel-button, #current-document-content-edit-cancel-button-top" ).click(function() {
       $("#current-document-content" ).css("display", "block");
       $("#current-document-content-edit-form" ).css("display", "none");
+      $("#current-document-toobar").css("display", "block");
     });
-    $('#current-document-content-edit-save-button').on('click', function(e){
+    $('#current-document-content-edit-save-button, #current-document-content-edit-save-button-top').on('click', function(e){
       // We don't want this to act as a link so cancel the link action
       e.preventDefault();
       $('#current_node_textarea_wysiwyg').cleanHtml();

@@ -8,7 +8,6 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
-bin/
 build/
 develop-eggs/
 dist/
@@ -52,8 +51,9 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# Vim
+# Vim and dev tools
 *.swp
+.idea
 
 # Virtualenv
 tg2env/

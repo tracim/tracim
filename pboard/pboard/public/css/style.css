@@ -122,8 +122,10 @@ body { padding-top: 60px; }
   position:fixed;
   left:0;
   top:0;
-  z-index:0 !important;
+  z-index:2001 !important;
   background-color:white;
+
+  padding: 0.5em 0.5em 0.5em 0.5em;
   
   filter: alpha(opacity=90); /* internet explorer */
   -khtml-opacity: 0.9;      /* khtml, old safari */
@@ -132,9 +134,9 @@ body { padding-top: 60px; }
 }
 
 .full-size-overlay-inner {
-  margin: 3.5em 0.5em 0.5em 0.5em;
+  margin: 0.5em 1em 0.5em 0em;
   overflow: auto;
-  max-height: 85%;
+  max-height: 90%;
 }
 
 
@@ -181,3 +183,10 @@ tr:Hover td div.pod-toolbar {
 }
 
 .navbar .nav > li > a.pod-do-not-display { display: none; }
+
+/* SEARCH RESULTS SCREEN */
+
+div.search-result-item > h5 {
+  margin-bottom: 0;
+}
+

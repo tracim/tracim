@@ -6,6 +6,7 @@ import datetime as datetimeroot
 from datetime import datetime
 from hashlib import sha256
 
+import bs4
 from sqlalchemy import Table, ForeignKey, Column, Sequence
 from sqlalchemy.types import Unicode, Integer, DateTime, Text, LargeBinary
 from sqlalchemy.orm import relation, synonym, relationship
@@ -263,21 +264,44 @@ class PBNode(DeclarativeBase):
     return self.getChildrenOfType([PBNodeType.Comment], PBNode.getSortingKeyBasedOnDataDatetime, True)
 
   def getIconClass(self):
+    if self.node_type==PBNodeType.Data and self.getStaticChildNb()>0:
+      return PBNode.getIconClassForNodeType('folder')
+    else:
+      return PBNode.getIconClassForNodeType(self.node_type)
+
+  def getBreadCrumbNodes(self):
+    loNodes = []
+    if self._oParent!=None:
+      loNodes = self._oParent.getBreadCrumbNodes()
+      loNodes.append(self._oParent)
+    return loNodes
+
+  def getContentWithHighlightedKeywords(self, plKeywords, psPlainText):
+    if len(plKeywords)<=0:
+      return psPlainText
+
+    lsPlainText = psPlainText
+
+    for lsKeyword in plKeywords:
+      lsPlainText = re.sub('(?i)(%s)' % lsKeyword, '<strong>\\1</strong>', lsPlainText)
+
+    return lsPlainText
+
+
+  @classmethod
+  def getIconClassForNodeType(cls, psIconType):
     laIconClass = dict()
     laIconClass['node']   = 'fa fa-folder-open'
     laIconClass['folder'] = 'fa fa-folder-open'
     laIconClass['data']   = 'fa fa-file-text-o'
 
-    laIconClass['file']   = 'fa fa-file-text-o'
+    laIconClass['file']   = 'fa fa-paperclip'
     laIconClass['event']  = 'fa fa-calendar'
     laIconClass['contact'] = 'fa fa-user'
     laIconClass['comment'] = 'fa fa-comments-o'
+    return laIconClass[psIconType]
 
-    if self.node_type==PBNodeType.Data and self.getStaticChildNb()>0:
-      return laIconClass['folder']
-    else:
-      return laIconClass[self.node_type]
-      
+
   def getUserFriendlyNodeType(self):
     laNodeTypesLng = dict()
     laNodeTypesLng['node']   = 'Document' # FIXME - D.A. - 2013-11-14 - Make text translatable
@@ -304,7 +328,7 @@ class PBNode(DeclarativeBase):
   def getFormattedTime(self, poDateTime, psDateTimeFormat = '%H:%M'):
     return poDateTime.strftime(psDateTimeFormat)
 
-  def getStatus(self):
+  def getStatus(self) -> PBNodeStatusItem:
     loStatus = PBNodeStatus.getStatusItem(self.node_status)
     if loStatus.status_id!='automatic':
       return loStatus
@@ -327,6 +351,17 @@ class PBNode(DeclarativeBase):
     else:
       lsTruncatedLabel = self.data_label
     return lsTruncatedLabel
+
+  def getTruncatedContentAsText(self, piCharNb):
+    lsPlainText = ''.join(bs4.BeautifulSoup(self.data_content).findAll(text=True))
+    lsTruncatedContent = ''
+
+    liMaxLength = int(piCharNb)
+    if len(lsPlainText)>liMaxLength:
+      lsTruncatedContent = lsPlainText[0:liMaxLength-1]+'…'
+    else:
+      lsTruncatedContent = lsPlainText
+    return lsTruncatedContent
 
   def getTagList(self):
     loPattern = re.compile('(^|\s|@)@(\w+)')

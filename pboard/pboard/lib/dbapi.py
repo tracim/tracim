@@ -9,6 +9,7 @@ from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Unicode, Integer, DateTime, Text
 from sqlalchemy.orm import relation, synonym
 from sqlalchemy.orm import joinedload_all
+import sqlalchemy as sqla
 
 from pboard.model import DeclarativeBase, metadata, DBSession
 from pboard.model import data as pbmd
@@ -89,6 +90,28 @@ class PODUserFilteredApiController(object):
     liOwnerIdList = self._getUserIdListForFiltering()
     return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
 
+
+  def searchNodesByText(self, plKeywordList, piMaxNodeNb=100):
+    """
+    Returns a list of nodes order by type, nodes which contain at least one of the keywords
+    """
+    liOwnerIdList = self._getUserIdListForFiltering()
+
+    loKeywordFilteringClauses = []
+    for keyword in plKeywordList:
+        loKeywordFilteringClauses.append(pbmd.PBNode.data_label.ilike('%'+keyword+'%'))
+        loKeywordFilteringClauses.append(pbmd.PBNode.data_content.ilike('%'+keyword+'%'))
+
+    loKeywordFilteringClausesAsOr = sqla.or_(*loKeywordFilteringClauses) # Combine them with or to a BooleanClauseList
+
+    loResultsForSomeKeywords = DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren"))\
+        .filter(loKeywordFilteringClausesAsOr)\
+        .filter(pbmd.PBNode.owner_id.in_(liOwnerIdList))\
+        .order_by(sqla.desc(pbmd.PBNode.node_type))\
+        .limit(piMaxNodeNb)\
+        .all()
+
+    return loResultsForSomeKeywords
 
   def getNodesByStatus(self, psNodeStatus, piMaxNodeNb=5):
     liOwnerIdList = self._getUserIdListForFiltering()

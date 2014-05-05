@@ -45,6 +45,24 @@ echo
 echo
 echo
 echo "-------------------------"
+echo "- install dependencies"
+echo "-------------------------"
+echo "-> psycopg2"
+echo "-> pillow"
+echo "-> beautifulsoup4"
+echo "-> tw.forms"
+echo "-> tgext.admin"
+pip install psycopg2
+pip install pillow
+pip install beautifulsoup4
+pip install tw.forms
+pip install tgext.admin
+echo
+echo
+
+echo
+echo
+echo "-------------------------"
 echo "- setup project"
 echo "-------------------------"
 cd pboard/
@@ -52,16 +70,6 @@ python setup.py develop
 echo
 echo
 
-echo
-echo
-echo "-------------------------"
-echo "- install dependencies"
-echo "-------------------------"
-echo "-> psycopg2"
-echo "-> pillow"
-pip install psycopg2
-pip install pillow
-echo
-echo
+
 
 cd ${OLD_PATH}
