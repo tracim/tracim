@@ -35,8 +35,9 @@
   <button id='${piId}' type="button" class="${psButtonCssClass}" title="${psButtonTitle}"><i class="${psButtonIcon}"></i>${'' if (pbWithLabel==False) else ' %s'%(psButtonLabel)}</button>
 </%def>
 
-<%def name="SaveButton(piId, pbWithLabel=False)" >
-  ${Button(piId, pbWithLabel, 'btn btn-small btn-success', _('Save'), ' icon-g-ok-2 icon-g-white', _('Save'))}
+<%def name="SaveButton(piId, pbWithLabel=False, psLabel='Save')" >
+## FIXME - Make the default value use _() in order to be translated
+  ${Button(piId, pbWithLabel, 'btn btn-small btn-success', psLabel, ' icon-g-ok-2 icon-g-white', psLabel)}
 </%def>
 <%def name="EditButton(piId, pbWithLabel=False)" >
   ${Button(piId, pbWithLabel, 'btn btn-small', _('Edit'), 'fa fa-edit', _('Edit'))}
@@ -51,6 +52,12 @@
   ${Button(piId, pbWithLabel, 'btn btn-small', psLabel or _('New'), 'fa fa-plus', psLabel or _('New'))}
 % endif
 </%def>
+<%def name="OpenModalButton(psModalAnchor, psLabel)">
+  <a href="#${psModalAnchor}" role="button" class="btn btn-success btn-small" data-toggle="modal">
+    <i class="fa fa-plus"></i>${psLabel}
+  </a>
+</%def>
+
 <%def name='Badge(psLabel, psCssClass="")'>
   <span class='badge ${psCssClass}'>${psLabel}</span>
 </%def>

@@ -1,3 +1,13 @@
+  function generateStringId(charNb = 32, allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
+    var text = "";
+
+    for( var i=0; i < charNb; i++ ) {
+      text += allowedChars.charAt(Math.floor(Math.random() * allowedChars.length));
+    }
+
+    return text;
+  }
+
   function toggleFullScreen(outerWidgetId, innerWidgetId) {
     if($(outerWidgetId).hasClass('full-size-overlay')) {
       // Toggle from fullscreen to "normal"
@@ -97,10 +107,7 @@
       $("#current-document-content-edit-form" ).css("display", "block");
       $("#current-document-toobar").css("display", "none");
     });
-    $("#current-document-content" ).dblclick(function() {
-      $("#current-document-content" ).css("display", "none");
-      $("#current-document-content-edit-form" ).css("display", "block");
-    });
+
     $("#current-document-content-edit-cancel-button, #current-document-content-edit-cancel-button-top" ).click(function() {
       $("#current-document-content" ).css("display", "block");
       $("#current-document-content-edit-form" ).css("display", "none");

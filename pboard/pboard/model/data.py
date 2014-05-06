@@ -333,7 +333,7 @@ class PBNode(DeclarativeBase):
           break
       return PBNodeStatus.getStatusItem(lsRealStatusId)
 
-  def getTruncatedLabel(self: PBNode, piCharNb: int):
+  def getTruncatedLabel(self, piCharNb: int):
     """
     return a truncated version of the data_label property.
     if piCharNb is not > 0, then the full data_label is returned

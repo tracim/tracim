@@ -1,16 +1,21 @@
 <%inherit file="local:templates.master"/>
 <%namespace name="POD" file="pboard.templates.pod"/>
 <%namespace name="DOC" file="pboard.templates.document-widgets"/>
+<%namespace name="DOCTABS" file="pboard.templates.document-widgets-tabs"/>
 
 <%def name="title()">
-pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} / ${current_node.getStatus().label}]
+  % if current_node!=None:
+    pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} / ${current_node.getStatus().label}]
+  % else:
+    pod :: document root
+  % endif
 </%def>
 
 <%def name="node_treeview(node_list, indentation=-1)">
   % if indentation==-1:
     <div id='pod-menu-item-0' class="pod-toolbar-parent" style="padding-left: 0.5em; position: relative;">
       <a class="toggle-child-menu-items"><i class='fa fa-folder-open'></i></a>
-      <a href="?node=0" title="${_('Root')}">
+      <a href="${tg.url('/document')}" title="${_('Root')}">
         ${_('Root')}
       </a>
       <div class="pod-toolbar">
@@ -22,7 +27,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
   % else:
     % if len(node_list)>0:
       % for node in node_list:
-        <div id='pod-menu-item-${node.node_id}' class="pod-toolbar-parent ${'pod-status-active' if node.node_id==current_node.node_id else ''}" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
+        <div id='pod-menu-item-${node.node_id}' class="pod-toolbar-parent ${'pod-status-active' if current_node!=None and node.node_id==current_node.node_id else ''}" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
           <a class="toggle-child-menu-items"><i class='${node.getIconClass()}'></i></a>
           <a href="${tg.url('/document/%s'%(node.node_id))}" title="${node.data_label}">
             % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
@@ -80,6 +85,12 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
     </div>
     <div id='application-main-panel' class="span9">
 
+      % if current_node==None:
+        <div class="row">
+          ${DOC.FirstTimeFakeDocument()}
+        </div>
+        
+      % else:
       <div class="row">
         <div id='application-document-panel' class="span5">
           <div id='current-document-content' class="">
@@ -97,7 +108,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
         </div>
         <div id='application-metadata-panel' class="span4">
           <div class="tabbable">
-            <ul class="nav nav-tabs" style="margin-bottom: 0.5em;">
+            <ul class="nav nav-tabs" style="margin-bottom: 0em;">
                 <li>${DOC.MetadataTab('#subdocuments', 'tab', _('Subdocuments'), 'fa-file-text-o', current_node.getChildren())}</li>
                 <li class="active">${DOC.MetadataTab('#events', 'tab', _('Calendar'), 'fa-calendar', current_node.getEvents())}</li>
                 <li>${DOC.MetadataTab('#contacts', 'tab', _('Address book'), 'fa-user', current_node.getContacts())}</li>
@@ -113,20 +124,22 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ################################
                 <!-- DEBUG - D.A. - 2013-11-07 - Not using tags for th moment -->
                 <div class="tab-pane" id="subdocuments">
-                  <p><strong>Sub-documents</strong></p> 
+                  <h4>${_('Sub-documents')}</h4>
+                  ${DOC.DocumentEditModalDialog(current_node.node_id, None, tg.url('/api/create_document'), 'add-subdocument-modal-%i'%current_node.node_id, _('New Sub-document'))}
+                  
                 % if len(current_node.getChildren())<=0:
                   <p class="pod-grey">
                     ${_("There is currently no child documents.")}<br/>
                   </p>
                   <p>
-                    
-                    <a class="btn btn-success btn-small" href="${tg.url('/api/create_document?parent_id=%i'%current_node.node_id)}">
-                      <i class="fa fa-plus"></i> ${_("Add one")}
+                    <a href="#add-subdocument-modal-${current_node.node_id}" role="button" class="btn btn-success btn-small" data-toggle="modal">
+                      <i class="fa fa-plus"></i>
+                      ${_("Add one")}
                     </a>
                   </p>
                 % else:
                   <p>
-                    <a class="btn btn-success btn-small" href="${tg.url('/api/create_document?parent_id=%i'%current_node.node_id)}">
+                    <a href="#add-subdocument-modal-${current_node.node_id}" role="button" class="btn btn-success btn-small" data-toggle="modal">
                       <i class="fa fa-plus"></i> ${_("Add one")}
                     </a>
                   </p>
@@ -150,7 +163,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ##
                 ################################
                 <div class="tab-pane active" id="events">
-                  <p><strong>Calendar</strong></p> 
+                  <h4>${_('Calendar')}</h4> 
                 % if len(current_node.getEvents())<=0:
                   <p class="pod-grey">${_("The calendar is empty.")}<br/></p>
                   <p>${POD.AddButton('current-document-add-event-button', True, _(' Add first event'))}</p>
@@ -227,7 +240,7 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ##
                 ##############################
                 <div class="tab-pane" id="contacts">
-                  <p><strong>${_('Address book')}</strong></p> 
+                  <h4>${_('Address book')}</h4> 
                 % if len(current_node.getContacts())<=0:
                   <p class="pod-grey">${_("The address book is empty.")}<br/></p>
                   <p>${POD.AddButton('current-document-add-contact-button', True, _(' Add first contact'), True)}</p>
@@ -275,53 +288,54 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ## PANEL SHOWING LIST OF COMMENTS
                 ##
                 ################################
-                <div class="tab-pane" id="comments">
-                  <p><strong>${_('Comment thread')}</strong></p> 
+                <div class="tab-pane" id="comments" style="margin: 0;">
+                  <h4>${_('Comment thread')}</h4>
                 % if len(current_node.getComments())<=0:
                   <p class="pod-grey">${_("The comment thread is empty.")}<br/></p>
-                  <p>${POD.AddButton('current-document-add-comment-button', True, _('Add first comment'), True)}</p>
-                % else:
-                  <p>${POD.AddButton('current-document-add-comment-button', True, _('Add a comment'))}</p>
+                % endif
+                  <!-- LIST OF COMMENTS -->
+                % if len(current_node.getComments())>0:
+                  <div>
+                    % for comment in current_node.getComments():
+                      <p>
+                        <a href="${tg.url('/api/toggle_share_status', dict(node_id=comment.node_id))}">
+                          % if comment.is_shared:
+                            <span class="label label-warning" title="${_('Shared comment. Click to make private.')}"><i class="fa fa-group"></i></span>
+                          % else:
+                            <span class="label label-info" title="${_('Private comment. Click to share.')}"><i class="fa fa-key"></i></span>
+                          % endif
+                        </a>
+                        <strong>${comment._oOwner.display_name}</strong>
+                        <i class="pull-right">
+                          The ${comment.getFormattedDate(comment.updated_at)} 
+                          at ${comment.getFormattedTime(comment.updated_at)}
+                        </i>
+                        <br/>
+                        ${comment.data_content|n}
+                        <hr style="border-top: 1px dotted #ccc; margin: 0;"/>
+                      </p>
+                    % endfor
+                  </div>
                 % endif
 
                   <!-- ADD COMMENT FORM -->
-                  <form style='display: none;' id='current-document-add-comment-form' action='${tg.url('/api/create_comment')}' method='post' class="well">
+                  <form class="form" id='current-document-add-comment-form' action='${tg.url('/api/create_comment')}' method='post'>
                     <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
-                    <fieldset>
-                      <legend>${_('Add a comment')}</legend>
-                      <label>
-                        <input type="text" name='data_label' placeholder="Title"/>
-                      </label>
-                      <label>
-                        <div>
-                          <input type="hidden" id="add_comment_data_content_textarea" name='data_content' />
-                          ${POD.RichTextEditor('add_comment_data_content_textarea_wysiwyg', '', 'boldanditalic|undoredo|fullscreen')}
-                        </div>
-                      </label>
-                      ${POD.CancelButton('current-document-add-comment-cancel-button', True)}
-                      ${POD.SaveButton('current-document-add-comment-save-button', True)}
-                    </fieldset>
+                    <input type="hidden" name='data_label' value=""/>
+                    <input type="hidden" id="add_comment_data_content_textarea" name='data_content' />
+                    ${POD.RichTextEditor('add_comment_data_content_textarea_wysiwyg', '', '')}
+                    <label>
+                      <input type="checkbox" name='is_shared'/> ${_('Share this comment')}
+                    </label>
+                    <span class="pull-right">
+                      % if len(current_node.getComments())<=0:
+                        ${POD.SaveButton('current-document-add-comment-save-button', True, _('Add first comment'))}
+                      % else:
+                        ${POD.SaveButton('current-document-add-comment-save-button', True, _('Comment'))}
+                      % endif
+                    </span>
                   </form>
 
-                  <!-- LIST OF COMMENTS -->
-                % if len(current_node.getComments())>0:
-                  <table class="table table-striped table-hover table-condensed">
-                    % for comment in current_node.getComments():
-                      <tr title="Last updated: ${comment.updated_at}">
-                        <td>
-                          <i>The ${comment.getFormattedDate(comment.updated_at)} at ${comment.getFormattedTime(comment.updated_at)}: </i><br/>
-                          <b>${comment.data_label}</b>
-                          ## TODO - 2013-11-20 - Use the right form in order to update meta-data
-                          <a class="pull-right" href="${tg.url('/document/%i'%comment.node_id)}"><i class="fa fa-edit"></i></a>
-                          <br/>
-                          <p>
-                            ${comment.data_content|n}
-                          </p>
-                        </td>
-                      </tr>
-                    % endfor
-                  </table>
-                % endif
                 </div>
                 ################################
                 ##
@@ -329,7 +343,11 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ##
                 ################################
                 <div class="tab-pane" id="files">
-                  <p><strong>${_('Attachments')}</strong></p> 
+                  ${DOCTABS.FilesTabContent(current_node)}
+                </div>
+
+                <div class="tab-pane" id="files">
+                  <h4>${_('Attachments')}</h4> 
                 % if len(current_node.getFiles())<=0:
                   <p class="pod-grey">${_("There is currently no attachment.")}<br/></p>
                   <p>${POD.AddButton('current-document-add-file-button', True, _(' Attach first file'))}</p>
@@ -390,14 +408,16 @@ pod :: document ${current_node.getTruncatedLabel(40)} [#${current_node.node_id} 
                 ## PANEL SHOWING ACCESS MANAGEMENT
                 ##
                 ################################
+                
                 <div class="tab-pane" id="accessmanagement">
-                  blabla
+                  ${DOCTABS.AccessManagementTab(current_node)}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      % endif
     </div>
   </div>
-
+</div>
