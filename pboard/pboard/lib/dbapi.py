@@ -70,17 +70,16 @@ class PODUserFilteredApiController(object):
 
   def createDummyNode(self):
     loNewNode = self.createNode()
-    loNewNode.data_label   = 'New document'
-    loNewNode.data_content = 'insert content...'
+    loNewNode.data_label   = ''
+    loNewNode.data_content = ''
     return loNewNode
 
 
   def getNode(self, liNodeId):
     liOwnerIdList = self._getUserIdListForFiltering()
-    if liNodeId==0:
-      return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).first()
-    else:
+    if liNodeId!=0:
       return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.node_id==liNodeId).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).one()
+    return None
 
 
   def getLastModifiedNodes(self, piMaxNodeNb):
