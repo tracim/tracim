@@ -9,6 +9,7 @@ from hashlib import sha256
 import bs4
 from sqlalchemy import Table, ForeignKey, Column, Sequence
 from sqlalchemy.types import Unicode, Integer, DateTime, Text, LargeBinary
+import sqlalchemy.types as sqlat
 from sqlalchemy.orm import relation, synonym, relationship
 from sqlalchemy.orm import backref
 import sqlalchemy.orm as sqlao
@@ -18,40 +19,7 @@ from tg.i18n import ugettext as _, lazy_ugettext as l_
 
 import tg
 from pboard.model import DeclarativeBase, metadata, DBSession
-
-# This is the association table for the many-to-many relationship between
-# groups and permissions.
-"""pod_node_table = Table('pod_nodes', metadata,
-    Column('node_id', Integer, Sequence('pod_nodes__node_id__sequence'), primary_key=True),
-    Column('parent_id', Integer, ForeignKey('pod_nodes.node_id'), nullable=True, default=None),
-    Column('node_order', Integer, nullable=True, default=1),
-    Column('node_type',   Unicode(16), unique=False, nullable=False, default='data'),
-    Column('node_status', Unicode(16), unique=False, nullable=False, default='new'),
-
-    Column('created_at', DateTime, unique=False, nullable=False),
-    Column('updated_at', DateTime, unique=False, nullable=False),
-
-    Column('data_label',   Unicode(1024), unique=False, nullable=False, default=''),
-    Column('data_content', Text(), unique=False, nullable=False, default=''),
-    Column('data_datetime', DateTime, unique=False, nullable=False),
-    Column('data_reminder_datetime', DateTime, unique=False, nullable=True),
-    
-    Column('data_file_name', Unicode(255), unique=False, nullable=False, default=''),
-    Column('data_file_mime_type', Unicode(255), unique=False, nullable=False, default=''),
-    Column('data_file_content', LargeBinary(), unique=False, nullable=False, default=None),
-)
-"""
-"""
-- node_type
-
-- node_created_at
-- node_updated_at
-
-- data_label
-- data_content
-- data_source_url
-- data_status_id
-"""
+from pboard.model import auth as pma
 
 class PBNodeStatusItem(object):
   def __init__(self, psStatusId, psStatusLabel, psStatusFamily, psIconId, psCssClass): #, psBackgroundColor):
@@ -143,8 +111,7 @@ class PBNodeStatus(object):
       PBNodeStatus.StatusList['closed'],
       PBNodeStatus.StatusList['deleted']
     ]
-    
-    PBNodeStatus.StatusList.values()
+
     
   @classmethod
   def getStatusItem(cls, psStatusId):
@@ -182,6 +149,7 @@ class PBNode(DeclarativeBase):
     return len(self._lStaticChildList)
 
   __tablename__ = 'pod_nodes'
+
   node_id          = Column(Integer, Sequence('pod_nodes__node_id__sequence'), primary_key=True)
   parent_id        = Column(Integer, ForeignKey('pod_nodes.node_id'), nullable=True, default=None)
   node_depth       = Column(Integer, unique=False, nullable=False, default=0)
@@ -195,6 +163,21 @@ class PBNode(DeclarativeBase):
   created_at = Column(DateTime, unique=False, nullable=False)
   updated_at = Column(DateTime, unique=False, nullable=False)
 
+  """
+    if 1, the document is available for other users logged into pod.
+    default is 0 (private document)
+  """
+  is_shared = Column(sqlat.Boolean, unique=False, nullable=False, default=False)
+  """
+    if 1, the document is available through a public - but obfuscated, url
+    default is 0 (document not publicly available)
+  """
+  is_public = Column(sqlat.Boolean, unique=False, nullable=False, default=False)
+  """
+    here is the hash allowing to get the document publicly
+  """
+  public_url_key = Column(Unicode(1024), unique=False, nullable=False, default='')
+
   data_label   = Column(Unicode(1024), unique=False, nullable=False, default='')
   data_content = Column(Text(),        unique=False, nullable=False, default='')
   
@@ -207,6 +190,7 @@ class PBNode(DeclarativeBase):
 
 
   _oParent = relationship('PBNode', remote_side=[node_id], backref='_lAllChildren')
+  _oOwner = relationship('User', remote_side=[pma.User.user_id], backref='_lAllNodes')
 
   def getChildrenOfType(self, plNodeTypeList, poKeySortingMethod=None, pbDoReverseSorting=False):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
@@ -230,9 +214,15 @@ class PBNode(DeclarativeBase):
   def getChildNb(self):
     return self.getChildNbOfType([PBNodeType.Data])
 
-  def getChildren(self):
+  def getChildren(self, pbIncludeDeleted=False):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
-    return self.getChildrenOfType([PBNodeType.Node, PBNodeType.Folder, PBNodeType.Data])
+    # return self.getChildrenOfType([PBNodeType.Node, PBNodeType.Folder, PBNodeType.Data])
+    items = self.getChildrenOfType([PBNodeType.Node, PBNodeType.Folder, PBNodeType.Data])
+    items2 = list()
+    for item in items:
+      if pbIncludeDeleted==True or item.node_status!='deleted':
+        items2.append(item)
+    return items2
 
   def getContacts(self):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
@@ -343,13 +333,23 @@ class PBNode(DeclarativeBase):
           break
       return PBNodeStatus.getStatusItem(lsRealStatusId)
 
-  def getTruncatedLabel(self, piCharNb):
-    lsTruncatedLabel = ''
+  def getTruncatedLabel(self: PBNode, piCharNb: int):
+    """
+    return a truncated version of the data_label property.
+    if piCharNb is not > 0, then the full data_label is returned
+    note: if the node is a file and the data_label is empty, the file name is returned
+    """
+    lsTruncatedLabel = self.data_label
+
+    # 2014-05-06 - D.A. - HACK
+    # if the node is a file and label empty, then use the filename as data_label
+    if self.node_type==PBNodeType.File and lsTruncatedLabel=='':
+      lsTruncatedLabel = self.data_file_name
+
     liMaxLength = int(piCharNb)
-    if len(self.data_label)>liMaxLength:
-      lsTruncatedLabel = self.data_label[0:liMaxLength-1]+'…'
-    else:
-      lsTruncatedLabel = self.data_label
+    if liMaxLength>0 and len(lsTruncatedLabel)>liMaxLength:
+      lsTruncatedLabel = lsTruncatedLabel[0:liMaxLength-1]+'…'
+
     return lsTruncatedLabel
 
   def getTruncatedContentAsText(self, piCharNb):
@@ -386,30 +386,4 @@ class PBNode(DeclarativeBase):
     # FIXME - D.A. - 2013-09-12
     # Does not match @@ at end of content.
 
-
-
-"""from sqlalchemy.orm import mapper
-mapper(
-  PBNode,
-  pod_node_table,
-  properties = {'_lAllChildren' : relationship(PBNode, backref=backref('_oParent', remote_side=PBNode.parent_id)) }
-)"""
-
-
-
-"""    children = relationship('TreeNode',
-
-                        # cascade deletions
-                        cascade="all",
-
-                        # many to one + adjacency list - remote_side
-                        # is required to reference the 'remote' 
-                        # column in the join condition.
-                        backref=backref("parent", remote_side='TreeNode.id'),
-
-                        # children will be represented as a dictionary
-                        # on the "name" attribute.
-                        collection_class=attribute_mapped_collection('name'),
-                    ) 
-"""
 
