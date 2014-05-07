@@ -207,6 +207,7 @@ class PBNode(DeclarativeBase):
 
 
   _oParent = relationship('PBNode', remote_side=[node_id], backref='_lAllChildren')
+  rights = relation('Rights', secondary=group_node_table, backref='nodes')
 
   def getChildrenOfType(self, plNodeTypeList, poKeySortingMethod=None, pbDoReverseSorting=False):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
@@ -413,3 +414,11 @@ mapper(
                     ) 
 """
 
+# This is the association table for the many-to-many relationship between groups and nodes
+group_node_table = Table('pod_group_node', metadata,
+        Column('group_id', Integer, ForeignKey('pod_group.group_id',
+            onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+        Column('node_id', Integer, ForeignKey('pod_nodes.node_id',
+            onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
+        Column('rights', Integer)
+)

@@ -14,7 +14,7 @@ from hashlib import sha256
 __all__ = ['User', 'Group', 'Permission']
 
 from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime
+from sqlalchemy.types import Unicode, Integer, DateTime, Boolean
 from sqlalchemy.orm import relation, synonym
 
 from pboard.model import DeclarativeBase, metadata, DBSession
@@ -52,7 +52,9 @@ class Group(DeclarativeBase):
     group_name = Column(Unicode(16), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     created = Column(DateTime, default=datetime.now)
+    personnal_group = Column(Boolean)
     users = relation('User', secondary=user_group_table, backref='groups')
+    rights = relation('Rights', secondary=group_node_table, backref='groups')
 
     def __repr__(self):
         return '<Group: name=%s>' % repr(self.group_name)
