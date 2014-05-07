@@ -295,19 +295,16 @@
   </div>
 </%def>
 
-<%def name="FilesTabContent(poNode)">
-  <h4>${_('Attachments')}</h4> 
-% if len(poNode.getFiles())<=0:
-  <p class="pod-grey">${_("There is currently no attachment.")}<br/></p>
-  <p>${POD.OpenModalButton('create-new-file-modal-form', _(' Attach first file'))}</p>
-% else:
-  <p>${POD.OpenModalButton('create-new-file-modal-form', _(' Attach a file'))}</p>
-% endif
+<%def name="FileTabContent(poNode)">
+  <h4>${_('Attachments')}</h4>
+  
+  % if len(poNode.getFiles())<=0:
+    <p class="pod-grey">${_("There is currently no attachment.")}<br/></p>
+    <p>${POD.OpenModalButton(h.ID.AddFileModalForm(poNode), _(' Attach first file'))}</p>
+  % else:
+    <p>${POD.OpenModalButton(h.ID.AddFileModalForm(poNode), _(' Attach a file'))}</p>
+  % endif
 
-  ${DOC.FileEditModalDialog(poNode.node_id, None, tg.url('/api/create_file'), 'create-new-file-modal-form', 'Add a new file')}
-
-
-  <!-- LIST OF FILES -->
   <div>
     % if len(poNode.getFiles())>0:
       % for loFile in poNode.getFiles():
@@ -330,4 +327,157 @@
       % endfor
     % endif
   </div>
+</%def>
+
+<%def name="SubdocumentContent(poNode)">
+  <h4>${_('Sub-documents')}</h4>
+  
+  % if len(poNode.getChildren())<=0:
+    <p class="pod-grey">${_("There is currently no child documents.")}</p>
+  % endif
+  <p>${POD.OpenModalButton(h.ID.AddDocumentModalForm(poNode), _('Add a document'))}</p>
+
+  % if len(poNode.getChildren())>0:
+    <div>
+      % for subnode in poNode.getChildren():
+        <p style="list-style-type:none;">
+          <i class="fa-fw ${subnode.getIconClass()}"></i>
+            <a href="${tg.url('/document/%i'%subnode.node_id)}">
+              ${subnode.data_label}
+            </a>
+        </p>
+      % endfor
+    </div>
+  % endif
+</%def>
+
+<%def name="EventTabContent(poNode)">
+  <h4>${_('Calendar')}</h4>
+  
+  % if len(poNode.getEvents())<=0:
+    <p class="pod-grey">${_("The calendar is empty.")}<br/></p>
+    <p>${POD.OpenModalButton(h.ID.AddEventModalForm(poNode), _(' Add first event'))}</p>
+  % else:
+    <p>${POD.OpenModalButton(h.ID.AddEventModalForm(poNode), _(' Add an event'))}</p>
+  % endif
+
+  % if len(poNode.getEvents())>0:
+    <table class="table table-striped table-hover table-condensed">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>
+            Event
+          </th>
+          <th>
+            <a href="" title="Add an event"><i class="icon-g-plus"></i></a>
+          </th>
+        </tr>
+      </thead>
+      % for event in poNode.getEvents():
+        <tr class="item-with-data-popoverable" data-content="${event.data_content}" rel="popover" data-placement="left" data-trigger="hover">
+          <td>${event.getFormattedDate(event.data_datetime)}</td>
+          <td>${event.getFormattedTime(event.data_datetime)}</td>
+          <td>${event.data_label}</td>
+        </tr>
+  ## FIXME                    <script>
+  ##                      $('.item-with-data-popoverable').popover({ html: true});
+  ##                    </script>
+
+      % endfor
+    </table>
+  % endif
+</%def>
+
+<%def name="ContactTabContent(poNode)">
+  <h4>${_('Address book')}</h4> 
+  % if len(poNode.getContacts())<=0:
+    <p class="pod-grey">${_("The address book is empty.")}<br/></p>
+    <p>${POD.OpenModalButton(h.ID.AddContactModalForm(poNode), _('Add first contact'))}</p>
+  % else:
+    <p>${POD.OpenModalButton(h.ID.AddContactModalForm(poNode), _('Add a contact'))}</p>
+  % endif
+
+  <!-- LIST OF CONTACT NODES -->
+  % for contact in poNode.getContacts():
+    <div class="well">
+      <legend class="text-info">
+        ${contact.data_label}
+        ## TODO - 2013-11-20 - Use the right form in order to update meta-data
+        <a class="pull-right" href="${tg.url('/document/%i'%contact.node_id)}"><i class="fa fa-edit"></i></a>
+      </legend>
+      
+      <div>
+        ## FIXME - D.A. - 2013-11-15 - Implement localisation stuff <a style='float: right;' href="" title='${_('Search on google maps')}'><i class='icon-g-google-maps'></i></a>
+        ${contact.data_content|n}
+      </div>
+    </div>
+  % endfor
+</%def>
+
+<%def name="CommentTabContent(poNode)">
+  <h4>${_('Comment thread')}</h4>
+  
+  % if len(poNode.getComments())<=0:
+    <p class="pod-grey">${_("The comment thread is empty.")}<br/></p>
+  % endif
+
+  % if len(poNode.getComments())>0:
+    % if len(poNode.getComments())>5:
+      ##
+      ## We show a "direct down" button in case the page is too long
+      ##
+      <p>${POD.OpenLinkButton(h.ID.AddCommentInlineForm(), _('Add a comment'))}</p>
+    % endif
+    <div>
+      % for comment in poNode.getComments():
+        <p>
+          <a href="${tg.url('/api/toggle_share_status', dict(node_id=comment.node_id))}">
+            % if comment.is_shared:
+              <span class="label label-warning" title="${_('Shared comment. Click to make private.')}">${h.ICON.Shared|n}</span>
+            % else:
+              <span class="label label-info" title="${_('Private comment. Click to share.')}">${h.ICON.Private|n}</span>
+            % endif
+          </a>
+          <strong>${comment._oOwner.display_name}</strong>
+          <i class="pull-right">
+            The ${comment.getFormattedDate(comment.updated_at)} 
+            at ${comment.getFormattedTime(comment.updated_at)}
+          </i>
+          <br/>
+          ${comment.data_content|n}
+          <hr style="border-top: 1px dotted #ccc; margin: 0;"/>
+        </p>
+      % endfor
+    </div>
+  % endif
+
+  <form class="form" id="${h.ID.AddCommentInlineForm()}" action="${tg.url('/api/create_comment')}" method="POST">
+    <input type="hidden" name='parent_id' value='${poNode.node_id}'/>
+    <input type="hidden" name='data_label' value=""/>
+    <input type="hidden" id="add_comment_data_content_textarea" name='data_content' />
+    <label>
+      ${_('Write your comment below:')}
+      ${POD.RichTextEditor('add_comment_data_content_textarea_wysiwyg', '', 'boldanditalic')}
+    </label>
+    <label>
+      <input type="checkbox" name='is_shared'/> ${_('Share this comment')}
+    </label>
+    <span class="pull-right">
+      % if len(poNode.getComments())<=0:
+        ${POD.SaveButton('current-document-add-comment-save-button', True, _('Add first comment'))}
+      % else:
+        ${POD.SaveButton('current-document-add-comment-save-button', True, _('Comment'))}
+      % endif
+    </span>
+  </form>
+  <script>
+      $('#current-document-add-comment-save-button').on('click', function(e){
+      e.preventDefault(); // We don't want this to act as a link so cancel the link action
+      $('#add_comment_data_content_textarea_wysiwyg').cleanHtml();
+      $('#add_comment_data_content_textarea').val($('#add_comment_data_content_textarea_wysiwyg').html());
+      $('#current-document-add-comment-form').submit();
+    });
+  </script>
 </%def>

@@ -24,6 +24,22 @@
   % endif
 </%def>
 
+<%def name="ToolbarMenuItemModal(psTargetModalId, psIconClasses, psMenuLabel)">
+  <li><a href="#${psTargetModalId}" role="button" data-toggle="modal"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
+</%def>
+
+<%def name="ToolbarMenuItemInline(psTargetId, psIconClasses, psMenuLabel)">
+  <li><a href="#${psTargetId}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
+</%def>
+<%def name="ToolbarMenuItemLink(psTargetUrl, psIconClasses, psMenuLabel, psLinkCss='', psLinkTitle='')">
+  % if psTargetUrl=='#':
+    <li class="disabled"><a href="${psTargetUrl}" class="${psLinkCss}" title="${psLinkTitle}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
+  % else:
+    <li><a href="${psTargetUrl}" class="${psLinkCss}" title="${psLinkTitle}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
+  % endif
+</%def>
+
+        
 <%def name="Toolbar(poNode, plNodeStatusList, plRootNodes, psDivId)">
   <div id="${psDivId}">
     <div class="btn-group">
@@ -36,19 +52,22 @@
         <span class="caret"></span>
       </a>
       <ul class="dropdown-menu">
+        <li>
+          <div class="pod-grey strong" ><strong><i class="fa fa-magic"></i> ${_('Current status is...')}</strong><br/></div>
+        </li>
       % for node_status in plNodeStatusList:
         % if node_status.status_id==poNode.getStatus().status_id:
-        <li title="${h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id)}">
-          <a class="${node_status.css}" href="#"  style="color: #999;">
-            <i class="${node_status.icon_id}"></i> ${node_status.label}
-          </a>
+          ${ToolbarMenuItemLink('#', node_status.icon_id, node_status.label, 'disabled '+node_status.css, h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id))}
+        % endif
+      % endfor
+        <li class="divider" role="presentation"></li>
+        <li>
+          <div class=" strong" ><strong><i class="fa fa-magic"></i> ${_('Change to...')}</strong><br/></div>
+          <div class="pod-grey"><i>${_('change the status to...')}</i></div>
         </li>
-        % else:
-        <li title="${h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id)}">
-          <a class="${node_status.css}" href="${tg.url('/api/edit_status?node_id=%i&node_status=%s'%(current_node.node_id, node_status.status_id))}">
-            <i class="${node_status.icon_id}"></i> ${node_status.label}
-          </a>
-        </li>
+      % for node_status in plNodeStatusList:
+        % if node_status.status_id!=poNode.getStatus().status_id:
+          ${ToolbarMenuItemLink(tg.url('/api/edit_status', dict(node_id=current_node.node_id, node_status=node_status.status_id)), node_status.icon_id, node_status.label, node_status.css, h.getExplanationAboutStatus(node_status.status_id, current_node.getStatus().status_id))}
         % endif
       % endfor
       </ul>
@@ -61,15 +80,18 @@
       <ul class="dropdown-menu">
       
         <li>
-          <div class="btn-success strong" ><strong><i class="fa fa-magic"></i> Add New...</strong><br/></div>
-          <div class="pod-grey"><i>create a totally new item...</i></div>
+          <div class="btn-success strong" ><strong><i class="fa fa-magic"></i> ${_('Add New...')}</strong><br/></div>
+          <div class="pod-grey"><i>${_('create a totally new item...')}</i></div>
         </li>
 
-        <li><a><i class="fa fa-file-text-o"></i> Document</a></li>
-        <li><a><i class="fa fa-paperclip"></i> File</a></li>
-        <li><a><i class="fa fa-calendar"></i> Event</a></li>
-        <li><a><i class="fa fa-user"></i> Contact</a></li>
-        <li><a><i class="fa fa-comments-o"></i> Comment</a></li>
+        ${ToolbarMenuItemModal(h.ID.AddDocumentModalForm(current_node), 'fa fa-file-text-o', _('Document'))}
+        ${ToolbarMenuItemModal(h.ID.AddFileModalForm(current_node), 'fa fa-paperclip', _('File'))}
+        ${ToolbarMenuItemModal(h.ID.AddEventModalForm(current_node), 'fa fa-calendar', _('Event'))}
+        ${ToolbarMenuItemModal(h.ID.AddContactModalForm(current_node), 'fa fa-user', _('Contact'))}
+##
+## FIXME - DA - 07-05-2014 - The link below is not working clean
+##
+        ${ToolbarMenuItemInline(h.ID.AddCommentInlineForm(), 'fa fa-comments-o', _('Comment'))}
 
         <li class="divider" role="presentation"></li>
 
@@ -77,12 +99,7 @@
           <div class="btn-warning strong" ><strong><i class="fa fa-link"></i> Add Existing...</strong><br/></div>
           <div class="pod-grey"><i>link to an existing item...</i></div>
         </li>
-        <li><a><i class="fa fa-file-text-o"></i> Document</a></li>
-        <li><a><i class="fa fa-paperclip"></i> File</a></li>
-        <li><a><i class="fa fa-calendar"></i> Event</a></li>
-        <li><a><i class="fa fa-user"></i> Contact</a></li>
-        <li><a><i class="fa fa-comments-o"></i> Comment</a></li>
-
+        <li><p class="pod-grey"><i class="fa fa-danger"></i> coming soon!</p></li>
       </ul>
     </div>
     <div class="btn-group ">
@@ -112,16 +129,20 @@
 <%def name="BreadCrumb(poNode)">
   <ul class="breadcrumb span12">
     <li>
-      <span class="divider"> / Documents /</span>
+      <span class="divider">/</span>
+      <a href="${tg.url('/document/')}">Documents</a>
     </li>
     % if poNode!=None:
       % for breadcrumb_node in poNode.getBreadCrumbNodes():
       <li>
-        <a href="${tg.url('/document/%s'%(breadcrumb_node.node_id))}">${breadcrumb_node.getTruncatedLabel(30)}</a>
         <span class="divider">/</span>
+        <a href="${tg.url('/document/%s'%(breadcrumb_node.node_id))}">${breadcrumb_node.getTruncatedLabel(30)}</a>
       </li>
       % endfor
-      <li class="active">${poNode.data_label}</li>
+      <li class="active">
+        <span class="divider">/</span>
+        ${poNode.data_label}
+      </li>
     % endif
   </ul>
 </%def>
@@ -140,13 +161,16 @@
     <div style="padding: 0.5em 0 0 0">
       <input type="hidden" name="node_id" value="${current_node.node_id}"/>
       <input type="hidden" name="data_content" id="current_node_textarea" />
-      <input
-        type="text"
-        name="data_label"
-        value="${current_node.data_label}"
-        class="span4"
-        placeholder="${_('document title')}"
-      />
+      <label>
+        ${_('Title')}
+        <input
+          type="text"
+          name="data_label"
+          value="${current_node.data_label}"
+          class="span4"
+          placeholder="${_('document title')}"
+        />
+      </label>
     </div>
     <div>
       ${POD.RichTextEditor('current_node_textarea_wysiwyg', current_node.data_content)}
@@ -220,26 +244,32 @@
 <%def name="FirstTimeFakeDocument()">
   <div id='application-document-panel' class="span5">
     <div id='current-document-content' class="">
-      <p class="alert alert-info">
-        <i class="fa  fa-smile-o"></i> <strong>${_('Welcome aboard.')}</strong>
+      <p class="well">
+        <strong>${_('Welcome aboard')}</strong>
+        <i class="fa fa-smile-o fa-2x"></i>
       </p>
-      <p>
-        ${_('It appears you do not have any document yet. We suggest you to start by creating a new document.')}
-      </p>
-      <p>
-        ${_('We suggest you to start by creating a new document.')}
-      </p>
-      <p class="alert alert-info">
-        <i class="fa fa-info-circle"></i> ${_('<strong>Note :</strong> You can even create a dummy document: you will be able to remove it later.')|n}
-      </p>
+      ${_('<p>We suggest you to...<br/><br/></p>')|n}
+      <h4>
+        <i class="fa fa-angle-double-left fa-3x fa-fw pod-blue" style="vertical-align: middle"></i>
+        ${_('work on existing documents')}
+      </h4>
+      <p class="text-center">${_('or')}</p>
+      <h4 class="text-right">
+        ${_('create a new document')}
+        <i class="fa fa-angle-double-down fa-3x fa-fw pod-blue" style="vertical-align: middle"></i>
+      </h4>
       <p class="pull-right">
-        <a href="#create-new-document-modal-form" role="button" class="btn btn-success" data-toggle="modal">
+        <a href="#${h.ID.AddDocumentModalForm()}" role="button" class="btn btn-success" data-toggle="modal">
           <i class="fa fa-plus"></i>
-          ${_('Create your first document')}
+          ${_('Create a new document')}
         </a>
       </p>
   
-      ${DocumentEditModalDialog(None, None, tg.url('/api/create_document'), 'create-new-document-modal-form', 'Create your first document')}
+      ${DocumentEditModalDialog(None, None, tg.url('/api/create_document'), h.ID.AddDocumentModalForm(), 'Create your first document')}
+      <div style="clear: both;"></div>
+      <p class="alert alert-info" style="margin-top: 2em;">
+        <i class="fa fa-info-circle"></i> ${_('<strong>Note :</strong> You can even create a dummy document: you will be able to remove it later.')|n}
+      </p>
     </div>
     <script>
     </script>
@@ -318,15 +348,15 @@
     aria-labelledby="myModalLabel"
     aria-hidden="true">
     
-   <div class="modal-header">
-## MODAL HEADER
+    <div class="modal-header">
+    ## MODAL HEADER
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
       <h3 id="myModalLabel">${psTitle}</h3>
-## MODAL HEADER [END]
+    ## MODAL HEADER [END]
     </div>
 
     <div class="modal-body">
-## MODAL BODY
+    ## MODAL BODY
       <form id='${psModalId}-form' method="POST" action="${psPostUrl}" enctype="multipart/form-data">
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
@@ -355,19 +385,17 @@
           ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', '')}
         </div>
       </form>
-
-## MODAL BODY [END]
+    ## MODAL BODY [END]
     </div>
     
     <div class="modal-footer">
-## MODAL FOOTER
+    ## MODAL FOOTER
       <button class="btn" data-dismiss="modal" aria-hidden="true">
         <i class="fa fa-ban"></i> ${_('Cancel')}
       </button>
       <button class="btn btn-success" id="${psModalId}-form-submit-button">
         <i class="fa fa-check"></i> ${_('Save changes')}
       </button>
-## MODAL FOOTER [END]
       <script>
         $('#${psModalId}-form-submit-button').click(function(){
           $('#${psModalId}-textarea-wysiwyg').cleanHtml();
@@ -375,6 +403,137 @@
           $('#${psModalId}-form')[0].submit();
         });
       </script>
+    ## MODAL FOOTER [END]
+    </div>
+  </div>
+</%def>
+
+<%def name="EventEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+  <div
+    id="${psModalId}"
+    class="modal hide"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    
+    <div class="modal-header">
+    ## MODAL HEADER
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+        ${psTitle}
+      </h3>
+    ## MODAL HEADER [END]
+    </div>
+
+    <div class="modal-body">
+    ###### MODAL BODY
+      <form id='${psModalId}-form' action='${psPostUrl}' method='POST'>
+        <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
+        <fieldset>
+          <label>
+            ${_('Event')}
+            <input type="text" name='data_label' placeholder="Event"/>
+          </label>
+          <label>
+            ${_('Date and time')}
+            <div class="datetime-picker-input-div input-append date">
+              <input name='data_datetime' data-format="dd/MM/yyyy hh:mm" type="text" placeholder="date and time"/>
+              <span class="add-on"><i data-time-icon="icon-g-clock" data-date-icon="icon-g-calendar"></i></span>
+            </div>
+          </label>
+          <label>
+            ${_('Event description:')}
+            <div>
+              <input type="hidden" name="data_content" id="${psModalId}-textarea" />
+              ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', 'boldanditalic')}
+            </div>
+          </label>
+        </fieldset>
+      </form>
+    ###### MODAL BODY [END]
+    </div>
+    
+    <div class="modal-footer">
+    ###### MODAL FOOTER
+      <button class="btn" data-dismiss="modal" aria-hidden="true">
+        <i class="fa fa-ban"></i> ${_('Cancel')}
+      </button>
+      <button class="btn btn-success" id="${psModalId}-form-submit-button">
+        <i class="fa fa-check"></i> ${_('Save changes')}
+      </button>
+      <script>
+        $('#${psModalId}-form-submit-button').click(function(){
+          $('#${psModalId}-textarea-wysiwyg').cleanHtml();
+          $('#${psModalId}-textarea').val($('#${psModalId}-textarea-wysiwyg').html());
+          $('#${psModalId}-form')[0].submit();
+        });
+      </script>
+    ###### MODAL FOOTER [END]
+    </div>
+  </div>
+</%def>
+
+<%def name="ContactEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+  <div
+    id="${psModalId}"
+    class="modal hide"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    
+    <div class="modal-header">
+    ## MODAL HEADER
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">${psTitle}</h3>
+    ## MODAL HEADER [END]
+    </div>
+
+    <div class="modal-body">
+    ## MODAL BODY
+      <form id='${psModalId}-form' method="POST" action="${psPostUrl}">
+          % if poNode!=None:
+            <input type="hidden" name="node_id" value="${poNode.node_id}"/>
+          % endif
+          <input type="hidden" name="parent_id" value="${piParentNodeId if piParentNodeId else 0}"/>
+          <input type="hidden" name="data_content" id="${psModalId}-textarea" />
+        <div>
+          <label>
+            ${_('Contact name and firstname')}
+            <input
+              type="text"
+              name="data_label"
+              value="${poNode.data_label if poNode!=None else ''}"
+              class="span4"
+              placeholder="${_('name, firstname, title...')}"
+            />
+          </label>
+        </div>
+        <div>
+          <label>${_('Address, phone, email, company...')}</label>
+          ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', 'boldanditalic')}
+        </div>
+      </form>
+    ## MODAL BODY [END]
+    </div>
+    
+    <div class="modal-footer">
+    ## MODAL FOOTER
+      <button class="btn" data-dismiss="modal" aria-hidden="true">
+        <i class="fa fa-ban"></i> ${_('Cancel')}
+      </button>
+      <button class="btn btn-success" id="${psModalId}-form-submit-button">
+        <i class="fa fa-check"></i> ${_('Save changes')}
+      </button>
+      <script>
+        $('#${psModalId}-form-submit-button').click(function(){
+          $('#${psModalId}-textarea-wysiwyg').cleanHtml();
+          $('#${psModalId}-textarea').val($('#${psModalId}-textarea-wysiwyg').html());
+          $('#${psModalId}-form')[0].submit();
+        });
+      </script>
+    ## MODAL FOOTER [END]
     </div>
   </div>
 </%def>

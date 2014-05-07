@@ -52,11 +52,19 @@
   ${Button(piId, pbWithLabel, 'btn btn-small', psLabel or _('New'), 'fa fa-plus', psLabel or _('New'))}
 % endif
 </%def>
+
+###
+##
+## GREEN CALL-TO-ACTION BUTTONS IN THE INTERFACE
+##
+##
 <%def name="OpenModalButton(psModalAnchor, psLabel)">
-  <a href="#${psModalAnchor}" role="button" class="btn btn-success btn-small" data-toggle="modal">
-    <i class="fa fa-plus"></i>${psLabel}
-  </a>
+  <a href="#${psModalAnchor}" role="button" class="btn btn-success btn-small" data-toggle="modal"><i class="fa fa-plus"></i> ${psLabel}</a>
 </%def>
+<%def name="OpenLinkButton(psModalAnchor, psLabel)">
+  <a href="#${psModalAnchor}" class="btn btn-success btn-small"><i class="fa fa-plus"></i> ${psLabel}</a>
+</%def>
+## END OF GREEN CALL-TO-ACTION BUTTONS
 
 <%def name='Badge(psLabel, psCssClass="")'>
   <span class='badge ${psCssClass}'>${psLabel}</span>
@@ -160,7 +168,7 @@
       % endif
       % if psMenuOptions.find('fullscreen')>=0:
         <div class="btn-group">
-          <a class="btn btn-primary pod-toggle-full-screen-button"
+          <a class="btn btn-success pod-toggle-full-screen-button"
              title="Toggle fullscreen"
              onclick="toggleFullScreen('#${psRichTextEditorNodeId}-widget', '#${psRichTextEditorNodeId}-widget-inner')"
             >
@@ -214,3 +222,4 @@
 
 </%def>
 
+<%def name="AddDocumentModalFormId(poNode)">add-document-modal-form-${poNode.node_id if poNode!=None else ''}</%def>
