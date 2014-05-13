@@ -93,15 +93,17 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_comment(self, parent_id=None, data_label='', data_content='', **kw):
+    def create_comment(self, parent_id=None, data_label='', data_content='', is_shared='', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
-      
+
       loNewNode = loApiController.createNode()
       loNewNode.parent_id     = int(parent_id)
       loNewNode.node_type     = pmd.PBNodeType.Comment
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
+      if is_shared=='on':
+        loNewNode.is_shared = True
 
       pm.DBSession.flush()
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
@@ -193,16 +195,25 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
-    def create_document(self, parent_id=None):
+    def create_document(self, parent_id=None, data_label='', data_content=''):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
-      
+
+      lsNodeName = 'Document with no name...'
+      if int(parent_id)!=0:
+        loParent = loApiController.getNode(parent_id)
+        lsNodeName = 'Subdocument of (%s)' % loParent.data_label
+
       loNewNode = loApiController.createDummyNode()
-      loNewNode.data_label   = 'New document'
+      loNewNode.data_label   = lsNodeName
       loNewNode.data_content = 'insert content...'
-      if int(parent_id)==0:
-        loNewNode.parent_id = None
-      else:
+
+      if data_label!='':
+        loNewNode.data_label = data_label
+      if data_content!='':
+        loNewNode.data_content = data_content
+
+      if int(parent_id)!=0:
         loNewNode.parent_id = parent_id
 
       pm.DBSession.flush()
@@ -258,3 +269,14 @@ class PODApiController(BaseController):
       flash(_('Documents re-indexed'), 'info')
       redirect(lurl('/document/%s'%(back_to_node_id)))
 
+    @expose()
+    def toggle_share_status(self, node_id):
+      loCurrentUser   = pld.PODStaticController.getCurrentUser()
+      loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
+      loNode = loApiController.getNode(node_id)
+      if loNode.owner_id==loCurrentUser.user_id:
+        loNode.is_shared = not loNode.is_shared
+      # FIXME - DA. - 2014-05-06
+      # - if root node, then exception
+      # - this redirect is done in order to be adapted to comment share status toggle
+      redirect(lurl('/document/%s#tab-comments'%(loNode._oParent.node_id)))

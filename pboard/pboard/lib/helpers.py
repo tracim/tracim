@@ -39,3 +39,44 @@ def getExplanationAboutStatus(psStatusId, psCurrentStatusId):
       return _("Close the item if you want not to see it anymore. The data won't be deleted")
     if psStatusId=='deleted':
       return _("This status tells that the item has been deleted.")
+
+class ID(object):
+  """ Helper class that will manage html items ids that need to be shared"""
+
+  @classmethod
+  def AddDocumentModalForm(cls, poNode=None):
+    if poNode:
+      return 'add-document-modal-form-%d'%poNode.node_id
+    else:
+      return 'add-document-modal-form'
+
+  @classmethod
+  def AddContactModalForm(cls, poNode=None):
+    if poNode:
+      return 'add-contact-modal-form-%d'%poNode.node_id
+    else:
+      return 'add-contact-modal-form'
+
+  @classmethod
+  def AddFileModalForm(cls, poNode=None):
+    if poNode:
+      return 'add-file-modal-form-%d'%poNode.node_id
+    else:
+      return 'add-file-modal-form'
+
+  @classmethod
+  def AddEventModalForm(cls, poNode=None):
+    if poNode:
+      return 'add-event-modal-form-%d'%poNode.node_id
+    else:
+      return 'add-event-modal-form'
+    ## Original id is 'current-document-add-event-form'
+
+  @classmethod
+  def AddCommentInlineForm(cls):
+    return 'current-document-add-comment-form'
+
+class ICON(object):
+  Shared = '<i class="fa fa-group"></i>'
+  Private = '<i class="fa fa-key"></i>'
+

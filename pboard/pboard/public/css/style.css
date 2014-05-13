@@ -127,10 +127,10 @@ body { padding-top: 60px; }
 
   padding: 0.5em 0.5em 0.5em 0.5em;
   
-  filter: alpha(opacity=90); /* internet explorer */
-  -khtml-opacity: 0.9;      /* khtml, old safari */
-  -moz-opacity: 0.9;       /* mozilla, netscape */
-  opacity: 0.9;           /* fx, safari, opera */
+  filter: alpha(opacity=95); /* internet explorer */
+  -khtml-opacity: 0.95;      /* khtml, old safari */
+  -moz-opacity: 0.95;       /* mozilla, netscape */
+  opacity: 0.95;           /* fx, safari, opera */
 }
 
 .full-size-overlay-inner {
@@ -190,3 +190,5 @@ div.search-result-item > h5 {
   margin-bottom: 0;
 }
 
+ul.nav-tabs li.active > a { background-color: #efefef; }
+div.tab-pane > h4 { background-color: #efefef; padding: 0.5em; margin: 0 0 0.5em 0;}

@@ -119,12 +119,12 @@ class RootController(BaseController):
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
         loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
-        # loRootNodeList   = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.parent_id==None).order_by(pbmd.PBNode.node_order).all()
         loRootNodeList = loApiController.buildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
         liNodeId         = int(node)
 
         loCurrentNode    = None
         loNodeStatusList = None
+
         try:
           loNodeStatusList = pbmd.PBNodeStatus.getChoosableList()
           loCurrentNode    = loApiController.getNode(liNodeId)
@@ -133,19 +133,6 @@ class RootController(BaseController):
 
         # FIXME - D.A - 2013-11-07 - Currently, the code build a new item if no item found for current user
         # the correct behavior should be to redirect to setup page
-        if loCurrentNode is not None and "%s"%loCurrentNode.node_id!=node:
-          redirect(tg.url('/document/%i'%loCurrentNode.node_id))
-
-        if loCurrentNode is None:
-          loCurrentNode = loApiController.getNode(0) # try to get an item
-          if loCurrentNode is not None:
-            flash(_('Document not found. Randomly showing item #%i')%(loCurrentNode.node_id), 'warning')
-            redirect(tg.url('/document/%i'%loCurrentNode.node_id))
-          else:
-            flash(_('Your first document has been automatically created'), 'info')
-            loCurrentNode = loApiController.createDummyNode()
-            pm.DBSession.flush()
-            redirect(tg.url('/document/%i'%loCurrentNode.node_id))
 
         return dict(
             root_node_list=loRootNodeList,

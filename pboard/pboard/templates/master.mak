@@ -55,7 +55,11 @@
 
 <%def name="footer()">
   <div class="footer hidden-tablet hidden-phone text-center">
-    <p class="pod-blue"><i>${_("Using pod, you can: search a job, manage projects, track and manage clients and prospects, document processes and knowledge, ...")}</i></p>
+    <p class="pod-blue">
+      <i>${_("collaborative work  ♦  improved efficiency  ♦  full traceability")}</i>
+      <br/>
+      this is pod
+    </p>
     <hr style="width: 50%; margin: 0.5em auto;"/>
     <p>Copyright &copy; 2013 - ${h.current_year()} pod project.</p>
   </div>
@@ -95,7 +99,7 @@
             </li>
 
             <li title="Rebuild document index">
-            % if current_node is UNDEFINED:
+            % if current_node is UNDEFINED or current_node==None:
               <a href="${tg.url('/api/reindex_nodes?back_to_node_id=0')}"><i class="fa fa-refresh"></i></a>
             % else:
               <a href="${tg.url('/api/reindex_nodes?back_to_node_id=%i'%(current_node.node_id))}"><i class="fa fa-refresh"></i></a>
