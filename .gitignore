@@ -60,3 +60,6 @@ tg2env/
 
 # cache
 pboard/data/
+
+# Site-local config file
+development.ini
