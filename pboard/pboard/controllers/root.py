@@ -114,20 +114,27 @@ class RootController(BaseController):
 
     @expose('pboard.templates.document')
     @require(predicates.in_group('user', msg=l_('Please login to access this page')))
-    def document(self, node=0, came_from=lurl('/'), highlight=''):
+    def document(self, node=0, version=0, came_from=lurl('/'), highlight=''):
         """show the user dashboard"""
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
         loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
         loRootNodeList = loApiController.buildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
         liNodeId         = int(node)
+        liVersionId      = int(version)
 
         loCurrentNode    = None
         loNodeStatusList = None
 
         try:
           loNodeStatusList = pbmd.PBNodeStatus.getChoosableList()
-          loCurrentNode    = loApiController.getNode(liNodeId)
+          if liVersionId:
+              row = dict(pm.DBSession.execute("select * from pod_nodes_history where node_id=:node_id and version_id=:version_id", {"node_id":liNodeId, "version_id":liVersionId}).first().items())
+              del(row['version_id'])
+              loCurrentNode = pbmd.PBNode(**row)
+              log.info(loCurrentNode)
+          else:
+            loCurrentNode    = loApiController.getNode(liNodeId)
         except Exception as e:
           flash(_('Document not found'), 'error')
 

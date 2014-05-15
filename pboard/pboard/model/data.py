@@ -166,8 +166,8 @@ MINIMUM_DATE = datetimeroot.date(datetimeroot.MINYEAR, 1, 1)
 
 class PBNode(DeclarativeBase):
 
-  def __init__(self):
-    self._lStaticChildList = []
+  #def __init__(self):
+  #  self._lStaticChildList = []
 
   @sqlao.reconstructor
   def init_on_load(self):
@@ -421,4 +421,7 @@ class PBNode(DeclarativeBase):
     return re.sub('(^|\s)@(\w+)', PBNode.addTagReplacement, lsTemporaryResult) # then, 'normal tags are transformed as labels'
     # FIXME - D.A. - 2013-09-12
     # Does not match @@ at end of content.
+  
+  def getHistory(self):
+      return DBSession.execute("select node_id, version_id, created_at from pod_nodes_history where node_id = :node_id order by created_at desc", {"node_id":self.node_id}).fetchall()
 

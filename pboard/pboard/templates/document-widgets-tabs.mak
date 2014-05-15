@@ -2,6 +2,15 @@
 <%namespace name="POD" file="pboard.templates.pod"/>
 <%namespace name="DOC" file="pboard.templates.document-widgets"/>
 
+<%def name="HistoryTabContent(poNode)">
+  <h4>History</h4>
+  <ul>
+  % for version in poNode.getHistory():
+  	<li><a href="${tg.url('/document/%i/%i'%(version.node_id, version.version_id))}">${version.created_at.strftime("%a %x %X")}</a></li>
+  % endfor
+  </ul>
+</%def>
+
 <%def name="AccessManagementTab(poNode)">
   ######
   ##

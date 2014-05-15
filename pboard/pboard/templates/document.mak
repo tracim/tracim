@@ -124,6 +124,7 @@
                 <li>${DOC.MetadataTab('#comments', 'tab', _('Comment thread'), 'fa-comments-o', current_node.getComments())}</li>
                 <li>${DOC.MetadataTab('#files', 'tab', _('Attachments'), 'fa-paperclip', current_node.getFiles())}</li>
                 <li class="pull-right">${DOC.MetadataTab('#accessmanagement', 'tab', _('Access Management'), 'fa-key', [])}</li>
+                <li class="pull-right">${DOC.MetadataTab('#history', 'tab', _('History'), 'fa-history', current_node.getHistory())}</li>
             </ul>
             ################################
             ##
@@ -136,6 +137,7 @@
               <div class="tab-pane" id="contacts">${DOCTABS.ContactTabContent(current_node)}</div>
               <div class="tab-pane" id="comments">${DOCTABS.CommentTabContent(current_node)}</div>
               <div class="tab-pane" id="files">${DOCTABS.FileTabContent(current_node)}</div>
+			  <div class="tab-pane" id="history">${DOCTABS.HistoryTabContent(current_node)}</div>
               <div class="tab-pane" id="accessmanagement">${DOCTABS.AccessManagementTab(current_node)}</div>
             </div>
           </div>
