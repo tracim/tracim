@@ -55,6 +55,7 @@ from pboard.model import auth as pma
 - data_status_id
 """
 
+
 class PBNodeStatusItem(object):
   def __init__(self, psStatusId, psStatusLabel, psStatusFamily, psIconId, psCssClass): #, psBackgroundColor):
     self._sStatusId     = psStatusId
@@ -222,9 +223,9 @@ class PBNode(DeclarativeBase):
   data_file_mime_type = Column(Unicode(255),  unique=False, nullable=False, default='')
   data_file_content   = sqlao.deferred(Column(LargeBinary(), unique=False, nullable=False, default=None))
 
+  rights = relation('Rights')
 
   _oParent = relationship('PBNode', remote_side=[node_id], backref='_lAllChildren')
-  rights = relation('Rights', secondary=group_node_table, backref='nodes')
   _oOwner = relationship('User', remote_side=[pma.User.user_id], backref='_lAllNodes')
 
   def getChildrenOfType(self, plNodeTypeList, poKeySortingMethod=None, pbDoReverseSorting=False):
@@ -421,13 +422,3 @@ class PBNode(DeclarativeBase):
     # FIXME - D.A. - 2013-09-12
     # Does not match @@ at end of content.
 
-
-
-# This is the association table for the many-to-many relationship between groups and nodes
-group_node_table = Table('pod_group_node', metadata,
-        Column('group_id', Integer, ForeignKey('pod_group.group_id',
-            onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-        Column('node_id', Integer, ForeignKey('pod_nodes.node_id',
-            onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-        Column('rights', Integer)
-)

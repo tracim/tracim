@@ -54,7 +54,6 @@ class Group(DeclarativeBase):
     created = Column(DateTime, default=datetime.now)
     personnal_group = Column(Boolean)
     users = relation('User', secondary=user_group_table, backref='groups')
-    rights = relation('Rights', secondary=group_node_table, backref='groups')
 
     def __repr__(self):
         return '<Group: name=%s>' % repr(self.group_name)
@@ -154,6 +153,15 @@ class User(DeclarativeBase):
         hash = sha256()
         hash.update((password + self.password[:64]).encode('utf-8'))
         return self.password[64:] == hash.hexdigest()
+
+class Rights(DeclarativeBase):
+    __tablename__ = 'pod_group_node'
+
+    group_id = Column(Integer, ForeignKey('pod_group.group_id'), autoincrement=True, primary_key=True)
+    node_id = Column(Integer, ForeignKey('pod_nodes.node_id'), autoincrement=True, primary_key=True)
+    rights = Column(Integer)
+
+    groups = relation('PBNode')
 
 class Permission(DeclarativeBase):
     """
