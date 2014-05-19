@@ -6,6 +6,7 @@ import tg
 from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates
+from pboard.lib.auth import can_read
 
 import tgext.admin.tgadminconfig as tgat
 import tgext.admin.controller as tgac
@@ -113,7 +114,8 @@ class RootController(BaseController):
 
 
     @expose('pboard.templates.document')
-    @require(predicates.in_group('user', msg=l_('Please login to access this page')))
+    #@require(predicates.in_group('user', msg=l_('Please login to access this page')))
+    @require(can_read())
     def document(self, node=0, version=0, came_from=lurl('/'), highlight=''):
         """show the user dashboard"""
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
