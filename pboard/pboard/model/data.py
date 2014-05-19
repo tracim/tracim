@@ -21,40 +21,6 @@ import tg
 from pboard.model import DeclarativeBase, metadata, DBSession
 from pboard.model import auth as pma
 
-# This is the association table for the many-to-many relationship between
-# groups and permissions.
-"""pod_node_table = Table('pod_nodes', metadata,
-    Column('node_id', Integer, Sequence('pod_nodes__node_id__sequence'), primary_key=True),
-    Column('parent_id', Integer, ForeignKey('pod_nodes.node_id'), nullable=True, default=None),
-    Column('node_order', Integer, nullable=True, default=1),
-    Column('node_type',   Unicode(16), unique=False, nullable=False, default='data'),
-    Column('node_status', Unicode(16), unique=False, nullable=False, default='new'),
-
-    Column('created_at', DateTime, unique=False, nullable=False),
-    Column('updated_at', DateTime, unique=False, nullable=False),
-
-    Column('data_label',   Unicode(1024), unique=False, nullable=False, default=''),
-    Column('data_content', Text(), unique=False, nullable=False, default=''),
-    Column('data_datetime', DateTime, unique=False, nullable=False),
-    Column('data_reminder_datetime', DateTime, unique=False, nullable=True),
-    
-    Column('data_file_name', Unicode(255), unique=False, nullable=False, default=''),
-    Column('data_file_mime_type', Unicode(255), unique=False, nullable=False, default=''),
-    Column('data_file_content', LargeBinary(), unique=False, nullable=False, default=None),
-)
-"""
-"""
-- node_type
-
-- node_created_at
-- node_updated_at
-
-- data_label
-- data_content
-- data_source_url
-- data_status_id
-"""
-
 
 class PBNodeStatusItem(object):
   def __init__(self, psStatusId, psStatusLabel, psStatusFamily, psIconId, psCssClass): #, psBackgroundColor):
@@ -227,6 +193,7 @@ class PBNode(DeclarativeBase):
 
   _oParent = relationship('PBNode', remote_side=[node_id], backref='_lAllChildren')
   _oOwner = relationship('User', remote_side=[pma.User.user_id], backref='_lAllNodes')
+
 
   def getChildrenOfType(self, plNodeTypeList, poKeySortingMethod=None, pbDoReverseSorting=False):
     """return all children nodes of type 'data' or 'node' or 'folder'"""

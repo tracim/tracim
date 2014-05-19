@@ -62,6 +62,13 @@
           </td>
         </tr>
       % endfor
+      <tr>
+        <td>Recherche et Développement</td>
+        <td>
+          <span class="label label-success" title="${_('Read access')}">R</span>
+          <span class="label label-warning" title="${_('Write access')}">W</span>
+        </td>
+      </tr>
       <thead>
         <tr>
           <th><i class="fa fa-user"></i> ${_('Users')}</th>

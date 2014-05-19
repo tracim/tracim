@@ -147,7 +147,9 @@ class RootController(BaseController):
             root_node_list=loRootNodeList,
             current_node=loCurrentNode,
             node_status_list = loNodeStatusList,
-            keywords = highlight
+            keywords = highlight,
+            user_specific_groups = pld.PODStaticController.getUserSpecificGroups(),
+            real_groups = pld.PODStaticController.getRealGroups()
         )
 
     @expose('pboard.templates.search')

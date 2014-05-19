@@ -49,9 +49,23 @@ class PODPublicApiController(BaseController):
         loNewAccount.email_address = email
         loNewAccount.display_name  = email
         loNewAccount.password      = password
+
         loUserGroup = pld.PODStaticController.getGroup('user')
         loUserGroup.users.append(loNewAccount)
+
+        pm.DBSession.add(loNewAccount)
         pm.DBSession.flush()
+        pm.DBSession.refresh(loNewAccount)
+
+        loUserSpecificGroup = pld.PODStaticController.createGroup()
+
+        loUserSpecificGroup.group_id = 0-loNewAccount.user_id # group id of a given user is the opposite of the user id
+        loUserSpecificGroup.group_name = ''
+        loUserSpecificGroup.personnal_group = True
+        loUserSpecificGroup.users.append(loNewAccount)
+
+        pm.DBSession.flush()
+
         flash(_('Account successfully created: %s') % (email), 'info')
         redirect(lurl('/'))
 

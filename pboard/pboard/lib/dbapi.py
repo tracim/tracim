@@ -41,6 +41,23 @@ class PODStaticController(object):
     loGroup = pbma.Group.by_group_name(psGroupName)
     return loGroup
 
+  @classmethod
+  def createGroup(cls):
+    loGroup = pbma.Group()
+    return loGroup
+
+  @classmethod
+  def getGroups(cls):
+    loGroups = pbma.Group.real_groups_first()
+    return loGroups
+
+  @classmethod
+  def getUserSpecificGroups(cls):
+    return DBSession.query(pbma.Group).filter(pbma.Group.personnal_group==True).all()
+
+  @classmethod
+  def getRealGroups(cls):
+    return DBSession.query(pbma.Group).filter(pbma.Group.personnal_group==False).all()
 
 class PODUserFilteredApiController(object):
   

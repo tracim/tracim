@@ -11,11 +11,12 @@ though.
 import os
 from datetime import datetime
 from hashlib import sha256
+
 __all__ = ['User', 'Group', 'Permission']
 
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Unicode, Integer, DateTime, Boolean
-from sqlalchemy.orm import relation, synonym
+from sqlalchemy.orm import relation, relationship, synonym
 
 from pboard.model import DeclarativeBase, metadata, DBSession
 
@@ -38,13 +39,25 @@ user_group_table = Table('pod_user_group', metadata,
 )
 
 
+
+
+class Rights(DeclarativeBase):
+    READ_ACCESS = 1
+    WRITE_ACCESS = 2
+
+    __tablename__ = 'pod_group_node'
+
+    group_id = Column(Integer, ForeignKey('pod_group.group_id'), autoincrement=True, primary_key=True)
+    node_id = Column(Integer, ForeignKey('pod_nodes.node_id'), autoincrement=True, primary_key=True)
+    rights = Column(Integer)
+
+    def hasReadAccess(self):
+        return self.rights & Rights.READ_ACCESS
+
+    def hasWriteAccess(self):
+        return self.rights & Rights.WRITE_ACCESS
+
 class Group(DeclarativeBase):
-    """
-    Group definition
-
-    Only the ``group_name`` column is required.
-
-    """
 
     __tablename__ = 'pod_group'
 
@@ -54,6 +67,9 @@ class Group(DeclarativeBase):
     created = Column(DateTime, default=datetime.now)
     personnal_group = Column(Boolean)
     users = relation('User', secondary=user_group_table, backref='groups')
+
+    users = relation('User', secondary=user_group_table, backref='groups')
+    _lRights = relationship('Rights', remote_side=[Rights.group_id], backref='_oGroup')
 
     def __repr__(self):
         return '<Group: name=%s>' % repr(self.group_name)
@@ -65,6 +81,17 @@ class Group(DeclarativeBase):
     def by_group_name(cls, group_name):
         """Return the user object whose email address is ``email``."""
         return DBSession.query(cls).filter_by(group_name=group_name).first()
+
+    def getDisplayName(self) -> str:
+        if self.group_id<0:
+            return self.users[0].display_name
+
+        return self.display_name
+
+    @property
+    def rights(self):
+        return self._lRights
+
 
 class User(DeclarativeBase):
     """
@@ -154,14 +181,7 @@ class User(DeclarativeBase):
         hash.update((password + self.password[:64]).encode('utf-8'))
         return self.password[64:] == hash.hexdigest()
 
-class Rights(DeclarativeBase):
-    __tablename__ = 'pod_group_node'
 
-    group_id = Column(Integer, ForeignKey('pod_group.group_id'), autoincrement=True, primary_key=True)
-    node_id = Column(Integer, ForeignKey('pod_nodes.node_id'), autoincrement=True, primary_key=True)
-    rights = Column(Integer)
-
-    groups = relation('PBNode')
 
 class Permission(DeclarativeBase):
     """
