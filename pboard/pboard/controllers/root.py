@@ -134,7 +134,6 @@ class RootController(BaseController):
               row = dict(pm.DBSession.execute("select * from pod_nodes_history where node_id=:node_id and version_id=:version_id", {"node_id":liNodeId, "version_id":liVersionId}).first().items())
               del(row['version_id'])
               loCurrentNode = pbmd.PBNode(**row)
-              log.info(loCurrentNode)
           else:
             loCurrentNode    = loApiController.getNode(liNodeId)
         except Exception as e:

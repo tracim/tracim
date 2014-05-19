@@ -24,6 +24,7 @@ from pboard.lib.base import BaseController
 from pboard.lib   import dbapi as pld
 from pboard.model import data as pmd
 from pboard import model as pm
+from pboard.lib.auth import can_read, can_write
 
 __all__ = ['PODPublicApiController', 'PODApiController']
 
@@ -141,6 +142,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
+    @require(can_read())
     def get_file_content(self, node_id=None, **kw):
       if node_id==None:
         return
@@ -177,6 +179,7 @@ class PODApiController(BaseController):
         return loResultBuffer.getvalue()
 
     @expose()
+    @require(can_write())
     def set_parent_node(self, node_id, new_parent_id, **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -189,6 +192,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
+    @require(can_write())
     def move_node_upper(self, node_id=0):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -199,6 +203,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
+    @require(can_write())
     def move_node_lower(self, node_id=0):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -234,6 +239,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.node_id)))
 
     @expose()
+    @require(can_write())
     def edit_status(self, node_id, node_status):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -243,6 +249,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
+    @require(can_write())
     def edit_label_and_content(self, node_id, data_label, data_content):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -253,6 +260,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
+    @require(can_write())
     def force_delete_node(self, node_id=None):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
@@ -284,6 +292,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(back_to_node_id)))
 
     @expose()
+    @require(can_write())
     def toggle_share_status(self, node_id):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
