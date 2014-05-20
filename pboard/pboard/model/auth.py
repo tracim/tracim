@@ -11,6 +11,7 @@ though.
 import os
 from datetime import datetime
 from hashlib import sha256
+from sqlalchemy.sql.functions import session_user
 
 __all__ = ['User', 'Group', 'Permission']
 
@@ -42,13 +43,14 @@ user_group_table = Table('pod_user_group', metadata,
 
 
 class Rights(DeclarativeBase):
+
     READ_ACCESS = 1
     WRITE_ACCESS = 2
 
     __tablename__ = 'pod_group_node'
 
-    group_id = Column(Integer, ForeignKey('pod_group.group_id'), autoincrement=True, primary_key=True)
-    node_id = Column(Integer, ForeignKey('pod_nodes.node_id'), autoincrement=True, primary_key=True)
+    group_id = Column(Integer, ForeignKey('pod_group.group_id'), primary_key=True)
+    node_id = Column(Integer, ForeignKey('pod_nodes.node_id'), primary_key=True)
     rights = Column(Integer)
 
     def hasReadAccess(self):
@@ -56,6 +58,8 @@ class Rights(DeclarativeBase):
 
     def hasWriteAccess(self):
         return self.rights & Rights.WRITE_ACCESS
+
+
 
 class Group(DeclarativeBase):
 
@@ -68,8 +72,9 @@ class Group(DeclarativeBase):
     personnal_group = Column(Boolean)
     users = relation('User', secondary=user_group_table, backref='groups')
 
-    users = relation('User', secondary=user_group_table, backref='groups')
-    _lRights = relationship('Rights', remote_side=[Rights.group_id], backref='_oGroup')
+    _lRights = relationship('Rights', backref='_oGroup', cascade = "all, delete-orphan")
+
+
 
     def __repr__(self):
         return '<Group: name=%s>' % repr(self.group_name)
@@ -84,13 +89,25 @@ class Group(DeclarativeBase):
 
     def getDisplayName(self) -> str:
         if self.group_id<0:
-            return self.users[0].display_name
+            # FIXME - D.A. - 2014-05-19 - MAKE THIS CODE CLEANER,
+            try:
+                return self.users[0].getDisplayName()
+            except:
+                print('ERROR GROUP =>', self.group_id)
+
 
         return self.display_name
 
     @property
     def rights(self):
         return self._lRights
+
+    def hasSomeAccess(self, poNode):
+        for loRight in self._lRights:
+            if loRight.node_id == poNode.node_id and loRight.rights>0:
+                return True
+        return False
+
 
 
 class User(DeclarativeBase):
@@ -181,6 +198,11 @@ class User(DeclarativeBase):
         hash.update((password + self.password[:64]).encode('utf-8'))
         return self.password[64:] == hash.hexdigest()
 
+    def getDisplayName(self):
+        if self.display_name!=None and self.display_name!='':
+            return self.display_name
+        else:
+            return self.email_address
 
 
 class Permission(DeclarativeBase):

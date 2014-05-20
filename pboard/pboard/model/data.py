@@ -189,7 +189,7 @@ class PBNode(DeclarativeBase):
   data_file_mime_type = Column(Unicode(255),  unique=False, nullable=False, default='')
   data_file_content   = sqlao.deferred(Column(LargeBinary(), unique=False, nullable=False, default=None))
 
-  rights = relation('Rights')
+  _lRights = relationship('Rights', backref='_oNode', cascade = "all, delete-orphan")
 
   _oParent = relationship('PBNode', remote_side=[node_id], backref='_lAllChildren')
   _oOwner = relationship('User', remote_side=[pma.User.user_id], backref='_lAllNodes')
@@ -216,6 +216,13 @@ class PBNode(DeclarativeBase):
   
   def getChildNb(self):
     return self.getChildNbOfType([PBNodeType.Data])
+
+  def getGroupsWithSomeAccess(self):
+    llRights = []
+    for loRight in self._lRights:
+      if loRight.rights>0:
+        llRights.append(loRight)
+    return llRights
 
   def getChildren(self, pbIncludeDeleted=False):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
