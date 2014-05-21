@@ -68,7 +68,6 @@ class Group(DeclarativeBase):
     personnal_group = Column(Boolean)
     users = relation('User', secondary=user_group_table, backref='groups')
 
-    users = relation('User', secondary=user_group_table, backref='groups')
     _lRights = relationship('Rights', remote_side=[Rights.group_id], backref='_oGroup')
 
     def __repr__(self):
