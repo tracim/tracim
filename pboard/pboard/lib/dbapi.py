@@ -92,17 +92,18 @@ class PODUserFilteredApiController(object):
     return self._iUserIdFilteringList
 
 
-  def createNode(self):
+  def createNode(self, parent_id=0):
     loNode          = pbmd.PBNode()
     loNode.owner_id = self._iCurrentUserId
+    loNode.parent_id = parent_id
+    parent_rights = DBSession.query(pbma.Rights).filter(pbma.Rights.node_id==parent_id).all()
+    loNode.rights = parent_rights
+    loNode.rights = [pbma.Rights(group_id=r.group_id, rights=r.rights) for r in parent_rights]
     DBSession.add(loNode)
     return loNode
   
-    query.filter(User.name.in_(['ed', 'wendy', 'jack']))
-
-
-  def createDummyNode(self):
-    loNewNode = self.createNode()
+  def createDummyNode(self, parent_id):
+    loNewNode = self.createNode(parent_id)
     loNewNode.data_label   = ''
     loNewNode.data_content = ''
     return loNewNode

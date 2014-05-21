@@ -82,8 +82,7 @@ class PODApiController(BaseController):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
-      loNewNode = loApiController.createNode()
-      loNewNode.parent_id     = int(parent_id)
+      loNewNode = loApiController.createNode(int(parent_id))
       loNewNode.node_type     = pmd.PBNodeType.Event
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -99,8 +98,7 @@ class PODApiController(BaseController):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
-      loNewNode = loApiController.createNode()
-      loNewNode.parent_id     = int(parent_id)
+      loNewNode = loApiController.createNode(int(parent_id))
       loNewNode.node_type     = pmd.PBNodeType.Contact
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -113,8 +111,7 @@ class PODApiController(BaseController):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
-      loNewNode = loApiController.createNode()
-      loNewNode.parent_id     = int(parent_id)
+      loNewNode = loApiController.createNode(int(parent_id))
       loNewNode.node_type     = pmd.PBNodeType.Comment
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -129,8 +126,7 @@ class PODApiController(BaseController):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
-      loNewNode = loApiController.createNode()
-      loNewNode.parent_id     = int(parent_id)
+      loNewNode = loApiController.createNode(int(parent_id))
       loNewNode.node_type     = pmd.PBNodeType.File
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -224,7 +220,7 @@ class PODApiController(BaseController):
         loParent = loApiController.getNode(parent_id)
         lsNodeName = 'Subdocument of (%s)' % loParent.data_label
 
-      loNewNode = loApiController.createDummyNode()
+      loNewNode = loApiController.createDummyNode(parent_id)
       loNewNode.data_label   = lsNodeName
       loNewNode.data_content = 'insert content...'
 
