@@ -109,28 +109,21 @@ class PODUserFilteredApiController(object):
     return loNewNode
 
 
-  def getNode(self, liNodeId):
-    """
-    liOwnerIdList = self._getUserIdListForFiltering()
-    if liNodeId!=0:
-      return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.node_id==liNodeId).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).one()
-    return None
-    """
+  def getNode(self, liNodeId: int) -> pbmd.PBNode:
 
-    sqla.or_
     lsSqlSelectQuery = """pod_nodes.node_id IN
-(SELECT
-	pgn.node_id
-FROM
-	pod_group_node AS pgn
-	join pod_user_group AS pug ON pug.group_id = pgn.group_id
-	join pod_user AS pu ON pug.user_id = pu.user_id
-WHERE
-	rights > 0
-	AND pu.user_id = %s)
-"""
+        (SELECT
+            pgn.node_id
+        FROM
+            pod_group_node AS pgn
+            join pod_user_group AS pug ON pug.group_id = pgn.group_id
+            join pod_user AS pu ON pug.user_id = pu.user_id
+        WHERE
+            rights > 0
+            AND pu.user_id = %s)
+    """
     lsNodeIdFiltering = lsSqlSelectQuery % (str(self._iCurrentUserId))
-    print("filter: ====>>>", lsNodeIdFiltering)
+
     if liNodeId!=0:
       return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren"))\
         .filter(pbmd.PBNode.node_id==liNodeId)\
@@ -143,7 +136,7 @@ WHERE
         .one()
     return None
 
-  def getLastModifiedNodes(self, piMaxNodeNb):
+  def getLastModifiedNodes(self, piMaxNodeNb: int):
     """
     Returns a list of nodes order by modification time and limited to piMaxNodeNb nodes
     """
@@ -151,7 +144,7 @@ WHERE
     return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
 
 
-  def searchNodesByText(self, plKeywordList, piMaxNodeNb=100):
+  def searchNodesByText(self, plKeywordList: [str], piMaxNodeNb=100):
     """
     Returns a list of nodes order by type, nodes which contain at least one of the keywords
     """
