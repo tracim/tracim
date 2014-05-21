@@ -147,8 +147,8 @@ class RootController(BaseController):
             current_node=loCurrentNode,
             node_status_list = loNodeStatusList,
             keywords = highlight,
-            user_specific_groups = pld.PODStaticController.getUserSpecificGroups(),
-            real_groups = pld.PODStaticController.getRealGroups()
+            user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(node_id),
+            real_group_rights = pld.PODStaticController.getRealGroupRightsOnNode(node_id)
         )
 
     @expose('pboard.templates.search')

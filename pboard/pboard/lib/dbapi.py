@@ -52,12 +52,28 @@ class PODStaticController(object):
     return loGroups
 
   @classmethod
-  def getUserSpecificGroups(cls):
-    return DBSession.query(pbma.Group).filter(pbma.Group.personnal_group==True).all()
+  def getRealGroupRightsOnNode(cls, piNodeId: int) -> pbmd.DIRTY_GroupRightsOnNode:
+
+    groupRightsOnNodeCustomSelect = DBSession\
+        .query(pbmd.DIRTY_GroupRightsOnNode)\
+        .from_statement(pbmd.DIRTY_RealGroupRightOnNodeSqlQuery)\
+        .params(node_id=piNodeId)\
+        .all()
+
+    return groupRightsOnNodeCustomSelect
 
   @classmethod
-  def getRealGroups(cls):
-    return DBSession.query(pbma.Group).filter(pbma.Group.personnal_group==False).all()
+  def getUserDedicatedGroupRightsOnNode(cls, piNodeId: int) -> pbmd.DIRTY_GroupRightsOnNode:
+
+    groupRightsOnNodeCustomSelect = DBSession\
+        .query(pbmd.DIRTY_GroupRightsOnNode)\
+        .from_statement(pbmd.DIRTY_UserDedicatedGroupRightOnNodeSqlQuery)\
+        .params(node_id=piNodeId)\
+        .all()
+
+    return groupRightsOnNodeCustomSelect
+
+
 
 class PODUserFilteredApiController(object):
   
@@ -93,11 +109,38 @@ class PODUserFilteredApiController(object):
 
 
   def getNode(self, liNodeId):
+    """
     liOwnerIdList = self._getUserIdListForFiltering()
     if liNodeId!=0:
       return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.node_id==liNodeId).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).one()
     return None
+    """
 
+    sqla.or_
+    lsSqlSelectQuery = """pod_nodes.node_id IN
+(SELECT
+	pgn.node_id
+FROM
+	pod_group_node AS pgn
+	join pod_user_group AS pug ON pug.group_id = pgn.group_id
+	join pod_user AS pu ON pug.user_id = pu.user_id
+WHERE
+	rights > 0
+	AND pu.user_id = %s)
+"""
+    lsNodeIdFiltering = lsSqlSelectQuery % (str(self._iCurrentUserId))
+    print("filter: ====>>>", lsNodeIdFiltering)
+    if liNodeId!=0:
+      return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren"))\
+        .filter(pbmd.PBNode.node_id==liNodeId)\
+        .filter(
+          sqla.or_(
+            pbmd.PBNode.owner_id==self._iCurrentUserId,
+            lsNodeIdFiltering
+          )
+        )\
+        .one()
+    return None
 
   def getLastModifiedNodes(self, piMaxNodeNb):
     """

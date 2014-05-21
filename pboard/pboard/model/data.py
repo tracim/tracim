@@ -8,11 +8,14 @@ from hashlib import sha256
 
 import bs4
 from sqlalchemy import Table, ForeignKey, Column, Sequence
+import sqlalchemy as sqla
+from sqlalchemy.sql.sqltypes import Boolean
 from sqlalchemy.types import Unicode, Integer, DateTime, Text, LargeBinary
 import sqlalchemy.types as sqlat
 from sqlalchemy.orm import relation, synonym, relationship
 from sqlalchemy.orm import backref
 import sqlalchemy.orm as sqlao
+import sqlalchemy.orm.query as sqlaoq
 from sqlalchemy import orm as sqlao
 
 from tg.i18n import ugettext as _, lazy_ugettext as l_
@@ -398,4 +401,76 @@ class PBNode(DeclarativeBase):
   
   def getHistory(self):
       return DBSession.execute("select node_id, version_id, created_at from pod_nodes_history where node_id = :node_id order by created_at desc", {"node_id":self.node_id}).fetchall()
+
+
+#####
+#
+# HACK - 2014-05-21 - D.A
+#
+# The following hack is a horrible piece of code that allow to map a raw SQL select to a mapped class
+#
+class DIRTY_GroupRightsOnNode(object):
+    def hasSomeAccess(self):
+        return self.rights >= pma.Rights.READ_ACCESS
+
+    def hasReadAccess(self):
+        return self.rights & pma.Rights.READ_ACCESS
+
+    def hasWriteAccess(self):
+        return self.rights & pma.Rights.WRITE_ACCESS
+
+DIRTY_group_rights_on_node_query = Table('fake_table', metadata,
+    Column('group_id', Integer, primary_key=True),
+    Column('node_id', Integer, primary_key=True),
+
+    Column('display_name', Unicode(255)),
+    Column('personnal_group', Boolean),
+    Column('rights', Integer, primary_key=True)
+)
+
+DIRTY_UserDedicatedGroupRightOnNodeSqlQuery = """
+SELECT
+    COALESCE(NULLIF(pg.display_name, ''), pu.display_name) AS display_name,
+    pg.personnal_group,
+    pg.group_id,
+    :node_id AS node_id,
+    COALESCE(pgn.rights, 0) AS rights
+FROM
+    pod_group AS pg
+    LEFT JOIN
+        pod_group_node AS pgn
+    ON
+        pg.group_id=pgn.group_id
+        AND pgn.node_id=:node_id
+    LEFT JOIN
+        pod_user AS pu
+    ON
+        pu.user_id=-pg.group_id
+WHERE
+    pg.personnal_group='t'
+ORDER BY
+    display_name
+;"""
+
+DIRTY_RealGroupRightOnNodeSqlQuery = """
+SELECT
+    pg.display_name AS display_name,
+    pg.personnal_group,
+    pg.group_id,
+    :node_id AS node_id,
+    COALESCE(pgn.rights, 0) AS rights
+FROM
+    pod_group AS pg
+    LEFT JOIN
+        pod_group_node AS pgn
+    ON
+        pg.group_id=pgn.group_id
+        AND pgn.node_id=:node_id
+WHERE
+    pg.personnal_group!='t'
+ORDER BY
+    display_name
+;"""
+
+sqlao.mapper(DIRTY_GroupRightsOnNode, DIRTY_group_rights_on_node_query)
 
