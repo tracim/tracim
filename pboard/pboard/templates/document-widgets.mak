@@ -206,9 +206,9 @@
         ${_('private')}
       </sup>
     % else:
-      <sup class="label label-warning" title="${_('This document is collaborative')}">
+      <sup class="label label-warning" title="${_('This document is shared')}">
         <i class="fa fa-group"></i>
-        ${_('collaborative')}
+        ${_('shared')}
       </sup>
     % endif
 ######

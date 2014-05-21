@@ -23,6 +23,7 @@ from tg.i18n import ugettext as _, lazy_ugettext as l_
 from pboard.lib.base import BaseController
 from pboard.lib   import dbapi as pld
 from pboard.model import data as pmd
+from pboard.model import auth as pma
 from pboard import model as pm
 from pboard.lib.auth import can_read, can_write
 
@@ -299,3 +300,56 @@ class PODApiController(BaseController):
       # - if root node, then exception
       # - this redirect is done in order to be adapted to comment share status toggle
       redirect(lurl('/document/%s#tab-comments'%(loNode._oParent.node_id)))
+
+    @expose()
+    @require(can_read())
+    def set_access_management(self, node_id, is_shared='off', read=[0], write=[0]):
+
+      llReadAccessGroupIds = [int(liGroupId) for liGroupId in read]
+      llWriteAccessGroupIds = [int(liGroupId) for liGroupId in write]
+
+      # HACK - D.A. - 2015-058-20
+      # the 0 values are added in order to get a read and write parameters as list even if only one value is inside
+      # (the default behavior of TG2 is to convert it to a string value if only one value is sent
+      #
+      llReadAccessGroupIds.remove(0) # remove useless value
+      llWriteAccessGroupIds.remove(0) # remove useless value
+
+      loCurrentUser   = pld.PODStaticController.getCurrentUser()
+      loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
+
+      loNode = loApiController.getNode(node_id)
+      # loNode._lRights = list()
+
+      # SHARE IS OFF, so deactivate the document share (and do not change "shared-with" group configuration
+      if is_shared=='off':
+        loNode.is_shared = False
+        pm.DBSession.flush()
+        redirect(lurl('/document/%s#tab-accessmanagement'%(loNode.node_id)))
+
+      # SHARE IS ON, so remove all current shares and set the new ones
+      loNode.is_shared = True
+
+      for loRight in loNode._lRights:
+        pm.DBSession.delete(loRight)
+      pm.DBSession.flush()
+
+      ldNewRights = dict()
+      for liGroupId in llReadAccessGroupIds:
+        ldNewRights[liGroupId] = pma.Rights.READ_ACCESS
+
+      for liGroupId in llWriteAccessGroupIds:
+        liOldValue = 0
+        if liGroupId in ldNewRights:
+          liOldValue = ldNewRights[liGroupId]
+        ldNewRights[liGroupId] = liOldValue + pma.Rights.WRITE_ACCESS
+
+      for liGroupId, liRightLevel in ldNewRights.items():
+        loNewRight = loApiController.createRight()
+        loNewRight.group_id = liGroupId
+        loNewRight.node_id = node_id
+        loNewRight.rights = liRightLevel
+        loNode._lRights.append(loNewRight)
+
+      redirect(lurl('/document/%s#tab-accessmanagement'%(loNode.node_id)))
+

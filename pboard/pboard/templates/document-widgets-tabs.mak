@@ -3,7 +3,7 @@
 <%namespace name="DOC" file="pboard.templates.document-widgets"/>
 
 <%def name="HistoryTabContent(poNode)">
-  <h4>History</h4>
+  <h4>${_('Revisions')}</h4>
   <ul>
   % for version in poNode.getHistory():
   	<li><a href="${tg.url('/document/%i/%i'%(version.node_id, version.version_id))}">${version.created_at.strftime("%a %x %X")}</a></li>
@@ -18,26 +18,14 @@
   ##
   <h4>${_('Share options')}</h4> 
   <p>
-    This document is
     % if poNode.is_shared==False:
-      <span class="label label-info">
-        <i class="fa fa-user"></i>
-        ${_('private')}
-      </span>
+      <span class="pod-grey">${_('This document is not shared')}</span>
     % else:
-      <span class="label label-info">
-        <i class="fa fa-group"></i>
-        ${_('collaborative')}
-      </span>
+      <span class="">${_('This document is shared.')}</span>
     % endif
   </p>
   <p>
-    % if poNode.is_shared==True or poNode.is_shared==False:
-      ${_('People working on it are:')}
-######
-##
-## FIXME - SHOW LIST OF GROUPS ALLOWED TO WORK ON THE DOCUMENT
-##
+    % if poNode.is_shared==True:
     <table class="table table-striped table-hover table-condensed">
       <thead>
         <tr>
@@ -46,44 +34,48 @@
         </tr>
       </thead>
       % for loCurrentGroup in real_groups:
-        <tr>
-          <td>${loCurrentGroup.getDisplayName()}</td>
-          <td>
-            % for loRight in loCurrentGroup.rights:
-              % if loRight.node_id==poNode.node_id:
-                % if loRight.hasReadAccess():
-                  <span class="label label-success">R</span>
+        % if loCurrentGroup.hasSomeAccess(poNode):
+          <tr>
+            <td>${loCurrentGroup.getDisplayName()}</td>
+            <td>
+              % for loRight in loCurrentGroup.rights:
+                % if loRight.node_id==poNode.node_id:
+                  % if loRight.hasReadAccess():
+                    <span class="label label-success">R</span>
+                  % endif
+                  % if loRight.hasWriteAccess():
+                    <span class="label label-warning">W</span>
+                  % endif
                 % endif
-                % if loRight.hasWriteAccess():
-                  <span class="label label-warning">W</span>
-                % endif
-              % endif
-            % endfor
-          </td>
-        </tr>
+              % endfor
+            </td>
+          </tr>
+        % endif
       % endfor
       <thead>
         <tr>
-          <th><i class="fa fa-user"></i> ${_('Users')}</th>
+          <th><i class="fa fa-user"></i> ${_('Individual users')}</th>
           <th></th>
         </tr>
       </thead>
       % for loCurrentGroup in user_specific_groups:
-        <tr>
-          <td>${loCurrentGroup.getDisplayName()}</td>
-          <td>
-            % for loRight in loCurrentGroup.rights:
-              % if loRight.node_id==poNode.node_id:
-                % if loRight.hasReadAccess():
-                  <span class="label label-success">R</span>
+        % if loCurrentGroup.hasSomeAccess(poNode):
+          <tr>
+            <td>${loCurrentGroup.getDisplayName()}</td>
+            <td>
+              % for loRight in loCurrentGroup.rights:
+                % if loRight.node_id==poNode.node_id:
+                  % if loRight.hasReadAccess():
+                    <span class="label label-success">R</span>
+                  % endif
+                  % if loRight.hasWriteAccess():
+                    <span class="label label-warning">W</span>
+                  % endif
                 % endif
-                % if loRight.hasWriteAccess():
-                  <span class="label label-warning">W</span>
-                % endif
-              % endif
-            % endfor
-          </td>
-        </tr>
+              % endfor
+            </td>
+          </tr>
+        % endif
       % endfor
     </table>
     
@@ -123,58 +115,70 @@
     </div>
     <div class="modal-body">
 
-      <form id='document-share-form' method="GET" action="${tg.url('/api/set_access_management?node_id=%d'%poNode.node_id)}">
+      <form id='document-share-form' method="GET" action="${tg.url('/api/set_access_management')}">
+        <input type="hidden" name="node_id" value="${poNode.node_id}" />
+        <input type="hidden" name="read" value="0" />
+        <input type="hidden" name="write" value="0" />
         <fieldset>
           <label class="checkbox">
             <input name="is_shared" type="checkbox" id="document-share-selector" ${('', 'checked')[poNode.is_shared]}/>
-            ${_('Share document with collaborators.')} <i class="fa fa-group"></i>
+            ${_('Share document with collaborators.')}
           </label>
           <div id="document-share-people-selector">
-            <p>
-              ${_('Select read and write access for each group or people...')}</p>
+            <p>${_('Select read and write access for each group or people...')}</p>
             <script>
-            function updateRights(psUserId) {
-              var ACCESS_NONE = '';
-              var ACCESS_READ = 'R';
-              var ACCESS_WRITE = 'RW';
+            function updateRights(psUserId, piNewValue = -1) {
+              var ACCESS_UNDEFINED = -1;
+              var ACCESS_NONE = 0;
+              var ACCESS_READ = 1;
+              var ACCESS_WRITE = 2;
               
               var nodeIdForSelectedUser = 'user-'+psUserId+'-value';
-              var widget = $('#'+nodeIdForSelectedUser);
-              var oldValue = widget.val();
-              var newValue = '';
-              if(oldValue==ACCESS_NONE) {
-                newValue = ACCESS_READ;
-                newHtml = '<span class="label label-success">R</span>';
-              } else if(oldValue==ACCESS_READ) {
-                newValue = ACCESS_WRITE;
-                newHtml = '<span class="label label-success">R</span> <span class="label label-warning">W</span>';
-              } else if (oldValue==ACCESS_WRITE) {
-                newValue = ACCESS_NONE;
+              var widgetRead = $('#'+nodeIdForSelectedUser+'-read');
+              var widgetWrite = $('#'+nodeIdForSelectedUser+'-write');
+              var oldReadValue = widgetRead.val()
+              var oldWriteValue = widgetWrite.val();
+              
+              if(oldReadValue=='' && oldWriteValue=='' && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_READ) {
+## SET READ ACCESS
+                widgetRead.val(psUserId)
+                widgetWrite.val('')
+                newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span>';
+              } else if(oldReadValue==psUserId && oldWriteValue=='' && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_READ+ACCESS_WRITE) {
+## SET READ + WRITE ACCESS
+                widgetRead.val(psUserId)
+                widgetWrite.val(psUserId)
+                newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span> <span class="label label-warning" title="${'Allow to modify the item'}">W</span>';
+              } else if (oldReadValue==psUserId && oldWriteValue==psUserId && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_NONE) {
+## SET NO ACCESS
+                widgetRead.val('')
+                widgetWrite.val('')
                 newHtml = '';
               } else {
-                newValue = ACCESS_READ;
-                newHtml = '<span class="label label-success">R</span>';
+## SET READ ACCESS (default)
+                widgetRead.val(psUserId)
+                widgetWrite.val('')
+                newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span>';
               }
               
-              widget.val(newValue);
               visibleid = 'user-'+psUserId+'-rights';
               $("#"+visibleid).html(newHtml);
             }
             </script>
             
             <table class="table table-striped table-hover table-condensed">
+    ######
+    ##
+    ## REAL GROUPS LISTING HERE
+    ##
               <thead>
                 <tr>
-                  <th></th>
+                  <th><i class="fa fa-group"></i></th>
                   <th>${_('Group')}</th>
                   <th>${_('Access')}</th>
                 </tr>
               </thead>
-    ######
-    ##
-    ## FIXME - SET A DYNAMIC SELECT LIST HERE
-    ##
-              % for loCurrentGroup in user_specific_groups:
+              % for loCurrentGroup in real_groups:
               <tr id='user-${loCurrentGroup.group_id}-rights-row'>
                 <td>
                   <a
@@ -186,12 +190,39 @@
                 </td>
                 <td class='pod-highlightable-access-management-cell'>
                   ${loCurrentGroup.getDisplayName()}
-                  <input
-                    type="hidden"
-                    id="user-${loCurrentGroup.group_id}-value"
-                    name="user[${loCurrentGroup.group_id}]"
-                    value=""
-                  />
+                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-read" name="read" value="" />
+                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-write" name="write" value="" />
+                </td>
+                <td id="user-${loCurrentGroup.group_id}-rights" class="pod-right-cell"></td>
+              </tr>
+              % endfor
+              
+    ######
+    ##
+    ## INDIVIDUAL USERS LISTING HERE
+    ##
+              <thead>
+                <tr>
+                  <th><i class="fa fa-user"></i></th>
+                  <th>${_('Individual Users')}</th>
+                  <th>${_('Access')}</th>
+                </tr>
+              </thead>
+              % for loCurrentGroup in user_specific_groups:
+              
+              <tr id='user-${loCurrentGroup.group_id}-rights-row'>
+                <td>
+                  <a
+                    class="btn btn-mini"
+                    onclick="updateRights(${loCurrentGroup.group_id})"
+                  >
+                    <i class="fa fa-key"></i>
+                  </a>
+                </td>
+                <td class='pod-highlightable-access-management-cell'>
+                  ${loCurrentGroup.getDisplayName()}
+                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-read" name="read" value="" />
+                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-write" name="write" value="" />
                 </td>
                 <td id="user-${loCurrentGroup.group_id}-rights" class="pod-right-cell"></td>
               </tr>
@@ -298,6 +329,8 @@
 
       // Submit access-management modal dialog form
       $('#document-share-form-submit-button').click(function(){
+        $("input[name='read'][value='']").remove();
+        $("input[name='write'][value='']").remove();
         $('#document-share-form')[0].submit();
       });
 
@@ -308,7 +341,28 @@
       // FIXME - 2014-05-06 - This is not working (should be done at document.ready time)
       // note: putting this in a document.ready callback does not work.
       //
-      $('#document-share-form')[0].reset();
+##
+## The following code is something like dirty ;)
+## the goal of this piece of code is to setup view
+## according to hidden input values
+## for read/write access management
+##
+
+      % for loCurrentGroup in real_groups + user_specific_groups:
+        % if loCurrentGroup.hasSomeAccess(poNode)==False:
+              updateRights(${loCurrentGroup.group_id}, 0);
+        % else:
+          % for loRight in loCurrentGroup.rights:
+            % if loRight.node_id==poNode.node_id:
+##
+## The following line should build some javascript code similar to this:
+## updateRights(-5, 3);
+              updateRights(${loCurrentGroup.group_id}, ${loRight.rights});
+            % endif
+          % endfor
+        % endif
+      % endfor
+
       toggleDocumentSharePeopleSelector($('#document-share-selector').prop("checked"));
 ##        toggleDocumentPublicKeyGenerator($('#document-public-selector').prop("checked"));  
 ##        

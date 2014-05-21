@@ -226,3 +226,7 @@ class PODUserFilteredApiController(object):
     # INFO - D.A. - 2013-11-07 - should be save as getNode should return only accessible nodes
     DBSession.delete(loNode)
     return
+
+  def createRight(self):
+    loRight = pbma.Rights()
+    return loRight

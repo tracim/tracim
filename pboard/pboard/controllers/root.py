@@ -116,13 +116,13 @@ class RootController(BaseController):
     @expose('pboard.templates.document')
     #@require(predicates.in_group('user', msg=l_('Please login to access this page')))
     @require(can_read())
-    def document(self, node=0, version=0, came_from=lurl('/'), highlight=''):
+    def document(self, node_id=0, version=0, came_from=lurl('/'), highlight=''):
         """show the user dashboard"""
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
         loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
         loRootNodeList = loApiController.buildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
-        liNodeId         = int(node)
+        liNodeId         = int(node_id)
         liVersionId      = int(version)
 
         loCurrentNode    = None
