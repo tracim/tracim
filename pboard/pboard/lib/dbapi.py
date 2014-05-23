@@ -96,7 +96,8 @@ class PODUserFilteredApiController(object):
   def createNode(self, parent_id=0):
     loNode          = pbmd.PBNode()
     loNode.owner_id = self._iCurrentUserId
-    loNode.parent_id = parent_id
+    if int(parent_id)!=0:
+      loNode.parent_id = parent_id
     parent_rights = DBSession.query(pbma.Rights).filter(pbma.Rights.node_id==parent_id).all()
     loNode.rights = parent_rights
     loNode.rights = [pbma.Rights(group_id=r.group_id, rights=r.rights) for r in parent_rights]
@@ -125,7 +126,7 @@ class PODUserFilteredApiController(object):
     """
     lsNodeIdFiltering = lsSqlSelectQuery % (str(self._iCurrentUserId))
 
-    if liNodeId!=0:
+    if liNodeId!=None and liNodeId!=0:
       return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren"))\
         .filter(pbmd.PBNode.node_id==liNodeId)\
         .filter(
@@ -245,7 +246,19 @@ class PODUserFilteredApiController(object):
 
     liOwnerIdList = self._getUserIdListForFiltering()
     
-    loNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).filter(pbmd.PBNode.node_status.in_(plViewableStatusId)).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).order_by(pbmd.PBNode.node_id).all()
+    # loNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).filter(pbmd.PBNode.node_status.in_(plViewableStatusId)).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).order_by(pbmd.PBNode.node_id).all()
+    loNodeListNotFiltered = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).filter(pbmd.PBNode.node_status.in_(plViewableStatusId)).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).order_by(pbmd.PBNode.node_id).all()
+
+    loNodeList = []
+    for loNode in loNodeListNotFiltered:
+      if loNode.owner_id in self._getUserIdListForFiltering():
+        loNodeList.append(loNode)
+      else:
+        for loRight in loNode._lRights:
+          for loUser in loRight._oGroup.users:
+            if loUser.user_id in self._getUserIdListForFiltering():
+              loNodeList.append(loNode)
+
     loTreeList = []
     loTmpDict = {}
     for loNode in loNodeList:
@@ -260,8 +273,18 @@ class PODUserFilteredApiController(object):
         # We suppose that the parent node has already been added
         # this *should* be the case, but the code does not check it
         if loNode.parent_id not in loTmpDict.keys():
-          loTmpDict[loNode.parent_id] = self.getNode(loNode.parent_id)
-        loTmpDict[loNode.parent_id].appendStaticChild(loNode)
+          print('THE NODE =========',loNode.parent_id)
+          try:
+            loTmpDict[loNode.parent_id] = self.getNode(loNode.parent_id)
+          except Exception as e:
+            # loTreeList.append(
+            # FIXME - D.A. - 2014-05-22 This may be wrong code:
+            # we are in the case when the node parent is not shared with the current user
+            # So the node should be added at the root
+            pass
+        if loNode.parent_id in loTmpDict.keys():
+          # HACK- D.A. - 2014-05-22 - See FIXME upper
+          loTmpDict[loNode.parent_id].appendStaticChild(loNode)
   
     return loTreeList
 

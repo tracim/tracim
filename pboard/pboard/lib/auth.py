@@ -3,6 +3,7 @@
 from tg.predicates import Predicate
 from pboard.model import DBSession as session
 from pboard.model.auth import Permission, User
+import logging as l
 
 DIRTY_canReadOrCanWriteSqlQuery = """
 SELECT
@@ -42,6 +43,7 @@ class can_read(Predicate):
                     {"email":credentials["repoze.who.userid"], "node_id":node_id, "excluded_right_low_level": 0}
                 )
                 if has_right.rowcount == 0 :
+                    l.info("User {} don't have read right on node {}".format(credentials["repoze.who.userid"], node_id))
                     self.unmet()
 
 class can_write(Predicate):

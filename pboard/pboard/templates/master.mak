@@ -172,6 +172,9 @@
                 <li><a href="${tg.url('/debug/identity')}"><i class="fa fa-user-md"></i>  request.identity</a></li>
               </ul>
             </li>
+          % endif
+
+          % if request.identity:
             <li>
               <form class="navbar-search  form-search" action="${tg.url('/search')}">
                 <div class="input-append">

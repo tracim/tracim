@@ -2,9 +2,9 @@
 
 """The base Controller API."""
 
-from tg import TGController, tmpl_context
+from tg import TGController, tmpl_context, flash
 from tg.render import render
-from tg import request
+from tg import request, redirect
 from tg.i18n import ugettext as _, ungettext
 import pboard.model as model
 
@@ -28,3 +28,10 @@ class BaseController(TGController):
         request.identity = request.environ.get('repoze.who.identity')
         tmpl_context.identity = request.identity
         return TGController.__call__(self, environ, context)
+
+    def back_with_error(self, message):
+        flash(message)
+        redirect(request.headers['Referer'])
+
+def current_user():
+    return request.environ.get('repoze.who.identity')['user']
