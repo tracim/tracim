@@ -33,21 +33,17 @@
           <th></th>
         </tr>
       </thead>
-      % for loCurrentGroup in real_groups:
-        % if loCurrentGroup.hasSomeAccess(poNode):
+      % for loGroupRightsOnNode in real_group_rights:
+        % if loGroupRightsOnNode.hasSomeAccess():
           <tr>
-            <td>${loCurrentGroup.getDisplayName()}</td>
+            <td>${loGroupRightsOnNode.display_name}</td>
             <td>
-              % for loRight in loCurrentGroup.rights:
-                % if loRight.node_id==poNode.node_id:
-                  % if loRight.hasReadAccess():
-                    <span class="label label-success">R</span>
-                  % endif
-                  % if loRight.hasWriteAccess():
-                    <span class="label label-warning">W</span>
-                  % endif
-                % endif
-              % endfor
+              % if loGroupRightsOnNode.hasReadAccess():
+                <span class="label label-success">R</span>
+              % endif
+              % if loGroupRightsOnNode.hasWriteAccess():
+                <span class="label label-warning">W</span>
+              % endif
             </td>
           </tr>
         % endif
@@ -58,21 +54,17 @@
           <th></th>
         </tr>
       </thead>
-      % for loCurrentGroup in user_specific_groups:
-        % if loCurrentGroup.hasSomeAccess(poNode):
+      % for loGroupRightsOnNode in user_specific_group_rights:
+        % if loGroupRightsOnNode.hasSomeAccess():
           <tr>
-            <td>${loCurrentGroup.getDisplayName()}</td>
+            <td>${loGroupRightsOnNode.display_name}</td>
             <td>
-              % for loRight in loCurrentGroup.rights:
-                % if loRight.node_id==poNode.node_id:
-                  % if loRight.hasReadAccess():
-                    <span class="label label-success">R</span>
-                  % endif
-                  % if loRight.hasWriteAccess():
-                    <span class="label label-warning">W</span>
-                  % endif
-                % endif
-              % endfor
+              % if loGroupRightsOnNode.hasReadAccess():
+                <span class="label label-success">R</span>
+              % endif
+              % if loGroupRightsOnNode.hasWriteAccess():
+                <span class="label label-warning">W</span>
+              % endif
             </td>
           </tr>
         % endif
@@ -178,22 +170,23 @@
                   <th>${_('Access')}</th>
                 </tr>
               </thead>
-              % for loCurrentGroup in real_groups:
-              <tr id='user-${loCurrentGroup.group_id}-rights-row'>
+              % for loGroupRightsOnNode in real_group_rights:
+
+              <tr id='user-${loGroupRightsOnNode.group_id}-rights-row'>
                 <td>
                   <a
                     class="btn btn-mini"
-                    onclick="updateRights(${loCurrentGroup.group_id})"
+                    onclick="updateRights(${loGroupRightsOnNode.group_id})"
                   >
                     <i class="fa fa-key"></i>
                   </a>
                 </td>
                 <td class='pod-highlightable-access-management-cell'>
-                  ${loCurrentGroup.getDisplayName()}
-                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-read" name="read" value="" />
-                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-write" name="write" value="" />
+                  ${loGroupRightsOnNode.display_name}
+                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-read" name="read" value="" />
+                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-write" name="write" value="" />
                 </td>
-                <td id="user-${loCurrentGroup.group_id}-rights" class="pod-right-cell"></td>
+                <td id="user-${loGroupRightsOnNode.group_id}-rights" class="pod-right-cell"></td>
               </tr>
               % endfor
               
@@ -208,23 +201,23 @@
                   <th>${_('Access')}</th>
                 </tr>
               </thead>
-              % for loCurrentGroup in user_specific_groups:
+              % for loGroupRightsOnNode in user_specific_group_rights:
               
-              <tr id='user-${loCurrentGroup.group_id}-rights-row'>
+              <tr id='user-${loGroupRightsOnNode.group_id}-rights-row'>
                 <td>
                   <a
                     class="btn btn-mini"
-                    onclick="updateRights(${loCurrentGroup.group_id})"
+                    onclick="updateRights(${loGroupRightsOnNode.group_id})"
                   >
                     <i class="fa fa-key"></i>
                   </a>
                 </td>
                 <td class='pod-highlightable-access-management-cell'>
-                  ${loCurrentGroup.getDisplayName()}
-                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-read" name="read" value="" />
-                  <input type="hidden" id="user-${loCurrentGroup.group_id}-value-write" name="write" value="" />
+                  ${loGroupRightsOnNode.display_name}
+                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-read" name="read" value="" />
+                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-write" name="write" value="" />
                 </td>
-                <td id="user-${loCurrentGroup.group_id}-rights" class="pod-right-cell"></td>
+                <td id="user-${loGroupRightsOnNode.group_id}-rights" class="pod-right-cell"></td>
               </tr>
               % endfor
             </table>
@@ -348,18 +341,16 @@
 ## for read/write access management
 ##
 
-      % for loCurrentGroup in real_groups + user_specific_groups:
-        % if loCurrentGroup.hasSomeAccess(poNode)==False:
-              updateRights(${loCurrentGroup.group_id}, 0);
+## FIXME      % for loGroupRightsOnNode in real_group_rights:
+##      % for loCurrentGroup in real_group_rights + user_specific_group_rights:
+      % for loGroupRightsOnNode in real_group_rights + user_specific_group_rights:
+        % if loGroupRightsOnNode.hasSomeAccess()==False:
+          updateRights(${loGroupRightsOnNode.group_id}, 0);
         % else:
-          % for loRight in loCurrentGroup.rights:
-            % if loRight.node_id==poNode.node_id:
 ##
 ## The following line should build some javascript code similar to this:
 ## updateRights(-5, 3);
-              updateRights(${loCurrentGroup.group_id}, ${loRight.rights});
-            % endif
-          % endfor
+          updateRights(${loGroupRightsOnNode.group_id}, ${loGroupRightsOnNode.rights});
         % endif
       % endfor
 

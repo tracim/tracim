@@ -70,7 +70,8 @@ class Group(DeclarativeBase):
     display_name = Column(Unicode(255))
     created = Column(DateTime, default=datetime.now)
     personnal_group = Column(Boolean)
-    users = relation('User', secondary=user_group_table, backref='groups')
+
+    users = relationship('User', secondary=user_group_table, backref='groups')
 
     _lRights = relationship('Rights', backref='_oGroup', cascade = "all, delete-orphan")
 
