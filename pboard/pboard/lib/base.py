@@ -32,3 +32,6 @@ class BaseController(TGController):
     def back_with_error(self, message):
         flash(message)
         redirect(request.headers['Referer'])
+
+def current_user():
+    return request.environ.get('repoze.who.identity')['user']
