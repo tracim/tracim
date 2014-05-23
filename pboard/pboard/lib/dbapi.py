@@ -19,6 +19,7 @@ import pboard.model as pbm
 import tg
 
 FIXME_ERROR_CODE=-1
+
 class PODStaticController(object):
 
   @classmethod
@@ -144,6 +145,30 @@ class PODUserFilteredApiController(object):
     return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
 
 
+  def getListOfAllowedNodes(self) -> pbmd.PBNode:
+    lsSqlQuery = """
+        SELECT
+            pgn.node_id
+        FROM
+            pod_group_node AS pgn
+            join pod_user_group AS pug ON pug.group_id = pgn.group_id
+        WHERE
+            pgn.rights > 0
+            AND pug.user_id = :owner_id
+        UNION
+            SELECT
+                node_id
+            FROM
+                pod_nodes
+            WHERE
+            owner_id=:owner_id;
+    """
+
+    loNodeListResult = DBSession.query(pbmd.PBNode).from_statement(lsSqlQuery).params(owner_id=self._iCurrentUserId)
+
+    return loNodeListResult.all()
+
+
   def searchNodesByText(self, plKeywordList: [str], piMaxNodeNb=100):
     """
     Returns a list of nodes order by type, nodes which contain at least one of the keywords
@@ -171,7 +196,53 @@ class PODUserFilteredApiController(object):
     return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_status==psNodeStatus).order_by(pbmd.PBNode.updated_at).limit(piMaxNodeNb).all()
 
 
-  def buildTreeListForMenu(self, plViewableStatusId):
+  def buildTreeListForMenu(self, poCurrentNode: pbmd.PBNode, plViewableStatusId: [], plAllowedNodes: [pbmd.PBNode]) -> [pbmd.NodeTreeItem]:
+    # The algorithm is:
+    # 1. build an intermediate tree containing only current node and parent path
+    #    + complete it with sibling at each level (except root)
+    # 2. add sibling nodes at root level
+    # 3. complete it with shared documents (which are not at root but shared with current user)
+
+    node_tree = []
+
+    previous_tree_item = None
+    tmp_children_nodes = []
+
+    if poCurrentNode is not None:
+        breadcrumb_nodes = poCurrentNode.getBreadCrumbNodes()
+        breadcrumb_nodes.append(poCurrentNode) # by default the current node is not included
+
+        for breadcrumb_node in reversed(breadcrumb_nodes):
+            if previous_tree_item is None:
+                # First iteration. We add all current_node children
+                for child_node in breadcrumb_node.getChildren():
+                    child_item = pbmd.NodeTreeItem(child_node, [])
+                    tmp_children_nodes.append(child_item)
+                previous_tree_item = pbmd.NodeTreeItem(breadcrumb_node, tmp_children_nodes)
+            else:
+                tmp_children_nodes = []
+                for child_node in breadcrumb_node.getChildren():
+                    if child_node == previous_tree_item.node:
+                        tmp_children_nodes.append(previous_tree_item)
+                    else:
+                        sibling_node = pbmd.NodeTreeItem(child_node, [])
+                        tmp_children_nodes.append(sibling_node)
+
+                previous_tree_item = pbmd.NodeTreeItem(breadcrumb_node, tmp_children_nodes)
+
+    for node in plAllowedNodes:
+        if node.parent_id==0 or node.parent_id is None:
+            if previous_tree_item is not None and node == previous_tree_item.node:
+                node_tree.append(previous_tree_item)
+            else:
+                node_tree.append(pbmd.NodeTreeItem(node, []))
+
+    return node_tree
+
+
+
+  def DIRTY_OLDbuildTreeListForMenu(self, plViewableStatusId: []) -> [pbmd.PBNode]:
+
     liOwnerIdList = self._getUserIdListForFiltering()
     
     loNodeList = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_type==pbmd.PBNodeType.Data).filter(pbmd.PBNode.node_status.in_(plViewableStatusId)).order_by(pbmd.PBNode.parent_tree_path).order_by(pbmd.PBNode.node_order).order_by(pbmd.PBNode.node_id).all()

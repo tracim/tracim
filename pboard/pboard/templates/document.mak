@@ -11,45 +11,36 @@
   % endif
 </%def>
 
-<%def name="node_treeview(node_list, indentation=-1)">
-  % if indentation==-1:
-    <div id='pod-menu-item-0' class="pod-toolbar-parent" style="padding-left: 0.5em; position: relative;">
-      <a class="toggle-child-menu-items"><i class='fa fa-folder-open'></i></a>
-      <a href="${tg.url('/document')}" title="${_('Root')}">
-        ${_('Root')}
-      </a>
-    </div>
-    <div id="pod-menu-item-0-children">${node_treeview(node_list, 0)}</div>
-    
-  % else:
-    % if len(node_list)<=0 and indentation==0:
-      <p class="pod-grey">${_('You have no document yet.')}</p>
-    % endif
-    
-    % if len(node_list)>0:
-      % for node in node_list:
-        <div id='pod-menu-item-${node.node_id}' class="pod-toolbar-parent ${'pod-status-active' if current_node!=None and node.node_id==current_node.node_id else ''}" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
-          <a class="toggle-child-menu-items"><i class='${node.getIconClass()}'></i></a>
-          <a href="${tg.url('/document/%s'%(node.node_id))}" title="${node.data_label}">
-            % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
-              <strike>
-            % endif
-                ${node.getTruncatedLabel(32-0.8*(indentation+1))}
-            % if node.getStatus().status_family=='closed' or node.getStatus().status_family=='invisible':
-              </strike>
-            % endif
-          </a>
-          <div class="pod-toolbar">
-            <a href="${tg.url('/api/move_node_upper?node_id=%i'%(node.node_id))}" title="${_('Move up')}"><i class="fa fa-arrow-up"></i></a>
-            <a href="${tg.url('/api/move_node_lower?node_id=%i'%(node.node_id))}" title="${_('Move down')}"><i class="fa fa-arrow-down"></i></a>
-          </div>
-          <div class="pod-status ${node.getStatus().css}" title='${node.getStatus().label}'>
-             <i class='${node.getStatus().icon}'></i>
-          </div>
+<%def name="node_treeview(node_list, indentation=0)">
+  % if len(node_list)<=0 and indentation==0:
+    <p class="pod-grey">${_('You have no document yet.')}</p>
+  % endif
+
+  % if len(node_list)>0:
+    % for item in node_list:
+      <div id='pod-menu-item-${item.node.node_id}' class="pod-toolbar-parent ${'pod-status-active' if current_node!=None and item.node.node_id==current_node.node_id else ''}" style="padding-left: ${(indentation+2)*0.5}em; position: relative;">
+        <a class="toggle-child-menu-items"><i class='${item.node.getIconClass()}'></i></a>
+        <a href="${tg.url('/document/%s'%(item.node.node_id))}" title="${item.node.data_label}">
+          % if item.node.getStatus().status_family=='closed' or item.node.getStatus().status_family=='invisible':
+            <strike>
+          % endif
+              ${item.node.getTruncatedLabel(32-0.8*(indentation+1))}
+          % if item.node.getStatus().status_family=='closed' or item.node.getStatus().status_family=='invisible':
+            </strike>
+          % endif
+        </a>
+        <div class="pod-toolbar">
+          <a href="${tg.url('/api/move_node_upper?node_id=%i'%(item.node.node_id))}" title="${_('Move up')}"><i class="fa fa-arrow-up"></i></a>
+          <a href="${tg.url('/api/move_node_lower?node_id=%i'%(item.node.node_id))}" title="${_('Move down')}"><i class="fa fa-arrow-down"></i></a>
         </div>
-        <div id="pod-menu-item-${node.node_id}-children">${node_treeview(node.getStaticChildList(), indentation+1)}</div>
-      % endfor
-    % endif
+        <div class="pod-status ${item.node.getStatus().css}" title='${item.node.getStatus().label}'>
+           <i class='${item.node.getStatus().icon}'></i>
+        </div>
+      </div>
+      % if len(item.children)>0:
+        <div id="pod-menu-item-${item.node.node_id}-children">${node_treeview(node_list=item.children, indentation=indentation+1)}</div>
+      % endif
+    % endfor
   % endif
 </%def>
 
@@ -80,7 +71,7 @@
   <div class="row">
     <div id='application-left-panel' class="span3">
       <div>
-        ${node_treeview(root_node_list)}
+        ${node_treeview(menu_node_list)}
       </div>
     </div>
     <div id='application-main-panel' class="span9">
@@ -100,7 +91,7 @@
             ##
             ## The Toolbar is a div with a specific id
             ##
-            ${DOC.Toolbar(current_node, node_status_list, root_node_list, 'current-document-toobar')}
+            ${DOC.Toolbar(current_node, node_status_list, root_node_list_for_select_field, 'current-document-toobar')}
             ${DOC.ShowTitle(current_node, keywords, 'current-document-title')}
             ${DOC.ShowContent(current_node, keywords)}
           </div>
@@ -137,7 +128,7 @@
               <div class="tab-pane" id="contacts">${DOCTABS.ContactTabContent(current_node)}</div>
               <div class="tab-pane" id="comments">${DOCTABS.CommentTabContent(current_node)}</div>
               <div class="tab-pane" id="files">${DOCTABS.FileTabContent(current_node)}</div>
-			  <div class="tab-pane" id="history">${DOCTABS.HistoryTabContent(current_node)}</div>
+              <div class="tab-pane" id="history">${DOCTABS.HistoryTabContent(current_node)}</div>
               <div class="tab-pane" id="accessmanagement">${DOCTABS.AccessManagementTab(current_node)}</div>
             </div>
           </div>

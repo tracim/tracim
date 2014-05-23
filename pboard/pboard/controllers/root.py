@@ -121,7 +121,8 @@ class RootController(BaseController):
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
         loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
-        loRootNodeList = loApiController.buildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
+        llAccessibleNodes = loApiController.getListOfAllowedNodes()
+
         liNodeId         = int(node_id)
         liVersionId      = int(version)
 
@@ -141,9 +142,12 @@ class RootController(BaseController):
 
         # FIXME - D.A - 2013-11-07 - Currently, the code build a new item if no item found for current user
         # the correct behavior should be to redirect to setup page
+        loMenuItems = loApiController.buildTreeListForMenu(loCurrentNode, pbmd.PBNodeStatus.getVisibleIdsList(), llAccessibleNodes)
+        nodes_as_tree_for_select_field = loApiController.DIRTY_OLDbuildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
 
         return dict(
-            root_node_list=loRootNodeList,
+            menu_node_list=loMenuItems,
+            root_node_list_for_select_field=nodes_as_tree_for_select_field,
             current_node=loCurrentNode,
             node_status_list = loNodeStatusList,
             keywords = highlight,

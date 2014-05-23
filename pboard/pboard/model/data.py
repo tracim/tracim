@@ -272,7 +272,7 @@ class PBNode(DeclarativeBase):
     else:
       return PBNode.getIconClassForNodeType(self.node_type)
 
-  def getBreadCrumbNodes(self):
+  def getBreadCrumbNodes(self) -> list('PBNode'):
     loNodes = []
     if self._oParent!=None:
       loNodes = self._oParent.getBreadCrumbNodes()
@@ -401,6 +401,18 @@ class PBNode(DeclarativeBase):
   
   def getHistory(self):
       return DBSession.execute("select node_id, version_id, created_at from pod_nodes_history where node_id = :node_id order by created_at desc", {"node_id":self.node_id}).fetchall()
+
+
+class NodeTreeItem(object):
+    """
+        This class implements a model that allow to simply represents the left-panel menu items
+         This model is used by dbapi but is not directly related to sqlalchemy and database
+    """
+    def __init__(self, node: PBNode, children: list('NodeTreeItem')):
+        self.node = node
+        self.children = children
+
+
 
 
 #####
