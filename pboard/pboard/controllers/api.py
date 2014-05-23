@@ -319,16 +319,24 @@ class PODApiController(BaseController):
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
       loNode = loApiController.getNode(node_id)
-      # loNode._lRights = list()
 
-      # SHARE IS OFF, so deactivate the document share (and do not change "shared-with" group configuration
-      if is_shared=='off':
-        loNode.is_shared = False
-        pm.DBSession.flush()
-        redirect(lurl('/document/%s#tab-accessmanagement'%(loNode.node_id)))
+      is_shared_b = False if is_shared=='off' else True
+      print(is_shared_b)
+      print(loNode.is_shared)
+      print(loNode.owner_id)
+      print(loCurrentUser.user_id)
 
-      # SHARE IS ON, so remove all current shares and set the new ones
-      loNode.is_shared = True
+      # Only the node owner can modify is_shared
+      if is_shared_b != loNode.is_shared and loNode.owner_id != loCurrentUser.user_id:
+        self.back_with_error(_("You can't share a document that doesn't belong to you."))
+      else:
+        loNode.is_shared = is_shared_b
+        if not is_shared_b:
+          # SHARE IS OFF, so deactivate the document share (and do not change "shared-with" group configuration
+          pm.DBSession.flush()
+          redirect(lurl('/document/%s#tab-accessmanagement'%(loNode.node_id)))
+
+      # remove all current shares and set the new ones
 
       for loRight in loNode._lRights:
         pm.DBSession.delete(loRight)
@@ -344,12 +352,24 @@ class PODApiController(BaseController):
           liOldValue = ldNewRights[liGroupId]
         ldNewRights[liGroupId] = liOldValue + pma.Rights.WRITE_ACCESS
 
+      user_list = loApiController._getUserIdListForFiltering()
+      comments = pm.DBSession.query(pmd.PBNode).filter(pmd.PBNode.parent_id==node_id).\
+              filter((pmd.PBNode.owner_id.in_(user_list)) | (pma.user_group_table.c.user_id.in_(user_list))).\
+              filter(pmd.PBNode.node_type=='comment').all()
+      for comment in comments:
+          pm.DBSession.add(comment)
+
       for liGroupId, liRightLevel in ldNewRights.items():
         loNewRight = loApiController.createRight()
         loNewRight.group_id = liGroupId
         loNewRight.node_id = node_id
         loNewRight.rights = liRightLevel
         loNode._lRights.append(loNewRight)
+        for comment in comments:
+            comment_right = loApiController.createRight()
+            comment_right.group_id = liGroupId
+            comment_right.node_id = comment.node_id
+            comment_right.rights = liRightLevel
 
       redirect(lurl('/document/%s#tab-accessmanagement'%(loNode.node_id)))
 

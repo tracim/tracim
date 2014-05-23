@@ -96,7 +96,11 @@ class PODUserFilteredApiController(object):
   def getNode(self, liNodeId):
     liOwnerIdList = self._getUserIdListForFiltering()
     if liNodeId!=0:
-      return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.node_id==liNodeId).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).one()
+      return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).\
+              join(pbma.Group.users).\
+              filter(pbmd.PBNode.node_id==liNodeId).\
+              filter((pbmd.PBNode.owner_id.in_(liOwnerIdList)) | (pbma.user_group_table.c.user_id.in_(liOwnerIdList))).\
+              first()
     return None
 
 
