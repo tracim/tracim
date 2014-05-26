@@ -264,7 +264,7 @@ class PODUserFilteredApiController(object):
     for loNode in loNodeList:
       loTmpDict[loNode.node_id] = loNode
   
-      if loNode.parent_id==None:
+      if loNode.parent_id==None or loNode.parent_id==0:
         loTreeList.append(loNode)
       else:
         # append the node to the parent list
@@ -273,8 +273,8 @@ class PODUserFilteredApiController(object):
         # We suppose that the parent node has already been added
         # this *should* be the case, but the code does not check it
         if loNode.parent_id not in loTmpDict.keys():
-          print('THE NODE =========',loNode.parent_id)
           try:
+
             loTmpDict[loNode.parent_id] = self.getNode(loNode.parent_id)
           except Exception as e:
             # loTreeList.append(

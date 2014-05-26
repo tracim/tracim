@@ -184,6 +184,8 @@ class PODApiController(BaseController):
       # TODO - D.A. - 2013-11-07 - Check that new parent is accessible by the user !!!
       loNewNode = loApiController.getNode(node_id)
       if new_parent_id!='':
+        if new_parent_id==0:
+          new_parent_id = None
         loNewNode.parent_id = int(new_parent_id)
       pm.DBSession.flush()
       redirect(lurl('/document/%s'%(node_id)))
