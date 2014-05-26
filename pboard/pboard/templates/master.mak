@@ -98,14 +98,6 @@
               <a title="${_('Toggle view mode: large')}"  id='view-size-toggle-button-large' class="pod-do-not-display"><i class='fa fa-eye'></i></a>
             </li>
 
-            <li title="Rebuild document index">
-            % if current_node is UNDEFINED or current_node==None:
-              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=0')}"><i class="fa fa-refresh"></i></a>
-            % else:
-              <a href="${tg.url('/api/reindex_nodes?back_to_node_id=%i'%(current_node.node_id))}"><i class="fa fa-refresh"></i></a>
-            % endif
-            </li>
-
 ##            <li class="dropdown" title="Calculator">
 ##              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-g-calculator"></i></a>
 ##              <ul class="dropdown-menu pull-left">

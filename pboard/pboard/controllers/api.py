@@ -178,6 +178,7 @@ class PODApiController(BaseController):
     @expose()
     @require(can_write())
     def set_parent_node(self, node_id, new_parent_id, **kw):
+      """ @see reindex_nodes() """
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
@@ -187,8 +188,24 @@ class PODApiController(BaseController):
         if new_parent_id==0:
           new_parent_id = None
         loNewNode.parent_id = int(new_parent_id)
+        self._updateParentTreePathForNodeAndChildren(loNewNode)
       pm.DBSession.flush()
       redirect(lurl('/document/%s'%(node_id)))
+
+    def _updateParentTreePathForNodeAndChildren(self, moved_node: pmd.PBNode):
+      """ propagate the move to all child nodes and update there node_depth and parent_tree_path properties """
+      parent_node = moved_node._oParent
+      if parent_node==None:
+        new_parent_tree_path = '/'
+        moved_node.node_depth = 0
+      else:
+        new_parent_tree_path = '{0}{1}/'.format(parent_node.parent_tree_path, parent_node.node_id)
+        moved_node.node_depth = parent_node.node_depth+1
+      moved_node.parent_tree_path = new_parent_tree_path
+
+      for child_node in moved_node._lAllChildren:
+        self._updateParentTreePathForNodeAndChildren(child_node)
+
 
     @expose()
     @require(can_write())
@@ -274,21 +291,37 @@ class PODApiController(BaseController):
 
       redirect(lurl('/document/%i'%(liParentId or 0)))
 
-    @expose()
     def reindex_nodes(self, back_to_node_id=0):
-      # FIXME - NOT SAFE
-      loRootNodeList   = pm.DBSession.query(pmd.PBNode).order_by(pmd.PBNode.parent_id).all()
-      for loNode in loRootNodeList:
-        if loNode.parent_id==None:
-          loNode.node_depth = 0
-          loNode.parent_tree_path = '/'
-        else:
-          loNode.node_depth = loNode._oParent.node_depth+1
-          loNode.parent_tree_path = '%s%i/'%(loNode._oParent.parent_tree_path,loNode.parent_id)
-      
-      pm.DBSession.flush()
-      flash(_('Documents re-indexed'), 'info')
-      redirect(lurl('/document/%s'%(back_to_node_id)))
+      # DA - INFO - 2014-05-26
+      #
+      #  The following query allows to detect which not are not up-to-date anymore.
+      # These up-to-date failure is related to the node_depth and parent_tree_path being out-dated.
+      # This mainly occured when "move node" feature was not working correctly.
+      #
+      # The way to fix the data is the following:
+      # - run mannually the following command
+      # - for each result, call manually /api/set_parent_node?node_id=parent_node_id&new_parent_id=parent_parent_id
+      #
+      sql_query = """
+        select
+            pn.node_id as child_node_id,
+            pn.parent_id as child_parent_id,
+            pn.parent_tree_path as child_parent_tree_path,
+            pn.node_depth as child_node_depth,
+            pnn.node_id as parent_node_id,
+            pnn.parent_id as parent_parent_id,
+            pnn.parent_tree_path as parent_parent_tree_path,
+            pnn.node_depth as parent_node_depth
+
+        from
+            pod_nodes as pn,
+            pod_nodes as pnn
+        where
+            pn.parent_id = pnn.node_id
+            and pn.parent_tree_path not like pnn.parent_tree_path||'%'
+      """
+      return 
+
 
     @expose()
     @require(can_write())
