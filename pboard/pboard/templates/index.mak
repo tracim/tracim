@@ -58,22 +58,30 @@
           </div>
         </div>
 
-        ${POD.SignUpForm('16em')}
-        <!--div class="span2">
-          <div class="row">
-            <p style="border: 1px solid #F00;">
-              Want to try?
-            </p>
-          </div>
-          <div class="row">
-            <p class="btn btn-success">
-              <a class="btn btn-success">
-                <i class="fa fa-2x fa-dot-circle-o"></i>
-                <strong>Sign up</strong>
-              </a>
-            </p>
-          </div>
-        </div-->
+		% if not request.identity:
+        <div class="span3">
+          <div class="well text-center" style="min-height: 16em;">
+			<form action="${tg.url('/login_handler')}">
+			  <fieldset>
+				<legend><i class="fa fa-key" style="vertical-align: baseline !important;"></i> Login</legend>
+				<input class="span2" type="text" id="login" name="login" placeholder="email...">
+				<input class="span2" type="password" id="password" name="password" placeholder="password...">
+				<div class="span2 control-group">
+				  Remember me <input type="checkbox" id="loginremember" name="remember" value="2252000"/>
+				</div>
+				<input type="submit" id="submit" value="Login" />
+			  </fieldset>
+			</form>
+		  </div>
+		</div>
+		% else:
+		<div class="span3">
+          <div class="well text-center" style="min-height: 16em;">
+		    <p>${_('Welcome, ')}${request.identity['user'].display_name}</p>
+			<p>${_('Click on Documents in the top menu to access you data.')}</p>
+		  </div>
+		</div>
+		% endif
       </div>
     </div>
   </div>

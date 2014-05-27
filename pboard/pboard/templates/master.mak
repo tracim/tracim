@@ -186,25 +186,7 @@
             </li>
 
 
-            % if not request.identity:
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Login</a>
-                <ul class="dropdown-menu pull-right">
-                  <li class="text-center">
-                    <form action="${tg.url('/login_handler')}">
-                      <fieldset>
-                        <legend><i class="fa fa-key" style="vertical-align: baseline !important;"></i> Login</legend>
-                        <input class="span2" type="text" id="login" name="login" placeholder="email...">
-                        <input class="span2" type="password" id="password" name="password" placeholder="password...">
-                        <div class="span2 control-group">
-                          Remember me <input type="checkbox" id="loginremember" name="remember" value="2252000"/>
-                        </div>
-                        <input type="submit" id="submit" value="Login" />
-                      </fieldset>
-                    </form>
-                 </ul>
-              </li>
-            % else:
+            % if request.identity:
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> ${request.identity['user'].display_name}</a>
                 <ul class="dropdown-menu pull-right">

@@ -165,5 +165,8 @@ class RootController(BaseController):
 
         return dict(search_string=keywords, found_nodes=loFoundNodes)
 
+    @expose('pboard.templates.create_account')
+    def create_account(self):
+        return dict()
 
 
