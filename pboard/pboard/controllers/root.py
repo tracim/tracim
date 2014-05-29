@@ -141,13 +141,10 @@ class RootController(BaseController):
         except Exception as e:
           flash(_('Document not found'), 'error')
 
-        # FIXME - D.A - 2013-11-07 - Currently, the code build a new item if no item found for current user
-        # the correct behavior should be to redirect to setup page
-        loMenuItems = loApiController.buildTreeListForMenu(loCurrentNode, pbmd.PBNodeStatus.getVisibleIdsList(), llAccessibleNodes)
-
         return dict(
-            menu_node_list=loMenuItems,
+            current_user=loCurrentUser,
             current_node=loCurrentNode,
+            allowed_nodes=llAccessibleNodes,
             node_status_list = loNodeStatusList,
             keywords = highlight,
             user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(node_id),
