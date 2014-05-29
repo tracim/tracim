@@ -7,18 +7,19 @@ import logging as l
 
 DIRTY_canReadOrCanWriteSqlQuery = """
 SELECT
-    node_id
+    pgn.node_id
 FROM
     pod_group_node AS pgn
-    join pod_user_group AS pug on pug.group_id = pgn.group_id
-    join pod_user AS pu ON pug.user_id = pu.user_id
+    JOIN pod_nodes AS pn ON pn.node_id = pgn.node_id AND pn.is_shared = 't'
+    JOIN pod_user_group AS pug ON pug.group_id = pgn.group_id
+    JOIN pod_user AS pu ON pug.user_id = pu.user_id
 WHERE
     rights > :excluded_right_low_level
     AND email_address = :email
-    AND node_id = :node_id
+    AND pgn.node_id = :node_id
 UNION
     SELECT
-        node_id
+        pnn.node_id
     FROM
         pod_nodes AS pnn,
         pod_user AS puu
@@ -53,13 +54,12 @@ class can_write(Predicate):
         pass
 
     def evaluate(self, environ, credentials):
-        if 'node_id' in environ['webob.adhoc_attrs']['validation']['values']:
-            node_id = environ['webob.adhoc_attrs']['validation']['values']['node_id']
-            if node_id!=0:
-                has_right = session.execute(
-                    DIRTY_canReadOrCanWriteSqlQuery,
-                    {"email":credentials["repoze.who.userid"], "node_id":node_id, "excluded_right_low_level": 1}
-                )
-                if has_right.rowcount == 0 :
-                    self.unmet()
+        node_id = environ['webob.adhoc_attrs']['validation']['values']['node_id']
+        if node_id!=0:
+            has_right = session.execute(
+                DIRTY_canReadOrCanWriteSqlQuery,
+                {"email":credentials["repoze.who.userid"], "node_id":node_id, "excluded_right_low_level": 1}
+            )
+            if has_right.rowcount == 0 :
+                self.unmet()
 
