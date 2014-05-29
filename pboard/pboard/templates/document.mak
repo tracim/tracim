@@ -65,7 +65,7 @@
 ## HERE COMES THE BREADCRUMB
 ##
   <div class="row">
-    ${DOC.BreadCrumb(current_node)}
+    ${DOC.BreadCrumb(current_node, allowed_nodes)}
   </div>
 
   <div class="row">
@@ -150,10 +150,10 @@
           ##
           ## HERE WE INCLUDE ALL MODAL DIALOG WHICH WILL BE ACCESSIBLE THROUGH TABS OR MENU
           ##
-          ${DOC.DocumentEditModalDialog(current_node.node_id, None, tg.url('/api/create_document'), h.ID.AddDocumentModalForm(current_node), _('New Sub-document'))}
-          ${DOC.EventEditModalDialog(current_node.node_id, None, tg.url('/api/create_event'), h.ID.AddEventModalForm(current_node), _('Add an event'))}
-          ${DOC.ContactEditModalDialog(current_node.node_id, None, tg.url('/api/create_contact'), h.ID.AddContactModalForm(current_node), _('Add a new contact'))}
-          ${DOC.FileEditModalDialog(current_node.node_id, None, tg.url('/api/create_file'), h.ID.AddFileModalForm(current_node), _('Add a new file'))}
+          ${DOC.DocumentEditModalDialog(current_node, None, tg.url('/api/create_document'), h.ID.AddDocumentModalForm(current_node), _('New Sub-document'))}
+          ${DOC.EventEditModalDialog(current_node, None, tg.url('/api/create_event'), h.ID.AddEventModalForm(current_node), _('Add an event'))}
+          ${DOC.ContactEditModalDialog(current_node, None, tg.url('/api/create_contact'), h.ID.AddContactModalForm(current_node), _('Add a new contact'))}
+          ${DOC.FileEditModalDialog(current_node, None, tg.url('/api/create_file'), h.ID.AddFileModalForm(current_node), _('Add a new file'))}
           ${DOC.MoveDocumentModalDialog(current_node, tg.url('/api/set_parent_node'), h.ID.MoveDocumentModalForm(current_node), _('Move the document'))}
 
           <div class="tabbable">
@@ -175,7 +175,7 @@
               <div class="tab-pane" id="subdocuments">${DOCTABS.SubdocumentContent(current_node)}</div>
               <div class="tab-pane active" id="events">${DOCTABS.EventTabContent(current_node)}</div>
               <div class="tab-pane" id="contacts">${DOCTABS.ContactTabContent(current_node)}</div>
-              <div class="tab-pane" id="comments">${DOCTABS.CommentTabContent(current_node)}</div>
+              <div class="tab-pane" id="comments">${DOCTABS.CommentTabContent(current_user, current_node)}</div>
               <div class="tab-pane" id="files">${DOCTABS.FileTabContent(current_node)}</div>
               <div class="tab-pane" id="history">${DOCTABS.HistoryTabContent(current_node)}</div>
               <div class="tab-pane" id="accessmanagement">${DOCTABS.AccessManagementTab(current_node)}</div>

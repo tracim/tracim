@@ -44,7 +44,7 @@ class PODApiMenuController(plb.BaseController):
             print("Node not found: {0}".format(current_node_id))
 
         allowed_nodes = api_controller.getListOfAllowedNodes()
-        initial_menu_structure = api_controller.buildTreeListForMenu(current_node, pmd.PBNodeStatus.getVisibleIdsList(), allowed_nodes)
+        initial_menu_structure = api_controller.buildTreeListForMenu(current_node, allowed_nodes)
 
         return initial_menu_structure
 

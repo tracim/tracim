@@ -94,19 +94,35 @@ class PODUserFilteredApiController(object):
     return self._iUserIdFilteringList
 
 
-  def createNode(self, parent_id=0):
+  def createNode(self, parent_id=0, inherit_rights=True):
     loNode          = pbmd.PBNode()
     loNode.owner_id = self._iCurrentUserId
     if int(parent_id)!=0:
-      loNode.parent_id = parent_id
-    parent_rights = DBSession.query(pbma.Rights).filter(pbma.Rights.node_id==parent_id).all()
-    loNode.rights = parent_rights
-    loNode.rights = [pbma.Rights(group_id=r.group_id, rights=r.rights) for r in parent_rights]
+        loNode.parent_id = parent_id
+
+    if inherit_rights:
+        parent_node = DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==parent_id).one()
+        self.copy_rights(parent_node, loNode)
+
     DBSession.add(loNode)
+
     return loNode
-  
-  def createDummyNode(self, parent_id):
-    loNewNode = self.createNode(parent_id)
+
+  def copy_rights(self, from_node: pbmd.PBNode, to_node: pbmd.PBNode, copy_also_is_shared=True):
+    """
+    copy rights from first node to second one
+    """
+    for parent_right in from_node._lRights:
+        new_right = self.createRight()
+        new_right.group_id = parent_right.group_id
+        new_right.rights = parent_right.rights
+        to_node._lRights.append(new_right)
+
+    if copy_also_is_shared:
+        to_node.is_shared = from_node.is_shared
+
+  def createDummyNode(self, parent_id, inherit_rights=True):
+    loNewNode = self.createNode(parent_id, inherit_rights)
     loNewNode.data_label   = ''
     loNewNode.data_content = ''
     return loNewNode
@@ -171,13 +187,13 @@ class PODUserFilteredApiController(object):
             FROM
                 pod_group_node AS pgn
                 join pod_user_group AS pug ON pug.group_id = pgn.group_id
-                join pod_nodes AS pn ON pgn.node_id=pn.node_id
+                join pod_nodes AS pn ON pgn.node_id=pn.node_id AND pn.is_shared='t'
             WHERE
                 pn.node_type='data'
                 AND pn.node_status NOT IN ('deleted', 'closed')
                 AND pn.node_id=pgn.node_id
                 AND pgn.rights > 0
-                AND pug.user_id = 3
+                AND pug.user_id = :owner_id
 
             UNION
                 SELECT
@@ -201,9 +217,9 @@ class PODUserFilteredApiController(object):
                 FROM
                     pod_nodes AS pn
                 WHERE
-                    pn.node_type='data'
+                    pn.node_type = 'data'
                     AND pn.node_status NOT IN ('deleted', 'closed')
-                    AND pn.owner_id=:owner_id
+                    AND pn.owner_id = :owner_id
 
             ORDER BY node_id ASC
         """
@@ -286,7 +302,7 @@ class PODUserFilteredApiController(object):
 
 
 
-  def buildTreeListForMenu(self, poCurrentNode: pbmd.PBNode, plViewableStatusId: [], plAllowedNodes: [pbmd.PBNode]) -> [pbmd.NodeTreeItem]:
+  def buildTreeListForMenu(self, current_node: pbmd.PBNode, allowed_nodes: [pbmd.PBNode]) -> [pbmd.NodeTreeItem]:
     # The algorithm is:
     # 1. build an intermediate tree containing only current node and parent path
     #    + complete it with sibling at each level (except root)
@@ -298,34 +314,33 @@ class PODUserFilteredApiController(object):
     previous_tree_item = None
     tmp_children_nodes = []
 
-    print("============================> ",poCurrentNode)
-    if poCurrentNode is not None:
-        breadcrumb_nodes = poCurrentNode.getBreadCrumbNodes()
-        print("====================> NODES", breadcrumb_nodes)
-        breadcrumb_nodes.append(poCurrentNode) # by default the current node is not included
+    if current_node is not None:
+        breadcrumb_nodes = current_node.getBreadCrumbNodes()
+        breadcrumb_nodes.append(current_node) # by default the current node is not included
 
         for breadcrumb_node in reversed(breadcrumb_nodes):
             if previous_tree_item is None:
                 # First iteration. We add all current_node children
                 for child_node in breadcrumb_node.getChildren():
-                    child_item = pbmd.NodeTreeItem(child_node, [])
-                    assert(isinstance(child_item, pbmd.NodeTreeItem))
-                    tmp_children_nodes.append(child_item)
+                    if child_node in allowed_nodes:
+                        child_item = pbmd.NodeTreeItem(child_node, [])
+                        tmp_children_nodes.append(child_item)
+
                 previous_tree_item = pbmd.NodeTreeItem(breadcrumb_node, tmp_children_nodes)
+
             else:
                 tmp_children_nodes = []
                 for child_node in breadcrumb_node.getChildren():
-                    if child_node == previous_tree_item.node:
-                        assert(isinstance(previous_tree_item, pbmd.NodeTreeItem))
-                        tmp_children_nodes.append(previous_tree_item)
-                    else:
-                        sibling_node = pbmd.NodeTreeItem(child_node, [])
-                        assert(isinstance(sibling_node, pbmd.NodeTreeItem))
-                        tmp_children_nodes.append(sibling_node)
+                    if child_node in allowed_nodes:
+                        if child_node == previous_tree_item.node:
+                            tmp_children_nodes.append(previous_tree_item)
+                        else:
+                            sibling_node = pbmd.NodeTreeItem(child_node, [])
+                            tmp_children_nodes.append(sibling_node)
 
                 previous_tree_item = pbmd.NodeTreeItem(breadcrumb_node, tmp_children_nodes)
 
-    for node in plAllowedNodes:
+    for node in allowed_nodes:
         # This part of the algorithm insert root items
         if node.parent_id==0 or node.parent_id is None:
             if previous_tree_item is not None and node == previous_tree_item.node:
@@ -337,9 +352,9 @@ class PODUserFilteredApiController(object):
             # Try to add nodes shared with me but with a parent which is not shared
             if node.owner_id!=self._iCurrentUserId:
                 # this is a node shared with me
-                if node._oParent!=None and node._oParent not in plAllowedNodes:
+                if node._oParent!=None and node._oParent not in allowed_nodes:
                     # the node is shared but not the parent => put it in the root
-                    node_tree.append(pbmd.NodeTreeItem(node))
+                    node_tree.append(pbmd.NodeTreeItem(node, []))
 
 
     return node_tree

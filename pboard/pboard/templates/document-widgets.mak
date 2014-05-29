@@ -125,7 +125,7 @@
   </div>
 </%def>
 
-<%def name="BreadCrumb(poNode)">
+<%def name="BreadCrumb(poNode, allowed_nodes)">
   <ul class="breadcrumb span12">
     <li>
       <span class="divider">/</span>
@@ -133,10 +133,17 @@
     </li>
     % if poNode!=None:
       % for breadcrumb_node in poNode.getBreadCrumbNodes():
-      <li>
-        <span class="divider">/</span>
-        <a href="${tg.url('/document/%s'%(breadcrumb_node.node_id))}">${breadcrumb_node.getTruncatedLabel(30)}</a>
-      </li>
+##
+## HACK - D.A - 2014-05-29
+## Here we remove forbidden nodes from the breadcrumb
+## This should not be done in the templates!
+##
+        % if breadcrumb_node in allowed_nodes:
+          <li>
+            <span class="divider">/</span>
+            <a href="${tg.url('/document/%s'%(breadcrumb_node.node_id))}">${breadcrumb_node.getTruncatedLabel(30)}</a>
+          </li>
+        % endif
       % endfor
       <li class="active">
         <span class="divider">/</span>
@@ -275,7 +282,7 @@
   </div>
 </%def>
 
-<%def name="DocumentEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="DocumentEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -298,7 +305,7 @@
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
           % endif
-          <input type="hidden" name="parent_id" value="${piParentNodeId if piParentNodeId else 0}"/>
+          <input type="hidden" name="parent_id" value="${poParentNode.node_id if poParentNode else 0}"/>
           
           <input type="hidden" name="data_content" id="${psModalId}-textarea" />
           <input
@@ -312,6 +319,13 @@
         <div>
           ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '')}
         </div>
+        % if poParentNode and poParentNode.is_shared:
+          <p>
+            <input type="checkbox" name="inherit_rights" checked="checked"/> 
+            ${_('Share:')}
+            <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+          </p>
+        % endif
       </form>
 
 ## MODAL BODY [END]
@@ -338,7 +352,7 @@
 </%def>
 
 
-<%def name="FileEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="FileEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -360,7 +374,7 @@
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
           % endif
-          <input type="hidden" name="parent_id" value="${piParentNodeId if piParentNodeId else 0}"/>
+          <input type="hidden" name="parent_id" value="${poParentNode.node_id if poParentNode else 0}"/>
           <input type="hidden" name="data_content" id="${psModalId}-textarea" />
         <div>
           <label>
@@ -383,6 +397,13 @@
           <label>${_('File description (optionnal)')}</label>
           ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', '')}
         </div>
+        % if poParentNode and poParentNode.is_shared:
+          <p>
+            <input type="checkbox" name="inherit_rights" checked="checked"/>
+            ${_('Share:')}
+            <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+          </p>
+        % endif
       </form>
     ## MODAL BODY [END]
     </div>
@@ -407,7 +428,7 @@
   </div>
 </%def>
 
-<%def name="EventEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="EventEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -428,7 +449,7 @@
     <div class="modal-body">
     ###### MODAL BODY
       <form id='${psModalId}-form' action='${psPostUrl}' method='POST'>
-        <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
+        <input type="hidden" name='parent_id' value="${poParentNode.node_id if poParentNode else 0}"/>
         <fieldset>
           <label>
             ${_('Event')}
@@ -448,6 +469,15 @@
               ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', 'boldanditalic')}
             </div>
           </label>
+          % if poParentNode and poParentNode.is_shared:
+            <label>
+              <p>
+                <input type="checkbox" name="inherit_rights" checked="checked"/>
+                ${_('Share:')}
+                <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+              </p>
+            <label>
+          % endif
         </fieldset>
       </form>
     ###### MODAL BODY [END]
@@ -473,7 +503,7 @@
   </div>
 </%def>
 
-<%def name="ContactEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="ContactEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -495,7 +525,7 @@
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
           % endif
-          <input type="hidden" name="parent_id" value="${piParentNodeId if piParentNodeId else 0}"/>
+          <input type="hidden" name="parent_id" value="${poParentNode.node_id if poParentNode else 0}"/>
           <input type="hidden" name="data_content" id="${psModalId}-textarea" />
         <div>
           <label>
@@ -513,6 +543,16 @@
           <label>${_('Address, phone, email, company...')}</label>
           ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', 'boldanditalic')}
         </div>
+        % if poParentNode and poParentNode.is_shared:
+          <label>
+            <p>
+              <input type="checkbox" name="inherit_rights" checked="checked"/>
+              ${_('Share:')}
+              <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+            </p>
+          <label>
+        % endif
+
       </form>
     ## MODAL BODY [END]
     </div>

@@ -41,12 +41,15 @@ class PODApiController(BaseController):
 
     menu = pcam.PODApiMenuController()
 
+    def on_off_to_boolean(self, on_or_off):
+        return True if on_or_off=='on' else False
+
     @expose()
-    def create_event(self, parent_id=None, data_label='', data_datetime=None, data_content='', data_reminder_datetime=None, add_reminder=False, **kw):
+    def create_event(self, parent_id=None, data_label='', data_datetime=None, data_content='', data_reminder_datetime=None, add_reminder=False, inherit_rights='off', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
-      
-      loNewNode = loApiController.createNode(int(parent_id))
+
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(inherit_rights))
       loNewNode.node_type     = pmd.PBNodeType.Event
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -58,11 +61,11 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_contact(self, parent_id=None, data_label='', data_content='', **kw):
+    def create_contact(self, parent_id=None, data_label='', data_content='', inherit_rights='off', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
-      loNewNode = loApiController.createNode(int(parent_id))
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(inherit_rights))
       loNewNode.node_type     = pmd.PBNodeType.Contact
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -75,7 +78,7 @@ class PODApiController(BaseController):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
-      loNewNode = loApiController.createNode(int(parent_id))
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(is_shared))
       loNewNode.node_type     = pmd.PBNodeType.Comment
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -86,11 +89,11 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_file(self, parent_id=None, data_label='', data_content='', data_file=None, **kw):
+    def create_file(self, parent_id=None, data_label='', data_content='', data_file=None, inherit_rights='off', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
-      loNewNode = loApiController.createNode(int(parent_id))
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(inherit_rights))
       loNewNode.node_type     = pmd.PBNodeType.File
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -194,7 +197,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
-    def create_document(self, parent_id=None, data_label='', data_content=''):
+    def create_document(self, parent_id=None, data_label='', data_content='', inherit_rights='off'):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
@@ -203,7 +206,7 @@ class PODApiController(BaseController):
         loParent = loApiController.getNode(parent_id)
         lsNodeName = 'Subdocument of (%s)' % loParent.data_label
 
-      loNewNode = loApiController.createDummyNode(parent_id)
+      loNewNode = loApiController.createDummyNode(parent_id, self.on_off_to_boolean(inherit_rights))
       loNewNode.data_label   = lsNodeName
       loNewNode.data_content = 'insert content...'
 
@@ -301,7 +304,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s#tab-comments'%(loNode._oParent.node_id)))
 
     @expose()
-    @require(can_read())
+    @require(can_write())
     def set_access_management(self, node_id, is_shared='off', read=[0], write=[0]):
 
       llReadAccessGroupIds = [int(liGroupId) for liGroupId in read]

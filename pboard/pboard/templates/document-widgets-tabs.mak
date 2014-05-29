@@ -119,7 +119,8 @@
           <div id="document-share-people-selector">
             <p>${_('Select read and write access for each group or people...')}</p>
             <script>
-            function updateRights(psUserId, piNewValue = -1) {
+            function updateRights(psUserId, piNewValue) {
+              if (typeof piNewValue === 'undefined') { piNewValue = -1; }
               var ACCESS_UNDEFINED = -1;
               var ACCESS_NONE = 0;
               var ACCESS_READ = 1;
@@ -485,7 +486,7 @@
   % endfor
 </%def>
 
-<%def name="CommentTabContent(poNode)">
+<%def name="CommentTabContent(current_user, poNode)">
   <h4>${_('Comment thread')}</h4>
   
   % if len(poNode.getComments())<=0:
@@ -501,23 +502,30 @@
     % endif
     <div>
       % for comment in poNode.getComments():
-        <p>
-          <a href="${tg.url('/api/toggle_share_status', dict(node_id=comment.node_id))}">
-            % if comment.is_shared:
-              <span class="label label-warning" title="${_('Shared comment. Click to make private.')}">${h.ICON.Shared|n}</span>
-            % else:
-              <span class="label label-info" title="${_('Private comment. Click to share.')}">${h.ICON.Private|n}</span>
-            % endif
-          </a>
-          <strong>${comment._oOwner.display_name}</strong>
-          <i class="pull-right">
-            The ${comment.getFormattedDate(comment.updated_at)} 
-            at ${comment.getFormattedTime(comment.updated_at)}
-          </i>
-          <br/>
-          ${comment.data_content|n}
-          <hr style="border-top: 1px dotted #ccc; margin: 0;"/>
-        </p>
+         % if comment.is_shared or comment.owner_id==current_user.user_id:
+##
+## FIXME - 2014-05-29
+## We do not check specific rights on comment but on document instead
+## In the future full-API architecture, it should be fixed
+##
+          <p>
+            <a href="${tg.url('/api/toggle_share_status', dict(node_id=comment.node_id))}">
+              % if comment.is_shared:
+                <span class="label label-warning" title="${_('Shared comment. Click to make private.')}">${h.ICON.Shared|n}</span>
+              % else:
+                <span class="label label-info" title="${_('Private comment. Click to share.')}">${h.ICON.Private|n}</span>
+              % endif
+            </a>
+            <strong>${comment._oOwner.display_name}</strong>
+            <i class="pull-right">
+              The ${comment.getFormattedDate(comment.updated_at)} 
+              at ${comment.getFormattedTime(comment.updated_at)}
+            </i>
+            <br/>
+            ${comment.data_content|n}
+            <hr style="border-top: 1px dotted #ccc; margin: 0;"/>
+          </p>
+        % endif
       % endfor
     </div>
   % endif
