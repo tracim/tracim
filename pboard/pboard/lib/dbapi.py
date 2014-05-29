@@ -9,6 +9,7 @@ from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Unicode, Integer, DateTime, Text
 from sqlalchemy.orm import relation, synonym
 from sqlalchemy.orm import joinedload_all
+import sqlalchemy.orm as sqlao
 import sqlalchemy as sqla
 
 from pboard.model import DeclarativeBase, metadata, DBSession
@@ -82,7 +83,7 @@ class PODUserFilteredApiController(object):
     self._iCurrentUserId       = piUserId
     self._iExtraUserIdList     = piExtraUserIdList
     self._iUserIdFilteringList = None
-  
+    self._cache_allowed_nodes = None
 
   def _getUserIdListForFiltering(self):
     if self._iUserIdFilteringList==None:
@@ -127,7 +128,7 @@ class PODUserFilteredApiController(object):
     lsNodeIdFiltering = lsSqlSelectQuery % (str(self._iCurrentUserId))
 
     if liNodeId!=None and liNodeId!=0:
-      return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren"))\
+      return DBSession.query(pbmd.PBNode).options(sqlao.joinedload_all("_oParent"), sqlao.joinedload_all("_lAllChildren"))\
         .filter(pbmd.PBNode.node_id==liNodeId)\
         .filter(
           sqla.or_(
@@ -146,28 +147,75 @@ class PODUserFilteredApiController(object):
     return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
 
 
-  def getListOfAllowedNodes(self) -> pbmd.PBNode:
-    lsSqlQuery = """
-        SELECT
-            pgn.node_id
-        FROM
-            pod_group_node AS pgn
-            join pod_user_group AS pug ON pug.group_id = pgn.group_id
-        WHERE
-            pgn.rights > 0
-            AND pug.user_id = :owner_id
-        UNION
+  def getListOfAllowedNodes(self, reset_cache=False) -> pbmd.PBNode:
+      if self._cache_allowed_nodes==None or reset_cache==True:
+        lsSqlQuery = """
             SELECT
-                node_id
+                pn.node_id,
+                pn.parent_id,
+                pn.node_order,
+                pn.node_type,
+                pn.created_at,
+                pn.updated_at,
+                pn.data_label,
+                pn.data_content,
+                pn.data_datetime,
+                pn.node_status,
+                pn.data_reminder_datetime,
+                pn.parent_tree_path,
+                pn.node_depth,
+                pn.owner_id,
+                pn.is_shared,
+                pn.is_public,
+                pn.public_url_key
             FROM
-                pod_nodes
+                pod_group_node AS pgn
+                join pod_user_group AS pug ON pug.group_id = pgn.group_id
+                join pod_nodes AS pn ON pgn.node_id=pn.node_id
             WHERE
-            owner_id=:owner_id;
-    """
+                pn.node_type='data'
+                AND pn.node_status NOT IN ('deleted', 'closed')
+                AND pn.node_id=pgn.node_id
+                AND pgn.rights > 0
+                AND pug.user_id = 3
 
-    loNodeListResult = DBSession.query(pbmd.PBNode).from_statement(lsSqlQuery).params(owner_id=self._iCurrentUserId)
+            UNION
+                SELECT
+                    pn.node_id,
+                    pn.parent_id,
+                    pn.node_order,
+                    pn.node_type,
+                    pn.created_at,
+                    pn.updated_at,
+                    pn.data_label,
+                    pn.data_content,
+                    pn.data_datetime,
+                    pn.node_status,
+                    pn.data_reminder_datetime,
+                    pn.parent_tree_path,
+                    pn.node_depth,
+                    pn.owner_id,
+                    pn.is_shared,
+                    pn.is_public,
+                    pn.public_url_key
+                FROM
+                    pod_nodes AS pn
+                WHERE
+                    pn.node_type='data'
+                    AND pn.node_status NOT IN ('deleted', 'closed')
+                    AND pn.owner_id=:owner_id
 
-    return loNodeListResult.all()
+            ORDER BY node_id ASC
+        """
+
+        loNodeListResult = DBSession.query(pbmd.PBNode).\
+            from_statement(lsSqlQuery).\
+            params(owner_id=self._iCurrentUserId)
+        allowed_nodes = loNodeListResult.all()
+
+        self._cache_allowed_nodes = allowed_nodes
+
+      return self._cache_allowed_nodes
 
 
   def searchNodesByText(self, plKeywordList: [str], piMaxNodeNb=100):
@@ -197,6 +245,47 @@ class PODUserFilteredApiController(object):
     return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_status==psNodeStatus).order_by(pbmd.PBNode.updated_at).limit(piMaxNodeNb).all()
 
 
+  def getChildNodesForMenu(self, poParentNode: pbmd.PBNode, allowed_nodes: [pbmd.PBNode]) -> [pbmd.PBNode]:
+    visible_child_nodes = []
+
+    if poParentNode!=None:
+        # standard case
+        print(" -------------- BEFORE @@@@@@@@@@@@@@@@ ")
+        all_child_nodes = poParentNode.getChildren()
+        print("@@@@@@@@@@@@@@@@ AFTER @@@@@@@@@@@@@@@@ ")
+        for child_node in all_child_nodes:
+          if child_node in allowed_nodes:
+            visible_child_nodes.append(child_node)
+    else:
+        # Root case
+        parent_nodes = DBSession
+        for allowed_node in allowed_nodes:
+            print("     @@@@@@@@@@@@@@@@ BEFORE @@@@@@@@@@@@@@@@ ")
+            # loParent = allowed_node._oParent
+            # print("@@@@@@@@@@@@@@@@ AFTER @@@@@@@@@@@@@@@@ {0}".format(allowed_node._oParent.node_id if allowed_node._oParent!=None else '0'))
+            # print("==== EXTRA {0}".format(allowed_node._oParent.node_id if allowed_node._oParent!=None else '0'))
+            print("====> ")
+
+            if allowed_node._oParent is None or allowed_node._oParent==allowed_node:
+                # D.A. - HACK - 2014-05-27
+                # I don't know why, but as from now (with use of sqlao.contains_eager in getListOfAllowedNodes()
+                # the root items have at first iteration itself as parent
+                print("==== EXTRA END")
+                # this is a root item => add it
+                visible_child_nodes.append(allowed_node)
+            else:
+                if allowed_node._oParent not in allowed_nodes:
+                    # the node is visible but not the parent => put it at the root
+                    visible_child_nodes.append(allowed_node)
+                else:
+                    print("==== EXTRA END 2 {0}".format(allowed_node._oParent.node_id))
+
+    print(" @@@@@@@@@@@@@@@@ PRE FAILURE @@@@@@@@@@@@@@@@ ")
+    return visible_child_nodes
+
+
+
+
   def buildTreeListForMenu(self, poCurrentNode: pbmd.PBNode, plViewableStatusId: [], plAllowedNodes: [pbmd.PBNode]) -> [pbmd.NodeTreeItem]:
     # The algorithm is:
     # 1. build an intermediate tree containing only current node and parent path
@@ -209,8 +298,10 @@ class PODUserFilteredApiController(object):
     previous_tree_item = None
     tmp_children_nodes = []
 
+    print("============================> ",poCurrentNode)
     if poCurrentNode is not None:
         breadcrumb_nodes = poCurrentNode.getBreadCrumbNodes()
+        print("====================> NODES", breadcrumb_nodes)
         breadcrumb_nodes.append(poCurrentNode) # by default the current node is not included
 
         for breadcrumb_node in reversed(breadcrumb_nodes):
@@ -218,25 +309,38 @@ class PODUserFilteredApiController(object):
                 # First iteration. We add all current_node children
                 for child_node in breadcrumb_node.getChildren():
                     child_item = pbmd.NodeTreeItem(child_node, [])
+                    assert(isinstance(child_item, pbmd.NodeTreeItem))
                     tmp_children_nodes.append(child_item)
                 previous_tree_item = pbmd.NodeTreeItem(breadcrumb_node, tmp_children_nodes)
             else:
                 tmp_children_nodes = []
                 for child_node in breadcrumb_node.getChildren():
                     if child_node == previous_tree_item.node:
+                        assert(isinstance(previous_tree_item, pbmd.NodeTreeItem))
                         tmp_children_nodes.append(previous_tree_item)
                     else:
                         sibling_node = pbmd.NodeTreeItem(child_node, [])
+                        assert(isinstance(sibling_node, pbmd.NodeTreeItem))
                         tmp_children_nodes.append(sibling_node)
 
                 previous_tree_item = pbmd.NodeTreeItem(breadcrumb_node, tmp_children_nodes)
 
     for node in plAllowedNodes:
+        # This part of the algorithm insert root items
         if node.parent_id==0 or node.parent_id is None:
             if previous_tree_item is not None and node == previous_tree_item.node:
+                assert(isinstance(previous_tree_item, pbmd.NodeTreeItem))
                 node_tree.append(previous_tree_item)
             else:
                 node_tree.append(pbmd.NodeTreeItem(node, []))
+        else:
+            # Try to add nodes shared with me but with a parent which is not shared
+            if node.owner_id!=self._iCurrentUserId:
+                # this is a node shared with me
+                if node._oParent!=None and node._oParent not in plAllowedNodes:
+                    # the node is shared but not the parent => put it in the root
+                    node_tree.append(pbmd.NodeTreeItem(node))
+
 
     return node_tree
 

@@ -24,59 +24,23 @@ from pboard.lib.base import BaseController
 from pboard.lib   import dbapi as pld
 from pboard.model import data as pmd
 from pboard.model import auth as pma
+from pboard.model import serializers as pms
 from pboard import model as pm
 from pboard.lib.auth import can_read, can_write
 
-__all__ = ['PODPublicApiController', 'PODApiController']
+from pboard.controllers import apimenu as pcam
+
 
 FIXME_ERROR_CODE=-1
-
-class PODPublicApiController(BaseController):
-
-    @expose()
-    def create_account(self, email='', password='', retyped_password='', **kw):
-      if email=='' or password=='' or retyped_password=='':
-        flash(_('Account creation error: please fill all the fields'), 'error')
-        redirect(lurl('/'))
-      elif password!=retyped_password:
-        flash(_('Account creation error: passwords do not match'), 'error')
-        redirect(lurl('/'))
-      else:
-        loExistingUser = pld.PODStaticController.getUserByEmailAddress(email)
-        if loExistingUser!=None:
-          flash(_('Account creation error: account already exist: %s') % (email), 'error')
-          redirect(lurl('/'))
-        
-        loNewAccount = pld.PODStaticController.createUser()
-        loNewAccount.email_address = email
-        loNewAccount.display_name  = email
-        loNewAccount.password      = password
-
-        loUserGroup = pld.PODStaticController.getGroup('user')
-        loUserGroup.users.append(loNewAccount)
-
-        pm.DBSession.add(loNewAccount)
-        pm.DBSession.flush()
-        pm.DBSession.refresh(loNewAccount)
-
-        loUserSpecificGroup = pld.PODStaticController.createGroup()
-
-        loUserSpecificGroup.group_id = 0-loNewAccount.user_id # group id of a given user is the opposite of the user id
-        loUserSpecificGroup.group_name = 'user_%d' % loNewAccount.user_id
-        loUserSpecificGroup.personnal_group = True
-        loUserSpecificGroup.users.append(loNewAccount)
-
-        pm.DBSession.flush()
-
-        flash(_('Account successfully created: %s') % (email), 'info')
-        redirect(lurl('/'))
 
 
 class PODApiController(BaseController):
     """Sample controller-wide authorization"""
     
     allow_only = tgp.in_group('user', msg=l_('You need to login in order to access this ressource'))
-    
+
+    menu = pcam.PODApiMenuController()
+
     @expose()
     def create_event(self, parent_id=None, data_label='', data_datetime=None, data_content='', data_reminder_datetime=None, add_reminder=False, **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
@@ -170,7 +134,7 @@ class PODApiController(BaseController):
         loImage     = pil.open(loJpegBytes)
         loImage.thumbnail([140,140], pil.ANTIALIAS)
         
-        loResultBuffer = StringIO()
+        loResultBuffer = csio.StringIO()
         loImage.save(loResultBuffer,"JPEG")
         tg.response.headers['Content-type'] = str(loFile.data_file_mime_type)
         return loResultBuffer.getvalue()
@@ -356,10 +320,7 @@ class PODApiController(BaseController):
       loNode = loApiController.getNode(node_id)
 
       is_shared_b = False if is_shared=='off' else True
-      print(is_shared_b)
-      print(loNode.is_shared)
-      print(loNode.owner_id)
-      print(loCurrentUser.user_id)
+
 
       # Only the node owner can modify is_shared
       if is_shared_b != loNode.is_shared and loNode.owner_id != loCurrentUser.user_id:
@@ -407,4 +368,3 @@ class PODApiController(BaseController):
             comment_right.rights = liRightLevel
 
       redirect(lurl('/document/%s#tab-accessmanagement'%(loNode.node_id)))
-
