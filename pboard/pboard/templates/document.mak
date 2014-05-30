@@ -76,6 +76,7 @@
         #mypodtree {overflow:hidden;}
         #mypodtree:hover {overflow:visible; }
       </style>
+      <h5>${_('Content explorer')}</h5>
       <div id="mypodtree"></div>
       <script>
         $(function () {
@@ -104,6 +105,7 @@
                 },
                 'success': function (new_data) {
                   console.log('loaded new menu data' + new_data)
+                  console.log(new_data);
                   return new_data;
                 },
               },
@@ -114,6 +116,14 @@
             url = "${tg.url('/document/')}"+data.selected[0];
             console.log("Opening document: "+url);
             location.href = url;
+          });
+          
+          $('#mypodtree').on("loaded.jstree", function () {
+            nodes = $('#mypodtree .jstree-node');
+            console.log("nodes = "+nodes.length);
+            if (nodes.length<=0) {
+              $("#mypodtree").append( "<p class='pod-grey'>${_('There is no content yet.')|n}</p>" );
+            }
           });
         });
       </script>
