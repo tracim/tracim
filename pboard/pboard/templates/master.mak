@@ -148,14 +148,24 @@
 
           % endif
 
-          % if request.identity and request.identity['repoze.who.userid']=='damien@accorsi.info':
+          % if request.identity:
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-cogs"></i>
+                Admin <b class="caret"></b>
+              </a>
               <ul class="dropdown-menu">
-                <li><a href="${tg.url('/admin')}"><i class="fa fa-magic"></i> Manage</a></li>
+                <li><a href="${tg.url('/admin/users')}"><i class="fa fa-user"></i> ${_('List users')}</a></li>
+                <li><a href="${tg.url('/admin/groups')}"><i class="fa fa-group"></i> ${_('Manage groups')}</a></li>
+                % if request.identity and 'managers' in request.identity['groups']:
+                  <li class="divider" role="presentation"></li>
+                  <li><a href="${tg.url('/admin')}"><i class="fa fa-magic"></i> Manage all</a></li>
+                % endif
               </ul>
             </li>
-            
+          % endif
+
+          % if request.identity and 'managers' in request.identity['groups']:
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cogs "></i> Debug <b class="caret"></b></a>
               <ul class="dropdown-menu">

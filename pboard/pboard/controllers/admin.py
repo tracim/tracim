@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
+import tg.predicates
 from tgext.admin.config import AdminConfig, CrudRestControllerConfig
 from sprox.formbase import AddRecordForm
 from sprox import formbase as sform
@@ -86,9 +87,7 @@ class UserRegistrationForm(AddRecordForm):
     display_name           = TextField
     verify_password        = PasswordField('verify_password')
     groups = tw2f.MultipleSelectionField('groups')
-    """
-    __base_validator__     = form_validator
-    """
+
 
 class UserTableFiller(sfill.TableFiller):
 
@@ -121,6 +120,6 @@ class UserCrudConfig(CrudRestControllerConfig):
 class PodAdminConfig(AdminConfig):
     user = UserCrudConfig
     group = GroupCrudConfig
-
+    allow_only = tg.predicates.in_group('user')
 
 

@@ -52,7 +52,7 @@
       <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
         <span class="caret"></span>
       </a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu pull-right">
         <li>
           <div class="pod-grey strong" ><strong><i class="fa fa-magic"></i> ${_('Current status is...')}</strong><br/></div>
         </li>

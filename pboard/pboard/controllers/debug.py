@@ -23,8 +23,8 @@ __all__ = ['DebugController']
 
 class DebugController(BaseController):
 
-  allow_only = predicates.in_group('admin',
-                              msg=l_('You\'re not allowed to access this page'))
+  # allow_only = predicates.in_group('admin',
+  #                            msg=l_('You\'re not allowed to access this page'))
 
   @expose('pboard.templates.debug.iconset')
   def iconset(self, **kw):
