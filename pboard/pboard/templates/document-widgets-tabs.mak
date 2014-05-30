@@ -6,7 +6,7 @@
   <h4>${_('Revisions')}</h4>
   <ul>
   % for version in poNode.getHistory():
-  	<li><a href="${tg.url('/document/%i/%i'%(version.node_id, version.version_id))}">${version.created_at.strftime("%a %x %X")}</a></li>
+  	<li><a href="${tg.url('/document/%i/%i#tab-history'%(version.node_id, version.version_id))}">${version.created_at.strftime("%a %x %X")}</a></li>
   % endfor
   </ul>
 </%def>
