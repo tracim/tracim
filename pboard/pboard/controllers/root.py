@@ -15,7 +15,8 @@ from pboard.lib.base import BaseController
 from pboard.controllers.error import ErrorController
 
 from pboard.lib import dbapi as pld
-from pboard.controllers import api as pbca
+from pboard.controllers import api as pca
+from pboard.controllers import apipublic as pcap
 from pboard.controllers import debug as pbcd
 
 from pboard import model as pm
@@ -46,11 +47,11 @@ class RootController(BaseController):
         config_type = tgat.TGAdminConfig
     )
 
-    api   = pbca.PODApiController()
+    api   = pca.PODApiController()
     debug = pbcd.DebugController()
     error = ErrorController()
 
-    public_api = pbca.PODPublicApiController()
+    public_api = pcap.PODPublicApiController()
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "pboard"
@@ -140,15 +141,10 @@ class RootController(BaseController):
         except Exception as e:
           flash(_('Document not found'), 'error')
 
-        # FIXME - D.A - 2013-11-07 - Currently, the code build a new item if no item found for current user
-        # the correct behavior should be to redirect to setup page
-        loMenuItems = loApiController.buildTreeListForMenu(loCurrentNode, pbmd.PBNodeStatus.getVisibleIdsList(), llAccessibleNodes)
-        nodes_as_tree_for_select_field = loApiController.DIRTY_OLDbuildTreeListForMenu(pbmd.PBNodeStatus.getVisibleIdsList())
-
         return dict(
-            menu_node_list=loMenuItems,
-            root_node_list_for_select_field=nodes_as_tree_for_select_field,
+            current_user=loCurrentUser,
             current_node=loCurrentNode,
+            allowed_nodes=llAccessibleNodes,
             node_status_list = loNodeStatusList,
             keywords = highlight,
             user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(node_id),

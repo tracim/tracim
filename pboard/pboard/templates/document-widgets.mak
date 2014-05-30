@@ -24,18 +24,18 @@
   % endif
 </%def>
 
-<%def name="ToolbarMenuItemModal(psTargetModalId, psIconClasses, psMenuLabel)">
-  <li><a href="#${psTargetModalId}" role="button" data-toggle="modal"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
+<%def name="ToolbarMenuItemModal(psTargetModalId, psIconClasses, psMenuLabel, psItemClasses='')">
+  <li class="${psItemClasses}"><a href="#${psTargetModalId}" role="button" data-toggle="modal"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
 </%def>
 
 <%def name="ToolbarMenuItemInline(psTargetId, psIconClasses, psMenuLabel)">
   <li><a href="#${psTargetId}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
 </%def>
-<%def name="ToolbarMenuItemLink(psTargetUrl, psIconClasses, psMenuLabel, psLinkCss='', psLinkTitle='')">
+<%def name="ToolbarMenuItemLink(psTargetUrl, psIconClasses, psMenuLabel, psLinkCss='', psLinkTitle='', psOnClick='')">
   % if psTargetUrl=='#':
-    <li class="disabled"><a href="${psTargetUrl}" class="${psLinkCss}" title="${psLinkTitle}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
+    <li class="disabled"><a href="${psTargetUrl}" class="${psLinkCss}" title="${psLinkTitle}" onclick="${psOnClick}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
   % else:
-    <li><a href="${psTargetUrl}" class="${psLinkCss}" title="${psLinkTitle}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
+    <li><a href="${psTargetUrl}" class="${psLinkCss}" title="${psLinkTitle}" onclick="${psOnClick}"><i class="${psIconClasses}"></i> ${psMenuLabel}</a></li>
   % endif
 </%def>
 
@@ -44,6 +44,7 @@
   <div id="${psDivId}">
     <div class="btn-group">
       ${POD.EditButton('current-document-content-edit-button', True)}
+
       <button class="btn btn-small"  data-toggle="dropdown" href="#"> 
         <i class="fa  fa-signal"></i>
         ${_("Change status")}
@@ -72,6 +73,7 @@
       % endfor
       </ul>
     </div>
+    
     <div class="btn-group">
       <button class="btn btn-small btn-success"  data-toggle="dropdown" href="#">
         <i class="fa fa-plus"></i> ${_('Add')}
@@ -102,31 +104,28 @@
         <li><p class="pod-grey"><i class="fa fa-danger"></i> coming soon!</p></li>
       </ul>
     </div>
-    <div class="btn-group ">
-      <a
-        class="btn btn-small btn-warning"
-        href="#"
-        data-toggle="dropdown"
-        title="${_('Move to')}"
-        ><i class="fa fa-arrows"></i></a>
+
+    <div class="btn-group pull-right">
+      <button class="btn btn-small btn-link"  data-toggle="dropdown" href="#">
+        ${_('more ...')}
+      </button>
       <ul class="dropdown-menu">
-        <li >
-          <div class="btn-warning strong" ><strong><i class="fa fa-magic"></i> ${_("Move the document...")}</strong><br/></div>
-          <div class="pod-grey"><i>move the document to...</i></div>
+        <li>
+          <div class="strong" ><strong><i class="fa fa-magic"></i> ${_('Advanced actions...')}</strong><br/></div>
+          <div class="pod-grey"><i>${_('power user actions...')}</i></div>
         </li>
-        ${node_treeview_for_set_parent_menu(poNode.node_id, plRootNodes)}
+##
+## Here are MOVE and DELETE buttons
+##
+        ${ToolbarMenuItemModal(h.ID.MoveDocumentModalForm(current_node), 'fa fa-arrows', _('Move'), 'btn-warning')}
+        ${ToolbarMenuItemLink(tg.url('/api/edit_status', dict(node_id=poNode.node_id, node_status='deleted')), 'fa fa-trash-o', _('Delete'), 'btn-danger', _('Delete the current document'), 'return confirm(\'{0}\');'.format('Delete current document?'))}
+
       </ul>
-      <a
-        class="btn btn-small btn-danger"
-        href='${tg.url('/api/edit_status', dict(node_id=poNode.node_id, node_status='deleted'))}'
-        id='current-document-force-delete-button' onclick="return confirm('${_('Delete current document?')}');"
-        title="${_('Delete')}"
-        ><i class="fa fa-trash-o"></i></a>
     </div>
   </div>
 </%def>
 
-<%def name="BreadCrumb(poNode)">
+<%def name="BreadCrumb(poNode, allowed_nodes)">
   <ul class="breadcrumb span12">
     <li>
       <span class="divider">/</span>
@@ -134,10 +133,17 @@
     </li>
     % if poNode!=None:
       % for breadcrumb_node in poNode.getBreadCrumbNodes():
-      <li>
-        <span class="divider">/</span>
-        <a href="${tg.url('/document/%s'%(breadcrumb_node.node_id))}">${breadcrumb_node.getTruncatedLabel(30)}</a>
-      </li>
+##
+## HACK - D.A - 2014-05-29
+## Here we remove forbidden nodes from the breadcrumb
+## This should not be done in the templates!
+##
+        % if breadcrumb_node in allowed_nodes:
+          <li>
+            <span class="divider">/</span>
+            <a href="${tg.url('/document/%s'%(breadcrumb_node.node_id))}">${breadcrumb_node.getTruncatedLabel(30)}</a>
+          </li>
+        % endif
       % endfor
       <li class="active">
         <span class="divider">/</span>
@@ -276,7 +282,7 @@
   </div>
 </%def>
 
-<%def name="DocumentEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="DocumentEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -299,7 +305,7 @@
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
           % endif
-          <input type="hidden" name="parent_id" value="${piParentNodeId if piParentNodeId else 0}"/>
+          <input type="hidden" name="parent_id" value="${poParentNode.node_id if poParentNode else 0}"/>
           
           <input type="hidden" name="data_content" id="${psModalId}-textarea" />
           <input
@@ -313,6 +319,13 @@
         <div>
           ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '')}
         </div>
+        % if poParentNode and poParentNode.is_shared:
+          <p>
+            <input type="checkbox" name="inherit_rights" checked="checked"/> 
+            ${_('Share:')}
+            <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+          </p>
+        % endif
       </form>
 
 ## MODAL BODY [END]
@@ -339,7 +352,7 @@
 </%def>
 
 
-<%def name="FileEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="FileEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -361,7 +374,7 @@
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
           % endif
-          <input type="hidden" name="parent_id" value="${piParentNodeId if piParentNodeId else 0}"/>
+          <input type="hidden" name="parent_id" value="${poParentNode.node_id if poParentNode else 0}"/>
           <input type="hidden" name="data_content" id="${psModalId}-textarea" />
         <div>
           <label>
@@ -384,6 +397,13 @@
           <label>${_('File description (optionnal)')}</label>
           ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', '')}
         </div>
+        % if poParentNode and poParentNode.is_shared:
+          <p>
+            <input type="checkbox" name="inherit_rights" checked="checked"/>
+            ${_('Share:')}
+            <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+          </p>
+        % endif
       </form>
     ## MODAL BODY [END]
     </div>
@@ -408,7 +428,7 @@
   </div>
 </%def>
 
-<%def name="EventEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="EventEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -429,7 +449,7 @@
     <div class="modal-body">
     ###### MODAL BODY
       <form id='${psModalId}-form' action='${psPostUrl}' method='POST'>
-        <input type="hidden" name='parent_id' value='${current_node.node_id}'/>
+        <input type="hidden" name='parent_id' value="${poParentNode.node_id if poParentNode else 0}"/>
         <fieldset>
           <label>
             ${_('Event')}
@@ -449,6 +469,15 @@
               ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', 'boldanditalic')}
             </div>
           </label>
+          % if poParentNode and poParentNode.is_shared:
+            <label>
+              <p>
+                <input type="checkbox" name="inherit_rights" checked="checked"/>
+                ${_('Share:')}
+                <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+              </p>
+            <label>
+          % endif
         </fieldset>
       </form>
     ###### MODAL BODY [END]
@@ -474,7 +503,7 @@
   </div>
 </%def>
 
-<%def name="ContactEditModalDialog(piParentNodeId, poNode, psPostUrl, psModalId, psTitle)">
+<%def name="ContactEditModalDialog(poParentNode, poNode, psPostUrl, psModalId, psTitle)">
   <div
     id="${psModalId}"
     class="modal hide"
@@ -496,7 +525,7 @@
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
           % endif
-          <input type="hidden" name="parent_id" value="${piParentNodeId if piParentNodeId else 0}"/>
+          <input type="hidden" name="parent_id" value="${poParentNode.node_id if poParentNode else 0}"/>
           <input type="hidden" name="data_content" id="${psModalId}-textarea" />
         <div>
           <label>
@@ -514,7 +543,100 @@
           <label>${_('Address, phone, email, company...')}</label>
           ${POD.RichTextEditor(psModalId+'-textarea-wysiwyg', poNode.data_content if poNode!=None else '', 'boldanditalic')}
         </div>
+        % if poParentNode and poParentNode.is_shared:
+          <label>
+            <p>
+              <input type="checkbox" name="inherit_rights" checked="checked"/>
+              ${_('Share:')}
+              <span class="pod-grey">${_('if checked, then copy share properties from current item')}</span>
+            </p>
+          <label>
+        % endif
+
       </form>
+    ## MODAL BODY [END]
+    </div>
+    
+    <div class="modal-footer">
+    ## MODAL FOOTER
+      <button class="btn" data-dismiss="modal" aria-hidden="true">
+        <i class="fa fa-ban"></i> ${_('Cancel')}
+      </button>
+      <button class="btn btn-success" id="${psModalId}-form-submit-button">
+        <i class="fa fa-check"></i> ${_('Save changes')}
+      </button>
+      <script>
+        $('#${psModalId}-form-submit-button').click(function(){
+          $('#${psModalId}-textarea-wysiwyg').cleanHtml();
+          $('#${psModalId}-textarea').val($('#${psModalId}-textarea-wysiwyg').html());
+          $('#${psModalId}-form')[0].submit();
+        });
+      </script>
+    ## MODAL FOOTER [END]
+    </div>
+  </div>
+</%def>
+
+<%def name="MoveDocumentModalDialog(poNode, psPostUrl, psModalId, psTitle)">
+  <div
+    id="${psModalId}"
+    class="modal hide"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    
+    <div class="modal-header">
+    ## MODAL HEADER
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">${psTitle}</h3>
+    ## MODAL HEADER [END]
+    </div>
+
+    <div class="modal-body">
+    ## MODAL BODY
+          <p>${_('Select the destination:')}</p>
+          <div id="${psModalId}-new-parent-selector-tree"></div>
+          <script>
+            $(function () {
+              $('#${psModalId}-new-parent-selector-tree').jstree({
+                "plugins" : [ "wholerow"],
+                'core' : {
+
+                  'error': function (error) {
+                    console.log('Error ' + error.toString())
+                  },
+                  'data' : {
+                    'dataType': 'json',
+                    'contentType': 'application/json; charset=utf-8',
+                    'url' : function (node) {
+                         return '${tg.url("/api/menu/children")}';
+                    },
+                    'data' : function(node) {
+                      console.log("NODE => "+JSON.stringify(node))
+                      return {
+                        'id' : node.id
+                      };
+                    },
+                    'success': function (new_data) {
+                      console.log('loaded new menu data' + new_data)
+                      return new_data;
+                    },
+                  },
+                }
+              });
+              
+              $('#${psModalId}-new-parent-selector-tree').on("select_node.jstree", function (e, data) {
+                new_parent_id_selected = data.selected[0];
+                $("#${psModalId}-form-new-parent-field").attr("value", new_parent_id_selected)
+                console.log("About to move document "+${poNode.node_id}+" as child of "+new_parent_id_selected);
+              });
+            });
+          </script>
+          <form id='${psModalId}-form' method="POST" action="${psPostUrl}" enctype="multipart/form-data">
+            <input type="hidden" name="node_id" value="${poNode.node_id}"/>
+            <input type="hidden" name="new_parent_id" value="-1" id="${psModalId}-form-new-parent-field" />
+          </form>
     ## MODAL BODY [END]
     </div>
     

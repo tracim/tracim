@@ -1,4 +1,7 @@
-  function generateStringId(charNb = 32, allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
+  function generateStringId(charNb, allowedChars) {
+    if (typeof charNb === 'undefined') { charNb = 32; }
+    if (typeof allowedChars === 'undefined') { allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; }
+  
     var text = "";
 
     for( var i=0; i < charNb; i++ ) {

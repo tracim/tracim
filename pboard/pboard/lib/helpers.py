@@ -65,6 +65,10 @@ class ID(object):
       return 'add-file-modal-form'
 
   @classmethod
+  def MoveDocumentModalForm(cls, poNode):
+      return 'move-document-modal-form-{0}'.format(poNode.node_id)
+
+  @classmethod
   def AddEventModalForm(cls, poNode=None):
     if poNode:
       return 'add-event-modal-form-%d'%poNode.node_id

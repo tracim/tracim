@@ -65,14 +65,62 @@
 ## HERE COMES THE BREADCRUMB
 ##
   <div class="row">
-    ${DOC.BreadCrumb(current_node)}
+    ${DOC.BreadCrumb(current_node, allowed_nodes)}
   </div>
 
   <div class="row">
-    <div id='application-left-panel' class="span3">
-      <div>
-        ${node_treeview(menu_node_list)}
-      </div>
+    <div id='application-left-panel' class="span3" >
+      <link rel="stylesheet" href="${tg.url('/jstree/dist/themes/default/style.min.css')}" />
+      <script src="${tg.url('/jstree/dist/jstree.js')}"></script>
+      <style>
+        #mypodtree {overflow:hidden;}
+        #mypodtree:hover {overflow:visible; }
+      </style>
+      <div id="mypodtree"></div>
+      <script>
+        $(function () {
+          $('#mypodtree').jstree({
+            "plugins" : [ "wholerow"],
+            'core' : {
+
+              'error': function (error) {
+                console.log('Error ' + error.toString())
+              },
+              'data' : {
+                'dataType': 'json',
+                'contentType': 'application/json; charset=utf-8',
+                'url' : function (node) {
+                  if (node.id==='#') {
+                    return '${tg.url("/api/menu/initialize", dict(current_node_id=current_node.node_id if current_node else 0))}';
+                  } else {
+                    return '${tg.url("/api/menu/children")}';
+                  }
+                },
+                'data' : function(node) {
+                  console.log("NODE => "+JSON.stringify(node))
+                  return {
+                    'id' : node.id
+                  };
+                },
+                'success': function (new_data) {
+                  console.log('loaded new menu data' + new_data)
+                  return new_data;
+                },
+              },
+            }
+          });
+          
+          $('#mypodtree').on("select_node.jstree", function (e, data) {
+            url = "${tg.url('/document/')}"+data.selected[0];
+            console.log("Opening document: "+url);
+            location.href = url;
+          });
+        });
+      </script>
+## INFO - D.A. - 2014-05-28 - Hide old school menu
+##      <div>
+##        ${node_treeview(menu_node_list)}
+##      </div>
     </div>
     <div id='application-main-panel' class="span9">
 
@@ -102,11 +150,12 @@
           ##
           ## HERE WE INCLUDE ALL MODAL DIALOG WHICH WILL BE ACCESSIBLE THROUGH TABS OR MENU
           ##
-          ${DOC.DocumentEditModalDialog(current_node.node_id, None, tg.url('/api/create_document'), h.ID.AddDocumentModalForm(current_node), _('New Sub-document'))}
-          ${DOC.EventEditModalDialog(current_node.node_id, None, tg.url('/api/create_event'), h.ID.AddEventModalForm(current_node), _('Add an event'))}
-          ${DOC.ContactEditModalDialog(current_node.node_id, None, tg.url('/api/create_contact'), h.ID.AddContactModalForm(current_node), _('Add a new contact'))}
-          ${DOC.FileEditModalDialog(current_node.node_id, None, tg.url('/api/create_file'), h.ID.AddFileModalForm(current_node), _('Add a new file'))}
-          
+          ${DOC.DocumentEditModalDialog(current_node, None, tg.url('/api/create_document'), h.ID.AddDocumentModalForm(current_node), _('New Sub-document'))}
+          ${DOC.EventEditModalDialog(current_node, None, tg.url('/api/create_event'), h.ID.AddEventModalForm(current_node), _('Add an event'))}
+          ${DOC.ContactEditModalDialog(current_node, None, tg.url('/api/create_contact'), h.ID.AddContactModalForm(current_node), _('Add a new contact'))}
+          ${DOC.FileEditModalDialog(current_node, None, tg.url('/api/create_file'), h.ID.AddFileModalForm(current_node), _('Add a new file'))}
+          ${DOC.MoveDocumentModalDialog(current_node, tg.url('/api/set_parent_node'), h.ID.MoveDocumentModalForm(current_node), _('Move the document'))}
+
           <div class="tabbable">
             <ul class="nav nav-tabs" style="margin-bottom: 0em;">
                 <li>${DOC.MetadataTab('#subdocuments', 'tab', _('Subdocuments'), 'fa-file-text-o', current_node.getChildren())}</li>
@@ -126,7 +175,7 @@
               <div class="tab-pane" id="subdocuments">${DOCTABS.SubdocumentContent(current_node)}</div>
               <div class="tab-pane active" id="events">${DOCTABS.EventTabContent(current_node)}</div>
               <div class="tab-pane" id="contacts">${DOCTABS.ContactTabContent(current_node)}</div>
-              <div class="tab-pane" id="comments">${DOCTABS.CommentTabContent(current_node)}</div>
+              <div class="tab-pane" id="comments">${DOCTABS.CommentTabContent(current_user, current_node)}</div>
               <div class="tab-pane" id="files">${DOCTABS.FileTabContent(current_node)}</div>
               <div class="tab-pane" id="history">${DOCTABS.HistoryTabContent(current_node)}</div>
               <div class="tab-pane" id="accessmanagement">${DOCTABS.AccessManagementTab(current_node)}</div>

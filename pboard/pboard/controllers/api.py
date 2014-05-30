@@ -24,50 +24,13 @@ from pboard.lib.base import BaseController
 from pboard.lib   import dbapi as pld
 from pboard.model import data as pmd
 from pboard.model import auth as pma
+from pboard.model import serializers as pms
 from pboard import model as pm
 from pboard.lib.auth import can_read, can_write
 import repoze.who.api
 
-__all__ = ['PODPublicApiController', 'PODApiController']
+from pboard.controllers import apimenu as pcam
 
-FIXME_ERROR_CODE=-1
-
-class PODPublicApiController(BaseController):
-
-    @expose()
-    def create_account(self, email='', password='', retyped_password='', **kw):
-      if email=='' or password=='' or retyped_password=='':
-        flash(_('Account creation error: please fill all the fields'), 'error')
-        redirect(lurl('/'))
-      elif password!=retyped_password:
-        flash(_('Account creation error: passwords do not match'), 'error')
-        redirect(lurl('/'))
-      else:
-        loExistingUser = pld.PODStaticController.getUserByEmailAddress(email)
-        if loExistingUser!=None:
-          flash(_('Account creation error: account already exist: %s') % (email), 'error')
-          redirect(lurl('/'))
-        
-        loNewAccount = pld.PODStaticController.createUser()
-        loNewAccount.email_address = email
-        loNewAccount.display_name  = email
-        loNewAccount.password      = password
-
-        loUserGroup = pld.PODStaticController.getGroup('user')
-        loUserGroup.users.append(loNewAccount)
-
-        pm.DBSession.add(loNewAccount)
-        pm.DBSession.flush()
-        pm.DBSession.refresh(loNewAccount)
-
-        loUserSpecificGroup = pld.PODStaticController.createGroup()
-
-        loUserSpecificGroup.group_id = 0-loNewAccount.user_id # group id of a given user is the opposite of the user id
-        loUserSpecificGroup.group_name = 'user_%d' % loNewAccount.user_id
-        loUserSpecificGroup.personnal_group = True
-        loUserSpecificGroup.users.append(loNewAccount)
-
-        pm.DBSession.flush()
 
         who_api = repoze.who.api.get_api(request.environ)
         creds = {}
@@ -76,21 +39,25 @@ class PODPublicApiController(BaseController):
         authenticated, headers = who_api.login(creds)
         response.headers = headers
 
-        flash(_('Account successfully created: %s') % (email), 'info')
-        redirect(lurl('/'))
+FIXME_ERROR_CODE=-1
 
 
 class PODApiController(BaseController):
     """Sample controller-wide authorization"""
     
     allow_only = tgp.in_group('user', msg=l_('You need to login in order to access this ressource'))
-    
+
+    menu = pcam.PODApiMenuController()
+
+    def on_off_to_boolean(self, on_or_off):
+        return True if on_or_off=='on' else False
+
     @expose()
-    def create_event(self, parent_id=None, data_label='', data_datetime=None, data_content='', data_reminder_datetime=None, add_reminder=False, **kw):
+    def create_event(self, parent_id=None, data_label='', data_datetime=None, data_content='', data_reminder_datetime=None, add_reminder=False, inherit_rights='off', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
-      
-      loNewNode = loApiController.createNode(int(parent_id))
+
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(inherit_rights))
       loNewNode.node_type     = pmd.PBNodeType.Event
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -102,11 +69,11 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_contact(self, parent_id=None, data_label='', data_content='', **kw):
+    def create_contact(self, parent_id=None, data_label='', data_content='', inherit_rights='off', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
-      loNewNode = loApiController.createNode(int(parent_id))
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(inherit_rights))
       loNewNode.node_type     = pmd.PBNodeType.Contact
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -119,7 +86,7 @@ class PODApiController(BaseController):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
-      loNewNode = loApiController.createNode(int(parent_id))
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(is_shared))
       loNewNode.node_type     = pmd.PBNodeType.Comment
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -130,11 +97,11 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%i'%(loNewNode.parent_id)))
 
     @expose()
-    def create_file(self, parent_id=None, data_label='', data_content='', data_file=None, **kw):
+    def create_file(self, parent_id=None, data_label='', data_content='', data_file=None, inherit_rights='off', **kw):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
       
-      loNewNode = loApiController.createNode(int(parent_id))
+      loNewNode = loApiController.createNode(int(parent_id), self.on_off_to_boolean(inherit_rights))
       loNewNode.node_type     = pmd.PBNodeType.File
       loNewNode.data_label    = data_label
       loNewNode.data_content  = data_content
@@ -178,7 +145,7 @@ class PODApiController(BaseController):
         loImage     = pil.open(loJpegBytes)
         loImage.thumbnail([140,140], pil.ANTIALIAS)
         
-        loResultBuffer = StringIO()
+        loResultBuffer = csio.StringIO()
         loImage.save(loResultBuffer,"JPEG")
         tg.response.headers['Content-type'] = str(loFile.data_file_mime_type)
         return loResultBuffer.getvalue()
@@ -238,7 +205,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
-    def create_document(self, parent_id=None, data_label='', data_content=''):
+    def create_document(self, parent_id=None, data_label='', data_content='', inherit_rights='off'):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
@@ -247,7 +214,7 @@ class PODApiController(BaseController):
         loParent = loApiController.getNode(parent_id)
         lsNodeName = 'Subdocument of (%s)' % loParent.data_label
 
-      loNewNode = loApiController.createDummyNode(parent_id)
+      loNewNode = loApiController.createDummyNode(parent_id, self.on_off_to_boolean(inherit_rights))
       loNewNode.data_label   = lsNodeName
       loNewNode.data_content = 'insert content...'
 
@@ -345,7 +312,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s#tab-comments'%(loNode._oParent.node_id)))
 
     @expose()
-    @require(can_read())
+    @require(can_write())
     def set_access_management(self, node_id, is_shared='off', read=[0], write=[0]):
 
       llReadAccessGroupIds = [int(liGroupId) for liGroupId in read]
@@ -364,10 +331,7 @@ class PODApiController(BaseController):
       loNode = loApiController.getNode(node_id)
 
       is_shared_b = False if is_shared=='off' else True
-      print(is_shared_b)
-      print(loNode.is_shared)
-      print(loNode.owner_id)
-      print(loCurrentUser.user_id)
+
 
       # Only the node owner can modify is_shared
       if is_shared_b != loNode.is_shared and loNode.owner_id != loCurrentUser.user_id:
@@ -415,4 +379,3 @@ class PODApiController(BaseController):
             comment_right.rights = liRightLevel
 
       redirect(lurl('/document/%s#tab-accessmanagement'%(loNode.node_id)))
-
