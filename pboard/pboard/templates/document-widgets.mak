@@ -43,7 +43,9 @@
 <%def name="Toolbar(poNode, plNodeStatusList, plRootNodes, psDivId)">
   <div id="${psDivId}">
     <div class="btn-group">
+	% if current_user_rights and current_user_rights.hasWriteAccess():
       ${POD.EditButton('current-document-content-edit-button', True)}
+	% endif
 
       <button class="btn btn-small"  data-toggle="dropdown" href="#"> 
         <i class="fa  fa-signal"></i>
