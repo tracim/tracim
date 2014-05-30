@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import tg
+import repoze.who.api
+
 from tg import _compat
 from pboard.lib import base as plb
 from pboard.lib import dbapi as pld
@@ -48,4 +50,13 @@ class PODPublicApiController(plb.BaseController):
         pm.DBSession.flush()
 
         tg.flash(_('Account successfully created: %s') % (email), 'info')
+
+        who_api = repoze.who.api.get_api(tg.request.environ)
+        creds = {}
+        creds['login'] = email
+        creds['password'] = password
+        authenticated, headers = who_api.login(creds)
+        tg.response.headers = headers
+
         tg.redirect(tg.lurl('/'))
+
