@@ -183,7 +183,7 @@
             ################################
             <div class="tab-content">
               <div class="tab-pane" id="subdocuments">${DOCTABS.SubdocumentContent(current_node)}</div>
-              <div class="tab-pane" id="events">${DOCTABS.EventTabContent(current_node)}</div>
+              <div class="tab-pane" id="events">${DOCTABS.EventTabContent(current_user, current_node)}</div>
               <div class="tab-pane" id="contacts">${DOCTABS.ContactTabContent(current_node)}</div>
               <div class="tab-pane active" id="comments">${DOCTABS.CommentTabContent(current_user, current_node)}</div>
               <div class="tab-pane" id="files">${DOCTABS.FileTabContent(current_node)}</div>
