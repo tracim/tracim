@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" media="screen" href="${tg.url('/css/external/font-awesome-4.1.0/css/font-awesome.min.css')}" />
 </head>
 <body class="${self.body_class()}">
-  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="${tg.url('/javascript/jquery.js')}"></script>
   <script src="${tg.url('/javascript/pod.js')}"></script>
 
   <div class="container">
