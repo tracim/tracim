@@ -249,33 +249,24 @@
 
 <%def name="FirstTimeFakeDocument()">
   <div id='application-document-panel' class="span5">
-    <div id='current-document-content' class="">
-      <p class="well">
-        <strong>${_('Welcome aboard')}</strong>
-        <i class="fa fa-smile-o fa-2x"></i>
-      </p>
-      ${_('<p>We suggest you to...<br/><br/></p>')|n}
+    <div id='current-document-content' class="well">
+      ${_('<p>We suggest you to start...<br/><br/></p>')|n}
       <h4>
         <i class="fa fa-angle-double-left fa-3x fa-fw pod-blue" style="vertical-align: middle"></i>
-        ${_('work on existing documents')}
+        ${_('by working on existing items')}
       </h4>
       <p class="text-center">${_('or')}</p>
-      <h4 class="text-right">
-        ${_('create a new document')}
-        <i class="fa fa-angle-double-down fa-3x fa-fw pod-blue" style="vertical-align: middle"></i>
-      </h4>
-      <p class="pull-right">
-        <a href="#${h.ID.AddDocumentModalForm()}" role="button" class="btn btn-success" data-toggle="modal">
+      <h4 class="">
+        <i class="fa fa-angle-double-right fa-3x fa-fw pod-blue" style="vertical-align: middle;"></i>
+        ${_('by creating a new document')}
+        <a href="#${h.ID.AddDocumentModalForm()}" role="button" class="btn btn-success" style="float:right;" data-toggle="modal">
           <i class="fa fa-plus"></i>
-          ${_('Create a new document')}
+          ${_('Create')}
         </a>
-      </p>
+      </h4>
   
       ${DocumentEditModalDialog(None, None, tg.url('/api/create_document'), h.ID.AddDocumentModalForm(), 'Create your first document')}
       <div style="clear: both;"></div>
-      <p class="alert alert-info" style="margin-top: 2em;">
-        <i class="fa fa-info-circle"></i> ${_('<strong>Note :</strong> You can even create a dummy document: you will be able to remove it later.')|n}
-      </p>
     </div>
     <script>
     </script>
