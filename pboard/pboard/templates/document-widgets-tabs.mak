@@ -6,7 +6,7 @@
   <h4>${_('Revisions')}</h4>
   <ul>
   % for version in poNode.getHistory():
-  	<li><a href="${tg.url('/document/%i/%i'%(version.node_id, version.version_id))}">${version.created_at.strftime("%a %x %X")}</a></li>
+  	<li><a href="${tg.url('/document/%i/%i#tab-history'%(version.node_id, version.version_id))}">${version.created_at.strftime("%a %x %X")}</a></li>
   % endfor
   </ul>
 </%def>
@@ -380,18 +380,18 @@
         <p style="list-style-type:none; margin-bottom: 0.5em;">
           <i class="fa fa-paperclip"></i>
           <a
-            href="${tg.url('/document/%i'%loFile.node_id)}"
-            title="${_('View the attachment')}: ${loFile.getTruncatedLabel(-1)}"
+            href="${tg.url('/api/get_file_content/%s'%(loFile.node_id))}"
+            title="${_('Download the file')}"
           >
             ${loFile.getTruncatedLabel(50)}
           </a>
           ## FIXME SHOW IMAGE THUMBNAIL <img src="${tg.url('/api/get_file_content_thumbnail/%i'%loFile.node_id)}"/>
           <a
             class="pull-right"
-            href="${tg.url('/api/get_file_content/%s'%(loFile.node_id))}"
-            title="${_('View the attachment')}"
+            href="${tg.url('/document/%i'%loFile.node_id)}"
+            title="${_('View the attachment')}: ${loFile.getTruncatedLabel(-1)}"
           >
-            <i class="fa fa-download"></i>
+            <i class="fa fa-edit"></i>
           </a>
         </p>
       % endfor
@@ -421,7 +421,7 @@
   % endif
 </%def>
 
-<%def name="EventTabContent(poNode)">
+<%def name="EventTabContent(current_user, poNode)">
   <h4>${_('Calendar')}</h4>
   
   % if len(poNode.getEvents())<=0:
@@ -446,15 +446,16 @@
         </tr>
       </thead>
       % for event in poNode.getEvents():
-        <tr class="item-with-data-popoverable" data-content="${event.data_content}" rel="popover" data-placement="left" data-trigger="hover">
-          <td>${event.getFormattedDate(event.data_datetime)}</td>
-          <td>${event.getFormattedTime(event.data_datetime)}</td>
-          <td>${event.data_label}</td>
-        </tr>
-  ## FIXME                    <script>
-  ##                      $('.item-with-data-popoverable').popover({ html: true});
-  ##                    </script>
-
+        % if event.is_shared or event.owner_id==current_user.user_id:
+##
+## TODO - D.A. - Sharing groups are not checked here : a shared event is share with everybody
+##
+          <tr class="item-with-data-popoverable" data-content="${event.data_content}" rel="popover" data-placement="left" data-trigger="hover">
+            <td>${event.getFormattedDate(event.data_datetime)}</td>
+            <td>${event.getFormattedTime(event.data_datetime)}</td>
+            <td>${event.data_label}</td>
+          </tr>
+        % endif
       % endfor
     </table>
   % endif
@@ -508,28 +509,36 @@
 ## We do not check specific rights on comment but on document instead
 ## In the future full-API architecture, it should be fixed
 ##
-          <p>
-            <a href="${tg.url('/api/toggle_share_status', dict(node_id=comment.node_id))}">
-              % if comment.is_shared:
-                <span class="label label-warning" title="${_('Shared comment. Click to make private.')}">${h.ICON.Shared|n}</span>
-              % else:
-                <span class="label label-info" title="${_('Private comment. Click to share.')}">${h.ICON.Private|n}</span>
-              % endif
-            </a>
-            <strong>${comment._oOwner.display_name}</strong>
+          <p style="margin-bottom: 1em;">
+            <i class="fa fa-comments-o"></i>
+            <strong class="pod-grey">${comment._oOwner.display_name}</strong>
+
             <i class="pull-right">
-              The ${comment.getFormattedDate(comment.updated_at)} 
-              at ${comment.getFormattedTime(comment.updated_at)}
+              <span class="pod-grey">${_('the')}</span>
+              ${comment.getFormattedDate(comment.updated_at)} 
+              <span class="pod-grey">${_('at')}</span>
+              ${comment.getFormattedTime(comment.updated_at)}
             </i>
             <br/>
+
+            % if comment.owner_id==current_user.user_id:
+              <a class="pull-right" href="${tg.url('/api/toggle_share_status', dict(node_id=comment.node_id))}">
+                % if comment.is_shared:
+                  <span class="label label-warning" title="${_('Shared comment. Click to make private.')}">${h.ICON.Shared|n}</span>
+                % else:
+                  <span class="label label-info" title="${_('Private comment. Click to share.')}">${h.ICON.Private|n}</span>
+                % endif
+              </a>
+            % endif
+
             ${comment.data_content|n}
-            <hr style="border-top: 1px dotted #ccc; margin: 0;"/>
           </p>
         % endif
       % endfor
     </div>
   % endif
 
+  <hr style="border-top: 1px dotted #ccc; margin: 0;"/>
   <form class="form" id="${h.ID.AddCommentInlineForm()}" action="${tg.url('/api/create_comment')}" method="POST">
     <input type="hidden" name='parent_id' value='${poNode.node_id}'/>
     <input type="hidden" name='data_label' value=""/>
