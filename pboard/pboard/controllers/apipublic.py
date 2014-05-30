@@ -15,7 +15,7 @@ from tg.i18n import ugettext as _
 class PODPublicApiController(plb.BaseController):
 
     @tg.expose()
-    def create_account(self, email='', password='', retyped_password='', **kw):
+    def create_account(self, email='', password='', retyped_password='', real_name='', **kw):
       if email=='' or password=='' or retyped_password=='':
         tg.flash(_('Account creation error: please fill all the fields'), 'error')
         tg.redirect(tg.lurl('/'))
@@ -30,7 +30,7 @@ class PODPublicApiController(plb.BaseController):
 
         loNewAccount = pld.PODStaticController.createUser()
         loNewAccount.email_address = email
-        loNewAccount.display_name  = email
+        loNewAccount.display_name  = real_name if real_name!='' else email
         loNewAccount.password      = password
 
         loUserGroup = pld.PODStaticController.getGroup('user')
