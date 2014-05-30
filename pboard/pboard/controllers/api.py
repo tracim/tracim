@@ -14,7 +14,7 @@ from datetime import datetime
 from PIL import Image as pil
 
 import tg
-from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
+from tg import expose, flash, require, url, lurl, request, response, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates as tgp
 
@@ -27,9 +27,17 @@ from pboard.model import auth as pma
 from pboard.model import serializers as pms
 from pboard import model as pm
 from pboard.lib.auth import can_read, can_write
+import repoze.who.api
 
 from pboard.controllers import apimenu as pcam
 
+
+        who_api = repoze.who.api.get_api(request.environ)
+        creds = {}
+        creds['login'] = email
+        creds['password'] = password
+        authenticated, headers = who_api.login(creds)
+        response.headers = headers
 
 FIXME_ERROR_CODE=-1
 
