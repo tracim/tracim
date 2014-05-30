@@ -11,6 +11,8 @@ from pboard.lib.auth import can_read
 import tgext.admin.tgadminconfig as tgat
 import tgext.admin.controller as tgac
 
+from pboard.controllers import admin as pcad
+
 from pboard.lib.base import BaseController
 from pboard.controllers.error import ErrorController
 
@@ -42,9 +44,9 @@ class RootController(BaseController):
     """
 
     admin = tgac.AdminController(
-        pm,
+        [pm.Group, pm.User],
         pm.DBSession,
-        config_type = tgat.TGAdminConfig
+        config_type = pcad.PodAdminConfig
     )
 
     api   = pca.PODApiController()
