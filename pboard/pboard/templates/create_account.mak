@@ -18,5 +18,5 @@
 </div>
 
 <div class="row">
-${POD.SignUpForm('16em')}
+  ${POD.SignUpForm('16em')}
 </div>

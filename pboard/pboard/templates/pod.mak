@@ -77,10 +77,10 @@
 </%def>
 
 <%def name='SignUpForm(psCssMinHeight="1em")'>
-  <div class="span3">
+  <div class="span3 offset4">
     <form class="well" method="POST" style="min-height: ${psCssMinHeight};" action="${tg.url('/public_api/create_account')}">
       <fieldset>
-        <legend>Want to try?</legend>
+        <legend>${_('Create an account')}</legend>
         <input type="text"     name="email"            id="email" placeholder="Email"><br/>
         <input type="password" name="password"         id="password" placeholder="Password"><br/>
         <input type="password" name="retyped_password" id="retyped_password" placeholder="Retype your password"><br/>
