@@ -23,11 +23,16 @@ from pboard import model as pm
 
 class GroupRegistrationForm(sform.AddRecordForm):
     __model__ = pma.Group
-    __require_fields__     = ['group_name', 'display_name', 'users']
-    __omit_fields__        = ['personnal_group', 'created', 'permissions', '_lRights']
-    __field_order__        = ['group_name', 'display_name']
+    __require_fields__     = ['group_name', 'display_name', 'users', 'personnal_group']
+    __omit_fields__        = ['created', 'permissions', '_lRights']
+    __field_order__        = ['group_name', 'display_name', 'users']
 
     __headers__ = dict(group_name='Unique name', display_name='Visible name')
+
+    group_name = tw2f.TextField('group_name')
+    display_name = tw2f.TextField('display_name', place_holder='agaga')
+    display_name = tw2f.TextField('display_name', place_holder='agaga')
+    personnal_group = tw2f.HiddenField('personnal_group', value='off')
 
 class GroupEditForm(sform.EditableForm):
     __model__ = pma.Group
