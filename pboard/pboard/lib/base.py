@@ -6,7 +6,6 @@ from tg import TGController, tmpl_context, flash
 from tg.render import render
 from tg import request, redirect
 from tg.i18n import ugettext as _, ungettext
-import pboard.model as model
 
 __all__ = ['BaseController']
 

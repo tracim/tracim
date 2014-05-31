@@ -23,6 +23,7 @@ from tg.i18n import ugettext as _, lazy_ugettext as l_
 import tg
 from pboard.model import DeclarativeBase, metadata, DBSession
 from pboard.model import auth as pma
+from pboard.lib.base import current_user
 
 
 class PBNodeStatusItem(object):
@@ -201,9 +202,13 @@ class PBNode(DeclarativeBase):
   def getChildrenOfType(self, plNodeTypeList, poKeySortingMethod=None, pbDoReverseSorting=False):
     """return all children nodes of type 'data' or 'node' or 'folder'"""
     llChildren = []
-    for child in self._lAllChildren:
-      if child.node_type in plNodeTypeList:
-        llChildren.append(child)
+    user_id = current_user().user_id
+    llChildren = DBSession.query(PBNode).outerjoin(pma.Rights)\
+            .outerjoin(pma.user_group_table, pma.Rights.group_id==pma.user_group_table.columns['group_id'])\
+            .filter(PBNode.parent_id==self.node_id)\
+            .filter((PBNode.owner_id==user_id) | ((pma.user_group_table.c.user_id==user_id) & (PBNode.is_shared == True)))\
+            .filter(PBNode.node_type.in_(plNodeTypeList))\
+            .all()
     if poKeySortingMethod!=None:
       llChildren = sorted(llChildren, key=poKeySortingMethod, reverse=pbDoReverseSorting)
     return llChildren
