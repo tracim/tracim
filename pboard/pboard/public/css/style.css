@@ -192,3 +192,7 @@ div.search-result-item > h5 {
 
 ul.nav-tabs li.active > a { background-color: #efefef; }
 div.tab-pane > h4 { background-color: #efefef; padding: 0.5em; margin: 0 0 0.5em 0;}
+
+/* Admin form select */
+
+#sx_users { height: 250px; }
