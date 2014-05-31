@@ -19,6 +19,7 @@ from pboard.lib import dbapi as pld
 
 class AdminGroupController(CrudRestController):
     model = pma.Group
+    substring_filters = True
 
     class new_form_type(AddRecordForm):
         __model__ = pma.Group

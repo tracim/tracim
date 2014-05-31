@@ -39,6 +39,7 @@ class GroupField(PropertyMultipleSelectField):
 
 class AdminUserController(CrudRestController):
     model = pma.User
+    substring_filters = True
 
     class new_form_type(AddRecordForm):
         __model__ = pma.User
@@ -101,12 +102,17 @@ class AdminUserController(CrudRestController):
         return tg.redirect('./', params=self._kept_params())
 
 
+    """
     @tg.expose()
     def post_delete(self, *args, **kw):
         user_id = int(args[0])
 
         pld.PODStaticController.deleteUser(user_id)
         return tg.redirect('./', params=self._kept_params())
+    """
+
+    def post_delete(self, *args, **kw):
+        pass
 
     @tg.expose()
     def put(self, *args, **kw):
