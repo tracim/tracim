@@ -20,12 +20,19 @@ from pboard.lib import dbapi as pld
 from pboard.controllers import api as pca
 from pboard.controllers import apipublic as pcap
 from pboard.controllers import debug as pbcd
+from pboard.controllers import adminuser as pbcu
+from pboard.controllers import admingroup as pbcg
 
 from pboard import model as pm
 
 import pboard.model.data as pbmd
 
 __all__ = ['RootController']
+
+
+class AdminController(BaseController):
+    users = pbcu.AdminUserController(pm.DBSession)
+    groups = pbcg.AdminGroupController(pm.DBSession)
 
 
 class RootController(BaseController):
@@ -43,11 +50,7 @@ class RootController(BaseController):
 
     """
 
-    admin = tgac.AdminController(
-        [pm.Group, pm.User],
-        pm.DBSession,
-        config_type = pcad.PodAdminConfig
-    )
+    admin = AdminController()
 
     api   = pca.PODApiController()
     debug = pbcd.DebugController()

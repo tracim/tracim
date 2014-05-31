@@ -62,6 +62,8 @@ class Rights(DeclarativeBase):
 
 
 class Group(DeclarativeBase):
+    GROUP_ID_ALL_USERS = 2
+    GROUP_ID_MANAGERS = 1
 
     __tablename__ = 'pod_group'
 

@@ -17,93 +17,55 @@ from formencode.validators import FieldsMatch
 
 from pboard.lib import dbapi as pld
 
-class GroupField(PropertyMultipleSelectField):
-    """ Shows a limited list of groups """
-
-    def prepare(self):
-        # self.entity = pma.Group
-        #self.__class__.entity
-
-        visible_groups = pm.DBSession.query(pma.Group).\
-            filter(pma.Group.group_id>0).\
-            filter(pma.Group.group_id!=pma.Group.GROUP_ID_ALL_USERS).all()
-
-        self.options = [(group.group_id, group.getDisplayName()) for group in visible_groups]
-
-        if not self.value:
-            self.value = []
-        self.value = [unicode_text(v) for v in self.value]
-
-        super(PropertyMultipleSelectField, self).prepare()
-
-
-class AdminUserController(CrudRestController):
-    model = pma.User
+class AdminGroupController(CrudRestController):
+    model = pma.Group
 
     class new_form_type(AddRecordForm):
-        __model__ = pma.User
+        __model__ = pma.Group
+        __require_fields__     = ['group_name', 'display_name', 'users', 'personnal_group']
+        __omit_fields__        = ['created', 'permissions', '_lRights']
+        __field_order__        = ['group_name', 'display_name', 'users']
 
-        __require_fields__     = ['display_name', 'email_address', 'password', 'verify_password', 'groups']
-        __omit_fields__        = ['_password', 'created', 'user_id', '_lAllNodes']
-        __field_order__        = ['display_name', 'email_address', 'password', 'verify_password', 'groups']
+        __headers__ = dict(group_name='Unique name', display_name='Visible name')
 
-        email_address          = tw2f.TextField('email_address')
-        display_name           = tw2f.TextField('display_name')
-        verify_password        = tw2f.PasswordField('verify_password')
-        groups = GroupField('groups')
+        group_name = tw2f.TextField('group_name')
+        display_name = tw2f.TextField('display_name')
+        personnal_group = tw2f.HiddenField('personnal_group', value='off')
+
 
     class edit_form_type(EditableForm):
-        __model__ = pma.User
+        __model__ = pma.Group
+        __require_fields__     = ['group_name', 'display_name', 'users']
+        __omit_fields__        = ['personnal_group', 'created', 'permissions', '_lRights']
+        __field_order__        = ['group_name', 'display_name']
 
-        __require_fields__     = ['display_name', 'email_address', 'groups']
-        __omit_fields__        = ['_password', 'created', 'user_id', '_lAllNodes', 'password']
-        __field_order__        = ['display_name', 'email_address', 'groups']
+        __headers__ = dict(group_name='Unique name', display_name='Visible name')
 
-        email_address          = tw2f.TextField('email_address')
-        display_name           = tw2f.TextField('display_name')
-        groups = GroupField('groups')
 
     class edit_filler_type(EditFormFiller):
-        __model__ = pma.User
+        __model__ = pma.Group
+
 
     class table_type(TableBase):
-        __model__ = pma.User
-        __limit_fields__ = ['user_id', 'email_address', 'display_name', 'groups']
-        __field_order__ = ['user_id', 'display_name', 'email_address', 'groups']
-        __headers__ = dict(user_id='id', email_address='Email', display_name='Name', groups='Groups')
-        __xml_fields__ = ['groups']
+        __model__ = pma.Group
+        __limit_fields__ = ['group_id', 'group_name', 'display_name', 'users']
+        __headers__ = dict(group_id='id', group_name='Unique name', display_name='Visible name', users='Users')
+        __xml_fields__ = ['users']
+
 
     class table_filler_type(TableFiller):
-        __model__ = pma.User
-        __limit_fields__ = ['user_id', 'email_address', 'display_name', 'groups']
+        __model__ = pma.Group
+        __limit_fields__ = ['group_id', 'group_name', 'display_name', 'users']
+        #__add_fields__ = {'associated_users':None}
 
-        def groups(self, obj):
-            groups = ''.join(['<li>{0}</li>'.format(group.getDisplayName()) for group in obj.groups if group.group_id>0])
-            return groups.join(('<ul>', '</ul>'))
+        def _do_get_provider_count_and_objs(self, groups=None, **kw):
+            groups = pm.DBSession.query(pma.Group).\
+                filter(pma.Group.group_id>0).\
+                filter(pma.Group.group_id != pma.Group.GROUP_ID_ALL_USERS).\
+                filter(pma.Group.group_id != pma.Group.GROUP_ID_MANAGERS).\
+                all()
+            return len(groups), groups
 
-    @tg.expose()
-    #@tg.validate(new_user_validator, error_handler=CrudRestController.new)
-    def post(self, *args, **kw):
-
-        real_name = kw['display_name']
-        email = kw['email_address']
-        groups = kw['groups'] if 'groups' in kw else []
-        password = kw['password']
-
-        new_user = pld.PODStaticController.createNewUser(real_name, email, password, groups)
-        if tg.request.response_type == 'application/json':
-            if new_user is not None and self.conditional_update_field is not None:
-                tg.response.last_modified = getattr(new_user, self.conditional_update_field)
-
-            return dict(model=self.model.__name__,
-                        value=self._dictify(new_user))
-
-        return tg.redirect('./', params=self._kept_params())
-
-
-    @tg.expose()
-    def post_delete(self, *args, **kw):
-        user_id = int(args[0])
-
-        pld.PODStaticController.deleteUser(user_id)
-        return tg.redirect('./', params=self._kept_params())
+        def users(self, obj):
+            users = ''.join(['<li>{0}</li>'.format(user.getDisplayName()) for user in obj.users])
+            return users.join(('<ul>', '</ul>'))

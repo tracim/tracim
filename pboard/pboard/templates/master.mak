@@ -155,8 +155,8 @@
                 Admin <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="${tg.url('/admin/users')}"><i class="fa fa-user"></i> ${_('List users')}</a></li>
-                <li><a href="${tg.url('/admin/groups')}"><i class="fa fa-group"></i> ${_('Manage groups')}</a></li>
+                <li><a href="${tg.url('/admin/users')}"><i class="fa fa-user"></i> ${_('Users')}</a></li>
+                <li><a href="${tg.url('/admin/groups')}"><i class="fa fa-group"></i> ${_('Groups')}</a></li>
                 % if request.identity and 'managers' in request.identity['groups']:
                   <li class="divider" role="presentation"></li>
                   <li><a href="${tg.url('/admin')}"><i class="fa fa-magic"></i> Manage all</a></li>

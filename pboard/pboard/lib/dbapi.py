@@ -12,7 +12,6 @@ from sqlalchemy.orm import joinedload_all
 import sqlalchemy.orm as sqlao
 import sqlalchemy as sqla
 
-from pboard.model import DeclarativeBase, metadata, DBSession
 from pboard.model import data as pbmd
 from pboard.model import auth as pbma
 import pboard.model as pbm
@@ -34,14 +33,91 @@ class PODStaticController(object):
     return loUser
   
   @classmethod
-  def createUser(cls):
+  def createNewUser(cls, real_name, email_address, password, groups):
     loUser = pbma.User()
-    return loUser
-  
+    new_user = pbma.User()
+    new_user.email_address = email_address
+    new_user.display_name  = real_name if real_name!='' else email_address
+    new_user.password      = password
+
+    public_group = cls.getGroupById(pbma.Group.GROUP_ID_ALL_USERS)
+    public_group.users.append(new_user)
+
+    pbm.DBSession.add(new_user)
+    pbm.DBSession.flush()
+    pbm.DBSession.refresh(new_user)
+
+    user_dedicated_group = cls.createGroup()
+    user_dedicated_group.group_id = 0-new_user.user_id # group id of a given user is the opposite of the user id
+    user_dedicated_group.group_name = 'user_%d' % new_user.user_id
+    user_dedicated_group.personnal_group = True
+    user_dedicated_group.users.append(new_user)
+
+    for group_id in groups:
+        selected_group = cls.getGroupById(group_id)
+        selected_group.users.append(new_user)
+
+    pbm.DBSession.flush()
+
+    return new_user
+
+  @classmethod
+  def updateUser(cls, user_id, real_name, email, group_ids):
+
+      group_ids = list(map(int, group_ids))
+      group_ids.append(pbma.Group.GROUP_ID_ALL_USERS)
+      print('new group ids:', group_ids)
+      user_to_update = pbm.DBSession.query(pbma.User).filter(pbma.User.user_id==user_id).one()
+      user_to_update.display_name = real_name
+      user_to_update.email_address = email
+
+      merged_new_groups = []
+
+      for group in user_to_update.groups:
+          if group.group_id==pbma.Group.GROUP_ID_MANAGERS:
+              print('adding group (3)', group.group_id)
+              merged_new_groups.append(group)
+
+          elif group.group_id==pbma.Group.GROUP_ID_ALL_USERS:
+              print('adding group (2)', group.group_id)
+              merged_new_groups.append(group)
+
+          elif group.group_id in group_ids:
+              print('adding group', group.group_id)
+              merged_new_groups.append(group)
+
+          else:
+              print('remove group', group.group_id)
+              user_to_update.groups.remove(group)
+
+      for group_id in group_ids:
+          group = cls.getGroupById(group_id)
+
+          if group not in merged_new_groups:
+              merged_new_groups.append(group)
+
+      user_to_update.groups = merged_new_groups
+
+      for group in merged_new_groups:
+          print("group => ", group.group_id)
+      pbm.DBSession.flush()
+
+  @classmethod
+  def deleteUser(cls, user_id):
+      user_to_delete = pbm.DBSession.query(pbma.User).filter(pbma.User.user_id==user_id).one()
+      user_dedicated_group = pbm.DBSession.query(pbma.Group).filter(pbma.Group.group_id==-user_id).one()
+      pbm.DBSession.delete(user_to_delete)
+      pbm.DBSession.delete(user_dedicated_group)
+      pbm.DBSession.flush()
+
   @classmethod
   def getGroup(cls, psGroupName):
     loGroup = pbma.Group.by_group_name(psGroupName)
     return loGroup
+
+  @classmethod
+  def getGroupById(cls, group_id):
+    return pbm.DBSession.query(pbma.Group).filter(pbma.Group.group_id==group_id).one()
 
   @classmethod
   def createGroup(cls):
@@ -56,7 +132,7 @@ class PODStaticController(object):
   @classmethod
   def getRealGroupRightsOnNode(cls, piNodeId: int) -> pbmd.DIRTY_GroupRightsOnNode:
 
-    groupRightsOnNodeCustomSelect = DBSession\
+    groupRightsOnNodeCustomSelect = pbm.DBSession\
         .query(pbmd.DIRTY_GroupRightsOnNode)\
         .from_statement(pbmd.DIRTY_RealGroupRightOnNodeSqlQuery)\
         .params(node_id=piNodeId)\
@@ -67,7 +143,7 @@ class PODStaticController(object):
   @classmethod
   def getUserDedicatedGroupRightsOnNode(cls, piNodeId: int) -> pbmd.DIRTY_GroupRightsOnNode:
 
-    groupRightsOnNodeCustomSelect = DBSession\
+    groupRightsOnNodeCustomSelect = pbm.DBSession\
         .query(pbmd.DIRTY_GroupRightsOnNode)\
         .from_statement(pbmd.DIRTY_UserDedicatedGroupRightOnNodeSqlQuery)\
         .params(node_id=piNodeId)\
@@ -101,10 +177,10 @@ class PODUserFilteredApiController(object):
         loNode.parent_id = parent_id
 
     if inherit_rights:
-        parent_node = DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==parent_id).one()
+        parent_node = pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.node_id==parent_id).one()
         self.copy_rights(parent_node, loNode)
 
-    DBSession.add(loNode)
+    pbm.DBSession.add(loNode)
 
     return loNode
 
@@ -144,7 +220,7 @@ class PODUserFilteredApiController(object):
     lsNodeIdFiltering = lsSqlSelectQuery % (str(self._iCurrentUserId))
 
     if liNodeId!=None and liNodeId!=0:
-      return DBSession.query(pbmd.PBNode).options(sqlao.joinedload_all("_oParent"), sqlao.joinedload_all("_lAllChildren"))\
+      return pbm.DBSession.query(pbmd.PBNode).options(sqlao.joinedload_all("_oParent"), sqlao.joinedload_all("_lAllChildren"))\
         .filter(pbmd.PBNode.node_id==liNodeId)\
         .filter(
           sqla.or_(
@@ -160,7 +236,7 @@ class PODUserFilteredApiController(object):
     Returns a list of nodes order by modification time and limited to piMaxNodeNb nodes
     """
     liOwnerIdList = self._getUserIdListForFiltering()
-    return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
+    return pbm.DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
 
 
   def getListOfAllowedNodes(self, reset_cache=False) -> pbmd.PBNode:
@@ -224,7 +300,7 @@ class PODUserFilteredApiController(object):
             ORDER BY node_id ASC
         """
 
-        loNodeListResult = DBSession.query(pbmd.PBNode).\
+        loNodeListResult = pbm.DBSession.query(pbmd.PBNode).\
             from_statement(lsSqlQuery).\
             params(owner_id=self._iCurrentUserId)
         allowed_nodes = loNodeListResult.all()
@@ -248,7 +324,7 @@ class PODUserFilteredApiController(object):
 
     loKeywordFilteringClausesAsOr = sqla.or_(*loKeywordFilteringClauses) # Combine them with or to a BooleanClauseList
 
-    loResultsForSomeKeywords = DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).join(pbma.Rights).join(pbma.user_group_table, pbma.Rights.group_id==pbma.user_group_table.columns['group_id'])\
+    loResultsForSomeKeywords = pbm.DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).join(pbma.Rights).join(pbma.user_group_table, pbma.Rights.group_id==pbma.user_group_table.columns['group_id'])\
         .filter(loKeywordFilteringClausesAsOr)\
         .filter((pbmd.PBNode.owner_id.in_(liOwnerIdList)) | (pbma.user_group_table.c.user_id.in_(liOwnerIdList) & pbmd.PBNode.is_shared))\
         .order_by(sqla.desc(pbmd.PBNode.node_type))\
@@ -259,7 +335,7 @@ class PODUserFilteredApiController(object):
 
   def getNodesByStatus(self, psNodeStatus, piMaxNodeNb=5):
     liOwnerIdList = self._getUserIdListForFiltering()
-    return DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_status==psNodeStatus).order_by(pbmd.PBNode.updated_at).limit(piMaxNodeNb).all()
+    return pbm.DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_status==psNodeStatus).order_by(pbmd.PBNode.updated_at).limit(piMaxNodeNb).all()
 
 
   def getChildNodesForMenu(self, poParentNode: pbmd.PBNode, allowed_nodes: [pbmd.PBNode]) -> [pbmd.PBNode]:
@@ -275,7 +351,7 @@ class PODUserFilteredApiController(object):
             visible_child_nodes.append(child_node)
     else:
         # Root case
-        parent_nodes = DBSession
+        parent_nodes = pbm.DBSession
         for allowed_node in allowed_nodes:
             print("     @@@@@@@@@@@@@@@@ BEFORE @@@@@@@@@@@@@@@@ ")
             # loParent = allowed_node._oParent
@@ -410,15 +486,15 @@ class PODUserFilteredApiController(object):
 
   def getParentNode(self, loNode):
     liOwnerIdList = self._getUserIdListForFiltering()
-    return DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_id==loNode.parent_id).one()
+    return pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_id==loNode.parent_id).one()
 
   def getSiblingNodes(self, poNode, pbReverseOrder=False):
     liOwnerIdList = self._getUserIdListForFiltering()
     
     if pbReverseOrder:
-      return DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.parent_id==poNode.parent_id).order_by(pbmd.PBNode.node_order.desc()).all()
+      return pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.parent_id==poNode.parent_id).order_by(pbmd.PBNode.node_order.desc()).all()
     else:
-      return DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.parent_id==poNode.parent_id).order_by(pbmd.PBNode.node_order).all()
+      return pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.parent_id==poNode.parent_id).order_by(pbmd.PBNode.node_order).all()
 
   def resetNodeOrderOfSiblingNodes(self, loSiblingNodes):
     liNewWeight = 0
@@ -470,11 +546,11 @@ class PODUserFilteredApiController(object):
 
   def getNodeFileContent(self, liNodeId):
     liOwnerIdList = self._getUserIdListForFiltering()
-    return DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_id==liNodeId).one().data_file_content
+    return pbm.DBSession.query(pbmd.PBNode).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).filter(pbmd.PBNode.node_id==liNodeId).one().data_file_content
 
   def deleteNode(loNode):
     # INFO - D.A. - 2013-11-07 - should be save as getNode should return only accessible nodes
-    DBSession.delete(loNode)
+    pbm.DBSession.delete(loNode)
     return
 
   def createRight(self):

@@ -28,26 +28,7 @@ class PODPublicApiController(plb.BaseController):
           tg.flash(_('Account creation error: account already exist: %s') % (email), 'error')
           tg.redirect(tg.lurl('/'))
 
-        loNewAccount = pld.PODStaticController.createUser()
-        loNewAccount.email_address = email
-        loNewAccount.display_name  = real_name if real_name!='' else email
-        loNewAccount.password      = password
-
-        loUserGroup = pld.PODStaticController.getGroup('user')
-        loUserGroup.users.append(loNewAccount)
-
-        pm.DBSession.add(loNewAccount)
-        pm.DBSession.flush()
-        pm.DBSession.refresh(loNewAccount)
-
-        loUserSpecificGroup = pld.PODStaticController.createGroup()
-
-        loUserSpecificGroup.group_id = 0-loNewAccount.user_id # group id of a given user is the opposite of the user id
-        loUserSpecificGroup.group_name = 'user_%d' % loNewAccount.user_id
-        loUserSpecificGroup.personnal_group = True
-        loUserSpecificGroup.users.append(loNewAccount)
-
-        pm.DBSession.flush()
+        loNewAccount = pld.PODStaticController.createNewUser(real_name if real_name!='' else email, email, password, [])
 
         tg.flash(_('Account successfully created: %s') % (email), 'info')
 
