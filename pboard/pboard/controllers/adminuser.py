@@ -111,8 +111,6 @@ class AdminUserController(CrudRestController):
     @tg.expose()
     def put(self, *args, **kw):
         """update"""
-        print ("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-        print(kw)
 
         user_id = kw['user_id']
         real_name = kw['display_name']
@@ -121,39 +119,4 @@ class AdminUserController(CrudRestController):
 
         updated_user = pld.PODStaticController.updateUser(user_id, real_name, email, groups)
 
-        return
-
-        omit_fields = []
-        if getattr(self, 'edit_form', None):
-            omit_fields.extend(self.edit_form.__omit_fields__)
-
-        for remembered_value in self.remember_values:
-            value = kw.get(remembered_value)
-            if value is None or value == '':
-                omit_fields.append(remembered_value)
-
-        obj = self.provider.get_obj(self.model, kw)
-
-        #This should actually by done by provider.update to make it atomic
-        can_modify = True
-        if obj is not None and self.conditional_update_field is not None and \
-           tg.request.if_unmodified_since is not None and \
-           tg.request.if_unmodified_since < getattr(obj, self.conditional_update_field):
-                can_modify = False
-
-        if obj is not None and can_modify:
-            obj = self.provider.update(self.model, params=kw, omit_fields=omit_fields)
-
-        if tg.request.response_type == 'application/json':
-            if obj is None:
-                tg.response.status_code = 404
-            elif can_modify is False:
-                tg.response.status_code = 412
-            elif self.conditional_update_field is not None:
-                tg.response.last_modified = getattr(obj, self.conditional_update_field)
-
-            return dict(model=self.model.__name__,
-                        value=self._dictify(obj))
-
-        pks = self.provider.get_primary_fields(self.model)
-        return redirect('../' * len(pks), params=self._kept_params())
+        return tg.redirect('../', params=self._kept_params())
