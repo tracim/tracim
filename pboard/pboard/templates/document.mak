@@ -60,6 +60,14 @@
     % endif
 </%def>
 
+<%def name='toggle_view_mode()'>
+            <li title=" ${_('Toggle view mode [narrow, medium, large]')}">
+              <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' class="pod-do-not-display"><i class='fa fa-eye'></i></a>
+              <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='fa fa-eye'></i></a>
+              <a title="${_('Toggle view mode: large')}"  id='view-size-toggle-button-large' class="pod-do-not-display"><i class='fa fa-eye'></i></a>
+            </li>
+</%def>
+
 #######
 ##
 ## HERE COMES THE BREADCRUMB

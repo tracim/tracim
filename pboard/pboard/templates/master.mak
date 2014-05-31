@@ -91,12 +91,7 @@
             <li>
               <a href="${tg.url('/document')}"><i class="fa fa-file-text-o"></i> ${_('Documents')}</a>
             </li>
-
-            <li title=" ${_('Toggle view mode [narrow, medium, large]')}">
-              <a title="${_('Toggle view mode: narrow')}" id='view-size-toggle-button-small' class="pod-do-not-display"><i class='fa fa-eye'></i></a>
-              <a title="${_('Toggle view mode: medium')}" id='view-size-toggle-button-medium'><i class='fa fa-eye'></i></a>
-              <a title="${_('Toggle view mode: large')}"  id='view-size-toggle-button-large' class="pod-do-not-display"><i class='fa fa-eye'></i></a>
-            </li>
+${self.toggle_view_mode()}
 
 ##            <li class="dropdown" title="Calculator">
 ##              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-g-calculator"></i></a>
@@ -215,6 +210,9 @@
       </div><!-- /.container -->
     </div><!-- /.navbar-inner -->
   </div><!-- /.navbar -->
+</%def>
+
+<%def name='toggle_view_mode()'>
 </%def>
 
 
