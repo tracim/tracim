@@ -363,6 +363,9 @@ class PBNode(DeclarativeBase):
     if liMaxLength>0 and len(lsTruncatedLabel)>liMaxLength:
       lsTruncatedLabel = lsTruncatedLabel[0:liMaxLength-1]+'…'
 
+    if lsTruncatedLabel=='':
+        lsTruncatedLabel = _('Titleless Document')
+
     return lsTruncatedLabel
 
   def getTruncatedContentAsText(self, piCharNb):
