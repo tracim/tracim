@@ -146,14 +146,22 @@ class RootController(BaseController):
         except Exception as e:
           flash(_('Document not found'), 'error')
 
+        user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(node_id)
+
+        current_user_rights = None
+        for right in user_specific_group_rights:
+            if right.group_id == -loCurrentUser.user_id:
+                current_user_rights = right
+
         return dict(
             current_user=loCurrentUser,
             current_node=loCurrentNode,
             allowed_nodes=llAccessibleNodes,
             node_status_list = loNodeStatusList,
             keywords = highlight,
-            user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(node_id),
-            real_group_rights = pld.PODStaticController.getRealGroupRightsOnNode(node_id)
+            user_specific_group_rights = user_specific_group_rights,
+            real_group_rights = pld.PODStaticController.getRealGroupRightsOnNode(node_id),
+            current_user_rights = current_user_rights
         )
 
     @expose('pboard.templates.search')
