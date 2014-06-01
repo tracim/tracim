@@ -413,7 +413,10 @@
         <p style="list-style-type:none;">
           <i class="fa-fw ${subnode.getIconClass()}"></i>
             <a href="${tg.url('/document/%i'%subnode.node_id)}">
-              ${subnode.data_label}
+              ${subnode.data_label}<i class="${subnode.getIconClass()}"></i>
+            ${subnode.data_label}
+            <span class="label ${subnode.getStatus().css} pull-right" title="${subnode.getStatus().label}">
+              <i class="${subnode.getStatus().icon}"></i>
             </a>
         </p>
       % endfor
