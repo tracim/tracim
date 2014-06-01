@@ -236,7 +236,13 @@ class PODUserFilteredApiController(object):
     Returns a list of nodes order by modification time and limited to piMaxNodeNb nodes
     """
     liOwnerIdList = self._getUserIdListForFiltering()
-    return pbm.DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).filter(pbmd.PBNode.owner_id.in_(liOwnerIdList)).order_by(pbmd.PBNode.updated_at.desc()).limit(piMaxNodeNb).all()
+    return pbm.DBSession.query(pbmd.PBNode)\
+        .outerjoin(pbma.Rights)\
+        .outerjoin(pbma.user_group_table, pbma.Rights.group_id==pbma.user_group_table.columns['group_id'])\
+        .options(joinedload_all("_lAllChildren"))\
+        .filter((pbmd.PBNode.owner_id.in_(liOwnerIdList)) | ((pbma.user_group_table.c.user_id.in_(liOwnerIdList)) & (pbmd.PBNode.is_shared == True)))\
+        .order_by(pbmd.PBNode.updated_at.desc())\
+        .limit(piMaxNodeNb).all()
 
 
   def getListOfAllowedNodes(self, reset_cache=False) -> pbmd.PBNode:
