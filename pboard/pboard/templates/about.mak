@@ -40,13 +40,8 @@
               <i class="pod-blue fa fa-desktop"></i>
                , tablets <i class="pod-blue fa fa-tablet"></i> and mobile phones <i class="pod-blue fa fa-mobile-phone"></i>
             </p>
-            <p class="text-right">
-              <strong class="pod-blue"> Give it a try!</strong>
-              <i class="fa fa-2x fa-arrow-right" style="vertical-align: middle;"></i>
-            </p>
           </div>
         </div>
-        ${POD.SignUpForm('17em')}
       </div>
     </div>
   </div>
