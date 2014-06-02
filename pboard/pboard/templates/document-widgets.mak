@@ -40,12 +40,15 @@
 </%def>
 
         
-<%def name="Toolbar(poNode, plNodeStatusList, plRootNodes, psDivId)">
+<%def name="Toolbar(poNode, plNodeStatusList, plRootNodes, psDivId, user_rights, user)">
   <div id="${psDivId}">
+
+##
+## TOOLBAR ITEMS ARE SHOWN ACCORDING TO THE R/W PERMISSIONS GRANTED TO THE USER
+##
+% if user.user_id==poNode.owner_id or (user_rights and user_rights.hasWriteAccess()):
     <div class="btn-group">
-	% if current_user_rights and current_user_rights.hasWriteAccess():
       ${POD.EditButton('current-document-content-edit-button', True)}
-	% endif
 
       <button class="btn btn-small"  data-toggle="dropdown" href="#"> 
         <i class="fa  fa-signal"></i>
@@ -75,7 +78,8 @@
       % endfor
       </ul>
     </div>
-    
+% endif
+
     <div class="btn-group">
       <button class="btn btn-small btn-success"  data-toggle="dropdown" href="#">
         <i class="fa fa-plus"></i> ${_('Add')}
@@ -106,7 +110,7 @@
         <li><p class="pod-grey"><i class="fa fa-danger"></i> coming soon!</p></li>
       </ul>
     </div>
-
+% if user.user_id==poNode.owner_id or (user_rights and user_rights.hasWriteAccess()):
     <div class="btn-group pull-right">
       <button class="btn btn-small btn-link"  data-toggle="dropdown" href="#">
         ${_('more ...')}
@@ -121,9 +125,9 @@
 ##
         ${ToolbarMenuItemModal(h.ID.MoveDocumentModalForm(current_node), 'fa fa-arrows', _('Move'), 'btn-warning')}
         ${ToolbarMenuItemLink(tg.url('/api/edit_status', dict(node_id=poNode.node_id, node_status='deleted')), 'fa fa-trash-o', _('Delete'), 'btn-danger', _('Delete the current document'), 'return confirm(\'{0}\');'.format('Delete current document?'))}
-
       </ul>
     </div>
+% endif
   </div>
 </%def>
 

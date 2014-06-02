@@ -141,7 +141,7 @@ class RootController(BaseController):
         except Exception as e:
           flash(_('Document not found'), 'error')
 
-        user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(node_id)
+        user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(loCurrentNode)
 
         current_user_rights = None
         for right in user_specific_group_rights:

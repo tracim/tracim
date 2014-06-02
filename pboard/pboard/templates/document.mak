@@ -130,7 +130,10 @@
             nodes = $('#mypodtree .jstree-node');
             console.log("nodes = "+nodes.length);
             if (nodes.length<=0) {
-              $("#mypodtree").append( "<p class='pod-grey'>${_('There is no content yet.')|n}</p>" );
+              $("#mypodtree").append( "<p class='pod-grey'>${_('There is no content yet.')|n}" );
+              $("#mypodtree").append( "<p><a class=\"btn btn-success\" data-toggle=\"modal\" role=\"button\" href=\"#add-document-modal-form\"><i class=\"fa fa-plus\"></i> ${_('Create a topic')}</a></p>" );
+              
+              
             }
           });
         });
@@ -157,7 +160,7 @@
             ##
             ## The Toolbar is a div with a specific id
             ##
-            ${DOC.Toolbar(current_node, node_status_list, root_node_list_for_select_field, 'current-document-toobar')}
+            ${DOC.Toolbar(current_node, node_status_list, root_node_list_for_select_field, 'current-document-toobar', current_user_rights, current_user)}
             ${DOC.ShowTitle(current_node, keywords, 'current-document-title')}
             ${DOC.ShowContent(current_node, keywords)}
           </div>
@@ -196,7 +199,7 @@
               <div class="tab-pane active" id="comments">${DOCTABS.CommentTabContent(current_user, current_node)}</div>
               <div class="tab-pane" id="files">${DOCTABS.FileTabContent(current_node)}</div>
               <div class="tab-pane" id="history">${DOCTABS.HistoryTabContent(current_node)}</div>
-              <div class="tab-pane" id="accessmanagement">${DOCTABS.AccessManagementTab(current_node)}</div>
+              <div class="tab-pane" id="accessmanagement">${DOCTABS.AccessManagementTab(current_node, current_user_rights, current_user)}</div>
             </div>
           </div>
         </div>

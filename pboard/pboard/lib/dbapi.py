@@ -141,15 +141,17 @@ class PODStaticController(object):
     return groupRightsOnNodeCustomSelect
 
   @classmethod
-  def getUserDedicatedGroupRightsOnNode(cls, piNodeId: int) -> pbmd.DIRTY_GroupRightsOnNode:
+  def getUserDedicatedGroupRightsOnNode(cls, node: pbmd.PBNode) -> pbmd.DIRTY_GroupRightsOnNode:
 
-    groupRightsOnNodeCustomSelect = pbm.DBSession\
-        .query(pbmd.DIRTY_GroupRightsOnNode)\
-        .from_statement(pbmd.DIRTY_UserDedicatedGroupRightOnNodeSqlQuery)\
-        .params(node_id=piNodeId)\
-        .all()
+    group_rights_on_node = []
+    if node:
+        group_rights_on_node = pbm.DBSession\
+            .query(pbmd.DIRTY_GroupRightsOnNode)\
+            .from_statement(pbmd.DIRTY_UserDedicatedGroupRightOnNodeSqlQuery)\
+            .params(node_id=node.node_id)\
+            .all()
 
-    return groupRightsOnNodeCustomSelect
+    return group_rights_on_node
 
 
 

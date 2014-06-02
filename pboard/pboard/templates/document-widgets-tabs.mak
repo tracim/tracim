@@ -11,7 +11,7 @@
   </ul>
 </%def>
 
-<%def name="AccessManagementTab(poNode)">
+<%def name="AccessManagementTab(poNode, user_rights, user)">
   ######
   ##
   ## THIS WIDGET IS INTENDED TO BE USED ONE TIME ONLY IN A PAGE
@@ -87,11 +87,13 @@
 ##    % endif
 ##  </p>
   <!-- Button to trigger modal -->
+% if user.user_id==poNode.owner_id or (user_rights and user_rights.hasWriteAccess()):
   <a href="#edit-document-share-properties" role="button" class="btn btn-success" data-toggle="modal">
     <i class="fa fa-edit"></i>
     ${_('Edit share options')}
   </a>
-     
+% endif
+
   <!-- Modal -->
   <div
     id="edit-document-share-properties"
@@ -413,7 +415,6 @@
         <p style="list-style-type:none;">
           <i class="fa-fw ${subnode.getIconClass()}"></i>
             <a href="${tg.url('/document/%i'%subnode.node_id)}">
-              ${subnode.data_label}<i class="${subnode.getIconClass()}"></i>
             ${subnode.data_label}
             <span class="label ${subnode.getStatus().css} pull-right" title="${subnode.getStatus().label}">
               <i class="${subnode.getStatus().icon}"></i>
