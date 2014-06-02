@@ -6,6 +6,7 @@
 from markupsafe import Markup
 from datetime import datetime
 from tg.i18n import ugettext as _, lazy_ugettext as l_
+import tg
 
 def current_year():
   now = datetime.now()
@@ -84,3 +85,11 @@ class ICON(object):
   Shared = '<i class="fa fa-group"></i>'
   Private = '<i class="fa fa-key"></i>'
 
+def tracker_js():
+    js_file_path = tg.config.get('js_tracker_path', None)
+    if js_file_path is not None:
+        with open (js_file_path, "r") as js_file:
+            data=js_file.read()
+        return data
+    else:
+        return ""

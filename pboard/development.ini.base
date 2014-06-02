@@ -96,6 +96,10 @@ templating.mako.compiled_templates_dir = %(here)s/data/templates
 #javascript files (if your library supports that)
 toscawidgets.framework.resource_variant=debug
 
+# if you have an analytics tracker, like google analytics or piwik,
+# put the path of the js file to include here (relative to .ini directory)
+js_tracker_path = analytics.js
+
 [loggers]
 keys = root, pboard, sqlalchemy, auth
 
