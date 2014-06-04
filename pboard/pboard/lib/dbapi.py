@@ -153,6 +153,19 @@ class PODStaticController(object):
 
     return group_rights_on_node
 
+  @classmethod
+  def DIRTY_get_rights_on_node(self, user_id, node_id):
+      rights = pbm.DBSession\
+              .execute("""select max(rights) as rights
+                      from pod_user_group
+                      natural join pod_group_node
+                      where node_id=:node_id
+                      and user_id=:user_id""", {"node_id":node_id, "user_id":user_id})\
+              .fetchone()
+      r = pbmd.DIRTY_GroupRightsOnNode()
+      r.rights = rights[0]
+      return r
+
 
 
 class PODUserFilteredApiController(object):

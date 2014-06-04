@@ -143,10 +143,7 @@ class RootController(BaseController):
 
         user_specific_group_rights = pld.PODStaticController.getUserDedicatedGroupRightsOnNode(loCurrentNode)
 
-        current_user_rights = None
-        for right in user_specific_group_rights:
-            if right.group_id == -loCurrentUser.user_id:
-                current_user_rights = right
+        current_user_rights = pld.PODStaticController.DIRTY_get_rights_on_node(loCurrentUser.user_id, loCurrentNode.node_id)
 
         return dict(
             current_user=loCurrentUser,
