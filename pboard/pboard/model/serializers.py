@@ -2,22 +2,29 @@
 import tg
 from pboard.model import data as pmd
 
+def node_to_dict(node: pmd.PBNode, children_content, new_item_state):
+    """
+        children_content may be boolean or a list containing json values
+    """
+    url = tg.url('/document/', dict(node_id=node.node_id)) ## FIXME - 2014-05-27 - Make this more flexible
+
+    return dict(
+        id = node.node_id,
+        children = children_content,
+        text = node.data_label,
+        a_attr = { "href" : url },
+        li_attr = { "title": node.data_label },
+        type = node.node_type, # this property is understandable by jstree (through "types" plugin)
+        state = new_item_state,
+        node_status = node.getStatus().getId() # this is not jstree understandable data. This requires a JS 'success' callback
+    )
+
+
 def PBNodeForMenu(func):
 
     def process_item(item: pmd.PBNode):
         """ convert given item into a dictionnary """
-        url = tg.url('/document/', dict(node_id=item.node_id)) ## FIXME - 2014-05-27 - Make this more flexible
-        print("########## BEFORE ##########")
-        new_item = dict(
-            id = item.node_id,
-            children = item.getChildNb()>0,
-            text = item.data_label,
-            # parent = item._oParent.node_id if (item._oParent!=None) else '#',
-            a_attr = { "href" : url },
-            li_attr = { "title": item.data_label }
-        )
-        print("########## AFTER ##########")
-        return new_item
+        return node_to_dict(item, item.getChildNb()>0, None)
 
     def pre_serialize(*args, **kws):
         initial_result = func(*args, **kws)
@@ -43,11 +50,10 @@ def NodeTreeItemForMenu(func):
         """ convert given item into a dictionnary """
 
         item = structure_item.node
-        url = tg.url('/document/', dict(node_id=item.node_id)) ## FIXME - 2014-05-27 - Make this more flexible
         children = []
+
         for child_item in structure_item.children:
             children.append(process_item(child_item, current_node_id))
-        # print("########## BEFORE ##########")
 
         children_field_value = None
         if len(children)>0:
@@ -58,21 +64,11 @@ def NodeTreeItemForMenu(func):
             children_field_value = False
 
         new_item_state = dict(
-            opened = len(children)>0,
+            opened = item.getChildNb()<=0 or len(children)>0,
             selected = current_node_id!=None and item.node_id==current_node_id,
         )
 
-        new_item = dict(
-            id = item.node_id,
-            children = children_field_value,
-            text = item.data_label,
-            # parent = item._oParent.node_id if (item._oParent!=None) else '#',
-            state = new_item_state,
-            a_attr = { "href" : url },
-            li_attr = { "title": item.data_label }
-        )
-        # print("########## AFTER ##########")
-        return new_item
+        return node_to_dict(item, children_field_value, new_item_state)
 
     def pre_serialize(*args, **kws):
         initial_result = func(*args, **kws)

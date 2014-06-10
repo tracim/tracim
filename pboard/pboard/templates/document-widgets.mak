@@ -593,42 +593,60 @@
     <div class="modal-body">
     ## MODAL BODY
           <p>${_('Select the destination:')}</p>
-          <div id="${psModalId}-new-parent-selector-tree"></div>
+          <div id="${psModalId}-new-parent-selector-treeview"></div>
           <script>
-            $(function () {
-              $('#${psModalId}-new-parent-selector-tree').jstree({
-                "plugins" : [ "wholerow"],
-                'core' : {
+              /** return true or false if the node should be shown in the "move item" dialog treeview 
+               */
+              function shouldRemoveNodeFromMoveTreeView(parentTreeItem, currentTreeItem, rootList) {
+                  if(currentTreeItem.id==${poNode.node_id}) {
+                      console.log('Say OK to remove item #'+currentTreeItem.id+' from menu');
+                      return true;
+                  }
+                  return false;
+              }
 
-                  'error': function (error) {
-                    console.log('Error ' + error.toString())
-                  },
-                  'data' : {
-                    'dataType': 'json',
-                    'contentType': 'application/json; charset=utf-8',
-                    'url' : function (node) {
-                         return '${tg.url("/api/menu/children")}';
-                    },
-                    'data' : function(node) {
-                      console.log("NODE => "+JSON.stringify(node))
-                      return {
-                        'id' : node.id
-                      };
-                    },
-                    'success': function (new_data) {
-                      console.log('loaded new menu data' + new_data)
-                      return new_data;
-                    },
-                  },
-                }
-              });
+              $(function () {
+                  $('#${psModalId}-new-parent-selector-treeview').jstree({
+                      "plugins" : [ "wholerow"],
+                      'core' : {
+                          'error': function (error) {
+                              console.log('Error ' + error.toString())
+                          },
+                          'data' : {
+                              'dataType': 'json',
+                              'contentType': 'application/json; charset=utf-8',
+                              'url' : function (node) {
+                                  if (node.id==='#') {
+                                      return '${tg.url("/api/menu/initialize", dict(current_node_id=poNode._oParent.node_id if poNode._oParent else 0))}';
+                                  } else {
+                                      return '${tg.url("/api/menu/children")}';
+                                  }
+                              },
+                              'data' : function(node) {
+                                  console.log("NODE => "+JSON.stringify(node))
+                                  return {
+                                      'id' : node.id
+                                  };
+                              },
+                              'success': function (new_data) {
+                                  console.log('loaded new menu data (for move operation)' + new_data)
+                                  console.log(new_data);
+
+                                  for (var i = new_data['d'].length; i--;) {
+                                      prepareOrRemoveTreeNode(null, new_data['d'][i], new_data['d'], shouldRemoveNodeFromMoveTreeView);
+                                  }
+                                  return new_data;
+                              },
+                          },
+                      }
+                  });
               
-              $('#${psModalId}-new-parent-selector-tree').on("select_node.jstree", function (e, data) {
-                new_parent_id_selected = data.selected[0];
-                $("#${psModalId}-form-new-parent-field").attr("value", new_parent_id_selected)
-                console.log("About to move document "+${poNode.node_id}+" as child of "+new_parent_id_selected);
+                  $('#${psModalId}-new-parent-selector-treeview').on("select_node.jstree", function (e, data) {
+                      new_parent_id_selected = data.selected[0];
+                      $("#${psModalId}-form-new-parent-field").attr("value", new_parent_id_selected)
+                      console.log("About to move document "+${poNode.node_id}+" as child of "+new_parent_id_selected);
+                  });
               });
-            });
           </script>
           <form id='${psModalId}-form' method="POST" action="${psPostUrl}" enctype="multipart/form-data">
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
