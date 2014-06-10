@@ -1,6 +1,5 @@
 <%inherit file="local:templates.master"/>
 <%namespace name="POD" file="pboard.templates.pod"/>
-<%namespace name="DOC" file="pboard.templates.document-widgets"/>
 
 <%def name="HistoryTabContent(poNode)">
   <h4>${_('Revisions')}</h4>

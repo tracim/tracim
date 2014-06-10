@@ -1,5 +1,6 @@
 <%inherit file="local:templates.master"/>
 <%namespace name="POD" file="pboard.templates.pod"/>
+<%namespace name="DOCTABS" file="pboard.templates.document-widgets-tabs"/>
 
 <%def name="node_treeview_for_set_parent_menu(node_id, node_list, indentation=-1)">
   % if indentation==-1:
@@ -673,4 +674,132 @@
     ## MODAL FOOTER [END]
     </div>
   </div>
+</%def>
+
+<%def name="TabbedMetadataPanelContent(current_user, current_node)">
+    <div class="tabbable">
+        <ul class="nav nav-tabs" style="margin-bottom: 0em;">
+            <li>${MetadataTab('#subdocuments', 'tab', _('Subdocuments'), 'fa-file-text-o', current_node.getChildren())}</li>
+            <li>${MetadataTab('#events', 'tab', _('Calendar'), 'fa-calendar', current_node.getEvents())}</li>
+            <li>${MetadataTab('#contacts', 'tab', _('Address book'), 'fa-user', current_node.getContacts())}</li>
+            <li class="active">${MetadataTab('#comments', 'tab', _('Comment thread'), 'fa-comments-o', current_node.getComments())}</li>
+            <li>${MetadataTab('#files', 'tab', _('Attachments'), 'fa-paperclip', current_node.getFiles())}</li>
+            <li class="pull-right">${MetadataTab('#accessmanagement', 'tab', _('Access Management'), 'fa-key', current_node.getGroupsWithSomeAccess())}</li>
+            <li class="pull-right">${MetadataTab('#history', 'tab', _('History'), 'fa-history', current_node.getHistory())}</li>
+        </ul>
+        
+        ################################
+        ##
+        ## PANEL SHOWING ASSOCIATED DATA AND METADATA
+        ##
+        ################################
+        <div class="tab-content">
+            <div class="tab-pane" id="subdocuments">${DOCTABS.SubdocumentContent(current_node)}</div>
+            <div class="tab-pane" id="events">${DOCTABS.EventTabContent(current_user, current_node)}</div>
+            <div class="tab-pane" id="contacts">${DOCTABS.ContactTabContent(current_node)}</div>
+            <div class="tab-pane active" id="comments">${DOCTABS.CommentTabContent(current_user, current_node)}</div>
+            <div class="tab-pane" id="files">${DOCTABS.FileTabContent(current_node)}</div>
+            <div class="tab-pane" id="history">${DOCTABS.HistoryTabContent(current_node)}</div>
+            <div class="tab-pane" id="accessmanagement">${DOCTABS.AccessManagementTab(current_node, current_user_rights, current_user)}</div>
+        </div>
+    </div>
+</%def>
+
+<%def name="ContentExplorerPanelContent(user, node)">
+    <link rel="stylesheet" href="${tg.url('/jstree/dist/themes/default/style.min.css')}" />
+    <script src="${tg.url('/jstree/dist/jstree.js')}"></script>
+    <style>
+      #left-menu-treeview {overflow:hidden;}
+      #left-menu-treeview:hover {overflow:visible; }
+    </style>
+    <h5>${_('Content explorer')}</h5>
+    <div id="left-menu-treeview"></div>
+    <script>
+        function prepareOrRemoveTreeNode(parentTreeViewItem, currentTreeViewItem, rootList, shouldRemoveNodeCallBack) {
+            // In case parentTreeViewItem is Null, then use rootList as the parent
+            
+            console.log("node #"+currentTreeViewItem.id+' => '+currentTreeViewItem.node_status);
+            
+            if(shouldRemoveNodeCallBack && shouldRemoveNodeCallBack(parentTreeViewItem, currentTreeViewItem, rootList)) {
+                console.log('Will remove node #'+currentTreeViewItem.id+' from tree view');
+                if(parentTreeViewItem!=null) {
+                  var currentTreeViewItemPosition = parentTreeViewItem.children.indexOf(currentTreeViewItem);
+                  if(currentTreeViewItemPosition != -1) {
+                      parentTreeViewItem.children.splice(currentTreeViewItemPosition, 1);
+                  }
+                } else {
+                  var currentTreeViewItemPosition = rootList.indexOf(currentTreeViewItem);
+                  if(currentTreeViewItemPosition != -1) {
+                      rootList.splice(currentTreeViewItemPosition, 1);
+                  }
+                }
+                
+            } else {
+                for (var i = currentTreeViewItem.children.length; i--;) {
+                    console.log('processing node #'+currentTreeViewItem.children[i].id);
+                    prepareOrRemoveTreeNode(currentTreeViewItem, currentTreeViewItem.children[i], rootList, shouldRemoveNodeCallBack);
+                }
+            }
+        }
+      
+        function shouldRemoveNodeDoneCallBack(parentTreeViewItem, currentTreeViewItem, rootList) {
+            if(currentTreeViewItem.node_status=='done' || currentTreeViewItem.node_status=='closed') {
+                console.log('Hide item #'+currentTreeViewItem.id+' from menu (status is '+currentTreeViewItem.node_status+')');
+                return true;
+            }
+            return false;
+        }
+      
+        $(function () {
+            $('#left-menu-treeview').jstree({
+                'plugins' : [ 'wholerow', 'types' ],
+                'core' : {
+                    'error': function (error) {
+                        console.log('Error ' + error.toString())
+                    },
+                    'data' : {
+                        'dataType': 'json',
+                        'contentType': 'application/json; charset=utf-8',
+                        'url' : function (node) {
+                            if (node.id==='#') {
+                                return '${tg.url("/api/menu/initialize", dict(current_node_id=node.node_id if node else 0))}';
+                            } else {
+                                return '${tg.url("/api/menu/children")}';
+                            }
+                        },
+                        'data' : function(node) {
+                            console.log("NODE => "+JSON.stringify(node))
+                            return {
+                                'id' : node.id
+                            };
+                        },
+                        'success': function (new_data) {
+                            console.log('loaded new menu data' + new_data)
+                            console.log(new_data);
+
+                            for (var i = new_data['d'].length; i--;) {
+                                prepareOrRemoveTreeNode(null, new_data['d'][i], new_data['d'], shouldRemoveNodeDoneCallBack);
+                            }
+                            return new_data;
+                        },
+                    },
+                }
+            });
+        
+            $('#left-menu-treeview').on("select_node.jstree", function (e, data) {
+                url = "${tg.url('/document/')}"+data.selected[0];
+                console.log("Opening document: "+url);
+                location.href = url;
+            });
+          
+            $('#left-menu-treeview').on("loaded.jstree", function () {
+                nodes = $('#left-menu-treeview .jstree-node');
+                console.log("nodes = "+nodes.length);
+                if (nodes.length<=0) {
+                    $("#left-menu-treeview").append( "<p class='pod-grey'>${_('There is no content yet.')|n}" );
+                    $("#left-menu-treeview").append( "<p><a class=\"btn btn-success\" data-toggle=\"modal\" role=\"button\" href=\"#add-document-modal-form\"><i class=\"fa fa-plus\"></i> ${_('Create a topic')}</a></p>" );
+                }
+            });
+        });
+    </script>
 </%def>
