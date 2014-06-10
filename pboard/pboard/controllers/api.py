@@ -197,7 +197,7 @@ class PODApiController(BaseController):
       redirect(lurl('/document/%s'%(node_id)))
 
     @expose()
-    def create_document(self, parent_id=None, data_label='', data_content='', inherit_rights='off'):
+    def create_document(self, parent_id=None, data_label='', data_content='', inherit_rights='off', node_status=''):
       loCurrentUser   = pld.PODStaticController.getCurrentUser()
       loApiController = pld.PODUserFilteredApiController(loCurrentUser.user_id)
 
@@ -217,6 +217,11 @@ class PODApiController(BaseController):
 
       if int(parent_id)!=0:
         loNewNode.parent_id = parent_id
+
+      if node_status!='':
+          status_item = pmd.PBNodeStatus.getStatusItem(node_status)
+          if status_item in pmd.PBNodeStatus.getChoosableList():
+              loNewNode.node_status = status_item.status_id
 
       pm.DBSession.flush()
       redirect(lurl('/document/%i'%(loNewNode.node_id)))
