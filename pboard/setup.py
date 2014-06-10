@@ -58,7 +58,7 @@ setup(
                                  'public/*/*']},
     message_extractors={'pboard': [
             ('**.py', 'python', None),
-            ('templates/**.mako', 'mako', None),
+            ('templates/**.mak', 'mako', {'input_encoding': 'utf-8'}),
             ('public/**', 'ignore', None)]},
 
     entry_points={
