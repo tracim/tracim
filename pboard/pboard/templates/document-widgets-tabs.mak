@@ -551,7 +551,7 @@
       ${POD.RichTextEditor('add_comment_data_content_textarea_wysiwyg', '', 'boldanditalic')}
     </label>
     <label>
-      <input type="checkbox" name='is_shared'/> ${_('Share this comment')}
+      <input type="checkbox" name='is_shared' checked /> ${_('Share this comment')}
     </label>
     <span class="pull-right">
       % if len(poNode.getComments())<=0:

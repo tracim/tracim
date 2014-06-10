@@ -1,0 +1,754 @@
+# French (France) translations for pboard.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the pboard project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pboard 0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-06-10 14:42+0200\n"
+"PO-Revision-Date: 2014-06-10 16:31+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: fr_FR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: pboard/controllers/api.py:40
+msgid "You need to login in order to access this ressource"
+msgstr "Vous devez vous identifier pour accéder à cette page"
+
+#: pboard/controllers/api.py:185
+#, python-format
+msgid "Document #%s can't move upper."
+msgstr "Le document #%s ne peut pas être remonté"
+
+#: pboard/controllers/api.py:196
+#, python-format
+msgid "Document #%s can't move lower."
+msgstr "Le document #%s ne peut pas être descendu"
+
+#: pboard/controllers/api.py:254
+#, python-format
+msgid "Document #%s has been deleted"
+msgstr "Le document #%s a été supprimé"
+
+#: pboard/controllers/api.py:256
+#, python-format
+msgid "Document #%s can't be deleted because it is not empty."
+msgstr ""
+"Le document #%s ne peut pas être supprimé car il possède des sous documents"
+
+#: pboard/controllers/api.py:330
+msgid "You can't share a document that doesn't belong to you."
+msgstr "Vous ne pouvez pas partager un document qui ne vous appartient pas"
+
+#: pboard/controllers/apipublic.py:20
+msgid "Account creation error: please fill all the fields"
+msgstr "Erreur à la création du compte : merci de remplir tous les champs"
+
+#: pboard/controllers/apipublic.py:23
+msgid "Account creation error: passwords do not match"
+msgstr "Erreur à la création du compte : les mots de passe ne concordent pas"
+
+#: pboard/controllers/apipublic.py:28
+#, python-format
+msgid "Account creation error: account already exist: %s"
+msgstr "Erreur à la création du compte : le compte %s existe déjà"
+
+#: pboard/controllers/apipublic.py:33
+#, python-format
+msgid "Account successfully created: %s"
+msgstr "Compte créé avec succès : %s"
+
+#: pboard/controllers/root.py:76
+msgid "Wrong credentials"
+msgstr "Mauvais identifiant et/ou mot de passe"
+
+#: pboard/controllers/root.py:92
+#, python-format
+msgid "Welcome back, %s!"
+msgstr "Bienvenue %s!"
+
+#: pboard/controllers/root.py:102
+msgid "We hope to see you soon!"
+msgstr "Nous espérons vous revoir bientôt!"
+
+#: pboard/controllers/root.py:106 pboard/controllers/root.py:165
+msgid "Please login to access this page"
+msgstr "Merci de vous identifier pour accéder à cette page"
+
+#: pboard/controllers/root.py:142
+msgid "Document not found"
+msgstr "Le document n'a pas été trouvé"
+
+#: pboard/controllers/secure.py:16
+msgid "Only for people with the \"manage\" permission"
+msgstr "Seulement pour les personnes ayant la permission \"manage\""
+
+#: pboard/controllers/secure.py:21
+msgid "Secure Controller here"
+msgstr "Contrôleur sécurisé"
+
+#: pboard/lib/helpers.py:25
+msgid "This is the current status."
+msgstr "C'est le statut actuel"
+
+#: pboard/lib/helpers.py:28
+msgid "The item is a normal document, like a howto or a text document."
+msgstr "L'élément est un document normal, comme un howto ou un document texte"
+
+#: pboard/lib/helpers.py:30
+msgid ""
+"The item will be automatically computed as \"in progress\" or \"done\" "
+"according to its children status."
+msgstr ""
+"L'élément sera automatiquement mis en \"En cours\" ou \"Fait\" suivant le "
+"statut de ses enfants."
+
+#: pboard/lib/helpers.py:32
+msgid "No action done on the item."
+msgstr "Aucun changement sur l'élément"
+
+#: pboard/lib/helpers.py:34
+msgid "The item is being worked on."
+msgstr "L'élément est en cours d'utilisation."
+
+#: pboard/lib/helpers.py:36
+msgid "Waiting for some external actions."
+msgstr "En attente d'actions externes."
+
+#: pboard/lib/helpers.py:38
+msgid "The work associated with the item is finished."
+msgstr "L'action associée à l'élément n'est pas terminée."
+
+#: pboard/lib/helpers.py:40
+msgid ""
+"Close the item if you want not to see it anymore. The data won't be deleted"
+msgstr ""
+"Fermez l'élément si vous ne voulez plus le voir. Les données ne seront pas "
+"supprimées"
+
+#: pboard/lib/helpers.py:42
+msgid "This status tells that the item has been deleted."
+msgstr "Ce status indique que l'élément a été supprimé."
+
+#: pboard/model/data.py:372
+msgid "Titleless Document"
+msgstr "Document sans titre"
+
+#: pboard/templates/about.mak:15
+msgid "Simple tool, flexible data."
+msgstr "Simple tool, flexible data."
+
+#: pboard/templates/about.mak:53
+msgid "Improving pod"
+msgstr "Améliorer pod"
+
+#: pboard/templates/about.mak:55
+msgid " is a piece of software developed with <u>user needs</u> in mind."
+msgstr ""
+"est un logiciel dévelopé avec <u>les besoin de l'utilisateur</u> à l'esprit."
+
+#: pboard/templates/about.mak:56
+msgid "It means that we need:"
+msgstr "Cela signifie que nous avons besoin de :"
+
+#: pboard/templates/about.mak:58
+msgid "your feedback,"
+msgstr "vos retours,"
+
+#: pboard/templates/about.mak:59
+msgid "you to ask questions,"
+msgstr "vos questions,"
+
+#: pboard/templates/about.mak:60
+msgid "your feature requests,"
+msgstr "savoir quelles fonctionnalités vous voudriez,"
+
+#: pboard/templates/about.mak:61
+msgid "you to tell us what's cool and what's wrong."
+msgstr "que vous nous disiez ce qui est bien ou pas."
+
+#: pboard/templates/about.mak:72
+msgid "The author"
+msgstr "The author"
+
+#: pboard/templates/about.mak:79
+msgid "I'm 35 years old,"
+msgstr "I'm 35 years old,"
+
+#: pboard/templates/about.mak:80
+msgid "I'm a skilled software engineer,"
+msgstr "I'm a skilled software engineer,"
+
+#: pboard/templates/about.mak:81
+msgid "I live in France, near Grenoble."
+msgstr "I live in France, near Grenoble."
+
+#: pboard/templates/about.mak:99
+msgid "email us"
+msgstr "email us"
+
+#: pboard/templates/about.mak:100
+msgid "and we will reply to you."
+msgstr "and we will reply to you."
+
+#: pboard/templates/about.mak:101
+msgid "Thank you."
+msgstr "Thank you."
+
+#: pboard/templates/create_account.mak:5
+msgid "Create account"
+msgstr "Créer un compte"
+
+#: pboard/templates/dashboard.mak:15
+msgid "What's hot!"
+msgstr "Quoi de neuf?"
+
+#: pboard/templates/dashboard.mak:17
+msgid "No hot stuff for today."
+msgstr "Rien de neuf aujourd'hui."
+
+#: pboard/templates/dashboard.mak:30 pboard/templates/dashboard.mak:57
+msgid "last modification"
+msgstr "dernière modification"
+
+#: pboard/templates/dashboard.mak:42
+msgid "Actions to do"
+msgstr "Actions à faire"
+
+#: pboard/templates/dashboard.mak:44
+msgid "No document requiring action."
+msgstr "Aucun document ne requière d'action."
+
+#: pboard/templates/dashboard.mak:72
+msgid "Latest operations"
+msgstr "Derniers changements"
+
+#: pboard/templates/dashboard.mak:74
+msgid "No activity found"
+msgstr "Pas de changements trouvés"
+
+#: pboard/templates/dashboard.mak:94
+msgid "created"
+msgstr "créé"
+
+#: pboard/templates/dashboard.mak:96
+msgid "updated"
+msgstr "mis à jour"
+
+#: pboard/templates/document-widgets-tabs.mak:6
+msgid "Revisions"
+msgstr "Révisions"
+
+#: pboard/templates/document-widgets-tabs.mak:19
+msgid "Share options"
+msgstr "Options de partage"
+
+#: pboard/templates/document-widgets-tabs.mak:22
+msgid "This document is not shared"
+msgstr "Ce document n'est pas partagé"
+
+#: pboard/templates/document-widgets-tabs.mak:24
+msgid "This document is shared."
+msgstr "Ce document est partagé"
+
+#: pboard/templates/document-widgets-tabs.mak:32
+#: pboard/templates/master.mak:155
+msgid "Groups"
+msgstr "Groupes"
+
+#: pboard/templates/document-widgets-tabs.mak:53
+msgid "Individual users"
+msgstr "Utilisateurs"
+
+#: pboard/templates/document-widgets-tabs.mak:93
+msgid "Edit share options"
+msgstr "Éditer les options de partage"
+
+#: pboard/templates/document-widgets-tabs.mak:119
+msgid "Share document with collaborators."
+msgstr "Partager le document avec des collaborateurs."
+
+#: pboard/templates/document-widgets-tabs.mak:122
+msgid "Select read and write access for each group or people..."
+msgstr ""
+"Sélectionnez l'accès en \"lecture\" ou \"écriture\" pour chaque groupe ou "
+"personne ..."
+
+#: pboard/templates/document-widgets-tabs.mak:172
+msgid "Group"
+msgstr "Groupe"
+
+#: pboard/templates/document-widgets-tabs.mak:173
+#: pboard/templates/document-widgets-tabs.mak:204
+msgid "Access"
+msgstr "Accès"
+
+#: pboard/templates/document-widgets-tabs.mak:203
+msgid "Individual Users"
+msgstr "Utilisateurs individuels"
+
+#: pboard/templates/document-widgets-tabs.mak:261
+#: pboard/templates/document-widgets.mak:334
+#: pboard/templates/document-widgets.mak:411
+#: pboard/templates/document-widgets.mak:486
+#: pboard/templates/document-widgets.mak:560
+#: pboard/templates/document-widgets.mak:643 pboard/templates/pod.mak:46
+msgid "Cancel"
+msgstr "Abandonner"
+
+#: pboard/templates/document-widgets-tabs.mak:264
+#: pboard/templates/document-widgets.mak:337
+#: pboard/templates/document-widgets.mak:414
+#: pboard/templates/document-widgets.mak:489
+#: pboard/templates/document-widgets.mak:563
+#: pboard/templates/document-widgets.mak:646
+msgid "Save changes"
+msgstr "Sauvergarder"
+
+#: pboard/templates/document-widgets-tabs.mak:370
+#: pboard/templates/document.mak:186
+msgid "Attachments"
+msgstr "Pièces jointes"
+
+#: pboard/templates/document-widgets-tabs.mak:373
+msgid "There is currently no attachment."
+msgstr "Il n'y a pas de pièces jointes pour le moment."
+
+#: pboard/templates/document-widgets-tabs.mak:374
+msgid " Attach first file"
+msgstr "Joindre le premier fichier"
+
+#: pboard/templates/document-widgets-tabs.mak:376
+msgid " Attach a file"
+msgstr "Joindre un fichier"
+
+#: pboard/templates/document-widgets-tabs.mak:386
+msgid "Download the file"
+msgstr "Télécharger le fichier"
+
+#: pboard/templates/document-widgets-tabs.mak:394
+msgid "View the attachment"
+msgstr "Voir les pièces jointe"
+
+#: pboard/templates/document-widgets-tabs.mak:405
+msgid "Sub-documents"
+msgstr "Sous documents"
+
+#: pboard/templates/document-widgets-tabs.mak:408
+msgid "There is currently no child documents."
+msgstr "Il n'y a pas de sous documents pour le moment."
+
+#: pboard/templates/document-widgets-tabs.mak:410
+msgid "Add a document"
+msgstr "Ajouter un document"
+
+#: pboard/templates/document-widgets-tabs.mak:429
+#: pboard/templates/document.mak:183
+msgid "Calendar"
+msgstr "Calendrier"
+
+#: pboard/templates/document-widgets-tabs.mak:432
+msgid "The calendar is empty."
+msgstr "Le calendrier est vide."
+
+#: pboard/templates/document-widgets-tabs.mak:433
+msgid " Add first event"
+msgstr "Ajouter le premier évènement"
+
+#: pboard/templates/document-widgets-tabs.mak:435
+msgid " Add an event"
+msgstr "Ajouter un évènement"
+
+#: pboard/templates/document-widgets-tabs.mak:469
+#: pboard/templates/document.mak:184
+msgid "Address book"
+msgstr "Carnet d'adresses"
+
+#: pboard/templates/document-widgets-tabs.mak:471
+msgid "The address book is empty."
+msgstr "Le carnet d'adresses est vide"
+
+#: pboard/templates/document-widgets-tabs.mak:472
+msgid "Add first contact"
+msgstr "Ajouter le premier contact"
+
+#: pboard/templates/document-widgets-tabs.mak:474
+msgid "Add a contact"
+msgstr "Ajouter un contact"
+
+#: pboard/templates/document-widgets-tabs.mak:495
+#: pboard/templates/document.mak:185
+msgid "Comment thread"
+msgstr "Fil de discussions"
+
+#: pboard/templates/document-widgets-tabs.mak:498
+msgid "The comment thread is empty."
+msgstr "Le fil de discussion est vide"
+
+#: pboard/templates/document-widgets-tabs.mak:506
+msgid "Add a comment"
+msgstr "Ajouter un commentaire"
+
+#: pboard/templates/document-widgets-tabs.mak:521
+msgid "the"
+msgstr "le"
+
+#: pboard/templates/document-widgets-tabs.mak:523
+msgid "at"
+msgstr "à"
+
+#: pboard/templates/document-widgets-tabs.mak:531
+msgid "Shared comment. Click to make private."
+msgstr "Commentaire partagé. Cliquez pour rendre privé."
+
+#: pboard/templates/document-widgets-tabs.mak:533
+msgid "Private comment. Click to share."
+msgstr "Commentaire privé. Cliquez pour partager."
+
+#: pboard/templates/document-widgets-tabs.mak:551
+msgid "Write your comment below:"
+msgstr "Écrivez votre commentaire ici :"
+
+#: pboard/templates/document-widgets-tabs.mak:555
+msgid "Share this comment"
+msgstr "Partager ce commentaire"
+
+#: pboard/templates/document-widgets-tabs.mak:559
+msgid "Add first comment"
+msgstr "Ajouter le premier commentaire"
+
+#: pboard/templates/document-widgets-tabs.mak:561
+#: pboard/templates/document-widgets.mak:102
+msgid "Comment"
+msgstr "Commentaire"
+
+#: pboard/templates/document-widgets.mak:8
+msgid "Home"
+msgstr "Accueil"
+
+#: pboard/templates/document-widgets.mak:55
+msgid "Change status"
+msgstr "Changer le statut"
+
+#: pboard/templates/document-widgets.mak:62
+msgid "Current status is..."
+msgstr "Le statut actuel est ..."
+
+#: pboard/templates/document-widgets.mak:71
+msgid "Change to..."
+msgstr "Changer en ..."
+
+#: pboard/templates/document-widgets.mak:72
+msgid "change the status to..."
+msgstr "changer le status en ..."
+
+#: pboard/templates/document-widgets.mak:85
+msgid "Add"
+msgstr "Ajouter"
+
+#: pboard/templates/document-widgets.mak:91
+msgid "Add New..."
+msgstr "Ajouter un nouveau ..."
+
+#: pboard/templates/document-widgets.mak:92
+msgid "create a totally new item..."
+msgstr "créer un nouvel élément ..."
+
+#: pboard/templates/document-widgets.mak:95
+msgid "Document"
+msgstr "Document"
+
+#: pboard/templates/document-widgets.mak:96
+msgid "File"
+msgstr "Fichier"
+
+#: pboard/templates/document-widgets.mak:97
+#: pboard/templates/document-widgets.mak:452
+msgid "Event"
+msgstr "Évènement"
+
+#: pboard/templates/document-widgets.mak:98
+msgid "Contact"
+msgstr "Contact"
+
+#: pboard/templates/document-widgets.mak:116
+msgid "more ..."
+msgstr "plus ..."
+
+#: pboard/templates/document-widgets.mak:120
+msgid "Advanced actions..."
+msgstr "Actions avancées"
+
+#: pboard/templates/document-widgets.mak:121
+msgid "power user actions..."
+msgstr "Actions avancées ..."
+
+#: pboard/templates/document-widgets.mak:126
+msgid "Move"
+msgstr "Déplacer"
+
+#: pboard/templates/document-widgets.mak:127
+msgid "Delete"
+msgstr "Supprimer"
+
+#: pboard/templates/document-widgets.mak:127
+msgid "Delete the current document"
+msgstr "Supprimer le document actuel"
+
+#: pboard/templates/document-widgets.mak:177
+#: pboard/templates/document-widgets.mak:378
+msgid "Title"
+msgstr "Titre"
+
+#: pboard/templates/document-widgets.mak:183
+#: pboard/templates/document-widgets.mak:313
+msgid "document title"
+msgstr "titre du document"
+
+#: pboard/templates/document-widgets.mak:216
+msgid "This document is private"
+msgstr "Ce document est privé"
+
+#: pboard/templates/document-widgets.mak:218
+msgid "private"
+msgstr "privé"
+
+#: pboard/templates/document-widgets.mak:221
+msgid "This document is shared"
+msgstr "Ce document est partagé"
+
+#: pboard/templates/document-widgets.mak:223
+msgid "shared"
+msgstr "partagé"
+
+#: pboard/templates/document-widgets.mak:259
+msgid "<p>We suggest you to start...<br/><br/></p>"
+msgstr "<p>Nous vous suggérons de commencer ...<br /><br /></p>"
+
+#: pboard/templates/document-widgets.mak:262
+msgid "by working on existing items"
+msgstr "en travaillant sur des éléments existants"
+
+#: pboard/templates/document-widgets.mak:264
+msgid "or"
+msgstr "ou"
+
+#: pboard/templates/document-widgets.mak:267
+msgid "by creating a new document"
+msgstr "en créant un nouveau document"
+
+#: pboard/templates/document-widgets.mak:270
+msgid "Create"
+msgstr "Créer"
+
+#: pboard/templates/document-widgets.mak:322
+#: pboard/templates/document-widgets.mak:400
+#: pboard/templates/document-widgets.mak:473
+#: pboard/templates/document-widgets.mak:547
+msgid "Share:"
+msgstr "Partager :"
+
+#: pboard/templates/document-widgets.mak:323
+#: pboard/templates/document-widgets.mak:401
+#: pboard/templates/document-widgets.mak:474
+#: pboard/templates/document-widgets.mak:548
+msgid "if checked, then copy share properties from current item"
+msgstr "si coché, les options de partage seront copiées de l'élément actuel"
+
+#: pboard/templates/document-widgets.mak:384
+msgid "this field is optionnal"
+msgstr "ce champ est optionnel"
+
+#: pboard/templates/document-widgets.mak:388
+msgid "Choose a file..."
+msgstr "Choisir un fichier ..."
+
+#: pboard/templates/document-widgets.mak:389
+msgid "choose a file..."
+msgstr "choisir un fichier ..."
+
+#: pboard/templates/document-widgets.mak:394
+msgid "File description (optionnal)"
+msgstr "Description du fichier (optionnel)"
+
+#: pboard/templates/document-widgets.mak:456
+msgid "Date and time"
+msgstr "Date et heure"
+
+#: pboard/templates/document-widgets.mak:463
+msgid "Event description:"
+msgstr "Description de l'évènement :"
+
+#: pboard/templates/document-widgets.mak:529
+msgid "Contact name and firstname"
+msgstr "Nom et prénom du contact"
+
+#: pboard/templates/document-widgets.mak:535
+msgid "name, firstname, title..."
+msgstr "nom, prénom, titre ..."
+
+#: pboard/templates/document-widgets.mak:540
+msgid "Address, phone, email, company..."
+msgstr "Adresse, téléphone, email, entreprise ..."
+
+#: pboard/templates/document-widgets.mak:595
+msgid "Select the destination:"
+msgstr "Sélectionnez la destination :"
+
+#: pboard/templates/document.mak:16
+msgid "You have no document yet."
+msgstr "Vous n'avez pas de document pour le moment."
+
+#: pboard/templates/document.mak:33
+msgid "Move up"
+msgstr "Monter"
+
+#: pboard/templates/document.mak:34
+msgid "Move down"
+msgstr "Descendre"
+
+#: pboard/templates/document.mak:64
+msgid "Toggle view mode [narrow, medium, large]"
+msgstr "Changer la vue [étroite, médium, large]"
+
+#: pboard/templates/document.mak:65
+msgid "Toggle view mode: narrow"
+msgstr "Changer la vue : étroite"
+
+#: pboard/templates/document.mak:66
+msgid "Toggle view mode: medium"
+msgstr "Changer la vue : médium"
+
+#: pboard/templates/document.mak:67
+msgid "Toggle view mode: large"
+msgstr "Changer la vue : large"
+
+#: pboard/templates/document.mak:87
+msgid "Content explorer"
+msgstr "Explorateur de contenu"
+
+#: pboard/templates/document.mak:133
+msgid "There is no content yet."
+msgstr "Il n'y a pas de contenu pour le moment."
+
+#: pboard/templates/document.mak:134
+msgid "Create a topic"
+msgstr "Créer un sujet"
+
+#: pboard/templates/document.mak:174
+msgid "New Sub-document"
+msgstr "Nouveau sous document"
+
+#: pboard/templates/document.mak:175
+msgid "Add an event"
+msgstr "Ajouter un évènement"
+
+#: pboard/templates/document.mak:176
+msgid "Add a new contact"
+msgstr "Ajouter un nouveau contact"
+
+#: pboard/templates/document.mak:177
+msgid "Add a new file"
+msgstr "Ajouter un nouveau fichier"
+
+#: pboard/templates/document.mak:178
+msgid "Move the document"
+msgstr "Déplacer le document"
+
+#: pboard/templates/document.mak:182
+msgid "Subdocuments"
+msgstr "Sous documents"
+
+#: pboard/templates/document.mak:187
+msgid "Access Management"
+msgstr "Gestion des droits"
+
+#: pboard/templates/document.mak:188
+msgid "History"
+msgstr "Historique"
+
+#: pboard/templates/index.mak:30
+msgid "Remember me"
+msgstr "Se souvenir de moi"
+
+#: pboard/templates/index.mak:38
+msgid "Welcome, "
+msgstr "Bienvenue,"
+
+#: pboard/templates/index.mak:39
+msgid ""
+"Click on <a href=\"{0}\">Document</a> in the top menu to access you data."
+msgstr ""
+"Cliquez sur <a href=\"{0}\">Document</a> dans le menu du haut pour accéder à "
+"vos données."
+
+#: pboard/templates/index.mak:53
+msgid "Text documents"
+msgstr "Documents texte"
+
+#: pboard/templates/index.mak:54
+msgid "Events"
+msgstr "Évènements"
+
+#: pboard/templates/index.mak:55
+msgid "Contacts"
+msgstr "Contacts"
+
+#: pboard/templates/index.mak:56
+msgid "Comments"
+msgstr "Commentaires"
+
+#: pboard/templates/index.mak:57
+msgid "Files"
+msgstr "Fichiers"
+
+#: pboard/templates/master.mak:60
+msgid "collaborative work  ♦  improved efficiency  ♦  full traceability"
+msgstr "collaborative work  ♦  improved efficiency  ♦  full traceability"
+
+#: pboard/templates/master.mak:93
+msgid "Documents"
+msgstr "Documents"
+
+#: pboard/templates/master.mak:154
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: pboard/templates/master.mak:180
+msgid "Search"
+msgstr "Recherche"
+
+#: pboard/templates/master.mak:190
+msgid "Help / About"
+msgstr "Aide/A propos"
+
+#: pboard/templates/pod.mak:43
+msgid "Edit"
+msgstr "Éditer"
+
+#: pboard/templates/pod.mak:50 pboard/templates/pod.mak:52
+msgid "New"
+msgstr "Nouveau"
+
+#: pboard/templates/pod.mak:83
+msgid "Create an account"
+msgstr "Créer un compte"
+
+#: pboard/templates/search.mak:13
+msgid "Search again"
+msgstr "Chercher de nouveau"
+
+#: pboard/templates/search.mak:22
+msgid "Results"
+msgstr "Résultats"
+
+#: pboard/templates/search.mak:83
+msgid "No data found for keywords:"
+msgstr "Aucune correspondance pour les mots clés :"
