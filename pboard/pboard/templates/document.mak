@@ -81,62 +81,98 @@
       <link rel="stylesheet" href="${tg.url('/jstree/dist/themes/default/style.min.css')}" />
       <script src="${tg.url('/jstree/dist/jstree.js')}"></script>
       <style>
-        #mypodtree {overflow:hidden;}
-        #mypodtree:hover {overflow:visible; }
+        #left-menu-treeview {overflow:hidden;}
+        #left-menu-treeview:hover {overflow:visible; }
       </style>
       <h5>${_('Content explorer')}</h5>
-      <div id="mypodtree"></div>
+      <div id="left-menu-treeview"></div>
       <script>
-        $(function () {
-          $('#mypodtree').jstree({
-            "plugins" : [ "wholerow"],
-            'core' : {
-
-              'error': function (error) {
-                console.log('Error ' + error.toString())
-              },
-              'data' : {
-                'dataType': 'json',
-                'contentType': 'application/json; charset=utf-8',
-                'url' : function (node) {
-                  if (node.id==='#') {
-                    return '${tg.url("/api/menu/initialize", dict(current_node_id=current_node.node_id if current_node else 0))}';
+          function prepareOrRemoveTreeNode(parentTreeViewItem, currentTreeViewItem, rootList, shouldRemoveNodeCallBack) {
+              // In case parentTreeViewItem is Null, then use rootList as the parent
+              
+              console.log("node #"+currentTreeViewItem.id+' => '+currentTreeViewItem.node_status);
+              
+              if(shouldRemoveNodeCallBack && shouldRemoveNodeCallBack(parentTreeViewItem, currentTreeViewItem, rootList)) {
+                  console.log('Will remove node #'+currentTreeViewItem.id+' from tree view');
+                  if(parentTreeViewItem!=null) {
+                    var currentTreeViewItemPosition = parentTreeViewItem.children.indexOf(currentTreeViewItem);
+                    if(currentTreeViewItemPosition != -1) {
+                        parentTreeViewItem.children.splice(currentTreeViewItemPosition, 1);
+                    }
                   } else {
-                    return '${tg.url("/api/menu/children")}';
+                    var currentTreeViewItemPosition = rootList.indexOf(currentTreeViewItem);
+                    if(currentTreeViewItemPosition != -1) {
+                        rootList.splice(currentTreeViewItemPosition, 1);
+                    }
                   }
-                },
-                'data' : function(node) {
-                  console.log("NODE => "+JSON.stringify(node))
-                  return {
-                    'id' : node.id
-                  };
-                },
-                'success': function (new_data) {
-                  console.log('loaded new menu data' + new_data)
-                  console.log(new_data);
-                  return new_data;
-                },
-              },
-            }
-          });
+                  
+              } else {
+                  for (var i = currentTreeViewItem.children.length; i--;) {
+                    console.log('processing node #'+currentTreeViewItem.children[i].id);
+                    prepareOrRemoveTreeNode(currentTreeViewItem, currentTreeViewItem.children[i], rootList, shouldRemoveNodeCallBack);
+                  }
+              }
+          }
+        
+          function shouldRemoveNodeDoneCallBack(parentTreeViewItem, currentTreeViewItem, rootList) {
+              if(currentTreeViewItem.node_status=='done' || currentTreeViewItem.node_status=='closed') {
+                  console.log('Hide item #'+currentTreeViewItem.id+' from menu (status is '+currentTreeViewItem.node_status+')');
+                  return true;
+              }
+              return false;
+          }
+        
+          $(function () {
+              $('#left-menu-treeview').jstree({
+                  'plugins' : [ 'wholerow', 'types' ],
+                  'core' : {
+                      'error': function (error) {
+                          console.log('Error ' + error.toString())
+                      },
+                      'data' : {
+                          'dataType': 'json',
+                          'contentType': 'application/json; charset=utf-8',
+                          'url' : function (node) {
+                              if (node.id==='#') {
+                                  return '${tg.url("/api/menu/initialize", dict(current_node_id=current_node.node_id if current_node else 0))}';
+                              } else {
+                                  return '${tg.url("/api/menu/children")}';
+                              }
+                          },
+                          'data' : function(node) {
+                              console.log("NODE => "+JSON.stringify(node))
+                              return {
+                                  'id' : node.id
+                              };
+                          },
+                          'success': function (new_data) {
+                              console.log('loaded new menu data' + new_data)
+                              console.log(new_data);
+
+                              for (var i = new_data['d'].length; i--;) {
+                                  prepareOrRemoveTreeNode(null, new_data['d'][i], new_data['d'], shouldRemoveNodeDoneCallBack);
+                              }
+                              return new_data;
+                          },
+                      },
+                  }
+              });
           
-          $('#mypodtree').on("select_node.jstree", function (e, data) {
-            url = "${tg.url('/document/')}"+data.selected[0];
-            console.log("Opening document: "+url);
-            location.href = url;
+              $('#left-menu-treeview').on("select_node.jstree", function (e, data) {
+                  url = "${tg.url('/document/')}"+data.selected[0];
+                  console.log("Opening document: "+url);
+                  location.href = url;
+              });
+            
+              $('#left-menu-treeview').on("loaded.jstree", function () {
+                  nodes = $('#left-menu-treeview .jstree-node');
+                  console.log("nodes = "+nodes.length);
+                  if (nodes.length<=0) {
+                      $("#left-menu-treeview").append( "<p class='pod-grey'>${_('There is no content yet.')|n}" );
+                      $("#left-menu-treeview").append( "<p><a class=\"btn btn-success\" data-toggle=\"modal\" role=\"button\" href=\"#add-document-modal-form\"><i class=\"fa fa-plus\"></i> ${_('Create a topic')}</a></p>" );
+                  }
+              });
           });
-          
-          $('#mypodtree').on("loaded.jstree", function () {
-            nodes = $('#mypodtree .jstree-node');
-            console.log("nodes = "+nodes.length);
-            if (nodes.length<=0) {
-              $("#mypodtree").append( "<p class='pod-grey'>${_('There is no content yet.')|n}" );
-              $("#mypodtree").append( "<p><a class=\"btn btn-success\" data-toggle=\"modal\" role=\"button\" href=\"#add-document-modal-form\"><i class=\"fa fa-plus\"></i> ${_('Create a topic')}</a></p>" );
-              
-              
-            }
-          });
-        });
       </script>
 ## INFO - D.A. - 2014-05-28 - Hide old school menu
 ##      <div>
