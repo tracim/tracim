@@ -11,358 +11,358 @@
 </%def>
 
 <%def name="AccessManagementTab(poNode, user_rights, user)">
+    ######
+    ##
+    ## THIS WIDGET IS INTENDED TO BE USED ONE TIME ONLY IN A PAGE
+    ##
+    <h4>${_('Share options')}</h4> 
+    <p>
+      % if poNode.is_shared==False:
+        <span class="pod-grey">${_('This document is not shared')}</span>
+      % else:
+        <span class="">${_('This document is shared.')}</span>
+      % endif
+    </p>
+    <p>
+      % if poNode.is_shared==True:
+      <table class="table table-striped table-hover table-condensed">
+        <thead>
+          <tr>
+            <th><i class="fa fa-group"></i> ${_('Groups')}</th>
+            <th></th>
+          </tr>
+        </thead>
+        % for loGroupRightsOnNode in real_group_rights:
+            % if loGroupRightsOnNode.hasSomeAccess():
+                <tr>
+                    <td>${loGroupRightsOnNode.display_name}</td>
+                    <td>
+                        % if loGroupRightsOnNode.hasReadAccess():
+                            <span class="label label-success">R</span>
+                        % endif
+                        % if loGroupRightsOnNode.hasWriteAccess():
+                            <span class="label label-warning">W</span>
+                        % endif
+                    </td>
+                </tr>
+            % endif
+        % endfor
+        <thead>
+            <tr>
+                <th><i class="fa fa-user"></i> ${_('Individual users')}</th>
+                <th></th>
+            </tr>
+        </thead>
+        % for loGroupRightsOnNode in user_specific_group_rights:
+            % if loGroupRightsOnNode.hasSomeAccess():
+                <tr>
+                    <td>${loGroupRightsOnNode.display_name}</td>
+                    <td>
+                        % if loGroupRightsOnNode.hasReadAccess():
+                            <span class="label label-success">R</span>
+                        % endif
+                        % if loGroupRightsOnNode.hasWriteAccess():
+                            <span class="label label-warning">W</span>
+                        % endif
+                    </td>
+                </tr>
+            % endif
+        % endfor
+      </table>
+      
+      % endif
+    <p>
+
+    ######
+    ##
+    ## 2014-05-06 - D.A. We do not share documents on internet yet.
+    ##
+    ##  <p>
+    ##    % if poNode.is_public==False:
+    ##      ${_('This document is not shared on internet')|n}
+    ##    % else:
+    ##      ${_('This document is <span class="label label-warning"><i class="fa fa-globe"></i><span>shared</span></span> on internet')|n}.
+    ##      ${_('The associated url is:')} <a href="FIXME">${poNode.public_url_key}</a>
+    ##    % endif
+    ##  </p>
+      <!-- Button to trigger modal -->
+    % if user.user_id==poNode.owner_id or (user_rights and user_rights.hasWriteAccess()):
+      <a href="#edit-document-share-properties" role="button" class="btn btn-success" data-toggle="modal">
+        <i class="fa fa-edit"></i>
+        ${_('Edit share options')}
+      </a>
+    % endif
+
+    <!-- Modal -->
+    <div
+      id="edit-document-share-properties"
+      class="modal hide"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel"
+      aria-hidden="true">
+      
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Document sharing options</h3>
+      </div>
+      <div class="modal-body">
+
+        <form id='document-share-form' method="GET" action="${tg.url('/api/set_access_management')}">
+          <input type="hidden" name="node_id" value="${poNode.node_id}" />
+          <input type="hidden" name="read" value="0" />
+          <input type="hidden" name="write" value="0" />
+          <fieldset>
+            <label class="checkbox">
+              <input name="is_shared" type="checkbox" id="document-share-selector" ${('', 'checked')[poNode.is_shared]}/>
+              ${_('Share document with collaborators.')}
+            </label>
+            <div id="document-share-people-selector">
+              <p>${_('Select read and write access for each group or people...')}</p>
+              <script>
+              function updateRights(psUserId, piNewValue) {
+                if (typeof piNewValue === 'undefined') { piNewValue = -1; }
+                var ACCESS_UNDEFINED = -1;
+                var ACCESS_NONE = 0;
+                var ACCESS_READ = 1;
+                var ACCESS_WRITE = 2;
+                
+                var nodeIdForSelectedUser = 'user-'+psUserId+'-value';
+                var widgetRead = $('#'+nodeIdForSelectedUser+'-read');
+                var widgetWrite = $('#'+nodeIdForSelectedUser+'-write');
+                var oldReadValue = widgetRead.val()
+                var oldWriteValue = widgetWrite.val();
+                
+                if(oldReadValue=='' && oldWriteValue=='' && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_READ) {
+  ## SET READ ACCESS
+                  widgetRead.val(psUserId)
+                  widgetWrite.val('')
+                  newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span>';
+                } else if(oldReadValue==psUserId && oldWriteValue=='' && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_READ+ACCESS_WRITE) {
+  ## SET READ + WRITE ACCESS
+                  widgetRead.val(psUserId)
+                  widgetWrite.val(psUserId)
+                  newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span> <span class="label label-warning" title="${'Allow to modify the item'}">W</span>';
+                } else if (oldReadValue==psUserId && oldWriteValue==psUserId && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_NONE) {
+  ## SET NO ACCESS
+                  widgetRead.val('')
+                  widgetWrite.val('')
+                  newHtml = '';
+                } else {
+  ## SET READ ACCESS (default)
+                  widgetRead.val(psUserId)
+                  widgetWrite.val('')
+                  newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span>';
+                }
+                
+                visibleid = 'user-'+psUserId+'-rights';
+                $("#"+visibleid).html(newHtml);
+              }
+              </script>
+              
+              <table class="table table-striped table-hover table-condensed">
+      ######
+      ##
+      ## REAL GROUPS LISTING HERE
+      ##
+                <thead>
+                  <tr>
+                    <th><i class="fa fa-group"></i></th>
+                    <th>${_('Group')}</th>
+                    <th>${_('Access')}</th>
+                  </tr>
+                </thead>
+                % for loGroupRightsOnNode in real_group_rights:
+
+                <tr id='user-${loGroupRightsOnNode.group_id}-rights-row'>
+                  <td>
+                    <a
+                      class="btn btn-mini"
+                      onclick="updateRights(${loGroupRightsOnNode.group_id})"
+                    >
+                      <i class="fa fa-key"></i>
+                    </a>
+                  </td>
+                  <td class='pod-highlightable-access-management-cell'>
+                    ${loGroupRightsOnNode.display_name}
+                    <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-read" name="read" value="" />
+                    <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-write" name="write" value="" />
+                  </td>
+                  <td id="user-${loGroupRightsOnNode.group_id}-rights" class="pod-right-cell"></td>
+                </tr>
+                % endfor
+                
+      ######
+      ##
+      ## INDIVIDUAL USERS LISTING HERE
+      ##
+                <thead>
+                  <tr>
+                    <th><i class="fa fa-user"></i></th>
+                    <th>${_('Individual Users')}</th>
+                    <th>${_('Access')}</th>
+                  </tr>
+                </thead>
+                % for loGroupRightsOnNode in user_specific_group_rights:
+                
+                <tr id='user-${loGroupRightsOnNode.group_id}-rights-row'>
+                  <td>
+                    <a
+                      class="btn btn-mini"
+                      onclick="updateRights(${loGroupRightsOnNode.group_id})"
+                    >
+                      <i class="fa fa-key"></i>
+                    </a>
+                  </td>
+                  <td class='pod-highlightable-access-management-cell'>
+                    ${loGroupRightsOnNode.display_name}
+                    <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-read" name="read" value="" />
+                    <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-write" name="write" value="" />
+                  </td>
+                  <td id="user-${loGroupRightsOnNode.group_id}-rights" class="pod-right-cell"></td>
+                </tr>
+                % endfor
+              </table>
+            </div>
+          </fieldset>
   ######
   ##
-  ## THIS WIDGET IS INTENDED TO BE USED ONE TIME ONLY IN A PAGE
+  ## 2014-05-06 - D.A. The documents are not yet sharable through internet
   ##
-  <h4>${_('Share options')}</h4> 
-  <p>
-    % if poNode.is_shared==False:
-      <span class="pod-grey">${_('This document is not shared')}</span>
-    % else:
-      <span class="">${_('This document is shared.')}</span>
-    % endif
-  </p>
-  <p>
-    % if poNode.is_shared==True:
-    <table class="table table-striped table-hover table-condensed">
-      <thead>
-        <tr>
-          <th><i class="fa fa-group"></i> ${_('Groups')}</th>
-          <th></th>
-        </tr>
-      </thead>
-      % for loGroupRightsOnNode in real_group_rights:
-        % if loGroupRightsOnNode.hasSomeAccess():
-          <tr>
-            <td>${loGroupRightsOnNode.display_name}</td>
-            <td>
-              % if loGroupRightsOnNode.hasReadAccess():
-                <span class="label label-success">R</span>
-              % endif
-              % if loGroupRightsOnNode.hasWriteAccess():
-                <span class="label label-warning">W</span>
-              % endif
-            </td>
-          </tr>
-        % endif
-      % endfor
-      <thead>
-        <tr>
-          <th><i class="fa fa-user"></i> ${_('Individual users')}</th>
-          <th></th>
-        </tr>
-      </thead>
-      % for loGroupRightsOnNode in user_specific_group_rights:
-        % if loGroupRightsOnNode.hasSomeAccess():
-          <tr>
-            <td>${loGroupRightsOnNode.display_name}</td>
-            <td>
-              % if loGroupRightsOnNode.hasReadAccess():
-                <span class="label label-success">R</span>
-              % endif
-              % if loGroupRightsOnNode.hasWriteAccess():
-                <span class="label label-warning">W</span>
-              % endif
-            </td>
-          </tr>
-        % endif
-      % endfor
-    </table>
-    
-    % endif
-  <p>
+  ##        <fieldset>
+  ##          <label class="checkbox">
+  ##            <input name="is_public" type="checkbox" id="document-public-selector" ${('', 'checked')[poNode.is_public]}/>
+  ##            ${_('Internet shared document')}
+  ##            <i class="fa fa-globe"></i>
+  ##          </label>
+  ##          <label id="document-public-key-selector">
+  ##            ${_('Key')}
+  ##            <div class="input-append">
+  ##              <input name="url_public_key" id="document-public-key" type="text">
+  ##              <span id="document-public-key-refresh-button" class="add-on btn" title="${_('Regenerate key')}">
+  ##                <i class="fa fa-refresh"></i>
+  ##              </span>
+  ##            </div>
+  ##            <p><a id='document-public-key-url' href="">http://share.pod.com/document/azefnzeioguneriugnreiugnre</a></p>
+  ##          </label>
 
-######
-##
-## 2014-05-06 - D.A. We do not share documents on internet yet.
-##
-##  <p>
-##    % if poNode.is_public==False:
-##      ${_('This document is not shared on internet')|n}
-##    % else:
-##      ${_('This document is <span class="label label-warning"><i class="fa fa-globe"></i><span>shared</span></span> on internet')|n}.
-##      ${_('The associated url is:')} <a href="FIXME">${poNode.public_url_key}</a>
-##    % endif
-##  </p>
-  <!-- Button to trigger modal -->
-% if user.user_id==poNode.owner_id or (user_rights and user_rights.hasWriteAccess()):
-  <a href="#edit-document-share-properties" role="button" class="btn btn-success" data-toggle="modal">
-    <i class="fa fa-edit"></i>
-    ${_('Edit share options')}
-  </a>
-% endif
-
-  <!-- Modal -->
-  <div
-    id="edit-document-share-properties"
-    class="modal hide"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="myModalLabel"
-    aria-hidden="true">
-    
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 id="myModalLabel">Document sharing options</h3>
-    </div>
-    <div class="modal-body">
-
-      <form id='document-share-form' method="GET" action="${tg.url('/api/set_access_management')}">
-        <input type="hidden" name="node_id" value="${poNode.node_id}" />
-        <input type="hidden" name="read" value="0" />
-        <input type="hidden" name="write" value="0" />
-        <fieldset>
-          <label class="checkbox">
-            <input name="is_shared" type="checkbox" id="document-share-selector" ${('', 'checked')[poNode.is_shared]}/>
-            ${_('Share document with collaborators.')}
-          </label>
-          <div id="document-share-people-selector">
-            <p>${_('Select read and write access for each group or people...')}</p>
-            <script>
-            function updateRights(psUserId, piNewValue) {
-              if (typeof piNewValue === 'undefined') { piNewValue = -1; }
-              var ACCESS_UNDEFINED = -1;
-              var ACCESS_NONE = 0;
-              var ACCESS_READ = 1;
-              var ACCESS_WRITE = 2;
-              
-              var nodeIdForSelectedUser = 'user-'+psUserId+'-value';
-              var widgetRead = $('#'+nodeIdForSelectedUser+'-read');
-              var widgetWrite = $('#'+nodeIdForSelectedUser+'-write');
-              var oldReadValue = widgetRead.val()
-              var oldWriteValue = widgetWrite.val();
-              
-              if(oldReadValue=='' && oldWriteValue=='' && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_READ) {
-## SET READ ACCESS
-                widgetRead.val(psUserId)
-                widgetWrite.val('')
-                newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span>';
-              } else if(oldReadValue==psUserId && oldWriteValue=='' && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_READ+ACCESS_WRITE) {
-## SET READ + WRITE ACCESS
-                widgetRead.val(psUserId)
-                widgetWrite.val(psUserId)
-                newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span> <span class="label label-warning" title="${'Allow to modify the item'}">W</span>';
-              } else if (oldReadValue==psUserId && oldWriteValue==psUserId && piNewValue==ACCESS_UNDEFINED || piNewValue==ACCESS_NONE) {
-## SET NO ACCESS
-                widgetRead.val('')
-                widgetWrite.val('')
-                newHtml = '';
-              } else {
-## SET READ ACCESS (default)
-                widgetRead.val(psUserId)
-                widgetWrite.val('')
-                newHtml = '<span class="label label-success" title="${'Allow to read the item'}">R</span>';
-              }
-              
-              visibleid = 'user-'+psUserId+'-rights';
-              $("#"+visibleid).html(newHtml);
-            }
-            </script>
-            
-            <table class="table table-striped table-hover table-condensed">
-    ######
-    ##
-    ## REAL GROUPS LISTING HERE
-    ##
-              <thead>
-                <tr>
-                  <th><i class="fa fa-group"></i></th>
-                  <th>${_('Group')}</th>
-                  <th>${_('Access')}</th>
-                </tr>
-              </thead>
-              % for loGroupRightsOnNode in real_group_rights:
-
-              <tr id='user-${loGroupRightsOnNode.group_id}-rights-row'>
-                <td>
-                  <a
-                    class="btn btn-mini"
-                    onclick="updateRights(${loGroupRightsOnNode.group_id})"
-                  >
-                    <i class="fa fa-key"></i>
-                  </a>
-                </td>
-                <td class='pod-highlightable-access-management-cell'>
-                  ${loGroupRightsOnNode.display_name}
-                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-read" name="read" value="" />
-                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-write" name="write" value="" />
-                </td>
-                <td id="user-${loGroupRightsOnNode.group_id}-rights" class="pod-right-cell"></td>
-              </tr>
-              % endfor
-              
-    ######
-    ##
-    ## INDIVIDUAL USERS LISTING HERE
-    ##
-              <thead>
-                <tr>
-                  <th><i class="fa fa-user"></i></th>
-                  <th>${_('Individual Users')}</th>
-                  <th>${_('Access')}</th>
-                </tr>
-              </thead>
-              % for loGroupRightsOnNode in user_specific_group_rights:
-              
-              <tr id='user-${loGroupRightsOnNode.group_id}-rights-row'>
-                <td>
-                  <a
-                    class="btn btn-mini"
-                    onclick="updateRights(${loGroupRightsOnNode.group_id})"
-                  >
-                    <i class="fa fa-key"></i>
-                  </a>
-                </td>
-                <td class='pod-highlightable-access-management-cell'>
-                  ${loGroupRightsOnNode.display_name}
-                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-read" name="read" value="" />
-                  <input type="hidden" id="user-${loGroupRightsOnNode.group_id}-value-write" name="write" value="" />
-                </td>
-                <td id="user-${loGroupRightsOnNode.group_id}-rights" class="pod-right-cell"></td>
-              </tr>
-              % endfor
-            </table>
-          </div>
-        </fieldset>
-######
-##
-## 2014-05-06 - D.A. The documents are not yet sharable through internet
-##
-##        <fieldset>
-##          <label class="checkbox">
-##            <input name="is_public" type="checkbox" id="document-public-selector" ${('', 'checked')[poNode.is_public]}/>
-##            ${_('Internet shared document')}
-##            <i class="fa fa-globe"></i>
-##          </label>
-##          <label id="document-public-key-selector">
-##            ${_('Key')}
-##            <div class="input-append">
-##              <input name="url_public_key" id="document-public-key" type="text">
-##              <span id="document-public-key-refresh-button" class="add-on btn" title="${_('Regenerate key')}">
-##                <i class="fa fa-refresh"></i>
-##              </span>
-##            </div>
-##            <p><a id='document-public-key-url' href="">http://share.pod.com/document/azefnzeioguneriugnreiugnre</a></p>
-##          </label>
-
-        </fieldset>
-####
-## Button replaced by modal dialog button
-##        <button type="submit" class="btn btn-success">
-##          <i class="fa fa-check"></i>
-##          ${_('Save')}
-##        </button>
-      </form>
-    </div>
-    <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">
-      <i class="fa fa-ban"></i> ${_('Cancel')}
-    </button>
-    <button class="btn btn-success" id="document-share-form-submit-button">
-      <i class="fa fa-check"></i> ${_('Save changes')}
-    </button>
-    </div>
-    <script>
-##
-## 2014-05-06 - D.A. - Documents are not yet sharable through internet
-##
-##        function refreshDocumentPublicKey(psNewPublicKey) {
-##          var lsNewUrl = 'http://share.pod.com/document/'+psNewPublicKey;
-##          $('#document-public-key').val(psNewPublicKey);
-##          $('#document-public-key-url').attr('href', lsNewUrl);
-##          $('#document-public-key-url').text(lsNewUrl);
-##        }
-      
-      function toggleDocumentSharePeopleSelector(pbShowIt) {
-        if (pbShowIt) {
-          $('#document-share-people-selector').show();
-          // $('#document-share-people-selector input').removeAttr("disabled");
-        } else {
-          $('#document-share-people-selector').hide();
-          // $('#document-share-people-selector input').prop('disabled', 'disabled');
+          </fieldset>
+  ####
+  ## Button replaced by modal dialog button
+  ##        <button type="submit" class="btn btn-success">
+  ##          <i class="fa fa-check"></i>
+  ##          ${_('Save')}
+  ##        </button>
+        </form>
+      </div>
+      <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">
+        <i class="fa fa-ban"></i> ${_('Cancel')}
+      </button>
+      <button class="btn btn-success" id="document-share-form-submit-button">
+        <i class="fa fa-check"></i> ${_('Save changes')}
+      </button>
+      </div>
+      <script>
+  ##
+  ## 2014-05-06 - D.A. - Documents are not yet sharable through internet
+  ##
+  ##        function refreshDocumentPublicKey(psNewPublicKey) {
+  ##          var lsNewUrl = 'http://share.pod.com/document/'+psNewPublicKey;
+  ##          $('#document-public-key').val(psNewPublicKey);
+  ##          $('#document-public-key-url').attr('href', lsNewUrl);
+  ##          $('#document-public-key-url').text(lsNewUrl);
+  ##        }
+        
+        function toggleDocumentSharePeopleSelector(pbShowIt) {
+          if (pbShowIt) {
+            $('#document-share-people-selector').show();
+            // $('#document-share-people-selector input').removeAttr("disabled");
+          } else {
+            $('#document-share-people-selector').hide();
+            // $('#document-share-people-selector input').prop('disabled', 'disabled');
+          }
         }
-      }
 
-##
-## 2014-05-06 - D.A. - Documents are not yet sharable through internet
-##
-##        function toggleDocumentPublicKeyGenerator(pbShowIt) {
-##          if (pbShowIt) {
-##            $('#document-public-key-selector input').removeAttr("disabled");
-##            $('#document-public-key-refresh-button').removeProp('disabled');
-##            $('#document-public-key-refresh-button').removeClass('btn-disabled');
-##            $('#document-public-key-selector a').show();
-##            $('#document-public-key-refresh-button').on("click").click(function () {
-##              refreshDocumentPublicKey(generateStringId()); // New random 32-char id
-##            });
-##            if($('#document-public-key-selector input').val()=='') {
-##              refreshDocumentPublicKey(generateStringId());
-##            }
-##          } else {
-##            $('#document-public-key-refresh-button').prop('disabled', true);
-##            $('#document-public-key-refresh-button').addClass('btn-disabled');
-##            $('#document-public-key-selector input').prop('disabled', 'disabled');
-##            $('#document-public-key-refresh-button').off("click");
-##            $('#document-public-key-selector a').hide();
-##          }
-##        }
-##
-##
-##
+  ##
+  ## 2014-05-06 - D.A. - Documents are not yet sharable through internet
+  ##
+  ##        function toggleDocumentPublicKeyGenerator(pbShowIt) {
+  ##          if (pbShowIt) {
+  ##            $('#document-public-key-selector input').removeAttr("disabled");
+  ##            $('#document-public-key-refresh-button').removeProp('disabled');
+  ##            $('#document-public-key-refresh-button').removeClass('btn-disabled');
+  ##            $('#document-public-key-selector a').show();
+  ##            $('#document-public-key-refresh-button').on("click").click(function () {
+  ##              refreshDocumentPublicKey(generateStringId()); // New random 32-char id
+  ##            });
+  ##            if($('#document-public-key-selector input').val()=='') {
+  ##              refreshDocumentPublicKey(generateStringId());
+  ##            }
+  ##          } else {
+  ##            $('#document-public-key-refresh-button').prop('disabled', true);
+  ##            $('#document-public-key-refresh-button').addClass('btn-disabled');
+  ##            $('#document-public-key-selector input').prop('disabled', 'disabled');
+  ##            $('#document-public-key-refresh-button').off("click");
+  ##            $('#document-public-key-selector a').hide();
+  ##          }
+  ##        }
+  ##
+  ##
+  ##
 
-      // Callbacks setup
-      $('#document-share-selector').change(function () {
-        var checkedValue = $('#document-share-selector').prop("checked");
-        toggleDocumentSharePeopleSelector(checkedValue);
-      });
+        // Callbacks setup
+        $('#document-share-selector').change(function () {
+          var checkedValue = $('#document-share-selector').prop("checked");
+          toggleDocumentSharePeopleSelector(checkedValue);
+        });
 
-##        $('#document-public-selector').change(function () {
-##          var checkedValue = $('#document-public-selector').prop("checked");
-##          toggleDocumentPublicKeyGenerator(checkedValue);
-##        });
+  ##        $('#document-public-selector').change(function () {
+  ##          var checkedValue = $('#document-public-selector').prop("checked");
+  ##          toggleDocumentPublicKeyGenerator(checkedValue);
+  ##        });
 
-      // Submit access-management modal dialog form
-      $('#document-share-form-submit-button').click(function(){
-        $("input[name='read'][value='']").remove();
-        $("input[name='write'][value='']").remove();
-        $('#document-share-form')[0].submit();
-      });
+        // Submit access-management modal dialog form
+        $('#document-share-form-submit-button').click(function(){
+          $("input[name='read'][value='']").remove();
+          $("input[name='write'][value='']").remove();
+          $('#document-share-form')[0].submit();
+        });
 
-      // Initial setup
-      // Activate or disactivate users selector according
-      // to current state of the is_shared property
-      //
-      // FIXME - 2014-05-06 - This is not working (should be done at document.ready time)
-      // note: putting this in a document.ready callback does not work.
-      //
-##
-## The following code is something like dirty ;)
-## the goal of this piece of code is to setup view
-## according to hidden input values
-## for read/write access management
-##
+        // Initial setup
+        // Activate or disactivate users selector according
+        // to current state of the is_shared property
+        //
+        // FIXME - 2014-05-06 - This is not working (should be done at document.ready time)
+        // note: putting this in a document.ready callback does not work.
+        //
+  ##
+  ## The following code is something like dirty ;)
+  ## the goal of this piece of code is to setup view
+  ## according to hidden input values
+  ## for read/write access management
+  ##
 
-## FIXME      % for loGroupRightsOnNode in real_group_rights:
-##      % for loCurrentGroup in real_group_rights + user_specific_group_rights:
-      % for loGroupRightsOnNode in real_group_rights + user_specific_group_rights:
-        % if loGroupRightsOnNode.hasSomeAccess()==False:
-          updateRights(${loGroupRightsOnNode.group_id}, 0);
-        % else:
-##
-## The following line should build some javascript code similar to this:
-## updateRights(-5, 3);
-          updateRights(${loGroupRightsOnNode.group_id}, ${loGroupRightsOnNode.rights});
-        % endif
-      % endfor
+  ## FIXME      % for loGroupRightsOnNode in real_group_rights:
+  ##      % for loCurrentGroup in real_group_rights + user_specific_group_rights:
+        % for loGroupRightsOnNode in real_group_rights + user_specific_group_rights:
+          % if loGroupRightsOnNode.hasSomeAccess()==False:
+            updateRights(${loGroupRightsOnNode.group_id}, 0);
+          % else:
+  ##
+  ## The following line should build some javascript code similar to this:
+  ## updateRights(-5, 3);
+            updateRights(${loGroupRightsOnNode.group_id}, ${loGroupRightsOnNode.rights});
+          % endif
+        % endfor
 
-      toggleDocumentSharePeopleSelector($('#document-share-selector').prop("checked"));
-##        toggleDocumentPublicKeyGenerator($('#document-public-selector').prop("checked"));  
-##        
-##        refreshDocumentPublicKey($('#document-public-key').val()); // First init
+        toggleDocumentSharePeopleSelector($('#document-share-selector').prop("checked"));
+  ##        toggleDocumentPublicKeyGenerator($('#document-public-selector').prop("checked"));  
+  ##        
+  ##        refreshDocumentPublicKey($('#document-public-key').val()); // First init
 
-    </script>
-  </div>
+      </script>
+    </div>
 </%def>
 
 <%def name="FileTabContent(poNode)">

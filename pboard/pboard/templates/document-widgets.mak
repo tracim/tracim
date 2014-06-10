@@ -723,15 +723,15 @@
             if(shouldRemoveNodeCallBack && shouldRemoveNodeCallBack(parentTreeViewItem, currentTreeViewItem, rootList)) {
                 console.log('Will remove node #'+currentTreeViewItem.id+' from tree view');
                 if(parentTreeViewItem!=null) {
-                  var currentTreeViewItemPosition = parentTreeViewItem.children.indexOf(currentTreeViewItem);
-                  if(currentTreeViewItemPosition != -1) {
-                      parentTreeViewItem.children.splice(currentTreeViewItemPosition, 1);
-                  }
+                    var currentTreeViewItemPosition = parentTreeViewItem.children.indexOf(currentTreeViewItem);
+                    if(currentTreeViewItemPosition != -1) {
+                        parentTreeViewItem.children.splice(currentTreeViewItemPosition, 1);
+                    }
                 } else {
-                  var currentTreeViewItemPosition = rootList.indexOf(currentTreeViewItem);
-                  if(currentTreeViewItemPosition != -1) {
-                      rootList.splice(currentTreeViewItemPosition, 1);
-                  }
+                    var currentTreeViewItemPosition = rootList.indexOf(currentTreeViewItem);
+                    if(currentTreeViewItemPosition != -1) {
+                        rootList.splice(currentTreeViewItemPosition, 1);
+                    }
                 }
                 
             } else {
