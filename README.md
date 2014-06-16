@@ -136,8 +136,12 @@ conflict between system-wide python modules and pod required ones.
     cd pod && python setup.py develop && cd -
     pip install -r install/requirements.txt
     
-Note: you may get errors with stevedore/pbr which is not supported by python 3.2
+Notes:
+
+* Debian: you may get errors with stevedore/pbr which is not supported by python 3.2
 (debian version of python 3). This is not a real problem
+* Ubuntu (at least 14.04): you should remove _distribute_ and _wsgiref _
+  from the requirements.txt file
 
 ### Create configuration ###
 
