@@ -1,4 +1,4 @@
-APP_CONFIG = "/home/daccorsi/sources/protos/pboard/pod/development.ini"
+APP_CONFIG = "/home/daccorsi/sources/pod/pod/development.ini"
 
 #Setup logging
 import logging

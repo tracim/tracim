@@ -65,7 +65,7 @@ echo
 echo "-------------------------"
 echo "- setup project"
 echo "-------------------------"
-cd pboard/
+cd pod/
 python setup.py develop
 echo
 echo
