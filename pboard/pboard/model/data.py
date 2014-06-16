@@ -21,9 +21,9 @@ from sqlalchemy import orm as sqlao
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 
 import tg
-from pboard.model import DeclarativeBase, metadata, DBSession
-from pboard.model import auth as pma
-from pboard.lib.base import current_user
+from pod.model import DeclarativeBase, metadata, DBSession
+from pod.model import auth as pma
+from pod.lib.base import current_user
 
 
 class PBNodeStatusItem(object):

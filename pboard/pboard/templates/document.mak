@@ -1,7 +1,7 @@
 <%inherit file="local:templates.master"/>
-<%namespace name="POD" file="pboard.templates.pod"/>
-<%namespace name="DOC" file="pboard.templates.document-widgets"/>
-<%namespace name="DOCTABS" file="pboard.templates.document-widgets-tabs"/>
+<%namespace name="POD" file="pod.templates.pod"/>
+<%namespace name="DOC" file="pod.templates.document-widgets"/>
+<%namespace name="DOCTABS" file="pod.templates.document-widgets-tabs"/>
 
 <%def name="title()">
   % if current_node!=None:

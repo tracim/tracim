@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Predicates for authorizations"""
 from tg.predicates import Predicate
-from pboard.model import DBSession as session
-from pboard.model.auth import Permission, User
+from pod.model import DBSession as session
+from pod.model.auth import Permission, User
 import logging as l
 
 DIRTY_canReadOrCanWriteSqlQuery = """

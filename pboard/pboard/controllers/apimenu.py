@@ -2,10 +2,10 @@
 
 import tg
 
-from pboard.lib import base as plb
-from pboard.lib import dbapi as pld
-from pboard.model import data as pmd
-from pboard.model import serializers as pms
+from pod.lib import base as plb
+from pod.lib import dbapi as pld
+from pod.model import data as pmd
+from pod.model import serializers as pms
 
 class PODApiMenuController(plb.BaseController):
 

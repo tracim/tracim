@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Setup the pboard application"""
+"""Setup the pod application"""
 from __future__ import print_function
 
 import logging
 from tg import config
-from pboard import model
+from pod import model
 import transaction
 
 def bootstrap(command, conf, vars):
-    """Place any commands to setup pboard here"""
+    """Place any commands to setup pod here"""
 
     # <websetup.bootstrap.before.auth
     from sqlalchemy.exc import IntegrityError

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""WSGI environment setup for pboard."""
+"""WSGI environment setup for pod."""
 
-from pboard.config.app_cfg import base_config
+from pod.config.app_cfg import base_config
 
 __all__ = ['load_environment']
 

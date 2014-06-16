@@ -2,7 +2,7 @@
 """
 Integration tests for the :mod:`repoze.who`-powered authentication sub-system.
 
-As pboard grows and the authentication method changes, only these tests
+As pod grows and the authentication method changes, only these tests
 should be updated.
 
 """
@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 
 from nose.tools import eq_, ok_
 
-from pboard.tests import TestController
+from pod.tests import TestController
 
 
 class TestAuthentication(TestController):

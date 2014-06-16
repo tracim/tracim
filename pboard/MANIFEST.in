@@ -1,4 +1,4 @@
-recursive-include pboard/public *
-include pboard/public/favicon.ico
-recursive-include pboard/i18n *
-recursive-include pboard/templates *
+recursive-include pod/public *
+include pod/public/favicon.ico
+recursive-include pod/i18n *
+recursive-include pod/templates *

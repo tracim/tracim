@@ -1,5 +1,5 @@
 #
-# pboard - TurboGears 2 development environment configuration
+# pod - TurboGears 2 development environment configuration
 #
 # The %(here)s variable will be replaced with the parent directory of this file
 #
@@ -23,11 +23,11 @@ port = 8080
 cookie_secret = 3283411b-1904-4554-b0e1-883863b53080
 
 [app:main]
-use = egg:pboard
+use = egg:pod
 full_stack = true
 #lang = fr_FR
 cache_dir = %(here)s/data
-beaker.session.key = pboard
+beaker.session.key = pod
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
 
 #By default session is store in cookies to avoid the overhead
@@ -54,13 +54,8 @@ beaker.session.validate_key = 3283411b-1904-4554-b0e1-883863b53080
 # invalidate the URI when specifying a SQLite db via path name
 # sqlalchemy.url=postgresql://username:password@hostname:port/databasename
 # sqlalchemy.url=mysql://username:password@hostname:port/databasename
-
-
-# If you have sqlite, here's a simple default to get you started
-# in development
-
-#sqlalchemy.url = postgresql://pboard:pboard@127.0.0.1:5432/pboarddb
 sqlalchemy.url = postgresql://pod_user:pod_user_password@127.0.0.1:5432/pod
+
 #echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
 sqlalchemy.echo_pool = false
@@ -100,7 +95,7 @@ toscawidgets.framework.resource_variant=debug
 #js_tracker_path = analytics.js
 
 [loggers]
-keys = root, pboard, sqlalchemy, auth
+keys = root, pod, sqlalchemy, auth
 
 [handlers]
 keys = console
@@ -113,10 +108,10 @@ keys = generic
 level = INFO
 handlers = console
 
-[logger_pboard]
+[logger_pod]
 level = DEBUG
 handlers =
-qualname = pboard
+qualname = pod
 
 [logger_sqlalchemy]
 level = INFO

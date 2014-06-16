@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Setup the pboard application"""
+"""Setup the pod application"""
 from __future__ import print_function
 
 import logging
@@ -7,11 +7,11 @@ from tg import config
 import transaction
 
 def setup_schema(command, conf, vars):
-    """Place any commands to setup pboard here"""
+    """Place any commands to setup pod here"""
     # Load the models
 
     # <websetup.websetup.schema.before.model.import>
-    from pboard import model
+    from pod import model
     # <websetup.websetup.schema.after.model.import>
 
     

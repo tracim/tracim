@@ -4,11 +4,11 @@ import tg
 import repoze.who.api
 
 from tg import _compat
-from pboard.lib import base as plb
-from pboard.lib import dbapi as pld
-from pboard import model as pm
-from pboard.model import data as pmd
-from pboard.model import serializers as pms
+from pod.lib import base as plb
+from pod.lib import dbapi as pld
+from pod import model as pm
+from pod.model import data as pmd
+from pod.model import serializers as pms
 
 from tg.i18n import ugettext as _
 

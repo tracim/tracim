@@ -1,4 +1,4 @@
-<%namespace name="POD" file="pboard.templates.pod"/>
+<%namespace name="POD" file="pod.templates.pod"/>
 <!DOCTYPE html>
 <html>
 <head>

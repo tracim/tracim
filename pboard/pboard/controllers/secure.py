@@ -4,7 +4,7 @@ from tg import expose, flash
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg.predicates import has_permission
 
-from pboard.lib.base import BaseController
+from pod.lib.base import BaseController
 
 __all__ = ['SecureController']
 
@@ -15,13 +15,13 @@ class SecureController(BaseController):
     allow_only = has_permission('manage',
                                 msg=l_('Only for people with the "manage" permission'))
     
-    @expose('pboard.templates.index')
+    @expose('pod.templates.index')
     def index(self):
         """Let the user know that's visiting a protected controller."""
         flash(_("Secure Controller here"))
         return dict(page='index')
     
-    @expose('pboard.templates.index')
+    @expose('pod.templates.index')
     def some_where(self):
         """Let the user know that this action is protected too."""
         return dict(page='some_where')

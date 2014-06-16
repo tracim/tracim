@@ -2,9 +2,9 @@
 """Unit test suite for the models of the application."""
 
 from nose.tools import eq_
-from pboard.model import DBSession
-from pboard.tests import load_app
-from pboard.tests import setup_db, teardown_db
+from pod.model import DBSession
+from pod.tests import load_app
+from pod.tests import setup_db, teardown_db
 
 __all__ = ['ModelTest']
 

@@ -1,5 +1,5 @@
 #
-# pboard - TurboGears 2 production environment configuration
+# pod - TurboGears 2 production environment configuration
 #
 # The %(here)s variable will be replaced with the parent directory of this file
 #
@@ -21,10 +21,10 @@ port = 8080
 cookie_secret = ${app_instance_secret}
 
 [app:main]
-use = egg:pboard
+use = egg:pod
 full_stack = true
 cache_dir = %(here)s/data
-beaker.session.key = pboard
+beaker.session.key = pod
 beaker.session.secret = ${app_instance_secret}
 app_instance_uuid = ${app_instance_uuid}
 
@@ -55,7 +55,7 @@ templating.genshi.method = xhtml
 # http://docs.python.org/lib/logging-config-fileformat.html
 
 [loggers]
-keys = root, pboard, sqlalchemy, auth
+keys = root, pod, sqlalchemy, auth
 
 [handlers]
 keys = console
@@ -68,10 +68,10 @@ keys = generic
 level = INFO
 handlers = console
 
-[logger_pboard]
+[logger_pod]
 level = INFO
 handlers =
-qualname = pboard
+qualname = pod
 
 [logger_sqlalchemy]
 level = WARN

@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
-import pboard
+import pod
 
 import tg
 from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg import predicates
-from pboard.lib.auth import can_read
+from pod.lib.auth import can_read
 
-from pboard.lib.base import BaseController
-from pboard.controllers.error import ErrorController
+from pod.lib.base import BaseController
+from pod.controllers.error import ErrorController
 
-from pboard.lib import dbapi as pld
-from pboard.controllers import api as pca
-from pboard.controllers import apipublic as pcap
-from pboard.controllers import debug as pbcd
-from pboard.controllers import adminuser as pbcu
-from pboard.controllers import admingroup as pbcg
+from pod.lib import dbapi as pld
+from pod.controllers import api as pca
+from pod.controllers import apipublic as pcap
+from pod.controllers import debug as pbcd
+from pod.controllers import adminuser as pbcu
+from pod.controllers import admingroup as pbcg
 
-from pboard import model as pm
+from pod import model as pm
 
-import pboard.model.data as pbmd
+import pod.model.data as pbmd
 
 __all__ = ['RootController']
 
@@ -32,7 +32,7 @@ class AdminController(BaseController):
 
 class RootController(BaseController):
     """
-    The root controller for the pboard application.
+    The root controller for the pod application.
 
     All the other controllers and WSGI applications should be mounted on this
     controller. For example::
@@ -54,21 +54,21 @@ class RootController(BaseController):
     public_api = pcap.PODPublicApiController()
 
     def _before(self, *args, **kw):
-        tmpl_context.project_name = "pboard"
+        tmpl_context.project_name = "pod"
 
-    @expose('pboard.templates.index')
+    @expose('pod.templates.index')
     def index(self):
         """Handle the front-page."""
         return dict()
 
 
-    @expose('pboard.templates.about')
+    @expose('pod.templates.about')
     def about(self):
         """Handle the about-page."""
         return dict()
 
 
-    @expose('pboard.templates.login')
+    @expose('pod.templates.login')
     def login(self, came_from=lurl('/')):
         """Start the user login."""
         login_counter = request.environ.get('repoze.who.logins', 0)
@@ -102,7 +102,7 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         redirect(came_from)
         
-    @expose('pboard.templates.dashboard')
+    @expose('pod.templates.dashboard')
     @require(predicates.in_group('user', msg=l_('Please login to access this page')))
     def dashboard(self):
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
@@ -114,7 +114,7 @@ class RootController(BaseController):
         return dict(last_modified_nodes=loLastModifiedNodes, whats_hot_nodes=loWhatsHotNodes, action_to_do_nodes = loActionToDoNodes)
 
 
-    @expose('pboard.templates.document')
+    @expose('pod.templates.document')
     #@require(predicates.in_group('user', msg=l_('Please login to access this page')))
     @require(can_read())
     def document(self, node_id=0, version=0, came_from=lurl('/'), highlight=''):
@@ -161,7 +161,7 @@ class RootController(BaseController):
             current_user_rights = current_user_rights
         )
 
-    @expose('pboard.templates.search')
+    @expose('pod.templates.search')
     @require(predicates.in_group('user', msg=l_('Please login to access this page')))
     def search(self, keywords=''):
         loCurrentUser   = pld.PODStaticController.getCurrentUser()
@@ -171,7 +171,7 @@ class RootController(BaseController):
 
         return dict(search_string=keywords, found_nodes=loFoundNodes)
 
-    @expose('pboard.templates.create_account')
+    @expose('pod.templates.create_account')
     def create_account(self):
         return dict()
 

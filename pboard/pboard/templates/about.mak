@@ -1,5 +1,5 @@
 <%inherit file="local:templates.master"/>
-<%namespace name="POD" file="pboard.templates.pod"/>
+<%namespace name="POD" file="pod.templates.pod"/>
 
 <%def name="title()">
   pod :: take notes, list tasks, write documents, manage projects

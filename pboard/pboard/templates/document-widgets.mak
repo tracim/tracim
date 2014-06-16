@@ -1,6 +1,6 @@
 <%inherit file="local:templates.master"/>
-<%namespace name="POD" file="pboard.templates.pod"/>
-<%namespace name="DOCTABS" file="pboard.templates.document-widgets-tabs"/>
+<%namespace name="POD" file="pod.templates.pod"/>
+<%namespace name="DOCTABS" file="pod.templates.document-widgets-tabs"/>
 
 <%def name="node_treeview_for_set_parent_menu(node_id, node_list, indentation=-1)">
   % if indentation==-1:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Fallback controller."""
 
-from pboard.lib.base import BaseController
+from pod.lib.base import BaseController
 from tg import abort
 
 __all__ = ['TemplateController']
@@ -9,7 +9,7 @@ __all__ = ['TemplateController']
 
 class TemplateController(BaseController):
     """
-    The fallback controller for pboard.
+    The fallback controller for pod.
     
     By default, the final controller tried to fulfill the request
     when no other routes match. It may be used to display a template

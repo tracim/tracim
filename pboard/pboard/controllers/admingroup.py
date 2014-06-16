@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from pboard import model  as pm
+from pod import model  as pm
 
 from tgext.crud import CrudRestController
 from sprox.tablebase import TableBase
 from sprox.formbase import EditableForm, AddRecordForm
 from sprox.fillerbase import TableFiller, EditFormFiller
-from pboard.model import auth as pma
+from pod.model import auth as pma
 from tw2 import forms as tw2f
 import tg
 
@@ -15,7 +15,7 @@ from sprox._compat import unicode_text
 from formencode import Schema
 from formencode.validators import FieldsMatch
 
-from pboard.lib import dbapi as pld
+from pod.lib import dbapi as pld
 
 class AdminGroupController(CrudRestController):
     model = pma.Group

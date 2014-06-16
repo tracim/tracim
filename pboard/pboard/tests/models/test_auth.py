@@ -3,8 +3,8 @@
 from __future__ import unicode_literals
 from nose.tools import eq_
 
-from pboard import model
-from pboard.tests.models import ModelTest
+from pod import model
+from pod.tests.models import ModelTest
 
 class TestGroup(ModelTest):
     """Unit test case for the ``Group`` model."""

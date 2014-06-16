@@ -4,7 +4,7 @@ Auth* related model.
 
 This is where the models used by the authentication stack are defined.
 
-It's perfectly fine to re-use this definition in the pboard application,
+It's perfectly fine to re-use this definition in the pod application,
 though.
 
 """
@@ -19,7 +19,7 @@ from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Unicode, Integer, DateTime, Boolean
 from sqlalchemy.orm import relation, relationship, synonym
 
-from pboard.model import DeclarativeBase, metadata, DBSession
+from pod.model import DeclarativeBase, metadata, DBSession
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions.

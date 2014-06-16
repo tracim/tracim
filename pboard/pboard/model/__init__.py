@@ -59,5 +59,5 @@ def init_model(engine):
     #mapper(Reflected, t_reflected)
 
 # Import your model modules here.
-from pboard.model.auth import User, Group, Permission
-from pboard.model.data import PBNode
+from pod.model.auth import User, Group, Permission
+from pod.model.data import PBNode

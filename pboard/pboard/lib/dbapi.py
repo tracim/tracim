@@ -12,9 +12,9 @@ from sqlalchemy.orm import joinedload_all
 import sqlalchemy.orm as sqlao
 import sqlalchemy as sqla
 
-from pboard.model import data as pbmd
-from pboard.model import auth as pbma
-import pboard.model as pbm
+from pod.model import data as pbmd
+from pod.model import auth as pbma
+import pod.model as pbm
 
 import tg
 

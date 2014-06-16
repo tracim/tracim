@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import tg
-from pboard.model import data as pmd
+from pod.model import data as pmd
 
 def node_to_dict(node: pmd.PBNode, children_content, new_item_state):
     """

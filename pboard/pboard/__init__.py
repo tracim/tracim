@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-"""The pboard package"""
+"""The pod package"""

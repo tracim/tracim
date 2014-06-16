@@ -9,14 +9,14 @@ from tg import expose
 #from tg import predicates
 
 # project specific imports
-from pboard.lib.base import BaseController
-#from pboard.model import DBSession, metadata
+from pod.lib.base import BaseController
+#from pod.model import DBSession, metadata
 
 
 class SampleController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = predicates.not_anonymous()
     
-    @expose('pboard.templates.index')
+    @expose('pod.templates.index')
     def index(self):
         return dict(page='index')

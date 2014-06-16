@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Global configuration file for TG2-specific settings in pboard.
+Global configuration file for TG2-specific settings in pod.
 
 This file complements development/deployment.ini.
 
@@ -15,16 +15,16 @@ convert them into boolean, for example, you should use the
 
 from tg.configuration import AppConfig
 
-import pboard
-from pboard import model
-from pboard.lib import app_globals, helpers 
+import pod
+from pod import model
+from pod.lib import app_globals, helpers 
 
 base_config = AppConfig()
 base_config.renderers = []
 base_config.use_toscawidgets = False
 base_config.use_toscawidgets2 = True
 
-base_config.package = pboard
+base_config.package = pod
 
 #Enable json in expose
 base_config.renderers.append('json')
@@ -37,8 +37,8 @@ base_config.default_renderer = 'mako'
 base_config.renderers.append('mako')
 #Configure the base SQLALchemy Setup
 base_config.use_sqlalchemy = True
-base_config.model = pboard.model
-base_config.DBSession = pboard.model.DBSession
+base_config.model = pod.model
+base_config.DBSession = pod.model.DBSession
 # Configure the authentication backend
 
 # YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP 

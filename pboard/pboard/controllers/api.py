@@ -20,15 +20,15 @@ from tg import predicates as tgp
 
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 
-from pboard.lib.base import BaseController
-from pboard.lib   import dbapi as pld
-from pboard.model import data as pmd
-from pboard.model import auth as pma
-from pboard.model import serializers as pms
-from pboard import model as pm
-from pboard.lib.auth import can_read, can_write
+from pod.lib.base import BaseController
+from pod.lib   import dbapi as pld
+from pod.model import data as pmd
+from pod.model import auth as pma
+from pod.model import serializers as pms
+from pod import model as pm
+from pod.lib.auth import can_read, can_write
 
-from pboard.controllers import apimenu as pcam
+from pod.controllers import apimenu as pcam
 
 
 FIXME_ERROR_CODE=-1

@@ -53,17 +53,17 @@ setup(
     include_package_data=True,
     test_suite='nose.collector',
     tests_require=testpkgs,
-    package_data={'pboard': ['i18n/*/LC_MESSAGES/*.mo',
+    package_data={'pod': ['i18n/*/LC_MESSAGES/*.mo',
                                  'templates/*/*',
                                  'public/*/*']},
-    message_extractors={'pboard': [
+    message_extractors={'pod': [
             ('**.py', 'python', None),
             ('templates/**.mak', 'mako', {'input_encoding': 'utf-8'}),
             ('public/**', 'ignore', None)]},
 
     entry_points={
         'paste.app_factory': [
-            'main = pboard.config.middleware:make_app'
+            'main = pod.config.middleware:make_app'
         ],
         'gearbox.plugins': [
             'turbogears-devtools = tg.devtools'

@@ -1,12 +1,12 @@
-This file is for you to describe the pboard application. Typically
+This file is for you to describe the pod application. Typically
 you would include information such as the information below:
 
 Installation and Setup
 ======================
 
-Install ``pboard`` using the setup.py script::
+Install ``pod`` using the setup.py script::
 
-    $ cd pboard
+    $ cd pod
     $ python setup.py develop
 
 Create the project database for any model classes defined::
