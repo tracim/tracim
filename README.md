@@ -43,7 +43,7 @@ Note: the following information is for Debian. For other OS, adapt the package n
 
 You'll need to install the following packages:
 
-    apt-get install realpath python3 python-virtualenv python-dev python-pip build-essential
+    apt-get install realpath python3 python-virtualenv python3-dev python-pip build-essential postgresql-server-dev-all
 
 If you work on a local database, then you also need to install PostgreSQL:
 
@@ -54,6 +54,8 @@ If you work on a local database, then you also need to install PostgreSQL:
 Get the sources from Bitbucket:
 
     git clone https://bitbucket.org/lebouquetin/pod.git
+
+Note: Now everything is documented to be executed from the pod directory newly created.
 
 ### Setup a database ###
 
@@ -80,7 +82,6 @@ First login as root, then su as postgre and run a PostgreSQL client:
 
     root@hostname:~# su postgres
     postgres@hostname:/root$ psql
-    could not change directory to "/root"
     psql (9.1.13)
     Type "help" for help.
     
@@ -91,7 +92,7 @@ Now, type the following commands:
 
     CREATE ROLE poduser WITH LOGIN PASSWORD 'podpassword';
     CREATE DATABASE poddb OWNER poduser;
-    GRANT ALL PRIVILEGES ON DATABASE poddb to poduser;
+    GRANT ALL PRIVILEGES ON DATABASE poddb TO poduser;
 
 At the end, you can quit the psql client by running the \q quit command:
 
@@ -132,15 +133,15 @@ conflict between system-wide python modules and pod required ones.
 
     virtualenv -p /usr/bin/python3 tg2env
     source tg2env/bin/activate
-    cd pboard && python setup.py develop && cd -
-    pip install -r install/requirement.txt
+    cd pod && python setup.py develop && cd -
+    pip install -r install/requirements.txt
     
 Note: you may get errors with stevedore/pbr which is not supported by python 3.2
 (debian version of python 3). This is not a real problem
 
 ### Create configuration ###
 
-    cp pboard/development.ini.base pboard/development.ini
+    cp pod/development.ini.base pod/development.ini
 
 Configure database in the development.ini file. This is defined as sqlalchemy.url
 and the default value is below:
@@ -188,13 +189,13 @@ Install dependencies:
 
         WSGIProcessGroup pod
         WSGIDaemonProcess pod user=www-data group=adm threads=4 python-path=/opt/demo.archipeldata.com/tg2env/lib/python3.2/site-packages
-        WSGIScriptAlias / /opt/demo.archipeldata.com/pboard/productionapp.wsgi
+        WSGIScriptAlias / /opt/podinstall/pod/productionapp.wsgi
 
         #Serve static files directly without TurboGears
-        Alias /img     /opt/demo.archipeldata.com/pboard/pboard/public/img/
-        Alias /favicon.ico /opt/demo.archipeldata.com/pboard/pboard/public/favicon.ico
-        Alias /css        /opt/demo.archipeldata.com/pboard/pboard/public/css
-        Alias /javascript /opt/demo.archipeldata.com/pboard/pboard/public/javascript
+        Alias /img     /opt/podinstall/pod/pod/public/img/
+        Alias /favicon.ico /opt/podinstall/pod/pod/public/favicon.ico
+        Alias /css        /opt/podinstall/pod/pod/public/css
+        Alias /javascript /opt/podinstall/pod/pod/public/javascript
 
         CustomLog /var/log/apache2/demopod-access.log combined
         ErrorLog /var/log/apache2/demopod-error.log
@@ -204,9 +205,8 @@ Install dependencies:
 
 ### Help required ###
 
-Contact us:
+If you need help, contact us. If you want to help, contact us. So... contact us ;)
 
-* damien.accorsi@free.fr
-* sylvain.ferot@hotmail.xxx
+Damien Accorsi - damien.accorsi@free.fr
 
 
