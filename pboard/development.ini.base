@@ -25,7 +25,7 @@ cookie_secret = 3283411b-1904-4554-b0e1-883863b53080
 [app:main]
 use = egg:pboard
 full_stack = true
-#lang = ru
+#lang = fr_FR
 cache_dir = %(here)s/data
 beaker.session.key = pboard
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
@@ -60,7 +60,7 @@ beaker.session.validate_key = 3283411b-1904-4554-b0e1-883863b53080
 # in development
 
 #sqlalchemy.url = postgresql://pboard:pboard@127.0.0.1:5432/pboarddb
-sqlalchemy.url = postgresql://pod_protov1_dev:pod_protov1_dev_password@127.0.0.1:5432/pod_protov1_dev
+sqlalchemy.url = postgresql://pod_user:pod_user_password@127.0.0.1:5432/pod
 #echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
 sqlalchemy.echo_pool = false

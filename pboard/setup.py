@@ -42,12 +42,12 @@ install_requires=[
     ]
 
 setup(
-    name='pboard',
+    name='pod',
     version='0.1',
-    description='',
-    author='',
-    author_email='',
-    #url='',
+    description='Pod is collaborative software designed to allow people to work on and share various data and document types.',
+    author='The POD team',
+    author_email='damien.accorsi@free.fr',
+    url='https://bitbucket.org/lebouquetin/pod',
     packages=find_packages(exclude=['ez_setup']),
     install_requires=install_requires,
     include_package_data=True,

@@ -58,8 +58,6 @@
   <div class="footer hidden-tablet hidden-phone text-center">
     <p class="pod-blue">
       <i>${_("collaborative work  ♦  improved efficiency  ♦  full traceability")}</i>
-      <br/>
-      this is pod
     </p>
     <hr style="width: 50%; margin: 0.5em auto;"/>
     <p>Copyright &copy; 2013 - ${h.current_year()} pod project.</p>
