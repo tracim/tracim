@@ -41,8 +41,6 @@ END;
 $$;
 
 
-ALTER FUNCTION public.pod_update_node() OWNER TO pod_intranet;
-
 --
 -- Name: set_created_at(); Type: FUNCTION; Schema: public; Owner: pod_intranet
 --
@@ -58,8 +56,6 @@ END;
 $$;
 
 
-ALTER FUNCTION public.set_created_at() OWNER TO pod_intranet;
-
 --
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: pod_intranet
 --
@@ -74,8 +70,6 @@ END;
 $$;
 
 
-ALTER FUNCTION public.set_updated_at() OWNER TO pod_intranet;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -88,8 +82,6 @@ CREATE TABLE migrate_version (
     version_num character varying(32) NOT NULL
 );
 
-
-ALTER TABLE public.migrate_version OWNER TO pod_intranet;
 
 --
 -- Name: pod_group; Type: TABLE; Schema: public; Owner: pod_intranet; Tablespace: 
@@ -104,8 +96,6 @@ CREATE TABLE pod_group (
 );
 
 
-ALTER TABLE public.pod_group OWNER TO pod_intranet;
-
 --
 -- Name: pod_group_group_id_seq; Type: SEQUENCE; Schema: public; Owner: pod_intranet
 --
@@ -117,8 +107,6 @@ CREATE SEQUENCE pod_group_group_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.pod_group_group_id_seq OWNER TO pod_intranet;
 
 --
 -- Name: pod_group_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pod_intranet
@@ -138,8 +126,6 @@ CREATE TABLE pod_group_node (
 );
 
 
-ALTER TABLE public.pod_group_node OWNER TO pod_intranet;
-
 --
 -- Name: pod_group_permission; Type: TABLE; Schema: public; Owner: pod_intranet; Tablespace: 
 --
@@ -149,8 +135,6 @@ CREATE TABLE pod_group_permission (
     permission_id integer NOT NULL
 );
 
-
-ALTER TABLE public.pod_group_permission OWNER TO pod_intranet;
 
 
 --
@@ -164,8 +148,6 @@ CREATE SEQUENCE pod_nodes_version_id_sequence
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.pod_nodes_version_id_sequence OWNER TO pod_intranet;
 
 --
 -- Name: pod_nodes_history; Type: TABLE; Schema: public; Owner: pod_intranet; Tablespace: 
@@ -196,8 +178,6 @@ CREATE TABLE pod_nodes_history (
 );
 
 
-ALTER TABLE public.pod_nodes_history OWNER TO pod_intranet;
-
 --
 -- Name: pod_nodes; Type: VIEW; Schema: public; Owner: pod_intranet
 --
@@ -205,8 +185,6 @@ ALTER TABLE public.pod_nodes_history OWNER TO pod_intranet;
 CREATE VIEW pod_nodes AS
     SELECT DISTINCT ON (pod_nodes_history.node_id) pod_nodes_history.node_id, pod_nodes_history.parent_id, pod_nodes_history.node_order, pod_nodes_history.node_type, pod_nodes_history.created_at, pod_nodes_history.updated_at, pod_nodes_history.data_label, pod_nodes_history.data_content, pod_nodes_history.data_datetime, pod_nodes_history.node_status, pod_nodes_history.data_reminder_datetime, pod_nodes_history.data_file_name, pod_nodes_history.data_file_content, pod_nodes_history.data_file_mime_type, pod_nodes_history.parent_tree_path, pod_nodes_history.node_depth, pod_nodes_history.owner_id, pod_nodes_history.is_shared, pod_nodes_history.is_public, pod_nodes_history.public_url_key FROM pod_nodes_history ORDER BY pod_nodes_history.node_id, pod_nodes_history.updated_at DESC;
 
-
-ALTER TABLE public.pod_nodes OWNER TO pod_intranet;
 
 --
 -- Name: pod_nodes__node_id__sequence; Type: SEQUENCE; Schema: public; Owner: pod_intranet
@@ -219,8 +197,6 @@ CREATE SEQUENCE pod_nodes__node_id__sequence
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.pod_nodes__node_id__sequence OWNER TO pod_intranet;
 
 --
 -- Name: pod_nodes__node_id__sequence; Type: SEQUENCE OWNED BY; Schema: public; Owner: pod_intranet
@@ -240,8 +216,6 @@ CREATE TABLE pod_permission (
 );
 
 
-ALTER TABLE public.pod_permission OWNER TO pod_intranet;
-
 --
 -- Name: pod_permission_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: pod_intranet
 --
@@ -253,8 +227,6 @@ CREATE SEQUENCE pod_permission_permission_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.pod_permission_permission_id_seq OWNER TO pod_intranet;
 
 --
 -- Name: pod_permission_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pod_intranet
@@ -276,8 +248,6 @@ CREATE TABLE pod_user (
 );
 
 
-ALTER TABLE public.pod_user OWNER TO pod_intranet;
-
 --
 -- Name: pod_user_group; Type: TABLE; Schema: public; Owner: pod_intranet; Tablespace: 
 --
@@ -287,8 +257,6 @@ CREATE TABLE pod_user_group (
     group_id integer NOT NULL
 );
 
-
-ALTER TABLE public.pod_user_group OWNER TO pod_intranet;
 
 --
 -- Name: pod_user_user_id_seq; Type: SEQUENCE; Schema: public; Owner: pod_intranet
@@ -301,8 +269,6 @@ CREATE SEQUENCE pod_user_user_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.pod_user_user_id_seq OWNER TO pod_intranet;
 
 --
 -- Name: pod_user_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pod_intranet
@@ -364,39 +330,6 @@ COPY pod_group (group_id, group_name, display_name, created, personnal_group) FR
 --
 
 SELECT pg_catalog.setval('pod_group_group_id_seq', 1, false);
-
-
---
--- Data for Name: pod_group_node; Type: TABLE DATA; Schema: public; Owner: pod_intranet
---
-
-COPY pod_group_node (group_id, node_id, rights) FROM stdin;
-2	1	3
-2	2	3
-2	3	3
-2	4	3
-2	5	3
-2	6	3
-2	7	3
-2	8	3
-2	9	3
-2	10	3
-2	11	3
-2	12	3
-2	13	3
-2	14	3
-2	15	3
-2	16	3
-2	17	3
-2	18	3
-2	19	3
-2	20	3
-2	21	3
-2	22	3
-2	23	3
-2	24	3
-2	25	3
-\.
 
 
 --
