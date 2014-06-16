@@ -2,14 +2,14 @@
     ServerName pod
 
     WSGIProcessGroup pod
-    WSGIDaemonProcess pod user=www-data group=www-data threads=4 python-path=/home/daccorsi/sources/protos/pboard/tg2env/lib/python3.2/site-packages
-    WSGIScriptAlias / /home/daccorsi/sources/protos/pboard/pboard/app.wsgi
+    WSGIDaemonProcess pod user=www-data group=www-data threads=4 python-path=/home/daccorsi/sources/protos/pod/tg2env/lib/python3.2/site-packages
+    WSGIScriptAlias / /home/daccorsi/sources/protos/pod/pod/app.wsgi
 
     #Serve static files directly without TurboGears
-    Alias /images     /home/daccorsi/sources/protos/pboard/pboard/pboard/public/images
-    Alias /favicon.ico     /home/daccorsi/sources/protos/pboard/pboard/pboard/public/favicon.ico
-    Alias /css        /home/daccorsi/sources/protos/pboard/pboard/pboard/public/css
-    Alias /javascript /home/daccorsi/sources/protos/pboard/pboard/pboard/public/javascript
+    Alias /images     /home/daccorsi/sources/protos/pod/pod/pod/public/images
+    Alias /favicon.ico     /home/daccorsi/sources/protos/pod/pod/pod/public/favicon.ico
+    Alias /css        /home/daccorsi/sources/protos/pod/pod/pod/public/css
+    Alias /javascript /home/daccorsi/sources/protos/pod/pod/pod/public/javascript
 
     CustomLog /var/log/apache2/pod-access.log combined
     ErrorLog /var/log/apache2/pod-error.log
