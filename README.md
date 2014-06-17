@@ -187,12 +187,14 @@ Install dependencies:
 
 #### WSGI configuration ####
 
+Example of Apache WSGI configuration. This configuration refers to productionapp.wsgi which is a copy of the file *app.wsgi* available in the repo. (this file has to be updated to match with your environment and installation)
+
     <VirtualHost *:80>
         ServerAdmin webmaster@archipeldata.com
         ServerName demo.archipeldata.com
 
         WSGIProcessGroup pod
-        WSGIDaemonProcess pod user=www-data group=adm threads=4 python-path=/opt/demo.archipeldata.com/tg2env/lib/python3.2/site-packages
+        WSGIDaemonProcess pod user=www-data group=adm threads=4 python-path=/opt/podinstall/tg2env/lib/python3.2/site-packages
         WSGIScriptAlias / /opt/podinstall/pod/productionapp.wsgi
 
         #Serve static files directly without TurboGears
@@ -204,7 +206,6 @@ Install dependencies:
         CustomLog /var/log/apache2/demopod-access.log combined
         ErrorLog /var/log/apache2/demopod-error.log
         LogLevel debug
-
     </VirtualHost>
 
 ### Help required ###
