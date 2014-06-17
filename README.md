@@ -55,7 +55,7 @@ Get the sources from Bitbucket:
 
     git clone https://bitbucket.org/lebouquetin/pod.git
 
-Note: Now everything is documented to be executed from the pod directory newly created.
+**Note: Now everything is documented to be executed from the pod directory newly created.**
 
 ### Setup a database ###
 
@@ -212,5 +212,3 @@ Install dependencies:
 If you need help, contact us. If you want to help, contact us. So... contact us ;)
 
 Damien Accorsi - damien.accorsi@free.fr
-
-
