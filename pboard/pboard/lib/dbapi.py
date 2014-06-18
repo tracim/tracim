@@ -336,7 +336,7 @@ class PODUserFilteredApiController(object):
     Returns a list of nodes order by type, nodes which contain at least one of the keywords
     """
     liOwnerIdList = self._getUserIdListForFiltering()
-
+    print ("AGAGA, ", liOwnerIdList)
     loKeywordFilteringClauses = []
     for keyword in plKeywordList:
         loKeywordFilteringClauses.append(pbmd.PBNode.data_label.ilike('%'+keyword+'%'))
@@ -345,7 +345,7 @@ class PODUserFilteredApiController(object):
 
     loKeywordFilteringClausesAsOr = sqla.or_(*loKeywordFilteringClauses) # Combine them with or to a BooleanClauseList
 
-    loResultsForSomeKeywords = pbm.DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).join(pbma.Rights).join(pbma.user_group_table, pbma.Rights.group_id==pbma.user_group_table.columns['group_id'])\
+    loResultsForSomeKeywords = pbm.DBSession.query(pbmd.PBNode).options(joinedload_all("_lAllChildren")).outerjoin(pbma.Rights).outerjoin(pbma.user_group_table, pbma.Rights.group_id==pbma.user_group_table.columns['group_id'])\
         .filter(loKeywordFilteringClausesAsOr)\
         .filter((pbmd.PBNode.owner_id.in_(liOwnerIdList)) | (pbma.user_group_table.c.user_id.in_(liOwnerIdList) & pbmd.PBNode.is_shared))\
         .order_by(sqla.desc(pbmd.PBNode.node_type))\
