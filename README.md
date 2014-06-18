@@ -28,7 +28,7 @@ The ACL is based on share with groups or individual users.
 The fastest way to test it is to test the demo:
 
 * http://demo.archipeldata.com
-* login: demo@archipeldata.com
+* login: demo@localhost
 * password: demo
 
 ### Install your own instance ###
