@@ -1,7 +1,7 @@
 #!/bin/bash
-POD_DB_USER='pod_protov1_dev'
-POD_DB_USER_PASSWORD='pod_protov1_dev_password'
-POD_DB_NAME='pod_protov1_dev'
+POD_DB_USER='pod_user'
+POD_DB_USER_PASSWORD='pod_user_password'
+POD_DB_NAME='pod'
 
 # DB_HOST='127.0.0.1'
 # DB_PORT='5432'
@@ -45,9 +45,8 @@ echo ${BUILD_DB_SQL} | psql
 # psql -c "DROP USER pod_master;"
 
 echo
-echo "You can now init schema and data by running the following commands:"
+echo "You can now init schema and data by running the following command:"
 echo
-echo "psql -h 127.0.0.1 -U ${POD_DB_USER} -W ${POD_DB_NAME} < pod-schema-2013.11.15-15.54.45.sql"
-echo "psql -h 127.0.0.1 -U ${POD_DB_USER} -W ${POD_DB_NAME} < pod-init-data-2013.11.15-15.54.45.sql"
+echo "psql -h 127.0.0.1 -U ${POD_DB_USER} -W ${POD_DB_NAME} < pod-init-database.sql"
 echo 
 echo "note that you'll be asked for the password"

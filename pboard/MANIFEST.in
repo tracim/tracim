@@ -1,4 +1,0 @@
-recursive-include pboard/public *
-include pboard/public/favicon.ico
-recursive-include pboard/i18n *
-recursive-include pboard/templates *
