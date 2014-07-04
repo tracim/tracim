@@ -147,11 +147,24 @@ Notes:
 
     cp pod/development.ini.base pod/development.ini
 
+#### Database 
+
 Configure database in the development.ini file. This is defined as sqlalchemy.url
 and the default value is below:
 
     sqlalchemy.url = postgresql://pod_user:pod_user_password@127.0.0.1:5432/pod
 
+#### Listening port
+
+Default configuration is to listen on port 8080. If you want to adapt this to your environment, edit the .ini file and setup the port you want:
+
+    port = 8080
+
+#### Interface language
+
+The default language is English. You can change it to french by uncommenting the following line in the .ini file:
+
+    lang = fr_FR
 
     
 ### Running Pod as standalone ###
