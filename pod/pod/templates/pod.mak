@@ -120,12 +120,12 @@
           <a class="btn" data-edit="strikethrough" title="Strikethrough"><i class="fa fa-strikethrough"></i></a>
           <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>
         </div>
+      % endif
+      % if psMenuOptions.find('lists')>=0:
         <div class="btn-group">
           <a class="btn" data-edit="insertHTML <table class='pod-table-editor'><tr><td>Val1</td><td>Val2</td></tr></table>" ><i class="fa fa-table"></i></a>
         </div>
-       % endif
-      % if psMenuOptions.find('lists')>=0:
-        <div class="btn-group">
+         <div class="btn-group">
           <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="fa fa-list-ul"></i></a>
           <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="fa fa-list-ol"></i></a>
           <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="fa fa-outdent"></i></a>
