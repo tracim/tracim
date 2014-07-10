@@ -163,6 +163,12 @@ tr:Hover td div.pod-toolbar {
   background-color: white;
 }
 
+.pod-table-editor, .pod-table-editor td {
+  border: 1px solid #CCC;
+  padding: 0.5em;
+  margin: 0.5em;
+}
+
 .pod-input-like-shadow {
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);

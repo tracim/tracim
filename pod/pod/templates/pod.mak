@@ -123,7 +123,7 @@
       % endif
       % if psMenuOptions.find('lists')>=0:
         <div class="btn-group">
-          <a class="btn" data-edit="insertHTML <table class='pod-table-editor'><tr><td>Val1</td><td>Val2</td></tr></table>" ><i class="fa fa-table"></i></a>
+          <a class="btn" data-edit="insertHTML <table class='pod-table-editor'><tr><td>cell1</td><td>cell2</td></tr><tr><td>cell3</td><td>cell4</td></tr></table>" ><i class="fa fa-table"></i></a>
         </div>
          <div class="btn-group">
           <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="fa fa-list-ul"></i></a>
