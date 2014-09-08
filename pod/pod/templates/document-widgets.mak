@@ -298,7 +298,7 @@
 
     <div class="modal-body">
 ## MODAL BODY
-      <form id='${psModalId}-form' method="GET" action="${psPostUrl}">
+      <form id='${psModalId}-form' method="POST" action="${psPostUrl}">
         <div style="padding: 0.5em 0 0 0">
           % if poNode!=None:
             <input type="hidden" name="node_id" value="${poNode.node_id}"/>
