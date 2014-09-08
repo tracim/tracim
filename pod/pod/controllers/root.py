@@ -176,3 +176,9 @@ class RootController(BaseController):
         return dict()
 
 
+    @expose('pod.templates.user_profile')
+    @require(predicates.in_group('user', msg=l_('Please login to access this page')))
+    def me(self):
+        """Handle the about-page."""
+        me = pld.PODStaticController.getCurrentUser()
+        return dict(current_user = me)

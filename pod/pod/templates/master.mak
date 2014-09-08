@@ -194,12 +194,9 @@ ${self.toggle_view_mode()}
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> ${request.identity['user'].display_name}</a>
                 <ul class="dropdown-menu pull-right">
-                  <li class="text-center">
-                    <fieldset>
-                      <legend><i class="fa fa-key"></i> Logout</legend>
-                      <a class="btn btn-danger" href="${tg.url('/logout_handler')}">Logout <i class="fa fa-power-off"></i> </a>
-                    </fieldset>
-                    <p></p>
+                    <li><a href="${tg.url('/me')}"><i class="fa fa-user"></i> My profile</a></li>
+                    <li class="divider"></li>
+                    <li><a href="${tg.url('/logout_handler')}"><i class="fa fa-power-off"></i> Logout</a></li>
                  </ul>
               </li>
             % endif

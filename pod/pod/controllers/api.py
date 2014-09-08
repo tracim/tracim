@@ -29,6 +29,7 @@ from pod import model as pm
 from pod.lib.auth import can_read, can_write
 
 from pod.controllers import apimenu as pcam
+from pod.controllers import apiuserprofile as pcaum
 
 
 FIXME_ERROR_CODE=-1
@@ -40,6 +41,7 @@ class PODApiController(BaseController):
     allow_only = tgp.in_group('user', msg=l_('You need to login in order to access this ressource'))
 
     menu = pcam.PODApiMenuController()
+    user = pcaum.PODApiUserProfileController()
 
     def on_off_to_boolean(self, on_or_off):
         return True if on_or_off=='on' else False
