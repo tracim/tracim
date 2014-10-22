@@ -1,8 +1,6 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master_authenticated"/>
 
-<%def name="title()">
-pod :: debug - iconset
-</%def>
+<%def name="title()">Debug - Font Awesome iconset</%def>
 
     <style>
         body{

@@ -1,8 +1,6 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master_authenticated"/>
 
-<%def name="title()">
-pod :: debug :: request.identity
-</%def>
+<%def name="title()">Debug - request.identity</%def>
 
 <h2>Identity object</h2>
   <table class="table">

@@ -1,8 +1,6 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master_authenticated"/>
 
-<%def name="title()">
-pod :: debug :: request.environment
-</%def>
+<%def name="title()">Debug :: request.environment</%def>
 
 <h2>The WSGI nature of the framework</h2>
   <p>In this page you can see all the WSGI variables your request object has, 

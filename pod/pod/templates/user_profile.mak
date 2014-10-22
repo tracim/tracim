@@ -1,80 +1,70 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master_authenticated"/>
 <%namespace name="POD" file="pod.templates.pod"/>
+<%namespace name="TOOLBAR" file="pod.templates.user_toolbars"/>
+<%namespace name="WIDGETS" file="pod.templates.user_workspace_widgets"/>
+<%def name="title()">${_('My profile')}</%def>
 
-<%def name="title()">
-pod :: your dashboard
-</%def>
+<div class="container-fluid">
+    <div class="row-fluid">
+        ${TOOLBAR.USER(fake_api.current_user, fake_api.current_user)}
+        <div>
+            <div class="row">
+                <h3 class="col-sm-11">${POD.ICO(32, 'actions/contact-new')} ${_("User profile")}</h3>
+            </div>
+            <div class="row">
+                <div class="col-sm-4" id='user-profile-global-info'>
+                    <div class="well well-sm">
+                        <h3>
+                            ${fake_api.current_user.name}
+                        </h3>
+                        <p>
+                            ${POD.ICO(16, 'apps/internet-mail')}
+                            <a href="mailto:${fake_api.current_user.email}">${fake_api.current_user.email}</a>
+                        </p>
+                        <p>
+                            % if fake_api.current_user.profile.id>=2:
+                                <span>${POD.ICO(16, 'emblems/emblem-checked')} ${_('I can create workspaces.')}</span><br/>
+                            % endif
+                            % if fake_api.current_user.profile.id>=3:
+                                <span>${POD.ICO(16, 'emblems/emblem-checked')} ${_('I\'m an administrator.')}</span><br/>
+                            % endif
+                        </p>
+                    </div>
+                </div>
 
-  <div class="row">
-      <div class="span6">
-          ## USER PROFILE PANEL
-          <div id='user-profile'>
-              <h3>${_("My Profile")}</h3>
-              <form class="form-horizontal">
-                  <div class="control-group">
-                      <label class="control-label" for="displayName">${_('Visible Name')}</label>
-                      <div class="controls">                        
-                          <div class="input-prepend">
-                              <span class="add-on"><i class="fa fa-user"></i></span>
-                              <input id="displayName" type="text" readonly="readonly" placeholder="Name" value="${current_user.display_name}">
-                        </div>
-                      </div>
-                  </div>
+                <div class="col-sm-4" id='user-profile-global-info'>
+                    <div class="well well-sm">
+                        <h3>
+                            ${POD.ICO(22, 'places/folder-remote')}
+                            ${_('Workspaces')}
+                        </h3>
+                        % if len(fake_api.current_user.roles)<=0:
+                            ${WIDGETS.EMPTY_CONTENT(_('This user is not member of any workspace.'))}
+                        % else:
+                            <table class="table">
+                                % for role in fake_api.current_user.roles:
+                                    <tr><td>${role.workspace.name}</td><td><span style="${role.style}">${role.label}</span></td></tr>
+                                % endfor
+                            </table>
+                        % endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                  <div class="control-group">
-                      <label class="control-label" for="emailAddress">${_('Email Address')}</label>
-                      <div class="controls">                        
-                          <div class="input-prepend">
-                              <span class="add-on"><i class="fa fa-envelope-o"></i></span>
-                              <input id="emailAddress" type="text" readonly="readonly" placeholder="Email Address" value="${current_user.email_address}">
-                        </div>
-                      </div>
-                  </div>
-
-                  <div class="control-group">
-                      <label class="control-label" for="displayName">${_('Groups')}</label>
-                      <div class="controls">
-                          % for group in current_user.groups:
-                            <span class="label">${group.getDisplayName()}</span>
-                          % endfor
-                      </div>
-                  </div>
-              </form>
-          </div>
-      </div>
-
-      <div class="span6">
-          <div id='user-password-change' class="well">
-              <p class="text-center"><b>${_('I want to change my password...')}</b></p>
-              <form class="form-horizontal" method="POST" action="${tg.url('/api/user/change-password')}">
-                  <div class="control-group">
-                      <label class="control-label" for="currentPassword">${_('Current Password')}</label>
-                      <div class="controls">
-                          <input type="password" id="currentPassword" name="current_password" placeholder="${_('Current Password')}">
-                      </div>
-                  </div>
-                  <div class="control-group">
-                      <label class="control-label" for="newPassword1">${_('New Password')}</label>
-                      <div class="controls">
-                          <input type="password" id="newPassword1" name="new_password1" placeholder="${_('New Password')}">
-                      </div>
-                  </div>
-                  <div class="control-group">
-                      <label class="control-label" for="newPassword2">${_('Retype New Password')}</label>
-                      <div class="controls">
-                          <input type="password" id="newPassword2" name="new_password2" placeholder="${_('Retype New Password')}">
-                      </div>
-                  </div>
-
-                  <div class="control-group">
-                      <div class="controls">
-                          <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> ${_('Save changes')}</button>
-                      </div>
-                  </div>
-              </form>
-    
-            ## WHAT'S HOT PANEL [END]
-          </div>
-      </div>
+<div id="user-edit-modal-dialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+    </div>
   </div>
+</div>
+
+<div id="user-edit-password-modal-dialog" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+    </div>
+  </div>
+</div>
 

@@ -1,4 +1,4 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master_anonymous"/>
 <%namespace name="POD" file="pod.templates.pod"/>
 
 <%def name="title()">

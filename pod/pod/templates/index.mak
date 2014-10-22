@@ -1,65 +1,58 @@
-<%inherit file="local:templates.master"/>
+<%inherit file="local:templates.master_anonymous"/>
 <%namespace name="POD" file="pod.templates.pod"/>
 
 <%def name="title()">
-  pod :: take notes, list tasks, write documents, manage projects blabla
+  ${h.WEBSITE_TITLE|n}
 </%def>
 
-  <div class="row">
-        <div class="span12">
-          <div class="well">
-            <h1>pod <small>Simple tool, flexible data.</small></h1>
-          </div>
-        </div>
-  </div>
 
-  <div class="row">
-    <div class="span10 offset1">
-      <div class="row hidden-phone hidden-tablet">
-
-        ## LOGIN SCREEN
-        <div class="span3 offset2">
-          % if not request.identity:
-            <div class="well text-center" style="min-height: 16em;">
-              <form action="${tg.url('/login_handler')}">
-                <fieldset>
-                <legend><i class="fa fa-key" style="vertical-align: baseline !important;"></i> Login</legend>
-                <input class="span2" type="text" id="login" name="login" placeholder="email..."><br/>
-                <input class="span2" type="password" id="password" name="password" placeholder="password..."><br/>
-                <div class="span2 control-group">
-                  <input type="checkbox" id="loginremember" name="remember" value="2252000"/> ${_('Remember me')}
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div>
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-5">
+                    <h1 class="text-center" style="color: ${h.WEBSITE_HOME_TITLE_COLOR};"><b>${h.WEBSITE_TITLE}</b></h1>
                 </div>
-                <input type="submit" id="submit" value="Login" />
-                </fieldset>
-              </form>
             </div>
-          % else:
-            <div class="well text-center" style="min-height: 16em;">
-              <p>${_('Welcome, ')}${request.identity['user'].display_name}</p>
-              <p>${_('Click on <a href="{0}">Document</a> in the top menu to access you data.'.format(tg.url('/document')))|n}</p>
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-2">
+                    <a class="thumbnail">
+                        <img src="${h.WEBSITE_HOME_IMAGE_URL}" alt="">
+                    </a>
+                </div>
+                <div class="col-sm-3">
+                    <div class="well">
+                    
+                    <h2 style="margin-top: 0;">${POD.ICO(32, 'status/status-locked')} ${_('Login')}</h2>
+                    <form role="form" method="POST" action="${tg.url('/login_handler', params=dict(came_from=came_from, __logins=login_counter))}">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="fa fa-envelope-o"></i></div>
+                                <input type="email" name="login" class="form-control" placeholder="${_('Enter email')}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="fa fa-key"></i></div>
+                                <input type="password" name="password" class="form-control" placeholder="${_('Enter password')}">
+                            </div>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="loginremember" name="remember" value="2252000"/> ${_('Remember me')}
+                            </label>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-small btn-success">
+                                <i class="fa fa-check"></i> ${_('Login')}
+                            </button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
             </div>
-          % endif
         </div>
-        ## END OF LOGIN SCREEN
-
-        <div class="span3" >
-          <div class="well" style="min-height: 15em;">
-            <p><i class="pod-blue fa-2x fa-fw fa fa-pencil" style="vertical-align: middle;"></i> Take <strong>notes</strong> </p>
-            <p><i class="pod-blue fa-2x fa-fw fa fa-list" style="vertical-align: middle;"></i> List <strong>tasks</strong> </p>
-            <p><i class="pod-blue fa-2x fa-fw fa fa-file-text-o" style="vertical-align: middle;"></i> Write <strong>documents</strong></p>
-            <p><i class="pod-blue fa-2x fa-fw fa fa-check-square-o" style="vertical-align: middle;"></i>Change <strong>Status</strong></p>
-            <hr/>
-            <p class="text-center">
-              <i class="pod-blue fa-2x fa-fw fa fa-file-text-o" title="${_('Text documents')}" style="vertical-align: middle;"></i>
-              <i class="pod-blue fa-2x fa-fw fa fa-calendar"    title="${_('Events')}" style="vertical-align: middle;"></i>
-              <i class="pod-blue fa-2x fa-fw fa fa-user"        title="${_('Contacts')}"       style="vertical-align: middle;"></i>
-              <i class="pod-blue fa-2x fa-fw fa fa-comments-o"  title="${_('Comments')}"       style="vertical-align: middle;"></i>
-              <i class="pod-blue fa-2x fa-fw fa fa-paperclip"   title="${_('Files')}" style="vertical-align: middle;"></i>
-            </p>
-          </div>
-        </div>
-
-      </div>
     </div>
-  </div>
+</div>
+
 
