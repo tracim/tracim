@@ -10,7 +10,7 @@ ROOT_FOLDER=${POD_INSTALL_FULL_PATH}
 
 cd ${ROOT_FOLDER}
 source tg2env/bin/activate
-cd ${ROOT_FOLDER}/pod/
+cd ${ROOT_FOLDER}/tracim/
 gearbox serve -c development.ini --reload --debug
 cd ${OLD_PATH}
 

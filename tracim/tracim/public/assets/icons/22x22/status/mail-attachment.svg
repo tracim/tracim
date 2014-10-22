@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="22"
+   height="22"
+   id="svg79606"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docbase="/home/andreas/projekt/bild/tango/22"
+   sodipodi:docname="mail-attachment.svg"
+   inkscape:export-filename="/home/andreas/projekt/bild/tango/22/mail-attachment.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs79608">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 11 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="22 : 11 : 1"
+       inkscape:persp3d-origin="11 : 7.3333333 : 1"
+       id="perspective21" />
+    <linearGradient
+       id="linearGradient5783">
+      <stop
+         style="stop-color:#d3d7cf;stop-opacity:1;"
+         offset="0"
+         id="stop5785" />
+      <stop
+         id="stop5791"
+         offset="0.5"
+         style="stop-color:#f5f5f5;stop-opacity:1;" />
+      <stop
+         style="stop-color:#bebebe;stop-opacity:1;"
+         offset="1"
+         id="stop5787" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3558">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3560" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3562" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5783"
+       id="linearGradient7043"
+       x1="1954.2888"
+       y1="5.5499086"
+       x2="1946.3507"
+       y2="18.931904"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.017661,0.000000,0.000000,1.000000,-34.39578,3.729656e-17)" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3558"
+       id="radialGradient7920"
+       cx="15.296065"
+       cy="38.986343"
+       fx="15.296065"
+       fy="38.986343"
+       r="15.571428"
+       gradientTransform="matrix(0.930641,-1.412878e-2,5.730818e-4,0.361365,9.393965,18.42063)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.525458"
+     inkscape:cx="9.7624204"
+     inkscape:cy="9.8809547"
+     inkscape:current-layer="g7051"
+     showgrid="false"
+     inkscape:grid-bbox="true"
+     inkscape:document-units="px"
+     inkscape:window-width="1280"
+     inkscape:window-height="818"
+     inkscape:window-x="154"
+     inkscape:window-y="30" />
+  <metadata
+     id="metadata79611">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <path
+       sodipodi:type="arc"
+       style="opacity:0.3125;color:#000000;fill:url(#radialGradient7920);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible"
+       id="path3556"
+       sodipodi:cx="22.571428"
+       sodipodi:cy="30.857143"
+       sodipodi:rx="15.571428"
+       sodipodi:ry="10.142858"
+       d="M 38.142857 30.857143 A 15.571428 10.142858 0 1 1  7,30.857143 A 15.571428 10.142858 0 1 1  38.142857 30.857143 z"
+       transform="matrix(0.610092,0.000000,0.000000,0.197183,-1.270644,13.91550)" />
+    <g
+       id="g7051"
+       transform="matrix(1.167377,0.000000,0.000000,1.181404,-2264.423,-4.122884)">
+      <path
+         d="M 1948.6738,6.0439453 L 1944.0078,14.124023 C 1943.1831,15.552734 1943.6768,17.396484 1945.1055,18.22168 L 1946.0039,18.741211 C 1947.4331,19.566406 1949.2769,19.072265 1950.1021,17.643555 L 1955.145,8.9091796 C 1955.9702,7.4799804 1955.6655,5.7456054 1954.4688,5.0541991 C 1953.272,4.3627928 1951.6172,4.9663085 1950.7925,6.3955077 L 1947.2939,12.456055 C 1946.4688,13.884765 1946.3799,15.395508 1947.0957,15.814453 C 1947.812,16.232422 1949.0732,15.405273 1949.8979,13.976562 L 1951.5977,11.032226"
+         id="path7053"
+         style="fill:none;stroke:#797c75;stroke-width:2.55456161;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
+    </g>
+    <g
+       id="g7055"
+       transform="matrix(1.153465,0.000000,0.000000,1.173837,-2237.305,-3.968370)">
+      <path
+         d="M 1948.6738,6.0439453 L 1944.0078,14.124023 C 1943.1831,15.552734 1943.6768,17.396484 1945.1055,18.22168 L 1946.0039,18.741211 C 1947.4331,19.566406 1949.2769,19.072265 1950.1021,17.643555 L 1955.145,8.9091796 C 1955.9702,7.4799804 1955.6655,5.7456054 1954.4688,5.0541991 C 1953.272,4.3627928 1951.6172,4.9663085 1950.7925,6.3955077 L 1947.2939,12.456055 C 1946.4688,13.884765 1946.3799,15.395508 1947.0957,15.814453 C 1947.812,16.232422 1949.0732,15.405273 1949.8979,13.976562 L 1951.5977,11.032226"
+         id="path7057"
+         style="fill:none;stroke:url(#linearGradient7043);stroke-linecap:round;stroke-linejoin:round" />
+    </g>
+  </g>
+</svg>

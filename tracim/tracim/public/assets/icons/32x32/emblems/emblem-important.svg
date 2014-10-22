@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32"
+   height="32"
+   id="svg1800"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docbase="/home/lapo/Desktop/tango-icon-theme/32x32/emblems"
+   sodipodi:docname="emblem-important.svg"
+   version="1.0"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs3">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 16 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="32 : 16 : 1"
+       inkscape:persp3d-origin="16 : 10.666667 : 1"
+       id="perspective18" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3101">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3103" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3105" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3101"
+       id="radialGradient1884"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.351613,0,16.55413)"
+       cx="17.3125"
+       cy="25.53125"
+       fx="17.3125"
+       fy="25.53125"
+       r="9.6875" />
+  </defs>
+  <sodipodi:namedview
+     fill="#edd400"
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666"
+     borderopacity="1"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="-139.89085"
+     inkscape:cy="3.2755691"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:grid-bbox="true"
+     inkscape:document-units="px"
+     inkscape:showpageshadow="false"
+     inkscape:window-width="1034"
+     inkscape:window-height="818"
+     inkscape:window-x="236"
+     inkscape:window-y="30"
+     width="32px"
+     height="32px"
+     showborder="false" />
+  <metadata
+     id="metadata4">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:title>Emblem Important</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Jakub Steiner</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>emblem</rdf:li>
+            <rdf:li>photos</rdf:li>
+            <rdf:li>pictures</rdf:li>
+            <rdf:li>raw</rdf:li>
+            <rdf:li>jpeg</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <path
+       sodipodi:type="arc"
+       style="opacity:0.40909089;color:black;fill:url(#radialGradient1884);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.10533953;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible"
+       id="path3099"
+       sodipodi:cx="17.3125"
+       sodipodi:cy="25.53125"
+       sodipodi:rx="9.6875"
+       sodipodi:ry="3.40625"
+       d="M 27 25.53125 A 9.6875 3.40625 0 1 1  7.625,25.53125 A 9.6875 3.40625 0 1 1  27 25.53125 z"
+       transform="matrix(1.455275,0,0,1.455275,-9.002485,-9.544121)" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#f57900;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.45548248;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path1650"
+       sodipodi:cx="24.130018"
+       sodipodi:cy="23.42804"
+       sodipodi:rx="22.008699"
+       sodipodi:ry="21.213203"
+       d="M 46.138718 23.42804 A 22.008699 21.213203 0 1 1  2.1213188,23.42804 A 22.008699 21.213203 0 1 1  46.138718 23.42804 z"
+       transform="matrix(0.63743,0,0,0.661334,1.118808,-0.993745)" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#fcaf3e;stroke-width:1.50407195;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3392"
+       sodipodi:cx="24.130018"
+       sodipodi:cy="23.42804"
+       sodipodi:rx="22.008699"
+       sodipodi:ry="21.213203"
+       d="M 46.138718 23.42804 A 22.008699 21.213203 0 1 1  2.1213188,23.42804 A 22.008699 21.213203 0 1 1  46.138718 23.42804 z"
+       transform="matrix(0.596893,0,0,0.619276,2.191025,-7.004377e-2)" />
+    <path
+       style="fill:white;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4.12249994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 14.588184,7.0566647 C 14.501828,7.0566647 14.429871,7.1744121 14.429871,7.3157228 L 15.148369,17.060299 C 15.148369,17.20161 15.220326,17.319357 15.306682,17.319358 C 15.306682,17.319358 15.874063,17.327391 16.341808,17.319358 C 16.495888,17.316712 16.54304,17.333065 16.68279,17.319358 C 17.150534,17.327391 17.717915,17.319358 17.717915,17.319358 C 17.804271,17.319358 17.876228,17.20161 17.876228,17.060299 L 18.594727,7.3157228 C 18.594727,7.1744121 18.522769,7.0765921 18.436413,7.0765921 L 16.694967,7.0765921 C 16.688549,7.0752849 16.689433,7.0566647 16.68279,7.0566647 L 14.588184,7.0566647 z "
+       id="rect1872" />
+    <path
+       sodipodi:type="arc"
+       style="fill:white;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4.12249994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path2062"
+       sodipodi:cx="-16.4375"
+       sodipodi:cy="34.0625"
+       sodipodi:rx="4.5625"
+       sodipodi:ry="3.8125"
+       d="M -11.875 34.0625 A 4.5625 3.8125 0 1 1  -21,34.0625 A 4.5625 3.8125 0 1 1  -11.875 34.0625 z"
+       transform="matrix(0.340679,0,0,0.407698,22.1421,6.540837)" />
+    <path
+       style="fill:#fffeff;fill-opacity:0.21390375;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 29.576349,13.87445 C 29.576349,21.182882 25.492388,10.968655 16.974766,14.135183 C 8.3897014,17.326784 3.0965451,21.182882 3.0965451,13.87445 C 3.0965451,6.5660186 9.0280205,0.63453841 16.336447,0.63453841 C 23.644873,0.63453841 29.576349,6.5660186 29.576349,13.87445 z "
+       id="path3068"
+       sodipodi:nodetypes="czssc" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#914900;stroke-width:1.45548248;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path1905"
+       sodipodi:cx="24.130018"
+       sodipodi:cy="23.42804"
+       sodipodi:rx="22.008699"
+       sodipodi:ry="21.213203"
+       d="M 46.138718 23.42804 A 22.008699 21.213203 0 1 1  2.1213188,23.42804 A 22.008699 21.213203 0 1 1  46.138718 23.42804 z"
+       transform="matrix(0.63743,0,0,0.661334,1.11881,-0.993745)" />
+  </g>
+</svg>

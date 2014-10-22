@@ -1,10 +1,10 @@
 # Introduction to POD #
 
-Pod is collaborative software designed to allow people to work on and share various data and document types. 
+Tracim is collaborative software designed to allow people to work on and share various data and document types. 
 
 It is [AGPL licenced](http://fr.wikipedia.org/wiki/GNU_Affero_General_Public_License) software.
 
-Pod is licensed under the terms of the 
+Tracim is licensed under the terms of the 
 [GNU Affero General Public License](http://www.gnu.org/licenses/agpl.txt)
 as published by the [Free Software Foundation](http://www.fsf.org/).
 
@@ -53,9 +53,9 @@ If you work on a local database, then you also need to install PostgreSQL:
 
 Get the sources from Bitbucket:
 
-    git clone https://bitbucket.org/lebouquetin/pod.git
+    git clone https://bitbucket.org/lebouquetin/tracim.git
 
-**Note: Now everything is documented to be executed from the pod directory newly created.**
+**Note: Now everything is documented to be executed from the tracim directory newly created.**
 
 ### Setup a database ###
 
@@ -75,8 +75,8 @@ If you changed the file, reload PostgreSQL:
 
 #### Create a new database and user on PostgreSQL ####
 
-We suppose you will create a user named _poduser_ with passowrd _podpassword_
-and a database _poddb_
+We suppose you will create a user named _tracimuser_ with passowrd _tracimpassword_
+and a database _tracimdb_
 
 First login as root, then su as postgre and run a PostgreSQL client:
 
@@ -90,9 +90,9 @@ First login as root, then su as postgre and run a PostgreSQL client:
     
 Now, type the following commands:
 
-    CREATE ROLE poduser WITH LOGIN PASSWORD 'podpassword';
-    CREATE DATABASE poddb OWNER poduser;
-    GRANT ALL PRIVILEGES ON DATABASE poddb TO poduser;
+    CREATE ROLE tracimuser WITH LOGIN PASSWORD 'tracimpassword';
+    CREATE DATABASE tracimdb OWNER tracimuser;
+    GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;
 
 At the end, you can quit the psql client by running the \q quit command:
 
@@ -103,12 +103,12 @@ At the end, you can quit the psql client by running the \q quit command:
 
 You can test your newly created user by running the following command:
 
-    psql -h 127.0.0.1 -W -U poduser poddb -c 'SELECT NOW();'
+    psql -h 127.0.0.1 -W -U tracimuser tracimdb -c 'SELECT NOW();'
 
 The result should be similar to:
 
-    user@hostname:~$ psql -h 127.0.0.1 -W -U poduser poddb -c 'SELECT NOW();'
-    Password for user poduser: 
+    user@hostname:~$ psql -h 127.0.0.1 -W -U tracimuser tracimdb -c 'SELECT NOW();'
+    Password for user tracimuser: 
                   now              
     -------------------------------
      2014-06-16 11:35:48.590838+02
@@ -118,22 +118,22 @@ The result should be similar to:
 
 Your database is now ready. Fill it with the required schema and data by importing SQL:
 
-    psql -h 127.0.0.1 -W -U poduser poddb < doc/database/pod-init-database.sql
+    psql -h 127.0.0.1 -W -U tracimuser tracimdb < doc/database/tracim-init-database.sql
 
 You can test it through the following command:
 
-    user@hostname:~$ psql -h 127.0.0.1 -W -U poduser poddb -c 'SELECT * from pod_user;'
+    user@hostname:~$ psql -h 127.0.0.1 -W -U tracimuser tracimdb -c 'SELECT * from tracim_user;'
 
 You should find the admin@localhost user entry.
 
 ### Setup python virtualenv ###
 
-Pod uses virtualenv as deployment environment. This ensure that there will be no 
-conflict between system-wide python modules and pod required ones.
+Tracim uses virtualenv as deployment environment. This ensure that there will be no 
+conflict between system-wide python modules and tracim required ones.
 
     virtualenv -p /usr/bin/python3 tg2env
     source tg2env/bin/activate
-    cd pod && python setup.py develop && cd -
+    cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
     
 Notes:
@@ -145,14 +145,14 @@ Notes:
 
 ### Create configuration ###
 
-    cp pod/development.ini.base pod/development.ini
+    cp tracim/development.ini.base tracim/development.ini
 
 #### Database 
 
 Configure database in the development.ini file. This is defined as sqlalchemy.url
 and the default value is below:
 
-    sqlalchemy.url = postgresql://pod_user:pod_user_password@127.0.0.1:5432/pod
+    sqlalchemy.url = postgresql://tracim_user:tracim_user_password@127.0.0.1:5432/tracim
 
 #### Listening port
 
@@ -167,7 +167,7 @@ The default language is English. You can change it to french by uncommenting the
     lang = fr_FR
 
     
-### Running Pod as standalone ###
+### Running Tracim as standalone ###
 
 Now you can run the standalone server:
 
@@ -176,7 +176,7 @@ Now you can run the standalone server:
 Which should result in something like this:
 
     13:53:49,982 INFO  [gearbox] Starting subprocess with file monitor
-    13:53:50,646 WARNI [py.warnings] /tmp/pod/protov1/tg2env/lib/python3.2/site-packages/tw2/core/validation.py:12: ImportWarning: Not importing directory '/tmp/pod/protov1/tg2env/lib/python3.2/site-packages/tw2/core/i18n': missing __init__.py
+    13:53:50,646 WARNI [py.warnings] /tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/validation.py:12: ImportWarning: Not importing directory '/tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/i18n': missing __init__.py
       from .i18n import _
     
     13:53:50,862 INFO  [gearbox] Starting server in PID 11174.
@@ -190,7 +190,7 @@ You can now enter the application at [http://localhost:8080](http://localhost:80
 Enjoy :)
 
 
-### Running Pod through Apache WSGI ###
+### Running Tracim through Apache WSGI ###
 
 #### Dependencies ####
 
@@ -206,18 +206,18 @@ Example of Apache WSGI configuration. This configuration refers to productionapp
         ServerAdmin webmaster@archipeldata.com
         ServerName demo.archipeldata.com
 
-        WSGIProcessGroup pod
-        WSGIDaemonProcess pod user=www-data group=adm threads=4 python-path=/opt/podinstall/tg2env/lib/python3.2/site-packages
-        WSGIScriptAlias / /opt/podinstall/pod/productionapp.wsgi
+        WSGIProcessGroup tracim
+        WSGIDaemonProcess tracim user=www-data group=adm threads=4 python-path=/opt/traciminstall/tg2env/lib/python3.2/site-packages
+        WSGIScriptAlias / /opt/traciminstall/tracim/productionapp.wsgi
 
         #Serve static files directly without TurboGears
-        Alias /img     /opt/podinstall/pod/pod/public/img/
-        Alias /favicon.ico /opt/podinstall/pod/pod/public/favicon.ico
-        Alias /css        /opt/podinstall/pod/pod/public/css
-        Alias /javascript /opt/podinstall/pod/pod/public/javascript
+        Alias /img     /opt/traciminstall/tracim/tracim/public/img/
+        Alias /favicon.ico /opt/traciminstall/tracim/tracim/public/favicon.ico
+        Alias /css        /opt/traciminstall/tracim/tracim/public/css
+        Alias /javascript /opt/traciminstall/tracim/tracim/public/javascript
 
-        CustomLog /var/log/apache2/demopod-access.log combined
-        ErrorLog /var/log/apache2/demopod-error.log
+        CustomLog /var/log/apache2/demotracim-access.log combined
+        ErrorLog /var/log/apache2/demotracim-error.log
         LogLevel debug
     </VirtualHost>
 

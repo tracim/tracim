@@ -1,0 +1,58 @@
+<%def name="ICO_URL(icon_size, icon_path)">${h.IconPath(icon_size, icon_path)|n}</%def>
+<%def name="ICO(icon_size, icon_path, title='')"><img src="${h.IconPath(icon_size, icon_path)|n}" alt="" title="${title}"/></%def>
+<%def name="ICO_BADGED(icon_size, icon_path, title='', css_class='badge')"><span class="${css_class}" rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="${title}">${ICO(icon_size, icon_path, title)}</span></%def>
+<%def name="ICO_FA_BADGED(fa_class='fa fa-flag', title='', css_style='')"><i style="${css_style}" class="${fa_class}" rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="${title}"></i></%def>
+
+<%def name="HELP_MODAL_DIALOG(help_page)"><div id="help-modal-dialog-${help_page}" class="modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"></div></div></div></%def>
+<%def name="HELP_MODAL_DIALOG_BUTTON(help_page, css_special_style='')"><a style="${css_special_style}" data-toggle="modal" data-target="#help-modal-dialog-${help_page}" data-remote="${tg.url('/help/page/{}?mode=modal'.format(help_page))}" >${ICO(16, 'apps/help-browser')}</a></%def>
+
+<%def name="NO_CONTENT_INFO(message)"><div class="alert alert-warning" role="alert">${ICO(32, 'status/dialog-information')} ${message|n}</div></%def>
+                
+<%def name="MODAL_DIALOG(css_id, modal_size='')">
+    <div id="${css_id}" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog ${modal_size}">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+</%def>
+
+<%def name="TINYMCE_INIT_SCRIPT(selector)">
+    <script>
+        tinymce.init({
+            menubar:false,
+            statusbar:true,
+            plugins: [ "table", "image", "charmap", "fullscreen", "autolink" ],
+
+            skin : 'custom',
+            selector:'${selector}',
+            toolbar: [
+              "undo redo | bold italic underline strikethrough | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen",
+            ]
+        });
+    </script>
+</%def>
+
+<%def name="FLASH_MSG(css_class='')">
+    <% flash=tg.flash_obj.render('flash', use_js=False) %>
+    % if flash:
+        <div class="row">
+            <div class="${css_class}">
+                ${flash|n}
+            </div>
+        </div>
+        ## HACK - D.A. - 2014-10-21
+        ##
+        ## The following JS "hack" is intended to make TG2 flash messages compatible with bootstrap alert classes
+        ## This should disappear as soon as LESS is implemented in the application
+        ## meaning we'll define a alert-ok style inheriting from alert-info, etc
+        <script>
+            $( document ).ready(function() {
+                $('.alert-ok').removeClass('alert-ok').addClass('alert-info');
+                $('.alert-error').removeClass('alert-error').addClass('alert-danger');
+            });
+        </script>
+    % endif
+</%def>
+
+

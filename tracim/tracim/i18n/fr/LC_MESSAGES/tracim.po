@@ -1,0 +1,1822 @@
+# French (France) translations for pod.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the pod project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pod 0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-10-22 14:01+0200\n"
+"PO-Revision-Date: 2014-10-22 13:43+0100\n"
+"Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
+"Language-Team: fr_FR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+
+#: pod/controllers/__init__.py:139 pod/templates/master_authenticated.mak:87
+#: pod/templates/master_no_toolbar_no_login.mak:112
+#: pod/templates/user_get_one.mak:39 pod/templates/user_profile.mak:39
+#: pod/templates/user_workspace_folder_file_get_one.mak:10
+#: pod/templates/user_workspace_folder_get_one.mak:11
+#: pod/templates/user_workspace_folder_page_get_one.mak:11
+#: pod/templates/user_workspace_folder_thread_get_one.mak:11
+#: pod/templates/user_workspace_get_all.mak:11
+#: pod/templates/user_workspace_get_one.mak:11
+#: pod/templates/workspace_get_all.mak:13
+msgid "Workspaces"
+msgstr "Espaces de travail"
+
+#: pod/controllers/__init__.py:274 pod/controllers/content.py:204
+msgid "{} updated"
+msgstr "{} mis(e) à jour"
+
+#: pod/controllers/__init__.py:279 pod/controllers/content.py:209
+msgid "{} not updated - error: {}"
+msgstr "{} pas mis(e) à jour - erreur : {}"
+
+#: pod/controllers/__init__.py:293
+msgid "{} status updated"
+msgstr "Statut de {} mis(e) à jour"
+
+#: pod/controllers/__init__.py:297
+msgid "{} status not updated: {}"
+msgstr "Statut de {} non mis(e) à jour : {}"
+
+#: pod/controllers/__init__.py:329
+msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
+msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+
+#: pod/controllers/__init__.py:338
+msgid "{} not archived: {}"
+msgstr "{} non archivé(e) : {}"
+
+#: pod/controllers/__init__.py:352
+msgid "{} unarchived."
+msgstr "{} désarchivé(e)"
+
+#: pod/controllers/__init__.py:360
+msgid "{} not un-archived: {}"
+msgstr "{} non désarchivé(e) : {}"
+
+#: pod/controllers/__init__.py:378
+msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
+msgstr ""
+"{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler "
+"l'opération</a>"
+
+#: pod/controllers/__init__.py:387
+msgid "{} not deleted: {}"
+msgstr "{} non supprimé(e) : {}"
+
+#: pod/controllers/__init__.py:402
+msgid "{} undeleted."
+msgstr "{} restauré(e)."
+
+#: pod/controllers/__init__.py:412
+msgid "{} not un-deleted: {}"
+msgstr "{} non restauré(e) : {}"
+
+#: pod/controllers/content.py:53
+msgid "Comment added"
+msgstr "Commentaire créé"
+
+#: pod/controllers/content.py:76
+msgid "File"
+msgstr "Fichier"
+
+#: pod/controllers/content.py:183
+msgid "File created"
+msgstr "Fichier créé"
+
+#: pod/controllers/content.py:234
+msgid "Page"
+msgstr "Page"
+
+#: pod/controllers/content.py:303
+msgid "Page created"
+msgstr "Page créée"
+
+#: pod/controllers/content.py:343
+msgid "Thread"
+msgstr "Discussion"
+
+#: pod/controllers/content.py:384
+msgid "Thread created"
+msgstr "Discussion créée"
+
+#: pod/controllers/content.py:462
+msgid "Item moved to {}"
+msgstr "Element déplacé vers {}"
+
+#: pod/controllers/content.py:578
+msgid "Folder created"
+msgstr "Dossier créé"
+
+#: pod/controllers/content.py:581
+msgid "Folder not created: {}"
+msgstr "Dossier non créé : {}"
+
+#: pod/controllers/content.py:609
+msgid "Folder updated"
+msgstr "Dossier mis à jour"
+
+#: pod/controllers/content.py:614
+msgid "Folder not updated: {}"
+msgstr "Dossier non mis à jour : {}"
+
+#: pod/controllers/root.py:66
+msgid "Wrong credentials"
+msgstr "Mauvais identifiant et/ou mot de passe"
+
+#: pod/controllers/root.py:97
+#, python-format
+msgid "Welcome back, %s!"
+msgstr "Bonjour %s. Ravis de vous revoir !"
+
+#: pod/controllers/root.py:105
+msgid "Successfully logged out. We hope to see you soon!"
+msgstr "Déconnexion réussie. Nous espérons vous revoir bientôt !"
+
+#: pod/controllers/user.py:64 pod/controllers/admin/user.py:186
+msgid "Empty password is not allowed."
+msgstr "Le mot de passe ne doit pas être vide"
+
+#: pod/controllers/user.py:68 pod/controllers/admin/user.py:190
+msgid "The current password you typed is wrong"
+msgstr "Le mot de passe que vous avez tapé est erroné"
+
+#: pod/controllers/user.py:72 pod/controllers/admin/user.py:194
+msgid "New passwords do not match."
+msgstr "Les mots de passe ne concordent pas"
+
+#: pod/controllers/user.py:78 pod/controllers/admin/user.py:200
+msgid "Your password has been changed"
+msgstr "Votre mot de passe a été changé"
+
+#: pod/controllers/user.py:133
+msgid "profile updated."
+msgstr "Profil mis à jour"
+
+#: pod/controllers/admin/user.py:73
+msgid "You can't change your own profile"
+msgstr "Vous ne pouvez pas changer votre propre profil"
+
+#: pod/controllers/admin/user.py:80
+msgid "Unknown profile"
+msgstr "Profil inconnu"
+
+#: pod/controllers/admin/user.py:87
+msgid "User updated."
+msgstr "Utilisateur mis à jour"
+
+#: pod/controllers/admin/user.py:103
+msgid "User {} is now a basic user"
+msgstr "L'utilisateur {} est désormais un utilisateur standard"
+
+#: pod/controllers/admin/user.py:116
+msgid "User {} can now workspaces"
+msgstr "L'utilisateur {} peut désormais créer des espaces de travail"
+
+#: pod/controllers/admin/user.py:127
+msgid "User {} is now an administrator"
+msgstr "L'utilisateur {} est désormais administrateur"
+
+#: pod/controllers/admin/user.py:248
+msgid "A user with email address \"{}\" already exists."
+msgstr "Un utilisateur avec l'adresse email \"{}\" existe déjà."
+
+#: pod/controllers/admin/user.py:268
+msgid "User {} created."
+msgstr "Utilisateur {} créé."
+
+#: pod/controllers/admin/user.py:307
+msgid "User {} updated."
+msgstr "Utilisateur {} mis à jour."
+
+#: pod/controllers/admin/user.py:321
+msgid "User {} activated."
+msgstr "Utilisateur {} activé."
+
+#: pod/controllers/admin/user.py:332
+msgid "You can't de-activate your own account"
+msgstr "Vous ne pouvez pas désactiver votre propre compte"
+
+#: pod/controllers/admin/user.py:337
+msgid "User {} desactivated"
+msgstr "Utilisateur {} désactivé."
+
+#: pod/controllers/admin/workspace.py:81
+msgid "You can't remove yourself from this workgroup"
+msgstr "Vous ne pouvez pas vous retirer de cet espace de travail."
+
+#: pod/controllers/admin/workspace.py:85
+msgid ""
+"User {} removed. You can <a class=\"alert-link\" href=\"{}\">restore "
+"it</a>"
+msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+
+#: pod/controllers/admin/workspace.py:93
+msgid "User {} restored in workspace {} as {}"
+msgstr "Utilisateur {} restauré dans l'espace de travail {} en tant que {}"
+
+#: pod/controllers/admin/workspace.py:100
+msgid "User {} added to workspace {} as {}"
+msgstr "Utilisateur {} ajouté à l'espace de travail {} en tant que {}"
+
+#: pod/controllers/admin/workspace.py:127
+msgid "You can't change your own role"
+msgstr "Vous ne pouvez pas modifier votre propre rôle"
+
+#: pod/controllers/admin/workspace.py:131
+msgid "Unknown role"
+msgstr "Rôle inconnu"
+
+#: pod/controllers/admin/workspace.py:136
+msgid "No change found."
+msgstr "Aucun changement trouvé."
+
+#: pod/controllers/admin/workspace.py:202
+msgid "{} workspace created."
+msgstr "Espace de travail {} créé."
+
+#: pod/controllers/admin/workspace.py:226
+msgid "{} workspace updated."
+msgstr "Espace de travail {} mis à jour."
+
+#: pod/controllers/admin/workspace.py:251
+msgid ""
+"{} workspace deleted. In case of error, you can <a class=\"alert-link\" "
+"href=\"{}\">restore it</a>."
+msgstr ""
+"Espace de travail {} supprimé. Vous pouvez <a class=\"alert-link\" "
+"href=\"{}\">annuler l'opération</a>."
+
+#: pod/controllers/admin/workspace.py:264
+msgid "{} workspace restored."
+msgstr "Espace de travail {} restauré."
+
+#: pod/lib/app_globals.py:27
+#, python-format
+msgid "%B %d at %I:%M%p"
+msgstr "le %d %B à %H:%M"
+
+#: pod/lib/helpers.py:71
+msgid "This is the current status."
+msgstr "C'est le statut actuel"
+
+#: pod/lib/helpers.py:74
+msgid "The item is a normal document, like a howto or a text document."
+msgstr "L'élément est un document normal, comme un howto ou un document texte"
+
+#: pod/lib/helpers.py:76
+msgid ""
+"The item will be automatically computed as \"in progress\" or \"done\" "
+"according to its children status."
+msgstr ""
+"L'élément sera automatiquement mis en \"En cours\" ou \"Fait\" suivant le"
+" statut de ses enfants."
+
+#: pod/lib/helpers.py:78
+msgid "No action done on the item."
+msgstr "Aucun changement sur l'élément"
+
+#: pod/lib/helpers.py:80
+msgid "The item is being worked on."
+msgstr "L'élément est en cours d'utilisation."
+
+#: pod/lib/helpers.py:82
+msgid "Waiting for some external actions."
+msgstr "En attente d'actions externes."
+
+#: pod/lib/helpers.py:84
+msgid "The work associated with the item is finished."
+msgstr "L'action associée à l'élément n'est pas terminée."
+
+#: pod/lib/helpers.py:86
+msgid ""
+"Close the item if you want not to see it anymore. The data won't be "
+"deleted"
+msgstr ""
+"Fermez l'élément si vous ne voulez plus le voir. Les données ne seront "
+"pas supprimées"
+
+#: pod/lib/helpers.py:88
+msgid "This status tells that the item has been deleted."
+msgstr "Ce status indique que l'élément a été supprimé."
+
+#: pod/lib/predicates.py:12
+msgid "You are not authorized to access this resource"
+msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
+
+#: pod/model/auth.py:131
+msgid "Nobody"
+msgstr "Personne"
+
+#: pod/model/auth.py:132 pod/templates/master_authenticated.mak:86
+#: pod/templates/master_no_toolbar_no_login.mak:111
+#: pod/templates/user_get_all.mak:13
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: pod/model/auth.py:133
+msgid "Global managers"
+msgstr "Managers globaux"
+
+#: pod/model/auth.py:134
+msgid "Administrators"
+msgstr "Administrateurs"
+
+#: pod/model/data.py:88
+msgid "N/A"
+msgstr "N/A"
+
+#: pod/model/data.py:89 pod/templates/help/page-user-role-definition.mak:15
+msgid "Reader"
+msgstr "Lecteur"
+
+#: pod/model/data.py:90 pod/templates/help/page-user-role-definition.mak:19
+msgid "Contributor"
+msgstr "Contributeurs"
+
+#: pod/model/data.py:91 pod/templates/help/page-user-role-definition.mak:23
+msgid "Content Manager"
+msgstr "Gestionnaire de contenu"
+
+#: pod/model/data.py:92 pod/templates/help/page-user-role-definition.mak:27
+msgid "Workspace Manager"
+msgstr "Responsable"
+
+#: pod/model/data.py:162
+msgid "Item archived"
+msgstr "Element archivé"
+
+#: pod/model/data.py:163
+msgid "Item commented"
+msgstr "Element commenté"
+
+#: pod/model/data.py:164
+msgid "Item created"
+msgstr "Elément créé"
+
+#: pod/model/data.py:165
+msgid "Item deleted"
+msgstr "Element supprimé"
+
+#: pod/model/data.py:166
+msgid "Item modified"
+msgstr "Elément modifié"
+
+#: pod/model/data.py:167
+msgid "New revision"
+msgstr "Nouvelle version"
+
+#: pod/model/data.py:168
+msgid "Status modified"
+msgstr "Statut modifié"
+
+#: pod/model/data.py:169
+msgid "Item un-archived"
+msgstr "Elément désarchivé"
+
+#: pod/model/data.py:170
+msgid "Item undeleted"
+msgstr "Elément restauré"
+
+#: pod/model/data.py:207 pod/model/data.py:217
+msgid "work in progress"
+msgstr "travail en cours"
+
+#: pod/model/data.py:208 pod/model/data.py:218
+msgid "closed — validated"
+msgstr "clos(e) — validé(e)"
+
+#: pod/model/data.py:209 pod/model/data.py:219
+msgid "closed — cancelled"
+msgstr "clos(e) — annulé(e)"
+
+#: pod/model/data.py:210 pod/model/data.py:215 pod/model/data.py:220
+msgid "deprecated"
+msgstr "obsolète"
+
+#: pod/model/data.py:212
+msgid "subject in progress"
+msgstr "discussion en cours"
+
+#: pod/model/data.py:213
+msgid "subject closed — resolved"
+msgstr "discussion close — résolue"
+
+#: pod/model/data.py:214
+msgid "subject closed — cancelled"
+msgstr "discussion close — annulée"
+
+#: pod/model/data.py:711
+msgid "Titleless Document"
+msgstr "Document sans titre"
+
+#: pod/templates/create_account.mak:5
+msgid "Create account"
+msgstr "Créer un compte"
+
+#: pod/templates/dashboard.mak:5 pod/templates/master_authenticated.mak:79
+#: pod/templates/master_no_toolbar_no_login.mak:105
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: pod/templates/dashboard.mak:12
+msgid "Welcome to your dashboard"
+msgstr "Votre tableau de bord"
+
+#: pod/templates/dashboard.mak:17
+msgid "What to do ?"
+msgstr "Que faire ?"
+
+#: pod/templates/dashboard.mak:19
+msgid "Go to my workspaces"
+msgstr "Accéder à mes espaces de travail"
+
+#: pod/templates/dashboard.mak:22
+msgid "Go to my profile"
+msgstr "Consulter mon profil"
+
+#: pod/templates/error.mak:23 pod/templates/error_authenticated.mak:20
+msgid "Something went wrong!"
+msgstr "Quelque chose s'est mal passé"
+
+#: pod/templates/error.mak:36
+msgid "We suggest..."
+msgstr "Nous vous suggérons..."
+
+#: pod/templates/error.mak:37
+msgid "to go back to the home page"
+msgstr "de retourner à la page d'accueil"
+
+#: pod/templates/error.mak:38
+msgid "to contact the support"
+msgstr "de contacter le support"
+
+#: pod/templates/error.mak:44 pod/templates/error_authenticated.mak:42
+msgid "The error was: error {code}"
+msgstr "L'erreur était : erreur {code}"
+
+#: pod/templates/error_authenticated.mak:4
+msgid "A {code} Error has occured"
+msgstr "Une erreur {code} est intervenue"
+
+#: pod/templates/error_authenticated.mak:33
+msgid "We suggest to..."
+msgstr "Nous vous suggérons de..."
+
+#: pod/templates/error_authenticated.mak:34
+msgid "Go back to the home page"
+msgstr "Retourner à la page d'accueil"
+
+#: pod/templates/error_authenticated.mak:35
+msgid "Contact the support"
+msgstr "Contacter le support"
+
+#: pod/templates/file_toolbars.mak:8
+msgid "Edit current file"
+msgstr "Modifier le fichier courant"
+
+#: pod/templates/file_toolbars.mak:14
+msgid "View versions of the file"
+msgstr "Voir les versions du fichier"
+
+#: pod/templates/file_toolbars.mak:23
+msgid "Archive file"
+msgstr "Archiver le fichier"
+
+#: pod/templates/file_toolbars.mak:24
+msgid "Delete file"
+msgstr "Supprimer le fichier"
+
+#: pod/templates/folder_toolbars.mak:14
+msgid "Edit current folder"
+msgstr "Modifier le dossier courant"
+
+#: pod/templates/folder_toolbars.mak:22
+msgid "Move current folder"
+msgstr "Déplacer le dossier courant"
+
+#: pod/templates/index.mak:26 pod/templates/index.mak:47
+#: pod/templates/master_authenticated.mak:138
+msgid "Login"
+msgstr "Login"
+
+#: pod/templates/index.mak:31
+msgid "Enter email"
+msgstr "Adresse email"
+
+#: pod/templates/index.mak:37
+msgid "Enter password"
+msgstr "Mot de passe"
+
+#: pod/templates/index.mak:42
+msgid "Remember me"
+msgstr "Se souvenir de moi"
+
+#: pod/templates/item_location_edit.mak:7
+msgid "Move folder"
+msgstr "Déplacer le dossier"
+
+#: pod/templates/master_anonymous.mak:67
+#: pod/templates/master_authenticated.mak:48
+msgid "Create your own email-ready collaborative workspace on trac.im"
+msgstr ""
+"Créez votre propre espace de travail collaboratif compatible avec l'email"
+" sur trac.im"
+
+#: pod/templates/master_authenticated.mak:80
+#: pod/templates/master_no_toolbar_no_login.mak:106
+#: pod/templates/workspace_get_all.mak:64
+msgid "Workspace"
+msgstr "Espace de travail"
+
+#: pod/templates/master_authenticated.mak:84
+#: pod/templates/master_no_toolbar_no_login.mak:109
+msgid "Admin"
+msgstr "Admin"
+
+#: pod/templates/master_authenticated.mak:128
+#: pod/templates/master_no_toolbar_no_login.mak:144
+msgid "My account"
+msgstr "Mon compte"
+
+#: pod/templates/master_authenticated.mak:133
+#: pod/templates/master_no_toolbar_no_login.mak:149
+msgid "Logout"
+msgstr "Fermer la session"
+
+#: pod/templates/master_no_toolbar_no_login.mak:80
+msgid "collaborate today, capitalize for tomorrow"
+msgstr "collaborez aujourd'hui, capitalisez pour demain"
+
+#: pod/templates/master_no_toolbar_no_login.mak:114
+msgid "Global configuration"
+msgstr "Configuration globale"
+
+#: pod/templates/master_no_toolbar_no_login.mak:160
+msgid "Get help"
+msgstr "Aide"
+
+#: pod/templates/master_no_toolbar_no_login.mak:161
+msgid "About pod"
+msgstr "A propos de pod"
+
+#: pod/templates/master_no_toolbar_no_login.mak:163
+msgid "You are using pod v"
+msgstr "Vous utilisez pod v"
+
+#: pod/templates/master_no_toolbar_no_login.mak:169
+msgid "Search..."
+msgstr "Rechercher..."
+
+#: pod/templates/page_toolbars.mak:8
+msgid "Edit current page"
+msgstr "Modifier la page courante"
+
+#: pod/templates/page_toolbars.mak:14
+msgid "View versions of the page"
+msgstr "Voir les versions de la page"
+
+#: pod/templates/page_toolbars.mak:15 pod/templates/thread_toolbars.mak:14
+msgid "View all links"
+msgstr "Voir tous les liens"
+
+#: pod/templates/page_toolbars.mak:25
+msgid "Archive page"
+msgstr "Archiver la page"
+
+#: pod/templates/page_toolbars.mak:26
+msgid "Delete page"
+msgstr "Supprimer la page"
+
+#: pod/templates/reset_password_change_password.mak:5
+msgid "Change Password Request"
+msgstr "Requête de changement de mot de passe"
+
+#: pod/templates/reset_password_change_password.mak:13
+#: pod/templates/reset_password_index.mak:13
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+#: pod/templates/reset_password_index.mak:5
+msgid "Password Reset Request"
+msgstr "Requête de réinitialisation du mot de passe"
+
+#: pod/templates/thread_toolbars.mak:8
+msgid "Edit current thread"
+msgstr "Modifier la discussion"
+
+#: pod/templates/thread_toolbars.mak:22
+msgid "Archive thread"
+msgstr "Archiver la discussion"
+
+#: pod/templates/thread_toolbars.mak:23
+msgid "Delete thread"
+msgstr "Supprimer la discussion"
+
+#: pod/templates/user_get_all.mak:24
+msgid "Create a user account..."
+msgstr "Créer un compte utilisateur"
+
+#: pod/templates/user_get_all.mak:29 pod/templates/user_get_all.mak:30
+#: pod/templates/user_workspace_folder_file_get_one.mak:70
+#: pod/templates/user_workspace_forms.mak:43
+#: pod/templates/user_workspace_forms.mak:44
+#: pod/templates/user_workspace_forms.mak:223
+#: pod/templates/user_workspace_forms.mak:224
+#: pod/templates/user_workspace_forms.mak:228
+#: pod/templates/workspace_edit.mak:12 pod/templates/workspace_edit.mak:13
+#: pod/templates/workspace_get_all.mak:28
+#: pod/templates/workspace_get_all.mak:29
+msgid "Name"
+msgstr "Nom"
+
+#: pod/templates/user_get_all.mak:33 pod/templates/user_get_all.mak:93
+#: pod/templates/user_workspace_forms.mak:227
+#: pod/templates/workspace_get_one.mak:87
+msgid "Email"
+msgstr "Email"
+
+#: pod/templates/user_get_all.mak:34
+msgid "Email address"
+msgstr "Adresse email"
+
+#: pod/templates/user_get_all.mak:37
+msgid "Password"
+msgstr "Mot de passe"
+
+#: pod/templates/user_get_all.mak:38
+msgid "Optionnaly choose a password"
+msgstr "Choisissez un mot de passe (optionnel)"
+
+#: pod/templates/user_get_all.mak:42
+msgid "This user can create workspaces"
+msgstr "Cet utilisateur peut créer des espaces de travail"
+
+#: pod/templates/user_get_all.mak:47
+msgid "This user is an administrator"
+msgstr "Cet utilisateur est un administrateur"
+
+#: pod/templates/user_get_all.mak:52
+#: pod/templates/user_workspace_folder_file_edit.mak:23
+#: pod/templates/user_workspace_folder_page_edit.mak:23
+#: pod/templates/user_workspace_folder_thread_edit.mak:23
+#: pod/templates/user_workspace_forms.mak:25
+#: pod/templates/user_workspace_forms.mak:68
+#: pod/templates/user_workspace_forms.mak:93
+#: pod/templates/user_workspace_forms.mak:113
+#: pod/templates/user_workspace_forms.mak:136
+#: pod/templates/user_workspace_forms.mak:159
+#: pod/templates/user_workspace_forms.mak:186
+#: pod/templates/user_workspace_forms.mak:205
+#: pod/templates/user_workspace_forms.mak:233
+#: pod/templates/workspace_edit.mak:22 pod/templates/workspace_get_all.mak:40
+#: pod/templates/workspace_get_one.mak:66
+msgid "Validate"
+msgstr "Valider"
+
+#: pod/templates/user_get_all.mak:86 pod/templates/workspace_get_all.mak:58
+msgid ""
+"There are no workspace yet. Start by <a class=\"alert-link\" data-"
+"toggle=\"collapse\" data-target=\"#create-workspace-form\">creating a "
+"workspace</a>."
+msgstr ""
+"Il n'y a pas encore d'espaces de travail. Commencez en <a class=\"alert-"
+"link\" data-toggle=\"collapse\" data-target=\"#create-workspace-"
+"form\">créant un espace de travail</a>."
+
+#: pod/templates/user_get_all.mak:92 pod/templates/workspace_get_one.mak:42
+#: pod/templates/workspace_get_one.mak:86
+msgid "User"
+msgstr "Utilisateur"
+
+#: pod/templates/user_get_all.mak:94
+msgid "Can create workspaces"
+msgstr "Peut créer des espaces de travail"
+
+#: pod/templates/user_get_all.mak:95
+msgid "Administrator"
+msgstr "Administrateur"
+
+#: pod/templates/user_get_all.mak:101
+msgid "User enabled. Click to disable this user"
+msgstr "Utilisateur activé. Cliquez pour le désactiver"
+
+#: pod/templates/user_get_all.mak:115
+msgid "User disabled. Click to enable this user"
+msgstr "Utilisateur désactivé. Cliquez pour l'activer"
+
+#: pod/templates/user_get_me.mak:5 pod/templates/user_get_one.mak:5
+#: pod/templates/user_profile.mak:5
+msgid "My profile"
+msgstr "Mon profil"
+
+#: pod/templates/user_get_me.mak:26 pod/templates/user_get_one.mak:26
+msgid "This user can create workspaces."
+msgstr "Cet utilisateur peut créer des espaces de travail."
+
+#: pod/templates/user_get_me.mak:29 pod/templates/user_get_one.mak:29
+msgid "This user is an administrator."
+msgstr "Cet utilisateur est un administrateur"
+
+#: pod/templates/user_get_me.mak:39 pod/templates/user_workspace_get_all.mak:8
+#: pod/templates/user_workspace_get_all.mak:29
+msgid "My workspaces"
+msgstr "Mes espaces de travail"
+
+#: pod/templates/user_get_me.mak:42 pod/templates/user_get_one.mak:42
+#: pod/templates/user_profile.mak:42
+msgid "This user is not member of any workspace."
+msgstr "Cet utilisateur n'est membre d'aucun espace de travail"
+
+#: pod/templates/user_profile.mak:12
+msgid "User profile"
+msgstr "Profil utilisateur"
+
+#: pod/templates/user_profile.mak:26
+msgid "I can create workspaces."
+msgstr "je peux créer des espaces de travail"
+
+#: pod/templates/user_profile.mak:29
+msgid "I'm an administrator."
+msgstr "Je suis un administrateur"
+
+#: pod/templates/user_toolbars.mak:16
+msgid "Edit current user"
+msgstr "Modifier l'utilisateur courant"
+
+#: pod/templates/user_toolbars.mak:17
+#: pod/templates/user_workspace_forms.mak:243
+msgid "Change password"
+msgstr "Changer le mot de passe"
+
+#: pod/templates/user_toolbars.mak:22 pod/templates/workspace_toolbars.mak:16
+msgid "Delete current workspace"
+msgstr "Supprimer l'espace de travail"
+
+#: pod/templates/user_workspace_folder_file_edit.mak:8
+#: pod/templates/user_workspace_folder_page_edit.mak:8
+#: pod/templates/user_workspace_folder_thread_edit.mak:8
+#: pod/templates/user_workspace_forms.mak:38
+#: pod/templates/user_workspace_forms.mak:79
+#: pod/templates/user_workspace_forms.mak:242 pod/templates/help/page.mak:14
+msgid "Close"
+msgstr "Fermer"
+
+#: pod/templates/user_workspace_folder_file_edit.mak:9
+msgid "Edit file"
+msgstr "Modifier le fichier"
+
+#: pod/templates/user_workspace_folder_file_edit.mak:13
+#: pod/templates/user_workspace_folder_file_edit.mak:14
+#: pod/templates/user_workspace_folder_page_edit.mak:13
+#: pod/templates/user_workspace_folder_page_edit.mak:14
+#: pod/templates/user_workspace_forms.mak:106
+msgid "Title"
+msgstr "Titre"
+
+#: pod/templates/user_workspace_folder_file_edit.mak:17
+#: pod/templates/user_workspace_folder_page_edit.mak:17
+#: pod/templates/user_workspace_forms.mak:109
+msgid "Content"
+msgstr "Contenu"
+
+#: pod/templates/user_workspace_folder_file_edit.mak:18
+msgid "Write here the file content"
+msgstr "Indiquez le contenu du fichier"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:33
+msgid ""
+"You are reading <b>an old revision</b> of the current file. (the shown "
+"revision is r{})."
+msgstr ""
+"Vous consultez <b>une ancienne version</b> du fichier courant. (la "
+"version affichée est v{})."
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:34
+#: pod/templates/user_workspace_folder_page_get_one.mak:35
+msgid "Show latest revision"
+msgstr "Voir la dernière version"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:41
+#: pod/templates/user_workspace_folder_page_get_one.mak:42
+#: pod/templates/user_workspace_folder_thread_get_one.mak:33
+msgid "<b>This information is deprecated</b>"
+msgstr "<b>Cette information est obsolète</b>"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:48
+#: pod/templates/user_workspace_folder_get_one.mak:35
+#: pod/templates/user_workspace_folder_page_get_one.mak:49
+#: pod/templates/user_workspace_folder_thread_get_one.mak:40
+msgid "Show localisation"
+msgstr "Localiser cet élément"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:55
+#: pod/templates/user_workspace_folder_get_one.mak:40
+#: pod/templates/user_workspace_folder_page_get_one.mak:56
+#: pod/templates/user_workspace_folder_thread_get_one.mak:49
+msgid "created on {} by <b>{}</b>"
+msgstr "Créé(e)  le {} par <b>{}</b>"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:62
+#: pod/templates/user_workspace_folder_file_get_one.mak:72
+msgid "Download the file (last revision)"
+msgstr "Télécharger le fichier (dernière version)"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:79
+msgid "Size"
+msgstr "Taille"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:83
+msgid "Modified"
+msgstr "Modifié"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:84
+msgid "by {}"
+msgstr "par {}"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:90
+#: pod/templates/user_workspace_folder_thread_edit.mak:17
+#: pod/templates/workspace_edit.mak:16 pod/templates/workspace_get_all.mak:32
+#: pod/templates/workspace_get_all.mak:65
+msgid "Description"
+msgstr "Description"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:99
+msgid ""
+"<b>Note</b>: You need to change status in case you want to upload a new "
+"version"
+msgstr ""
+"<b>Note</b>: Vous devez changer le statut du fichier avant de pouvoir "
+"télécharger une nouvelle version"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:104
+#: pod/templates/user_workspace_folder_file_get_one.mak:108
+msgid "File revisions"
+msgstr "Versions du fichier"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:105
+#: pod/templates/user_workspace_folder_file_get_one.mak:109
+msgid "This file contains {} revision(s)"
+msgstr "ce fichier contient {} version(s)"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:108
+msgid "upload a new revision and/or comment..."
+msgstr "téléverser une nouvelle version et/ou commenter..."
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:127
+msgid "Download this particular revision"
+msgstr "Télécharger cette version"
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:128
+#: pod/templates/user_workspace_folder_page_get_one.mak:90
+#, python-format
+msgid "%Y-%m-%d at %H:%M"
+msgstr ""
+
+#: pod/templates/user_workspace_folder_file_get_one.mak:132
+#: pod/templates/user_workspace_folder_page_get_one.mak:94
+msgid "Revision r{}"
+msgstr "Version v{}"
+
+#: pod/templates/user_workspace_folder_get_one.mak:43
+msgid "Content:"
+msgstr "Contenu :"
+
+#: pod/templates/user_workspace_folder_get_one.mak:45
+#: pod/templates/user_workspace_forms.mak:17
+#: pod/templates/user_workspace_forms.mak:51
+msgid "sub-folders"
+msgstr "sous-dossiers"
+
+#: pod/templates/user_workspace_folder_get_one.mak:48
+#: pod/templates/user_workspace_forms.mak:18
+#: pod/templates/user_workspace_forms.mak:55
+msgid "threads"
+msgstr "discussions"
+
+#: pod/templates/user_workspace_folder_get_one.mak:51
+#: pod/templates/user_workspace_forms.mak:19
+#: pod/templates/user_workspace_forms.mak:59
+msgid "files"
+msgstr "fichiers"
+
+#: pod/templates/user_workspace_folder_get_one.mak:54
+msgid "pages"
+msgstr "pages"
+
+#: pod/templates/user_workspace_folder_get_one.mak:61
+#: pod/templates/user_workspace_folder_get_one.mak:63
+msgid "Sub-folders"
+msgstr "Sous-dossiers"
+
+#: pod/templates/user_workspace_folder_get_one.mak:63
+msgid "create new folder..."
+msgstr "créer un nouveau dossier..."
+
+#: pod/templates/user_workspace_folder_get_one.mak:73
+msgid "Threads"
+msgstr "Discussions"
+
+#: pod/templates/user_workspace_folder_get_one.mak:73
+msgid "start new thread..."
+msgstr "lancer une nouvelle discussion..."
+
+#: pod/templates/user_workspace_folder_get_one.mak:83
+msgid "Files"
+msgstr "Fichiers"
+
+#: pod/templates/user_workspace_folder_get_one.mak:83
+msgid "add new file..."
+msgstr "ajouter un nouveau fichier..."
+
+#: pod/templates/user_workspace_folder_get_one.mak:93
+msgid "Pages"
+msgstr "Pages"
+
+#: pod/templates/user_workspace_folder_get_one.mak:93
+msgid "create new page..."
+msgstr "créer une nouvelle page..."
+
+#: pod/templates/user_workspace_folder_page_edit.mak:9
+msgid "Edit Page"
+msgstr "Modifier la page"
+
+#: pod/templates/user_workspace_folder_page_edit.mak:18
+#: pod/templates/user_workspace_forms.mak:110
+msgid "Write here the page content"
+msgstr "Rédigez le contenu de la page"
+
+#: pod/templates/user_workspace_folder_page_get_one.mak:34
+msgid ""
+"You are reading <b>an old revision</b> of the current page. (the shown "
+"revision is r{})."
+msgstr ""
+"Vous consultez <b>une ancienne version</b> de al page courante. (la "
+"version affichée est la v{})."
+
+#: pod/templates/user_workspace_folder_page_get_one.mak:65
+msgid "Links extracted from the page"
+msgstr "Liens extraits de la page"
+
+#: pod/templates/user_workspace_folder_page_get_one.mak:68
+msgid "No link found."
+msgstr "Aucun lien trouvé."
+
+#: pod/templates/user_workspace_folder_page_get_one.mak:80
+msgid "Page revisions"
+msgstr "Versions de la page"
+
+#: pod/templates/user_workspace_folder_thread_edit.mak:9
+msgid "Edit Subject"
+msgstr "Modifier le sujet"
+
+#: pod/templates/user_workspace_folder_thread_edit.mak:13
+#: pod/templates/user_workspace_folder_thread_edit.mak:14
+#: pod/templates/user_workspace_forms.mak:128
+msgid "Subject"
+msgstr "Sujet"
+
+#: pod/templates/user_workspace_folder_thread_edit.mak:18
+msgid "Optionnaly, you can describe the subject"
+msgstr "Vous pouvez décrire le sujet (facultatif)"
+
+#: pod/templates/user_workspace_folder_thread_get_one.mak:64
+msgid ""
+"<b>Note</b>: In case you'd like to post a reply, you must first open "
+"again the thread"
+msgstr ""
+"<b>Note</b> : si vous souhaitez commenter cette discussion, vous devez "
+"tout d'abord en modifier le statut pour la ré-ouvrir"
+
+#: pod/templates/user_workspace_folder_thread_get_one.mak:69
+msgid "Post a reply..."
+msgstr "Poster une réponse..."
+
+#: pod/templates/user_workspace_folder_thread_get_one.mak:88
+msgid "<strong>{}</strong> wrote:"
+msgstr "<strong>{}</strong> a écrit :"
+
+#: pod/templates/user_workspace_forms.mak:10
+msgid "Folder name"
+msgstr "Nom du dossier"
+
+#: pod/templates/user_workspace_forms.mak:14
+#: pod/templates/user_workspace_forms.mak:47
+msgid "This folder may contain:"
+msgstr "Ce dossier peut contenir :"
+
+#: pod/templates/user_workspace_forms.mak:20
+#: pod/templates/user_workspace_forms.mak:63
+msgid "Wiki pages"
+msgstr "des pages \"wiki\""
+
+#: pod/templates/user_workspace_forms.mak:25
+msgid "Create this folder"
+msgstr "Créer ce dossier"
+
+#: pod/templates/user_workspace_forms.mak:39
+msgid "Edit Folder"
+msgstr "Modifier le dossier"
+
+#: pod/templates/user_workspace_forms.mak:105
+msgid "Page title"
+msgstr "Titre de la page"
+
+#: pod/templates/user_workspace_forms.mak:113
+#: pod/templates/user_workspace_forms.mak:136
+msgid "Create this page"
+msgstr "Créer cette page"
+
+#: pod/templates/user_workspace_forms.mak:129
+#: pod/templates/user_workspace_forms.mak:133
+#: pod/templates/user_workspace_forms.mak:202
+msgid "..."
+msgstr "..."
+
+#: pod/templates/user_workspace_forms.mak:132
+msgid "Message"
+msgstr "Message"
+
+#: pod/templates/user_workspace_forms.mak:151
+msgid "Title (optionnal)"
+msgstr "Titre (optionnel)"
+
+#: pod/templates/user_workspace_forms.mak:152
+msgid "you can give a title to this file"
+msgstr "Vous pouvez donner un titre à ce fichier"
+
+#: pod/templates/user_workspace_forms.mak:155
+msgid "Select a file"
+msgstr "Sélectionner un fichier ..."
+
+#: pod/templates/user_workspace_forms.mak:156
+#: pod/templates/user_workspace_forms.mak:179
+msgid "choose a file"
+msgstr "choisir un fichier"
+
+#: pod/templates/user_workspace_forms.mak:178
+msgid "Select new file revision"
+msgstr "Sélectionner la nouvelle version du fichier"
+
+#: pod/templates/user_workspace_forms.mak:182
+msgid "Your comment..."
+msgstr "Votre commentaire..."
+
+#: pod/templates/user_workspace_forms.mak:201
+msgid "Your message"
+msgstr "votre message"
+
+#: pod/templates/user_workspace_forms.mak:219
+msgid "Edit User"
+msgstr "Modifier l'utilisateur"
+
+#: pod/templates/user_workspace_forms.mak:247
+#: pod/templates/user_workspace_forms.mak:248
+msgid "Current password"
+msgstr "Mot de passe actuel"
+
+#: pod/templates/user_workspace_forms.mak:251
+#: pod/templates/user_workspace_forms.mak:252
+msgid "New password"
+msgstr "Nouveau mot de passe"
+
+#: pod/templates/user_workspace_forms.mak:255
+#: pod/templates/user_workspace_forms.mak:256
+msgid "Retype password"
+msgstr "Confirmez le mot de passe"
+
+#: pod/templates/user_workspace_forms.mak:260
+msgid "Save changes"
+msgstr "Sauvergarder"
+
+#: pod/templates/user_workspace_get_all.mak:36
+msgid "Let's start working on existing information."
+msgstr "Commencez à travailler sur des éléments existant."
+
+#: pod/templates/user_workspace_get_one.mak:32
+msgid "created on {}"
+msgstr "créé le {}"
+
+#: pod/templates/user_workspace_get_one.mak:40
+msgid "There are no members in this workspace"
+msgstr "Cet espace de travail ne compte aucun membre"
+
+#: pod/templates/user_workspace_get_one.mak:53
+#: pod/templates/user_workspace_get_one.mak:55
+msgid "Folders"
+msgstr "Dossiers"
+
+#: pod/templates/user_workspace_get_one.mak:55
+msgid "Add a folder..."
+msgstr "Ajouter un dossier..."
+
+#: pod/templates/user_workspace_widgets.mak:35
+msgid "No folder found."
+msgstr "Aucun dossier."
+
+#: pod/templates/user_workspace_widgets.mak:43
+msgid "This folder is empty"
+msgstr "Ce dossier est vide"
+
+#: pod/templates/user_workspace_widgets.mak:46
+msgid "{nb_total} subfolder(s)"
+msgstr "{nb_total} sous-dossier(s)"
+
+#: pod/templates/user_workspace_widgets.mak:50
+msgid "{nb_total} thread(s) &mdash; {nb_open} open"
+msgstr "{nb_total} discussion(s) &mdash; {nb_open} ouverte(s)"
+
+#: pod/templates/user_workspace_widgets.mak:55
+msgid "{nb_total} file(s) &mdash; {nb_open} open"
+msgstr "{nb_total} fichier(s) &mdash; {nb_open} ouvert(s)"
+
+#: pod/templates/user_workspace_widgets.mak:60
+msgid "{nb_total} page(s) &mdash; {nb_open} open"
+msgstr "{nb_total} page(s) &mdash; {nb_open} ouverte(s)"
+
+#: pod/templates/user_workspace_widgets.mak:74
+msgid "No page found."
+msgstr "Aucune page."
+
+#: pod/templates/user_workspace_widgets.mak:91
+msgid "No file found."
+msgstr "Aucun fichier."
+
+#: pod/templates/user_workspace_widgets.mak:108
+msgid "No thread found."
+msgstr "Aucune discussion."
+
+#: pod/templates/user_workspace_widgets.mak:115
+msgid "{} message(s)"
+msgstr "{} message(s)"
+
+#: pod/templates/user_workspace_widgets.mak:207
+msgid "There is no content yet."
+msgstr "Il n'y a pas de contenu pour le moment."
+
+#: pod/templates/user_workspace_widgets.mak:208
+msgid "Create a topic"
+msgstr "Créer un sujet"
+
+#: pod/templates/workspace_edit.mak:8
+msgid "Edit Workspace"
+msgstr "Modifier l'espace de travail"
+
+#: pod/templates/workspace_edit.mak:17 pod/templates/workspace_get_all.mak:33
+msgid "You may add a description of the workspace"
+msgstr "Vous pouvez décrire l'espace de travail"
+
+#: pod/templates/workspace_get_all.mak:23
+msgid "Create a workspace..."
+msgstr "Créer un espace de travail"
+
+#: pod/templates/workspace_get_all.mak:36
+msgid "<u>Note</u>: members will be added during next step."
+msgstr "<u>Note</u> : les membres seront ajoutées à la prochaine étape."
+
+#: pod/templates/workspace_get_all.mak:66
+msgid "User Nb"
+msgstr "Nombre d'utilisateurs"
+
+#: pod/templates/workspace_get_one.mak:6
+msgid "Workspace:"
+msgstr "Espace de travail :"
+
+#: pod/templates/workspace_get_one.mak:34
+#: pod/templates/workspace_get_one.mak:36
+msgid "Members"
+msgstr "Membres"
+
+#: pod/templates/workspace_get_one.mak:36
+msgid "Add a member..."
+msgstr "Ajouter un membre..."
+
+#: pod/templates/workspace_get_one.mak:53
+#: pod/templates/workspace_get_one.mak:88
+msgid "Role"
+msgstr "Rôle"
+
+#: pod/templates/workspace_get_one.mak:80
+msgid ""
+"There are no user associated to the current workspace. Start by <a class"
+"=\"alert-link\" data-toggle=\"collapse\" data-target=\"#add-role-from-"
+"existing-user-form\">adding members</a>  to the workspace."
+msgstr ""
+"Il n'y a aucun membre dans cet espace de travail. Commencez par <a class"
+"=\"alert-link\" data-toggle=\"collapse\" data-target=\"#add-role-from-"
+"existing-user-form\">ajouter des membres</a> à cet espace."
+
+#: pod/templates/workspace_get_one.mak:107
+msgid "Change role to..."
+msgstr "Changer le rôle en..."
+
+#: pod/templates/workspace_get_one.mak:117
+msgid "Remove this user from the current workspace"
+msgstr "Retirer cet utilisateur de l'espace de travail courant"
+
+#: pod/templates/workspace_toolbars.mak:7
+msgid "Edit current workspace"
+msgstr "Modifier l'espace de travail courant"
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:4
+msgid "Wiki page definition"
+msgstr "Définition de page wiki"
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:7
+msgid "A wiki page is a document you write and modify online."
+msgstr "Une page wiki est un document que vous rédigez et modifiez en ligne."
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:8
+msgid "It's a wikipedia-like page dedicated to your workspace."
+msgstr "C'est une page type \"wikipedia\" dédiée à votre espace de travail."
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:10
+msgid "It can contain:"
+msgstr "Une page peut contenir :"
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:12
+msgid "text,"
+msgstr "du texte,"
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:13
+msgid "images,"
+msgstr "des images,"
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:14
+msgid "links,"
+msgstr "des liens,"
+
+#: pod/templates/help/page-content-wiki-page-definition.mak:15
+msgid "tables,"
+msgstr "des tableaux,"
+
+#: pod/templates/help/page-user-role-definition.mak:4
+msgid "User role definition"
+msgstr "Rôles utilisateurs"
+
+#: pod/templates/help/page-user-role-definition.mak:8
+msgid "Users have a role for each workspace."
+msgstr "Les utilisateurs ont un rôle spécifique à chaque espace de travail."
+
+#: pod/templates/help/page-user-role-definition.mak:11
+msgid "Roles give progressive rights on what the user can or can't do."
+msgstr ""
+"Les rôles donnent des droits progressifs qui déterminent ce que "
+"l'utilisateur peut ou ne peut pas faire."
+
+#: pod/templates/help/page-user-role-definition.mak:16
+msgid "This role gives read-only access to workspace resources."
+msgstr "Ce rôle donne accès en lecteur aux informations de l'espace de travail."
+
+#: pod/templates/help/page-user-role-definition.mak:20
+msgid ""
+"Same as <span style=\"color: #1fdb11;\">reader</span> + contribution "
+"rights: edit, comments, status update."
+msgstr ""
+"Comme <span style=\"color: #1fdb11;\">lecteur</span> + contribution : "
+"modifications, commentaires, mise à jour du statut."
+
+#: pod/templates/help/page-user-role-definition.mak:24
+msgid ""
+"Same as <span style=\"color: #759ac5;\">contributor</span> + content "
+"management rights: move content, folders management, delete archive "
+"operations."
+msgstr ""
+"Comme <span style=\"color: #759ac5;\">contributeur</span> + gestion du "
+"contenu : déplacer le contenu, les dossiers"
+
+#: pod/templates/help/page-user-role-definition.mak:28
+msgid ""
+"Same as <span style=\"color: #ea983d;\">content manager</span> + "
+"workspace management rights: edit workspace, invite users, revoke them."
+msgstr ""
+"Comme <span style=\"color: #ea983d;\">gestionnaire de contenu</span> + "
+"modification de l'espace de travail."
+
+#~ msgid "You have no document yet."
+#~ msgstr "Vous n'avez pas de document pour le moment."
+
+#~ msgid "Move up"
+#~ msgstr "Monter"
+
+#~ msgid "Move down"
+#~ msgstr "Descendre"
+
+#~ msgid "Document not found"
+#~ msgstr "Le document n'a pas été trouvé"
+
+#~ msgid "What's hot!"
+#~ msgstr "Quoi de neuf?"
+
+#~ msgid "No hot stuff for today."
+#~ msgstr "Rien de neuf aujourd'hui."
+
+#~ msgid "last modification"
+#~ msgstr "dernière modification"
+
+#~ msgid "Actions to do"
+#~ msgstr "Actions à faire"
+
+#~ msgid "No document requiring action."
+#~ msgstr "Aucun document ne requière d'action."
+
+#~ msgid "Latest operations"
+#~ msgstr "Derniers changements"
+
+#~ msgid "No activity found"
+#~ msgstr "Pas de changements trouvés"
+
+#~ msgid "Welcome, "
+#~ msgstr "Bienvenue,"
+
+#~ msgid ""
+#~ msgstr ""
+
+#~ msgid "Text documents"
+#~ msgstr "Documents texte"
+
+#~ msgid "Events"
+#~ msgstr "Évènements"
+
+#~ msgid "Contacts"
+#~ msgstr "Contacts"
+
+#~ msgid "Comments"
+#~ msgstr "Commentaires"
+
+#~ msgid "collaborative work  ♦  improved efficiency  ♦  full traceability"
+#~ msgstr "collaborative work  ♦  improved efficiency  ♦  full traceability"
+
+#~ msgid "Documents"
+#~ msgstr "Documents"
+
+#~ msgid "Help / About"
+#~ msgstr "Aide/A propos"
+
+#~ msgid "Revisions"
+#~ msgstr "Révisions"
+
+#~ msgid "Share options"
+#~ msgstr "Options de partage"
+
+#~ msgid "This document is not shared"
+#~ msgstr "Ce document n'est pas partagé"
+
+#~ msgid "This document is shared."
+#~ msgstr "Ce document est partagé"
+
+#~ msgid "Groups"
+#~ msgstr "Groupes"
+
+#~ msgid "Individual users"
+#~ msgstr "Utilisateurs"
+
+#~ msgid "Edit share options"
+#~ msgstr "Éditer les options de partage"
+
+#~ msgid "Share document with collaborators."
+#~ msgstr "Partager le document avec des collaborateurs."
+
+#~ msgid "Select read and write access for each group or people..."
+#~ msgstr ""
+
+#~ msgid "Group"
+#~ msgstr "Groupe"
+
+#~ msgid "Access"
+#~ msgstr "Accès"
+
+#~ msgid "Individual Users"
+#~ msgstr "Utilisateurs individuels"
+
+#~ msgid "Attachments"
+#~ msgstr "Pièces jointes"
+
+#~ msgid "There is currently no attachment."
+#~ msgstr "Il n'y a pas de pièces jointes pour le moment."
+
+#~ msgid " Attach first file"
+#~ msgstr "Joindre le premier fichier"
+
+#~ msgid " Attach a file"
+#~ msgstr "Joindre un fichier"
+
+#~ msgid "Download the file"
+#~ msgstr "Télécharger le fichier"
+
+#~ msgid "View the attachment"
+#~ msgstr "Voir les pièces jointe"
+
+#~ msgid "Sub-documents"
+#~ msgstr "Sous documents"
+
+#~ msgid "There is currently no child documents."
+#~ msgstr "Il n'y a pas de sous documents pour le moment."
+
+#~ msgid "Add a document"
+#~ msgstr "Ajouter un document"
+
+#~ msgid "Calendar"
+#~ msgstr "Calendrier"
+
+#~ msgid "The calendar is empty."
+#~ msgstr "Le calendrier est vide."
+
+#~ msgid " Add first event"
+#~ msgstr "Ajouter le premier évènement"
+
+#~ msgid " Add an event"
+#~ msgstr "Ajouter un évènement"
+
+#~ msgid "Address book"
+#~ msgstr "Carnet d'adresses"
+
+#~ msgid "The address book is empty."
+#~ msgstr "Le carnet d'adresses est vide"
+
+#~ msgid "Add first contact"
+#~ msgstr "Ajouter le premier contact"
+
+#~ msgid "Add a contact"
+#~ msgstr "Ajouter un contact"
+
+#~ msgid "Comment thread"
+#~ msgstr "Fil de discussions"
+
+#~ msgid "The comment thread is empty."
+#~ msgstr "Le fil de discussion est vide"
+
+#~ msgid "Add a comment"
+#~ msgstr "Ajouter un commentaire"
+
+#~ msgid "the"
+#~ msgstr "le"
+
+#~ msgid "at"
+#~ msgstr "à"
+
+#~ msgid "Shared comment. Click to make private."
+#~ msgstr "Commentaire partagé. Cliquez pour rendre privé."
+
+#~ msgid "Private comment. Click to share."
+#~ msgstr "Commentaire privé. Cliquez pour partager."
+
+#~ msgid "Write your comment below:"
+#~ msgstr "Écrivez votre commentaire ici :"
+
+#~ msgid "Share this comment"
+#~ msgstr "Partager ce commentaire"
+
+#~ msgid "Add first comment"
+#~ msgstr "Ajouter le premier commentaire"
+
+#~ msgid "Comment"
+#~ msgstr "Commentaire"
+
+#~ msgid "Home"
+#~ msgstr "Accueil"
+
+#~ msgid "Change status"
+#~ msgstr "Changer le statut"
+
+#~ msgid "Current status is..."
+#~ msgstr "Le statut actuel est ..."
+
+#~ msgid "Change to..."
+#~ msgstr "Changer en ..."
+
+#~ msgid "change the status to..."
+#~ msgstr "changer le status en ..."
+
+#~ msgid "Add"
+#~ msgstr "Ajouter"
+
+#~ msgid "Add New..."
+#~ msgstr "Ajouter un nouveau ..."
+
+#~ msgid "create a totally new item..."
+#~ msgstr "créer un nouvel élément ..."
+
+#~ msgid "Document"
+#~ msgstr "Document"
+
+#~ msgid "Event"
+#~ msgstr "Évènement"
+
+#~ msgid "Contact"
+#~ msgstr "Contact"
+
+#~ msgid "more ..."
+#~ msgstr "plus ..."
+
+#~ msgid "Advanced actions..."
+#~ msgstr "Actions avancées"
+
+#~ msgid "power user actions..."
+#~ msgstr "Actions avancées ..."
+
+#~ msgid "Move"
+#~ msgstr "Déplacer"
+
+#~ msgid "Delete"
+#~ msgstr "Supprimer"
+
+#~ msgid "Delete the current document"
+#~ msgstr "Supprimer le document actuel"
+
+#~ msgid "document title"
+#~ msgstr "titre du document"
+
+#~ msgid "This document is private"
+#~ msgstr "Ce document est privé"
+
+#~ msgid "private"
+#~ msgstr "privé"
+
+#~ msgid "This document is shared"
+#~ msgstr "Ce document est partagé"
+
+#~ msgid "shared"
+#~ msgstr "partagé"
+
+#~ msgid "<p>We suggest you to start...<br/><br/></p>"
+#~ msgstr "<p>Nous vous suggérons de commencer ...<br /><br /></p>"
+
+#~ msgid "by working on existing items"
+#~ msgstr "en travaillant sur des éléments existants"
+
+#~ msgid "or"
+#~ msgstr "ou"
+
+#~ msgid "by creating a new document"
+#~ msgstr "en créant un nouveau document"
+
+#~ msgid "Create"
+#~ msgstr "Créer"
+
+#~ msgid "Share:"
+#~ msgstr "Partager :"
+
+#~ msgid "if checked, then copy share properties from current item"
+#~ msgstr "si coché, les options de partage seront copiées de l'élément actuel"
+
+#~ msgid "this field is optionnal"
+#~ msgstr "ce champ est optionnel"
+
+#~ msgid "Choose a file..."
+#~ msgstr "Choisir un fichier ..."
+
+#~ msgid "choose a file..."
+#~ msgstr "choisir un fichier ..."
+
+#~ msgid "File description (optionnal)"
+#~ msgstr "Description du fichier (optionnel)"
+
+#~ msgid "Date and time"
+#~ msgstr "Date et heure"
+
+#~ msgid "Event description:"
+#~ msgstr "Description de l'évènement :"
+
+#~ msgid "Contact name and firstname"
+#~ msgstr "Nom et prénom du contact"
+
+#~ msgid "name, firstname, title..."
+#~ msgstr "nom, prénom, titre ..."
+
+#~ msgid "Address, phone, email, company..."
+#~ msgstr "Adresse, téléphone, email, entreprise ..."
+
+#~ msgid "Select the destination:"
+#~ msgstr "Sélectionnez la destination :"
+
+#~ msgid "Subdocuments"
+#~ msgstr "Sous documents"
+
+#~ msgid "Access Management"
+#~ msgstr "Gestion des droits"
+
+#~ msgid "History"
+#~ msgstr "Historique"
+
+#~ msgid "Content explorer"
+#~ msgstr "Explorateur de contenu"
+
+#~ msgid "Toggle view mode [narrow, medium, large]"
+#~ msgstr "Changer la vue [étroite, médium, large]"
+
+#~ msgid "Toggle view mode: narrow"
+#~ msgstr "Changer la vue : étroite"
+
+#~ msgid "Toggle view mode: medium"
+#~ msgstr "Changer la vue : médium"
+
+#~ msgid "Toggle view mode: large"
+#~ msgstr "Changer la vue : large"
+
+#~ msgid "New Sub-document"
+#~ msgstr "Nouveau sous document"
+
+#~ msgid "Add an event"
+#~ msgstr "Ajouter un évènement"
+
+#~ msgid "Add a new contact"
+#~ msgstr "Ajouter un nouveau contact"
+
+#~ msgid "Add a new file"
+#~ msgstr "Ajouter un nouveau fichier"
+
+#~ msgid "Move the document"
+#~ msgstr "Déplacer le document"
+
+#~ msgid "Search again"
+#~ msgstr "Chercher de nouveau"
+
+#~ msgid "Results"
+#~ msgstr "Résultats"
+
+#~ msgid "No data found for keywords:"
+#~ msgstr "Aucune correspondance pour les mots clés :"
+
+#~ msgid "View versions of the thread"
+#~ msgstr "Voir les versions de la discussion"
+
+#~ msgid "January"
+#~ msgstr "janvier"
+
+#~ msgid "February"
+#~ msgstr "février"
+
+#~ msgid "March"
+#~ msgstr "mars"
+
+#~ msgid "April"
+#~ msgstr "avril"
+
+#~ msgid "May"
+#~ msgstr "mai"
+
+#~ msgid "June"
+#~ msgstr "Juin"
+
+#~ msgid "July"
+#~ msgstr "juillet"
+
+#~ msgid "August"
+#~ msgstr "août"
+
+#~ msgid "September"
+#~ msgstr "septembre"
+
+#~ msgid "October"
+#~ msgstr "octobre"
+
+#~ msgid "November"
+#~ msgstr "novembre"
+
+#~ msgid "December"
+#~ msgstr "décembre"
+
+#~ msgid "Your dashboard"
+#~ msgstr "Votre tableau de bord"
+
+#~ msgid "This folder can contains"
+#~ msgstr "Ce dossier peut contenir"
+
+#~ msgid "sub-folders, "
+#~ msgstr "des sous-dossiers,"
+
+#~ msgid "threads, "
+#~ msgstr "des discussions,"
+
+#~ msgid "files, "
+#~ msgstr "fichiers,"
+
+#~ msgid "pages, "
+#~ msgstr "des pages,"
+
+#~ msgid "Simple tool, flexible data."
+#~ msgstr "Simple tool, flexible data."
+
+#~ msgid "Improving pod"
+#~ msgstr "Améliorer pod"
+
+#~ msgid " is a piece of software developed with <u>user needs</u> in mind."
+#~ msgstr ""
+
+#~ msgid "It means that we need:"
+#~ msgstr "Cela signifie que nous avons besoin de :"
+
+#~ msgid "your feedback,"
+#~ msgstr "vos retours,"
+
+#~ msgid "you to ask questions,"
+#~ msgstr "vos questions,"
+
+#~ msgid "your feature requests,"
+#~ msgstr "savoir quelles fonctionnalités vous voudriez,"
+
+#~ msgid "you to tell us what's cool and what's wrong."
+#~ msgstr "que vous nous disiez ce qui est bien ou pas."
+
+#~ msgid "The author"
+#~ msgstr "The author"
+
+#~ msgid "I'm 35 years old,"
+#~ msgstr "I'm 35 years old,"
+
+#~ msgid "I'm a skilled software engineer,"
+#~ msgstr "I'm a skilled software engineer,"
+
+#~ msgid "I live in France, near Grenoble."
+#~ msgstr "I live in France, near Grenoble."
+
+#~ msgid "email us"
+#~ msgstr "email us"
+
+#~ msgid "and we will reply to you."
+#~ msgstr "and we will reply to you."
+
+#~ msgid "Thank you."
+#~ msgstr "Thank you."
+
+#~ msgid "Document #%s can't move upper."
+#~ msgstr "Le document #%s ne peut pas être remonté"
+
+#~ msgid "Document #%s can't move lower."
+#~ msgstr "Le document #%s ne peut pas être descendu"
+
+#~ msgid "Document #%s has been deleted"
+#~ msgstr "Le document #%s a été supprimé"
+
+#~ msgid "Document #%s can't be deleted because it is not empty."
+#~ msgstr ""
+
+#~ msgid "You can't share a document that doesn't belong to you."
+#~ msgstr "Vous ne pouvez pas partager un document qui ne vous appartient pas"
+
+#~ msgid "Account creation error: please fill all the fields"
+#~ msgstr "Erreur à la création du compte : merci de remplir tous les champs"
+
+#~ msgid "Account creation error: passwords do not match"
+#~ msgstr "Erreur à la création du compte : les mots de passe ne concordent pas"
+
+#~ msgid "Account creation error: account already exist: %s"
+#~ msgstr "Erreur à la création du compte : le compte %s existe déjà"
+
+#~ msgid "Account successfully created: %s"
+#~ msgstr "Compte créé avec succès : %s"
+
+#~ msgid "The password has been successfully changed"
+#~ msgstr "Le mot de passe a été changé"
+
+#~ msgid "Please login to access this page"
+#~ msgstr "Merci de vous identifier pour accéder à cette page"
+
+#~ msgid "Only for people with the \"manage\" permission"
+#~ msgstr "Seulement pour les personnes ayant la permission \"manage\""
+
+#~ msgid "Secure Controller here"
+#~ msgstr "Contrôleur sécurisé"
+
+#~ msgid "User {} removed. You can <a href=\"{}\">restore it</a>"
+#~ msgstr ""
+
+#~ msgid "Go to top"
+#~ msgstr "Haut de page"
+
+#~ msgid "Edit"
+#~ msgstr "Éditer"
+
+#~ msgid "Cancel"
+#~ msgstr "Abandonner"
+
+#~ msgid "New"
+#~ msgstr "Nouveau"
+
+#~ msgid "Create an account"
+#~ msgstr "Créer un compte"
+
+#~ msgid "sub-folder"
+#~ msgstr "sous-dossier"
+
+#~ msgid "thread"
+#~ msgstr "discussion"
+
+#~ msgid ", including {} open"
+#~ msgstr ""
+
+#~ msgid "file"
+#~ msgstr "fichier"
+
+#~ msgid "page"
+#~ msgstr "page"
+
