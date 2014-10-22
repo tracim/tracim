@@ -55,7 +55,10 @@ docs/_build/
 tg2env/
 
 # cache
-pboard/data/
+tracim/data/
 
 # Site-local config file
 development.ini
+
+# Temporary files
+*~

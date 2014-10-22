@@ -1,5 +1,5 @@
 #
-# pod - TurboGears 2 development environment configuration
+# tracim - TurboGears 2 development environment configuration
 #
 # The %(here)s variable will be replaced with the parent directory of this file
 #
@@ -23,11 +23,11 @@ port = 8080
 cookie_secret = 3283411b-1904-4554-b0e1-883863b53080
 
 [app:main]
-use = egg:pod
+use = egg:tracim
 full_stack = true
-#lang = fr_FR
+lang = fr
 cache_dir = %(here)s/data
-beaker.session.key = pod
+beaker.session.key = tracim
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
 
 #By default session is store in cookies to avoid the overhead
@@ -54,7 +54,7 @@ beaker.session.validate_key = 3283411b-1904-4554-b0e1-883863b53080
 # invalidate the URI when specifying a SQLite db via path name
 # sqlalchemy.url=postgresql://username:password@hostname:port/databasename
 # sqlalchemy.url=mysql://username:password@hostname:port/databasename
-sqlalchemy.url = postgresql://pod_user:pod_user_password@127.0.0.1:5432/pod
+sqlalchemy.url = postgresql://tracim_user:tracim_user_password@127.0.0.1:5432/tracim
 
 #echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
@@ -80,11 +80,11 @@ templating.mako.compiled_templates_dir = %(here)s/data/templates
 # WARNING: *THE LINE BELOW MUST BE UNCOMMENTED ON A PRODUCTION ENVIRONMENT*
 # Debug mode will enable the interactive debugging tool, allowing ANYONE to
 # execute malicious code after an exception is raised.
-#set debug = false
+# set debug = false
 
 # Logging configuration
 # Add additional loggers, handlers, formatters here
-# Uses python's logging config file format
+# Uses pythons logging config file format
 # http://docs.python.org/lib/logging-config-fileformat.html
 
 #turn this setting to "min" if you would like tw to produce minified
@@ -94,8 +94,14 @@ toscawidgets.framework.resource_variant=debug
 # if you want to setup analytics like piwik or google analytics, then put the js code in a file and set file path below
 #js_tracker_path = analytics.js
 
+
+# resetpassword.email_sender = email@sender.com
+# resetpassword.smtp_host = smtp.sender
+# resetpassword.smtp_port = 25
+
+
 [loggers]
-keys = root, pod, sqlalchemy, auth
+keys = root, tracim, sqlalchemy, auth
 
 [handlers]
 keys = console
@@ -108,13 +114,13 @@ keys = generic
 level = INFO
 handlers = console
 
-[logger_pod]
+[logger_tracim]
 level = DEBUG
 handlers =
-qualname = pod
+qualname = tracim
 
 [logger_sqlalchemy]
-level = INFO
+level = WARN
 handlers =
 qualname = sqlalchemy.engine
 # "level = INFO" logs SQL queries.
