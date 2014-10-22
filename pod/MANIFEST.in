@@ -1,4 +1,0 @@
-recursive-include pod/public *
-include pod/public/favicon.ico
-recursive-include pod/i18n *
-recursive-include pod/templates *
