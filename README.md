@@ -1,4 +1,4 @@
-# Introduction to POD #
+# Introduction to TRACIM #
 
 Tracim is collaborative software designed to allow people to work on and share various data and document types. 
 
