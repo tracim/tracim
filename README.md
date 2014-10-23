@@ -164,7 +164,7 @@ Default configuration is to listen on port 8080. If you want to adapt this to yo
 
 The default language is English. You can change it to french by uncommenting the following line in the .ini file:
 
-    lang = fr_FR
+    lang = fr
 
     
 ### Running Tracim as standalone ###
