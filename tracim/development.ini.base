@@ -15,8 +15,15 @@ smtp_server = localhost
 error_email_from = turbogears@localhost
 
 [server:main]
-use = egg:gearbox#wsgiref
-host = 0.0.0.0
+# Below is the HTTP server to be used. See documentation online if you want to use another server
+# http://turbogears.readthedocs.org/en/latest/turbogears/gearbox.html#changing-http-server
+use = egg:gearbox#cherrypy
+
+# If you want to access to the instance through the network,
+# change host value below to 0.0.0.0 or to the IP address
+# you want it to manage (this may be usefull if you have several
+# network interfaces)
+host = 127.0.0.1
 port = 8080
 
 [sa_auth]
@@ -91,14 +98,24 @@ templating.mako.compiled_templates_dir = %(here)s/data/templates
 #javascript files (if your library supports that)
 toscawidgets.framework.resource_variant=debug
 
-# if you want to setup analytics like piwik or google analytics, then put the js code in a file and set file path below
-#js_tracker_path = analytics.js
+# if you want to setup analytics like piwik or google analytics,
+# put the JS tracking code in a file and set its path below
+#
+# js_tracker_path = analytics.js
 
 
+# Reset password through email related configuration.
+# These emails will be sent through SMTP
+#
 # resetpassword.email_sender = email@sender.com
 # resetpassword.smtp_host = smtp.sender
 # resetpassword.smtp_port = 25
 
+
+#####
+#
+# All configuration below is about logging.
+#
 
 [loggers]
 keys = root, tracim, sqlalchemy, auth

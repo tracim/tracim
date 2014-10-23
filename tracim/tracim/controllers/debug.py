@@ -17,8 +17,8 @@ class is_debug(Predicate):
 
     def evaluate(self, environ, credentials):
         # Comment next line if you want to activate the debug controller
-        pass
-        self.unmet()
+        return
+        # self.unmet()
 
 class DebugController(StandardController):
 

@@ -15,6 +15,7 @@ convert them into boolean, for example, you should use the
 
 from tg.configuration import AppConfig
 from tgext.pluggable import plug, replace_template
+from tg.i18n import lazy_ugettext as l_
 
 import tracim
 from tracim import model
@@ -112,7 +113,19 @@ base_config.sa_auth.post_login_url = '/post_login'
 # on logout:
 base_config.sa_auth.post_logout_url = '/post_logout'
 
-
-plug(base_config, 'resetpassword')
+# INFO - This is the way to specialize the resetpassword email properties
+# plug(base_config, 'resetpassword', None, mail_subject=reset_password_email_subject)
+plug(base_config, 'resetpassword', 'reset_password')
 replace_template(base_config, 'resetpassword.templates.index', 'tracim.templates.reset_password_index')
 replace_template(base_config, 'resetpassword.templates.change_password', 'tracim.templates.reset_password_change_password')
+
+# Note: here are fake translatable strings that allow to translate messages for reset password email content
+duplicated_email_subject = l_('Password reset request')
+duplicated_email_body = l_('''
+We've received a request to reset the password for this account.
+Please click this link to reset your password:
+
+%(password_reset_link)s
+
+If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.
+''')

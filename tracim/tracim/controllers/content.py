@@ -6,6 +6,7 @@ from cgi import FieldStorage
 import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
+import traceback
 
 from tracim.controllers import TIMRestController
 from tracim.controllers import TIMRestPathContextSetup
@@ -14,6 +15,7 @@ from tracim.controllers import TIMWorkspaceContentRestController
 
 from tracim.lib import CST
 from tracim.lib.base import BaseController
+from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.predicates import current_user_is_reader
@@ -459,7 +461,11 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         item = api.get_one(item_id, PBNodeType.Any, workspace)
         api.move(item, new_parent)
         next_url = self.parent_controller.url(item_id)
-        tg.flash(_('Item moved to {}').format(new_parent.data_label), CST.STATUS_OK)
+        if new_parent:
+            tg.flash(_('Item moved to {}').format(new_parent.data_label), CST.STATUS_OK)
+        else:
+            tg.flash(_('Item moved to workspace root'))
+
         tg.redirect(next_url)
 
 
@@ -560,6 +566,9 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         api = ContentApi(tmpl_context.current_user)
 
         redirect_url_tmpl = '/workspaces/{}/folders/{}'
+        redirect_url = ''
+
+
         try:
             parent = None
             if parent_id:
@@ -576,13 +585,23 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             api.save(folder)
 
             tg.flash(_('Folder created'), CST.STATUS_OK)
-            tg.redirect(tg.url(redirect_url_tmpl.format(tmpl_context.workspace_id, folder.node_id)))
+            redirect_url = redirect_url_tmpl.format(tmpl_context.workspace_id, folder.node_id)
         except Exception as e:
-            tg.flash(_('Folder not created: {}').format(e), CST.STATUS_ERROR)
+            logger.error(self, 'An unexpected exception has been catched. Look at the traceback below.')
+            traceback.print_exc()
+
+            tg.flash(_('Folder not created: {}').format(e.with_traceback()), CST.STATUS_ERROR)
             if parent_id:
-                tg.redirect(tg.url(redirect_url_tmpl.format(tmpl_context.workspace_id, parent_id)))
+                redirect_url = redirect_url_tmpl.format(tmpl_context.workspace_id, parent_id)
             else:
-                tg.redirect(tg.url('/workspaces/{}'.format(tmpl_context.workspace_id)))
+                redirect_url = '/workspaces/{}'.format(tmpl_context.workspace_id)
+
+        ####
+        #
+        # INFO - D.A. - 2014-10-22 - Do not put redirect in a
+        # try/except block as redirect is using exceptions!
+        #
+        tg.redirect(tg.url(redirect_url))
 
 
     @tg.require(current_user_is_content_manager())
