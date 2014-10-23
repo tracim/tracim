@@ -96,7 +96,7 @@ class UserRestController(TIMRestController):
         pass
 
     @tg.expose()
-    def post(self, name, email, password, is_pod_manager='off', is_pod_admin='off'):
+    def post(self, name, email, password, is_tracim_manager='off', is_pod_admin='off'):
         pass
 
     @tg.expose('tracim.templates.user_get_me')

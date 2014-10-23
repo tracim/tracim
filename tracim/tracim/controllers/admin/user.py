@@ -20,6 +20,7 @@ from formencode.validators import FieldsMatch
 from tracim.controllers import TIMRestController
 from tracim.lib import CST
 from tracim.lib import helpers as h
+from tracim.lib.base import logger
 from tracim.lib.user import UserApi
 from tracim.lib.group import GroupApi
 from tracim.lib.user import UserStaticApi
@@ -36,7 +37,17 @@ class UserProfileAdminRestController(TIMRestController):
     """
     allow_only = predicates.in_any_group(Group.TIM_ADMIN_GROUPNAME)
 
-    allowed_profiles = ['tracim-user', 'tracim-manager', 'tracim-admin']
+    _ALLOWED_PROFILE_USER = 'tracim-profile-user'
+    _ALLOWED_PROFILE_MANAGER = 'tracim-profile-manager'
+    _ALLOWED_PROFILE_ADMIN = 'tracim-profile-admin'
+
+    @property
+    def allowed_profiles(self):
+        return [
+        UserProfileAdminRestController._ALLOWED_PROFILE_USER,
+        UserProfileAdminRestController._ALLOWED_PROFILE_MANAGER,
+        UserProfileAdminRestController._ALLOWED_PROFILE_ADMIN
+    ]
 
     def _before(self, *args, **kw):
         """
@@ -86,7 +97,7 @@ class UserProfileAdminRestController(TIMRestController):
 
         flash_message = _('User updated.') # this is the default value ; should never appear
 
-        if new_profile=='tracim-user':
+        if new_profile==UserProfileAdminRestController._ALLOWED_PROFILE_USER:
             if pod_user_group not in user.groups:
                 user.groups.append(pod_user_group)
 
@@ -102,7 +113,7 @@ class UserProfileAdminRestController(TIMRestController):
 
             flash_message = _('User {} is now a basic user').format(user.get_display_name())
 
-        elif new_profile=='tracim-manager':
+        elif new_profile==UserProfileAdminRestController._ALLOWED_PROFILE_MANAGER:
             if pod_user_group not in user.groups:
                 user.groups.append(pod_user_group)
             if pod_manager_group not in user.groups:
@@ -116,7 +127,7 @@ class UserProfileAdminRestController(TIMRestController):
             flash_message = _('User {} can now workspaces').format(user.get_display_name())
 
 
-        elif new_profile=='tracim-admin':
+        elif new_profile==UserProfileAdminRestController._ALLOWED_PROFILE_ADMIN:
             if pod_user_group not in user.groups:
                 user.groups.append(pod_user_group)
             if pod_manager_group not in user.groups:
@@ -126,8 +137,12 @@ class UserProfileAdminRestController(TIMRestController):
 
             flash_message = _('User {} is now an administrator').format(user.get_display_name())
 
-        DBSession.flush()
+        else:
+            logger.error(self, 'Trying to change user {} profile with unexpected profile {}'.format(user.user_id, new_profile))
+            tg.flash(_('Unknown profile'), CST.STATUS_ERROR)
+            tg.redirect(redirect_url)
 
+        DBSession.flush()
         tg.flash(flash_message, CST.STATUS_OK)
         tg.redirect(redirect_url)
 
@@ -231,15 +246,15 @@ class UserRestController(TIMRestController):
 
     @tg.require(predicates.in_group(Group.TIM_MANAGER_GROUPNAME))
     @tg.expose()
-    def post(self, name, email, password, is_pod_manager='off', is_pod_admin='off'):
-        is_pod_manager = h.on_off_to_boolean(is_pod_manager)
-        is_pod_admin = h.on_off_to_boolean(is_pod_admin)
+    def post(self, name, email, password, is_tracim_manager='off', is_pod_admin='off'):
+        is_tracim_manager = h.on_off_to_boolean(is_tracim_manager)
+        is_tracim_admin = h.on_off_to_boolean(is_pod_admin)
         current_user = tmpl_context.current_user
         current_user = User()
         if current_user.profile.id < Group.TIM_ADMIN:
             # A manager can't give large rights
-            is_pod_manager = False
-            is_pod_admin = False
+            is_tracim_manager = False
+            is_tracim_admin = False
 
 
         api = UserApi(current_user)
@@ -258,9 +273,9 @@ class UserRestController(TIMRestController):
         # Now add the user to related groups
         group_api = GroupApi(current_user)
         user.groups.append(group_api.get_one(Group.TIM_USER))
-        if is_pod_manager:
+        if is_tracim_manager:
             user.groups.append(group_api.get_one(Group.TIM_MANAGER))
-            if is_pod_admin:
+            if is_tracim_admin:
                 user.groups.append(group_api.get_one(Group.TIM_ADMIN))
 
         api.save(user)

@@ -201,7 +201,7 @@ CREATE OR REPLACE RULE pod_insert_new_node AS
   VALUES (nextval('pod_nodes__node_id__sequence'::regclass), new.parent_id, new.node_order, new.node_type, new.created_at, new.updated_at, new.data_label, new.data_content, new.data_datetime, new.node_status, new.data_reminder_datetime, new.data_file_name, new.data_file_content, new.data_file_mime_type, new.parent_tree_path, new.node_depth, new.owner_id, nextval('pod_nodes_version_id_sequence'::regclass), new.is_shared, new.is_public, new.public_url_key, new.workspace_id, new.is_deleted, new.is_archived, new.properties, new.last_action)
   RETURNING pod_nodes_history.node_id, pod_nodes_history.parent_id, pod_nodes_history.node_order, pod_nodes_history.node_type, pod_nodes_history.created_at, pod_nodes_history.updated_at, pod_nodes_history.data_label, pod_nodes_history.data_content, pod_nodes_history.data_datetime, pod_nodes_history.node_status, pod_nodes_history.data_reminder_datetime, pod_nodes_history.data_file_name, pod_nodes_history.data_file_content, pod_nodes_history.data_file_mime_type, pod_nodes_history.parent_tree_path, pod_nodes_history.node_depth, pod_nodes_history.owner_id, pod_nodes_history.is_shared, pod_nodes_history.is_public, pod_nodes_history.public_url_key, pod_nodes_history.workspace_id, pod_nodes_history.is_deleted, pod_nodes_history.is_archived, pod_nodes_history.properties, pod_nodes_history.last_action;
 
--- DROP TRIGGER pod_update_node_tg ON pod_nodes;
+DROP TRIGGER pod_update_node_tg ON pod_nodes;
 CREATE TRIGGER pod_update_node_tg
   INSTEAD OF UPDATE
   ON pod_nodes

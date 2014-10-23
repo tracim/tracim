@@ -39,12 +39,12 @@
                                     </div>
                                     <div class="checkbox">
                                       <label>
-                                        <input type="checkbox" class="checkbox" name="is_pod_manager" id="is-pod-manager"> ${_('This user can create workspaces')}
+                                        <input type="checkbox" class="checkbox" name="is_tracim_manager" id="is-tracim-manager"> ${_('This user can create workspaces')}
                                       </label>
                                     </div>
                                     <div class="checkbox disabled">
                                       <label>
-                                        <input type="checkbox" class="checkbox" disabled name="is_pod_admin" id="is-pod-admin"> ${_('This user is an administrator')}
+                                        <input type="checkbox" class="checkbox" disabled name="is_tracim_admin" id="is-tracim-admin"> ${_('This user is an administrator')}
                                       </label>
                                     </div>
                                         
@@ -53,16 +53,16 @@
                                     </span>
                                     <script>
                                         $(document).ready(function() {
-                                            $('#is-pod-manager').change(function() {
-                                                if($('#is-pod-manager').prop('checked')==true) {
+                                            $('#is-tracim-manager').change(function() {
+                                                if($('#is-tracim-manager').prop('checked')==true) {
                                                     console.log('now manager is checked');
-                                                    $('#is-pod-admin').removeAttr('disabled');
-                                                    $('#is-pod-admin').parent().parent().removeClass('disabled');
+                                                    $('#is-tracim-admin').removeAttr('disabled');
+                                                    $('#is-tracim-admin').parent().parent().removeClass('disabled');
                                                 } else {
                                                     console.log('now manager is unchecked');
-                                                    $('#is-pod-admin').prop('checked', false);
-                                                    $('#is-pod-admin').attr('disabled', 'disabled');
-                                                    $('#is-pod-admin').parent().parent().addClass('disabled');
+                                                    $('#is-tracim-admin').prop('checked', false);
+                                                    $('#is-tracim-admin').attr('disabled', 'disabled');
+                                                    $('#is-tracim-admin').parent().parent().addClass('disabled');
                                                 }
                                             });
                                         });
@@ -103,12 +103,12 @@
                                         <td><a href="mailto:${user.email}">${user.email}</a></td>
                                         <td>
                                             <% icon = ('emblems/emblem-unreadable', 'emblems/emblem-checked')[user.profile.id>=2] %>
-                                            <% linked_profile = ('pod-manager', 'pod-user')[user.profile.id>=2] %>
+                                            <% linked_profile = ('tracim-profile-manager', 'tracim-profile-user')[user.profile.id>=2] %>
                                             <a href="${tg.url('/admin/users/{}/profile/switch?new_role={}'.format(user.id, linked_profile))}">${TIM.ICO(16, icon)}</a>
                                         </td>
                                         <td>
                                             <% icon = ('emblems/emblem-unreadable', 'emblems/emblem-checked')[user.profile.id>=3] %>
-                                            <% linked_profile = ('pod-admin', 'pod-manager')[user.profile.id>=3] %>
+                                            <% linked_profile = ('tracim-profile-admin', 'tracim-profile-manager')[user.profile.id>=3] %>
                                             <a href="${tg.url('/admin/users/{}/profile/switch?new_role={}'.format(user.id, linked_profile))}">${TIM.ICO(16, icon)}</a>
                                         </td>
                                     % else:
@@ -121,7 +121,7 @@
                                         </td>
                                         <td>
                                             <% icon = ('emblems/emblem-unreadable-disabled', 'emblems/emblem-checked-disabled')[user.profile.id>=3] %>
-                                            <% linked_profile = ('pod-admin', 'pod-manager')[user.profile.id>=3] %>
+                                            <% linked_profile = ('tracim-profile-admin', 'tracim-profile-manager')[user.profile.id>=3] %>
                                             ${TIM.ICO(16, icon)}
                                         </td>
                                     % endif
