@@ -37,3 +37,6 @@ tw2.forms==2.2.0.3
 wsgiref==0.1.2
 zope.interface==4.1.1
 zope.sqlalchemy==0.7.4
+cherrypy==3.6.0
+tgext.pluggable==0.5.2
+tgapp-resetpassword==0.1.3
