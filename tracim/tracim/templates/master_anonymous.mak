@@ -28,8 +28,9 @@
         <div class="container-fluid">
             ${self.main_menu()}
             ${self.content_wrapper()}
-            ${self.footer()}
+            <div id="tracim-footer-separator"></div>
         </div>
+        ${self.footer()}
 
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
         ## HACK - D.A. - 2014-10-21
@@ -64,7 +65,7 @@
 <%def name="footer()">
     <div class="pod-footer footer hidden-tablet hidden-phone text-center">
         <p>
-            <a href="http://trac.im">${_('Create your own email-ready collaborative workspace on trac.im')}</a> &mdash;
+            <a href="http://trac.im">${_('Create your own collaborative workspace on trac.im')}</a> &mdash;
             copyright &copy; 2013 - ${h.current_year()} tracim project.
         </p>
     </div>

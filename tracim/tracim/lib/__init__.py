@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from tg.i18n import lazy_ugettext as l_
 
+class NotFoundError(Exception):
+    pass
+
 class CST(object):
     STATUS_ERROR = 'error'
     STATUS_OK = 'ok'

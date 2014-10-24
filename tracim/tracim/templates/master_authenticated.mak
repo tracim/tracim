@@ -21,8 +21,9 @@
         <div class="container-fluid">
             ${self.main_menu()}
             ${self.content_wrapper()}
-            ${self.footer()}
+            <div id="tracim-footer-separator"></div>
         </div>
+        ${self.footer()}
 
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
         ${h.tracker_js()|n}
@@ -45,7 +46,7 @@
 <%def name="footer()">
     <div class="pod-footer footer hidden-tablet hidden-phone text-center">
         <p>
-            <a href="http://trac.im">${_('Create your own email-ready collaborative workspace on trac.im')}</a> &mdash;
+            <a href="http://trac.im">${_('Create your own collaborative workspace on trac.im')}</a> &mdash;
             copyright &copy; 2013 - ${h.current_year()} tracim project.
         </p>
     </div>
@@ -121,7 +122,7 @@
 ##                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                              ${request.identity['user'].display_name}
+                              ${TIM.ICO(16, 'categories/applications-system')} ${request.identity['user'].display_name}
                             </a>
                             <ul class="dropdown-menu pull-right">
                                 <li>

@@ -11,102 +11,14 @@ from tracim.model.data import ContentStatus
 from tracim.model.data import ContentRevisionRO
 from tracim.model.data import LinkItem
 from tracim.model.data import NodeTreeItem
-from tracim.model.data import PBNode
-from tracim.model.data import PBNodeType
+from tracim.model.data import Content
+from tracim.model.data import ContentType
 from tracim.model.data import RoleType
 from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
 
 from tracim.model import data as pmd
 from tracim.lib import CST
-
-def node_to_dict(node: pmd.PBNode, children_content, new_item_state):
-    """
-    DEPRECATED - TODO - REMOVE
-        children_content may be boolean or a list containing json values
-    """
-    url = tg.url('/document/', dict(node_id=node.node_id)) ## FIXME - 2014-05-27 - Make this more flexible
-
-    return dict(
-        id = node.node_id,
-        children = children_content,
-        text = node.data_label,
-        a_attr = { "href" : url },
-        li_attr = { "title": node.data_label },
-        type = node.node_type, # this property is understandable by jstree (through "types" plugin)
-        state = new_item_state,
-        node_status = node.getStatus().getId() # this is not jstree understandable data. This requires a JS 'success' callback
-    )
-
-
-def PBNodeForMenu(func):
-
-    def process_item(item: pmd.PBNode):
-        """ convert given item into a dictionnary """
-        return node_to_dict(item, item.getChildNb()>0, None)
-
-    def pre_serialize(*args, **kws):
-        initial_result = func(*args, **kws)
-        real_result = None
-
-        if isinstance(initial_result, list):
-            real_result = list()
-            for value_item in initial_result:
-                real_result.append(process_item(value_item))
-        else:
-            # We suppose here that we have an object only
-            real_result = process_item(initial_result)
-
-        return dict(d = real_result)
-
-    return pre_serialize
-
-
-def NodeTreeItemForMenu(func):
-    """ works with structure NodeTreeItem """
-    def process_item(structure_item: pmd.NodeTreeItem, current_node_id=None):
-        """ convert given item into a dictionnary """
-
-        item = structure_item.node
-        children = []
-
-        for child_item in structure_item.children:
-            children.append(process_item(child_item, current_node_id))
-
-        children_field_value = None
-        if len(children)>0:
-            children_field_value = children
-        elif item.getChildNb()>0:
-            children_field_value = True
-        else:
-            children_field_value = False
-
-        new_item_state = dict(
-            opened = item.getChildNb()<=0 or len(children)>0,
-            selected = current_node_id!=None and item.node_id==current_node_id,
-        )
-
-        return node_to_dict(item, children_field_value, new_item_state)
-
-    def pre_serialize(*args, **kws):
-        initial_result = func(*args, **kws)
-        real_result = None
-
-        current_node_id = None
-        if "current_node_id" in kws:
-            current_node_id = int(kws['current_node_id'])
-
-        if isinstance(initial_result, list):
-            real_result = list()
-            for value_item in initial_result:
-                real_result.append(process_item(value_item, current_node_id))
-        else:
-            # We suppose here that we have an object only
-            real_result = process_item(initial_result, current_node_id)
-
-        return dict(d = real_result)
-
-    return pre_serialize
 
 #############################################################"
 ##
@@ -324,66 +236,63 @@ def serialize_breadcrumb_item(item: BreadcrumbItem, context: Context):
 @pod_serializer(ContentRevisionRO, CTX.FILE)
 def serialize_version_for_page_or_file(version: ContentRevisionRO, context: Context):
     return DictLikeClass(
-        id = version.version_id,
-        node_id = version.node_id,
-        label = version.data_label if version.data_label else version.data_file_name,
+        id = version.revision_id,
+        label = version.label if version.label else version.file_name,
         owner = context.toDict(version.owner),
-        created = version.created_at,
+        created = version.created,
         action = context.toDict(version.get_last_action())
     )
 
 
-@pod_serializer(PBNode, CTX.DEFAULT)
-def serialize_breadcrumb_item(content: PBNode, context: Context):
+@pod_serializer(Content, CTX.DEFAULT)
+def serialize_breadcrumb_item(content: Content, context: Context):
     return DictLikeClass(
-        id = content.node_id,
-        label = content.data_label,
-        folder = context.toDict(DictLikeClass(id = content.parent.node_id if content.parent else None)),
-        # folder = None if not content.parent else context.toDict(DictLikeClass(id = content.parent.node_id)),
+        id = content.content_id,
+        label = content.label,
+        folder = context.toDict(DictLikeClass(id = content.parent.content_id if content.parent else None)),
         workspace = context.toDict(content.workspace)
     )
 
 
-@pod_serializer(PBNode, CTX.MENU_API)
-def serialize_content_for_menu_api(content: PBNode, context: Context):
-    content_id = content.node_id
+@pod_serializer(Content, CTX.MENU_API)
+def serialize_content_for_menu_api(content: Content, context: Context):
+    content_id = content.content_id
     workspace_id = content.workspace_id
 
     result = DictLikeClass(
         id = CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(workspace_id, content_id),
         children = True, # TODO: make this dynamic
-        text = content.data_label,
+        text = content.label,
         a_attr = { 'href' : tg.url('/workspaces/{}/folders/{}'.format(workspace_id, content_id)) },
-        li_attr = { 'title': content.data_label, 'class': 'tracim-tree-item-is-a-folder' },
-        type = content.node_type,
+        li_attr = { 'title': content.label, 'class': 'tracim-tree-item-is-a-folder' },
+        type = content.type,
         state = { 'opened': False, 'selected': False }
     )
     return result
 
 
-@pod_serializer(PBNode, CTX.FILES)
-@pod_serializer(PBNode, CTX.PAGES)
-def serialize_node_for_page_list(content: PBNode, context: Context):
+@pod_serializer(Content, CTX.FILES)
+@pod_serializer(Content, CTX.PAGES)
+def serialize_node_for_page_list(content: Content, context: Context):
 
-    if content.node_type==PBNodeType.Page:
+    if content.type==ContentType.Page:
         if not content.parent:
             folder = None
         else:
-            print('FOLDER PARENT IS', content.parent)
             folder = Context(CTX.DEFAULT).toDict(content.parent)
-        print('FOLDER IS', folder)
+
         result = DictLikeClass(
-            id = content.node_id,
-            label = content.data_label,
+            id = content.content_id,
+            label = content.label,
             status = context.toDict(content.get_status()),
             folder = folder
         )
         return result
 
-    if content.node_type==PBNodeType.File:
+    if content.type==ContentType.File:
         result = DictLikeClass(
-            id = content.node_id,
-            label = content.data_label if content.data_label else content.data_file_name,
+            id = content.content_id,
+            label = content.label if content.label else content.file_name,
             status = context.toDict(content.get_status()),
             folder = Context(CTX.DEFAULT).toDict(content.parent)
         )
@@ -392,19 +301,19 @@ def serialize_node_for_page_list(content: PBNode, context: Context):
 
     # TODO - DA - 2014-10-16 - THE FOLLOWING CODE SHOULD BE REMOVED
     #
-    # if content.node_type==PBNodeType.Folder:
+    # if content.type==ContentType.Folder:
     #     return DictLikeClass(
-    #         id = content.node_id,
-    #         label = content.data_label,
+    #         id = content.content_id,
+    #         label = content.label,
     #     )
 
-    raise NotImplementedError('node type / context not implemented: {} {}'. format(content.node_type, context.context_string))
+    raise NotImplementedError('node type / context not implemented: {} {}'. format(content.type, context.context_string))
 
 
-@pod_serializer(PBNode, CTX.PAGE)
-@pod_serializer(PBNode, CTX.FILE)
-def serialize_node_for_page(content: PBNode, context: Context):
-    if content.node_type in (PBNodeType.Page, PBNodeType.File) :
+@pod_serializer(Content, CTX.PAGE)
+@pod_serializer(Content, CTX.FILE)
+def serialize_node_for_page(content: Content, context: Context):
+    if content.type in (ContentType.Page, ContentType.File) :
         data_container = content
 
 
@@ -412,121 +321,118 @@ def serialize_node_for_page(content: PBNode, context: Context):
         # The following properties are overriden by revision values
         if content.revision_to_serialize>0:
             for revision in content.revisions:
-                if revision.version_id==content.revision_to_serialize:
+                if revision.revision_id==content.revision_to_serialize:
                     data_container = revision
                     break
 
         result = DictLikeClass(
-            id = content.node_id,
+            id = content.content_id,
             parent = context.toDict(content.parent),
             workspace = context.toDict(content.workspace),
-            type = content.node_type,
+            type = content.type,
 
-            content = data_container.data_content,
-            created = data_container.created_at,
-            label = data_container.data_label,
-            icon = PBNodeType.icon(content.node_type),
+            content = data_container.description,
+            created = data_container.created,
+            label = data_container.label,
+            icon = ContentType.icon(content.type),
             owner = context.toDict(data_container.owner),
             status = context.toDict(data_container.get_status()),
-            links = context.toDict(content.extract_links_from_content(data_container.data_content)),
-            revisions = context.toDict(sorted(content.revisions, key=lambda v: v.created_at, reverse=True)),
+            links = context.toDict(content.extract_links_from_content(data_container.description)),
+            revisions = context.toDict(sorted(content.revisions, key=lambda v: v.created, reverse=True)),
             selected_revision = 'latest' if content.revision_to_serialize<=0 else content.revision_to_serialize
         )
 
-        if content.node_type==PBNodeType.File:
-            result.label = content.data_label if content.data_label else content.data_file_name
+        if content.type==ContentType.File:
+            result.label = content.label if content.label else content.file_name
             result['file'] = DictLikeClass(
-                name = data_container.data_file_name,
-                size = len(data_container.data_file_content),
-                mimetype = data_container.data_file_mime_type)
+                name = data_container.file_name,
+                size = len(data_container.file_content),
+                mimetype = data_container.file_mimetype)
         return result
 
-    if content.node_type==PBNodeType.Folder:
+    if content.type==ContentType.Folder:
         value = DictLikeClass(
-            id = content.node_id,
-            label = content.data_label,
+            id = content.content_id,
+            label = content.label,
         )
         return value
 
     raise NotImplementedError
 
 
-@pod_serializer(PBNode, CTX.THREAD)
-def serialize_node_for_page(item: PBNode, context: Context):
-    if item.node_type==PBNodeType.Thread:
+@pod_serializer(Content, CTX.THREAD)
+def serialize_node_for_page(item: Content, context: Context):
+    if item.type==ContentType.Thread:
         return DictLikeClass(
-            content = item.data_content,
-            created = item.created_at,
-            icon = PBNodeType.icon(item.node_type),
-            id = item.node_id,
-            label = item.data_label,
-            links = context.toDict(item.extract_links_from_content(item.data_content)),
+            content = item.description,
+            created = item.created,
+            icon = ContentType.icon(item.type),
+            id = item.content_id,
+            label = item.label,
+            links = context.toDict(item.extract_links_from_content(item.description)),
             owner = context.toDict(item.owner),
             parent = context.toDict(item.parent),
             selected_revision = 'latest',
             status = context.toDict(item.get_status()),
-            type = item.node_type,
+            type = item.type,
             workspace = context.toDict(item.workspace),
             comments = reversed(context.toDict(item.get_comments()))
         )
 
-    if item.node_type==PBNodeType.Comment:
+    if item.type==ContentType.Comment:
         return DictLikeClass(
-            content = item.data_content,
-            created = item.created_at,
-            icon = PBNodeType.icon(item.node_type),
-            id = item.node_id,
-            label = item.data_label,
+            content = item.description,
+            created = item.created,
+            icon = ContentType.icon(item.type),
+            id = item.content_id,
+            label = item.label,
             owner = context.toDict(item.owner),
             # REMOVE parent = context.toDict(item.parent),
-            type = item.node_type,
+            type = item.type,
         )
 
-    if item.node_type==PBNodeType.Folder:
+    if item.type==ContentType.Folder:
         return Context(CTX.DEFAULT).toDict(item)
     ### CODE BELOW IS REPLACED BY THE TWO LINES UP ^^
     # 2014-10-08 - IF YOU FIND THIS COMMENT, YOU CAn REMOVE THE CODE
     #
-    #if item.node_type==PBNodeType.Folder:
+    #if item.type==ContentType.Folder:
     #    value = DictLikeClass(
-    #        id = item.node_id,
-    #        label = item.data_label,
+    #        id = item.content_id,
+    #        label = item.label,
     #    )
     #    return value
 
     raise NotImplementedError
 
 
-@pod_serializer(PBNode, CTX.THREADS)
-def serialize_node_for_thread_list(content: PBNode, context: Context):
-    if content.node_type==PBNodeType.Thread:
+@pod_serializer(Content, CTX.THREADS)
+def serialize_node_for_thread_list(content: Content, context: Context):
+    if content.type==ContentType.Thread:
         return DictLikeClass(
-            id = content.node_id,
-            label = content.data_label,
+            id = content.content_id,
+            label = content.label,
             status = context.toDict(content.get_status()),
             folder = context.toDict(content.parent),
             comment_nb = len(content.get_comments())
         )
 
-    if content.node_type==PBNodeType.Folder:
+    if content.type==ContentType.Folder:
         return Context(CTX.DEFAULT).toDict(content)
 
     raise NotImplementedError
 
-@pod_serializer(PBNode, CTX.WORKSPACE)
-@pod_serializer(PBNode, CTX.FOLDERS)
-def serialize_content_for_workspace(content: PBNode, context: Context):
-    content_id = content.node_id
-    workspace_id = content.workspace_id
-
-    thread_nb_all  = content.get_child_nb(PBNodeType.Thread)
-    thread_nb_open = content.get_child_nb(PBNodeType.Thread)
-    file_nb_all  = content.get_child_nb(PBNodeType.File)
-    file_nb_open = content.get_child_nb(PBNodeType.File)
-    folder_nb_all  = content.get_child_nb(PBNodeType.Folder)
-    folder_nb_open = content.get_child_nb(PBNodeType.Folder)
-    page_nb_all  = content.get_child_nb(PBNodeType.Data)
-    page_nb_open = content.get_child_nb(PBNodeType.Data)
+@pod_serializer(Content, CTX.WORKSPACE)
+@pod_serializer(Content, CTX.FOLDERS)
+def serialize_content_for_workspace(content: Content, context: Context):
+    thread_nb_all  = content.get_child_nb(ContentType.Thread)
+    thread_nb_open = content.get_child_nb(ContentType.Thread)
+    file_nb_all  = content.get_child_nb(ContentType.File)
+    file_nb_open = content.get_child_nb(ContentType.File)
+    folder_nb_all  = content.get_child_nb(ContentType.Folder)
+    folder_nb_open = content.get_child_nb(ContentType.Folder)
+    page_nb_all  = content.get_child_nb(ContentType.Page)
+    page_nb_open = content.get_child_nb(ContentType.Page)
 
     content_nb_all = thread_nb_all +\
                      thread_nb_open +\
@@ -538,10 +444,11 @@ def serialize_content_for_workspace(content: PBNode, context: Context):
                      page_nb_open
 
 
-    if content.node_type==PBNodeType.Folder:
+    result = None
+    if content.type==ContentType.Folder:
         result = DictLikeClass(
-            id = content.node_id,
-            label = content.data_label,
+            id = content.content_id,
+            label = content.label,
             thread_nb = DictLikeClass(
                 all = thread_nb_all,
                 open = thread_nb_open,
@@ -563,19 +470,16 @@ def serialize_content_for_workspace(content: PBNode, context: Context):
 
     return result
 
-@pod_serializer(PBNode, CTX.FOLDER)
-def serialize_content_for_workspace_and_folder(content: PBNode, context: Context):
-    content_id = content.node_id
-    workspace_id = content.workspace_id
-
-    thread_nb_all  = content.get_child_nb(PBNodeType.Thread)
-    thread_nb_open = content.get_child_nb(PBNodeType.Thread)
-    file_nb_all  = content.get_child_nb(PBNodeType.File)
-    file_nb_open = content.get_child_nb(PBNodeType.File)
-    folder_nb_all  = content.get_child_nb(PBNodeType.Folder)
-    folder_nb_open = content.get_child_nb(PBNodeType.Folder)
-    page_nb_all  = content.get_child_nb(PBNodeType.Data)
-    page_nb_open = content.get_child_nb(PBNodeType.Data)
+@pod_serializer(Content, CTX.FOLDER)
+def serialize_content_for_workspace_and_folder(content: Content, context: Context):
+    thread_nb_all  = content.get_child_nb(ContentType.Thread)
+    thread_nb_open = content.get_child_nb(ContentType.Thread)
+    file_nb_all  = content.get_child_nb(ContentType.File)
+    file_nb_open = content.get_child_nb(ContentType.File)
+    folder_nb_all  = content.get_child_nb(ContentType.Folder)
+    folder_nb_open = content.get_child_nb(ContentType.Folder)
+    page_nb_all  = content.get_child_nb(ContentType.Page)
+    page_nb_open = content.get_child_nb(ContentType.Page)
 
     content_nb_all = thread_nb_all +\
                      thread_nb_open +\
@@ -587,11 +491,12 @@ def serialize_content_for_workspace_and_folder(content: PBNode, context: Context
                      page_nb_open
 
 
-    if content.node_type==PBNodeType.Folder:
+    result = None
+    if content.type==ContentType.Folder:
         result = DictLikeClass(
-            id = content.node_id,
-            label = content.data_label,
-            created = content.created_at,
+            id = content.content_id,
+            label = content.label,
+            created = content.created,
             workspace = context.toDict(content.workspace),
             allowed_content = DictLikeClass(content.properties['allowed_content']),
             selected_revision = 'latest',
@@ -616,15 +521,15 @@ def serialize_content_for_workspace_and_folder(content: PBNode, context: Context
             content_nb = DictLikeClass(all = content_nb_all)
         )
 
-    elif content.node_type==PBNodeType.Page:
+    elif content.type==ContentType.Page:
         result = DictLikeClass(
-            id = content.node_id,
-            label = content.data_label,
-            created = content.created_at,
+            id = content.content_id,
+            label = content.label,
+            created = content.created,
             workspace = context.toDict(content.workspace),
             owner = DictLikeClass(
-                id = content._oOwner.user_id,
-                name = content._oOwner.display_name
+                id = content.owner.user_id,
+                name = content.owner.get_display_name()
             ),
             status = DictLikeClass(id='', label=''), #FIXME - EXPORT DATA
         )
@@ -712,7 +617,7 @@ def serialize_user_list_default(user: User, context: Context):
     result = DictLikeClass()
     result['id'] = user.user_id
     result['name'] = user.get_display_name()
-    result['email'] = user.email_address
+    result['email'] = user.email
     result['enabled'] = user.is_active
     result['profile'] = user.profile
     return result
@@ -731,7 +636,7 @@ def serialize_user_for_user(user: User, context: Context):
     result = DictLikeClass()
     result['id'] = user.user_id
     result['name'] = user.get_display_name()
-    result['email'] = user.email_address
+    result['email'] = user.email
     result['roles'] = context.toDict(user.roles)
     result['enabled'] = user.is_active
     result['profile'] = user.profile
@@ -756,7 +661,7 @@ def serialize_role_in_workspace(role: UserRoleInWorkspace, context: Context):
     result['role'] = role.role
     result['style'] = role.style
     result['role_description'] = role.role_as_label()
-    result['email'] = role.user.email_address
+    result['email'] = role.user.email
     return result
 
 
@@ -774,7 +679,7 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
     result['label'] = role.role_as_label()
     result['style'] = RoleType(role.role).css_style
     result['workspace'] =  context.toDict(role.workspace)
-    # result['workspace_name'] = role.workspace.data_label
+    # result['workspace_name'] = role.workspace.label
 
     return result
 
@@ -785,7 +690,7 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
 def serialize_workspace_default(workspace: Workspace, context: Context):
     result = DictLikeClass(
         id = workspace.workspace_id,
-        label = workspace.data_label
+        label = workspace.label
     )
     return result
 
@@ -800,7 +705,7 @@ def serialize_workspace_in_list_for_one_user(workspace: Workspace, context: Cont
     """
     result = DictLikeClass()
     result['id'] = workspace.workspace_id
-    result['name'] = workspace.data_label
+    result['name'] = workspace.label
 
     return result
 
@@ -808,8 +713,8 @@ def serialize_workspace_in_list_for_one_user(workspace: Workspace, context: Cont
 def serialize_workspace_in_list(workspace: pmd.Workspace, context: Context):
     result = DictLikeClass()
     result['id'] = workspace.workspace_id
-    result['label'] = workspace.data_label
-    result['description'] = workspace.data_comment
+    result['label'] = workspace.label
+    result['description'] = workspace.description
     result['member_nb'] = len(workspace.roles)
 
     #    roles = serializableObject.roles
@@ -822,9 +727,9 @@ def serialize_workspace_in_list(workspace: pmd.Workspace, context: Context):
 def serialize_workspace_complete(workspace: pmd.Workspace, context: Context):
     result = DictLikeClass()
     result['id'] = workspace.workspace_id
-    result['label'] = workspace.data_label
-    result['description'] = workspace.data_comment
-    result['created'] = workspace.created_at
+    result['label'] = workspace.label
+    result['description'] = workspace.description
+    result['created'] = workspace.created
     result['members'] = context.toDict(workspace.roles)
     result['member_nb'] = len(workspace.roles)
 
@@ -835,9 +740,9 @@ def serialize_workspace_for_menu_api(workspace: Workspace, context: Context):
     result = DictLikeClass(
         id = CST.TREEVIEW_MENU.ID_TEMPLATE__WORKSPACE_ONLY.format(workspace.workspace_id),
         children = True, # TODO: make this dynamic
-        text = workspace.data_label,
+        text = workspace.label,
         a_attr = { 'href' : tg.url('/workspaces/{}'.format(workspace.workspace_id)) },
-        li_attr = { 'title': workspace.data_label, 'class': 'tracim-tree-item-is-a-workspace' },
+        li_attr = { 'title': workspace.label, 'class': 'tracim-tree-item-is-a-workspace' },
         type = 'workspace',
         state = { 'opened': False, 'selected': False }
     )
@@ -845,13 +750,13 @@ def serialize_workspace_for_menu_api(workspace: Workspace, context: Context):
 
 @pod_serializer(NodeTreeItem, CTX.MENU_API_BUILD_FROM_TREE_ITEM)
 def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Context):
-    if isinstance(item.node, PBNode):
+    if isinstance(item.node, Content):
         return DictLikeClass(
-            id=CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(item.node.workspace_id, item.node.node_id),
+            id=CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(item.node.workspace_id, item.node.content_id),
             children=True if len(item.children)<=0 else context.toDict(item.children),
-            text=item.node.data_label,
-            a_attr={'href': tg.url('/workspaces/{}/folders/{}'.format(item.node.workspace_id, item.node.node_id)) },
-            li_attr={'title': item.node.data_label, 'class': 'tracim-tree-item-is-a-folder'},
+            text=item.node.label,
+            a_attr={'href': tg.url('/workspaces/{}/folders/{}'.format(item.node.workspace_id, item.node.content_id)) },
+            li_attr={'title': item.node.label, 'class': 'tracim-tree-item-is-a-folder'},
             type='folder',
             state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
         )
@@ -859,9 +764,9 @@ def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Cont
         return DictLikeClass(
             id=CST.TREEVIEW_MENU.ID_TEMPLATE__WORKSPACE_ONLY.format(item.node.workspace_id),
             children=True if len(item.children)<=0 else context.toDict(item.children),
-            text=item.node.data_label,
+            text=item.node.label,
             a_attr={'href': tg.url('/workspaces/{}'.format(item.node.workspace_id))},
-            li_attr={'title': item.node.data_label, 'class': 'tracim-tree-item-is-a-workspace'},
+            li_attr={'title': item.node.label, 'class': 'tracim-tree-item-is-a-workspace'},
             type='workspace',
             state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
         )

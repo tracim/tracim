@@ -1,5 +1,6 @@
 <%def name="ICO_URL(icon_size, icon_path)">${h.IconPath(icon_size, icon_path)|n}</%def>
 <%def name="ICO(icon_size, icon_path, title='')"><img src="${h.IconPath(icon_size, icon_path)|n}" alt="" title="${title}"/></%def>
+<%def name="ICO_TOOLTIP(icon_size, icon_path, title='')"><span rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="${title}">${ICO(icon_size, icon_path, title)}</span></%def>
 <%def name="ICO_BADGED(icon_size, icon_path, title='', css_class='badge')"><span class="${css_class}" rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="${title}">${ICO(icon_size, icon_path, title)}</span></%def>
 <%def name="ICO_FA_BADGED(fa_class='fa fa-flag', title='', css_style='')"><i style="${css_style}" class="${fa_class}" rel="tooltip" data-toggle="tooltip" data-placement="bottom" title="${title}"></i></%def>
 

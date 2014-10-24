@@ -24,8 +24,8 @@ from tracim.lib.predicates import current_user_is_content_manager
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
 from tracim.model.data import ActionDescription
-from tracim.model.data import PBNode
-from tracim.model.data import PBNodeType
+from tracim.model.data import Content
+from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 
 
@@ -71,7 +71,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
 
     @property
     def _item_type(self):
-        return PBNodeType.File
+        return ContentType.File
 
     @property
     def _item_type_label(self):
@@ -135,25 +135,25 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                 if not revision_to_send:
                     revision_to_send = revision
 
-                if revision.version_id>revision_to_send.version_id:
+                if revision.revision_id>revision_to_send.revision_id:
                     revision_to_send = revision
         else:
             for revision in item.revisions:
-                if revision.version_id==item.revision_to_serialize:
+                if revision.revision_id==item.revision_to_serialize:
                     revision_to_send = revision
                     break
 
         content_type = 'application/x-download'
-        if revision_to_send.data_file_mime_type:
-            content_type = str(revision_to_send.data_file_mime_type)
-            tg.response.headers['Content-type'] = str(revision_to_send.data_file_mime_type)
+        if revision_to_send.file_mimetype:
+            content_type = str(revision_to_send.file_mimetype)
+            tg.response.headers['Content-type'] = str(revision_to_send.file_mimetype)
 
         tg.response.headers['Content-Type'] = content_type
-        tg.response.headers['Content-Disposition'] = str('attachment; filename="{}"'.format(revision_to_send.data_file_name))
-        return revision_to_send.data_file_content
+        tg.response.headers['Content-Disposition'] = str('attachment; filename="{}"'.format(revision_to_send.file_name))
+        return revision_to_send.file_content
 
 
-    def get_all_fake(self, context_workspace: Workspace, context_folder: PBNode):
+    def get_all_fake(self, context_workspace: Workspace, context_folder: Content):
         """
         fake methods are used in other controllers in order to simulate a client/server api.
         the "client" controller method will include the result into its own fake_api object
@@ -164,7 +164,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         """
         workspace = context_workspace
         content_api = ContentApi(tmpl_context.current_user)
-        files = content_api.get_all(context_folder.node_id, PBNodeType.File, workspace)
+        files = content_api.get_all(context_folder.content_id, ContentType.File, workspace)
 
         dictified_files = Context(CTX.FILES).toDict(files)
         return DictLikeClass(result = dictified_files)
@@ -178,12 +178,12 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
 
         api = ContentApi(tmpl_context.current_user)
 
-        file = api.create(PBNodeType.File, workspace, tmpl_context.folder, label)
+        file = api.create(ContentType.File, workspace, tmpl_context.folder, label)
         api.update_file_data(file, file_data.filename, file_data.type, file_data.file.read())
         api.save(file, ActionDescription.CREATION)
 
         tg.flash(_('File created'), CST.STATUS_OK)
-        tg.redirect(tg.url('/workspaces/{}/folders/{}/files/{}').format(tmpl_context.workspace_id, tmpl_context.folder_id, file.node_id))
+        tg.redirect(tg.url('/workspaces/{}/folders/{}/files/{}').format(tmpl_context.workspace_id, tmpl_context.folder_id, file.content_id))
 
 
     @tg.require(current_user_is_contributor())
@@ -196,7 +196,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
             if comment:
-                api.update_content(item, label if label else item.data_label, comment)
+                api.update_content(item, label if label else item.label, comment)
 
             if isinstance(file_data, FieldStorage):
                 api.update_file_data(item, file_data.filename, file_data.type, file_data.file.read())
@@ -205,7 +205,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
-            tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item.node_id))
+            tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item.content_id))
 
         except ValueError as e:
             msg = _('{} not updated - error: {}').format(self._item_type_label, str(e))
@@ -229,7 +229,7 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
 
     @property
     def _item_type(self):
-        return PBNodeType.Page
+        return ContentType.Page
 
     @property
     def _item_type_label(self):
@@ -261,9 +261,9 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
 
         content_api = ContentApi(user)
         if revision_id:
-            page = content_api.get_one_from_revision(page_id, PBNodeType.Page, workspace, revision_id)
+            page = content_api.get_one_from_revision(page_id, ContentType.Page, workspace, revision_id)
         else:
-            page = content_api.get_one(page_id, PBNodeType.Page, workspace)
+            page = content_api.get_one(page_id, ContentType.Page, workspace)
 
         fake_api_breadcrumb = self.get_breadcrumb(page_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb, current_user=current_user_content)
@@ -273,7 +273,7 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
         return DictLikeClass(result = dictified_page, fake_api=fake_api)
 
 
-    def get_all_fake(self, context_workspace: Workspace, context_folder: PBNode):
+    def get_all_fake(self, context_workspace: Workspace, context_folder: Content):
         """
         fake methods are used in other controllers in order to simulate a client/server api.
         the "client" controller method will include the result into its own fake_api object
@@ -284,7 +284,7 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
         """
         workspace = context_workspace
         content_api = ContentApi(tmpl_context.current_user)
-        pages = content_api.get_all(context_folder.node_id, PBNodeType.Page, workspace)
+        pages = content_api.get_all(context_folder.content_id, ContentType.Page, workspace)
 
         dictified_pages = Context(CTX.PAGES).toDict(pages)
         return DictLikeClass(result = dictified_pages)
@@ -298,12 +298,12 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
 
         api = ContentApi(tmpl_context.current_user)
 
-        page = api.create(PBNodeType.Page, workspace, tmpl_context.folder, label)
-        page.data_content = content
+        page = api.create(ContentType.Page, workspace, tmpl_context.folder, label)
+        page.description = content
         api.save(page, ActionDescription.CREATION)
 
         tg.flash(_('Page created'), CST.STATUS_OK)
-        tg.redirect(tg.url('/workspaces/{}/folders/{}/pages/{}').format(tmpl_context.workspace_id, tmpl_context.folder_id, page.node_id))
+        tg.redirect(tg.url('/workspaces/{}/folders/{}/pages/{}').format(tmpl_context.workspace_id, tmpl_context.folder_id, page.content_id))
 
 
 
@@ -337,7 +337,7 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
 
     @property
     def _item_type(self):
-        return PBNodeType.Thread
+        return ContentType.Thread
 
 
     @property
@@ -374,17 +374,17 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
 
         api = ContentApi(tmpl_context.current_user)
 
-        thread = api.create(PBNodeType.Thread, workspace, tmpl_context.folder, label)
-        # FIXME - DO NOT DUPLCIATE FIRST MESSAGE thread.data_content = content
+        thread = api.create(ContentType.Thread, workspace, tmpl_context.folder, label)
+        # FIXME - DO NOT DUPLCIATE FIRST MESSAGE thread.description = content
         api.save(thread, ActionDescription.CREATION)
 
-        comment = api.create(PBNodeType.Comment, workspace, thread, label)
-        comment.data_label = ''
-        comment.data_content = content
+        comment = api.create(ContentType.Comment, workspace, thread, label)
+        comment.label = ''
+        comment.description = content
         api.save(comment, ActionDescription.COMMENT)
 
         tg.flash(_('Thread created'), CST.STATUS_OK)
-        tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, thread.node_id))
+        tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, thread.content_id))
 
 
     @tg.require(current_user_is_reader())
@@ -398,7 +398,7 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
         content_api = ContentApi(user)
-        thread = content_api.get_one(thread_id, PBNodeType.Thread, workspace)
+        thread = content_api.get_one(thread_id, ContentType.Thread, workspace)
 
         fake_api_breadcrumb = self.get_breadcrumb(thread_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb, current_user=current_user_content)
@@ -418,7 +418,7 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         user = tmpl_context.current_user
         workspace = tmpl_context.workspace
 
-        item = ContentApi(user).get_one(item_id, PBNodeType.Any, workspace)
+        item = ContentApi(user).get_one(item_id, ContentType.Any, workspace)
         raise NotImplementedError
         return item
 
@@ -438,7 +438,7 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         workspace = tmpl_context.workspace
 
         content_api = ContentApi(user)
-        item = content_api.get_one(item_id, PBNodeType.Any, workspace)
+        item = content_api.get_one(item_id, ContentType.Any, workspace)
 
         dictified_item = Context(CTX.DEFAULT).toDict(item, 'item')
         return DictLikeClass(result = dictified_item)
@@ -458,11 +458,11 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         new_workspace, new_parent = convert_id_into_instances(folder_id)
 
         api = ContentApi(tmpl_context.current_user)
-        item = api.get_one(item_id, PBNodeType.Any, workspace)
+        item = api.get_one(item_id, ContentType.Any, workspace)
         api.move(item, new_parent)
         next_url = self.parent_controller.url(item_id)
         if new_parent:
-            tg.flash(_('Item moved to {}').format(new_parent.data_label), CST.STATUS_OK)
+            tg.flash(_('Item moved to {}').format(new_parent.label), CST.STATUS_OK)
         else:
             tg.flash(_('Item moved to workspace root'))
 
@@ -498,7 +498,7 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         workspace = tmpl_context.workspace
 
         content_api = ContentApi(user)
-        folder = content_api.get_one(folder_id, PBNodeType.Folder, workspace)
+        folder = content_api.get_one(folder_id, ContentType.Folder, workspace)
 
         dictified_folder = Context(CTX.FOLDER).toDict(folder, 'folder')
         return DictLikeClass(result = dictified_folder)
@@ -516,10 +516,10 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
         content_api = ContentApi(user)
-        folder = content_api.get_one(folder_id, PBNodeType.Folder, workspace)
+        folder = content_api.get_one(folder_id, ContentType.Folder, workspace)
 
         fake_api_breadcrumb = self.get_breadcrumb(folder_id)
-        fake_api_subfolders = self.get_all_fake(workspace, folder.node_id).result
+        fake_api_subfolders = self.get_all_fake(workspace, folder.content_id).result
         fake_api_pages = self.pages.get_all_fake(workspace, folder).result
         fake_api_files = self.files.get_all_fake(workspace, folder).result
         fake_api_threads = self.threads.get_all_fake(workspace, folder).result
@@ -550,7 +550,7 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         """
         workspace = context_workspace
         content_api = ContentApi(tmpl_context.current_user)
-        parent_folder = content_api.get_one(parent_id, PBNodeType.Folder)
+        parent_folder = content_api.get_one(parent_id, ContentType.Folder)
         folders = content_api.get_child_folders(parent_folder, workspace)
 
         folders = Context(CTX.FOLDERS).toDict(folders)
@@ -572,8 +572,8 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         try:
             parent = None
             if parent_id:
-                parent = api.get_one(int(parent_id), PBNodeType.Folder, workspace)
-            folder = api.create(PBNodeType.Folder, workspace, parent, label)
+                parent = api.get_one(int(parent_id), ContentType.Folder, workspace)
+            folder = api.create(ContentType.Folder, workspace, parent, label)
 
             subcontent = dict(
                 folder = True if can_contain_folders=='on' else False,
@@ -585,7 +585,7 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             api.save(folder)
 
             tg.flash(_('Folder created'), CST.STATUS_OK)
-            redirect_url = redirect_url_tmpl.format(tmpl_context.workspace_id, folder.node_id)
+            redirect_url = redirect_url_tmpl.format(tmpl_context.workspace_id, folder.content_id)
         except Exception as e:
             logger.error(self, 'An unexpected exception has been catched. Look at the traceback below.')
             traceback.print_exc()
@@ -614,20 +614,20 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         next_url = ''
 
         try:
-            folder = api.get_one(int(folder_id), PBNodeType.Folder, workspace)
+            folder = api.get_one(int(folder_id), ContentType.Folder, workspace)
             subcontent = dict(
                 folder = True if can_contain_folders=='on' else False,
                 thread = True if can_contain_threads=='on' else False,
                 file = True if can_contain_files=='on' else False,
                 page = True if can_contain_pages=='on' else False
             )
-            api.update_content(folder, label, folder.data_content)
+            api.update_content(folder, label, folder.description)
             api.set_allowed_content(folder, subcontent)
             api.save(folder)
 
             tg.flash(_('Folder updated'), CST.STATUS_OK)
 
-            next_url = self.url(folder.node_id)
+            next_url = self.url(folder.content_id)
 
         except Exception as e:
             tg.flash(_('Folder not updated: {}').format(str(e)), CST.STATUS_ERROR)

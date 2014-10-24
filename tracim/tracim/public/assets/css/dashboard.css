@@ -146,22 +146,27 @@ iframe { border: 5px solid #b3e7ff; }
 .pod-tree-item-is-a-folder > a { }
 
 
-.pod-less-visible { color: #999; }
+.tracim-less-visible { color: #999; }
 
-.pod-status-open { font-weight: bold; color: #759ac5; }
-.pod-status-closed-validated { font-weight: bold; color: #1fdb11;}
-.pod-status-closed-unvalidated { font-weight: bold; color: #F00;}
-.pod-status-closed-deprecated { font-weight: bold; color: #ea983d;}
-.pod-status-selected { background-color: #EEE; }
-.pod-panel-separator { border-width: 12px 0 0 0; }
+.tracim-status-open { font-weight: bold; color: #759ac5; }
+.tracim-status-closed-validated { font-weight: bold; color: #1fdb11;}
+.tracim-status-closed-unvalidated { font-weight: bold; color: #F00;}
+.tracim-status-closed-deprecated { font-weight: bold; color: #ea983d;}
+.tracim-status-selected { background-color: #EEE; }
+.tracim-panel-separator { border-width: 12px 0 0 0; }
 
-.pod-thread-item {}
-.pod-thread-item-content { margin-left: 12px; border-left: 8px solid #EEE; padding: 0 0.5em; }
+.tracim-thread-item {}
+.tracim-thread-item-content { margin-left: 12px; border-left: 8px solid #EEE; padding: 0 0.5em; }
 
+#tracim-footer-separator { margin-bottom: 30px; }
 .pod-footer {
     position: fixed;
     bottom: 0;
     width: 100%;
+    background-color: #F5F5F5;
+    border-top: 1px solid #CCC;
+    z-index: 1001;
 }
+.pod-footer p { margin: auto; }
 
 

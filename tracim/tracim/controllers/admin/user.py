@@ -246,11 +246,11 @@ class UserRestController(TIMRestController):
 
     @tg.require(predicates.in_group(Group.TIM_MANAGER_GROUPNAME))
     @tg.expose()
-    def post(self, name, email, password, is_tracim_manager='off', is_pod_admin='off'):
+    def post(self, name, email, password, is_tracim_manager='off', is_tracim_admin='off'):
         is_tracim_manager = h.on_off_to_boolean(is_tracim_manager)
-        is_tracim_admin = h.on_off_to_boolean(is_pod_admin)
+        is_tracim_admin = h.on_off_to_boolean(is_tracim_admin)
         current_user = tmpl_context.current_user
-        current_user = User()
+
         if current_user.profile.id < Group.TIM_ADMIN:
             # A manager can't give large rights
             is_tracim_manager = False
@@ -264,7 +264,7 @@ class UserRestController(TIMRestController):
             tg.redirect(self.url())
 
         user = api.create_user()
-        user.email_address = email
+        user.email = email
         user.display_name = name
         if password:
             user.password = password

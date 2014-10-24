@@ -60,4 +60,4 @@ def init_model(engine):
 
 # Import your model modules here.
 from tracim.model.auth import User, Group, Permission
-from tracim.model.data import PBNode
+from tracim.model.data import Content

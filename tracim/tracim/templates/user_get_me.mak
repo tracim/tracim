@@ -39,7 +39,7 @@
                             ${_('My workspaces')}
                         </h3>
                         % if len(result.user.roles)<=0:
-                            ${WIDGETS.EMPTY_CONTENT(_('This user is not member of any workspace.'))}
+                            ${WIDGETS.EMPTY_CONTENT(_('You are not member of any workspace.'))}
                         % else:
                             <table class="table">
                                 % for role in result.user.roles:

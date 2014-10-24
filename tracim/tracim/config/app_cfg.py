@@ -77,11 +77,11 @@ class ApplicationAuthMetadata(TGAuthMetadata):
     def __init__(self, sa_auth):
         self.sa_auth = sa_auth
     def authenticate(self, environ, identity):
-        user = self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(and_(self.sa_auth.user_class.is_active==True, self.sa_auth.user_class.email_address==identity['login'])).first()
+        user = self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(and_(self.sa_auth.user_class.is_active==True, self.sa_auth.user_class.email==identity['login'])).first()
         if user and user.validate_password(identity['password']):
             return identity['login']
     def get_user(self, identity, userid):
-        return self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(and_(self.sa_auth.user_class.is_active==True, self.sa_auth.user_class.email_address==userid)).first()
+        return self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(and_(self.sa_auth.user_class.is_active==True, self.sa_auth.user_class.email==userid)).first()
     def get_groups(self, identity, userid):
         return [g.group_name for g in identity['user'].groups]
     def get_permissions(self, identity, userid):
@@ -116,8 +116,24 @@ base_config.sa_auth.post_logout_url = '/post_logout'
 # INFO - This is the way to specialize the resetpassword email properties
 # plug(base_config, 'resetpassword', None, mail_subject=reset_password_email_subject)
 plug(base_config, 'resetpassword', 'reset_password')
+
+def fake_unicode(some_string_or_bytes):
+    return some_string_or_bytes
+    if isinstance(some_string_or_bytes, str):
+        print("IS STRING")
+        return some_string_or_bytes
+
+    print("IS ", some_string_or_bytes.__class__.__name__)
+    return str(some_string_or_bytes, 'utf-8')
+#     if isinstance(some_string_or_bytes, bytes):
+#         return some_string_or_bytes.encode('utf-8')
+#     return some_string_or_bytes
+#
+import resetpassword.lib as rplib
+# rplib.unicode = fake_unicode
+
 replace_template(base_config, 'resetpassword.templates.index', 'tracim.templates.reset_password_index')
-replace_template(base_config, 'resetpassword.templates.change_password', 'tracim.templates.reset_password_change_password')
+replace_template(base_config, 'resetpassword.templates.change_password', 'mako:tracim.templates.reset_password_change_password')
 
 # Note: here are fake translatable strings that allow to translate messages for reset password email content
 duplicated_email_subject = l_('Password reset request')

@@ -17,8 +17,8 @@ from tracim.lib.workspace import WorkspaceApi
 
 from tracim.model.auth import Group
 from tracim.model.data import NodeTreeItem
-from tracim.model.data import PBNode
-from tracim.model.data import PBNodeType
+from tracim.model.data import Content
+from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 from tracim.model.data import UserRoleInWorkspace
 
@@ -109,7 +109,7 @@ class RoleInWorkspaceRestController(TIMRestController, BaseController):
 
         tg.flash(flash_msg_template.format(
             role.user.get_display_name(),
-            tg.tmpl_context.workspace.data_label,
+            tg.tmpl_context.workspace.label,
             role.role_as_label()), CST.STATUS_OK)
 
         tg.redirect(self.parent_controller.url(tg.tmpl_context.workspace_id))
@@ -199,7 +199,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
 
         workspace = workspace_api_controller.create_workspace(name, description)
 
-        tg.flash(_('{} workspace created.').format(workspace.data_label), CST.STATUS_OK)
+        tg.flash(_('{} workspace created.').format(workspace.label), CST.STATUS_OK)
         tg.redirect(self.url())
         return
 
@@ -219,11 +219,11 @@ class WorkspaceRestController(TIMRestController, BaseController):
         workspace_api_controller = WorkspaceApi(user)
 
         workspace = workspace_api_controller.get_one(id)
-        workspace.data_label = name
-        workspace.data_comment = description
+        workspace.label = name
+        workspace.description = description
         workspace_api_controller.save(workspace)
 
-        tg.flash(_('{} workspace updated.').format(workspace.data_label), CST.STATUS_OK)
+        tg.flash(_('{} workspace updated.').format(workspace.label), CST.STATUS_OK)
         tg.redirect(self.url(workspace.workspace_id))
         return
 
@@ -245,7 +245,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         workspace = api.get_one(workspace_id)
         api.delete_one(workspace_id)
 
-        workspace_label = workspace.data_label
+        workspace_label = workspace.label
         undo_url = self.url(workspace_id, self.restore.__name__)
 
         tg.flash(_('{} workspace deleted. In case of error, you can <a class="alert-link" href="{}">restore it</a>.').format(workspace_label, undo_url), CST.STATUS_OK, no_escape=True)
@@ -258,7 +258,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         api = WorkspaceApi(tg.tmpl_context.current_user)
         workspace = api.restore_one(workspace_id, True)
 
-        workspace_label = workspace.data_label
+        workspace_label = workspace.label
         undo_url = self.url(workspace_id, 'delete')
 
         tg.flash(_('{} workspace restored.').format(workspace_label), CST.STATUS_OK)

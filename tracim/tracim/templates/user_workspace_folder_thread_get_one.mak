@@ -58,13 +58,13 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
 
 % if h.user_role(fake_api.current_user, result.thread.workspace)<=1:
     ## READONLY USER
-    <hr class="pod-panel-separator"/>
+    <hr class="tracim-panel-separator"/>
 % else:
     % if result.thread.status.id!='open':
-        <p class="pod-less-visible">${_('<b>Note</b>: In case you\'d like to post a reply, you must first open again the thread')|n}</p>
-        <hr class="pod-panel-separator"/>
+        <p class="tracim-less-visible">${_('<b>Note</b>: In case you\'d like to post a reply, you must first open again the thread')|n}</p>
+        <hr class="tracim-panel-separator"/>
     % else:
-        <hr class="pod-panel-separator"/>
+        <hr class="tracim-panel-separator"/>
         <p>    
             ${WIDGETS.DATA_TARGET_BUTTON('new-comment', _('Post a reply...'))}
             ${FORMS.NEW_COMMENT_FORM_IN_THREAD('new-comment', result.thread.workspace.id, result.thread.parent.id, result.thread.id)}
@@ -73,7 +73,7 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
 % endif 
 
 % for comment in result.thread.comments:
-    <div class="pod-thread-item">
+    <div class="tracim-thread-item">
         <h5 style="margin: 0;">
             <div class="pull-right text-right">
                 <div class="label" style="font-size: 10px; border: 1px solid #CCC; color: #777; ">
@@ -85,9 +85,9 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
             </div>
    
             ${TIM.ICO(32, comment.icon)}
-            <span class="pod-less-visible">${_('<strong>{}</strong> wrote:').format(comment.owner.name)|n}</span>
+            <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(comment.owner.name)|n}</span>
         </h5>
-        <div class="pod-thread-item-content">
+        <div class="tracim-thread-item-content">
             <div>${comment.content|n}</div>
             <br/>
         </div>
@@ -95,7 +95,7 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
 
 % endfor
 
-## <hr class="pod-panel-separator"/>
+## <hr class="tracim-panel-separator"/>
 ## <div>
 ##     <h4 id="associated-links" class="anchored-title" >${_('Links extracted from the thread')}</h4>
 ##     <div>

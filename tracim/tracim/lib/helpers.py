@@ -15,8 +15,8 @@ from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
 
 from tracim.model.data import ContentStatus
-from tracim.model.data import PBNode
-from tracim.model.data import PBNodeType
+from tracim.model.data import Content
+from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
 
@@ -64,69 +64,6 @@ def icon(icon_name, white=False):
     else:
         return Markup('<i class="icon-%s"></i>' % icon_name)
 
-
-def getExplanationAboutStatus(psStatusId, psCurrentStatusId):
-  lsMsg = ""
-  if psStatusId==psCurrentStatusId:
-    return _("This is the current status.")
-  else:
-    if psStatusId=='information':
-      return _("The item is a normal document, like a howto or a text document.")
-    if psStatusId=='automatic':
-      return _("The item will be automatically computed as \"in progress\" or \"done\" according to its children status.")
-    if psStatusId=='new':
-      return _("No action done on the item.")
-    if psStatusId=='inprogress':
-      return _("The item is being worked on.")
-    if psStatusId=='standby':
-      return _("Waiting for some external actions.")
-    if psStatusId=='done':
-      return _("The work associated with the item is finished.")
-    if psStatusId=='closed':
-      return _("Close the item if you want not to see it anymore. The data won't be deleted")
-    if psStatusId=='deleted':
-      return _("This status tells that the item has been deleted.")
-
-class ID(object):
-  """ Helper class that will manage html items ids that need to be shared"""
-
-  @classmethod
-  def AddDocumentModalForm(cls, poNode=None):
-    if poNode:
-      return 'add-document-modal-form-%d'%poNode.node_id
-    else:
-      return 'add-document-modal-form'
-
-  @classmethod
-  def AddContactModalForm(cls, poNode=None):
-    if poNode:
-      return 'add-contact-modal-form-%d'%poNode.node_id
-    else:
-      return 'add-contact-modal-form'
-
-  @classmethod
-  def AddFileModalForm(cls, poNode=None):
-    if poNode:
-      return 'add-file-modal-form-%d'%poNode.node_id
-    else:
-      return 'add-file-modal-form'
-
-  @classmethod
-  def MoveDocumentModalForm(cls, poNode):
-      return 'move-document-modal-form-{0}'.format(poNode.node_id)
-
-  @classmethod
-  def AddEventModalForm(cls, poNode=None):
-    if poNode:
-      return 'add-event-modal-form-%d'%poNode.node_id
-    else:
-      return 'add-event-modal-form'
-    ## Original id is 'current-document-add-event-form'
-
-  @classmethod
-  def AddCommentInlineForm(cls):
-    return 'current-document-add-comment-form'
-
 class ICON(object):
   Shared = '<i class="fa fa-group"></i>'
   Private = '<i class="fa fa-key"></i>'
@@ -158,8 +95,8 @@ def RoleLevelAssociatedCss(role_level):
     elif role_level==UserRoleInWorkspace.WORKSPACE_MANAGER:
         return '#F00'
 
-def AllStatus(node_type=''):
-    return ContentStatus.all(node_type)
+def AllStatus(type=''):
+    return ContentStatus.all(type)
 
 
 def is_debug_mode():
@@ -169,7 +106,7 @@ def is_debug_mode():
 def on_off_to_boolean(on_or_off: str) -> bool:
     return True if on_or_off=='on' else False
 
-def convert_id_into_instances(id: str) -> (Workspace, PBNode):
+def convert_id_into_instances(id: str) -> (Workspace, Content):
     """
     TODO - D.A. - 2014-10-18 - Refactor and move this function where it must be placed
     convert an id like 'workspace_<workspace_id>|content_<content_id>'
@@ -179,7 +116,13 @@ def convert_id_into_instances(id: str) -> (Workspace, PBNode):
     if id=='#':
         return None, None
 
-    workspace_str, content_str = id.split(CST.TREEVIEW_MENU.ITEM_SEPARATOR)
+    workspace_str = ''
+    content_str = ''
+    try:
+        workspace_str, content_str = id.split(CST.TREEVIEW_MENU.ITEM_SEPARATOR)
+    except:
+        pass
+
     workspace = None
     content = None
 
@@ -193,7 +136,7 @@ def convert_id_into_instances(id: str) -> (Workspace, PBNode):
     try:
         content_data = content_str.split(CST.TREEVIEW_MENU.ID_SEPARATOR)
         content_id = int(content_data[1])
-        content = ContentApi(tg.tmpl_context.current_user).get_one(content_id, PBNodeType.Folder)
+        content = ContentApi(tg.tmpl_context.current_user).get_one(content_id, ContentType.Folder)
     except (IndexError, ValueError) as e:
         content = None
 

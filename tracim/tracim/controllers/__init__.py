@@ -17,8 +17,8 @@ from tracim.lib.predicates import current_user_is_content_manager
 from tracim.model.auth import User
 from tracim.model.data import ActionDescription
 from tracim.model.data import BreadcrumbItem
-from tracim.model.data import PBNode
-from tracim.model.data import PBNodeType
+from tracim.model.data import Content
+from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 
 from tracim.lib.content import ContentApi
@@ -53,10 +53,10 @@ class TIMRestPathContextSetup(object):
 
 
     @classmethod
-    def current_folder(cls) -> PBNode:
+    def current_folder(cls) -> Content:
         content_api = ContentApi(tg.tmpl_context.current_user)
         folder_id = int(tg.request.controller_state.routing_args.get('folder_id'))
-        folder = content_api.get_one(folder_id, PBNodeType.Folder, tg.tmpl_context.workspace)
+        folder = content_api.get_one(folder_id, ContentType.Folder, tg.tmpl_context.workspace)
 
         tg.tmpl_context.folder_id = folder_id
         tg.tmpl_context.folder = folder
@@ -65,10 +65,10 @@ class TIMRestPathContextSetup(object):
 
 
     @classmethod
-    def current_folder(cls) -> PBNode:
+    def current_folder(cls) -> Content:
         content_api = ContentApi(tg.tmpl_context.current_user)
         folder_id = int(tg.request.controller_state.routing_args.get('folder_id'))
-        folder = content_api.get_one(folder_id, PBNodeType.Folder, tg.tmpl_context.workspace)
+        folder = content_api.get_one(folder_id, ContentType.Folder, tg.tmpl_context.workspace)
 
         tg.tmpl_context.folder_id = folder_id
         tg.tmpl_context.folder = folder
@@ -77,32 +77,32 @@ class TIMRestPathContextSetup(object):
 
 
     @classmethod
-    def _current_item_manually(cls, item_id: int, item_type: str) -> PBNode:
+    def _current_item_manually(cls, item_id: int, item_type: str) -> Content:
         # in case thread or page or other stuff is instanciated, then force
         # the associated item to be available through generic name tmpl_context.item to be available
         content_api = ContentApi(tg.tmpl_context.current_user)
         item = content_api.get_one(item_id, item_type, tg.tmpl_context.workspace)
 
-        tg.tmpl_context.item_id = item.node_id
+        tg.tmpl_context.item_id = item.content_id
         tg.tmpl_context.item = item
 
         return item
 
 
     @classmethod
-    def current_thread(cls) -> PBNode:
+    def current_thread(cls) -> Content:
         thread_id = int(tg.request.controller_state.routing_args.get('thread_id'))
-        thread = cls._current_item_manually(thread_id, PBNodeType.Thread)
-        tg.tmpl_context.thread_id = thread.node_id
+        thread = cls._current_item_manually(thread_id, ContentType.Thread)
+        tg.tmpl_context.thread_id = thread.content_id
         tg.tmpl_context.thread = thread
         return thread
 
 
     @classmethod
-    def current_page(cls) -> PBNode:
+    def current_page(cls) -> Content:
         page_id = int(tg.request.controller_state.routing_args.get('page_id'))
-        page = cls._current_item_manually(page_id, PBNodeType.Page)
-        tg.tmpl_context.page_id = page.node_id
+        page = cls._current_item_manually(page_id, ContentType.Page)
+        tg.tmpl_context.page_id = page.content_id
         tg.tmpl_context.page = page
         return page
 
@@ -136,19 +136,19 @@ class TIMRestControllerWithBreadcrumb(TIMRestController):
         workspace_id = tmpl_context.workspace_id
         breadcrumb = []
 
-        breadcrumb.append(BreadcrumbItem(PBNodeType.icon(PBNodeType.FAKE_Dashboard), _('Workspaces'), tg.url('/workspaces')))
-        breadcrumb.append(BreadcrumbItem(PBNodeType.icon(PBNodeType.FAKE_Workspace), workspace.data_label, tg.url('/workspaces/{}'.format(workspace.workspace_id))))
+        breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Dashboard), _('Workspaces'), tg.url('/workspaces')))
+        breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Workspace), workspace.label, tg.url('/workspaces/{}'.format(workspace.workspace_id))))
 
         content_api = ContentApi(tmpl_context.current_user)
         if folder_id:
             breadcrumb_folder_items = []
-            current_item = content_api.get_one(folder_id, PBNodeType.Any, workspace)
+            current_item = content_api.get_one(folder_id, ContentType.Any, workspace)
             is_active = True
 
             while current_item:
-                breadcrumb_item = BreadcrumbItem(PBNodeType.icon(current_item.node_type),
-                                                 current_item.data_label,
-                                                 tg.url('/workspaces/{}/folders/{}'.format(workspace_id, current_item.node_id)),
+                breadcrumb_item = BreadcrumbItem(ContentType.icon(current_item.type),
+                                                 current_item.label,
+                                                 tg.url('/workspaces/{}/folders/{}'.format(workspace_id, current_item.content_id)),
                                                  is_active)
                 is_active = False # the first item is True, then all other are False => in the breadcrumb, only the last item is "active"
                 breadcrumb_folder_items.append(breadcrumb_item)
@@ -273,7 +273,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
-            tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item.node_id))
+            tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item.content_id))
 
         except ValueError as e:
             msg = _('{} not updated - error: {}').format(self._item_type_label, str(e))
@@ -292,14 +292,14 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             content_api.save(item, ActionDescription.STATUS_UPDATE)
             msg = _('{} status updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
-            tg.redirect(self._std_url.format(item.workspace_id, item.parent_id, item.node_id))
+            tg.redirect(self._std_url.format(item.workspace_id, item.parent_id, item.content_id))
         except ValueError as e:
             msg = _('{} status not updated: {}').format(self._item_type_label, str(e))
             tg.flash(msg, CST.STATUS_ERROR)
-            tg.redirect(self._err_url.format(item.workspace_id, item.parent_id, item.node_id))
+            tg.redirect(self._err_url.format(item.workspace_id, item.parent_id, item.content_id))
 
 
-    def get_all_fake(self, context_workspace: Workspace, context_folder: PBNode) -> [PBNode]:
+    def get_all_fake(self, context_workspace: Workspace, context_folder: Content) -> [Content]:
         """
         fake methods are used in other controllers in order to simulate a client/server api.
         the "client" controller method will include the result into its own fake_api object
@@ -310,7 +310,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         """
         workspace = context_workspace
         content_api = ContentApi(tmpl_context.current_user)
-        items = content_api.get_all(context_folder.node_id, self._item_type, workspace)
+        items = content_api.get_all(context_folder.content_id, self._item_type, workspace)
 
         dictified_items = Context(self._get_all_context).toDict(items)
         return DictLikeClass(result = dictified_items)
@@ -325,7 +325,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
         try:
             next_url = self._parent_url.format(item.workspace_id, item.parent_id)
-            undo_url = self._std_url.format(item.workspace_id, item.parent_id, item.node_id)+'/put_archive_undo'
+            undo_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)+'/put_archive_undo'
             msg = _('{} archived. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
 
             content_api.archive(item)
@@ -334,7 +334,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             tg.flash(msg, CST.STATUS_OK, no_escape=True) # TODO allow to come back
             tg.redirect(next_url)
         except ValueError as e:
-            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.node_id)
+            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
             msg = _('{} not archived: {}').format(self._item_type_label, str(e))
             tg.flash(msg, CST.STATUS_ERROR)
             tg.redirect(next_url)
@@ -348,7 +348,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         content_api = ContentApi(tmpl_context.current_user, True) # Here we do not filter archived items
         item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
         try:
-            next_url = self._parent_url.format(item.workspace_id, item.parent_id)
+            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
             msg = _('{} unarchived.').format(self._item_type_label)
             content_api.unarchive(item)
             content_api.save(item, ActionDescription.UNARCHIVING)
@@ -358,7 +358,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
 
         except ValueError as e:
             msg = _('{} not un-archived: {}').format(self._item_type_label, str(e))
-            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.node_id)
+            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
             # We still use std url because the item has not been archived
             tg.flash(msg, CST.STATUS_ERROR)
             tg.redirect(next_url)
@@ -374,7 +374,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         try:
 
             next_url = self._parent_url.format(item.workspace_id, item.parent_id)
-            undo_url = self._std_url.format(item.workspace_id, item.parent_id, item.node_id)+'/put_delete_undo'
+            undo_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)+'/put_delete_undo'
             msg = _('{} deleted. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
             content_api.delete(item)
             content_api.save(item, ActionDescription.DELETION)
@@ -383,7 +383,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             tg.redirect(next_url)
 
         except ValueError as e:
-            back_url = self._std_url.format(item.workspace_id, item.parent_id, item.node_id)
+            back_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
             msg = _('{} not deleted: {}').format(self._item_type_label, str(e))
             tg.flash(msg, CST.STATUS_ERROR)
             tg.redirect(back_url)
@@ -398,7 +398,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         content_api = ContentApi(tmpl_context.current_user, True, True) # Here we do not filter deleted items
         item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
         try:
-            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.node_id)
+            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
             msg = _('{} undeleted.').format(self._item_type_label)
             content_api.undelete(item)
             content_api.save(item, ActionDescription.UNDELETION)

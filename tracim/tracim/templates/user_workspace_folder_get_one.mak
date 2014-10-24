@@ -54,7 +54,7 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
         ${TIM.ICO_BADGED(16, 'mimetypes/text-html', _('pages'))}
     % endif
 </p>
-<hr class="pod-panel-separator"/>
+<hr class="tracim-panel-separator"/>
 
 % if result.folder.allowed_content.folder:
     % if h.user_role(fake_api.current_user, result.folder.workspace)<=2: # User must be a content manager to be allowed to create folders

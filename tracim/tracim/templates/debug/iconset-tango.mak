@@ -23,7 +23,7 @@
     import sys
 
     icon_files = dict()
-    rootdir = './pod/public/assets/icons/'
+    rootdir = './tracim/public/assets/icons/'
     
     for root, subFolders, files in os.walk(rootdir):
         for foundFile in files:

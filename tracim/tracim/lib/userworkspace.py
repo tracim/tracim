@@ -71,7 +71,7 @@ class RoleApi(object):
         return self._get_all_for_user(user_id).all()
 
     def get_all_for_user_order_by_workspace(self, user_id: int) -> UserRoleInWorkspace:
-        return self._get_all_for_user(user_id).join(UserRoleInWorkspace.workspace).order_by(Workspace.data_label).all()
+        return self._get_all_for_user(user_id).join(UserRoleInWorkspace.workspace).order_by(Workspace.label).all()
 
     def get_all_for_workspace(self, workspace_id):
         return DBSession.query(UserRoleInWorkspace).filter(UserRoleInWorkspace.workspace_id==workspace_id).all()

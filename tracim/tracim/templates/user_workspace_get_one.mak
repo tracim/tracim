@@ -46,7 +46,7 @@
         % endfor
     % endif
 </p>
-<hr class="pod-panel-separator"/>
+<hr class="tracim-panel-separator"/>
 
 
 % if h.user_role(fake_api.current_user, result.workspace)<=2: # User must be a content manager to be allowed to create folders

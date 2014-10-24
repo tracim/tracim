@@ -21,7 +21,7 @@ class TestUser(ModelTest):
     klass = model.User
     attrs = dict(
         user_name = "ignucius",
-        email_address = "ignucius@example.org"
+        email = "ignucius@example.org"
         )
 
     def test_obj_creation_username(self):
@@ -30,7 +30,7 @@ class TestUser(ModelTest):
 
     def test_obj_creation_email(self):
         """The obj constructor must set the email right"""
-        eq_(self.obj.email_address, "ignucius@example.org")
+        eq_(self.obj.email, "ignucius@example.org")
 
     def test_no_permissions_by_default(self):
         """User objects should have no permission by default."""

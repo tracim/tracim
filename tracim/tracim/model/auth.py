@@ -11,6 +11,7 @@ though.
 import os
 from datetime import datetime
 from hashlib import sha256
+from sqlalchemy.ext.hybrid import hybrid_property
 from tg.i18n import lazy_ugettext as l_
 
 __all__ = ['User', 'Group', 'Permission']
@@ -23,42 +24,21 @@ from tracim.model import DeclarativeBase, metadata, DBSession
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions.
-group_permission_table = Table('pod_group_permission', metadata,
-    Column('group_id', Integer, ForeignKey('pod_group.group_id',
+group_permission_table = Table('group_permission', metadata,
+    Column('group_id', Integer, ForeignKey('groups.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('permission_id', Integer, ForeignKey('pod_permission.permission_id',
+    Column('permission_id', Integer, ForeignKey('permissions.permission_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
 # This is the association table for the many-to-many relationship between
 # groups and members - this is, the memberships.
-user_group_table = Table('pod_user_group', metadata,
-    Column('user_id', Integer, ForeignKey('pod_user.user_id',
+user_group_table = Table('user_group', metadata,
+    Column('user_id', Integer, ForeignKey('users.user_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('group_id', Integer, ForeignKey('pod_group.group_id',
+    Column('group_id', Integer, ForeignKey('groups.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
-
-
-
-
-class Rights(DeclarativeBase):
-
-    READ_ACCESS = 1
-    WRITE_ACCESS = 2
-
-    __tablename__ = 'pod_group_node'
-
-    group_id = Column(Integer, ForeignKey('pod_group.group_id'), primary_key=True)
-    node_id = Column(Integer, ForeignKey('pod_nodes.node_id'), primary_key=True)
-    rights = Column(Integer)
-
-    def hasReadAccess(self):
-        return self.rights & Rights.READ_ACCESS
-
-    def hasWriteAccess(self):
-        return self.rights & Rights.WRITE_ACCESS
-
 
 class Group(DeclarativeBase):
 
@@ -72,7 +52,7 @@ class Group(DeclarativeBase):
     TIM_MANAGER_GROUPNAME = 'managers'
     TIM_ADMIN_GROUPNAME = 'administrators'
 
-    __tablename__ = 'pod_group'
+    __tablename__ = 'groups'
 
     group_id = Column(Integer, autoincrement=True, primary_key=True)
     group_name = Column(Unicode(16), unique=True, nullable=False)
@@ -80,10 +60,6 @@ class Group(DeclarativeBase):
     created = Column(DateTime, default=datetime.now)
 
     users = relationship('User', secondary=user_group_table, backref='groups')
-
-    _lRights = relationship('Rights', backref='_oGroup', cascade = "all, delete-orphan")
-
-
 
     def __repr__(self):
         return '<Group: name=%s>' % repr(self.group_name)
@@ -95,27 +71,6 @@ class Group(DeclarativeBase):
     def by_group_name(cls, group_name):
         """Return the user object whose email address is ``email``."""
         return DBSession.query(cls).filter_by(group_name=group_name).first()
-
-    def getDisplayName(self) -> str:
-        if self.group_id<0:
-            # FIXME - D.A. - 2014-05-19 - MAKE THIS CODE CLEANER,
-            try:
-                return self.users[0].get_display_name()
-            except:
-                print('ERROR GROUP =>', self.group_id)
-
-
-        return self.display_name
-
-    @property
-    def rights(self):
-        return self._lRights
-
-    def hasSomeAccess(self, poNode):
-        for loRight in self._lRights:
-            if loRight.node_id == poNode.node_id and loRight.rights>0:
-                return True
-        return False
 
 
 
@@ -146,23 +101,28 @@ class User(DeclarativeBase):
     User definition.
 
     This is the user definition used by :mod:`repoze.who`, which requires at
-    least the ``email_address`` column.
+    least the ``email`` column.
 
     """
-    __tablename__ = 'pod_user'
+    __tablename__ = 'users'
 
     user_id = Column(Integer, autoincrement=True, primary_key=True)
-    email_address = Column(Unicode(255), unique=True, nullable=False)
+    email = Column(Unicode(255), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     _password = Column('password', Unicode(128))
     created = Column(DateTime, default=datetime.now)
     is_active = Column(Boolean, default=True, nullable=False)
+
+    @hybrid_property
+    def email_address(self):
+        return self.email
+
     def __repr__(self):
         return '<User: email=%s, display=%s>' % (
-                repr(self.email_address), repr(self.display_name))
+                repr(self.email), repr(self.display_name))
 
     def __unicode__(self):
-        return self.display_name or self.email_address
+        return self.display_name or self.email
 
     @property
     def permissions(self):
@@ -182,12 +142,12 @@ class User(DeclarativeBase):
     @classmethod
     def by_email_address(cls, email):
         """Return the user object whose email address is ``email``."""
-        return DBSession.query(cls).filter_by(email_address=email).first()
+        return DBSession.query(cls).filter_by(email=email).first()
 
     @classmethod
     def by_user_name(cls, username):
         """Return the user object whose user name is ``username``."""
-        return DBSession.query(cls).filter_by(email_address=username).first()
+        return DBSession.query(cls).filter_by(email=username).first()
 
     @classmethod
     def _hash_password(cls, password):
@@ -240,7 +200,7 @@ class User(DeclarativeBase):
         if self.display_name!=None and self.display_name!='':
             return self.display_name
         else:
-            return self.email_address
+            return self.email
 
 
 class Permission(DeclarativeBase):
@@ -251,7 +211,7 @@ class Permission(DeclarativeBase):
 
     """
 
-    __tablename__ = 'pod_permission'
+    __tablename__ = 'permissions'
 
 
     permission_id = Column(Integer, autoincrement=True, primary_key=True)

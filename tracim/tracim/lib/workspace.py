@@ -41,8 +41,8 @@ class WorkspaceApi(object):
 
     def create_workspace(self, label: str, description: str='', save_now:bool=False) -> Workspace:
         workspace = Workspace()
-        workspace.data_label = label
-        workspace.data_comment = description
+        workspace.label = label
+        workspace.description = description
 
         # By default, we force the current user to be the workspace manager
         role = RoleApi(self._user).create_one(self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER)
@@ -70,7 +70,7 @@ class WorkspaceApi(object):
 
     def get_all_for_user(self, user: User):
         workspaces = [role.workspace for role in user.roles]
-        workspaces.sort(key=lambda workspace: workspace.data_label.lower())
+        workspaces.sort(key=lambda workspace: workspace.label.lower())
         return workspaces
 
     def save(self, workspace: Workspace):

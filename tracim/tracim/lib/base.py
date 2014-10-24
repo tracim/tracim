@@ -96,10 +96,6 @@ class BaseController(TGController):
         :param id:
         :return:
         """
-        print('***********************************')
-        print("searching for an id")
-        print(cls)
-        print(cls)
         return getattr(tmpl_context, cls.current_item_id_key_in_context(), '')
 
     def back_with_error(self, message):

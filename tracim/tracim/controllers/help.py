@@ -25,7 +25,6 @@ class HelpController(BaseController):
         # FIXME - NOT REALLY SAFE BECAUSE SOME UNWANTED FILE MAY BE USED AS HELP PAGE
         if help_page:
             help_page_path = 'mako:tracim.templates.help.page-{}'.format(help_page)
-            print('TEMPLATE:', help_page_path)
             override_template(HelpController.page, help_page_path)
 
         return dict(mode=mode)

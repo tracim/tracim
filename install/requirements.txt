@@ -7,7 +7,7 @@ PasteDeploy==1.5.2
 Pillow==2.4.0
 SQLAlchemy==0.9.4
 Tempita==0.5.3dev
-TurboGears2==2.3.3
+TurboGears2==2.3.4
 WebOb==1.4
 WebTest==1.4.3
 alembic==0.6.5

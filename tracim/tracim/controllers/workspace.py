@@ -17,8 +17,8 @@ from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
 
 from tracim.model.data import NodeTreeItem
-from tracim.model.data import PBNode
-from tracim.model.data import PBNodeType
+from tracim.model.data import Content
+from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 from tracim.model.data import UserRoleInWorkspace
 
@@ -85,7 +85,7 @@ class UserWorkspaceRestController(TIMRestController):
             return dictified_workspaces
 
 
-        allowed_content_types = PBNodeType.allowed_types_from_str(folder_allowed_content_types)
+        allowed_content_types = ContentType.allowed_types_from_str(folder_allowed_content_types)
         ignored_item_ids = [int(ignore_id)] if ignore_id else []
 
         # Now complex case: we must return a structured tree
@@ -147,11 +147,11 @@ class UserWorkspaceRestController(TIMRestController):
 
     def _build_sibling_list_of_tree_items(self,
                                           workspace: Workspace,
-                                          content: PBNode,
+                                          content: Content,
                                           children: [NodeTreeItem],
                                           select_active_node = False,
                                           allowed_content_types: list = [],
-                                          ignored_item_ids: list = []) -> (PBNode, [NodeTreeItem]):
+                                          ignored_item_ids: list = []) -> (Content, [NodeTreeItem]):
         api = ContentApi(tmpl_context.current_user)
         tree_items = []
 

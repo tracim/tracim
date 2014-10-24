@@ -60,7 +60,7 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
     ${result.page.content|n}
 </div>
 
-<hr class="pod-panel-separator"/>
+<hr class="tracim-panel-separator"/>
 <div>
     <h4 id="associated-links" class="anchored-title" >${_('Links extracted from the page')}</h4>
     <div>
@@ -74,7 +74,7 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
             </ul>
         % endif
     </div>
-    <hr/>
+    <hr class="tracim-panel-separator"/>
 
 
     <h4 id="associated-links" class="anchored-title" >${_('Page revisions')}</h4>
