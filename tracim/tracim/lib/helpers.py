@@ -5,7 +5,7 @@
 #from webhelpers import date, feedgenerator, html, number, misc, text
 from markupsafe import Markup
 from datetime import datetime
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+
 import tg
 
 from tracim.lib import app_globals as plag
@@ -25,10 +25,6 @@ def date_time_in_long_format(datetime_object, format=''):
         format = plag.Globals.LONG_DATE_FORMAT
     return datetime_object.strftime(format.__str__())
 
-def date_time_in_long_format(datetime_object, format=''):
-    if not format:
-        format = plag.Globals.LONG_DATE_FORMAT
-    return datetime_object.strftime(format.__str__())
 
 def format_short(datetime_object):
     return datetime_object.strftime(format = plag.Globals.SHORT_DATE_FORMAT.__str__())
