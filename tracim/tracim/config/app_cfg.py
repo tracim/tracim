@@ -117,27 +117,35 @@ base_config.sa_auth.post_logout_url = '/post_logout'
 # plug(base_config, 'resetpassword', None, mail_subject=reset_password_email_subject)
 plug(base_config, 'resetpassword', 'reset_password')
 
-def fake_unicode(some_string_or_bytes):
-    return some_string_or_bytes
-    if isinstance(some_string_or_bytes, str):
-        print("IS STRING")
-        return some_string_or_bytes
-
-    print("IS ", some_string_or_bytes.__class__.__name__)
-    return str(some_string_or_bytes, 'utf-8')
-#     if isinstance(some_string_or_bytes, bytes):
-#         return some_string_or_bytes.encode('utf-8')
-#     return some_string_or_bytes
-#
-import resetpassword.lib as rplib
-# rplib.unicode = fake_unicode
-
 replace_template(base_config, 'resetpassword.templates.index', 'tracim.templates.reset_password_index')
 replace_template(base_config, 'resetpassword.templates.change_password', 'mako:tracim.templates.reset_password_change_password')
 
 # Note: here are fake translatable strings that allow to translate messages for reset password email content
 duplicated_email_subject = l_('Password reset request')
 duplicated_email_body = l_('''
+We've received a request to reset the password for this account.
+Please click this link to reset your password:
+
+%(password_reset_link)s
+
+If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.
+''')
+
+
+l_('New password')
+l_('Confirm new password')
+l_('Save new password')
+l_('Email address')
+l_('Send Request')
+
+
+l_('Password reset request sent')
+l_('Invalid password reset request')
+l_('Password reset request timed out')
+l_('Invalid password reset request')
+l_('Password changed successfully')
+
+l_('''
 We've received a request to reset the password for this account.
 Please click this link to reset your password:
 
