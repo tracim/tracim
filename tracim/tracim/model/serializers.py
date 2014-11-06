@@ -55,30 +55,24 @@ class ContextConverterNotFoundException(Exception):
 
 class CTX(object):
     """ constants that are used for serialization / dictification of models"""
-    DEFAULT = 'DEFAULT' # default context. This will allow to define a serialization method to be used by default
-
-    CURRENT_USER = 'CURRENT_USER'
-
-    USER = 'USER'
-    USERS = 'USERS'
     ADMIN_WORKSPACE = 'ADMIN_WORKSPACE'
     ADMIN_WORKSPACES = 'ADMIN_WORKSPACES'
-
-    WORKSPACE = 'WORKSPACE'
-    FOLDER = 'FOLDER'
-    FOLDERS = 'FOLDERS'
-
+    CURRENT_USER = 'CURRENT_USER'
+    DEFAULT = 'DEFAULT' # default context. This will allow to define a serialization method to be used by default
+    EMAIL_NOTIFICATION = 'EMAIL_NOTIFICATION'
     FILE = 'FILE'
     FILES = 'FILES'
-
-    PAGE = 'PAGE'
-    PAGES = 'PAGES'
-
-    THREAD = 'THREAD'
-    THREADS = 'THREADS'
-
+    FOLDER = 'FOLDER'
+    FOLDERS = 'FOLDERS'
     MENU_API = 'MENU_API'
     MENU_API_BUILD_FROM_TREE_ITEM = 'MENU_API_BUILD_FROM_TREE_ITEM'
+    PAGE = 'PAGE'
+    PAGES = 'PAGES'
+    THREAD = 'THREAD'
+    THREADS = 'THREADS'
+    USER = 'USER'
+    USERS = 'USERS'
+    WORKSPACE = 'WORKSPACE'
 
 
 class DictLikeClass(dict):
@@ -91,7 +85,6 @@ class DictLikeClass(dict):
     """
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
-
 
 
 class Context(object):
@@ -139,10 +132,18 @@ class Context(object):
 
             raise ContextConverterNotFoundException(context_string,model_class)
 
-    def __init__(self, context_string):
+    def __init__(self, context_string, base_url=''):
         """
         """
         self.context_string = context_string
+        self._base_url = base_url # real root url like http://mydomain.com:8080
+
+    def url(self, base_url='/', params=None, qualified=False) -> str:
+        url = tg.url(base_url, params)
+
+        if self._base_url:
+            url = '{}{}'.format(self._base_url, url)
+        return  url
 
     def toDict(self, serializableObject, key_value_for_a_list_object='', key_value_for_list_item_nb=''):
         """
@@ -206,6 +207,7 @@ class Context(object):
         assert isinstance(result, DictLikeClass)
         return result
 
+
 ########################################################################################################################
 ## ActionDescription
 
@@ -253,6 +255,19 @@ def serialize_breadcrumb_item(content: Content, context: Context):
         workspace = context.toDict(content.workspace)
     )
 
+@pod_serializer(Content, CTX.EMAIL_NOTIFICATION)
+def serialize_item(content: Content, context: Context):
+    return DictLikeClass(
+        id = content.content_id,
+        label = content.label,
+        status = context.toDict(content.get_status()),
+        folder = context.toDict(DictLikeClass(id = content.parent.content_id if content.parent else None)),
+        workspace = context.toDict(content.workspace),
+        is_deleted = content.is_deleted,
+        is_archived = content.is_archived,
+        url = context.url('/workspaces/{wid}/folders/{fid}/{ctype}/{cid}'.format(wid = content.workspace_id, fid=content.parent_id, ctype=content.type+'s', cid=content.content_id))
+    )
+
 
 @pod_serializer(Content, CTX.MENU_API)
 def serialize_content_for_menu_api(content: Content, context: Context):
@@ -263,7 +278,7 @@ def serialize_content_for_menu_api(content: Content, context: Context):
         id = CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(workspace_id, content_id),
         children = True, # TODO: make this dynamic
         text = content.label,
-        a_attr = { 'href' : tg.url('/workspaces/{}/folders/{}'.format(workspace_id, content_id)) },
+        a_attr = { 'href' : context.url('/workspaces/{}/folders/{}'.format(workspace_id, content_id)) },
         li_attr = { 'title': content.label, 'class': 'tracim-tree-item-is-a-folder' },
         type = content.type,
         state = { 'opened': False, 'selected': False }
@@ -679,6 +694,8 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
     result['label'] = role.role_as_label()
     result['style'] = RoleType(role.role).css_style
     result['workspace'] =  context.toDict(role.workspace)
+    result['notifications_subscribed'] = role.do_notify
+
     # result['workspace_name'] = role.workspace.label
 
     return result
@@ -690,7 +707,8 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
 def serialize_workspace_default(workspace: Workspace, context: Context):
     result = DictLikeClass(
         id = workspace.workspace_id,
-        label = workspace.label
+        label = workspace.label,
+        url = context.url('/workspaces/{}'.format(workspace.workspace_id))
     )
     return result
 
@@ -741,7 +759,7 @@ def serialize_workspace_for_menu_api(workspace: Workspace, context: Context):
         id = CST.TREEVIEW_MENU.ID_TEMPLATE__WORKSPACE_ONLY.format(workspace.workspace_id),
         children = True, # TODO: make this dynamic
         text = workspace.label,
-        a_attr = { 'href' : tg.url('/workspaces/{}'.format(workspace.workspace_id)) },
+        a_attr = { 'href' : context.url('/workspaces/{}'.format(workspace.workspace_id)) },
         li_attr = { 'title': workspace.label, 'class': 'tracim-tree-item-is-a-workspace' },
         type = 'workspace',
         state = { 'opened': False, 'selected': False }
@@ -755,7 +773,7 @@ def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Cont
             id=CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(item.node.workspace_id, item.node.content_id),
             children=True if len(item.children)<=0 else context.toDict(item.children),
             text=item.node.label,
-            a_attr={'href': tg.url('/workspaces/{}/folders/{}'.format(item.node.workspace_id, item.node.content_id)) },
+            a_attr={'href': context.url('/workspaces/{}/folders/{}'.format(item.node.workspace_id, item.node.content_id)) },
             li_attr={'title': item.node.label, 'class': 'tracim-tree-item-is-a-folder'},
             type='folder',
             state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
@@ -765,10 +783,8 @@ def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Cont
             id=CST.TREEVIEW_MENU.ID_TEMPLATE__WORKSPACE_ONLY.format(item.node.workspace_id),
             children=True if len(item.children)<=0 else context.toDict(item.children),
             text=item.node.label,
-            a_attr={'href': tg.url('/workspaces/{}'.format(item.node.workspace_id))},
+            a_attr={'href': context.url('/workspaces/{}'.format(item.node.workspace_id))},
             li_attr={'title': item.node.label, 'class': 'tracim-tree-item-is-a-workspace'},
             type='workspace',
             state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
         )
-
-

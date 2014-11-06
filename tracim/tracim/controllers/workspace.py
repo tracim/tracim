@@ -3,16 +3,12 @@
 import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
+from tg.predicates import not_anonymous
 
 from tracim.controllers import TIMRestController
-from tracim.controllers import TIMRestPathContextSetup
+from tracim.controllers.content import UserWorkspaceFolderRestController
 
-
-from tracim.lib import CST
 from tracim.lib.helpers import convert_id_into_instances
-from tracim.lib.base import BaseController
-from tracim.lib.user import UserApi
-from tracim.lib.userworkspace import RoleApi
 from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
 
@@ -20,15 +16,15 @@ from tracim.model.data import NodeTreeItem
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import Workspace
-from tracim.model.data import UserRoleInWorkspace
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
 
-from tracim.controllers.content import UserWorkspaceFolderRestController
 
 
 
 class UserWorkspaceRestController(TIMRestController):
+
+    allow_only = not_anonymous()
 
     folders = UserWorkspaceFolderRestController()
 

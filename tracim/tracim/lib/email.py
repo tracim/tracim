@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+
+from email.mime.multipart import MIMEMultipart
+import smtplib
+
+from tracim.lib.base import logger
+
+
+class SmtpConfiguration(object):
+    """
+    Container class for SMTP configuration used in Tracim
+    """
+
+    def __init__(self, server: str, port: int, login: str, password: str):
+        self.server = server
+        self.port = port
+        self.login = login
+        self.password = password
+
+
+
+class EmailSender(object):
+    """
+    this class allow to send emails and has no relations with SQLAlchemy and other tg HTTP request environment
+    This means that it can be used in any thread (even through a asyncjob_perform() call
+    """
+    def __init__(self, config: SmtpConfiguration):
+        self._smtp_config = config
+        self._smtp_connection = None
+
+    def connect(self):
+        if not self._smtp_connection:
+            logger.info(self, 'Connecting from SMTP server {}'.format(self._smtp_config.server))
+            self._smtp_connection = smtplib.SMTP(self._smtp_config.server, self._smtp_config.port)
+            self._smtp_connection.ehlo()
+            self._smtp_connection.login(self._smtp_config.login, self._smtp_config.password)
+            logger.info(self, 'Connection OK')
+
+    def disconnect(self):
+        if self._smtp_connection:
+            logger.info(self, 'Disconnecting from SMTP server {}'.format(self._smtp_config.server))
+            self._smtp_connection.quit()
+            logger.info(self, 'Connection closed.')
+
+
+    def send_mail(self, message: MIMEMultipart):
+        self.connect() # Acutally, this connects to SMTP only if required
+        logger.info(self, 'Sending email to {}'.format(message['To']))
+        self._smtp_connection.send_message(message)

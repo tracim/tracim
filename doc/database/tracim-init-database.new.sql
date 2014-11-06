@@ -152,7 +152,8 @@ ALTER SEQUENCE seq__users__user_id OWNED BY users.user_id;
 CREATE TABLE user_workspace (
     user_id integer NOT NULL,
     workspace_id integer NOT NULL,
-    role integer
+    role integer,
+    do_notify boolean DEFAULT FALSE NOT NULL
 );
 
 CREATE TABLE workspaces (

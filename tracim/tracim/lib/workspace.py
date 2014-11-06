@@ -73,6 +73,24 @@ class WorkspaceApi(object):
         workspaces.sort(key=lambda workspace: workspace.label.lower())
         return workspaces
 
+    def disable_notifications(self, user: User, workspace: Workspace):
+        for role in user.roles:
+            if role.workspace==workspace:
+                role.do_notify = False
+
+    def enable_notifications(self, user: User, workspace: Workspace):
+        for role in user.roles:
+            if role.workspace==workspace:
+                role.do_notify = True
+
+    def get_notifiable_roles(self, workspace: Workspace) -> [UserRoleInWorkspace]:
+        roles = []
+        for role in workspace.roles:
+            print(role.user.email)
+            if role.do_notify==True and role.user!=self._user:
+                roles.append(role)
+        return roles
+
     def save(self, workspace: Workspace):
         DBSession.flush()
 

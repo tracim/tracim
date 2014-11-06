@@ -2,7 +2,7 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 
 <%def name="title()">
-  ${h.WEBSITE_TITLE|n}
+  ${h.CFG.WEBSITE_TITLE|n}
 </%def>
 
 
@@ -11,13 +11,13 @@
         <div>
             <div class="row">
                 <div class="col-sm-offset-3 col-sm-5">
-                    <h1 class="text-center" style="color: ${h.WEBSITE_HOME_TITLE_COLOR};"><b>${h.WEBSITE_TITLE}</b></h1>
+                    <h1 class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};"><b>${h.CFG.WEBSITE_TITLE}</b></h1>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-offset-3 col-sm-2">
                     <a class="thumbnail">
-                        <img src="${h.WEBSITE_HOME_IMAGE_URL}" alt="">
+                        <img src="${h.CFG.WEBSITE_HOME_IMAGE_URL}" alt="">
                     </a>
                 </div>
                 <div class="col-sm-3">

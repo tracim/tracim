@@ -13,13 +13,16 @@ convert them into boolean, for example, you should use the
  
 """
 
+import tg
 from tg.configuration import AppConfig
-from tgext.pluggable import plug, replace_template
+from tgext.pluggable import plug
+from tgext.pluggable import replace_template
+
 from tg.i18n import lazy_ugettext as l_
 
 import tracim
 from tracim import model
-from tracim.lib import app_globals, helpers
+from tracim.lib.base import logger
 
 base_config = AppConfig()
 base_config.renderers = []
@@ -131,6 +134,12 @@ Please click this link to reset your password:
 If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.
 ''')
 
+#######
+#
+# INFO - D.A. - 2014-10-31
+# The following code is a dirty way to integrate translation for resetpassword tgapp in tracim
+# TODO - Integrate these translations into tgapp-resetpassword
+#
 
 l_('New password')
 l_('Confirm new password')
@@ -153,3 +162,58 @@ Please click this link to reset your password:
 
 If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.
 ''')
+
+class CFG(object):
+    """
+    Singleton used for easy access to config file parameters
+    """
+
+    _instance = None
+
+    @classmethod
+    def get_instance(cls) -> 'CFG':
+        if not CFG._instance:
+            CFG._instance = CFG()
+        return CFG._instance
+
+    def __init__(self):
+        self.WEBSITE_TITLE = tg.config.get('website.title', 'TRACIM')
+        self.WEBSITE_HOME_TITLE_COLOR = tg.config.get('website.title.color', '#555')
+        self.WEBSITE_HOME_IMAGE_URL = tg.lurl('/assets/img/home_illustration.jpg')
+        self.WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl('/assets/img/bg.jpg')
+        self.WEBSITE_BASE_URL = tg.config.get('website.base_url')
+
+        self.EMAIL_NOTIFICATION_FROM = tg.config.get('email.notification.from')
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get('email.notification.content_update.template.html')
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = tg.config.get('email.notification.content_update.template.text')
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = tg.config.get('email.notification.content_update.subject')
+        self.EMAIL_NOTIFICATION_PROCESSING_MODE = tg.config.get('email.notification.processing_mode')
+
+
+        self.EMAIL_NOTIFICATION_SMTP_SERVER = tg.config.get('email.notification.smtp.server')
+        self.EMAIL_NOTIFICATION_SMTP_PORT = tg.config.get('email.notification.smtp.port')
+        self.EMAIL_NOTIFICATION_SMTP_USER = tg.config.get('email.notification.smtp.user')
+        self.EMAIL_NOTIFICATION_SMTP_PASSWORD = tg.config.get('email.notification.smtp.password')
+
+
+    class CST(object):
+        ASYNC = 'ASYNC'
+        SYNC = 'SYNC'
+
+#######
+#
+# INFO - D.A. - 2014-11-05
+# Allow to process asynchronous tasks
+# This is used for email notifications
+#
+
+# import tgext.asyncjob
+# tgext.asyncjob.plugme(base_config)
+#
+# OR
+#
+# plug(base_config, 'tgext.asyncjob', app_globals=base_config)
+#
+# OR
+#
+plug(base_config, 'tgext.asyncjob')

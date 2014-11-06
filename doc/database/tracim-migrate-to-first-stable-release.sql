@@ -65,6 +65,8 @@ CREATE TABLE pod_user_workspace
   user_id integer NOT NULL,
   workspace_id integer NOT NULL,
   role integer,
+  do_notify boolean DEFAULT FALSE NOT NULL,
+
   CONSTRAINT pk__pod_user_workspace__user_id__workspace_id PRIMARY KEY (user_id , workspace_id ),
   CONSTRAINT fk__pod_user_workspace__user_id FOREIGN KEY (user_id)
       REFERENCES pod_user (user_id) MATCH SIMPLE

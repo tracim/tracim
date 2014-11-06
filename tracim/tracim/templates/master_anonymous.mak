@@ -17,7 +17,7 @@
 
     <body class="${self.body_class()}" style="
     height: 100%;
-    background: url(${h.WEBSITE_HOME_BACKGROUND_IMAGE_URL}) no-repeat center bottom scroll;
+    background: url(${h.CFG.WEBSITE_HOME_BACKGROUND_IMAGE_URL}) no-repeat center bottom scroll;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;

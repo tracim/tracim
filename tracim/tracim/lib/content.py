@@ -5,6 +5,7 @@ __author__ = 'damien'
 import tg
 
 from sqlalchemy.orm.attributes import get_history
+from tracim.lib.notifications import Notifier
 from tracim.model import DBSession
 from tracim.model.auth import User
 from tracim.model.data import ContentStatus, ContentRevisionRO, ActionDescription
@@ -64,7 +65,7 @@ class ContentApi(object):
         content.revision_type = ActionDescription.CREATION
 
         if do_save:
-            self.save(content)
+            self.save(content, ActionDescription.CREATION)
         return content
 
 
@@ -80,7 +81,7 @@ class ContentApi(object):
         item.revision_type = ActionDescription.COMMENT
 
         if do_save:
-            self.save(item)
+            self.save(item, ActionDescription.COMMENT)
         return content
 
 
@@ -203,7 +204,7 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def save(self, content: Content, action_description: str=None, do_flush=True):
+    def save(self, content: Content, action_description: str=None, do_flush=True, do_notify=True):
         """
         Save an object, flush the session and set the revision_type property
         :param content:
@@ -223,3 +224,5 @@ class ContentApi(object):
         if do_flush:
             DBSession.flush()
 
+        if do_notify:
+            Notifier(self._user).notify_content_update(content)

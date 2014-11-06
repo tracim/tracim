@@ -96,8 +96,7 @@ def AllStatus(type=''):
 
 
 def is_debug_mode():
-    # return tg.config.get('debug')
-    return False
+    return tg.config.get('debug')
 
 def on_off_to_boolean(on_or_off: str) -> bool:
     return True if on_or_off=='on' else False
@@ -151,16 +150,5 @@ def user_role(user, workspace) -> int:
 
     return 0
 
-# SDAEP RELATED DAtA
-WEBSITE_TITLE = 'SDAEP22'
-WEBSITE_HOME_TITLE_COLOR = '#555'
-WEBSITE_HOME_IMAGE_URL = 'http://t0.gstatic.com/images?q=tbn:ANd9GcSGwpT9eJn4jSrQQuYyd6mxj9f59ZfHWf9m4FcWpinPV7eFXHaosDv4bynJ'
-WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl('/assets/img/eau.jpg')
-
-
-
-WEBSITE_TITLE = 'Tracim'
-WEBSITE_TITLE_COLOR = '#555'
-WEBSITE_HOME_IMAGE_URL = tg.lurl('/assets/img/home_illustration.jpg')
-WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl('/assets/img/bg.jpg')
-
+from tracim.config.app_cfg import CFG as CFG_ORI
+CFG = CFG_ORI.get_instance() # local CFG var is an instance of CFG class found in app_cfg

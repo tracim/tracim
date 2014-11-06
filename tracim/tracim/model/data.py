@@ -65,6 +65,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False, default=None, primary_key=True)
     workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), nullable=False, default=None, primary_key=True)
     role = Column(Integer, nullable=False, default=0, primary_key=False)
+    do_notify = Column(Boolean, unique=False, nullable=False, default=False)
 
     workspace = relationship('Workspace', remote_side=[Workspace.workspace_id], backref='roles', lazy='joined')
     user = relationship('User', remote_side=[User.user_id], backref='roles')

@@ -28,6 +28,43 @@ from tracim.model import DBSession
 from tracim.model.auth import Group, User
 from tracim.model.serializers import Context, CTX, DictLikeClass
 
+
+class UserWorkspaceRestController(TIMRestController):
+
+    def _before(self, *args, **kw):
+        """
+        Instantiate the current workspace in tg.tmpl_context
+        :param args:
+        :param kw:
+        :return:
+        """
+        super(self.__class__, self)._before(args, kw)
+
+        api = UserApi(tg.tmpl_context.current_user)
+        user_id = tmpl_context.current_user_id
+        user = tmpl_context.current_user
+
+    @tg.expose()
+    def enable_notifications(self, workspace_id):
+        workspace_id = int(workspace_id)
+        api = WorkspaceApi(tg.tmpl_context.current_user)
+
+        workspace = api.get_one(workspace_id)
+        api.enable_notifications(tg.tmpl_context.current_user, workspace)
+        tg.flash(_('Notification enabled for workspace {}').format(workspace.label))
+        tg.redirect(self.parent_controller.url(None, 'me'))
+
+    @tg.expose()
+    def disable_notifications(self, workspace_id):
+        workspace_id = int(workspace_id)
+        api = WorkspaceApi(tg.tmpl_context.current_user)
+
+        workspace = api.get_one(workspace_id)
+        api.disable_notifications(tg.tmpl_context.current_user, workspace)
+        tg.flash(_('Notification disabled for workspace {}').format(workspace.label))
+        tg.redirect(self.parent_controller.url(None, 'me'))
+
+
 class UserPasswordRestController(TIMRestController):
     """
      CRUD Controller allowing to manage password of a given user
@@ -85,6 +122,7 @@ class UserRestController(TIMRestController):
     """
 
     password = UserPasswordRestController()
+    workspaces = UserWorkspaceRestController()
 
     @classmethod
     def current_item_id_key_in_context(cls):
@@ -106,6 +144,7 @@ class UserRestController(TIMRestController):
         current_user = tmpl_context.current_user
         assert user_id==current_user.user_id
         api = UserApi(current_user)
+        current_user = api.get_one(current_user.user_id)
         dictified_user = Context(CTX.USER).toDict(current_user, 'user')
         current_user_content = Context(CTX.CURRENT_USER).toDict(tmpl_context.current_user)
         fake_api_content = DictLikeClass(current_user=current_user_content)

@@ -94,16 +94,18 @@
                         % endif
 
                         % if h.is_debug_mode():
-                          <li class="dropdown">
-                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.ICO(16, 'categories/applications-system')} Debug <b class="caret"></b></a>
-                              <ul class="dropdown-menu">
-                                <li><a href="${tg.url('/debug/environ')}">${TIM.ICO(16, 'apps/internet-web-browser')} request.environ</a></li>
-                                <li><a href="${tg.url('/debug/identity')}">${TIM.ICO(16, 'actions/contact-new')} request.identity</a></li>
-                                <li class="divider" role="presentation"></li>
-                                <li><a href="${tg.url('/debug/iconset-fa')}">${TIM.ICO(16, 'mimetypes/image-x-generic')} Icon set - Font Awesome</a></li>
-                                <li><a href="${tg.url('/debug/iconset-tango')}">${TIM.ICO(16, 'mimetypes/image-x-generic')} Icon set - Tango Icons</a></li>
-                              </ul>
-                          </li>
+                            <li class="dropdown text-danger" >
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.ICO(16, 'status/dialog-warning')} Debug <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="text-danger" href=""><strong>${_('you MUST desactivate debug in production')}</strong></a></li>
+                                    <li class="divider" role="presentation"></li>
+                                    <li><a href="${tg.url('/debug/environ')}">${TIM.ICO(16, 'apps/internet-web-browser')} request.environ</a></li>
+                                    <li><a href="${tg.url('/debug/identity')}">${TIM.ICO(16, 'actions/contact-new')} request.identity</a></li>
+                                    <li class="divider" role="presentation"></li>
+                                    <li><a href="${tg.url('/debug/iconset-fa')}">${TIM.ICO(16, 'mimetypes/image-x-generic')} Icon set - Font Awesome</a></li>
+                                    <li><a href="${tg.url('/debug/iconset-tango')}">${TIM.ICO(16, 'mimetypes/image-x-generic')} Icon set - Tango Icons</a></li>
+                                </ul>
+                            </li>
                         % endif
                     </ul>
                 % endif

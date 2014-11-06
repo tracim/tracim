@@ -293,7 +293,6 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
     @tg.require(current_user_is_contributor())
     @tg.expose()
     def post(self, label='', content=''):
-        # TODO - SECURE THIS
         workspace = tmpl_context.workspace
 
         api = ContentApi(tmpl_context.current_user)
