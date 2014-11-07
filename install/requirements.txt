@@ -40,4 +40,5 @@ zope.sqlalchemy
 cherrypy
 tgext.pluggable
 tgapp-resetpassword
-
+tgext.asyncjob
+babel
