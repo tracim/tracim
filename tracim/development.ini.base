@@ -32,7 +32,8 @@ cookie_secret = 3283411b-1904-4554-b0e1-883863b53080
 [app:main]
 use = egg:tracim
 full_stack = true
-lang = fr
+# You can set french as default language by uncommenting next line
+# lang = fr
 cache_dir = %(here)s/data
 beaker.session.key = tracim
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
@@ -61,7 +62,7 @@ beaker.session.validate_key = 3283411b-1904-4554-b0e1-883863b53080
 # invalidate the URI when specifying a SQLite db via path name
 # sqlalchemy.url=postgresql://username:password@hostname:port/databasename
 # sqlalchemy.url=mysql://username:password@hostname:port/databasename
-sqlalchemy.url = postgresql://tracim_user:tracim_user_password@127.0.0.1:5432/tracim
+sqlalchemy.url = postgresql://tracim_user:tracim_user_password@127.0.0.1:5432/tracim?client_encoding=utf8
 
 #echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
@@ -110,6 +111,25 @@ toscawidgets.framework.resource_variant=debug
 # resetpassword.email_sender = email@sender.com
 # resetpassword.smtp_host = smtp.sender
 # resetpassword.smtp_port = 25
+
+
+website.title = TRACIM - BOB
+website.title.color = #555
+# The following base_url is used for links and icons
+# integrated in the email notifcations
+website.base_url = http://127.0.0.1:8080
+    
+email.notification.from = Tracim Notification <noreply@trac.im>
+email.notification.content_update.template.html = ./tracim/templates/mail/content_update_body_html.mak
+email.notification.content_update.template.text = ./tracim/templates/mail/content_update_body_text.mak
+# Note: items between { and } are variable names. Do not remove / rename them
+email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
+# processing_mode may be sync or async
+email.notification.processing_mode = sync
+email.notification.smtp.server = your_smtp_server
+email.notification.smtp.port = 25
+email.notification.smtp.user = your_smtp_user
+email.notification.smtp.password = your_smtp_password
 
 
 #####
