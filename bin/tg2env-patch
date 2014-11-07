@@ -1,0 +1,93 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+# Go to parent folder
+
+def usage():
+    print('')
+    print('USAGE: '+__file__+' <virtualenv_folder_path>')
+    print('')
+    print('')
+
+
+def show_help_and_exit():
+    usage()
+    exit()
+
+def on_result_and_exit(error_code):
+    if error_code==0:
+        print('')
+        print('')
+        exit(0)
+    
+    print('ERRROR')
+    print('')
+    print('')
+    exit(error_code)
+
+#######
+
+
+if len(sys.argv)<=1:
+    show_help_and_exit()
+
+########################################
+#
+# BELOW ARE STANDARD ACTIONS
+#
+########################################
+
+tg2env_path = sys.argv[1]
+
+print('PATCHING PYTHON CODE')
+print('--------------------')
+print('tg2env path:    %s'%(tg2env_path))
+print('')
+
+patchable_paths = [
+    tg2env_path+'/lib/python3*/site-packages/tgext/pluggable',
+    tg2env_path+'/lib/python3*/site-packages/resetpassword',
+    tg2env_path+'/lib/python3*/site-packages/babel'
+]
+
+for patchable_path in patchable_paths:
+    print('2to3 conversion for %s...' % (patchable_path))
+    os.system('2to3 -w %s'%(patchable_path))
+    print('-> done')
+
+babel_source_code_patch_content = """--- tg2env/lib/python3.2/site-packages/babel/messages/pofile.py 2014-11-07 15:35:14.039913184 +0100
++++ tg2env/lib/python3.2/site-packages/babel/messages/pofile.py 2014-10-30 17:37:36.295091573 +0100
+@@ -384,8 +384,13 @@
+ 
+     def _write(text):
+         if isinstance(text, text_type):
+-            text = text.encode(catalog.charset, 'backslashreplace')
+-        fileobj.write(text)
++            pass
++            # text = text.encode(catalog.charset, 'backslashreplace')
++        try:
++            fileobj.write(text.encode('UTF-8'))
++        except Exception as e:
++            fileobj.write(text)
++        
+ 
+     def _write_comment(comment, prefix=''):
+         # xgettext always wraps comments even if --no-wrap is passed;
+"""
+
+babel_patchable_file_path = tg2env_path+'/lib/python*/site-packages/babel/messages/pofile.py'
+print('Patching code in file %s...'%(babel_patchable_file_path))
+os.system('echo "%s"|patch -p1 %s'%(babel_source_code_patch_content, babel_patchable_file_path))
+print('-> done')
+
+resetpassword_patchable_file_path = tg2env_path+'/lib/python*/site-packages/resetpassword/lib/__init__.py'
+print('Patching code in file %s...'%(resetpassword_patchable_file_path))
+os.system("sed -i 's/body\.encode/body/g' %s" % (resetpassword_patchable_file_path))
+print('-> done')
+
+print('')
+print('')
+
+
