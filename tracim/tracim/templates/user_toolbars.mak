@@ -17,9 +17,9 @@
             <a title="${_('Change password')}" class="btn btn-default" data-toggle="modal" data-target="#user-edit-password-modal-dialog" data-remote="${user_password_edit_url}" >${TIM.ICO(32, 'actions/system-lock-screen')}</a>
         </div>
         <p></p>
-        % if current_user.profile.id>=2 and current_user.id!=user.id:
+        % if current_user.profile.id>2 and current_user.id!=user.id:
         <div class="btn-group btn-group-vertical">
-            <a title="${_('Delete current workspace')}" class="btn btn-default" href="${tg.url('/user/{}/delete'.format(user.id))}">${TIM.ICO(32, 'status/user-trash-full')}</a>
+            <a title="${_('Delete user')}" class="btn btn-default" href="${tg.url('/user/{}/delete'.format(user.id))}">${TIM.ICO(32, 'status/user-trash-full')}</a>
         </div>
         % endif
     </div> <!-- # End of side bar right -->
