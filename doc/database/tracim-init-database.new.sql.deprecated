@@ -15,7 +15,7 @@ BEGIN
 INSERT INTO content_revisions (content_id, parent_id, type, created, updated, 
        label, description, status, 
        file_name, file_content, file_mimetype, parent_tree_path, 
-       node_depth, owner_id, revision_id, workspace_id, is_deleted, is_archived, properties, revision_type) VALUES (NEW.content_id, NEW.parent_id, NEW.type, NEW.created, NEW.updated, NEW.label, NEW.description, NEW.status, NEW.file_name, NEW.file_content, NEW.file_mimetype, NEW.parent_tree_path, NEW.node_depth, NEW.owner_id, nextval('seq__content_revisions__revision_id'), NEW.workspace_id, NEW.is_deleted, NEW.is_archived, NEW.properties, NEW.revision_type);
+       owner_id, revision_id, workspace_id, is_deleted, is_archived, properties, revision_type) VALUES (NEW.content_id, NEW.parent_id, NEW.type, NEW.created, NEW.updated, NEW.label, NEW.description, NEW.status, NEW.file_name, NEW.file_content, NEW.file_mimetype, NEW.parent_tree_path, NEW.owner_id, nextval('seq__content_revisions__revision_id'), NEW.workspace_id, NEW.is_deleted, NEW.is_archived, NEW.properties, NEW.revision_type);
 return new;
 END;
 $$;
@@ -87,7 +87,6 @@ CREATE TABLE content_revisions (
     file_content bytea,
     file_mimetype character varying(255),
     parent_tree_path character varying(255),
-    node_depth integer DEFAULT 0 NOT NULL,
     owner_id integer,
     revision_id integer DEFAULT nextval('seq__content_revisions__revision_id'::regclass) NOT NULL,
     workspace_id integer,
@@ -100,7 +99,7 @@ CREATE TABLE content_revisions (
 COMMENT ON COLUMN content_revisions.properties IS 'This column contain properties specific to a given type. these properties are json encoded (so there is no structure "a priori")';
 
 CREATE VIEW contents AS
-    SELECT DISTINCT ON (content_revisions.content_id) content_revisions.content_id, content_revisions.parent_id, content_revisions.type, content_revisions.created, content_revisions.updated, content_revisions.label, content_revisions.description, content_revisions.status, content_revisions.file_name, content_revisions.file_content, content_revisions.file_mimetype, content_revisions.parent_tree_path, content_revisions.node_depth, content_revisions.owner_id, content_revisions.workspace_id, content_revisions.is_deleted, content_revisions.is_archived, content_revisions.properties, content_revisions.revision_type FROM content_revisions ORDER BY content_revisions.content_id, content_revisions.updated DESC, content_revisions.created DESC;
+    SELECT DISTINCT ON (content_revisions.content_id) content_revisions.content_id, content_revisions.parent_id, content_revisions.type, content_revisions.created, content_revisions.updated, content_revisions.label, content_revisions.description, content_revisions.status, content_revisions.file_name, content_revisions.file_content, content_revisions.file_mimetype, content_revisions.parent_tree_path, content_revisions.owner_id, content_revisions.workspace_id, content_revisions.is_deleted, content_revisions.is_archived, content_revisions.properties, content_revisions.revision_type FROM content_revisions ORDER BY content_revisions.content_id, content_revisions.updated DESC, content_revisions.created DESC;
 
 CREATE SEQUENCE seq__contents__content_id
     START WITH 1
@@ -241,7 +240,7 @@ CREATE INDEX idx__content_revisions__parent_id ON content_revisions USING btree 
 
 CREATE INDEX idx__content_revisions__parent_tree_path ON content_revisions USING btree (parent_tree_path);
 
-CREATE RULE rul__insert__new_node AS ON INSERT TO contents DO INSTEAD INSERT INTO content_revisions (content_id, parent_id, type, created, updated, label, description, status, file_name, file_content, file_mimetype, parent_tree_path, node_depth, owner_id, revision_id, workspace_id, is_deleted, is_archived, properties, revision_type) VALUES (nextval('seq__contents__content_id'::regclass), new.parent_id, new.type, new.created, new.updated, new.label, new.description, new.status, new.file_name, new.file_content, new.file_mimetype, new.parent_tree_path, new.node_depth, new.owner_id, nextval('seq__content_revisions__revision_id'::regclass), new.workspace_id, new.is_deleted, new.is_archived, new.properties, new.revision_type) RETURNING content_revisions.content_id, content_revisions.parent_id, content_revisions.type, content_revisions.created, content_revisions.updated, content_revisions.label, content_revisions.description, content_revisions.status, content_revisions.file_name, content_revisions.file_content, content_revisions.file_mimetype, content_revisions.parent_tree_path, content_revisions.node_depth, content_revisions.owner_id, content_revisions.workspace_id, content_revisions.is_deleted, content_revisions.is_archived, content_revisions.properties, content_revisions.revision_type;
+CREATE RULE rul__insert__new_node AS ON INSERT TO contents DO INSTEAD INSERT INTO content_revisions (content_id, parent_id, type, created, updated, label, description, status, file_name, file_content, file_mimetype, parent_tree_path, owner_id, revision_id, workspace_id, is_deleted, is_archived, properties, revision_type) VALUES (nextval('seq__contents__content_id'::regclass), new.parent_id, new.type, new.created, new.updated, new.label, new.description, new.status, new.file_name, new.file_content, new.file_mimetype, new.parent_tree_path, new.owner_id, nextval('seq__content_revisions__revision_id'::regclass), new.workspace_id, new.is_deleted, new.is_archived, new.properties, new.revision_type) RETURNING content_revisions.content_id, content_revisions.parent_id, content_revisions.type, content_revisions.created, content_revisions.updated, content_revisions.label, content_revisions.description, content_revisions.status, content_revisions.file_name, content_revisions.file_content, content_revisions.file_mimetype, content_revisions.parent_tree_path, content_revisions.owner_id, content_revisions.workspace_id, content_revisions.is_deleted, content_revisions.is_archived, content_revisions.properties, content_revisions.revision_type;
 
 CREATE TRIGGER trg__contents__on_insert__set_created BEFORE INSERT ON content_revisions FOR EACH ROW EXECUTE PROCEDURE set_created();
 CREATE TRIGGER trg__contents__on_update__set_updated BEFORE UPDATE ON content_revisions FOR EACH ROW EXECUTE PROCEDURE set_updated();
@@ -271,4 +270,4 @@ ALTER TABLE ONLY user_group
 ALTER TABLE ONLY user_group
     ADD CONSTRAINT fk__user_group__user_id FOREIGN KEY (user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-
+COMMIT;

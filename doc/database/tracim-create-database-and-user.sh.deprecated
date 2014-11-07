@@ -9,7 +9,7 @@ TRACIM_DB_NAME='tracim'
 BUILD_DB_SQL="
 CREATE USER ${TRACIM_DB_USER} WITH PASSWORD '${TRACIM_DB_USER_PASSWORD}';
 CREATE DATABASE ${TRACIM_DB_NAME};
-GRANT ALL PRIVILEGES ON DATABASE ${TRACIM_DB_NAME} to ${TRACIM_DB_USER};
+GRANT ALL PRIVILEGES ON DATABASE ${TRACIM_DB_NAME} TO ${TRACIM_DB_USER};
 "
 
 if [ `whoami` != 'postgres' ]; then
@@ -47,6 +47,6 @@ echo ${BUILD_DB_SQL} | psql
 echo
 echo "You can now init schema and data by running the following command:"
 echo
-echo "psql -h 127.0.0.1 -U ${TRACIM_DB_USER} -W ${TRACIM_DB_NAME} < tracim-init-database.sql"
+echo "psql -h 127.0.0.1 -U ${TRACIM_DB_USER} -W ${TRACIM_DB_NAME} < tracim-init-database.new.sql"
 echo 
 echo "note that you'll be asked for the password"
