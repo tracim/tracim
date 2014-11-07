@@ -1,41 +1,81 @@
 # Introduction to TRACIM #
 
-Tracim is collaborative software designed to allow people to work on and share various data and document types. 
+Tracim is a collaborative software designed to allow people to work on and share various data and document types.
 
-It is [AGPL licenced](http://fr.wikipedia.org/wiki/GNU_Affero_General_Public_License) software.
+You hesitate to install a wiki, a forum or a file management software ? Stop hesitating: install Tracim.
+
+With Tracim, you manage in the same place:
+
+- forum-like threads,
+- files and automatic versionning,
+- wiki-like pages for online information,
+
+All data offers:
+
+- information status: open / resolved / cancelled / deprecated
+- native versionning
+- comment threads making tracim knowledge-growth-ready
+
+# Use-cases #
+
+## Collaborate with clients ##
+
+Share information with your clients.
+
+In the same place you will be able to share trouble-shooting threads, files and general information. You can define who the information is shared with.
+
+Example: share the documentation with all your clients, run a forum open to your clients, a forum for your collaborators and share troubleshooting threads with each of your clients in a private workspace.
+
+## Run a community of experts or passionate people ##
+
+Collaborate and share experience (and stimulate knowledge growth).
+
+In a unique place, you centralize files and threads, and raw information too. Every collaborator may update-the status, no worries: the traceability is at the hearth of Tracim.
+
+The newcomers knowledge growth is easy because all information has a status.
+
+## Work on quality-driven projects ##
+
+In quality-driven projects like research and development, knowledge and quality are more important that task ownership and deadlines.
+
+With Tracim, you centralize information, you can stay in touch by configuring your email notifications and work on several projects.
+
+## Manage documents and files ##
+
+Traceability and versionning is something important for quality-ready processes. Unfortunately, specialized software are hard to setup and to use. Let's try Tracim  ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versionned and never deleted.
+
+# Licence #
 
 Tracim is licensed under the terms of the 
-[GNU Affero General Public License](http://www.gnu.org/licenses/agpl.txt)
-as published by the [Free Software Foundation](http://www.fsf.org/).
+[GNU Affero General Public License](http://www.gnu.org/licenses/agpl.txt) as published by the [Free Software Foundation](http://www.fsf.org/).
 
-It is currently unstable, it is recommended to use it for test purpose only.
+# Technical information #
 
-It's a python 3 web application based on [TurboGears](http://www.turbogears.org/); it uses [PostgreSQL](http://www.postgresql.org/) as storage engine.
+Tracim is a python 3 web application based on [TurboGears](http://www.turbogears.org/). It relies on [PostgreSQL](http://www.postgresql.org/) as storage engine.
 
-## Features ##
+It runs on Debian GNU/Linux and should also work on other Linux distributions (and hopefully on BSD and Windows OSes)
 
-* Data and document sharing: text documents, files, contact, calendar, comments
-* Data and document status
-* Full traceability
-* Access control management, document granularity.
+# Give it a try #
 
-It allows to keep private and shared data in the same place.
-The ACL is based on share with groups or individual users.
+## Online Demo ##
+Let's visit the online demo:
 
-## Give it a try ##
+* [http://demo.tracim.org](http://demo.tracim.org) 
+* login as admin: admin@admin.admin
+* password: admin@admin.admin
 
-### Online demo ###
-The fastest way to test it is to test the demo:
+Note: this instance is reset every day
 
-* http://demo.archipeldata.com
-* login: demo@localhost
-* password: demo
+## Install your own instance ##
 
-### Install your own instance ###
+Following the installation documentation below, you'll be able to run your own instance on your server.
 
-The other way to test it is to install it on your computer. See documentation below.
+## Ask for a dedicated instance ##
 
-## Installation ##
+You wan't to get your own instance without to manage it by yourself?
+Contact us at hello@trac.im
+
+# Installation #
 
 ### Dependencies###
 
@@ -135,6 +175,7 @@ conflict between system-wide python modules and tracim required ones.
     source tg2env/bin/activate
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
+    ./bin/tg2env-patch tg2env/
     
 Notes:
 
