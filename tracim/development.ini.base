@@ -108,9 +108,11 @@ toscawidgets.framework.resource_variant=debug
 # Reset password through email related configuration.
 # These emails will be sent through SMTP
 #
-# resetpassword.email_sender = email@sender.com
-# resetpassword.smtp_host = smtp.sender
-# resetpassword.smtp_port = 25
+resetpassword.email_sender = email@sender.com
+resetpassword.smtp_host = smtp.sender
+resetpassword.smtp_port = 25
+resetpassword.smtp_login = smtp.login
+resetpassword.smtp_passwd = smtp.password
 
 
 website.title = TRACIM - BOB
