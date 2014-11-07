@@ -1,4 +1,4 @@
-# Introduction to TRACIM #
+# Tracim - Introduction #
 
 Tracim is a collaborative software designed to allow people to work on and share various data and document types.
 
@@ -16,9 +16,9 @@ All data offers:
 - native versionning
 - comment threads making tracim knowledge-growth-ready
 
-# Use-cases #
+## Use-cases ##
 
-## Collaborate with clients ##
+### Collaborate with clients ###
 
 Share information with your clients.
 
@@ -26,7 +26,7 @@ In the same place you will be able to share trouble-shooting threads, files and 
 
 Example: share the documentation with all your clients, run a forum open to your clients, a forum for your collaborators and share troubleshooting threads with each of your clients in a private workspace.
 
-## Run a community of experts or passionate people ##
+### Run a community of experts or passionate people ###
 
 Collaborate and share experience (and stimulate knowledge growth).
 
@@ -34,52 +34,60 @@ In a unique place, you centralize files and threads, and raw information too. Ev
 
 The newcomers knowledge growth is easy because all information has a status.
 
-## Work on quality-driven projects ##
+### Work on quality-driven projects ###
 
 In quality-driven projects like research and development, knowledge and quality are more important that task ownership and deadlines.
 
 With Tracim, you centralize information, you can stay in touch by configuring your email notifications and work on several projects.
 
-## Manage documents and files ##
+### Manage documents and files ###
 
 Traceability and versionning is something important for quality-ready processes. Unfortunately, specialized software are hard to setup and to use. Let's try Tracim  ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versionned and never deleted.
 
-# Licence #
+# Tracim - the software #
+
+## Licence ##
 
 Tracim is licensed under the terms of the 
 [GNU Affero General Public License](http://www.gnu.org/licenses/agpl.txt) as published by the [Free Software Foundation](http://www.fsf.org/).
 
-# Technical information #
+## Technical information ##
 
-Tracim is a python 3 web application based on [TurboGears](http://www.turbogears.org/). It relies on [PostgreSQL](http://www.postgresql.org/) as storage engine.
+Tracim is a web application :
 
-It runs on Debian GNU/Linux and should also work on other Linux distributions (and hopefully on BSD and Windows OSes)
+* developed with python 3.
+* based on the [TurboGears](http://www.turbogears.org/) web framework.
+* relying on [PostgreSQL](http://www.postgresql.org/) as the storage engine.
 
-# Give it a try #
+It runs on [Debian GNU/Linux](http://www.debian.org/), it should work out-of-the-box on [Ubuntu](http://www.ubuntu.com/) and also on other GNU/Linux distributions.
+
+Hopefully it works on BSD and Windows OSes (but this has not been tested yet)
+
+# Use it (or give it a try) #
 
 ## Online Demo ##
-Let's visit the online demo:
 
-* [http://demo.tracim.org](http://demo.tracim.org) 
+The easiest way to test Tracim is to test it through the online demo:
+
+* [http://demo.tracim.org](http://demo.tracim.org)
 * login as admin: admin@admin.admin
 * password: admin@admin.admin
 
-Note: this instance is reset every day
-
-## Install your own instance ##
-
-Following the installation documentation below, you'll be able to run your own instance on your server.
+_Note : this instance is reset every day_
 
 ## Ask for a dedicated instance ##
 
-You wan't to get your own instance without to manage it by yourself?
-Contact us at hello@trac.im
+If you wan't your own dedicated instance but do not want to manage it by yourself, let's contact us at hello@trac.im
+
+## Install Tracim on your server ##
+
+Following the installation documentation below, you'll be able to run your own instance on your server.
 
 # Installation #
 
-### Dependencies###
+## Dependencies ##
 
-Note: the following information is for Debian. For other OS, adapt the package names.
+_Note: the following information is for Debian. For other OS, adapt the package names._
 
 You'll need to install the following packages:
 
@@ -89,13 +97,44 @@ If you work on a local database, then you also need to install PostgreSQL:
 
     apt-get install postgresql postgresql-client
 
+## Installation ##
+
 ### Get the source ###
 
 Get the sources from Bitbucket:
 
     git clone https://bitbucket.org/lebouquetin/tracim.git
 
-**Note: Now everything is documented to be executed from the tracim directory newly created.**
+*Note: Now everything is documented to be executed from the tracim directory newly created.*
+
+### Setting-up python virtualenv ###
+
+_Reminder : Tracim is developped and tested using python3._
+
+Tracim uses virtualenv as deployment environment. This ensure that there will be no 
+conflict between system-wide python installation and Tracim required ones.
+
+    virtualenv -p /usr/bin/python3 tg2env
+    source tg2env/bin/activate
+    cd tracim && python setup.py develop && cd -
+    pip install -r install/requirements.txt
+    ./bin/tg2env-patch tg2env/
+    
+Notes:
+
+* Debian: you may get errors with stevedore/pbr which is not supported by python 3.2
+(debian version of python 3). This is not a real problem
+* Ubuntu (at least 14.04): you should remove _distribute_ and _wsgiref _
+  from the requirements.txt file
+
+## Configuration ##
+## Database Setup ##
+## Running the server ##
+### Standalone mode ###
+### Apache WSGI configuration ###
+## Support ##
+
+
 
 ### Setup a database ###
 
@@ -166,23 +205,6 @@ You can test it through the following command:
 
 You should find the admin@localhost user entry.
 
-### Setup python virtualenv ###
-
-Tracim uses virtualenv as deployment environment. This ensure that there will be no 
-conflict between system-wide python modules and tracim required ones.
-
-    virtualenv -p /usr/bin/python3 tg2env
-    source tg2env/bin/activate
-    cd tracim && python setup.py develop && cd -
-    pip install -r install/requirements.txt
-    ./bin/tg2env-patch tg2env/
-    
-Notes:
-
-* Debian: you may get errors with stevedore/pbr which is not supported by python 3.2
-(debian version of python 3). This is not a real problem
-* Ubuntu (at least 14.04): you should remove _distribute_ and _wsgiref _
-  from the requirements.txt file
 
 ### Create configuration ###
 
