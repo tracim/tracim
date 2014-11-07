@@ -1,0 +1,123 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+# print 'Number of arguments:', len(sys.argv), 'arguments.'
+# print 'Argument List:', str(sys.argv)
+
+actions = ['help', 'drop_user', 'create_user', 'delete_user', 'delete_database', 'create_database', 'grant_all_privileges']
+def usage():
+    print('')
+    print('USAGE: '+__file__+' ['+'|'.join(action for action in actions)+'] [parameters]')
+    print('')
+    print('    '+__file__+' create_user <user_name> <password>')
+    print('    '+__file__+' delete_user <user_name>')
+    print('    '+__file__+' create_database <database_name>')
+    print('    '+__file__+' delete_database <database_name> --force')
+    print('    '+__file__+' grant_all_privileges <database_name> <user_name>')
+    print('')
+    print('')
+    print('NOTE: this tool is intended to be used as \'postgres\' system user')
+    print('')
+    print('')
+
+
+def show_help_and_exit():
+    usage()
+    exit()
+
+def on_result_and_exit(result):
+    if result==0:
+        exit(0)
+    
+    print('ERRROR')
+    exit(error_code)
+
+#######
+
+
+if len(sys.argv)<=1:
+    show_help_and_exit()
+    
+if sys.argv[1] not in actions:
+    print('Unknown command %s'%sys.argv[1])
+    show_help_and_exit()
+    
+if sys.argv[1]=='help':
+    show_help_and_exit()
+
+
+if sys.argv[1]=='create_user':
+    if len(sys.argv)!=4:
+        show_help_and_exit()
+    user_name = sys.argv[2]
+    user_pass = sys.argv[3]
+    
+    print('PG - CREATE USER')
+    print('- name: '+user_name)
+    print('- password: XXX')
+    
+    sql = '"CREATE USER %s WITH PASSWORD \'%s\';"' %(user_name, user_pass)
+    result = os.system('echo %s|psql' % (sql))
+    on_result_and_exit(result)
+
+
+if sys.argv[1]=='delete_user':
+    if len(sys.argv)!=3:
+        show_help_and_exit()
+
+    user_name = sys.argv[2]
+    
+    print('PG - DELETE USER')
+    print('- name: '+user_name)
+    
+    sql = '"DROP ROLE %s;"' %(user_name)
+    result = os.system('echo %s|psql' % (sql))
+    on_result_and_exit(result)
+
+
+if sys.argv[1]=='create_database':
+    if len(sys.argv)!=3:
+        show_help_and_exit()
+    name = sys.argv[2]
+    
+    print('PG - CREATE DATABASE')
+    print('- name: '+name)
+    
+    sql = '"CREATE DATABASE %s;"' %(name)
+    result = os.system('echo %s|psql' % (sql))
+    on_result_and_exit(result)
+
+if sys.argv[1]=='delete_database':
+    if len(sys.argv)!=4:
+        show_help_and_exit()
+    name = sys.argv[2]
+    force = sys.argv[3]
+    
+    print('PG - DROP DATABASE')
+    print('- name: '+name)
+    
+    if force!='--force':
+        print('Add --force option in order to drop a database')
+        on_result_and_exit(-1)
+        
+    sql = '"DROP DATABASE %s;"' %(name)
+    result = os.system('echo %s|psql' % (sql))
+    on_result_and_exit(result)
+
+
+if sys.argv[1]=='grant_all_privileges':
+    if len(sys.argv)!=4:
+        show_help_and_exit()
+    database_name = sys.argv[2]
+    user_name = sys.argv[3]
+    
+    print('PG - GRANT ALL PRIVILEGES ON DATABASE')
+    print('- database: '+database_name)
+    print('- user: '+user_name)
+    
+    sql = '"GRANT ALL PRIVILEGES ON DATABASE %s to %s;"' % (database_name, user_name)
+    result = os.system('echo %s|psql' % (sql))
+    on_result_and_exit(result)
+
