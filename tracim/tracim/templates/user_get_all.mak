@@ -98,21 +98,25 @@
                             % for user in result.users:
                                 <tr>
                                     % if user.enabled:
-                                        <td title="${_('User enabled. Click to disable this user')}"><a href="${tg.url('/admin/users/{}/disable'.format(user.id))}">${TIM.ICO(16, 'status/item-enabled')}</a></td>
+                                        <td>
+                                            ${TIM.ICO_ACTION(16, 'status/item-enabled', _('User enabled. Click to disable this user'), tg.url('/admin/users/{}/disable'.format(user.id)), fake_api.current_user, 3)}
+                                        </td>
                                         <td><a href="${tg.url('/admin/users/{}'.format(user.id))}"><b>${user.name}</b></a></td>
                                         <td><a href="mailto:${user.email}">${user.email}</a></td>
                                         <td>
                                             <% icon = ('emblems/emblem-unreadable', 'emblems/emblem-checked')[user.profile.id>=2] %>
                                             <% linked_profile = ('tracim-profile-manager', 'tracim-profile-user')[user.profile.id>=2] %>
-                                            <a href="${tg.url('/admin/users/{}/profile/switch?new_role={}'.format(user.id, linked_profile))}">${TIM.ICO(16, icon)}</a>
+                                            ${TIM.ICO_ACTION(16, icon, '', tg.url('/admin/users/{}/profile/switch?new_role={}'.format(user.id, linked_profile)), fake_api.current_user, 3)}
                                         </td>
                                         <td>
                                             <% icon = ('emblems/emblem-unreadable', 'emblems/emblem-checked')[user.profile.id>=3] %>
                                             <% linked_profile = ('tracim-profile-admin', 'tracim-profile-manager')[user.profile.id>=3] %>
-                                            <a href="${tg.url('/admin/users/{}/profile/switch?new_role={}'.format(user.id, linked_profile))}">${TIM.ICO(16, icon)}</a>
+                                            ${TIM.ICO_ACTION(16, icon, '', tg.url('/admin/users/{}/profile/switch?new_role={}'.format(user.id, linked_profile)), fake_api.current_user, 3)}
                                         </td>
                                     % else:
-                                        <td title="${_('User disabled. Click to enable this user')}"><a href="${tg.url('/admin/users/{}/enable'.format(user.id))}">${TIM.ICO(16, 'status/item-disabled')}</a></td>
+                                        <td>
+                                            ${TIM.ICO_ACTION(16, 'status/item-disabled', _('User disabled. Click to enable this user'), tg.url('/admin/users/{}/enable'.format(user.id)), fake_api.current_user, 3)}
+                                        </td>
                                         <td>${user.name}</td>
                                         <td>${user.email}</td>
                                         <td>

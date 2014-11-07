@@ -9,6 +9,14 @@
 
 <%def name="NO_CONTENT_INFO(message)"><div class="alert alert-warning" role="alert">${ICO(32, 'status/dialog-information')} ${message|n}</div></%def>
                 
+<%def name="ICO_ACTION(icon_size, icon_path, title, link_url, current_user, required_profile_id)">
+    % if current_user.profile.id>=required_profile_id:
+        <a href="${link_url}">${ICO_TOOLTIP(icon_size, icon_path, title)}</a>
+    % else:
+        <span class="tracim-less-visible">${ICO(icon_size, icon_path)}</span>
+    % endif
+</%def>
+
 <%def name="MODAL_DIALOG(css_id, modal_size='')">
     <div id="${css_id}" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog ${modal_size}">
