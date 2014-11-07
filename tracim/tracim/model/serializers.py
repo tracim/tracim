@@ -259,7 +259,8 @@ def serialize_breadcrumb_item(content: Content, context: Context):
 def serialize_item(content: Content, context: Context):
     return DictLikeClass(
         id = content.content_id,
-        label = content.label,
+        label = content.label if content.label else content.file_name,
+        icon = ContentType.icon(content.type),
         status = context.toDict(content.get_status()),
         folder = context.toDict(DictLikeClass(id = content.parent.content_id if content.parent else None)),
         workspace = context.toDict(content.workspace),
