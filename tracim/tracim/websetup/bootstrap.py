@@ -14,37 +14,35 @@ def bootstrap(command, conf, vars):
     from sqlalchemy.exc import IntegrityError
     try:
         u = model.User()
-        u.user_name = 'manager'
-        u.display_name = 'Example manager'
-        u.email = 'manager@somedomain.com'
-        u.password = 'managepass'
-    
+        u.display_name = 'Global manager'
+        u.email = 'admin@admin.admin'
+        u.password = 'admin@admin.admin'
         model.DBSession.add(u)
-    
-        g = model.Group()
-        g.group_name = 'managers'
-        g.display_name = 'Managers Group'
-    
-        g.users.append(u)
-    
-        model.DBSession.add(g)
-    
-        p = model.Permission()
-        p.permission_name = 'manage'
-        p.description = 'This permission give an administrative right to the bearer'
-        p.groups.append(g)
-    
-        model.DBSession.add(p)
-    
-        u1 = model.User()
-        u1.user_name = 'editor'
-        u1.display_name = 'Example editor'
-        u1.email = 'editor@somedomain.com'
-        u1.password = 'editpass'
-    
-        model.DBSession.add(u1)
+
+        g1 = model.Group()
+        g1.group_id = 1
+        g1.group_name = 'users'
+        g1.display_name = 'Users'
+        g1.users.append(u)
+        model.DBSession.add(g1)
+
+        g2 = model.Group()
+        g2.group_id = 2
+        g2.group_name = 'managers'
+        g2.display_name = 'Global Managers'
+        g2.users.append(u)
+        model.DBSession.add(g2)
+
+        g3 = model.Group()
+        g3.group_id = 3
+        g3.group_name = 'administrators'
+        g3.display_name = 'Administrators'
+        g3.users.append(u)
+        model.DBSession.add(g3)
+
         model.DBSession.flush()
         transaction.commit()
+
     except IntegrityError:
         print('Warning, there was a problem adding your auth data, it may have already been added:')
         import traceback

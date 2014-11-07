@@ -295,14 +295,13 @@ class ContentType(object):
         return allowed_types
 
 class Content(DeclarativeBase):
+
     __tablename__ = 'contents'
 
     revision_to_serialize = -0  # This flag allow to serialize a given revision if required by the user
 
     content_id = Column(Integer, autoincrement=True, primary_key=True)
     parent_id = Column(Integer, ForeignKey('contents.content_id'), nullable=True, default=None)
-    node_depth = Column(Integer, unique=False, nullable=False, default=0)
-    parent_tree_path = Column(Unicode(255), unique=False, nullable=False, default='')
     owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True, default=None)
 
     type = Column(Unicode(32), unique=False, nullable=False)
