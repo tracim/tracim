@@ -35,7 +35,8 @@ class UserProfileAdminRestController(TIMRestController):
     """
      CRUD Controller allowing to manage groups of a user
     """
-    allow_only = predicates.in_any_group(Group.TIM_ADMIN_GROUPNAME)
+
+    allow_only = predicates.in_group(Group.TIM_ADMIN_GROUPNAME)
 
     _ALLOWED_PROFILE_USER = 'tracim-profile-user'
     _ALLOWED_PROFILE_MANAGER = 'tracim-profile-manager'
