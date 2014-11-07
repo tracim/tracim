@@ -33,12 +33,13 @@
       </tr>
       <tr>
         <td style="padding: 5px 5px 5px 4em;">
-          <img style="vertical-align: middle;" src="${base_url+'/assets/icons/32x32/apps/internet-group-chat.png'}"/>
+          <img style="vertical-align: middle;" src="${base_url+'/assets/icons/32x32/'+result.item.icon+'.png'}"/>
           <span style="font-weight: bold; padding-left: 0.5em; font-size: 1em; vertical-align: middle;">
-            ${result.item.label}
+            ${result.item.label} &mdash;
             <span style="font-weight: bold; color: #999; font-weight: bold;">
-            ${result.item.status.label}
-            <img src="${base_url+'/assets/icons/16x16/{}.png'.format(result.item.status.icon)}" style="vertical-align: middle;">
+                ${result.item.status.label}
+                <img src="${base_url+'/assets/icons/16x16/{}.png'.format(result.item.status.icon)}" style="vertical-align: middle;">
+            </span>
           </span>
         </td>
       </tr>
