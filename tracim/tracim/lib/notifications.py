@@ -141,7 +141,7 @@ class EmailNotifier(object):
             subject = self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT
             subject = subject.replace(EST.WEBSITE_TITLE, self._global_config.WEBSITE_TITLE.__str__())
             subject = subject.replace(EST.WORKSPACE_LABEL, content.workspace.label.__str__())
-            subject = subject.replace(EST.CONTENT_LABEL, content.label.__str__())
+            subject = subject.replace(EST.CONTENT_LABEL, content.label.__str__() if content.label else content.file_name.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, content.get_status().label.__str__())
 
             message = MIMEMultipart('alternative')
