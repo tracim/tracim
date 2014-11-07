@@ -60,5 +60,12 @@
 <p>
     ${WIDGETS.FOLDER_LIST('subfolder-list', result.workspace.id, fake_api.current_workspace_folders)}
 </p>
-
+% if len(fake_api.current_workspace_folders)<=0 and fake_api.current_user:
+    % if h.user_role(fake_api.current_user, result.workspace)>2: # User must be a content manager to be allowed to create folders
+        <p>
+            ${_('You need folders to organize your content.')}
+            <a class="btn btn-small btn-primary" data-toggle="collapse" data-target="#folder-new"><i class="fa fa-check"></i> <b>${_('Create a folder now')}</b></a>
+        </p>
+    % endif
+% endif
 

@@ -168,11 +168,6 @@
                             },
                             'success': function (new_data) {
                                 console.log('loaded new menu data' + new_data)
-                                console.log(new_data);
-
-                                for (var i = new_data['d'].length; i--;) {
-                                    // prepareOrRemoveTreeNode(null, new_data['d'][i], new_data['d'], shouldRemoveNodeDoneCallBack);
-                                }
                                 return new_data;
                             },
                         },
@@ -201,11 +196,16 @@
                 % endif
                 
                 $('#${dom_id}-treeview').on("loaded.jstree", function () {
-                    nodes = $('#left-sidebar-treeview .jstree-node');
+                    nodes = $('#${dom_id}-treeview .jstree-node');
                     console.log("nodes = "+nodes.length);
                     if (nodes.length<=0) {
-                        $("#left-sidebar-treeview").append( "<p class='pod-grey'>${_('There is no content yet.')|n}" );
-                        $("#left-sidebar-treeview").append( "<p><a class=\"btn btn-success\" data-toggle=\"modal\" role=\"button\" href=\"#add-document-modal-form\"><i class=\"fa fa-plus\"></i> ${_('Create a topic')}</a></p>" );
+                        ## TODO - D.A. - 2014-11-06 - Parameterize the fake_api.current_user access
+                        $("#${dom_id}-treeview").append( "<p class='pod-grey'>${_('You have no workspace.')|n}" );
+                        % if fake_api.current_user.profile.id >= 2:
+                            $("#${dom_id}-treeview").append( "<p><a class=\"btn btn-success\" href=\"${tg.url('/admin/workspaces')}\" ><i class=\"fa fa-plus\"></i> ${_('Create a workspace')}</a></p>" );
+                        % else:
+                            $("#${dom_id}-treeview").append( "<p class=\"alert alert-info\"><b>${_('Contact the administrator.')}</b></p>" );
+                        % endif
                     }
                 });
             });

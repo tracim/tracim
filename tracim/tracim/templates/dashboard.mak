@@ -9,10 +9,10 @@
     <div class="row-fluid">
         <div>
             <div class="row">
-                <h1 class="col-sm-6 col-sm-offset-3 text-center">${TIM.ICO(32, 'status/dialog-information')} ${_("Welcome to your dashboard")}</h1>
+                <h1 class="col-sm-6 col-sm-offset-3">${TIM.ICO(32, 'status/dialog-information')} ${_("Dashboard")}</h1>
             </div>
             <div class="row">
-                <div class="col-sm-5 col-sm-offset-4">
+                <div class="col-sm-5 col-sm-offset-3">
                     <div class="well">
                         <h2 style="margin-top: 0;">${_('What to do ?')}</h2>
                         <h3>
@@ -24,6 +24,21 @@
                     </div>
                 </div>
             </div>
+            % if fake_api.current_user.profile.id >= 2:
+                <div class="row">
+                    <div class="col-sm-5 col-sm-offset-3">
+                        <div class="well">
+                            <h2 style="margin-top: 0;">${_('You can also manage...')}</h2>
+                            <h3>
+                                ${TIM.ICO(32, 'apps/system-users')} <a href="${tg.url('/admin/users')}">${_('Users')}</a>
+                            </h3>
+                            <h3>
+                                ${TIM.ICO(32, 'places/folder-remote')} <a href="${tg.url('/admin/workspaces')}">${_('Workspaces')}</a>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            % endif
         </div>
     </div>
 </div>
