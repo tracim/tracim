@@ -4,7 +4,6 @@ Genshi
 Mako
 MarkupSafe
 PasteDeploy
-Pillow
 SQLAlchemy
 Tempita
 TurboGears2
