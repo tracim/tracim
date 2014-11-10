@@ -95,7 +95,7 @@ The easiest way to test Tracim is to test it through the online demo:
 
 ## Ask for a dedicated instance ##
 
-If you wan't your own dedicated instance but do not want to manage it by yourself, let's contact me at damien.accorsi@free.fr
+If you want your own dedicated instance but do not want to manage it by yourself, let's contact me at damien.accorsi@free.fr
 
 ## Install Tracim on your server ##
 
