@@ -115,8 +115,14 @@ resetpassword.smtp_login = smtp.login
 resetpassword.smtp_passwd = smtp.password
 
 
-website.title = TRACIM - BOB
+# The following parameters allow to personalize the home page
+# They are html ready (you can put html tags they will be interpreted)
+website.title = TRACIM
 website.title.color = #555
+website.home.subtitle = Default login: admin@admin.admin (password: admin@admin.admin)
+website.home.tag_line = <div class="text-center" style="font-weight: bold;">Collaboration, versionning and traceability</div>
+website.home.below_login_form = in case of problem, please contact the administrator.
+
 # The following base_url is used for links and icons
 # integrated in the email notifcations
 website.base_url = http://127.0.0.1:8080

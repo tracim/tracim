@@ -183,6 +183,11 @@ class CFG(object):
         self.WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl('/assets/img/bg.jpg')
         self.WEBSITE_BASE_URL = tg.config.get('website.base_url')
 
+        self.WEBSITE_HOME_TAG_LINE = tg.config.get('website.home.tag_line')
+        self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle')
+        self.WEBSITE_HOME_BELOW_LOGIN_FORM = tg.config.get('website.home.below_login_form')
+
+
         self.EMAIL_NOTIFICATION_FROM = tg.config.get('email.notification.from')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get('email.notification.content_update.template.html')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = tg.config.get('email.notification.content_update.template.text')

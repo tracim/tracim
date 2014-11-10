@@ -10,8 +10,9 @@
     <div class="row-fluid">
         <div>
             <div class="row">
-                <div class="col-sm-offset-3 col-sm-5">
-                    <h1 class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};"><b>${h.CFG.WEBSITE_TITLE}</b></h1>
+                <div class="col-sm-offset-3 col-sm-6">
+                    <h1 class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};"><b>${h.CFG.WEBSITE_TITLE|n}</b></h1>
+                    <p class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};">${h.CFG.WEBSITE_SUBTITLE|n}</p>
                 </div>
             </div>
             <div class="row">
@@ -19,8 +20,11 @@
                     <a class="thumbnail">
                         <img src="${h.CFG.WEBSITE_HOME_IMAGE_URL}" alt="">
                     </a>
+                    <p>${h.CFG.WEBSITE_HOME_TAG_LINE|n}</p>
+                    
+
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <div class="well">
                         <h2 style="margin-top: 0;">${TIM.ICO(32, 'status/status-locked')} ${_('Login')}</h2>
                         <form role="form" method="POST" action="${tg.url('/login_handler', params=dict(came_from=came_from, __logins=login_counter))}">
@@ -42,18 +46,20 @@
                                 </label>
                             </div>
                             <div class="text-right">
-                                <button type="submit" class="btn btn-small btn-success">
+                                <button type="submit" class="btn btn-small btn-success text-right">
                                     <i class="fa fa-check"></i> ${_('Login')}
                                 </button>
+                                <div class="pull-left">
+                                    <a class="btn btn-link" href="${tg.url('/reset_password')}"><i class="fa fa-magic"></i> ${_('Forgot password?')}</a>
+                                </div>
+
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-offset-5 col-sm-3" style="margin-top: -1.5em;">
-                    <a class="btn btn-link" href="${tg.url('/reset_password')}"><i class="fa fa-magic"></i> ${_('Forgot password?')}</a>
-                </div>
+                <div class="col-sm-offset-3 col-sm-6 text-center">${h.CFG.WEBSITE_HOME_BELOW_LOGIN_FORM|n}</div>
             </div>
 
         </div>
