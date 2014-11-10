@@ -124,8 +124,10 @@ If you work on a local database, then you also need to install PostgreSQL:
 Get the sources from Bitbucket:
 
     git clone https://bitbucket.org/lebouquetin/tracim.git
+    cd tracim/
 
 *Note: Now everything is documented to be executed from the tracim directory newly created.*
+
 
 ### Setting-up python virtualenv ###
 
@@ -180,7 +182,7 @@ login as *postgres* user and run the follwoing commands (which are self explanat
 
     ./bin/pgtool create_user tracimuser tracimpassword
     ./bin/pgtool create_database tracimdb
-    ./bin/pgtool grant_all_priviles tracimdb tracimuser
+    ./bin/pgtool grant_all_privileges tracimdb tracimuser
 
 Notes :
 
