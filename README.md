@@ -44,6 +44,8 @@ With Tracim, you centralize information, you can stay in touch by configuring yo
 
 Traceability and versionning is something important for quality-ready processes. Unfortunately, specialized software are hard to setup and to use. Let's try Tracim  ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versionned and never deleted.
 
+----
+
 # Tracim - the software #
 
 ## Licence ##
@@ -63,6 +65,8 @@ It runs on [Debian GNU/Linux](http://www.debian.org/), it should work out-of-the
 
 Hopefully it works on BSD and Windows OSes (but this has not been tested yet)
 
+----
+
 # Use it (or give it a try) #
 
 ## Online Demo ##
@@ -73,15 +77,15 @@ The easiest way to test Tracim is to test it through the online demo:
 * login as admin: admin@admin.admin
 * password: admin@admin.admin
 
-_Note : this instance is reset every day_
-
 ## Ask for a dedicated instance ##
 
-If you wan't your own dedicated instance but do not want to manage it by yourself, let's contact us at hello@trac.im
+If you wan't your own dedicated instance but do not want to manage it by yourself, let's contact me at damien.accorsi@free.fr
 
 ## Install Tracim on your server ##
 
 Following the installation documentation below, you'll be able to run your own instance on your server.
+
+----
 
 # Installation #
 
@@ -127,95 +131,102 @@ Notes:
 * Ubuntu (at least 14.04): you should remove _distribute_ and _wsgiref _
   from the requirements.txt file
 
-## Configuration ##
 ## Database Setup ##
-## Running the server ##
-### Standalone mode ###
-### Apache WSGI configuration ###
-## Support ##
 
+### Minimalist introduction to PostgreSQL ###
 
-
-### Setup a database ###
+If you already use/know PostgreSQL, you can directly go to *Test the database access*.
 
 #### Allowing local connections on PostgreSQL ####
 
-Check the pg_hba.conf file, it should allow connection for user/pass through loopback IP address.
-The file should include the following configuration:
+PostgreSQL stores connections ahtorization in *pg\_hba.conf*
+
+Edit the pg_hba.conf file and check that connectionx from 127.0.0.1 are allowed using user/password. You should find the following line in the file:
 
     # IPv4 local connections:
     host    all             all             127.0.0.1/32            md5
 
-Note: on Debian, the pg\_hba file is found at /etc/postgresql/9.1/main/pg_hba.conf
+Note: on Debian, the *pg\_hba.conf* file is found at */etc/postgresql/9.1/main/pg\_hba.conf*
 
 If you changed the file, reload PostgreSQL:
 
     service postgresql reload
 
-#### Create a new database and user on PostgreSQL ####
+#### Creating a user and associated database ####
 
-We suppose you will create a user named _tracimuser_ with passowrd _tracimpassword_
-and a database _tracimdb_
+You need a database and associated user/password.
 
-First login as root, then su as postgre and run a PostgreSQL client:
+Tracim comes with a tool that will make this step easy : pgtool.
 
-    root@hostname:~# su postgres
-    postgres@hostname:/root$ psql
-    psql (9.1.13)
-    Type "help" for help.
-    
-    postgres=# 
-    
-    
-Now, type the following commands:
+    ~/tracim$ ./bin/pgtool help
 
-    CREATE ROLE tracimuser WITH LOGIN PASSWORD 'tracimpassword';
-    CREATE DATABASE tracimdb OWNER tracimuser;
-    GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;
+login as *postgres* user and run the follwoing commands (which are self explanatory)
 
-At the end, you can quit the psql client by running the \q quit command:
+    ./bin/pgtool create_user tracimuser tracimpassword
+    ./bin/pgtool create_database tracimdb
+    ./bin/pgtool grant_all_priviles tracimdb tracimuser
 
-    postgres=# \q
-    postgres@mozart:/root$
+Notes :
+
+* in order to login as postgres user, su as root (with your password) then su postgres.
+* pgtool also offers options to delete users / databases. Run *./bin/pgtool help* for more information
 
 #### Test the database access ####
 
-You can test your newly created user by running the following command:
+So, now you have a database and an associated user/password.
 
-    psql -h 127.0.0.1 -W -U tracimuser tracimdb -c 'SELECT NOW();'
+A good habit is to test things before to use them, that's why we want to test the database access now. This is easily done with tracim pgtool :
 
-The result should be similar to:
+    ./bin/pgtool test_connection tracimdb tracimuser tracimpassword 127.0.0.1
 
-    user@hostname:~$ psql -h 127.0.0.1 -W -U tracimuser tracimdb -c 'SELECT NOW();'
-    Password for user tracimuser: 
+The result is similar to the following :
+
+    PG # CONNECT TO DATABASE
+    ------------------------
+    server:     127.0.0.1
+    database:   tracimdb
+    username:   bibi
+
                   now              
     -------------------------------
-     2014-06-16 11:35:48.590838+02
+     2014-11-10 09:40:23.306199+01
     (1 row)
 
-#### Setup the database schema and initial data ####
+In case of failure, you would get something like this:
 
-Your database is now ready. Fill it with the required schema and data by importing SQL:
+    PG # CONNECT TO DATABASE
+    ------------------------
+    server:     127.0.0.1
+    database:   tracimdb
+    username:   bibi
 
-    psql -h 127.0.0.1 -W -U tracimuser tracimdb < doc/database/tracim-init-database.sql
+    psql: FATAL:  password authentication failed for user "bibi"
+    FATAL:  password authentication failed for user "bibi"
+    ERRROR
 
-You can test it through the following command:
+In this case, delete the user and database you previously created (using pgtool) and do it again. Do not forget to run the grant_all_rights command!
 
-    user@hostname:~$ psql -h 127.0.0.1 -W -U tracimuser tracimdb -c 'SELECT * from tracim_user;'
+## Configuration ##
 
-You should find the admin@localhost user entry.
+At this point, you have :
 
+* an installation of Tracim with its dedicated python3-ready virtualenv
+* a PostgreSQL server and dedicated database
+
+What you have to do now is to configure the application and to initialize the database content.
 
 ### Create configuration ###
 
     cp tracim/development.ini.base tracim/development.ini
 
-#### Database 
+You can now edit the file and setup required files. Here are the main ones:
+
+#### Database access ####
 
 Configure database in the development.ini file. This is defined as sqlalchemy.url
 and the default value is below:
 
-    sqlalchemy.url = postgresql://tracim_user:tracim_user_password@127.0.0.1:5432/tracim
+    sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
 
 #### Listening port
 
@@ -225,12 +236,57 @@ Default configuration is to listen on port 8080. If you want to adapt this to yo
 
 #### Interface language
 
-The default language is English. You can change it to french by uncommenting the following line in the .ini file:
+The default language is English. You can change it to French by uncommenting the following line in the .ini file:
 
     lang = fr
 
-    
-### Running Tracim as standalone ###
+#### SMTP parameters for resetpassword and notifications
+
+for some reason, you have to configure SMTP parameters for rest password process and SMTP parameters for notifications in separate places.
+
+The reset password related parameters are the follwoing ones :
+
+    resetpassword.email_sender = tracim@mycompany.com
+    resetpassword.smtp_host = smtp.mycompany.com
+    resetpassword.smtp_port = 25
+    resetpassword.smtp_login = username
+    resetpassword.smtp_passwd = password
+
+The main parameters for notifications are the following ones:
+
+    email.notification.from = Tracim Notification <tracim@tmycompany.com>
+    email.notification.smtp.server = smtp.mycompany.com
+    email.notification.smtp.port = 25
+    email.notification.smtp.user = username
+    email.notification.smtp.password = password
+
+#### Website ####
+
+You must define general parameters like the base_url and the website title which are required for home page and email notification links
+
+    website.title = My Company Intranet
+    website.base_url = http://intranet.mycompany.com:8080
+
+#### Other parameters  ####
+
+There are other parameters which may be of some interest for you. For example, you can:
+
+* include a JS tracker like Piwik or Google Analytics,
+* define your own notification email subject
+* personalize notification email
+* personalize home page (background image, title color...)
+* ...
+
+### database schema ###
+
+The last step before to run the application is to initialize the database schema. This is done through the following command:
+
+    source tg2env/bin/activate
+    cd tracim && gearbox setup-app && cd -
+
+## Running the server ##
+
+### Running Tracim in standalone mode ###
 
 Now you can run the standalone server:
 
@@ -247,11 +303,10 @@ Which should result in something like this:
     
 You can now enter the application at [http://localhost:8080](http://localhost:8080) and login:
 
-* user : admin@localhost
-* password : admin
+* user : admin@admin.admin
+* password : admin@admin.admin
     
 Enjoy :)
-
 
 ### Running Tracim through Apache WSGI ###
 
@@ -266,26 +321,27 @@ Install dependencies:
 Example of Apache WSGI configuration. This configuration refers to productionapp.wsgi which is a copy of the file *app.wsgi* available in the repo. (this file has to be updated to match with your environment and installation)
 
     <VirtualHost *:80>
-        ServerAdmin webmaster@archipeldata.com
-        ServerName demo.archipeldata.com
+        ServerAdmin webmaster@tracim.mycompany.com
+        ServerName tracim.mycompany.com
 
         WSGIProcessGroup tracim
         WSGIDaemonProcess tracim user=www-data group=adm threads=4 python-path=/opt/traciminstall/tg2env/lib/python3.2/site-packages
         WSGIScriptAlias / /opt/traciminstall/tracim/productionapp.wsgi
 
         #Serve static files directly without TurboGears
-        Alias /img     /opt/traciminstall/tracim/tracim/public/img/
+        Alias /assets     /opt/traciminstall/tracim/tracim/public/assets
         Alias /favicon.ico /opt/traciminstall/tracim/tracim/public/favicon.ico
-        Alias /css        /opt/traciminstall/tracim/tracim/public/css
-        Alias /javascript /opt/traciminstall/tracim/tracim/public/javascript
 
         CustomLog /var/log/apache2/demotracim-access.log combined
         ErrorLog /var/log/apache2/demotracim-error.log
         LogLevel debug
     </VirtualHost>
 
-### Help required ###
+## Support ##
 
-If you need help, contact us. If you want to help, contact us. So... contact us ;)
+### Community - Need help ? ###
 
-Damien Accorsi - damien.accorsi@free.fr
+Building the community is a work in progress.
+
+Do not hesitate to contact me : damien.accorsi@free.fr
+
