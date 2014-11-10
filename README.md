@@ -1,8 +1,8 @@
 # Tracim - Introduction #
 
-Tracim is a collaborative software designed to allow people to work on and share various data and document types.
+Tracim is a collaborative software designed to allow people to share and work on various data and document types.
 
-You hesitate to install a wiki, a forum or a file management software ? Stop hesitating: install Tracim.
+If you hesitate to install a wiki, a forum or a file management software, stop hesitating and install Tracim.
 
 With Tracim, you manage in the same place:
 
@@ -14,7 +14,7 @@ All data offers:
 
 - information status: open / resolved / cancelled / deprecated
 - native versionning
-- comment threads making tracim knowledge-growth-ready
+- comment threads making tracim knowledge-growth ready.
 
 ## Use-cases ##
 
@@ -24,15 +24,17 @@ Share information with your clients.
 
 In the same place you will be able to share trouble-shooting threads, files and general information. You can define who the information is shared with.
 
-Example: share the documentation with all your clients, run a forum open to your clients, a forum for your collaborators and share troubleshooting threads with each of your clients in a private workspace.
+Example: share the documentation with all your users, run a forum open to your clients, another forum for your collaborators and share troubleshooting threads with each of your clients in a private workspace.
 
 ### Run a community of experts or passionate people ###
 
-Collaborate and share experience (and stimulate knowledge growth).
+Collaborate and share experience and stimulate knowledge growth.
 
-In a unique place, you centralize files and threads, and raw information too. Every collaborator may update-the status, no worries: the traceability is at the hearth of Tracim.
+In a unique place, you centralize files and threads, and raw information too. Every collaborator can update the information status.
+Stop worrying about information loss: the traceability is at the hearth of Tracim.
 
-The newcomers knowledge growth is easy because all information has a status.
+The newcomers knowledge growth is easy because all information has a status and full history.
+You get the status of information and know how it got there.
 
 ### Work on quality-driven projects ###
 
@@ -42,7 +44,11 @@ With Tracim, you centralize information, you can stay in touch by configuring yo
 
 ### Manage documents and files ###
 
-Traceability and versionning is something important for quality-ready processes. Unfortunately, specialized software are hard to setup and to use. Let's try Tracim  ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versionned and never deleted.
+Traceability and versionning are very important for high-quality processes. Unfortunately, specialized software are hard to setup and to use.
+
+Let's try Tracim ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versionned and never deleted.
+
+The user interface is easy to use: it's based on the well-known folders and files explorer paradigm.
 
 ----
 
@@ -55,11 +61,21 @@ Tracim is licensed under the terms of the
 
 ## Technical information ##
 
-Tracim is a web application :
+Tracim is a web application:
 
 * developed with python 3.
 * based on the [TurboGears](http://www.turbogears.org/) web framework.
 * relying on [PostgreSQL](http://www.postgresql.org/) as the storage engine.
+
+The user interface is based on the following resources and technologies:
+
+* [Mako](http://www.makotemplates.org/) templating engine (server-side)
+* [Bootstrap 3](http://getbootstrap.com/)
+* [jQuery](http://wwwjquery.corm)
+* Icons are taken from [Tango Icons](http://tango.freedesktop.org/) and [Font Awesome](http://fortawesome.github.io/Font-Awesome/)
+* The design is based on the [Bootstrap dashboard example](http://getbootstrap.com/examples/dashboard/) and uses some images from [Start Boostrap free templates](http://startbootstrap.com/)
+
+
 
 It runs on [Debian GNU/Linux](http://www.debian.org/), it should work out-of-the-box on [Ubuntu](http://www.ubuntu.com/) and also on other GNU/Linux distributions.
 
@@ -337,9 +353,9 @@ Example of Apache WSGI configuration. This configuration refers to productionapp
         LogLevel debug
     </VirtualHost>
 
-## Support ##
+# Support and Community #
 
-### Community - Need help ? ###
+## Need help ? ##
 
 Building the community is a work in progress.
 
