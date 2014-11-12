@@ -195,13 +195,16 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         try:
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
-            if comment:
-                api.update_content(item, label if label else item.label, comment)
+            if comment or label:
+                api.update_content(item, label if label else item.label, comment if comment else '')
+                action_description = ActionDescription.EDITION
+                # The action_description is overwritten by ActionDescription.REVISION if the file content is also updated
 
             if isinstance(file_data, FieldStorage):
                 api.update_file_data(item, file_data.filename, file_data.type, file_data.file.read())
+                action_description = ActionDescription.REVISION
 
-            api.save(item, ActionDescription.REVISION)
+            api.save(item, action_description)
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
@@ -431,6 +434,8 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         :param item_id:
         :return:
         """
+        current_user_content = Context(CTX.CURRENT_USER).toDict(tmpl_context.current_user)
+        fake_api = Context(CTX.FOLDER).toDict(DictLikeClass(current_user=current_user_content))
 
         item_id = int(item_id)
         user = tmpl_context.current_user
@@ -440,7 +445,11 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         item = content_api.get_one(item_id, ContentType.Any, workspace)
 
         dictified_item = Context(CTX.DEFAULT).toDict(item, 'item')
-        return DictLikeClass(result = dictified_item)
+        return DictLikeClass(result = dictified_item, fake_api=fake_api)
+
+
+
+
 
 
     @tg.require(current_user_is_content_manager())
