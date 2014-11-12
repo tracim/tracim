@@ -124,7 +124,7 @@
 ##                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                              ${TIM.ICO(16, 'categories/applications-system')} ${request.identity['user'].display_name}
+                              ${TIM.ICO(16, 'categories/applications-system')} ${fake_api.current_user.name}
                             </a>
                             <ul class="dropdown-menu pull-right">
                                 <li>
