@@ -60,7 +60,8 @@ class BaseController(TGController):
             controller = step[1]
             url = '/'.join([url.rstrip('/'), path.rstrip('/')]) # we always remove trailing slash
 
-            logger.debug(self, ' Looking for item related to controller {} [type: {}]'.format(path, controller.__class__))
+            # LOW-LEVEL DEBUG related log
+            # logger.debug(self, ' Looking for item related to controller {} [type: {}]'.format(path, controller.__class__))
 
             if not skip_id:
                 if id and self==controller:
