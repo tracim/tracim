@@ -89,7 +89,7 @@ Hopefully it works on BSD and Windows OSes (but this has not been tested yet)
 
 The easiest way to test Tracim is to test it through the online demo:
 
-* [http://demo.tracim.org](http://demo.tracim.org)
+* [http://demo.tracim.fr](http://demo.tracim.fr)
 * login as admin: admin@admin.admin
 * password: admin@admin.admin
 
