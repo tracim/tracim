@@ -65,13 +65,7 @@ class ICON(object):
   Private = '<i class="fa fa-key"></i>'
 
 def tracker_js():
-    js_file_path = tg.config.get('js_tracker_path', None)
-    if js_file_path is not None:
-        with open (js_file_path, "r") as js_file:
-            data=js_file.read()
-        return data
-    else:
-        return ""
+    return CFG.get_instance().TRACKER_JS_CONTENT
 
 def IconPath(icon_size, icon_path):
     return tg.url('/assets/icons/{0}x{0}/{1}.png'.format(icon_size, icon_path))
