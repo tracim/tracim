@@ -33,7 +33,15 @@ class EmailSender(object):
             logger.info(self, 'Connecting from SMTP server {}'.format(self._smtp_config.server))
             self._smtp_connection = smtplib.SMTP(self._smtp_config.server, self._smtp_config.port)
             self._smtp_connection.ehlo()
-            self._smtp_connection.login(self._smtp_config.login, self._smtp_config.password)
+            if self._smtp_config.login:
+                try:
+                    starttls_result = self._smtp_connection.starttls()
+                    logger.debug(self, 'SMTP start TLS result: {}'.format(starttls_result))
+                except Exception as e:
+                    logger.debug(self, 'SMTP start TLS error: {}'.format(e.__str__()))
+
+            login_res = self._smtp_connection.login(self._smtp_config.login, self._smtp_config.password)
+            logger.debug(self, 'SMTP login result: {}'.format(login_res))
             logger.info(self, 'Connection OK')
 
     def disconnect(self):
