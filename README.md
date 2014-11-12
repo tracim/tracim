@@ -123,7 +123,7 @@ If you work on a local database, then you also need to install PostgreSQL:
 
 Get the sources from Bitbucket:
 
-    git clone https://bitbucket.org/lebouquetin/tracim.git
+    git clone https://github.com/tracim/tracim.git
     cd tracim/
 
 *Note: Now everything is documented to be executed from the tracim directory newly created.*
