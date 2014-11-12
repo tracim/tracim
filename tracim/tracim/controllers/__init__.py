@@ -423,7 +423,6 @@ class StandardController(BaseController):
         :param kw:
         :return:
         """
-
         TIMRestPathContextSetup.current_user()
 
     @classmethod

@@ -12,6 +12,8 @@ from tg import url
 
 from tg.i18n import ugettext as _
 
+from tracim.lib import CST
+from tracim.lib.base import logger
 from tracim.lib.user import UserStaticApi
 
 from tracim.controllers import StandardController
@@ -57,13 +59,17 @@ class RootController(StandardController):
 
 
     @expose('tracim.templates.index')
-    def index(self, came_from=lurl('/'), *args, **kwargs):
+    def index(self, came_from='', *args, **kwargs):
         if request.identity:
-            redirect(self.url(None, self.dashboard.__name__))
+            if came_from:
+                logger.info(self, 'Will redirect to {}'.format(came_from))
+                redirect(url(came_from))
+            else:
+                redirect(self.url(None, self.dashboard.__name__))
 
         login_counter = request.environ.get('repoze.who.logins', 0)
         if login_counter > 0:
-            flash(_('Wrong credentials'), 'error')
+            flash(_('Wrong credentials'), CST.STATUS_ERROR)
         return dict(page='login', login_counter=str(login_counter),
                     came_from=came_from)
 
@@ -78,7 +84,9 @@ class RootController(StandardController):
         :param kwargs:
         :return:
         """
-        return self.index(args, kwargs)
+        came_from = kwargs['came_from'] if 'came_from' in kwargs.keys() else ''
+        logger.info(self, 'came_from: {}'.format(kwargs))
+        return self.index(came_from, args, *kwargs)
 
 
     @expose()
