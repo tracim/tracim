@@ -176,6 +176,22 @@ class CFG(object):
             CFG._instance = CFG()
         return CFG._instance
 
+    def __setattr__(self, key, value):
+        """
+        Log-ready setter. this is used for logging configuration (every parameter except password)
+        :param key:
+        :param value:
+        :return:
+        """
+        if 'PASSWORD' not in key and 'URL' not in key and 'CONTENT' not in key:
+            # We do not show PASSWORD for security reason
+            # we do not show URL because the associated config uses tg.lurl() which is evaluated when at display time.
+            # At the time of configuration setup, it can't be evaluated
+            # We do not show CONTENT in order not to pollute log files
+            logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
+
+        self.__dict__[key] = value
+
     def __init__(self):
         self.WEBSITE_TITLE = tg.config.get('website.title', 'TRACIM')
         self.WEBSITE_HOME_TITLE_COLOR = tg.config.get('website.title.color', '#555')
@@ -199,6 +215,21 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_SMTP_PORT = tg.config.get('email.notification.smtp.port')
         self.EMAIL_NOTIFICATION_SMTP_USER = tg.config.get('email.notification.smtp.user')
         self.EMAIL_NOTIFICATION_SMTP_PASSWORD = tg.config.get('email.notification.smtp.password')
+
+        self.TRACKER_JS_PATH = tg.config.get('js_tracker_path')
+        self.TRACKER_JS_CONTENT = self.get_tracker_js_content(self.TRACKER_JS_PATH)
+
+
+    def get_tracker_js_content(self, js_tracker_file_path = None):
+        js_tracker_file_path = tg.config.get('js_tracker_path', None)
+        if js_tracker_file_path:
+            logger.info(self, 'Reading JS tracking code from file {}'.format(js_tracker_file_path))
+            with open (js_tracker_file_path, 'r') as js_file:
+                data = js_file.read()
+            return data
+        else:
+            return ''
+
 
 
     class CST(object):
