@@ -89,7 +89,7 @@ Hopefully it works on BSD and Windows OSes (but this has not been tested yet)
 
 The easiest way to test Tracim is to test it through the online demo:
 
-* [http://sandbox.tracim.org](http://sandbox.tracim.org)
+* [http://demo.tracim.org](http://demo.tracim.org)
 * login as admin: admin@admin.admin
 * password: admin@admin.admin
 
@@ -360,4 +360,3 @@ Example of Apache WSGI configuration. This configuration refers to productionapp
 Building the community is a work in progress.
 
 Need help ? Do not hesitate to contact me : damien.accorsi@free.fr
-
