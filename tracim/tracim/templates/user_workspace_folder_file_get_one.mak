@@ -106,34 +106,32 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
     % else:
         <hr class="tracim-panel-separator"/>
         ${WIDGETS.SECURED_SECTION_TITLE(fake_api.current_user, result.file.workspace, 'file-revisions', _('File revisions'), 'new-file-revision', _('upload a new revision and/or comment...'))}
-        <p>${_('This file contains {} revision(s)').format(sum(1 for revision in result.file.revisions if revision.action.id=='revision'))}</p>
+        <p>${_('This file contains {} revision(s)').format(sum(1 for revision in result.file.revisions if revision.action.id in ('creation', 'revision')))}</p>
         ${FORMS.NEW_FILE_REVISION_WITH_COMMENT_FORM('new-file-revision', result.file.workspace.id, result.file.parent.id, result.file.id)}
     % endif
 % endif    
 
 <div>
     <table class="table table-striped table-hover">
-        % for revid, revision in reversed(list(enumerate(reversed(result.file.revisions)))):
-            % if revision.action.id in ('creation', 'revision'):
-                ## INFO - D.A. - 2014-10-22
-                ## We do not show status update and other editions that are not revisions
-                ## (at least in this revision list table)
-                <% warning_or_not = ('', 'warning')[result.file.selected_revision==revision.id] %>
-                <tr class="${warning_or_not}">
-                    <td><span class="label label-default">v${revid}</span></td>
-                    <td>${revision.owner.name}</td>
-                    <td><a href="${tg.url('/workspaces/{}/folders/{}/files/{}?revision_id={}').format(result.file.workspace.id, result.file.parent.id, result.file.id, revision.id)}">${revision.label}</a></td>
-                    <% rev_download_url = tg.url('/workspaces/{}/folders/{}/files/{}/download?revision_id={}'.format(result.file.workspace.id, result.file.parent.id, result.file.id, revision.id)) %>
-                    <td><a href="${rev_download_url}">${TIM.ICO(16, 'actions/go-bottom', _('Download this particular revision'))}</a></td>
-                    <td>${h.date_time_in_long_format(revision.created, _('%Y-%m-%d at %H:%M'))}</td>
-                    <td>${TIM.ICO_TOOLTIP(16, revision.action.icon, revision.action.label)}</td>
-                    <td>
-                        % if warning_or_not:
-                            ${TIM.ICO(16, 'actions/go-previous')} <strong>${_('Revision r{}').format(result.file.selected_revision)}</strong>
-                        % endif
-                    </td>
-                </tr>
-            % endif
+        % for revid, revision in reversed(list(enumerate(reversed([revision for revision in result.file.revisions if revision.action.id in ('creation', 'revision')])))):
+            ## INFO - D.A. - 2014-10-22
+            ## We do not show status update and other editions that are not revisions
+            ## (at least in this revision list table)
+            <% warning_or_not = ('', 'warning')[result.file.selected_revision==revision.id] %>
+            <tr class="${warning_or_not}">
+                <td><span class="label label-default">v${revid}</span></td>
+                <td>${revision.owner.name}</td>
+                <td><a href="${tg.url('/workspaces/{}/folders/{}/files/{}?revision_id={}').format(result.file.workspace.id, result.file.parent.id, result.file.id, revision.id)}">${revision.label}</a></td>
+                <% rev_download_url = tg.url('/workspaces/{}/folders/{}/files/{}/download?revision_id={}'.format(result.file.workspace.id, result.file.parent.id, result.file.id, revision.id)) %>
+                <td><a href="${rev_download_url}">${TIM.ICO(16, 'actions/go-bottom', _('Download this particular revision'))}</a></td>
+                <td>${h.date_time_in_long_format(revision.created, _('%Y-%m-%d at %H:%M'))}</td>
+                <td>${TIM.ICO_TOOLTIP(16, revision.action.icon, revision.action.label)}</td>
+                <td>
+                    % if warning_or_not:
+                        ${TIM.ICO(16, 'actions/go-previous')} <strong>${_('Revision r{}').format(result.file.selected_revision)}</strong>
+                    % endif
+                </td>
+            </tr>
         % endfor
     </table>
 </div>
