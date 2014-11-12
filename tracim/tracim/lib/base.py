@@ -42,7 +42,6 @@ class BaseController(TGController):
 
     def url(self, id: int=None, subpath: str='', params:dict=None, skip_id=False) -> str:
         """
-        burl means 'base url'
         return a standard REST URL for list or one item.
         If your mount point is /someitems, then this will return /someitems or /someitems/4 if id not None
         if subpath is given, then it will be added at the end, eg /someitems/subpath or /someitems/4/subpath
