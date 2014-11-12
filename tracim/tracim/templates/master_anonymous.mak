@@ -49,7 +49,7 @@
     </body>
 
 <%def name="content_wrapper()">
-    ${TIM.FLASH_MSG('col-sm-5 col-sm-offset-3')}
+    ${TIM.FLASH_MSG('col-sm-6 col-sm-offset-3')}
     ${self.body()}
 </%def>
 
