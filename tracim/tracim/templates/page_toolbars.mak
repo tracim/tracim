@@ -11,8 +11,8 @@
     % endif
     
     <div class="btn-group btn-group-vertical">
-        <a href="#page-versions" role="button" class="btn btn-default" data-toggle="modal" title="${_('View versions of the page')}">${TIM.ICO(32, 'actions/gnome-document-open-recent')}</a>
-        <a href="#page-associated-links" role="button" class="btn btn-default" data-toggle="modal" title="${_('View all links')}">${TIM.ICO(32, 'apps/internet-web-browser')}</a>
+        <a href="#associated-revisions" role="button" class="btn btn-default" title="${_('View versions of the page')}">${TIM.ICO(32, 'actions/gnome-document-open-recent')}</a>
+        <a href="#associated-links" role="button" class="btn btn-default" title="${_('View all links')}">${TIM.ICO(32, 'apps/internet-web-browser')}</a>
     </div>
     <p></p>
     

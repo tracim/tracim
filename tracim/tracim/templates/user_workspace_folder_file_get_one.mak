@@ -67,7 +67,7 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
     <div class="col-md-6">
         <table class="table table-hover table-condensed table-striped table-bordered">
             <tr>
-                <td class="tracim-title">${_('Name')}</td>
+                <td class="tracim-title">${_('File')}</td>
                 <td>
                     <a href="${download_url}" tittle="${_('Download the file (last revision)')}">
                         ${result.file.file.name}

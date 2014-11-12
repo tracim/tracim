@@ -76,8 +76,8 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
     </div>
     <hr class="tracim-panel-separator"/>
 
-
-    <h4 id="associated-links" class="anchored-title" >${_('Page revisions')}</h4>
+    <span id="associated-revisions" ></span>
+    <h4 class="anchored-title">${_('Page revisions')}</h4>
     <div>
         <table class="table table-striped table-hover">
             % for revid, revision in reversed(list(enumerate(reversed(result.page.revisions)))):

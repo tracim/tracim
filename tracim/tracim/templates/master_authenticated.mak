@@ -13,6 +13,12 @@
         <link href="${tg.url('/assets/css/bootstrap.min.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/css/dashboard.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/font-awesome-4.2.0/css/font-awesome.css')}" rel="stylesheet">
+
+        <script>
+            var shiftWindow = function() { scrollBy(0, -50) };
+            window.addEventListener("hashchange", shiftWindow);
+            function load() { if (window.location.hash) shiftWindow(); }
+        </script>
     </head>
 
     <body class="${self.body_class()}">
