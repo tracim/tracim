@@ -49,10 +49,11 @@
                                 <button type="submit" class="btn btn-small btn-success text-right">
                                     <i class="fa fa-check"></i> ${_('Login')}
                                 </button>
-                                <div class="pull-left">
-                                    <a class="btn btn-link" href="${tg.url('/reset_password')}"><i class="fa fa-magic"></i> ${_('Forgot password?')}</a>
-                                </div>
-
+                                % if h.show_email_stuff():
+                                    <div class="pull-left">
+                                        <a class="btn btn-link" href="${tg.url('/reset_password')}"><i class="fa fa-magic"></i> ${_('Forgot password?')}</a>
+                                    </div>
+                                % endif
                             </div>
                         </form>
                     </div>

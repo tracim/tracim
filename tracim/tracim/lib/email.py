@@ -24,9 +24,10 @@ class EmailSender(object):
     this class allow to send emails and has no relations with SQLAlchemy and other tg HTTP request environment
     This means that it can be used in any thread (even through a asyncjob_perform() call
     """
-    def __init__(self, config: SmtpConfiguration):
+    def __init__(self, config: SmtpConfiguration, really_send_messages):
         self._smtp_config = config
         self._smtp_connection = None
+        self._is_active = really_send_messages
 
     def connect(self):
         if not self._smtp_connection:
@@ -52,6 +53,9 @@ class EmailSender(object):
 
 
     def send_mail(self, message: MIMEMultipart):
-        self.connect() # Acutally, this connects to SMTP only if required
-        logger.info(self, 'Sending email to {}'.format(message['To']))
-        self._smtp_connection.send_message(message)
+        if not self._is_active:
+            logger.info(self, 'Not sending email to {} (service desactivated)'.format(message['To']))
+        else:
+            self.connect() # Acutally, this connects to SMTP only if required
+            logger.info(self, 'Sending email to {}'.format(message['To']))
+            self._smtp_connection.send_message(message)

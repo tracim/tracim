@@ -127,6 +127,7 @@ website.home.below_login_form = in case of problem, please contact the administr
 # integrated in the email notifcations
 website.base_url = http://127.0.0.1:8080
     
+email.notification.activated = False
 email.notification.from = Tracim Notification <noreply@trac.im>
 email.notification.content_update.template.html = ./tracim/templates/mail/content_update_body_html.mak
 email.notification.content_update.template.text = ./tracim/templates/mail/content_update_body_text.mak

@@ -126,7 +126,7 @@ class EmailNotifier(object):
         # In the other thread.
         #
         # This way, the webserver will return sooner (actually before notification emails are sent
-        async_email_sender = EmailSender(self._smtp_config)
+        async_email_sender = EmailSender(self._smtp_config, self._global_config.EMAIL_NOTIFICATION_ACTIVATED)
 
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))

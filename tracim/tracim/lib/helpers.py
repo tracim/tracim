@@ -64,6 +64,12 @@ class ICON(object):
   Shared = '<i class="fa fa-group"></i>'
   Private = '<i class="fa fa-key"></i>'
 
+def show_email_stuff():
+    """
+    this function is used in order to show/hide link for sending password reset through email
+    """
+    return CFG.get_instance().EMAIL_NOTIFICATION_ACTIVATED
+
 def tracker_js():
     return CFG.get_instance().TRACKER_JS_CONTENT
 

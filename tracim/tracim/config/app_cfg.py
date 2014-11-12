@@ -14,6 +14,8 @@ convert them into boolean, for example, you should use the
 """
 
 import tg
+from paste.deploy.converters import asbool
+
 from tg.configuration import AppConfig
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
@@ -211,6 +213,7 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = tg.config.get('email.notification.processing_mode')
 
 
+        self.EMAIL_NOTIFICATION_ACTIVATED = asbool(tg.config.get('email.notification.activated'))
         self.EMAIL_NOTIFICATION_SMTP_SERVER = tg.config.get('email.notification.smtp.server')
         self.EMAIL_NOTIFICATION_SMTP_PORT = tg.config.get('email.notification.smtp.port')
         self.EMAIL_NOTIFICATION_SMTP_USER = tg.config.get('email.notification.smtp.user')
