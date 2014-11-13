@@ -16,6 +16,8 @@ All data offers:
 - native versionning
 - comment threads making tracim knowledge-growth ready.
 
+Join Tracim community : http://tracim.org
+
 ## Use-cases ##
 
 ### Collaborate with clients ###
