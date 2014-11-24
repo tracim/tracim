@@ -331,6 +331,12 @@ class Content(DeclarativeBase):
     parent = relationship('Content', remote_side=[content_id], backref='children')
     owner = relationship('User', remote_side=[User.user_id])
 
+    @property
+    def valid_children(self):
+        for child in self.children:
+            if not child.is_deleted and not child.is_archived:
+                yield child
+
     @hybrid_property
     def properties(self):
         """ return a structure decoded from json content of _properties """
@@ -365,7 +371,7 @@ class Content(DeclarativeBase):
 
     def get_child_nb(self, content_type: ContentType, content_status = ''):
         child_nb = 0
-        for child in self.children:
+        for child in self.valid_children:
             if child.type==content_type:
                 if not content_status:
                     child_nb = child_nb+1

@@ -642,3 +642,118 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             next_url = self.url(int(folder_id))
 
         tg.redirect(next_url)
+
+    @property
+    def _std_url(self):
+        return tg.url('/workspaces/{}/folders/{}')
+
+    @property
+    def _parent_url(self):
+        return tg.url('/workspaces/{}')
+
+    @property
+    def _item_type_label(self):
+        return _('Folder')
+
+    @property
+    def _item_type(self):
+        return ContentType.Folder
+
+
+    @tg.require(current_user_is_content_manager())
+    @tg.expose()
+    def put_archive(self, item_id):
+        # TODO - CHECK RIGHTS
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user)
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+
+        try:
+            next_url = self._parent_url.format(item.workspace_id, item.parent_id)
+            undo_url = self._std_url.format(item.workspace_id, item.content_id)+'/put_archive_undo'
+            msg = _('{} archived. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
+
+            content_api.archive(item)
+            content_api.save(item, ActionDescription.ARCHIVING)
+
+            tg.flash(msg, CST.STATUS_OK, no_escape=True) # TODO allow to come back
+            tg.redirect(next_url)
+        except ValueError as e:
+            next_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
+            msg = _('{} not archived: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(next_url)
+
+
+    @tg.require(current_user_is_content_manager())
+    @tg.expose()
+    def put_archive_undo(self, item_id):
+        print('AGAGA')
+        # TODO - CHECK RIGHTS
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user, True, True) # Here we do not filter deleted items
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+        try:
+            next_url = self._std_url.format(item.workspace_id, item.content_id)
+            msg = _('{} unarchived.').format(self._item_type_label)
+            content_api.unarchive(item)
+            content_api.save(item, ActionDescription.UNARCHIVING)
+
+            tg.flash(msg, CST.STATUS_OK)
+            tg.redirect(next_url )
+
+        except ValueError as e:
+            msg = _('{} not un-archived: {}').format(self._item_type_label, str(e))
+            next_url = self._std_url.format(item.workspace_id, item.content_id)
+            # We still use std url because the item has not been archived
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(next_url)
+
+    @tg.require(current_user_is_content_manager())
+    @tg.expose()
+    def put_delete(self, item_id):
+        # TODO - CHECK RIGHTS
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user)
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+        try:
+
+            next_url = self._parent_url.format(item.workspace_id, item.parent_id)
+            undo_url = self._std_url.format(item.workspace_id, item.content_id)+'/put_delete_undo'
+            msg = _('{} deleted. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
+            content_api.delete(item)
+            content_api.save(item, ActionDescription.DELETION)
+
+            tg.flash(msg, CST.STATUS_OK, no_escape=True)
+            tg.redirect(next_url)
+
+        except ValueError as e:
+            back_url = self._std_url.format(item.workspace_id, item.content_id)
+            msg = _('{} not deleted: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(back_url)
+
+
+    @tg.require(current_user_is_content_manager())
+    @tg.expose()
+    def put_delete_undo(self, item_id):
+        # TODO - CHECK RIGHTS
+
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user, True, True) # Here we do not filter deleted items
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+        try:
+            next_url = self._std_url.format(item.workspace_id, item.content_id)
+            msg = _('{} undeleted.').format(self._item_type_label)
+            content_api.undelete(item)
+            content_api.save(item, ActionDescription.UNDELETION)
+
+            tg.flash(msg, CST.STATUS_OK)
+            tg.redirect(next_url)
+
+        except ValueError as e:
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            back_url = self._parent_url.format(item.workspace_id, item.parent_id)
+            msg = _('{} not un-deleted: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(back_url)

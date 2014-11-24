@@ -59,6 +59,6 @@ tracim/data/
 
 # Site-local config file
 development.ini
-
+track.js
 # Temporary files
 *~
