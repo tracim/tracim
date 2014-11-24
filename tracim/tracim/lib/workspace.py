@@ -69,7 +69,7 @@ class WorkspaceApi(object):
         return self._base_query().all()
 
     def get_all_for_user(self, user: User):
-        workspaces = [role.workspace for role in user.roles]
+        workspaces = [role.workspace for role in user.roles if not role.workspace.is_deleted]
         workspaces.sort(key=lambda workspace: workspace.label.lower())
         return workspaces
 
