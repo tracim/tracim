@@ -53,15 +53,18 @@ class Notifier(object):
         # INFO - D.A. - 2014-11-05 - Emails are sent through asynchronous jobs. For that reason, we do not
         # give SQLAlchemy objects but ids only (SQLA objects are related to a given thread/session)
         #
-        if global_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower()==global_config.CST.ASYNC.lower():
-            logger.info(self, 'Sending email in ASYNC mode')
-            # TODO - D.A - 2014-11-06
-            # This feature must be implemented in order to be able to scale to large communities
-            raise NotImplementedError('Sending emails through ASYNC mode is not working yet')
-            asyncjob_perform(EmailNotifier(self._smtp_config, global_config).notify_content_update, self._user.user_id, content.content_id)
-        else:
-            logger.info(self, 'Sending email in SYNC mode')
-            EmailNotifier(self._smtp_config, global_config).notify_content_update(self._user.user_id, content.content_id)
+        try:
+            if global_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower()==global_config.CST.ASYNC.lower():
+                logger.info(self, 'Sending email in ASYNC mode')
+                # TODO - D.A - 2014-11-06
+                # This feature must be implemented in order to be able to scale to large communities
+                raise NotImplementedError('Sending emails through ASYNC mode is not working yet')
+                asyncjob_perform(EmailNotifier(self._smtp_config, global_config).notify_content_update, self._user.user_id, content.content_id)
+            else:
+                logger.info(self, 'Sending email in SYNC mode')
+                EmailNotifier(self._smtp_config, global_config).notify_content_update(self._user.user_id, content.content_id)
+        except Exception as e:
+            logger.error(self, 'Exception catched during email notification: {}'.format(e.__str__()))
 
 class EST(object):
     """
@@ -118,6 +121,7 @@ class EmailNotifier(object):
         if len(notifiable_roles)<=0:
             logger.info(self, 'Skipping notification as nobody subscribed to in workspace {}'.format(content.workspace.label))
             return
+
 
         logger.info(self, 'Sending asynchronous emails to {} user(s)'.format(len(notifiable_roles)))
         # INFO - D.A. - 2014-11-06
