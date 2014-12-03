@@ -5,6 +5,8 @@ from tg import tmpl_context
 from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
 
+from tracim.config.app_cfg import CFG
+
 from tracim.controllers import TIMRestController
 from tracim.controllers.content import UserWorkspaceFolderRestController
 
@@ -18,8 +20,6 @@ from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
-
-
 
 
 class UserWorkspaceRestController(TIMRestController):
@@ -88,6 +88,10 @@ class UserWorkspaceRestController(TIMRestController):
         # including the selected node, all parents (and their siblings)
         workspace, content = convert_id_into_instances(current_id)
 
+        # The following step allow to select the parent folder when content itself is not visible in the treeview
+        if content.type!=ContentType.Folder and CFG.CST.TREEVIEW_ALL!=CFG.get_instance().WEBSITE_TREEVIEW_CONTENT:
+            content = content.parent if content.parent else None
+
         # This is the init of the recursive-like build of the tree
         content_parent = content
         tree_items = []
@@ -113,7 +117,6 @@ class UserWorkspaceRestController(TIMRestController):
         full_tree = self._build_sibling_list_of_workspaces(workspace, tree_items, should_select_workspace, all_workspaces)
 
         return Context(CTX.MENU_API_BUILD_FROM_TREE_ITEM).toDict(full_tree, 'd')
-
 
     def _build_sibling_list_of_workspaces(self, workspace: Workspace, child_contents: [NodeTreeItem], select_active_workspace = False, all_workspaces = True) -> [NodeTreeItem]:
 
@@ -141,6 +144,7 @@ class UserWorkspaceRestController(TIMRestController):
 
         return root_items
 
+
     def _build_sibling_list_of_tree_items(self,
                                           workspace: Workspace,
                                           content: Content,
@@ -152,12 +156,25 @@ class UserWorkspaceRestController(TIMRestController):
         tree_items = []
 
         parent = content.parent if content else None
-        for child in api.get_child_folders(parent, workspace, allowed_content_types, ignored_item_ids):
+
+        viewable_content_types = self._get_treeviewable_content_types_or_none()
+        child_contents = api.get_child_folders(parent, workspace, allowed_content_types, ignored_item_ids, viewable_content_types)
+        for child in child_contents:
             children_to_add = children if child==content else []
-            is_selected = True if select_active_node and child==content else False
+            if child==content and select_active_node:
+                # The item is the requested node, so we select it
+                is_selected = True
+            elif content not in child_contents and select_active_node and child==content:
+                # The item is not present in the list, so we select its parent node
+                is_selected = True
+            else:
+                is_selected = False
+
             new_item = NodeTreeItem(child, children_to_add, is_selected)
             tree_items.append(new_item)
 
+        # This allow to show contents and folders group by type
+        tree_items = ContentApi.sort_tree_items(tree_items)
 
         return parent, tree_items
 
@@ -172,8 +189,16 @@ class UserWorkspaceRestController(TIMRestController):
 
         ignore_item_ids = [int(ignore_id)] if ignore_id else []
         workspace, content = convert_id_into_instances(id)
-        contents = ContentApi(tmpl_context.current_user).get_child_folders(content, workspace, [], ignore_item_ids)
 
-        dictified_contents = Context(CTX.MENU_API).toDict(contents, 'd')
+        viewable_content_types = self._get_treeviewable_content_types_or_none()
+        contents = ContentApi(tmpl_context.current_user).get_child_folders(content, workspace, [], ignore_item_ids, viewable_content_types)
+        # This allow to show contents and folders group by type
+        sorted_contents = ContentApi.sort_content(contents)
+
+        dictified_contents = Context(CTX.MENU_API).toDict(sorted_contents, 'd')
         return dictified_contents
 
+    def _get_treeviewable_content_types_or_none(self):
+        if CFG.get_instance().WEBSITE_TREEVIEW_CONTENT==CFG.CST.TREEVIEW_ALL:
+            return ContentType.Any
+        return None # None means "workspaces and folders"

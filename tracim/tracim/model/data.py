@@ -56,7 +56,9 @@ class Workspace(DeclarativeBase):
                 return role.role
         return UserRoleInWorkspace.NOT_APPLICABLE
 
-
+    def get_label(self):
+        """ this method is for interoperability with Content class"""
+        return self.label
 
 class UserRoleInWorkspace(DeclarativeBase):
 
@@ -276,10 +278,22 @@ class ContentType(object):
         'comment': 'apps/internet-group-chat',
     }
 
+    _ORDER_WEIGHT = {
+        'folder': 0,
+        'page': 1,
+        'thread': 2,
+        'file': 3,
+        'comment': 4,
+    }
+
     @classmethod
     def icon(cls, type: str):
         assert(type in ContentType._ICONS) # DYN_REMOVE
         return ContentType._ICONS[type]
+
+    @classmethod
+    def all(cls):
+        return cls.allowed_types()
 
     @classmethod
     def allowed_types(cls):
@@ -293,6 +307,27 @@ class ContentType(object):
             if item and item in ContentType.allowed_types():
                 allowed_types.append(item)
         return allowed_types
+
+    @classmethod
+    def fill_url(cls, content: 'Content'):
+        # TODO - DYNDATATYPE - D.A. - 2014-12-02
+        # Make this code dynamic loading data types
+
+        if content.type==ContentType.Folder:
+            return '/workspaces/{}/folders/{}'.format(content.workspace_id, content.content_id)
+        elif content.type==ContentType.File:
+            return '/workspaces/{}/folders/{}/files/{}'.format(content.workspace_id, content.parent_id, content.content_id)
+        elif content.type==ContentType.Thread:
+            return '/workspaces/{}/folders/{}/threads/{}'.format(content.workspace_id, content.parent_id, content.content_id)
+        elif content.type==ContentType.Page:
+            return '/workspaces/{}/folders/{}/pages/{}'.format(content.workspace_id, content.parent_id, content.content_id)
+
+    @classmethod
+    def fill_url_for_workspace(cls, workspace: Workspace):
+        # TODO - DYNDATATYPE - D.A. - 2014-12-02
+        # Make this code dynamic loading data types
+        return '/workspaces/{}'.format(workspace.workspace_id)
+
 
 class Content(DeclarativeBase):
 
@@ -378,6 +413,9 @@ class Content(DeclarativeBase):
                 elif content_status==child.status:
                     child_nb = child_nb+1
         return child_nb
+
+    def get_label(self):
+        return self.label if self.label else self.file_name if self.file_name else ''
 
     def get_status(self) -> ContentStatus:
         return ContentStatus(self.status, self.type.__str__())

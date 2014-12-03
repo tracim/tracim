@@ -8,7 +8,7 @@
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
     <h4>${_('Workspaces')}</h4>
-    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__folder_{}'.format(result.file.workspace.id, result.file.parent.id))}
+    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.file.workspace.id, result.file.id))}
     <hr/>
 </%def>
 

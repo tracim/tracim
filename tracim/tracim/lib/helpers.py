@@ -131,7 +131,7 @@ def convert_id_into_instances(id: str) -> (Workspace, Content):
     try:
         content_data = content_str.split(CST.TREEVIEW_MENU.ID_SEPARATOR)
         content_id = int(content_data[1])
-        content = ContentApi(tg.tmpl_context.current_user).get_one(content_id, ContentType.Folder)
+        content = ContentApi(tg.tmpl_context.current_user).get_one(content_id, ContentType.Any)
     except (IndexError, ValueError) as e:
         content = None
 

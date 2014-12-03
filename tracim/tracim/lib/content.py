@@ -5,20 +5,71 @@ __author__ = 'damien'
 import tg
 
 from sqlalchemy.orm.attributes import get_history
+from tracim.lib import cmp_to_key
 from tracim.lib.notifications import Notifier
 from tracim.model import DBSession
 from tracim.model.auth import User
 from tracim.model.data import ContentStatus, ContentRevisionRO, ActionDescription
 from tracim.model.data import Content
 from tracim.model.data import ContentType
+from tracim.model.data import NodeTreeItem
 from tracim.model.data import Workspace
+
+def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Content):
+    """
+    :param content1:
+    :param content2:
+    :return:    1 if content1 > content2
+                -1 if content1 < content2
+                0 if content1 = content2
+    """
+
+    if content1.type==content2.type:
+        if content1.get_label().lower()>content2.get_label().lower():
+            return 1
+        elif content1.get_label().lower()<content2.get_label().lower():
+            return -1
+        return 0
+    else:
+        # TODO - D.A. - 2014-12-02 - Manage Content Types Dynamically
+        content_type_order = [ContentType.Folder, ContentType.Page, ContentType.Thread, ContentType.File]
+        result = content_type_order.index(content1.type)-content_type_order.index(content2.type)
+        if result<0:
+            return -1
+        elif result>0:
+            return 1
+        else:
+            return 0
+
+def compare_tree_items_for_sorting_by_type_and_name(item1: NodeTreeItem, item2: NodeTreeItem):
+    return compare_content_for_sorting_by_type_and_name(item1.node, item2.node)
+
 
 class ContentApi(object):
 
-    def __init__(self, current_user: User, show_archived=False, show_deleted=False):
+    def __init__(self, current_user: User, show_archived=False, show_deleted=False, all_content_in_treeview=True):
         self._user = current_user
         self._show_archived = show_archived
         self._show_deleted = show_deleted
+        self._show_all_type_of_contents_in_treeview = all_content_in_treeview
+
+
+    @classmethod
+    def sort_tree_items(cls, content_list: [NodeTreeItem])-> [Content]:
+        news = []
+        for item in content_list:
+            news.append(item)
+
+        content_list.sort(key=cmp_to_key(compare_tree_items_for_sorting_by_type_and_name))
+
+        return content_list
+
+
+    @classmethod
+    def sort_content(cls, content_list: [Content])-> [Content]:
+        content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
+        return content_list
+
 
     def _base_query(self, workspace: Workspace=None):
         result = DBSession.query(Content)
@@ -33,12 +84,26 @@ class ContentApi(object):
 
         return result
 
-    def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[]) -> [Content]:
+    def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> [Content]:
+        """
+        This method returns child items (folders or items) for left bar treeview.
+
+        :param parent:
+        :param workspace:
+        :param filter_by_allowed_content_types:
+        :param removed_item_ids:
+        :param allowed_node_types:
+        :return:
+        """
+        if not allowed_node_types:
+            allowed_node_types = [ContentType.Folder]
+        elif allowed_node_types==ContentType.Any:
+            allowed_node_types = ContentType.all()
 
         parent_id = parent.content_id if parent else None
         folders = self._base_query(workspace).\
             filter(Content.parent_id==parent_id).\
-            filter(Content.type==ContentType.Folder).\
+            filter(Content.type.in_(allowed_node_types)).\
             filter(Content.content_id.notin_(removed_item_ids)).\
             all()
 
@@ -49,7 +114,7 @@ class ContentApi(object):
         result = []
         for folder in folders:
             for allowed_content_type in filter_by_allowed_content_types:
-                if folder.properties['allowed_content'][allowed_content_type]==True:
+                if folder.type==ContentType.Folder and folder.properties['allowed_content'][allowed_content_type]==True:
                     result.append(folder)
 
         return result
