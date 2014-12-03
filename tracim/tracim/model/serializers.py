@@ -278,9 +278,9 @@ def serialize_content_for_menu_api(content: Content, context: Context):
     result = DictLikeClass(
         id = CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(workspace_id, content_id),
         children = True, # TODO: make this dynamic
-        text = content.label,
-        a_attr = { 'href' : context.url('/workspaces/{}/folders/{}'.format(workspace_id, content_id)) },
-        li_attr = { 'title': content.label, 'class': 'tracim-tree-item-is-a-folder' },
+        text = content.get_label(),
+        a_attr = { 'href' : context.url(ContentType.fill_url(content)) },
+        li_attr = { 'title': content.get_label(), 'class': 'tracim-tree-item-is-a-folder' },
         type = content.type,
         state = { 'opened': False, 'selected': False }
     )
@@ -770,22 +770,24 @@ def serialize_workspace_for_menu_api(workspace: Workspace, context: Context):
 @pod_serializer(NodeTreeItem, CTX.MENU_API_BUILD_FROM_TREE_ITEM)
 def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Context):
     if isinstance(item.node, Content):
+        ContentType.fill_url(item.node)
         return DictLikeClass(
             id=CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(item.node.workspace_id, item.node.content_id),
-            children=True if len(item.children)<=0 else context.toDict(item.children),
-            text=item.node.label,
-            a_attr={'href': context.url('/workspaces/{}/folders/{}'.format(item.node.workspace_id, item.node.content_id)) },
-            li_attr={'title': item.node.label, 'class': 'tracim-tree-item-is-a-folder'},
-            type='folder',
-            state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
+            children=True if ContentType.Folder==item.node.type and len(item.children)<=0 else context.toDict(item.children),
+            text=item.node.get_label(),
+            a_attr={'href': context.url(ContentType.fill_url(item.node)) },
+            li_attr={'title': item.node.get_label()},
+            # type='folder',
+            type=item.node.type,
+            state={'opened': True if ContentType.Folder==item.node.type and len(item.children)>0 else False, 'selected': item.is_selected}
         )
     elif isinstance(item.node, Workspace):
         return DictLikeClass(
             id=CST.TREEVIEW_MENU.ID_TEMPLATE__WORKSPACE_ONLY.format(item.node.workspace_id),
             children=True if len(item.children)<=0 else context.toDict(item.children),
             text=item.node.label,
-            a_attr={'href': context.url('/workspaces/{}'.format(item.node.workspace_id))},
-            li_attr={'title': item.node.label, 'class': 'tracim-tree-item-is-a-workspace'},
+            a_attr={'href': context.url(ContentType.fill_url_for_workspace(item.node))},
+            li_attr={'title': item.node.get_label()},
             type='workspace',
             state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
         )

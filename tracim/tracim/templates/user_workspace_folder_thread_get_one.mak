@@ -9,7 +9,7 @@
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
     <h4>${_('Workspaces')}</h4>
-    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__folder_{}'.format(result.thread.workspace.id, result.thread.parent.id))}
+    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.thread.workspace.id, result.thread.id))}
     <hr/>
 </%def>
 
@@ -19,6 +19,7 @@
 
 <%def name="REQUIRED_DIALOGS()">
     ${TIM.MODAL_DIALOG('thread-edit-modal-dialog', 'modal-lg')}
+    ${TIM.MODAL_DIALOG('thread-move-modal-dialog')}
 </%def>
 
 ############################################################################

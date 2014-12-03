@@ -122,6 +122,8 @@ website.title.color = #555
 website.home.subtitle = Default login: admin@admin.admin (password: admin@admin.admin)
 website.home.tag_line = <div class="text-center" style="font-weight: bold;">Collaboration, versionning and traceability</div>
 website.home.below_login_form = in case of problem, please contact the administrator.
+# Values may be 'all' or 'folders'
+website.treeview.content = all
 
 # The following base_url is used for links and icons
 # integrated in the email notifcations

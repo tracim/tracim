@@ -79,10 +79,16 @@ from tg.configuration.auth import TGAuthMetadata
 from sqlalchemy import and_
 #This tells to TurboGears how to retrieve the data for your user
 class ApplicationAuthMetadata(TGAuthMetadata):
+
     def __init__(self, sa_auth):
         self.sa_auth = sa_auth
+
     def authenticate(self, environ, identity):
-        user = self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(and_(self.sa_auth.user_class.is_active==True, self.sa_auth.user_class.email==identity['login'])).first()
+        user = self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(and_(
+            self.sa_auth.user_class.is_active==True,
+            self.sa_auth.user_class.email==identity['login']
+        )).first()
+
         if user and user.validate_password(identity['password']):
             return identity['login']
     def get_user(self, identity, userid):
@@ -222,6 +228,8 @@ class CFG(object):
         self.TRACKER_JS_PATH = tg.config.get('js_tracker_path')
         self.TRACKER_JS_CONTENT = self.get_tracker_js_content(self.TRACKER_JS_PATH)
 
+        self.WEBSITE_TREEVIEW_CONTENT = tg.config.get('website.treeview.content')
+
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
@@ -238,6 +246,9 @@ class CFG(object):
     class CST(object):
         ASYNC = 'ASYNC'
         SYNC = 'SYNC'
+
+        TREEVIEW_FOLDERS = 'folders'
+        TREEVIEW_ALL = 'all'
 
 #######
 #

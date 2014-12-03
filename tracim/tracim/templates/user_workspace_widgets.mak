@@ -142,6 +142,15 @@
                         "default" : {
                             "icon" : "${TIM.ICO_URL(16, 'places/jstree-folder')}"
                         },
+                        "page" : {
+                            "icon" : "${TIM.ICO_URL(16, 'mimetypes/text-html')}"
+                        },
+                        "file" : {
+                            "icon" : "${TIM.ICO_URL(16, 'status/mail-attachment')}"
+                        },
+                        "thread" : {
+                            "icon" : "${TIM.ICO_URL(16, 'apps/internet-group-chat')}"
+                        },
                         "workspace" : {
                             "icon" : "${TIM.ICO_URL(16, 'places/folder-remote')}"
                         },
@@ -167,7 +176,7 @@
                                 };
                             },
                             'success': function (new_data) {
-                                console.log('loaded new menu data' + new_data)
+                                console.log('loaded new menu data' + JSON.stringify(new_data))
                                 return new_data;
                             },
                         },
