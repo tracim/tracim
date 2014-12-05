@@ -90,7 +90,7 @@ class RootController(StandardController):
 
 
     @expose()
-    def post_login(self, came_from=lurl('/')):
+    def post_login(self, came_from=lurl('/dashboard')):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.

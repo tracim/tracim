@@ -205,11 +205,11 @@ class CFG(object):
         self.WEBSITE_HOME_TITLE_COLOR = tg.config.get('website.title.color', '#555')
         self.WEBSITE_HOME_IMAGE_URL = tg.lurl('/assets/img/home_illustration.jpg')
         self.WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl('/assets/img/bg.jpg')
-        self.WEBSITE_BASE_URL = tg.config.get('website.base_url')
+        self.WEBSITE_BASE_URL = tg.config.get('website.base_url', '')
 
-        self.WEBSITE_HOME_TAG_LINE = tg.config.get('website.home.tag_line')
-        self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle')
-        self.WEBSITE_HOME_BELOW_LOGIN_FORM = tg.config.get('website.home.below_login_form')
+        self.WEBSITE_HOME_TAG_LINE = tg.config.get('website.home.tag_line', '')
+        self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle', '')
+        self.WEBSITE_HOME_BELOW_LOGIN_FORM = tg.config.get('website.home.below_login_form', '')
 
 
         self.EMAIL_NOTIFICATION_FROM = tg.config.get('email.notification.from')

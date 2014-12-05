@@ -6,6 +6,7 @@ import json
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Sequence
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -40,7 +41,7 @@ class Workspace(DeclarativeBase):
 
     __tablename__ = 'workspaces'
 
-    workspace_id = Column(Integer, autoincrement=True, primary_key=True)
+    workspace_id = Column(Integer, Sequence('seq__workspaces__workspace_id'), autoincrement=True, primary_key=True)
 
     label   = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
@@ -335,7 +336,7 @@ class Content(DeclarativeBase):
 
     revision_to_serialize = -0  # This flag allow to serialize a given revision if required by the user
 
-    content_id = Column(Integer, autoincrement=True, primary_key=True)
+    content_id = Column(Integer, Sequence('seq__contents__content_id'), autoincrement=True, primary_key=True)
     parent_id = Column(Integer, ForeignKey('contents.content_id'), nullable=True, default=None)
     owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True, default=None)
 
@@ -475,7 +476,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     __tablename__ = 'content_revisions'
 
-    revision_id = Column(Integer, primary_key=True)
+    revision_id = Column(Integer, Sequence('seq__content_revisions__revision_id'), primary_key=True)
     content_id = Column(Integer, ForeignKey('contents.content_id'))
     owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
     label = Column(Unicode(1024), unique=False, nullable=False)

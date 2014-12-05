@@ -27,14 +27,44 @@ from tracim.model.auth import User
 
 from tgext.asyncjob import asyncjob_perform
 
-class Notifier(object):
+class INotifier(object):
+    """
+    Interface for Notifier instances
+    """
+    def __init__(self, current_user: User=None):
+        raise NotImplementedError
+
+    def notify_content_update(self, content: Content):
+        raise NotImplementedError
+
+
+class NotifierFactory(object):
+
+    @classmethod
+    def create(cls, current_user: User=None) -> INotifier:
+        cfg = CFG.get_instance()
+        if cfg.EMAIL_NOTIFICATION_ACTIVATED:
+            return DummyNotifier(current_user)
+
+        return RealNotifier(current_user)
+
+
+class DummyNotifier(INotifier):
+    def __init__(self, current_user: User=None):
+        logger.info(self, 'Instantiating Dummy Notifier')
+
+    def notify_content_update(self, content: Content):
+        logger.info(self, 'Fake notifier, do not send email-notification for update of content {} by user {}'.format(content.content_id, self._user.user_id))
+
+
+class RealNotifier(object):
 
     def __init__(self, current_user: User=None):
         """
-
         :param current_user: the user that has triggered the notification
         :return:
         """
+        logger.info(self, 'Instantiating Real Notifier')
         cfg = CFG.get_instance()
 
         self._user = current_user
@@ -44,7 +74,7 @@ class Notifier(object):
                                        cfg.EMAIL_NOTIFICATION_SMTP_PASSWORD)
 
     def notify_content_update(self, content: Content):
-        logger.info(self, 'About to email-notify update of content {} by user {}'.format(content.content_id, self._user.user_id))
+        logger.info(self, 'About to email-notify update of content {} by user {}'.format(content.content_id, self._user.user_id if self._user else 0)) # 0 means "no user"
 
         global_config = CFG.get_instance()
 

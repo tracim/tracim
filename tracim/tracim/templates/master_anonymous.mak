@@ -23,7 +23,6 @@
     background-size: cover;
     -o-background-size: cover;">
         <script src="${tg.url('/assets/js/jquery.min.js')}"></script>
-## FIXME - REMOVE        <script src="${tg.url('/javascript/tracim.js')}"></script>
 
         <div class="container-fluid">
             ${self.main_menu()}
