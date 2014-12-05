@@ -5,8 +5,9 @@ __author__ = 'damien'
 import tg
 
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy import not_
 from tracim.lib import cmp_to_key
-from tracim.lib.notifications import Notifier
+from tracim.lib.notifications import NotifierFactory
 from tracim.model import DBSession
 from tracim.model.auth import User
 from tracim.model.data import ContentStatus, ContentRevisionRO, ActionDescription
@@ -73,6 +74,7 @@ class ContentApi(object):
 
     def _base_query(self, workspace: Workspace=None):
         result = DBSession.query(Content)
+
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
@@ -130,6 +132,7 @@ class ContentApi(object):
         content.revision_type = ActionDescription.CREATION
 
         if do_save:
+            DBSession.add(content)
             self.save(content, ActionDescription.CREATION)
         return content
 
@@ -190,16 +193,18 @@ class ContentApi(object):
 
     def get_all(self, parent_id: int, content_type: str, workspace: Workspace=None) -> Content:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-        assert content_type is not None # DYN_REMOVE
+        assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
 
-        if not parent_id:
-            return
+        resultset = self._base_query(workspace)
 
-        return self._base_query(workspace).\
-            filter(Content.parent_id==parent_id).\
-            filter(Content.type==content_type).\
-            all()
+        if content_type!=ContentType.Any:
+            resultset.filter(Content.type==content_type)
+
+        if parent_id:
+            resultset.filter(Content.parent_id==parent_id)
+
+        return resultset.all()
 
     def set_allowed_content(self, folder: Content, allowed_content_dict:dict):
         """
@@ -269,6 +274,9 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
+    def flush(self):
+        DBSession.flush()
+
     def save(self, content: Content, action_description: str=None, do_flush=True, do_notify=True):
         """
         Save an object, flush the session and set the revision_type property
@@ -290,4 +298,5 @@ class ContentApi(object):
             DBSession.flush()
 
         if do_notify:
-            Notifier(self._user).notify_content_update(content)
+            NotifierFactory.create(self._user).notify_content_update(content)
+

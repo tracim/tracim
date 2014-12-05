@@ -48,7 +48,8 @@ SET client_min_messages = warning;
 -- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
-CREATE FUNCTION update_node() RETURNS trigger
+
+CREATE OR REPLACE FUNCTION update_node() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -60,7 +61,7 @@ return new;
 END;
 $$;
 
-CREATE FUNCTION set_created() RETURNS trigger
+CREATE OR REPLACE FUNCTION set_created() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -70,7 +71,7 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION set_updated() RETURNS trigger
+CREATE OR REPLACE FUNCTION set_updated() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN

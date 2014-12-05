@@ -10,7 +10,19 @@ from gearbox.commands.setup_app import SetupAppCommand
 from tg import config
 from tg.util import Bunch
 
-from tracim import model
+from sqlalchemy.engine import reflection
+
+from sqlalchemy.schema import DropConstraint
+from sqlalchemy.schema import DropSequence
+from sqlalchemy.schema import DropTable
+from sqlalchemy.schema import ForeignKeyConstraint
+from sqlalchemy.schema import MetaData
+from sqlalchemy.schema import Sequence
+from sqlalchemy.schema import Table
+
+import transaction
+
+from tracim.lib.base import logger
 
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
@@ -24,21 +36,118 @@ def load_app(name=application_name):
 
 def setup_app():
     """Setup the application."""
+
+    engine = config['tg.app_globals'].sa_engine
+    inspector = reflection.Inspector.from_engine(engine)
+    metadata = MetaData()
+
+    logger.debug(setup_app, 'Before setup...')
+
     cmd = SetupAppCommand(Bunch(options=Bunch(verbose_level=1)), Bunch())
+    logger.debug(setup_app, 'After setup, before run...')
+
     cmd.run(Bunch(config_file='config:test.ini', section_name=None))
+    logger.debug(setup_app, 'After run...')
+
+
 
 def setup_db():
     """Create the database schema (not needed when you run setup_app)."""
+
     engine = config['tg.app_globals'].sa_engine
-    model.init_model(engine)
-    model.metadata.create_all(engine)
+    # model.init_model(engine)
+    # model.metadata.create_all(engine)
+
 
 
 def teardown_db():
     """Destroy the database schema."""
     engine = config['tg.app_globals'].sa_engine
-    model.metadata.drop_all(engine)
+    connection = engine.connect()
 
+    # INFO - D.A. - 2014-12-04
+    # Recipe taken from bitbucket:
+    # https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/DropEverything
+
+    inspector = reflection.Inspector.from_engine(engine)
+    metadata = MetaData()
+
+    tbs = []
+    all_fks = []
+    views = []
+
+    # INFO - D.A. - 2014-12-04
+    # Sequences are hard defined here because SQLA does not allow to reflect them from existing schema
+    seqs = [
+        Sequence('seq__groups__group_id'),
+        Sequence('seq__contents__content_id'),
+        Sequence('seq__content_revisions__revision_id'),
+        Sequence('seq__permissions__permission_id'),
+        Sequence('seq__users__user_id'),
+        Sequence('seq__workspaces__workspace_id')
+    ]
+
+    for view_name in inspector.get_view_names():
+        v = Table(view_name,metadata)
+        views.append(v)
+
+    for table_name in inspector.get_table_names():
+
+        fks = []
+        for fk in inspector.get_foreign_keys(table_name):
+            if not fk['name']:
+                continue
+            fks.append(
+                ForeignKeyConstraint((),(),name=fk['name'])
+                )
+        t = Table(table_name,metadata,*fks)
+        tbs.append(t)
+        all_fks.extend(fks)
+
+    for fkc in all_fks:
+        connection.execute(DropConstraint(fkc))
+
+    for view in views:
+        drop_statement = 'DROP VIEW {}'.format(view.name)
+        # engine.execute(drop_statement)
+        connection.execute(drop_statement)
+
+    for table in tbs:
+        connection.execute(DropTable(table))
+
+
+    for sequence in seqs:
+        try:
+            connection.execute(DropSequence(sequence))
+        except Exception as e:
+            logger.debug(teardown_db, 'Exception while trying to remove sequence {}'.format(sequence.name))
+
+    transaction.commit()
+    engine.dispose()
+
+
+class TestStandard(object):
+
+    def setUp(self):
+        self.app = load_app('main')
+
+        logger.debug(self, 'Start setUp() by trying to clean database...')
+        try:
+            teardown_db()
+        except Exception as e:
+            logger.debug(self, 'teardown() throwed an exception {}'.format(e.__str__()))
+        logger.debug(self, 'Start setUp() by trying to clean database... -> done')
+
+        logger.debug(self, 'Start Application Setup...')
+        setup_app()
+        logger.debug(self, 'Start Application Setup... -> done')
+
+        logger.debug(self, 'Start Database Setup...')
+        setup_db()
+        logger.debug(self, 'Start Database Setup... -> done')
+
+    def tearDown(self):
+        transaction.commit()
 
 class TestController(object):
     """Base functional test case for the controllers.
@@ -61,9 +170,17 @@ class TestController(object):
     def setUp(self):
         """Setup test fixture for each functional test method."""
         self.app = load_app(self.application_under_test)
+
+        try:
+            teardown_db()
+        except Exception as e:
+            print('-> err ({})'.format(e.__str__()))
+
         setup_app()
+        setup_db()
+
 
     def tearDown(self):
         """Tear down test fixture for each functional test method."""
-        model.DBSession.remove()
+        # model.DBSession.remove()
         teardown_db()

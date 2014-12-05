@@ -33,7 +33,7 @@ class UserApi(object):
         if do_save:
             self.save(user)
 
-        if user.user_id==self._user.user_id:
+        if self._user and user.user_id==self._user.user_id:
             # this is required for the session to keep on being up-to-date
             tg.request.identity['repoze.who.userid'] = email
 
@@ -58,10 +58,20 @@ class UserApi(object):
 
 class UserStaticApi(object):
 
-  @classmethod
-  def get_current_user(cls) -> User:
-    identity = tg.request.identity
+    @classmethod
+    def get_current_user(cls) -> User:
+        identity = tg.request.identity
 
-    if tg.request.identity:
-        return pbma.User.by_email_address(tg.request.identity['repoze.who.userid'])
-    return None
+        if tg.request.identity:
+            return cls._get_user(tg.request.identity['repoze.who.userid'])
+
+        return None
+
+    @classmethod
+    def _get_user(cls, email) -> User:
+        """
+        Do not use directly in your code.
+        :param email:
+        :return:
+        """
+        return pbma.User.by_email_address(email)

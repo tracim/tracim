@@ -16,8 +16,15 @@ from tg.i18n import lazy_ugettext as l_
 
 __all__ = ['User', 'Group', 'Permission']
 
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, Boolean
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Sequence
+from sqlalchemy import Table
+
+from sqlalchemy.types import Unicode
+from sqlalchemy.types import Integer
+from sqlalchemy.types import DateTime
+from sqlalchemy.types import Boolean
 from sqlalchemy.orm import relation, relationship, synonym
 
 from tracim.model import DeclarativeBase, metadata, DBSession
@@ -54,7 +61,7 @@ class Group(DeclarativeBase):
 
     __tablename__ = 'groups'
 
-    group_id = Column(Integer, autoincrement=True, primary_key=True)
+    group_id = Column(Integer, Sequence('seq__groups__group_id'), autoincrement=True, primary_key=True)
     group_name = Column(Unicode(16), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     created = Column(DateTime, default=datetime.now)
@@ -106,7 +113,7 @@ class User(DeclarativeBase):
     """
     __tablename__ = 'users'
 
-    user_id = Column(Integer, autoincrement=True, primary_key=True)
+    user_id = Column(Integer, Sequence('seq__users__user_id'), autoincrement=True, primary_key=True)
     email = Column(Unicode(255), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     _password = Column('password', Unicode(128))
@@ -214,7 +221,7 @@ class Permission(DeclarativeBase):
     __tablename__ = 'permissions'
 
 
-    permission_id = Column(Integer, autoincrement=True, primary_key=True)
+    permission_id = Column(Integer, Sequence('seq__permissions__permission_id'), autoincrement=True, primary_key=True)
     permission_name = Column(Unicode(63), unique=True, nullable=False)
     description = Column(Unicode(255))
 

@@ -15,6 +15,7 @@
                     <p class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};">${h.CFG.WEBSITE_SUBTITLE|n}</p>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-sm-offset-3 col-sm-2">
                     <a class="thumbnail">
@@ -27,7 +28,7 @@
                 <div class="col-sm-4">
                     <div class="well">
                         <h2 style="margin-top: 0;">${TIM.ICO(32, 'status/status-locked')} ${_('Login')}</h2>
-                        <form role="form" method="POST" action="${tg.url('/login_handler', params=dict(came_from=came_from, __logins=login_counter))}">
+                        <form id='w-login-form' role="form" method="POST" action="${tg.url('/login_handler', params=dict(came_from=came_from, __logins=login_counter))}">
                             <div class="form-group">
                                 <div class="input-group">
                                     <div class="input-group-addon"><i class="fa fa-envelope-o"></i></div>
@@ -62,6 +63,7 @@
             <div class="row">
                 <div class="col-sm-offset-3 col-sm-6 text-center">${h.CFG.WEBSITE_HOME_BELOW_LOGIN_FORM|n}</div>
             </div>
+
 
         </div>
     </div>
