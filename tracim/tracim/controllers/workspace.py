@@ -89,7 +89,7 @@ class UserWorkspaceRestController(TIMRestController):
         workspace, content = convert_id_into_instances(current_id)
 
         # The following step allow to select the parent folder when content itself is not visible in the treeview
-        if content.type!=ContentType.Folder and CFG.CST.TREEVIEW_ALL!=CFG.get_instance().WEBSITE_TREEVIEW_CONTENT:
+        if content and content.type!=ContentType.Folder and CFG.CST.TREEVIEW_ALL!=CFG.get_instance().WEBSITE_TREEVIEW_CONTENT:
             content = content.parent if content.parent else None
 
         # This is the init of the recursive-like build of the tree
