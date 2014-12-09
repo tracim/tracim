@@ -32,7 +32,8 @@ class INotifier(object):
     Interface for Notifier instances
     """
     def __init__(self, current_user: User=None):
-        raise NotImplementedError
+        pass
+
 
     def notify_content_update(self, content: Content):
         raise NotImplementedError
@@ -43,7 +44,7 @@ class NotifierFactory(object):
     @classmethod
     def create(cls, current_user: User=None) -> INotifier:
         cfg = CFG.get_instance()
-        if cfg.EMAIL_NOTIFICATION_ACTIVATED:
+        if not cfg.EMAIL_NOTIFICATION_ACTIVATED:
             return DummyNotifier(current_user)
 
         return RealNotifier(current_user)
@@ -54,7 +55,7 @@ class DummyNotifier(INotifier):
         logger.info(self, 'Instantiating Dummy Notifier')
 
     def notify_content_update(self, content: Content):
-        logger.info(self, 'Fake notifier, do not send email-notification for update of content {} by user {}'.format(content.content_id, self._user.user_id))
+        logger.info(self, 'Fake notifier, do not send email-notification for update of content {}'.format(content.content_id))
 
 
 class RealNotifier(object):

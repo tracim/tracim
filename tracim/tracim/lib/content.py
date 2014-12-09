@@ -150,7 +150,7 @@ class ContentApi(object):
 
         if do_save:
             self.save(item, ActionDescription.COMMENT)
-        return content
+        return item
 
 
     def get_one_from_revision(self, content_id: int, content_type: str, workspace: Workspace=None, revision_id=None) -> Content:
@@ -174,22 +174,14 @@ class ContentApi(object):
         return content
 
     def get_one(self, content_id: int, content_type: str, workspace: Workspace=None) -> Content:
-        assert content_id is None or isinstance(content_id, int) # DYN_REMOVE
-        assert content_type is not None # DYN_REMOVE
-        assert isinstance(content_type, str) # DYN_REMOVE
 
         if not content_id:
-            return
+            return None
 
         if content_type==ContentType.Any:
-            return self._base_query(workspace).\
-                filter(Content.content_id==content_id).\
-                one()
+            return self._base_query(workspace).filter(Content.content_id==content_id).one()
 
-        return self._base_query(workspace).\
-            filter(Content.content_id==content_id).\
-            filter(Content.type==content_type).\
-            one()
+        return self._base_query(workspace).filter(Content.content_id==content_id).filter(Content.type==content_type).one()
 
     def get_all(self, parent_id: int, content_type: str, workspace: Workspace=None) -> Content:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
@@ -199,10 +191,10 @@ class ContentApi(object):
         resultset = self._base_query(workspace)
 
         if content_type!=ContentType.Any:
-            resultset.filter(Content.type==content_type)
+            resultset = resultset.filter(Content.type==content_type)
 
         if parent_id:
-            resultset.filter(Content.parent_id==parent_id)
+            resultset = resultset.filter(Content.parent_id==parent_id)
 
         return resultset.all()
 
@@ -218,12 +210,6 @@ class ContentApi(object):
             )
         :return:
         """
-        assert folder.type==ContentType.Folder
-        assert 'file' in allowed_content_dict.keys()
-        assert 'folder' in allowed_content_dict.keys()
-        assert 'page' in allowed_content_dict.keys()
-        assert 'thread' in allowed_content_dict.keys()
-
         properties = dict(allowed_content = allowed_content_dict)
         folder.properties = properties
 
@@ -245,32 +231,39 @@ class ContentApi(object):
         item.revision_type = ActionDescription.EDITION
 
 
-    def update_content(self, item: Content, new_label: str, new_content: str) -> Content:
+    def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
+        item.owner = self._user
         item.label = new_label
-        item.description = new_content # TODO: convert urls into links
+        item.description = new_content if new_content else item.description # TODO: convert urls into links
         item.revision_type = ActionDescription.EDITION
         return item
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_file_content) -> Content:
+        item.owner = self._user
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.file_content = new_file_content
+        item.revision_type = ActionDescription.REVISION
         return item
 
     def archive(self, content: Content):
+        content.owner = self._user
         content.is_archived = True
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
+        content.owner = self._user
         content.is_archived = False
         content.revision_type = ActionDescription.UNARCHIVING
 
 
     def delete(self, content: Content):
+        content.owner = self._user
         content.is_deleted = True
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
+        content.owner = self._user
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
@@ -292,7 +285,9 @@ class ContentApi(object):
                 # The action has not been modified, so we set it to default edition
                 action_description = ActionDescription.EDITION
 
-        content.revision_type = action_description
+        if action_description:
+            content.revision_type = action_description
+
 
         if do_flush:
             DBSession.flush()
