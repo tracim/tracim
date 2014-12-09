@@ -3,11 +3,21 @@ python:
   - "3.2"
   - "3.3"
   - "3.4"
+
+addons:
+  postgresql: "9.3"
+
 # command to install dependencies
 install:
   - "cd tracim && python setup.py develop && cd -"
   - "pip install -r install/requirements.txt"
   - "./bin/tg2env-patch tg2env/"
   
+before_script:
+  - "psql -c 'create database tracim_test;' -U postgres"
+  - "cd tracim && gearbox setup-app && cd -"
+
 # command to run tests
 script: nosetests --with-coverage --cover-package=tracim
+
+
