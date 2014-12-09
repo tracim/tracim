@@ -199,10 +199,10 @@ class ContentApi(object):
         resultset = self._base_query(workspace)
 
         if content_type!=ContentType.Any:
-            resultset.filter(Content.type==content_type)
+            resultset = resultset.filter(Content.type==content_type)
 
         if parent_id:
-            resultset.filter(Content.parent_id==parent_id)
+            resultset = resultset.filter(Content.parent_id==parent_id)
 
         return resultset.all()
 
