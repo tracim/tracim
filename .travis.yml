@@ -1,0 +1,13 @@
+language: python
+python:
+  - "3.2"
+  - "3.3"
+  - "3.4"
+# command to install dependencies
+install:
+  - "cd tracim && python setup.py develop && cd -"
+  - "pip install -r install/requirements.txt"
+  - "./bin/tg2env-patch tg2env/"
+  
+# command to run tests
+script: nosetests --with-coverage --cover-package=tracim
