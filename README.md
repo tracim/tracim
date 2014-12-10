@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=master)](https://travis-ci.org/tracim/tracim)
+[![Coverage Status](https://img.shields.io/coveralls/tracim/tracim.svg)](https://coveralls.io/r/tracim/tracim)
+
 # Tracim - Introduction #
 
 Tracim is a collaborative software designed to allow people to share and work on various data and document types.
