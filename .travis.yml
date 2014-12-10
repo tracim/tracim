@@ -19,12 +19,14 @@ install:
   - "./bin/tg2env-patch 1 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
   - "pip install -r install/requirements.txt; echo"
   - "./bin/tg2env-patch 2 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
+  - "pip install coveralls"
   
 before_script:
   - "psql -c 'create database tracim_test;' -U postgres"
   - "cp tracim/development.ini.base tracim/development.ini"
 
 # command to run tests
-script: cd tracim && nosetests --with-coverage --cover-package=tracim
+script: "cd tracim && nosetests -v --with-coverage --cover-package=tracim --cover-erase"
 
-
+after_success:
+- coveralls
