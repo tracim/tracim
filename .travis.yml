@@ -16,8 +16,9 @@ addons:
 install:
   - "cd tracim && python setup.py develop; cd -"
   - "pip install -r install/requirements.txt; echo"
+  - "./bin/tg2env-patch 1 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
   - "pip install -r install/requirements.txt; echo"
-  - "./bin/tg2env-patch /home/travis/virtualenv/python3.2.5"
+  - "./bin/tg2env-patch 2 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
   
 before_script:
   - "psql -c 'create database tracim_test;' -U postgres"
