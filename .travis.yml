@@ -1,13 +1,32 @@
 language: python
 python:
   - "3.2"
-  - "3.3"
-  - "3.4"
+#  - "3.3"
+#  - "3.4"
+
+addons:
+  postgresql: "9.3"
+
 # command to install dependencies
+# Note: there's an echo at the end of pip install. It allows to override the default return code which is not 0
+# because some packages need to be ugraded to python3 (invalid python syntax because of python2 source code)
+#
+# pip install -r is run 2 times in order to really install tgapp-resetpassword (to investigate)
+#
 install:
-  - "cd tracim && python setup.py develop && cd -"
-  - "pip install -r install/requirements.txt"
-  - "./bin/tg2env-patch tg2env/"
+  - "cd tracim && python setup.py develop; cd -"
+  - "pip install -r install/requirements.txt; echo"
+  - "./bin/tg2env-patch 1 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
+  - "pip install -r install/requirements.txt; echo"
+  - "./bin/tg2env-patch 2 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
+  - "pip install coveralls"
   
+before_script:
+  - "psql -c 'create database tracim_test;' -U postgres"
+  - "cp tracim/development.ini.base tracim/development.ini"
+
 # command to run tests
-script: nosetests --with-coverage --cover-package=tracim
+script: "cd tracim && nosetests -v --with-coverage --cover-package=tracim --cover-erase"
+
+after_success:
+- coveralls
