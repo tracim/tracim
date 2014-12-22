@@ -8,59 +8,42 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
 
-from tracim.lib.user import UserApi
+from tracim.config.app_cfg import CFG
+from tracim.lib.notifications import DummyNotifier
+from tracim.lib.notifications import EST
+from tracim.lib.notifications import NotifierFactory
+from tracim.lib.notifications import RealNotifier
+from tracim.model.auth import User
+from tracim.model.data import Content
+
 from tracim.tests import TestStandard
 
 
+class TestDummyNotifier(TestStandard):
 
-class TestUserApi(TestStandard):
+    def test_dummy_notifier__notify_content_update(self):
+        c = Content()
+        notifier = DummyNotifier()
+        notifier.notify_content_update(c)
+        # INFO - D.A. - 2014-12-09 - Old notification_content_update raised an exception
 
-    def test_create_and_update_user(self):
-        api = UserApi(None)
-        u = api.create_user()
-        api.update(u, 'bob', 'bob@bob', True)
+    def test_notifier_factory_method(self):
+        u = User()
 
-        nu = api.get_one_by_email('bob@bob')
-        ok_(nu!=None)
-        eq_('bob@bob', nu.email)
-        eq_('bob', nu.display_name)
+        cfg = CFG.get_instance()
+        cfg.EMAIL_NOTIFICATION_ACTIVATED = True
+        notifier = NotifierFactory.create(u)
+        eq_(RealNotifier, notifier.__class__)
 
+        cfg.EMAIL_NOTIFICATION_ACTIVATED = False
+        notifier = NotifierFactory.create(u)
+        eq_(DummyNotifier, notifier.__class__)
 
-    def test_user_with_email_exists(self):
-        api = UserApi(None)
-        u = api.create_user()
-        api.update(u, 'bibi', 'bibi@bibi', True)
-        transaction.commit()
+    def test_email_subject_tag_list(self):
+        tags = EST.all()
 
-        eq_(True, api.user_with_email_exists('bibi@bibi'))
-        eq_(False, api.user_with_email_exists('unknown'))
-
-
-    def test_get_one_by_email(self):
-        api = UserApi(None)
-        u = api.create_user()
-        api.update(u, 'bibi', 'bibi@bibi', True)
-        uid = u.user_id
-        transaction.commit()
-
-        eq_(uid, api.get_one_by_email('bibi@bibi').user_id)
-
-    @raises(NoResultFound)
-    def test_get_one_by_email_exception(self):
-        api = UserApi(None)
-        api.get_one_by_email('unknown')
-
-    def test_get_all(self):
-        api = UserApi(None)
-        # u1 = api.create_user(True)
-        # u2 = api.create_user(True)
-
-        # users = api.get_all()
-        # ok_(2==len(users))
-
-    def test_get_one(self):
-        api = UserApi(None)
-        u = api.create_user()
-        api.update(u, 'titi', 'titi@titi', True)
-        one = api.get_one(u.user_id)
-        eq_(u.user_id, one.user_id)
+        eq_(4,len(tags))
+        ok_('{website_title}' in tags)
+        ok_('{workspace_label}' in tags)
+        ok_('{content_label}' in tags)
+        ok_('{content_status_label}' in tags)
