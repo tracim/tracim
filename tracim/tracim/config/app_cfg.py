@@ -197,10 +197,15 @@ class CFG(object):
             # At the time of configuration setup, it can't be evaluated
             # We do not show CONTENT in order not to pollute log files
             logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
+        else:
+            logger.info(self, 'CONFIG: [ {} | <value not shown> ]'.format(key))
 
         self.__dict__[key] = value
 
     def __init__(self):
+
+        self.DATA_UPDATE_ALLOWED_DURATION = int(tg.config.get('content.update.allowed.duration', 0))
+
         self.WEBSITE_TITLE = tg.config.get('website.title', 'TRACIM')
         self.WEBSITE_HOME_TITLE_COLOR = tg.config.get('website.title.color', '#555')
         self.WEBSITE_HOME_IMAGE_URL = tg.lurl('/assets/img/home_illustration.jpg')

@@ -10,6 +10,8 @@ import transaction
 
 
 from tracim.model.data import Content
+from tracim.model.data import ContentType
+from tracim.model.data import Workspace
 
 from tracim.model.serializers import Context
 from tracim.model.serializers import ContextConverterNotFoundException
@@ -89,3 +91,53 @@ class TestSerializers(TestStandard):
 
 
 
+    def test_serialize_Content_comment_THREAD(self):
+
+        wor = Workspace()
+        wor.workspace_id = 4
+
+        fol = Content()
+        fol.type = ContentType.Folder
+        fol.content_id = 72
+        fol.workspace = wor
+
+        par = Content()
+        par.type = ContentType.Thread
+        par.content_id = 37
+        par.parent = fol
+        par.workspace = wor
+
+        obj = Content()
+        obj.type = ContentType.Comment
+        obj.content_id = 132
+        obj.label = 'some label'
+        obj.description = 'Some Description'
+        obj.parent = par
+
+        res = Context(CTX.THREAD).toDict(obj)
+        eq_(res.__class__, DictLikeClass, res)
+
+        ok_('label' in res.keys())
+        eq_(obj.label, res.label, res)
+
+        ok_('content' in res.keys())
+        eq_(obj.description, res.content, res)
+
+        ok_('created' in res.keys())
+
+        ok_('icon' in res.keys())
+        eq_(ContentType.icon(obj.type), res.icon, res)
+
+        ok_('id' in res.folder.keys())
+        eq_(obj.content_id, res.id, res)
+
+        ok_('owner' in res.folder.keys())
+        eq_(None, res.owner, res) # TODO - test with a owner value
+
+        ok_('type' in res.folder.keys())
+        eq_(obj.type, res.type, res)
+
+        ok_('urls' in res.folder.keys())
+        ok_('delete' in res.urls.keys())
+
+        eq_(8, len(res.keys()), res)

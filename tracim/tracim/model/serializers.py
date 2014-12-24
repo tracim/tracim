@@ -282,7 +282,7 @@ def serialize_content_for_menu_api(content: Content, context: Context):
         a_attr = { 'href' : context.url(ContentType.fill_url(content)) },
         li_attr = { 'title': content.get_label(), 'class': 'tracim-tree-item-is-a-folder' },
         type = content.type,
-        state = { 'opened': False, 'selected': False }
+        state = { 'opened': True if ContentType.Folder!=content.type else False, 'selected': False }
     )
     return result
 
@@ -405,6 +405,9 @@ def serialize_node_for_page(item: Content, context: Context):
             owner = context.toDict(item.owner),
             # REMOVE parent = context.toDict(item.parent),
             type = item.type,
+            urls = context.toDict({
+                'delete': context.url('/workspaces/{wid}/folders/{fid}/{ctype}/{cid}/comments/{commentid}/put_delete'.format(wid = item.workspace_id, fid=item.parent.parent_id, ctype=item.parent.type+'s', cid=item.parent.content_id, commentid=item.content_id))
+            })
         )
 
     if item.type==ContentType.Folder:
@@ -771,6 +774,7 @@ def serialize_workspace_for_menu_api(workspace: Workspace, context: Context):
 def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Context):
     if isinstance(item.node, Content):
         ContentType.fill_url(item.node)
+
         return DictLikeClass(
             id=CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(item.node.workspace_id, item.node.content_id),
             children=True if ContentType.Folder==item.node.type and len(item.children)<=0 else context.toDict(item.children),

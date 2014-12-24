@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from tg import expose, flash, require, url, lurl, request, redirect, tmpl_context
+from tg import abort
+from tg import request
+from tg import tmpl_context
 from tg.i18n import lazy_ugettext as l_
+from tg.i18n import ugettext as _
 from tg.predicates import Predicate
 
+from tracim.model.data import ContentType
 from tracim.lib.base import logger
+from tracim.lib.content import ContentApi
 
 from tracim.model.data import UserRoleInWorkspace
 
@@ -56,3 +61,9 @@ class current_user_is_workspace_manager(WorkspaceRelatedPredicate):
     def minimal_role_level(self):
         return UserRoleInWorkspace.WORKSPACE_MANAGER
 
+def require_current_user_is_owner(item_id: int):
+    current_user = tmpl_context.current_user
+    item = ContentApi(current_user, True, True).get_one(item_id, ContentType.Any)
+
+    if item.owner_id!=current_user.user_id:
+        abort(403, _('You\'re not allowed to access this resource'))

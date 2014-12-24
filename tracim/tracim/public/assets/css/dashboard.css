@@ -155,8 +155,8 @@ iframe { border: 5px solid #b3e7ff; }
 .tracim-status-selected { background-color: #EEE; }
 .tracim-panel-separator { border-width: 12px 0 0 0; }
 
-.tracim-thread-item {}
-.tracim-thread-item-content { margin-left: 12px; border-left: 8px solid #EEE; padding: 0 0.5em; }
+.tracim-timeline-item {}
+.tracim-timeline-item-content { margin-left: 12px; border-left: 8px solid #EEE; padding: 0 0.5em; }
 
 #tracim-footer-separator { margin-bottom: 30px; }
 .pod-footer {

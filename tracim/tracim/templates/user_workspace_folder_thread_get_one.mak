@@ -74,26 +74,7 @@ ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
 % endif 
 
 % for comment in result.thread.comments:
-    <div class="tracim-thread-item">
-        <h5 style="margin: 0;">
-            <div class="pull-right text-right">
-                <div class="label" style="font-size: 10px; border: 1px solid #CCC; color: #777; ">
-                    ${h.format_short(comment.created)|n}
-                </div>
-                <br/>
-## SHOW REMOVE ACTION                <a class="btn btn-default btn-xs" style="margin-top: 6px;" href="">
-##                <img src="assets/icons/16x16/places/user-trash.png" title="Supprimer ce commentaire"></a>
-            </div>
-   
-            ${TIM.ICO(32, comment.icon)}
-            <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(comment.owner.name)|n}</span>
-        </h5>
-        <div class="tracim-thread-item-content">
-            <div>${comment.content|n}</div>
-            <br/>
-        </div>
-    </div>
-
+    ${WIDGETS.SECURED_TIMELINE_ITEM(fake_api.current_user, comment)}
 % endfor
 
 ## <hr class="tracim-panel-separator"/>
