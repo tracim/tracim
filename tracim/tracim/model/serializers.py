@@ -130,7 +130,7 @@ class Context(object):
                 if model_class in Context._converters[CTX.DEFAULT]:
                     return Context._converters[CTX.DEFAULT][model_class]
 
-            raise ContextConverterNotFoundException(context_string,model_class)
+            raise ContextConverterNotFoundException(context_string, model_class)
 
     def __init__(self, context_string, base_url=''):
         """
