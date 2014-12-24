@@ -264,3 +264,28 @@
         % endif
     </div>
 </%def>
+
+<%def name="SECURED_TIMELINE_ITEM(user, item)">
+    <div class="tracim-timeline-item">
+        <h5 style="margin: 0;">
+            ${TIM.ICO(32, item.icon)}
+            <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(item.owner.name)|n}</span>
+
+            <div class="pull-right text-right">
+                <div class="label" style="font-size: 10px; border: 1px solid #CCC; color: #777; ">
+                    ${h.format_short(item.created)|n}
+                </div>
+                % if h.is_item_still_editable(item) and item.owner.id==user.id:
+                    <br/>
+                    <div class="btn-group">
+                    <a class="btn btn-default btn-xs" style="margin-top: 8px; padding-bottom: 3px;" href="${item.urls.delete}">${TIM.ICO_TOOLTIP(16, 'status/user-trash-full', h.delete_label_for_item(item))}</a>
+                    </div>
+                % endif
+            </div>
+        </h5>
+        <div class="tracim-timeline-item-content">
+            <div>${item.content|n}</div>
+            <br/>
+        </div>
+    </div>
+</%def>

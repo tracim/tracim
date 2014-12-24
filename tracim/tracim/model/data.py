@@ -287,6 +287,16 @@ class ContentType(object):
         'comment': 4,
     }
 
+    _DELETE_LABEL = {
+        'dashboard': '',
+        'workspace': l_('Delete this workspace'),
+        'folder': l_('Delete this folder'),
+        'file': l_('Delete this file'),
+        'page': l_('Delete this page'),
+        'thread': l_('Delete this thread'),
+        'comment': l_('Delete this comment'),
+    }
+
     @classmethod
     def icon(cls, type: str):
         assert(type in ContentType._ICONS) # DYN_REMOVE
@@ -429,7 +439,7 @@ class Content(DeclarativeBase):
     def get_comments(self):
         children = []
         for child in self.children:
-            if child.type==ContentType.Comment:
+            if ContentType.Comment==child.type and not child.is_deleted and not child.is_archived:
                 children.append(child)
         return children
 

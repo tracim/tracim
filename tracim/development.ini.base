@@ -115,6 +115,17 @@ resetpassword.smtp_login = smtp.login
 resetpassword.smtp_passwd = smtp.password
 
 
+# Specifies if the update of comments and attached files is allowed (by the owner only).
+# Examples:
+#    600 means 10 minutes (ie 600 seconds)
+#   3600 means 1 hour (60x60 seconds)
+#
+# Allowed values:
+#  -1 means that content update is allowed for ever
+#   0 means that content update is not allowed
+#   x means that content update is allowed for x seconds (with x>0)
+content.update.allowed.duration = 3600
+
 # The following parameters allow to personalize the home page
 # They are html ready (you can put html tags they will be interpreted)
 website.title = TRACIM

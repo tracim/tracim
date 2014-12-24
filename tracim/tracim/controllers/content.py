@@ -6,6 +6,8 @@ from cgi import FieldStorage
 import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
+from tg.predicates import not_anonymous
+
 import traceback
 
 from tracim.controllers import TIMRestController
@@ -21,6 +23,7 @@ from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.predicates import current_user_is_reader
 from tracim.lib.predicates import current_user_is_contributor
 from tracim.lib.predicates import current_user_is_content_manager
+from tracim.lib.predicates import require_current_user_is_owner
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
 from tracim.model.data import ActionDescription
@@ -28,8 +31,15 @@ from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 
-
 class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
+
+    @property
+    def _item_type(self):
+        return ContentType.Comment
+
+    @property
+    def _item_type_label(self):
+        return _('Comment')
 
     def _before(self, *args, **kw):
         TIMRestPathContextSetup.current_user()
@@ -37,8 +47,8 @@ class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
         TIMRestPathContextSetup.current_folder()
         TIMRestPathContextSetup.current_thread()
 
-    @tg.require(current_user_is_contributor())
     @tg.expose()
+    @tg.require(current_user_is_contributor())
     def post(self, content=''):
         # TODO - SECURE THIS
         workspace = tmpl_context.workspace
@@ -54,6 +64,70 @@ class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
                                                                               tmpl_context.thread_id)
         tg.flash(_('Comment added'), CST.STATUS_OK)
         tg.redirect(next_url)
+
+    @tg.expose()
+    @tg.require(not_anonymous())
+    def put_delete(self, item_id):
+        require_current_user_is_owner(int(item_id))
+
+        # TODO - CHECK RIGHTS
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user)
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+
+        try:
+
+            next_url = tg.url('/workspaces/{}/folders/{}/threads/{}').format(tmpl_context.workspace_id,
+                                                                             tmpl_context.folder_id,
+                                                                             tmpl_context.thread_id)
+            undo_url = tg.url('/workspaces/{}/folders/{}/threads/{}/comments/{}/put_delete_undo').format(tmpl_context.workspace_id,
+                                                                                                         tmpl_context.folder_id,
+                                                                                                         tmpl_context.thread_id,
+                                                                                                         item_id)
+
+            msg = _('{} deleted. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
+            content_api.delete(item)
+            content_api.save(item, ActionDescription.DELETION)
+
+            tg.flash(msg, CST.STATUS_OK, no_escape=True)
+            tg.redirect(next_url)
+
+        except ValueError as e:
+            back_url = tg.url('/workspaces/{}/folders/{}/threads/{}').format(tmpl_context.workspace_id,
+                                                                             tmpl_context.folder_id,
+                                                                             tmpl_context.thread_id)
+            msg = _('{} not deleted: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(back_url)
+
+
+    @tg.expose()
+    @tg.require(not_anonymous())
+    def put_delete_undo(self, item_id):
+        require_current_user_is_owner(int(item_id))
+
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user, True, True) # Here we do not filter deleted items
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+        try:
+            next_url = tg.url('/workspaces/{}/folders/{}/threads/{}').format(tmpl_context.workspace_id,
+                                                                             tmpl_context.folder_id,
+                                                                             tmpl_context.thread_id)
+            msg = _('{} undeleted.').format(self._item_type_label)
+            content_api.undelete(item)
+            content_api.save(item, ActionDescription.UNDELETION)
+
+            tg.flash(msg, CST.STATUS_OK)
+            tg.redirect(next_url)
+
+        except ValueError as e:
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            back_url = tg.url('/workspaces/{}/folders/{}/threads/{}').format(tmpl_context.workspace_id,
+                                                                             tmpl_context.folder_id,
+                                                                             tmpl_context.thread_id)
+            msg = _('{} not un-deleted: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(back_url)
 
 
 class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):

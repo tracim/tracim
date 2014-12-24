@@ -3,14 +3,18 @@
 """WebHelpers used in tracim."""
 
 #from webhelpers import date, feedgenerator, html, number, misc, text
+
+import datetime
 from markupsafe import Markup
-from datetime import datetime
 
 import tg
+
+from tracim.config.app_cfg import CFG
 
 from tracim.lib import app_globals as plag
 
 from tracim.lib import CST
+from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
 
@@ -39,7 +43,7 @@ def user_friendly_file_size(file_size: int):
             return '{:.3f} Mo'.format(int(mega_size))
 
 def current_year():
-  now = datetime.now()
+  now = datetime.datetime.now()
   return now.strftime('%Y')
 
 def formatLongDateAndTime(datetime_object, format=''):
@@ -149,6 +153,32 @@ def user_role(user, workspace) -> int:
             return role.id
 
     return 0
+
+def delete_label_for_item(item) -> str:
+    """
+    :param item: is a serialized Content item (be carefull; it's not an instance of 'Content')
+    :return: the delete label to show to the user (in the right language)
+    """
+    return ContentType._DELETE_LABEL[item.type]
+
+def is_item_still_editable(item):
+    # HACK - D.A - 2014-12-24 - item contains a datetime object!!!
+    # 'item' is a variable which is created by serialization and it should be an instance of DictLikeClass.
+    # therefore, it contains strins, integers and booleans (something json-ready or almost json-ready)
+    #
+    # BUT, the property 'created' is still a datetime object
+    #
+    edit_duration = CFG.get_instance().DATA_UPDATE_ALLOWED_DURATION
+    if edit_duration<0:
+        return True
+    elif edit_duration==0:
+        return False
+    else:
+        time_limit = item.created + datetime.timedelta(0, edit_duration)
+        logger.warning(is_item_still_editable, 'limit is: {}'.format(time_limit))
+        if datetime.datetime.now() < time_limit:
+            return True
+    return False
 
 from tracim.config.app_cfg import CFG as CFG_ORI
 CFG = CFG_ORI.get_instance() # local CFG var is an instance of CFG class found in app_cfg
