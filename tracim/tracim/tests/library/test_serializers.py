@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
 
-
+from tg.util import LazyString
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import Workspace
@@ -17,6 +17,7 @@ from tracim.model.serializers import Context
 from tracim.model.serializers import ContextConverterNotFoundException
 from tracim.model.serializers import CTX
 from tracim.model.serializers import DictLikeClass
+from tracim.model.serializers import pod_serializer
 
 from tracim.model.data import ActionDescription
 
@@ -141,3 +142,86 @@ class TestSerializers(TestStandard):
     #     ok_('delete' in res.urls.keys())
     #
     #     eq_(8, len(res.keys()), res)
+
+    def test_serializer_get_converter_return_CTX_DEFAULT(self):
+
+        class A(object):
+            pass
+
+        @pod_serializer(A, CTX.DEFAULT)
+        def dummy_converter(item: A, context: Context):
+            return DictLikeClass({'a': 'agaga'})
+
+        converter = Context.get_converter(CTX.FILE, A)
+        eq_(converter, dummy_converter)
+
+    @raises(ContextConverterNotFoundException)
+    def test_serializer_get_converter_raise_ContextConverterNotFoundException(self):
+        class A(object):
+            pass
+
+        @pod_serializer(A, CTX.PAGE)
+        def dummy_converter(item: A, context: Context):
+            return DictLikeClass({'a': 'agaga'})
+
+        converter = Context.get_converter(CTX.FILE, A)
+
+    def test_serializer_toDict_int_str_and_LazyString(self):
+
+        s = Context(CTX.DEFAULT).toDict(5)
+        ok_(isinstance(s, int))
+        eq_(5, s)
+
+        s2 = Context(CTX.DEFAULT).toDict('bob')
+        ok_(isinstance(s2, str))
+        eq_('bob', s2)
+
+        lazystr = LazyString('bob')
+        s3 = Context(CTX.DEFAULT).toDict(lazystr)
+        ok_(isinstance(s3, LazyString))
+        eq_(lazystr, s3)
+
+    def test_serializer_toDict_for_list_of_objects(self):
+
+        class A(object):
+            def __init__(self, name):
+                self.name = name
+
+        @pod_serializer(A, CTX.DEFAULT)
+        def dummy_converter(item: A, context: Context):
+            return DictLikeClass({'name': item.name})
+
+        mylist = [
+            A('a'), A('b'), A('C')
+        ]
+
+        s = Context(CTX.DEFAULT).toDict(mylist)
+        ok_('name' in s[0].keys())
+        eq_('a', s[0].name)
+        ok_('name' in s[1].keys())
+        eq_('b', s[1].name)
+        ok_('name' in s[2].keys())
+        eq_('C', s[2].name)
+        eq_(3, len(s))
+
+        s2 = Context(CTX.DEFAULT).toDict(mylist, 'subitems', 'subitems_nb')
+
+        print('----------------->  ---> ', s2)
+        print('----------------->  ', s2.items)
+        ok_('subitems' in s2.keys(), s2)
+
+        ok_('name' in s2.subitems[0].keys())
+        eq_('a', s2.subitems[0].name)
+        ok_('name' in s2.subitems[1].keys())
+        eq_('b', s2.subitems[1].name)
+        ok_('name' in s2.subitems[2].keys())
+        eq_('C', s2.subitems[2].name)
+
+        ok_('subitems' in s2.keys())
+        ok_('subitems_nb' in s2.keys())
+        eq_(3, s2.subitems_nb)
+        eq_(3, len(s2.subitems))
+
+
+
+        eq_(2, len(s2))
