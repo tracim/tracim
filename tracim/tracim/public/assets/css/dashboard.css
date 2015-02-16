@@ -170,3 +170,20 @@ iframe { border: 5px solid #b3e7ff; }
 .pod-footer p { margin: auto; }
 
 
+table.user_content, table.user_content td  {
+    border: 1px solid #CCC;
+    padding: 0.5em;
+    border-collapse: collapse;
+}
+
+table.first_row_headers tr:first-child td {
+    font-weight: bold;
+    background-color: #EEE;
+    align: center;
+}
+
+table.first_column_headers tr td:first-child {
+    font-weight: bold;
+    background-color: #EEE;
+    align: center;
+}

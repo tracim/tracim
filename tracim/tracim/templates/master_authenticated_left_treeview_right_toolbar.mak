@@ -73,20 +73,9 @@
     </script>
     <!-- TinyMCE ================================================== -->
     <script src="${tg.url('/assets/tinymce/js/tinymce/tinymce.min.js')}"></script>
-    <script>
-      tinymce.init({
-          menubar:false,
-          statusbar:true,
-          plugins: [ "table", "image", "charmap", "autolink" ],
+    ${TIM.TINYMCE_INIT_SCRIPT('.pod-rich-textarea')}
 
-          skin : 'custom',
-          selector:'.pod-rich-textarea',
-          toolbar: [
-              "undo redo | bold italic underline strikethrough | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright",
-          ]
-      });
-    </script>
-    
+
     <!-- JSTree ================================================== -->
     <link rel="stylesheet" href="${tg.url('/assets/jstree/themes/default/style.min.css')}" />
     <script src="${tg.url('/assets/jstree/jstree.min.js')}"></script>

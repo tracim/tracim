@@ -31,13 +31,29 @@
         tinymce.init({
             menubar:false,
             statusbar:true,
-            plugins: [ "table", "image", "charmap", "fullscreen", "autolink" ],
+            plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker" ],
 
-            skin : 'custom',
+            skin : 'tracim',
             selector:'${selector}',
             toolbar: [
               "undo redo | bold italic underline strikethrough | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen",
+            ],
+            paste_data_images: true,
+            table_default_attributes: {
+                'class': 'user_content'
+            },
+            content_css: '/assets/css/dashboard.css',
+            table_default_styles: {
+                border: '1px solid #CCC',
+                borderCollapse: 'collapse',
+                padding: '20px'
+            },
+            table_class_list: [
+                {title: 'Normal', value: 'user_content'},
+                {title: 'First row is header', value: 'user_content first_row_headers'},
+                {title: 'First column is header', value: 'user_content first_column_headers'}
             ]
+
         });
     </script>
 </%def>
