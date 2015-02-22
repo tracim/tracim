@@ -42,7 +42,7 @@
             table_default_attributes: {
                 'class': 'user_content'
             },
-            content_css: '/assets/css/dashboard.css',
+            content_css: '/assets/css/rich-text-area.css',
             table_default_styles: {
                 border: '1px solid #CCC',
                 borderCollapse: 'collapse',
