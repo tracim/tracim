@@ -187,3 +187,17 @@ table.first_column_headers tr td:first-child {
     background-color: #EEE;
     align: center;
 }
+
+.search-result-item-breadcrumb {
+    margin-top: -1em;
+}
+
+.search-result-item-breadcrumb a {
+    color: #090;
+}
+
+#search-result-dynamic-resume {
+    color: #090;
+    margin-top: -1em;
+    margin-bottom: 0;
+}

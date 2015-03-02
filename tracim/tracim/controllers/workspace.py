@@ -80,7 +80,6 @@ class UserWorkspaceRestController(TIMRestController):
             dictified_workspaces = Context(CTX.MENU_API).toDict(workspaces, 'd')
             return dictified_workspaces
 
-
         allowed_content_types = ContentType.allowed_types_from_str(folder_allowed_content_types)
         ignored_item_ids = [int(ignore_id)] if ignore_id else []
 
