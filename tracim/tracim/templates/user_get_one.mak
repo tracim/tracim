@@ -22,10 +22,13 @@
                             <a href="mailto:${result.user.email}">${result.user.email}</a>
                         </p>
                         <p>
+                            % if result.user.profile.id<2:
+                                <span>${_('This user a standard user.')}</span><br/>
+                            % endif
                             % if result.user.profile.id>=2:
                                 <span>${TIM.ICO(16, 'emblems/emblem-checked')} ${_('This user can create workspaces.')}</span><br/>
                             % endif
-                            % if fake_api.current_user.profile.id>=3:
+                            % if result.user.profile.id>=3:
                                 <span>${TIM.ICO(16, 'emblems/emblem-checked')} ${_('This user is an administrator.')}</span><br/>
                             % endif
                         </p>
