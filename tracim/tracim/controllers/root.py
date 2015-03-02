@@ -123,3 +123,28 @@ class RootController(StandardController):
         fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
 
         return DictLikeClass(fake_api=fake_api)
+
+    @require(predicates.not_anonymous())
+    @expose('tracim.templates.search')
+    def search(self, keywords = ''):
+        from tracim.lib.content import ContentApi
+
+        user = tmpl_context.current_user
+        api = ContentApi(user)
+
+        items = []
+        keyword_list = api.get_keywords(keywords)
+
+        result = api.search(keyword_list)
+        if result:
+            items = result.limit(ContentApi.SEARCH_DEFAULT_RESULT_NB).all()
+
+        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
+        fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
+
+        search_results = Context(CTX.SEARCH).toDict(items, 'results', 'result_nb')
+        search_results.keywords = keyword_list
+
+        return DictLikeClass(fake_api=fake_api, search=search_results)
+
+

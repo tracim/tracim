@@ -113,7 +113,7 @@ class Logger(object):
         self._logger = logging.getLogger(self._name)
 
     def _txt(self, instance_or_class):
-        if instance_or_class.__class__.__name__=='type':
+        if instance_or_class.__class__.__name__ in ('function', 'type'):
             return instance_or_class.__name__
         else:
             return instance_or_class.__class__.__name__

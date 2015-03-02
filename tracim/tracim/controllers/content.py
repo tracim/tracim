@@ -762,7 +762,6 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
     @tg.require(current_user_is_content_manager())
     @tg.expose()
     def put_archive_undo(self, item_id):
-        print('AGAGA')
         # TODO - CHECK RIGHTS
         item_id = int(item_id)
         content_api = ContentApi(tmpl_context.current_user, True, True) # Here we do not filter deleted items

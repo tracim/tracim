@@ -180,5 +180,16 @@ def is_item_still_editable(item):
             return True
     return False
 
+def shorten(text: str, maxlength: int, add_three_points=True) -> str:
+
+    result = text
+    if len(text)>maxlength:
+        result = text[:maxlength]
+
+        if add_three_points:
+            result += '…'
+
+    return result
+
 from tracim.config.app_cfg import CFG as CFG_ORI
 CFG = CFG_ORI.get_instance() # local CFG var is an instance of CFG class found in app_cfg

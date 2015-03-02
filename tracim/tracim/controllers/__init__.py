@@ -126,40 +126,13 @@ class TIMRestController(RestController, BaseController):
 
 class TIMRestControllerWithBreadcrumb(TIMRestController):
 
-    def get_breadcrumb(self, folder_id=None) -> [BreadcrumbItem]:
+    def get_breadcrumb(self, item_id=None) -> [BreadcrumbItem]:
         """
         TODO - Remove this and factorize it with other get_breadcrumb_xxx methods
-        :param folder_id:
+        :param item_id: an item id (item may be normal content or folder
         :return:
         """
-        workspace = tmpl_context.workspace
-        workspace_id = tmpl_context.workspace_id
-        breadcrumb = []
-
-        breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Dashboard), _('Workspaces'), tg.url('/workspaces')))
-        breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Workspace), workspace.label, tg.url('/workspaces/{}'.format(workspace.workspace_id))))
-
-        content_api = ContentApi(tmpl_context.current_user)
-        if folder_id:
-            breadcrumb_folder_items = []
-            current_item = content_api.get_one(folder_id, ContentType.Any, workspace)
-            is_active = True
-
-            while current_item:
-                breadcrumb_item = BreadcrumbItem(ContentType.icon(current_item.type),
-                                                 current_item.label,
-                                                 tg.url('/workspaces/{}/folders/{}'.format(workspace_id, current_item.content_id)),
-                                                 is_active)
-                is_active = False # the first item is True, then all other are False => in the breadcrumb, only the last item is "active"
-                breadcrumb_folder_items.append(breadcrumb_item)
-                current_item = current_item.parent
-
-            for item in reversed(breadcrumb_folder_items):
-                breadcrumb.append(item)
-
-
-        return breadcrumb
-
+        return ContentApi(tmpl_context.current_user).build_breadcrumb(tmpl_context.workspace, item_id)
 
 
 class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
