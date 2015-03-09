@@ -2,12 +2,16 @@
 
 __author__ = 'damien'
 
-import tg
+import re
+import sqlalchemy
 
 from sqlalchemy.orm.attributes import get_history
-from sqlalchemy import not_
+from sqlalchemy import or_
+from sqlalchemy.orm import aliased, joinedload
+
 from tracim.lib import cmp_to_key
 from tracim.lib.notifications import NotifierFactory
+
 from tracim.model import DBSession
 from tracim.model.auth import User
 from tracim.model.data import ContentStatus, ContentRevisionRO, ActionDescription
@@ -54,7 +58,6 @@ class ContentApi(object):
         self._show_deleted = show_deleted
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
 
-
     @classmethod
     def sort_tree_items(cls, content_list: [NodeTreeItem])-> [Content]:
         news = []
@@ -72,11 +75,16 @@ class ContentApi(object):
         return content_list
 
 
-    def _base_query(self, workspace: Workspace=None):
+    def __real_base_query(self, workspace: Workspace=None):
         result = DBSession.query(Content)
 
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
+
+        return result
+
+    def _base_query(self, workspace: Workspace=None):
+        result = self.__real_base_query(workspace)
 
         if not self._show_deleted:
             result = result.filter(Content.is_deleted==False)
@@ -85,6 +93,33 @@ class ContentApi(object):
             result = result.filter(Content.is_archived==False)
 
         return result
+
+    def _hard_filtered_base_query(self, workspace: Workspace=None):
+        """
+        If set to True, then filterign on is_deleted and is_archived will also
+        filter parent properties. This is required for search() function which
+        also search in comments (for example) which may be 'not deleted' while
+        the associated content is deleted
+
+        :param hard_filtering:
+        :return:
+        """
+        result = self.__real_base_query(workspace)
+
+        if not self._show_deleted:
+            parent = aliased(Content)
+            result = result.join(parent, Content.parent).\
+                filter(Content.is_deleted==False).\
+                filter(parent.is_deleted==False)
+
+        if not self._show_archived:
+            parent = aliased(Content)
+            result = result.join(parent, Content.parent).\
+                filter(Content.is_archived==False).\
+                filter(parent.is_archived==False)
+
+        return result
+
 
     def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> [Content]:
         """
@@ -290,8 +325,40 @@ class ContentApi(object):
 
 
         if do_flush:
+            DBSession.add(content)
             DBSession.flush()
 
         if do_notify:
             NotifierFactory.create(self._user).notify_content_update(content)
 
+    def get_keywords(self, search_string, search_string_separators=None) -> [str]:
+        """
+        :param search_string: a list of coma-separated keywords
+        :return: a list of str (each keyword = 1 entry
+        """
+
+        search_string_separators = search_string_separators or ContentApi.SEARCH_SEPARATORS
+
+        keywords = []
+        if search_string:
+            keywords = [keyword.strip() for keyword in re.split(search_string_separators, search_string)]
+
+        return keywords
+
+    def search(self, keywords: [str]) -> sqlalchemy.orm.query.Query:
+        """
+        :return: a sorted list of Content items
+        """
+
+        if len(keywords)<=0:
+            return None
+
+        filter_group_label = list(Content.label.ilike('%{}%'.format(keyword)) for keyword in keywords)
+        filter_group_desc = list(Content.description.ilike('%{}%'.format(keyword)) for keyword in keywords)
+
+        title_keyworded_items = self._hard_filtered_base_query().\
+            filter(or_(*(filter_group_label+filter_group_desc))).\
+            options(joinedload('children')).\
+            options(joinedload('parent'))
+
+        return title_keyworded_items
