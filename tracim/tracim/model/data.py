@@ -311,11 +311,16 @@ class ContentType(object):
         return [cls.Folder, cls.File, cls.Comment, cls.Thread, cls.Page]
 
     @classmethod
+    def allowed_types_for_folding(cls):
+        # This method is used for showing only "main" types in the left-side treeview
+        return [cls.Folder, cls.File, cls.Thread, cls.Page]
+
+    @classmethod
     def allowed_types_from_str(cls, allowed_types_as_string: str):
         allowed_types = []
         # HACK - THIS
         for item in allowed_types_as_string.split(ContentType._STRING_LIST_SEPARATOR):
-            if item and item in ContentType.allowed_types():
+            if item and item in ContentType.allowed_types_for_folding():
                 allowed_types.append(item)
         return allowed_types
 

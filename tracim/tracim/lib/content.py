@@ -2,15 +2,25 @@
 
 __author__ = 'damien'
 
-import tg
+import re
 
+import tg
+from tg.i18n import ugettext as _
+
+import sqlalchemy
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy import not_
+from sqlalchemy import or_
 from tracim.lib import cmp_to_key
 from tracim.lib.notifications import NotifierFactory
 from tracim.model import DBSession
 from tracim.model.auth import User
-from tracim.model.data import ContentStatus, ContentRevisionRO, ActionDescription
+from tracim.model.data import ActionDescription
+from tracim.model.data import BreadcrumbItem
+from tracim.model.data import ContentStatus
+from tracim.model.data import ContentRevisionRO
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import NodeTreeItem
@@ -48,6 +58,10 @@ def compare_tree_items_for_sorting_by_type_and_name(item1: NodeTreeItem, item2: 
 
 class ContentApi(object):
 
+    SEARCH_SEPARATORS = ',| '
+    SEARCH_DEFAULT_RESULT_NB = 50
+
+
     def __init__(self, current_user: User, show_archived=False, show_deleted=False, all_content_in_treeview=True):
         self._user = current_user
         self._show_archived = show_archived
@@ -71,18 +85,88 @@ class ContentApi(object):
         content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
         return content_list
 
+    def build_breadcrumb(self, workspace, item_id=None, skip_root=False) -> [BreadcrumbItem]:
+        """
+        TODO - Remove this and factorize it with other get_breadcrumb_xxx methods
+        :param item_id: an item id (item may be normal content or folder
+        :return:
+        """
+        workspace_id = workspace.workspace_id
+        breadcrumb = []
 
-    def _base_query(self, workspace: Workspace=None):
+        if not skip_root:
+            breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Dashboard), _('Workspaces'), tg.url('/workspaces')))
+        breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Workspace), workspace.label, tg.url('/workspaces/{}'.format(workspace.workspace_id))))
+
+        if item_id:
+            breadcrumb_folder_items = []
+            current_item = self.get_one(item_id, ContentType.Any, workspace)
+            is_active = True
+            if current_item.type==ContentType.Folder:
+                next_url = tg.url('/workspaces/{}/folders/{}'.format(workspace_id, current_item.content_id))
+            else:
+                next_url = tg.url('/workspaces/{}/folders/{}/{}s/{}'.format(workspace_id, current_item.parent_id, current_item.type, current_item.content_id))
+
+            while current_item:
+                breadcrumb_item = BreadcrumbItem(ContentType.icon(current_item.type),
+                                                 current_item.label,
+                                                 next_url,
+                                                 is_active)
+                is_active = False # the first item is True, then all other are False => in the breadcrumb, only the last item is "active"
+                breadcrumb_folder_items.append(breadcrumb_item)
+                current_item = current_item.parent
+                if current_item:
+                    # In last iteration, the parent is None, and there is no more breadcrumb item to build
+                    next_url = tg.url('/workspaces/{}/folders/{}'.format(workspace_id, current_item.content_id))
+
+            for item in reversed(breadcrumb_folder_items):
+                breadcrumb.append(item)
+
+
+        return breadcrumb
+
+    def __real_base_query(self, workspace: Workspace=None):
         result = DBSession.query(Content)
 
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
+
+        return result
+
+    def _base_query(self, workspace: Workspace=None):
+        result = self.__real_base_query(workspace)
 
         if not self._show_deleted:
             result = result.filter(Content.is_deleted==False)
 
         if not self._show_archived:
             result = result.filter(Content.is_archived==False)
+
+        return result
+
+    def _hard_filtered_base_query(self, workspace: Workspace=None):
+        """
+        If set to True, then filterign on is_deleted and is_archived will also
+        filter parent properties. This is required for search() function which
+        also search in comments (for example) which may be 'not deleted' while
+        the associated content is deleted
+
+        :param hard_filtering:
+        :return:
+        """
+        result = self.__real_base_query(workspace)
+
+        if not self._show_deleted:
+            parent = aliased(Content)
+            result = result.join(parent, Content.parent).\
+                filter(Content.is_deleted==False).\
+                filter(parent.is_deleted==False)
+
+        if not self._show_archived:
+            parent = aliased(Content)
+            result = result.join(parent, Content.parent).\
+                filter(Content.is_archived==False).\
+                filter(parent.is_archived==False)
 
         return result
 
@@ -110,7 +194,7 @@ class ContentApi(object):
             all()
 
         if not filter_by_allowed_content_types or len(filter_by_allowed_content_types)<=0:
-            return folders
+            filter_by_allowed_content_types = ContentType.allowed_types_for_folding()
 
         # Now, the case is to filter folders by the content that they are allowed to contain
         result = []
@@ -118,6 +202,7 @@ class ContentApi(object):
             for allowed_content_type in filter_by_allowed_content_types:
                 if folder.type==ContentType.Folder and folder.properties['allowed_content'][allowed_content_type]==True:
                     result.append(folder)
+                    break
 
         return result
 
@@ -290,8 +375,41 @@ class ContentApi(object):
 
 
         if do_flush:
+            DBSession.add(content)
             DBSession.flush()
 
         if do_notify:
             NotifierFactory.create(self._user).notify_content_update(content)
+
+
+    def get_keywords(self, search_string, search_string_separators=None) -> [str]:
+        """
+        :param search_string: a list of coma-separated keywords
+        :return: a list of str (each keyword = 1 entry
+        """
+
+        search_string_separators = search_string_separators or ContentApi.SEARCH_SEPARATORS
+
+        keywords = []
+        if search_string:
+            keywords = [keyword.strip() for keyword in re.split(search_string_separators, search_string)]
+
+        return keywords
+
+    def search(self, keywords: [str]) -> sqlalchemy.orm.query.Query:
+        """
+        :return: a sorted list of Content items
+        """
+
+        if len(keywords)<=0:
+            return None
+
+        filter_group_label = list(Content.label.ilike('%{}%'.format(keyword)) for keyword in keywords)
+        filter_group_desc = list(Content.description.ilike('%{}%'.format(keyword)) for keyword in keywords)
+        title_keyworded_items = self._hard_filtered_base_query().\
+            filter(or_(*(filter_group_label+filter_group_desc))).\
+            options(joinedload('children')).\
+            options(joinedload('parent'))
+
+        return title_keyworded_items
 
