@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import types
 
+from bs4 import BeautifulSoup
 import tg
 from tg.util import LazyString
 from tracim.lib.base import logger
-from tracim.model.auth import Group, Profile
+from tracim.lib.utils import exec_time_monitor
+from tracim.model.auth import Profile
 from tracim.model.auth import User
 from tracim.model.data import BreadcrumbItem, ActionDescription
 from tracim.model.data import ContentStatus
@@ -47,7 +49,6 @@ class pod_serializer(object):
         Context.register_converter(self.context, self.model_class, func)
         return func
 
-
 class ContextConverterNotFoundException(Exception):
     def __init__(self, context_string, model_class):
         message = 'converter not found (context: {0} - model: {1})'.format(context_string, model_class.__name__)
@@ -68,6 +69,7 @@ class CTX(object):
     MENU_API_BUILD_FROM_TREE_ITEM = 'MENU_API_BUILD_FROM_TREE_ITEM'
     PAGE = 'PAGE'
     PAGES = 'PAGES'
+    SEARCH = 'SEARCH'
     THREAD = 'THREAD'
     THREADS = 'THREADS'
     USER = 'USER'
@@ -412,17 +414,7 @@ def serialize_node_for_page(item: Content, context: Context):
 
     if item.type==ContentType.Folder:
         return Context(CTX.DEFAULT).toDict(item)
-    ### CODE BELOW IS REPLACED BY THE TWO LINES UP ^^
-    # 2014-10-08 - IF YOU FIND THIS COMMENT, YOU CAn REMOVE THE CODE
-    #
-    #if item.type==ContentType.Folder:
-    #    value = DictLikeClass(
-    #        id = item.content_id,
-    #        label = item.label,
-    #    )
-    #    return value
 
-    raise NotImplementedError
 
 
 @pod_serializer(Content, CTX.THREADS)
@@ -554,6 +546,65 @@ def serialize_content_for_workspace_and_folder(content: Content, context: Contex
         )
 
     return result
+
+
+from tg import cache
+
+@pod_serializer(Content, CTX.SEARCH)
+def serialize_content_for_search_result(content: Content, context: Context):
+
+    def serialize_it():
+        nonlocal content
+
+        if content.type == ContentType.Comment:
+            logger.info('serialize_content_for_search_result', 'Serializing parent class {} instead of {} [content #{}]'.format(content.parent.type, content.type, content.content_id))
+            content = content.parent
+
+        data_container = content
+
+        if content.revision_to_serialize>0:
+            for revision in content.revisions:
+                if revision.revision_id==content.revision_to_serialize:
+                    data_container = revision
+                    break
+
+        # FIXME - D.A. - 2015-02-23 - This import should not be there...
+        from tracim.lib.content import ContentApi
+        breadcrumbs = ContentApi(None).build_breadcrumb(data_container.workspace, data_container.content_id, skip_root=True)
+
+        last_comment_datetime = data_container.updated
+        comments = data_container.get_comments()
+        if comments:
+            last_comment_datetime = max(last_comment_datetime, max(comment.updated for comment in comments))
+
+        result = DictLikeClass(
+            id = content.content_id,
+            parent = context.toDict(content.parent),
+            workspace = context.toDict(content.workspace),
+            type = content.type,
+
+            content = data_container.description,
+            content_raw = BeautifulSoup(data_container.description).text,
+
+            created = data_container.created,
+            label = data_container.label,
+            icon = ContentType.icon(content.type),
+            owner = context.toDict(data_container.owner),
+            status = context.toDict(data_container.get_status()),
+            breadcrumb = context.toDict(breadcrumbs),
+            last_activity = last_comment_datetime
+        )
+
+        if content.type==ContentType.File:
+            result.label = content.label.__str__() if content.label else content.file_name.__str__()
+
+        if not result.label or ''==result.label:
+            result.label = 'No title'
+
+        return result
+
+    return serialize_it()
+
 
 
 ########################################################################################################################

@@ -113,6 +113,13 @@
                                 </ul>
                             </li>
                         % endif
+                        
+                        <form class="navbar-form navbar-left" role="search" action="${tg.url('/search?')}">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="${_('Search for...')}" name="keywords" value="${','.join(search.keywords) if search else ''}">
+                            </div>
+                            <button type="submit" class="btn btn-default">${_('Search')}</button>
+                        </form>
                     </ul>
                 % endif
 
