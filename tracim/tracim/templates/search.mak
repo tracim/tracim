@@ -30,7 +30,7 @@
     <h1 class="page-header">
         ${TIM.ICO(32, 'actions/system-search')} ${_('Search results')}
         <small>
-            ${_('<span class="badge">{}</span> results for keywords: '.format(search.result_nb))|n}
+            ${_('for keywords: ')|n}
             % for keyword in search.keywords:
                 <span class="label label-default">${keyword}</span>
             % endfor

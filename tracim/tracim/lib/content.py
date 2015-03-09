@@ -125,21 +125,46 @@ class ContentApi(object):
 
         return breadcrumb
 
-    def _base_query(self, workspace: Workspace=None):
+    def __real_base_query(self, workspace: Workspace=None):
         result = DBSession.query(Content)
 
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
+        return result
+
+    def _base_query(self, workspace: Workspace=None):
+        result = self.__real_base_query(workspace)
+
+        if not self._show_deleted:
+            result = result.filter(Content.is_deleted==False)
+
+        if not self._show_archived:
+            result = result.filter(Content.is_archived==False)
+
+        return result
+
+    def _hard_filtered_base_query(self, workspace: Workspace=None):
+        """
+        If set to True, then filterign on is_deleted and is_archived will also
+        filter parent properties. This is required for search() function which
+        also search in comments (for example) which may be 'not deleted' while
+        the associated content is deleted
+
+        :param hard_filtering:
+        :return:
+        """
+        result = self.__real_base_query(workspace)
+
         if not self._show_deleted:
             parent = aliased(Content)
-            result.join(parent, Content.parent).\
+            result = result.join(parent, Content.parent).\
                 filter(Content.is_deleted==False).\
                 filter(parent.is_deleted==False)
 
         if not self._show_archived:
             parent = aliased(Content)
-            result.join(parent, Content.parent).\
+            result = result.join(parent, Content.parent).\
                 filter(Content.is_archived==False).\
                 filter(parent.is_archived==False)
 
@@ -350,6 +375,7 @@ class ContentApi(object):
 
 
         if do_flush:
+            DBSession.add(content)
             DBSession.flush()
 
         if do_notify:
@@ -380,7 +406,7 @@ class ContentApi(object):
 
         filter_group_label = list(Content.label.ilike('%{}%'.format(keyword)) for keyword in keywords)
         filter_group_desc = list(Content.description.ilike('%{}%'.format(keyword)) for keyword in keywords)
-        title_keyworded_items = self._base_query().\
+        title_keyworded_items = self._hard_filtered_base_query().\
             filter(or_(*(filter_group_label+filter_group_desc))).\
             options(joinedload('children')).\
             options(joinedload('parent'))

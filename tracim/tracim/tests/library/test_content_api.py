@@ -5,6 +5,7 @@ from nose.tools import raises
 
 import transaction
 
+from tracim.lib.base import logger
 from tracim.lib.content import compare_content_for_sorting_by_type_and_name
 from tracim.lib.content import ContentApi
 from tracim.lib.user import UserApi
@@ -187,10 +188,7 @@ class TestContentApi(TestStandard):
 
         api = ContentApi(user)
         p = api.create(ContentType.Page, None, None, 'this_is_a_page')
-        transaction.commit()
-
         c = api.create_comment(None, p, 'this is the comment', True)
-        transaction.commit()
 
         eq_(Content, c.__class__)
         eq_(p.content_id, c.parent_id)
@@ -377,3 +375,77 @@ class TestContentApi(TestStandard):
         eq_(False, updated2.is_deleted)
         eq_(ActionDescription.UNDELETION, updated2.revision_type)
         eq_(u1id, updated2.owner_id)
+
+    def test_search_in_label(self):
+        # HACK - D.A. - 2015-03-09
+        # This test is based on a bug which does NOT return results found
+        # at root of a workspace (eg a folder)
+        uapi = UserApi(None)
+        user = uapi.create_user()
+        user.email = 'this.is@user'
+        uapi.save(user)
+
+        api = ContentApi(user)
+
+        a = api.create(ContentType.Folder, None, None, 'this is randomized folder', True)
+        p = api.create(ContentType.Page, None, a, 'this is randomized label content', True)
+        p.description = 'This is some amazing test'
+        api.save(p)
+        original_id = p.content_id
+
+        res = api.search(['randomized'])
+        eq_(1, len(res.all()))
+        item = res.all()[0]
+        eq_(original_id, item.content_id)
+
+    def test_search_in_description(self):
+        # HACK - D.A. - 2015-03-09
+        # This test is based on a bug which does NOT return results found
+        # at root of a workspace (eg a folder)
+        uapi = UserApi(None)
+        user = uapi.create_user()
+        user.email = 'this.is@user'
+        uapi.save(user)
+
+        api = ContentApi(user)
+
+        a = api.create(ContentType.Folder, None, None, 'this is randomized folder', True)
+
+        p = api.create(ContentType.Page, None, a, 'this is dummy label content', True)
+        p.description = 'This is some amazing test'
+        api.save(p)
+        original_id = p.content_id
+
+        res = api.search(['dummy'])
+        eq_(1, len(res.all()))
+        item = res.all()[0]
+        eq_(original_id, item.content_id)
+
+
+    def test_search_in_label_or_description(self):
+        # HACK - D.A. - 2015-03-09
+        # This test is based on a bug which does NOT return results found
+        # at root of a workspace (eg a folder)
+        uapi = UserApi(None)
+        user = uapi.create_user()
+        user.email = 'this.is@user'
+        uapi.save(user)
+
+        api = ContentApi(user)
+
+        a = api.create(ContentType.Folder, None, None, 'this is randomized folder', True)
+        p1 = api.create(ContentType.Page, None, a, 'this is dummy label content', True)
+        p1.description = 'This is some amazing test'
+        p2 = api.create(ContentType.Page, None, a, 'Hey ! Jon !', True)
+        p2.description = 'What\'s up ?'
+        api.save(p1)
+        api.save(p2)
+
+        id1 = p1.content_id
+        id2 = p2.content_id
+
+        res = api.search(['dummy', 'jon'])
+        eq_(2, len(res.all()))
+
+        eq_(True, id1 in [o.content_id for o in res.all()])
+        eq_(True, id2 in [o.content_id for o in res.all()])
