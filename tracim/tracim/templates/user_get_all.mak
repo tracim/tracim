@@ -132,10 +132,6 @@
                                     % endif
                                     <td>
                                         % if False==user.has_password:
-                                            <%
-                                                url = tg.url('/reset_password')
-                                                msg = _('This user has no password. Visit <a href="{}">Reset password</a> page for init.').format(url)
-                                            %>
                                             ${TIM.ICO_TOOLTIP(16, 'emblems/emblem-readonly', _('This user has no password.'))}
                                             ${_('No password defined.')}
 
