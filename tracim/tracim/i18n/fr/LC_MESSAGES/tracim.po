@@ -8,12 +8,17 @@ msgstr ""
 "Project-Id-Version: pod 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2015-03-02 22:28+0100\n"
 "PO-Revision-Date: 2015-03-02 22:32+0100\n"
 =======
 "POT-Creation-Date: 2015-03-09 16:56+0100\n"
 "PO-Revision-Date: 2015-03-09 17:00+0100\n"
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
+=======
+"POT-Creation-Date: 2015-03-10 18:35+0100\n"
+"PO-Revision-Date: 2015-03-10 18:32+0100\n"
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 "Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
 "Language-Team: fr_FR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -26,8 +31,7 @@ msgstr ""
 msgid "Password reset request"
 msgstr "Réinitialisation du mot de passe"
 
-#: tracim/config/app_cfg.py:136
-#: tracim/config/app_cfg.py:165
+#: tracim/config/app_cfg.py:136 tracim/config/app_cfg.py:165
 #, python-format
 msgid ""
 "\n"
@@ -36,18 +40,21 @@ msgid ""
 "\n"
 "%(password_reset_link)s\n"
 "\n"
-"If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.\n"
+"If you no longer wish to make the above change, or if you did not "
+"initiate this request, please disregard and/or delete this e-mail.\n"
 msgstr ""
 "\n"
-"Nous avons reçu une requête de réinitialisation du mot de passe pour ce compte utilisateur.\n"
+"Nous avons reçu une requête de réinitialisation du mot de passe pour ce "
+"compte utilisateur.\n"
 "Cliquer sur le lien ci-dessous pour réinitialiser votre mot de passe :\n"
 "\n"
 "%(password_reset_link)s\n"
 "\n"
-"Si vous ne souhaitez plus procéder à ce changement, ou si vous n'êtes pas à l'originie de cette requête, merci d'ignorer et/ou supprimer cet e-mail.\n"
+"Si vous ne souhaitez plus procéder à ce changement, ou si vous n'êtes pas"
+" à l'originie de cette requête, merci d'ignorer et/ou supprimer cet "
+"e-mail.\n"
 
-#: tracim/config/app_cfg.py:152
-#: tracim/templates/user_workspace_forms.mak:251
+#: tracim/config/app_cfg.py:152 tracim/templates/user_workspace_forms.mak:251
 #: tracim/templates/user_workspace_forms.mak:252
 msgid "New password"
 msgstr "Nouveau mot de passe"
@@ -60,8 +67,7 @@ msgstr "Confirmer le nouveau mot de passe"
 msgid "Save new password"
 msgstr "Enregistrer le nouveau mot de passe"
 
-#: tracim/config/app_cfg.py:155
-#: tracim/templates/user_get_all.mak:34
+#: tracim/config/app_cfg.py:155 tracim/templates/user_get_all.mak:34
 msgid "Email address"
 msgstr "Adresse email"
 
@@ -73,8 +79,7 @@ msgstr "Valider"
 msgid "Password reset request sent"
 msgstr "Requête de réinitialisation du mot de passe envoyée"
 
-#: tracim/config/app_cfg.py:160
-#: tracim/config/app_cfg.py:162
+#: tracim/config/app_cfg.py:160 tracim/config/app_cfg.py:162
 msgid "Invalid password reset request"
 msgstr "Requête de réinitialisation du mot de passe invalide"
 
@@ -86,6 +91,7 @@ msgstr "Echec de la requête de réinitialisation du mot de passe"
 msgid "Password changed successfully"
 msgstr "Mot de passe changé"
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: tracim/controllers/__init__.py:139
 #: tracim/templates/dashboard.mak:36
@@ -117,6 +123,13 @@ msgstr "{} mis(e) à jour"
 #: tracim/controllers/__init__.py:252
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 #: tracim/controllers/content.py:288
+=======
+#: tracim/controllers/__init__.py:247 tracim/controllers/content.py:283
+msgid "{} updated"
+msgstr "{} mis(e) à jour"
+
+#: tracim/controllers/__init__.py:252 tracim/controllers/content.py:288
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 msgid "{} not updated - error: {}"
 msgstr "{} pas mis(e) à jour - erreur : {}"
 
@@ -139,6 +152,7 @@ msgstr "Statut de {} mis(e) à jour"
 msgid "{} status not updated: {}"
 msgstr "Statut de {} non mis(e) à jour : {}"
 
+<<<<<<< HEAD
 #: tracim/controllers/__init__.py:302
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 #: tracim/controllers/content.py:748
@@ -189,41 +203,48 @@ msgstr "{} restauré(e)."
 =======
 #: tracim/controllers/__init__.py:325
 #: tracim/controllers/content.py:771
+=======
+#: tracim/controllers/__init__.py:302 tracim/controllers/content.py:748
+msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
+msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+
+#: tracim/controllers/__init__.py:311 tracim/controllers/content.py:757
+msgid "{} not archived: {}"
+msgstr "{} non archivé(e) : {}"
+
+#: tracim/controllers/__init__.py:325 tracim/controllers/content.py:771
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 msgid "{} unarchived."
 msgstr "{} désarchivé(e)"
 
-#: tracim/controllers/__init__.py:333
-#: tracim/controllers/content.py:779
+#: tracim/controllers/__init__.py:333 tracim/controllers/content.py:779
 msgid "{} not un-archived: {}"
 msgstr "{} non désarchivé(e) : {}"
 
-#: tracim/controllers/__init__.py:351
-#: tracim/controllers/content.py:88
+#: tracim/controllers/__init__.py:351 tracim/controllers/content.py:88
 #: tracim/controllers/content.py:796
 msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
-msgstr "{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+msgstr ""
+"{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler "
+"l'opération</a>"
 
-#: tracim/controllers/__init__.py:360
-#: tracim/controllers/content.py:99
+#: tracim/controllers/__init__.py:360 tracim/controllers/content.py:99
 #: tracim/controllers/content.py:805
 msgid "{} not deleted: {}"
 msgstr "{} non supprimé(e) : {}"
 
-#: tracim/controllers/__init__.py:375
-#: tracim/controllers/content.py:116
+#: tracim/controllers/__init__.py:375 tracim/controllers/content.py:116
 #: tracim/controllers/content.py:820
 msgid "{} undeleted."
 msgstr "{} restauré(e)."
 
-#: tracim/controllers/__init__.py:385
-#: tracim/controllers/content.py:128
+#: tracim/controllers/__init__.py:385 tracim/controllers/content.py:128
 #: tracim/controllers/content.py:830
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 msgid "{} not un-deleted: {}"
 msgstr "{} non restauré(e) : {}"
 
 #: tracim/controllers/content.py:42
-#| msgid "Item commented"
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -281,7 +302,6 @@ msgid "Folder not updated: {}"
 msgstr "Dossier non mis à jour : {}"
 
 #: tracim/controllers/content.py:730
-#| msgid "Folders"
 msgid "Folder"
 <<<<<<< HEAD
 msgstr "Dossier"
@@ -310,23 +330,19 @@ msgstr "Notifications activées pour l'espace de travail {}"
 msgid "Notification disabled for workspace {}"
 msgstr "Notifications désactivées pour l'espace de travail {}"
 
-#: tracim/controllers/user.py:101
-#: tracim/controllers/admin/user.py:202
+#: tracim/controllers/user.py:101 tracim/controllers/admin/user.py:202
 msgid "Empty password is not allowed."
 msgstr "Le mot de passe ne doit pas être vide"
 
-#: tracim/controllers/user.py:105
-#: tracim/controllers/admin/user.py:206
+#: tracim/controllers/user.py:105 tracim/controllers/admin/user.py:206
 msgid "The current password you typed is wrong"
 msgstr "Le mot de passe que vous avez tapé est erroné"
 
-#: tracim/controllers/user.py:109
-#: tracim/controllers/admin/user.py:210
+#: tracim/controllers/user.py:109 tracim/controllers/admin/user.py:210
 msgid "New passwords do not match."
 msgstr "Les mots de passe ne concordent pas"
 
-#: tracim/controllers/user.py:115
-#: tracim/controllers/admin/user.py:216
+#: tracim/controllers/user.py:115 tracim/controllers/admin/user.py:216
 msgid "Your password has been changed"
 msgstr "Votre mot de passe a été changé"
 
@@ -338,8 +354,7 @@ msgstr "Profil mis à jour"
 msgid "You can't change your own profile"
 msgstr "Vous ne pouvez pas changer votre propre profil"
 
-#: tracim/controllers/admin/user.py:92
-#: tracim/controllers/admin/user.py:143
+#: tracim/controllers/admin/user.py:92 tracim/controllers/admin/user.py:143
 msgid "Unknown profile"
 msgstr "Profil inconnu"
 
@@ -388,7 +403,9 @@ msgid "You can't remove yourself from this workgroup"
 msgstr "Vous ne pouvez pas vous retirer de cet espace de travail."
 
 #: tracim/controllers/admin/workspace.py:85
-msgid "User {} removed. You can <a class=\"alert-link\" href=\"{}\">restore it</a>"
+msgid ""
+"User {} removed. You can <a class=\"alert-link\" href=\"{}\">restore "
+"it</a>"
 msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
 
 #: tracim/controllers/admin/workspace.py:93
@@ -420,8 +437,12 @@ msgid "{} workspace updated."
 msgstr "Espace de travail {} mis à jour."
 
 #: tracim/controllers/admin/workspace.py:251
-msgid "{} workspace deleted. In case of error, you can <a class=\"alert-link\" href=\"{}\">restore it</a>."
-msgstr "Espace de travail {} supprimé. Vous pouvez <a class=\"alert-link\" href=\"{}\">annuler l'opération</a>."
+msgid ""
+"{} workspace deleted. In case of error, you can <a class=\"alert-link\" "
+"href=\"{}\">restore it</a>."
+msgstr ""
+"Espace de travail {} supprimé. Vous pouvez <a class=\"alert-link\" "
+"href=\"{}\">annuler l'opération</a>."
 
 #: tracim/controllers/admin/workspace.py:264
 msgid "{} workspace restored."
@@ -433,13 +454,16 @@ msgid "%B %d at %I:%M%p"
 msgstr "le %d %B à %H:%M"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 #: tracim/lib/content.py:98
 #: tracim/templates/dashboard.mak:36
+=======
+#: tracim/lib/content.py:98 tracim/templates/dashboard.mak:36
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 #: tracim/templates/master_authenticated.mak:94
 #: tracim/templates/master_no_toolbar_no_login.mak:112
-#: tracim/templates/search.mak:11
-#: tracim/templates/user_get_one.mak:39
+#: tracim/templates/search.mak:11 tracim/templates/user_get_one.mak:39
 #: tracim/templates/user_profile.mak:39
 #: tracim/templates/user_workspace_folder_file_get_one.mak:10
 #: tracim/templates/user_workspace_folder_get_one.mak:11
@@ -457,7 +481,6 @@ msgid "You are not authorized to access this resource"
 msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 
 #: tracim/lib/predicates.py:69
-#| msgid "You are not authorized to access this resource"
 msgid "You're not allowed to access this resource"
 msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 
@@ -465,8 +488,7 @@ msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 msgid "Nobody"
 msgstr "Personne"
 
-#: tracim/model/auth.py:94
-#: tracim/templates/dashboard.mak:33
+#: tracim/model/auth.py:94 tracim/templates/dashboard.mak:33
 #: tracim/templates/master_authenticated.mak:93
 #: tracim/templates/master_no_toolbar_no_login.mak:111
 #: tracim/templates/user_get_all.mak:13
@@ -541,24 +563,19 @@ msgstr "Elément désarchivé"
 msgid "Item undeleted"
 msgstr "Elément restauré"
 
-#: tracim/model/data.py:202
-#: tracim/model/data.py:212
+#: tracim/model/data.py:202 tracim/model/data.py:212
 msgid "work in progress"
 msgstr "travail en cours"
 
-#: tracim/model/data.py:203
-#: tracim/model/data.py:213
+#: tracim/model/data.py:203 tracim/model/data.py:213
 msgid "closed — validated"
 msgstr "clos(e) — validé(e)"
 
-#: tracim/model/data.py:204
-#: tracim/model/data.py:214
+#: tracim/model/data.py:204 tracim/model/data.py:214
 msgid "closed — cancelled"
 msgstr "clos(e) — annulé(e)"
 
-#: tracim/model/data.py:205
-#: tracim/model/data.py:210
-#: tracim/model/data.py:215
+#: tracim/model/data.py:205 tracim/model/data.py:210 tracim/model/data.py:215
 msgid "deprecated"
 msgstr "obsolète"
 
@@ -575,7 +592,6 @@ msgid "subject closed — cancelled"
 msgstr "discussion close — annulée"
 
 #: tracim/model/data.py:292
-#| msgid "Delete current workspace"
 msgid "Delete this workspace"
 <<<<<<< HEAD
 msgstr "Supprimer cet espace de travail"
@@ -584,12 +600,10 @@ msgstr "Supprimer l'espace de travail"
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 
 #: tracim/model/data.py:293
-#| msgid "Create this folder"
 msgid "Delete this folder"
 msgstr "Supprimer ce dossier"
 
 #: tracim/model/data.py:294
-#| msgid "Delete file"
 msgid "Delete this file"
 <<<<<<< HEAD
 msgstr "Supprimer ce fichier"
@@ -598,17 +612,14 @@ msgstr "Supprimer le fichier"
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 
 #: tracim/model/data.py:295
-#| msgid "Create this page"
 msgid "Delete this page"
 msgstr "Supprimer cette page"
 
 #: tracim/model/data.py:296
-#| msgid "Delete thread"
 msgid "Delete this thread"
 msgstr "Supprimer cette discussion"
 
 #: tracim/model/data.py:297
-#| msgid "Item commented"
 msgid "Delete this comment"
 msgstr "Supprimer ce commentaire"
 
@@ -616,8 +627,7 @@ msgstr "Supprimer ce commentaire"
 msgid "Create account"
 msgstr "Créer un compte"
 
-#: tracim/templates/dashboard.mak:5
-#: tracim/templates/dashboard.mak:12
+#: tracim/templates/dashboard.mak:5 tracim/templates/dashboard.mak:12
 #: tracim/templates/master_authenticated.mak:86
 #: tracim/templates/master_no_toolbar_no_login.mak:105
 msgid "Dashboard"
@@ -639,8 +649,7 @@ msgstr "Consulter mon profil"
 msgid "You can also manage..."
 msgstr "Vous pouvez aussi gérer..."
 
-#: tracim/templates/error.mak:23
-#: tracim/templates/error_authenticated.mak:20
+#: tracim/templates/error.mak:23 tracim/templates/error_authenticated.mak:20
 msgid "Something went wrong!"
 msgstr "Quelque chose s'est mal passé"
 
@@ -656,8 +665,7 @@ msgstr "de retourner à la page d'accueil"
 msgid "to contact the support"
 msgstr "de contacter le support"
 
-#: tracim/templates/error.mak:44
-#: tracim/templates/error_authenticated.mak:42
+#: tracim/templates/error.mak:44 tracim/templates/error_authenticated.mak:42
 msgid "The error was: error {code}"
 msgstr "L'erreur était : erreur {code}"
 
@@ -711,11 +719,15 @@ msgstr "Archiver la discussion"
 msgid "Delete thread"
 msgstr "Supprimer la discussion"
 
+<<<<<<< HEAD
 #: tracim/templates/index.mak:30
 #: tracim/templates/index.mak:51
 <<<<<<< HEAD
 #: tracim/templates/master_authenticated.mak:147
 =======
+=======
+#: tracim/templates/index.mak:30 tracim/templates/index.mak:51
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 #: tracim/templates/master_authenticated.mak:154
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 msgid "Login"
@@ -765,12 +777,10 @@ msgstr "vous DEVEZ désactiver le mode \"debug\" en production"
 #: tracim/templates/master_authenticated.mak:137
 =======
 #: tracim/templates/master_authenticated.mak:119
-#| msgid "Search..."
 msgid "Search for..."
 msgstr "Rechercher..."
 
 #: tracim/templates/master_authenticated.mak:121
-#| msgid "Search..."
 msgid "Search"
 msgstr "Rechercher..."
 
@@ -852,8 +862,7 @@ msgstr "Retourner à la page d'accueil"
 msgid "Password Reset Request"
 msgstr "Requête de réinitialisation du mot de passe"
 
-#: tracim/templates/search.mak:8
-#: tracim/templates/user_get_me.mak:39
+#: tracim/templates/search.mak:8 tracim/templates/user_get_me.mak:39
 #: tracim/templates/user_workspace_get_all.mak:8
 #: tracim/templates/user_workspace_get_all.mak:29
 msgid "My workspaces"
@@ -885,7 +894,9 @@ msgstr "Affichage de {0} élément sur un total de {1}"
 
 #: tracim/templates/search_toolbars.mak:66
 msgid "Showing all items. You can filter by clicking right toolbar buttons."
-msgstr "Affichage de tous les résultats. Vous pouvez les filtrer à l'aide de la barre d'outils à droite"
+msgstr ""
+"Affichage de tous les résultats. Vous pouvez les filtrer à l'aide de la "
+"barre d'outils à droite"
 
 #: tracim/templates/thread_toolbars.mak:8
 msgid "Edit current thread"
@@ -895,8 +906,7 @@ msgstr "Modifier le sujet de discussion"
 msgid "Create a user account..."
 msgstr "Créer un compte utilisateur"
 
-#: tracim/templates/user_get_all.mak:29
-#: tracim/templates/user_get_all.mak:30
+#: tracim/templates/user_get_all.mak:29 tracim/templates/user_get_all.mak:30
 #: tracim/templates/user_workspace_forms.mak:43
 #: tracim/templates/user_workspace_forms.mak:44
 #: tracim/templates/user_workspace_forms.mak:223
@@ -909,8 +919,7 @@ msgstr "Créer un compte utilisateur"
 msgid "Name"
 msgstr "Nom"
 
-#: tracim/templates/user_get_all.mak:33
-#: tracim/templates/user_get_all.mak:93
+#: tracim/templates/user_get_all.mak:33 tracim/templates/user_get_all.mak:93
 #: tracim/templates/user_workspace_forms.mak:227
 #: tracim/templates/workspace_get_one.mak:87
 msgid "Email"
@@ -953,8 +962,14 @@ msgstr "Valider"
 
 #: tracim/templates/user_get_all.mak:86
 #: tracim/templates/workspace_get_all.mak:58
-msgid "There are no workspace yet. Start by <a class=\"alert-link\" data-toggle=\"collapse\" data-target=\"#create-workspace-form\">creating a workspace</a>."
-msgstr "Il n'y a pas encore d'espaces de travail. Commencez en <a class=\"alert-link\" data-toggle=\"collapse\" data-target=\"#create-workspace-form\">créant un espace de travail</a>."
+msgid ""
+"There are no workspace yet. Start by <a class=\"alert-link\" data-"
+"toggle=\"collapse\" data-target=\"#create-workspace-form\">creating a "
+"workspace</a>."
+msgstr ""
+"Il n'y a pas encore d'espaces de travail. Commencez en <a class=\"alert-"
+"link\" data-toggle=\"collapse\" data-target=\"#create-workspace-"
+"form\">créant un espace de travail</a>."
 
 #: tracim/templates/user_get_all.mak:92
 #: tracim/templates/workspace_get_one.mak:42
@@ -970,22 +985,32 @@ msgstr "Peut créer des espaces de travail"
 msgid "Administrator"
 msgstr "Administrateur"
 
-#: tracim/templates/user_get_all.mak:102
+#: tracim/templates/user_get_all.mak:96
+msgid "Notes"
+msgstr "Remarques"
+
+#: tracim/templates/user_get_all.mak:103
 msgid "User enabled. Click to disable this user"
 msgstr "Utilisateur activé. Cliquez pour le désactiver"
 
-#: tracim/templates/user_get_all.mak:118
+#: tracim/templates/user_get_all.mak:119
 msgid "User disabled. Click to enable this user"
 msgstr "Utilisateur désactivé. Cliquez pour l'activer"
 
-#: tracim/templates/user_get_me.mak:5
-#: tracim/templates/user_get_one.mak:5
+#: tracim/templates/user_get_all.mak:135
+msgid "This user has no password."
+msgstr "Cet utilisateur n'a pas de mot de passe"
+
+#: tracim/templates/user_get_all.mak:136
+msgid "No password defined."
+msgstr "Aucun mot de passe"
+
+#: tracim/templates/user_get_me.mak:5 tracim/templates/user_get_one.mak:5
 #: tracim/templates/user_profile.mak:5
 msgid "My profile"
 msgstr "Mon profil"
 
-#: tracim/templates/user_get_me.mak:26
-#: tracim/templates/user_profile.mak:26
+#: tracim/templates/user_get_me.mak:26 tracim/templates/user_profile.mak:26
 msgid "I can create workspaces."
 msgstr "je peux créer des espaces de travail"
 
@@ -999,15 +1024,23 @@ msgstr "Je ne suis membre d'aucun espace de travail"
 
 #: tracim/templates/user_get_me.mak:52
 msgid "Email notifications subscribed. Click to stop notifications."
-msgstr "Vous êtes abonné(e) aux notifications par email. Cliquez pour pour les désactiver"
+msgstr ""
+"Vous êtes abonné(e) aux notifications par email. Cliquez pour pour les "
+"désactiver"
 
 #: tracim/templates/user_get_me.mak:56
 msgid "Email notifications desactivated. Click to subscribe."
-msgstr "Vous n'êtes pas abonné(e) aux notifications par email. Cliquez pour pour les activer"
+msgstr ""
+"Vous n'êtes pas abonné(e) aux notifications par email. Cliquez pour pour "
+"les activer"
 
 #: tracim/templates/user_get_me.mak:66
-msgid "You can configure your email notifications by clicking on the email icons above"
-msgstr "Vous pouvez configurer vos notifications par email en cliquant sur l'icône \"email\" ci-dessus"
+msgid ""
+"You can configure your email notifications by clicking on the email icons"
+" above"
+msgstr ""
+"Vous pouvez configurer vos notifications par email en cliquant sur "
+"l'icône \"email\" ci-dessus"
 
 #: tracim/templates/user_get_one.mak:26
 msgid "This user a standard user."
@@ -1021,8 +1054,12 @@ msgstr "Cet utilisateur peut créer des espaces de travail."
 msgid "This user is an administrator."
 msgstr "Cet utilisateur est un administrateur"
 
+<<<<<<< HEAD
 #: tracim/templates/user_get_one.mak:45
 #: tracim/templates/user_profile.mak:42
+=======
+#: tracim/templates/user_get_one.mak:42 tracim/templates/user_profile.mak:42
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 msgid "This user is not member of any workspace."
 msgstr "Cet utilisateur n'est membre d'aucun espace de travail"
 
@@ -1080,8 +1117,12 @@ msgid "Write here the file content"
 msgstr "Indiquez le contenu du fichier"
 
 #: tracim/templates/user_workspace_folder_file_get_one.mak:33
-msgid "You are reading <b>an old revision</b> of the current file. (the shown revision is r{})."
-msgstr "Vous consultez <b>une ancienne version</b> du fichier courant. (la version affichée est v{})."
+msgid ""
+"You are reading <b>an old revision</b> of the current file. (the shown "
+"revision is r{})."
+msgstr ""
+"Vous consultez <b>une ancienne version</b> du fichier courant. (la "
+"version affichée est v{})."
 
 #: tracim/templates/user_workspace_folder_file_get_one.mak:34
 #: tracim/templates/user_workspace_folder_page_get_one.mak:35
@@ -1134,8 +1175,12 @@ msgid "Description"
 msgstr "Description"
 
 #: tracim/templates/user_workspace_folder_file_get_one.mak:99
-msgid "<b>Note</b>: You need to change status in case you want to upload a new version"
-msgstr "<b>Note</b>: Vous devez changer le statut du fichier avant de pouvoir télécharger une nouvelle version"
+msgid ""
+"<b>Note</b>: You need to change status in case you want to upload a new "
+"version"
+msgstr ""
+"<b>Note</b>: Vous devez changer le statut du fichier avant de pouvoir "
+"télécharger une nouvelle version"
 
 #: tracim/templates/user_workspace_folder_file_get_one.mak:104
 #: tracim/templates/user_workspace_folder_file_get_one.mak:108
@@ -1235,8 +1280,12 @@ msgid "Write here the page content"
 msgstr "Rédigez le contenu de la page"
 
 #: tracim/templates/user_workspace_folder_page_get_one.mak:34
-msgid "You are reading <b>an old revision</b> of the current page. (the shown revision is r{})."
-msgstr "Vous consultez <b>une ancienne version</b> de al page courante. (la version affichée est la v{})."
+msgid ""
+"You are reading <b>an old revision</b> of the current page. (the shown "
+"revision is r{})."
+msgstr ""
+"Vous consultez <b>une ancienne version</b> de al page courante. (la "
+"version affichée est la v{})."
 
 #: tracim/templates/user_workspace_folder_page_get_one.mak:65
 msgid "Links extracted from the page"
@@ -1265,8 +1314,12 @@ msgid "Optionnaly, you can describe the subject"
 msgstr "Vous pouvez décrire le sujet (facultatif)"
 
 #: tracim/templates/user_workspace_folder_thread_get_one.mak:65
-msgid "<b>Note</b>: In case you'd like to post a reply, you must first open again the thread"
-msgstr "<b>Note</b> : si vous souhaitez commenter cette discussion, vous devez tout d'abord en modifier le statut pour la ré-ouvrir"
+msgid ""
+"<b>Note</b>: In case you'd like to post a reply, you must first open "
+"again the thread"
+msgstr ""
+"<b>Note</b> : si vous souhaitez commenter cette discussion, vous devez "
+"tout d'abord en modifier le statut pour la ré-ouvrir"
 
 #: tracim/templates/user_workspace_folder_thread_get_one.mak:70
 msgid "Post a reply..."
@@ -1485,8 +1538,14 @@ msgid "Role"
 msgstr "Rôle"
 
 #: tracim/templates/workspace_get_one.mak:80
-msgid "There are no user associated to the current workspace. Start by <a class=\"alert-link\" data-toggle=\"collapse\" data-target=\"#add-role-from-existing-user-form\">adding members</a>  to the workspace."
-msgstr "Il n'y a aucun membre dans cet espace de travail. Commencez par <a class=\"alert-link\" data-toggle=\"collapse\" data-target=\"#add-role-from-existing-user-form\">ajouter des membres</a> à cet espace."
+msgid ""
+"There are no user associated to the current workspace. Start by <a class"
+"=\"alert-link\" data-toggle=\"collapse\" data-target=\"#add-role-from-"
+"existing-user-form\">adding members</a>  to the workspace."
+msgstr ""
+"Il n'y a aucun membre dans cet espace de travail. Commencez par <a class"
+"=\"alert-link\" data-toggle=\"collapse\" data-target=\"#add-role-from-"
+"existing-user-form\">ajouter des membres</a> à cet espace."
 
 #: tracim/templates/workspace_get_one.mak:107
 msgid "Change role to..."
@@ -1546,23 +1605,38 @@ msgstr "Les utilisateurs ont un rôle spécifique à chaque espace de travail."
 
 #: tracim/templates/help/page-user-role-definition.mak:11
 msgid "Roles give progressive rights on what the user can or can't do."
-msgstr "Les rôles donnent des droits progressifs qui déterminent ce que l'utilisateur peut ou ne peut pas faire."
+msgstr ""
+"Les rôles donnent des droits progressifs qui déterminent ce que "
+"l'utilisateur peut ou ne peut pas faire."
 
 #: tracim/templates/help/page-user-role-definition.mak:16
 msgid "This role gives read-only access to workspace resources."
 msgstr "Ce rôle donne accès en lecteur aux informations de l'espace de travail."
 
 #: tracim/templates/help/page-user-role-definition.mak:20
-msgid "Same as <span style=\"color: #1fdb11;\">reader</span> + contribution rights: edit, comments, status update."
-msgstr "Comme <span style=\"color: #1fdb11;\">lecteur</span> + contribution : modifications, commentaires, mise à jour du statut."
+msgid ""
+"Same as <span style=\"color: #1fdb11;\">reader</span> + contribution "
+"rights: edit, comments, status update."
+msgstr ""
+"Comme <span style=\"color: #1fdb11;\">lecteur</span> + contribution : "
+"modifications, commentaires, mise à jour du statut."
 
 #: tracim/templates/help/page-user-role-definition.mak:24
-msgid "Same as <span style=\"color: #759ac5;\">contributor</span> + content management rights: move content, folders management, delete archive operations."
-msgstr "Comme <span style=\"color: #759ac5;\">contributeur</span> + gestion du contenu : déplacer le contenu, les dossiers"
+msgid ""
+"Same as <span style=\"color: #759ac5;\">contributor</span> + content "
+"management rights: move content, folders management, delete archive "
+"operations."
+msgstr ""
+"Comme <span style=\"color: #759ac5;\">contributeur</span> + gestion du "
+"contenu : déplacer le contenu, les dossiers"
 
 #: tracim/templates/help/page-user-role-definition.mak:28
-msgid "Same as <span style=\"color: #ea983d;\">content manager</span> + workspace management rights: edit workspace, invite users, revoke them."
-msgstr "Comme <span style=\"color: #ea983d;\">gestionnaire de contenu</span> + modification de l'espace de travail."
+msgid ""
+"Same as <span style=\"color: #ea983d;\">content manager</span> + "
+"workspace management rights: edit workspace, invite users, revoke them."
+msgstr ""
+"Comme <span style=\"color: #ea983d;\">gestionnaire de contenu</span> + "
+"modification de l'espace de travail."
 
 #: tracim/templates/mail/content_update_body_html.mak:52
 msgid "Some activity has been detected"
@@ -1587,8 +1661,14 @@ msgid "Go to information"
 msgstr "Voir en ligne"
 
 #: tracim/templates/mail/content_update_body_html.mak:82
-msgid "{user_display_name}, you receive this email because you are <b>{user_role_label}</b> in the workspace <a href=\"{workspace_url}\">{workspace_label}</a>"
-msgstr "{user_display_name}, vous recevez cet email car vous êtes <b>{user_role_label}</b> dans l'espace de travail <a href=\"{workspace_url}\">{workspace_label}</a>"
+msgid ""
+"{user_display_name}, you receive this email because you are "
+"<b>{user_role_label}</b> in the workspace <a "
+"href=\"{workspace_url}\">{workspace_label}</a>"
+msgstr ""
+"{user_display_name}, vous recevez cet email car vous êtes "
+"<b>{user_role_label}</b> dans l'espace de travail <a "
+"href=\"{workspace_url}\">{workspace_label}</a>"
 
 #: tracim/templates/mail/content_update_body_text.mak:8
 msgid "Some activity has been detected on the item above"
@@ -1603,8 +1683,13 @@ msgid "Go to information:"
 msgstr "Voir en ligne :"
 
 #: tracim/templates/mail/content_update_body_text.mak:25
-msgid "*{user_display_name}*, you receive this email because you are *{user_role_label}* in the workspace {workspace_label} - {workspace_url}"
-msgstr "*{user_display_name}*, vous recevez cet email car vous êtes *{user_role_label}* dans l'espace de travail {workspace_label} - {workspace_url}"
+msgid ""
+"*{user_display_name}*, you receive this email because you are "
+"*{user_role_label}* in the workspace {workspace_label} - {workspace_url}"
+msgstr ""
+"*{user_display_name}*, vous recevez cet email car vous êtes "
+"*{user_role_label}* dans l'espace de travail {workspace_label} - "
+"{workspace_url}"
 
 #~ msgid "You have no document yet."
 #~ msgstr "Vous n'avez pas de document pour le moment."
@@ -2163,3 +2248,13 @@ msgstr "*{user_display_name}*, vous recevez cet email car vous êtes *{user_role
 
 #~ msgid "Create a topic"
 #~ msgstr "Créer un sujet"
+
+#~ msgid ""
+#~ "This user has no password. Visit "
+#~ "<a href=\"{}\">Reset password</a> page for "
+#~ "init."
+#~ msgstr ""
+#~ "Cet utilisateur n'a pas de mot de"
+#~ " passe. Visitez <a href=\"{}\">cette "
+#~ "page</a> pour l'initialiser."
+

@@ -93,6 +93,7 @@
                                     <th>${_('Email')}</th>
                                     <th>${_('Can create workspaces')}</th>
                                     <th>${_('Administrator')}</th>
+                                    <th>${_('Notes')}</th>
                                 </tr>
                             </thead>
                             % for user in result.users:
@@ -129,6 +130,13 @@
                                             ${TIM.ICO(16, icon)}
                                         </td>
                                     % endif
+                                    <td>
+                                        % if False==user.has_password:
+                                            ${TIM.ICO_TOOLTIP(16, 'emblems/emblem-readonly', _('This user has no password.'))}
+                                            ${_('No password defined.')}
+
+                                        % endif
+                                    </td>
                                 </tr>
                             % endfor
                         </table>

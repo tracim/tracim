@@ -32,3 +32,16 @@ class TestUserModel(TestStandard):
         eq_(new_user.display_name, name)
         eq_(new_user.email, email)
         eq_(new_user.email_address, email)
+
+    def test_null_password(self):
+        # Check bug #70 fixed
+        # http://tracim.org/workspaces/4/folders/5/threads/70
+
+        name = 'Damien'
+        email = 'tracim@trac.im'
+
+        user = User()
+        user.display_name = name
+        user.email = email
+
+        eq_(False, user.validate_password(None))
