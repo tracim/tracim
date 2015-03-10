@@ -9,12 +9,17 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2015-03-02 22:28+0100\n"
 "PO-Revision-Date: 2015-03-02 22:32+0100\n"
 =======
 "POT-Creation-Date: 2015-03-09 16:56+0100\n"
 "PO-Revision-Date: 2015-03-09 17:00+0100\n"
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
+=======
+"POT-Creation-Date: 2015-03-10 18:35+0100\n"
+"PO-Revision-Date: 2015-03-10 18:32+0100\n"
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 =======
 "POT-Creation-Date: 2015-03-10 18:35+0100\n"
 "PO-Revision-Date: 2015-03-10 18:32+0100\n"
@@ -93,6 +98,7 @@ msgstr "Mot de passe changé"
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: tracim/controllers/__init__.py:139
 #: tracim/templates/dashboard.mak:36
 #: tracim/templates/master_authenticated.mak:94
@@ -130,6 +136,13 @@ msgstr "{} mis(e) à jour"
 
 #: tracim/controllers/__init__.py:252 tracim/controllers/content.py:288
 >>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
+=======
+#: tracim/controllers/__init__.py:247 tracim/controllers/content.py:283
+msgid "{} updated"
+msgstr "{} mis(e) à jour"
+
+#: tracim/controllers/__init__.py:252 tracim/controllers/content.py:288
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 msgid "{} not updated - error: {}"
 msgstr "{} pas mis(e) à jour - erreur : {}"
 
@@ -152,6 +165,7 @@ msgstr "Statut de {} mis(e) à jour"
 msgid "{} status not updated: {}"
 msgstr "Statut de {} non mis(e) à jour : {}"
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: tracim/controllers/__init__.py:302
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
@@ -182,9 +196,32 @@ msgstr "{} non désarchivé(e) : {}"
 #: tracim/controllers/__init__.py:378
 #: tracim/controllers/content.py:88
 #: tracim/controllers/content.py:797
-msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
-msgstr "{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+=======
+#: tracim/controllers/__init__.py:302 tracim/controllers/content.py:748
+msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
+msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
 
+#: tracim/controllers/__init__.py:311 tracim/controllers/content.py:757
+msgid "{} not archived: {}"
+msgstr "{} non archivé(e) : {}"
+
+#: tracim/controllers/__init__.py:325 tracim/controllers/content.py:771
+msgid "{} unarchived."
+msgstr "{} désarchivé(e)"
+
+#: tracim/controllers/__init__.py:333 tracim/controllers/content.py:779
+msgid "{} not un-archived: {}"
+msgstr "{} non désarchivé(e) : {}"
+
+#: tracim/controllers/__init__.py:351 tracim/controllers/content.py:88
+#: tracim/controllers/content.py:796
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
+msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
+msgstr ""
+"{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler "
+"l'opération</a>"
+
+<<<<<<< HEAD
 #: tracim/controllers/__init__.py:387
 #: tracim/controllers/content.py:99
 #: tracim/controllers/content.py:806
@@ -238,6 +275,18 @@ msgstr "{} non supprimé(e) : {}"
 msgid "{} undeleted."
 msgstr "{} restauré(e)."
 
+=======
+#: tracim/controllers/__init__.py:360 tracim/controllers/content.py:99
+#: tracim/controllers/content.py:805
+msgid "{} not deleted: {}"
+msgstr "{} non supprimé(e) : {}"
+
+#: tracim/controllers/__init__.py:375 tracim/controllers/content.py:116
+#: tracim/controllers/content.py:820
+msgid "{} undeleted."
+msgstr "{} restauré(e)."
+
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 #: tracim/controllers/__init__.py:385 tracim/controllers/content.py:128
 #: tracim/controllers/content.py:830
 >>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
@@ -455,9 +504,13 @@ msgstr "le %d %B à %H:%M"
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 #: tracim/lib/content.py:98
 #: tracim/templates/dashboard.mak:36
+=======
+#: tracim/lib/content.py:98 tracim/templates/dashboard.mak:36
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 =======
 #: tracim/lib/content.py:98 tracim/templates/dashboard.mak:36
 >>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
@@ -720,11 +773,15 @@ msgid "Delete thread"
 msgstr "Supprimer la discussion"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: tracim/templates/index.mak:30
 #: tracim/templates/index.mak:51
 <<<<<<< HEAD
 #: tracim/templates/master_authenticated.mak:147
 =======
+=======
+#: tracim/templates/index.mak:30 tracim/templates/index.mak:51
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 =======
 #: tracim/templates/index.mak:30 tracim/templates/index.mak:51
 >>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
@@ -1055,8 +1112,12 @@ msgid "This user is an administrator."
 msgstr "Cet utilisateur est un administrateur"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: tracim/templates/user_get_one.mak:45
 #: tracim/templates/user_profile.mak:42
+=======
+#: tracim/templates/user_get_one.mak:42 tracim/templates/user_profile.mak:42
+>>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 =======
 #: tracim/templates/user_get_one.mak:42 tracim/templates/user_profile.mak:42
 >>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
