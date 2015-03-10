@@ -690,6 +690,7 @@ def serialize_user_list_default(user: User, context: Context):
     result['email'] = user.email
     result['enabled'] = user.is_active
     result['profile'] = user.profile
+    result['has_password'] = user.password!=None
     return result
 
 

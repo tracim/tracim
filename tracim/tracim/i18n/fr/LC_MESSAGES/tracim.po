@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pod 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-09 16:56+0100\n"
-"PO-Revision-Date: 2015-03-09 17:00+0100\n"
+"POT-Creation-Date: 2015-03-10 18:30+0100\n"
+"PO-Revision-Date: 2015-03-10 18:32+0100\n"
 "Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
 "Language-Team: fr_FR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -144,7 +144,6 @@ msgid "{} not un-deleted: {}"
 msgstr "{} non restauré(e) : {}"
 
 #: tracim/controllers/content.py:42
-#| msgid "Item commented"
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -202,7 +201,6 @@ msgid "Folder not updated: {}"
 msgstr "Dossier non mis à jour : {}"
 
 #: tracim/controllers/content.py:730
-#| msgid "Folders"
 msgid "Folder"
 msgstr "Dossiers"
 
@@ -371,7 +369,6 @@ msgid "You are not authorized to access this resource"
 msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 
 #: tracim/lib/predicates.py:69
-#| msgid "You are not authorized to access this resource"
 msgid "You're not allowed to access this resource"
 msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 
@@ -489,32 +486,26 @@ msgid "subject closed — cancelled"
 msgstr "discussion close — annulée"
 
 #: tracim/model/data.py:292
-#| msgid "Delete current workspace"
 msgid "Delete this workspace"
 msgstr "Supprimer l'espace de travail"
 
 #: tracim/model/data.py:293
-#| msgid "Create this folder"
 msgid "Delete this folder"
 msgstr "Supprimer ce dossier"
 
 #: tracim/model/data.py:294
-#| msgid "Delete file"
 msgid "Delete this file"
 msgstr "Supprimer le fichier"
 
 #: tracim/model/data.py:295
-#| msgid "Create this page"
 msgid "Delete this page"
 msgstr "Supprimer cette page"
 
 #: tracim/model/data.py:296
-#| msgid "Delete thread"
 msgid "Delete this thread"
 msgstr "Supprimer cette discussion"
 
 #: tracim/model/data.py:297
-#| msgid "Item commented"
 msgid "Delete this comment"
 msgstr "Supprimer ce commentaire"
 
@@ -664,12 +655,10 @@ msgid "you MUST desactivate debug in production"
 msgstr "vous DEVEZ désactiver le mode \"debug\" en production"
 
 #: tracim/templates/master_authenticated.mak:119
-#| msgid "Search..."
 msgid "Search for..."
 msgstr "Rechercher..."
 
 #: tracim/templates/master_authenticated.mak:121
-#| msgid "Search..."
 msgid "Search"
 msgstr "Rechercher..."
 
@@ -864,13 +853,31 @@ msgstr "Peut créer des espaces de travail"
 msgid "Administrator"
 msgstr "Administrateur"
 
-#: tracim/templates/user_get_all.mak:102
+#: tracim/templates/user_get_all.mak:96
+msgid "Notes"
+msgstr "Remarques"
+
+#: tracim/templates/user_get_all.mak:103
 msgid "User enabled. Click to disable this user"
 msgstr "Utilisateur activé. Cliquez pour le désactiver"
 
-#: tracim/templates/user_get_all.mak:118
+#: tracim/templates/user_get_all.mak:119
 msgid "User disabled. Click to enable this user"
 msgstr "Utilisateur désactivé. Cliquez pour l'activer"
+
+#: tracim/templates/user_get_all.mak:137
+msgid "This user has no password. Visit <a href=\"{}\">Reset password</a> page for init."
+msgstr "Cet utilisateur n'a pas de mot de passe. Visitez <a href=\"{}\">cette page</a> pour l'initialiser."
+
+#: tracim/templates/user_get_all.mak:139
+#| msgid "Enter password"
+msgid "This user has no password."
+msgstr "Cet utilisateur n'a pas de mot de passe"
+
+#: tracim/templates/user_get_all.mak:140
+#| msgid "Your password has been changed"
+msgid "No password defined."
+msgstr "Aucun mot de passe"
 
 #: tracim/templates/user_get_me.mak:5
 #: tracim/templates/user_get_one.mak:5

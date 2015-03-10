@@ -199,6 +199,8 @@ class User(DeclarativeBase):
         :rtype: bool
 
         """
+        if not self.password:
+            return False
         hash = sha256()
         hash.update((password + self.password[:64]).encode('utf-8'))
         return self.password[64:] == hash.hexdigest()
