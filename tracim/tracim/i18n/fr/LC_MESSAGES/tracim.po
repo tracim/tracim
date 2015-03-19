@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pod 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-10 18:35+0100\n"
-"PO-Revision-Date: 2015-03-10 18:32+0100\n"
+"POT-Creation-Date: 2015-03-20 00:44+0100\n"
+"PO-Revision-Date: 2015-03-20 00:37+0100\n"
 "Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
 "Language-Team: fr_FR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: tracim/config/app_cfg.py:135
+#: tracim/config/app_cfg.py:137
 msgid "Password reset request"
 msgstr "Réinitialisation du mot de passe"
 
-#: tracim/config/app_cfg.py:136 tracim/config/app_cfg.py:165
+#: tracim/config/app_cfg.py:138 tracim/config/app_cfg.py:167
 #, python-format
 msgid ""
 "\n"
@@ -44,48 +44,50 @@ msgstr ""
 " à l'originie de cette requête, merci d'ignorer et/ou supprimer cet "
 "e-mail.\n"
 
-#: tracim/config/app_cfg.py:152 tracim/templates/user_workspace_forms.mak:251
+#: tracim/config/app_cfg.py:154 tracim/templates/user_workspace_forms.mak:251
 #: tracim/templates/user_workspace_forms.mak:252
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
-#: tracim/config/app_cfg.py:153
+#: tracim/config/app_cfg.py:155
 msgid "Confirm new password"
 msgstr "Confirmer le nouveau mot de passe"
 
-#: tracim/config/app_cfg.py:154
+#: tracim/config/app_cfg.py:156
 msgid "Save new password"
 msgstr "Enregistrer le nouveau mot de passe"
 
-#: tracim/config/app_cfg.py:155 tracim/templates/user_get_all.mak:34
+#: tracim/config/app_cfg.py:157 tracim/templates/user_get_all.mak:34
 msgid "Email address"
 msgstr "Adresse email"
 
-#: tracim/config/app_cfg.py:156
+#: tracim/config/app_cfg.py:158
 msgid "Send Request"
 msgstr "Valider"
 
-#: tracim/config/app_cfg.py:159
+#: tracim/config/app_cfg.py:161
 msgid "Password reset request sent"
 msgstr "Requête de réinitialisation du mot de passe envoyée"
 
-#: tracim/config/app_cfg.py:160 tracim/config/app_cfg.py:162
+#: tracim/config/app_cfg.py:162 tracim/config/app_cfg.py:164
 msgid "Invalid password reset request"
 msgstr "Requête de réinitialisation du mot de passe invalide"
 
-#: tracim/config/app_cfg.py:161
+#: tracim/config/app_cfg.py:163
 msgid "Password reset request timed out"
 msgstr "Echec de la requête de réinitialisation du mot de passe"
 
-#: tracim/config/app_cfg.py:163
+#: tracim/config/app_cfg.py:165
 msgid "Password changed successfully"
 msgstr "Mot de passe changé"
 
-#: tracim/controllers/__init__.py:247 tracim/controllers/content.py:283
+#: tracim/controllers/__init__.py:247 tracim/controllers/content.py:310
+#: tracim/controllers/content.py:425
 msgid "{} updated"
 msgstr "{} mis(e) à jour"
 
-#: tracim/controllers/__init__.py:252 tracim/controllers/content.py:288
+#: tracim/controllers/__init__.py:252 tracim/controllers/content.py:315
+#: tracim/controllers/content.py:430
 msgid "{} not updated - error: {}"
 msgstr "{} pas mis(e) à jour - erreur : {}"
 
@@ -97,41 +99,41 @@ msgstr "Statut de {} mis(e) à jour"
 msgid "{} status not updated: {}"
 msgstr "Statut de {} non mis(e) à jour : {}"
 
-#: tracim/controllers/__init__.py:302 tracim/controllers/content.py:748
+#: tracim/controllers/__init__.py:302 tracim/controllers/content.py:798
 msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
 msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
 
-#: tracim/controllers/__init__.py:311 tracim/controllers/content.py:757
+#: tracim/controllers/__init__.py:311 tracim/controllers/content.py:807
 msgid "{} not archived: {}"
 msgstr "{} non archivé(e) : {}"
 
-#: tracim/controllers/__init__.py:325 tracim/controllers/content.py:771
+#: tracim/controllers/__init__.py:325 tracim/controllers/content.py:821
 msgid "{} unarchived."
 msgstr "{} désarchivé(e)"
 
-#: tracim/controllers/__init__.py:333 tracim/controllers/content.py:779
+#: tracim/controllers/__init__.py:333 tracim/controllers/content.py:829
 msgid "{} not un-archived: {}"
 msgstr "{} non désarchivé(e) : {}"
 
 #: tracim/controllers/__init__.py:351 tracim/controllers/content.py:88
-#: tracim/controllers/content.py:796
+#: tracim/controllers/content.py:846
 msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
 msgstr ""
 "{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler "
 "l'opération</a>"
 
 #: tracim/controllers/__init__.py:360 tracim/controllers/content.py:99
-#: tracim/controllers/content.py:805
+#: tracim/controllers/content.py:855
 msgid "{} not deleted: {}"
 msgstr "{} non supprimé(e) : {}"
 
 #: tracim/controllers/__init__.py:375 tracim/controllers/content.py:116
-#: tracim/controllers/content.py:820
+#: tracim/controllers/content.py:870
 msgid "{} undeleted."
 msgstr "{} restauré(e)."
 
 #: tracim/controllers/__init__.py:385 tracim/controllers/content.py:128
-#: tracim/controllers/content.py:830
+#: tracim/controllers/content.py:880
 msgid "{} not un-deleted: {}"
 msgstr "{} non restauré(e) : {}"
 
@@ -152,47 +154,47 @@ msgstr "Fichier"
 msgid "File created"
 msgstr "Fichier créé"
 
-#: tracim/controllers/content.py:313
+#: tracim/controllers/content.py:340
 msgid "Page"
 msgstr "Page"
 
-#: tracim/controllers/content.py:381
+#: tracim/controllers/content.py:408
 msgid "Page created"
 msgstr "Page créée"
 
-#: tracim/controllers/content.py:421
+#: tracim/controllers/content.py:470
 msgid "Thread"
 msgstr "Discussion"
 
-#: tracim/controllers/content.py:462
+#: tracim/controllers/content.py:512
 msgid "Thread created"
 msgstr "Discussion créée"
 
-#: tracim/controllers/content.py:547
+#: tracim/controllers/content.py:597
 msgid "Item moved to {}"
 msgstr "Element déplacé vers {}"
 
-#: tracim/controllers/content.py:549
+#: tracim/controllers/content.py:599
 msgid "Item moved to workspace root"
 msgstr "Element déplacé à la racine de l'espace de travail"
 
-#: tracim/controllers/content.py:669
+#: tracim/controllers/content.py:719
 msgid "Folder created"
 msgstr "Dossier créé"
 
-#: tracim/controllers/content.py:675
+#: tracim/controllers/content.py:725
 msgid "Folder not created: {}"
 msgstr "Dossier non créé : {}"
 
-#: tracim/controllers/content.py:710
+#: tracim/controllers/content.py:760
 msgid "Folder updated"
 msgstr "Dossier mis à jour"
 
-#: tracim/controllers/content.py:715
+#: tracim/controllers/content.py:765
 msgid "Folder not updated: {}"
 msgstr "Dossier non mis à jour : {}"
 
-#: tracim/controllers/content.py:730
+#: tracim/controllers/content.py:780
 msgid "Folder"
 msgstr "Dossiers"
 
@@ -340,7 +342,7 @@ msgstr "Espace de travail {} restauré."
 msgid "%B %d at %I:%M%p"
 msgstr "le %d %B à %H:%M"
 
-#: tracim/lib/content.py:98 tracim/templates/dashboard.mak:36
+#: tracim/lib/content.py:100 tracim/templates/dashboard.mak:36
 #: tracim/templates/master_authenticated.mak:94
 #: tracim/templates/master_no_toolbar_no_login.mak:112
 #: tracim/templates/search.mak:11 tracim/templates/user_get_one.mak:39
@@ -354,6 +356,67 @@ msgstr "le %d %B à %H:%M"
 #: tracim/templates/workspace_get_all.mak:13
 msgid "Workspaces"
 msgstr "Espaces de travail"
+
+#: tracim/lib/notifications.py:289
+msgid "<span id=\"content-intro-username\">{}</span> added a comment:"
+msgstr "<span id=\"content-intro-username\">{}</span> a ajouté un commentaire :"
+
+#: tracim/lib/notifications.py:291 tracim/lib/notifications.py:300
+msgid "Answer"
+msgstr "Répondre"
+
+#: tracim/lib/notifications.py:297 tracim/lib/notifications.py:321
+#: tracim/lib/notifications.py:347
+msgid "View online"
+msgstr "Voir en ligne"
+
+#: tracim/lib/notifications.py:301
+msgid "<span id=\"content-intro-username\">{}</span> started a thread entitled:"
+msgstr ""
+"<span id=\"content-intro-username\">{}</span> a lancé une discussion "
+"intitulée :"
+
+#: tracim/lib/notifications.py:306
+msgid "<span id=\"content-intro-username\">{}</span> added a file entitled:"
+msgstr ""
+"<span id=\"content-intro-username\">{}</span> a ajouté un fichier "
+"intitulé :"
+
+#: tracim/lib/notifications.py:316
+msgid "<span id=\"content-intro-username\">{}</span> added a page entitled:"
+msgstr ""
+"<span id=\"content-intro-username\">{}</span> a ajouté une page intitulée"
+" :"
+
+#: tracim/lib/notifications.py:324
+msgid "<span id=\"content-intro-username\">{}</span> uploaded a new revision."
+msgstr ""
+"<span id=\"content-intro-username\">{}</span> a téléchargé une nouvelle "
+"version."
+
+#: tracim/lib/notifications.py:328
+msgid "<span id=\"content-intro-username\">{}</span> updated this page."
+msgstr "<span id=\"content-intro-username\">{}</span> a mis à jour cette page."
+
+#: tracim/lib/notifications.py:333
+msgid "<p id=\"content-body-intro\">Here is an overview of the changes:</p>"
+msgstr "<p id=\"content-body-intro\">Voici un aperçu des modifications :</p>"
+
+#: tracim/lib/notifications.py:338
+msgid ""
+"<span id=\"content-intro-username\">{}</span> updated the thread "
+"description."
+msgstr ""
+"<span id=\"content-intro-username\">{}</span> a mis à jour la description"
+" de la discussion."
+
+#: tracim/lib/notifications.py:350
+msgid ""
+"<span id=\"content-intro-username\">{}</span> updated the file "
+"description."
+msgstr ""
+"<span id=\"content-intro-username\">{}</span> a mis à jour la description"
+" du fichier."
 
 #: tracim/lib/predicates.py:17
 msgid "You are not authorized to access this resource"
@@ -442,55 +505,55 @@ msgstr "Elément désarchivé"
 msgid "Item undeleted"
 msgstr "Elément restauré"
 
-#: tracim/model/data.py:202 tracim/model/data.py:212
+#: tracim/model/data.py:201 tracim/model/data.py:211
 msgid "work in progress"
 msgstr "travail en cours"
 
-#: tracim/model/data.py:203 tracim/model/data.py:213
+#: tracim/model/data.py:202 tracim/model/data.py:212
 msgid "closed — validated"
 msgstr "clos(e) — validé(e)"
 
-#: tracim/model/data.py:204 tracim/model/data.py:214
+#: tracim/model/data.py:203 tracim/model/data.py:213
 msgid "closed — cancelled"
 msgstr "clos(e) — annulé(e)"
 
-#: tracim/model/data.py:205 tracim/model/data.py:210 tracim/model/data.py:215
+#: tracim/model/data.py:204 tracim/model/data.py:209 tracim/model/data.py:214
 msgid "deprecated"
 msgstr "obsolète"
 
-#: tracim/model/data.py:207
+#: tracim/model/data.py:206
 msgid "subject in progress"
 msgstr "discussion en cours"
 
-#: tracim/model/data.py:208
+#: tracim/model/data.py:207
 msgid "subject closed — resolved"
 msgstr "discussion close — résolue"
 
-#: tracim/model/data.py:209
+#: tracim/model/data.py:208
 msgid "subject closed — cancelled"
 msgstr "discussion close — annulée"
 
-#: tracim/model/data.py:292
+#: tracim/model/data.py:291
 msgid "Delete this workspace"
 msgstr "Supprimer l'espace de travail"
 
-#: tracim/model/data.py:293
+#: tracim/model/data.py:292
 msgid "Delete this folder"
 msgstr "Supprimer ce dossier"
 
-#: tracim/model/data.py:294
+#: tracim/model/data.py:293
 msgid "Delete this file"
 msgstr "Supprimer le fichier"
 
-#: tracim/model/data.py:295
+#: tracim/model/data.py:294
 msgid "Delete this page"
 msgstr "Supprimer cette page"
 
-#: tracim/model/data.py:296
+#: tracim/model/data.py:295
 msgid "Delete this thread"
 msgstr "Supprimer cette discussion"
 
-#: tracim/model/data.py:297
+#: tracim/model/data.py:296
 msgid "Delete this comment"
 msgstr "Supprimer ce commentaire"
 
@@ -1483,58 +1546,24 @@ msgstr ""
 "Comme <span style=\"color: #ea983d;\">gestionnaire de contenu</span> + "
 "modification de l'espace de travail."
 
-#: tracim/templates/mail/content_update_body_html.mak:52
-msgid "Some activity has been detected"
-msgstr "Il se passe des choses"
-
-#: tracim/templates/mail/content_update_body_html.mak:60
-msgid "<span style=\"{style}\">&mdash; by {actor_name}</span>"
-msgstr "<span style=\"{style}\">&mdash; par {actor_name}</span>"
-
-#: tracim/templates/mail/content_update_body_html.mak:65
-#: tracim/templates/mail/content_update_body_text.mak:16
-msgid "This item has been deleted."
-msgstr "Cet élément a été supprimé"
-
-#: tracim/templates/mail/content_update_body_html.mak:68
-#: tracim/templates/mail/content_update_body_text.mak:18
-msgid "This item has been archived."
-msgstr "Cet élément a été archivé."
-
-#: tracim/templates/mail/content_update_body_html.mak:72
-msgid "Go to information"
-msgstr "Voir en ligne"
-
-#: tracim/templates/mail/content_update_body_html.mak:82
+#: tracim/templates/mail/content_update_body_html.mak:66
 msgid ""
-"{user_display_name}, you receive this email because you are "
-"<b>{user_role_label}</b> in the workspace <a "
-"href=\"{workspace_url}\">{workspace_label}</a>"
+"{user_display_name}, you receive this email because you are registered on"
+" <i>{website_title}</i> and you are <i>{user_role_label}</i> in the "
+"workspace <a href=\"{workspace_url}\">{workspace_label}</a>."
 msgstr ""
-"{user_display_name}, vous recevez cet email car vous êtes "
-"<b>{user_role_label}</b> dans l'espace de travail <a "
-"href=\"{workspace_url}\">{workspace_label}</a>"
+"{user_display_name}, vous recevez cet email car vous êtes enregistré sur "
+"le site web <i>{website_title}</i> et vous êtes <i>{user_role_label}</i> "
+"dans l'espace de travail <a "
+"href=\"{workspace_url}\">{workspace_label}</a>."
 
-#: tracim/templates/mail/content_update_body_text.mak:8
-msgid "Some activity has been detected on the item above"
-msgstr "Il se passe des choses"
-
-#: tracim/templates/mail/content_update_body_text.mak:8
-msgid "-- by {actor_name}"
-msgstr "-- par {actor_name}"
-
-#: tracim/templates/mail/content_update_body_text.mak:20
-msgid "Go to information:"
-msgstr "Voir en ligne :"
-
-#: tracim/templates/mail/content_update_body_text.mak:25
+#: tracim/templates/mail/content_update_body_html.mak:70
 msgid ""
-"*{user_display_name}*, you receive this email because you are "
-"*{user_role_label}* in the workspace {workspace_label} - {workspace_url}"
+"This email was automatically sent by <i>Tracim</i>, a collaborative "
+"software developped by Algoo."
 msgstr ""
-"*{user_display_name}*, vous recevez cet email car vous êtes "
-"*{user_role_label}* dans l'espace de travail {workspace_label} - "
-"{workspace_url}"
+"Cet email a été envoyé automatiquement par <i>Tracim</i>, un logiciel "
+"collaboratif développé par Algoo."
 
 #~ msgid "You have no document yet."
 #~ msgstr "Vous n'avez pas de document pour le moment."
@@ -2094,12 +2123,38 @@ msgstr ""
 #~ msgid "Create a topic"
 #~ msgstr "Créer un sujet"
 
+#~ msgid "Some activity has been detected"
+#~ msgstr "Il se passe des choses"
+
+#~ msgid "<span style=\"{style}\">&mdash; by {actor_name}</span>"
+#~ msgstr "<span style=\"{style}\">&mdash; par {actor_name}</span>"
+
+#~ msgid "Go to information"
+#~ msgstr "Voir en ligne"
+
+#~ msgid "Some activity has been detected on the item above"
+#~ msgstr "Il se passe des choses"
+
+#~ msgid "-- by {actor_name}"
+#~ msgstr "-- par {actor_name}"
+
+#~ msgid "This item has been deleted."
+#~ msgstr "Cet élément a été supprimé"
+
+#~ msgid "This item has been archived."
+#~ msgstr "Cet élément a été archivé."
+
+#~ msgid "Go to information:"
+#~ msgstr "Voir en ligne :"
+
 #~ msgid ""
-#~ "This user has no password. Visit "
-#~ "<a href=\"{}\">Reset password</a> page for "
-#~ "init."
+#~ "*{user_display_name}*, you receive this email"
+#~ " because you are *{user_role_label}* in "
+#~ "the workspace {workspace_label} - "
+#~ "{workspace_url}"
 #~ msgstr ""
-#~ "Cet utilisateur n'a pas de mot de"
-#~ " passe. Visitez <a href=\"{}\">cette "
-#~ "page</a> pour l'initialiser."
+#~ "*{user_display_name}*, vous recevez cet email"
+#~ " car vous êtes *{user_role_label}* dans "
+#~ "l'espace de travail {workspace_label} - "
+#~ "{workspace_url}"
 

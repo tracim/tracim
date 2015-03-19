@@ -25,8 +25,10 @@ from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import NodeTreeItem
 from tracim.model.data import Workspace
+from tracim.model.data import UserRoleInWorkspace
 
-def compare_content_for_sorting_by_type_and_name(content1: Content, content2: Content):
+def compare_content_for_sorting_by_type_and_name(content1: Content,
+                                                 content2: Content):
     """
     :param content1:
     :param content2:
@@ -131,6 +133,12 @@ class ContentApi(object):
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
+        if self._user:
+            # Filter according to user workspaces
+            workspace_ids = [r.workspace_id for r in self._user.roles \
+                             if r.role>=UserRoleInWorkspace.READER]
+            result = result.filter(Content.workspace_id.in_(workspace_ids))
+
         return result
 
     def _base_query(self, workspace: Workspace=None):
@@ -178,7 +186,8 @@ class ContentApi(object):
         :param workspace:
         :param filter_by_allowed_content_types:
         :param removed_item_ids:
-        :param allowed_node_types:
+        :param allowed_node_types: This parameter allow to hide folders for which the given type of content is not allowed.
+               For example, if you want to move a Page from a folder to another, you should show only folders that accept pages
         :return:
         """
         if not allowed_node_types:
@@ -193,10 +202,17 @@ class ContentApi(object):
             filter(Content.content_id.notin_(removed_item_ids)).\
             all()
 
-        if not filter_by_allowed_content_types or len(filter_by_allowed_content_types)<=0:
-            filter_by_allowed_content_types = ContentType.allowed_types_for_folding()
+        if not filter_by_allowed_content_types or \
+                        len(filter_by_allowed_content_types)<=0:
+            # Standard case for the left treeview: we want to show all contents
+            # in the left treeview... so we still filter because for example
+            # comments must not appear in the treeview
+            return [folder for folder in folders \
+                    if folder.type in ContentType.allowed_types_for_folding()]
 
-        # Now, the case is to filter folders by the content that they are allowed to contain
+        # Now this is a case of Folders only (used for moving content)
+        # When moving a content, you must get only folders that allow to be filled
+        # with the type of content you want to move
         result = []
         for folder in folders:
             for allowed_content_type in filter_by_allowed_content_types:
@@ -379,8 +395,16 @@ class ContentApi(object):
             DBSession.flush()
 
         if do_notify:
-            NotifierFactory.create(self._user).notify_content_update(content)
+            self.do_notify(content)
 
+    def do_notify(self, content: Content):
+        """
+        Allow to force notification for a given content. By default, it is
+        called during the .save() operation
+        :param content:
+        :return:
+        """
+        NotifierFactory.create(self._user).notify_content_update(content)
 
     def get_keywords(self, search_string, search_string_separators=None) -> [str]:
         """
