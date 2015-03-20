@@ -1,26 +1,32 @@
 ## -*- coding: utf-8 -*-
-${h.CFG.WEBSITE_TITLE}
--> ${result.item.workspace.label}
--> ${result.item.label} - ${result.item.status.label}
 
-==============================================================================
- 
-${_('Some activity has been detected on the item above')} ${_('-- by {actor_name}').format(actor_name=result.actor.name)}
-##
-## TODO - D.A. - Show last action in the notification message
-##
-##${_('{last_action} -- by {actor_name}').format(last_action=result.item.last_action.label, actor_name=result.actor.name)}
-##
+Dear ${user_display_name},
 
-% if result.item.is_deleted:
-${_('This item has been deleted.')}
-% elif result.item.is_archived:
-${_('This item has been archived.')}
-% else:
-${_('Go to information:')} ${result.item.url}
-% endif
+This email is intended to be read as HTML content.
+Please configure your email client to get the best of Tracim notifications.
 
-==============================================================================
+We understand that Email was originally intended to carry raw text only.
+And you probably understand on your own that we are a decades after email
+was created ;)
 
-${_('*{user_display_name}*, you receive this email because you are *{user_role_label}* in the workspace {workspace_label} - {workspace_url}').format(user_display_name=user_display_name, user_role_label=user_role_label, workspace_url=result.item.workspace.url, workspace_label=workspace_label)}
+Hope you'll switch your mail client configuration and enjoy Tracim :)
+
+
+--------------------------------------------------------------------------------
+
+
+You receive this email because you are registered on /${h.CFG.WEBSITE_TITLE}/
+and you are /${user_role_label}/ in the workspace /${workspace_label}/
+${result.item.workspace.url}
+
+----
+
+This email was automatically sent by *Tracim*,
+a collaborative software developped by Algoo.
+
+**Algoo SAS**
+9 rue du rocher de Lorzier
+38430 Moirans
+France
+http://algoo.fr
 

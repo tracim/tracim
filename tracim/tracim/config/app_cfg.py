@@ -25,6 +25,8 @@ from tg.i18n import lazy_ugettext as l_
 import tracim
 from tracim import model
 from tracim.lib.base import logger
+from tracim.model.data import ActionDescription
+from tracim.model.data import ContentType
 
 base_config = AppConfig()
 base_config.renderers = []
@@ -234,6 +236,21 @@ class CFG(object):
         self.TRACKER_JS_CONTENT = self.get_tracker_js_content(self.TRACKER_JS_PATH)
 
         self.WEBSITE_TREEVIEW_CONTENT = tg.config.get('website.treeview.content')
+
+        self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
+            ActionDescription.COMMENT,
+            ActionDescription.CREATION,
+            ActionDescription.EDITION,
+            ActionDescription.REVISION
+        ]
+
+        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
+            ContentType.Page,
+            ContentType.Thread,
+            ContentType.File,
+            ContentType.Comment,
+            # ContentType.Folder -- Folder is skipped
+        ]
 
 
     def get_tracker_js_content(self, js_tracker_file_path = None):

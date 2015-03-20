@@ -165,7 +165,6 @@ class ActionDescription(object):
         'undeletion': l_('Item undeleted'),
     }
 
-
     def __init__(self, id):
         assert id in ActionDescription.allowed_values()
         self.id = id
@@ -447,6 +446,33 @@ class Content(DeclarativeBase):
             if ContentType.Comment==child.type and not child.is_deleted and not child.is_archived:
                 children.append(child)
         return children
+
+    def get_last_comment_from(self, user: User) -> 'Content':
+        # TODO - Make this more efficient
+        last_comment_updated = None
+        last_comment = None
+        for comment in self.get_comments():
+            if user.user_id==comment.owner.user_id:
+                if not last_comment or last_comment_updated<comment.updated:
+                    # take only the latest comment !
+                    last_comment = comment
+                    last_comment_updated = comment.updated
+
+        return last_comment
+
+
+    def get_previous_revision(self) -> 'ContentRevisionRO':
+        rev_ids = [revision.revision_id for revision in self.revisions]
+        rev_ids.sort()
+
+        if len(rev_ids)>=2:
+            revision_rev_id = rev_ids[-2]
+
+            for revision in self.revisions:
+                if revision.revision_id == revision_rev_id:
+                    return revision
+
+        return None
 
 
 

@@ -3,6 +3,8 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import lxml
+from lxml.html.diff import htmldiff
 
 from mako.template import Template
 
@@ -21,7 +23,8 @@ from tracim.model.serializers import Context
 from tracim.model.serializers import CTX
 from tracim.model.serializers import DictLikeClass
 
-from tracim.model.data import Content, UserRoleInWorkspace, ContentType
+from tracim.model.data import Content, UserRoleInWorkspace, ContentType, \
+    ActionDescription
 from tracim.model.auth import User
 
 
@@ -75,14 +78,59 @@ class RealNotifier(object):
                                        cfg.EMAIL_NOTIFICATION_SMTP_PASSWORD)
 
     def notify_content_update(self, content: Content):
-        logger.info(self, 'About to email-notify update of content {} by user {}'.format(content.content_id, self._user.user_id if self._user else 0)) # 0 means "no user"
-
         global_config = CFG.get_instance()
+
+        if content.get_last_action().id not \
+                in global_config.EMAIL_NOTIFICATION_NOTIFIED_EVENTS:
+            logger.info(
+                self,
+                'Skip email notification for update of content {}'
+                'by user {} (the action is {})'.format(
+                    content.content_id,
+                    # below: 0 means "no user"
+                    self._user.user_id if self._user else 0,
+                    content.get_last_action().id
+                )
+            )
+            return
+
+        logger.info(self,
+                    'About to email-notify update'
+                    'of content {} by user {}'.format(
+                        content.content_id,
+                        # Below: 0 means "no user"
+                        self._user.user_id if self._user else 0
+                    )
+        )
+
+        if content.type not \
+                in global_config.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS:
+            logger.info(
+                self,
+                'Skip email notification for update of content {}'
+                'by user {} (the content type is {})'.format(
+                    content.type,
+                    # below: 0 means "no user"
+                    self._user.user_id if self._user else 0,
+                    content.get_last_action().id
+                )
+            )
+            return
+
+        logger.info(self,
+                    'About to email-notify update'
+                    'of content {} by user {}'.format(
+                        content.content_id,
+                        # Below: 0 means "no user"
+                        self._user.user_id if self._user else 0
+                    )
+        )
 
         ####
         #
-        # INFO - D.A. - 2014-11-05 - Emails are sent through asynchronous jobs. For that reason, we do not
-        # give SQLAlchemy objects but ids only (SQLA objects are related to a given thread/session)
+        # INFO - D.A. - 2014-11-05 - Emails are sent through asynchronous jobs.
+        # For that reason, we do not give SQLAlchemy objects but ids only
+        # (SQLA objects are related to a given thread/session)
         #
         try:
             if global_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower()==global_config.CST.ASYNC.lower():
@@ -146,7 +194,7 @@ class EmailNotifier(object):
         logger.debug(self, 'Content: {}'.format(event_content_id))
 
         content = ContentApi(user, show_archived=True, show_deleted=True).get_one(event_content_id, ContentType.Any) # TODO - use a system user instead of the user that has triggered the event
-        content = content.parent if content.type==ContentType.Comment else content
+        main_content = content.parent if content.type==ContentType.Comment else content
         notifiable_roles = WorkspaceApi(user).get_notifiable_roles(content.workspace)
 
         if len(notifiable_roles)<=0:
@@ -175,9 +223,9 @@ class EmailNotifier(object):
             #
             subject = self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT
             subject = subject.replace(EST.WEBSITE_TITLE, self._global_config.WEBSITE_TITLE.__str__())
-            subject = subject.replace(EST.WORKSPACE_LABEL, content.workspace.label.__str__())
-            subject = subject.replace(EST.CONTENT_LABEL, content.label.__str__() if content.label else content.file_name.__str__())
-            subject = subject.replace(EST.CONTENT_STATUS_LABEL, content.get_status().label.__str__())
+            subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
+            subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__() if main_content.label else main_content.file_name.__str__())
+            subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
 
             message = MIMEMultipart('alternative')
             message['Subject'] = subject
@@ -185,7 +233,11 @@ class EmailNotifier(object):
             message['To'] = to_addr
 
             body_text = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
+
+
+
             body_html = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML, role, content, user)
+
             part1 = MIMEText(body_text, 'plain', 'utf-8')
             part2 = MIMEText(body_html, 'html', 'utf-8')
             # Attach parts into message container.
@@ -223,12 +275,102 @@ class EmailNotifier(object):
         dictified_item = Context(CTX.EMAIL_NOTIFICATION, self._global_config.WEBSITE_BASE_URL).toDict(content)
         dictified_actor = Context(CTX.DEFAULT).toDict(actor)
 
+        main_title = dictified_item.label
+        content_intro = ''
+        content_text = ''
+        call_to_action_text = ''
+
+        action = content.get_last_action().id
+        if ActionDescription.COMMENT == action:
+            content_intro = _('<span id="content-intro-username">{}</span> added a comment:'.format(actor.display_name))
+            content_text = content.description
+            call_to_action_text = _('Answer')
+
+        elif ActionDescription.CREATION == action:
+
+            # Default values (if not overriden)
+            content_text = content.description
+            call_to_action_text = _('View online')
+
+            if ContentType.Thread == content.type:
+                call_to_action_text = _('Answer')
+                content_intro = _('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
+                content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + \
+                               content.get_last_comment_from(actor).description
+
+            elif ContentType.File == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
+                if content.description:
+                    content_text = content.description
+                elif content.label:
+                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
+                else:
+                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.file_name)
+
+
+            elif ContentType.Page == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
+                content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
+
+        elif ActionDescription.REVISION == action:
+            content_text = content.description
+            call_to_action_text = _('View online')
+
+            if ContentType.File == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
+                content_text = ''
+
+            elif ContentType.Page == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+                previous_revision = content.get_previous_revision()
+                title_diff = ''
+                if previous_revision.label != content.label:
+                    title_diff = htmldiff(previous_revision.label, content.label)
+                content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                    title_diff + \
+                    htmldiff(previous_revision.description, content.description)
+
+            elif ContentType.Thread == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
+
+            # elif ContentType.Thread == content.type:
+            #     content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+            #     previous_revision = content.get_previous_revision()
+            #     content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+            #         htmldiff(previous_revision.description, content.description)
+
+        elif ActionDescription.EDITION == action:
+            call_to_action_text = _('View online')
+
+            if ContentType.File == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
+                content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
+                    content.description
+
+
+        if '' == content_intro and content_text == '':
+            # Skip notification, but it's not normal
+            logger.error(
+                self, 'A notification is being sent but no content. '
+                      'Here are some debug informations: [content_id: {cid}]'
+                      '[action: {act}][author: {actor}]'.format(
+                    cid=content.content_id, act=action, actor=actor
+                )
+            )
+            raise ValueError('Unexpected empty notification')
+
+        # Thread - create
+        # logger.debug(self, 'This is a NOT comment <--------------------- {}'.format(content.type))
         body_content = template.render(base_url=self._global_config.WEBSITE_BASE_URL,
                                _=_,
                                h=helpers,
                                user_display_name=role.user.display_name,
                                user_role_label=role.role_as_label(),
                                workspace_label=role.workspace.label,
+                               content_intro=content_intro,
+                               content_text=content_text,
+                               main_title=main_title,
+                               call_to_action_text=call_to_action_text,
                                result = DictLikeClass(item=dictified_item, actor=dictified_actor))
 
         return body_content
