@@ -116,7 +116,7 @@ _Note: the following information is for Debian. For other OS, adapt the package 
 
 You'll need to install the following packages:
 
-    apt-get install realpath python3 python-virtualenv python3-dev python-pip build-essential postgresql-server-dev-all
+    apt-get install realpath python3 python-virtualenv python3-dev python-pip build-essential postgresql-server-dev-all libxml2-dev libxslt1-dev python-lxml
 
 If you work on a local database, then you also need to install PostgreSQL:
 
