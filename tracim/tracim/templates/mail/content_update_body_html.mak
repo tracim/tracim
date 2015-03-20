@@ -14,72 +14,62 @@
       }
       a.call-to-action img { vertical-align: middle;}
       th { vertical-align: top;}
+      
+      #content-intro-username { font-size: 1.5em; color: #666; font-weight: bold; }
+      #content-intro { margin: 0; border: 1em solid #DDD; border-width: 0 0 0 0em; padding: 1em 1em 1em 1em; }
+      #content-body { margin: 0em; border: 2em solid #DDD; border-width: 0 0 0 4em; padding: 0.5em 2em 1em 1em; }
+      #content-body-intro { font-size: 2em; color: #666; }
+      #content-body-only-title { font-size: 1.5em; }
+
+      #content-body ins { background-color: #AFA; }
+      #content-body del { background-color: #FAA; }
+
+
+      #call-to-action-button { background-color: #5CB85C; border: 1px solid #4CAE4C; color: #FFF; text-decoration: none; font-weight: bold; padding: 4px; border-radius: 3px; font-size: 2em; padding-right: 0.5em;}
+      #call-to-action-container { text-align: right; margin-top: 2em; }
+
+      #footer hr { border: 0px solid #CCC; border-top-width: 1px; width: 8em; max-width:25%; margin-left: 0;}
+      #footer { color: #999; margin: 4em auto auto 0.5em; }
+      #footer a { color: #999; }
     </style>
   </head>
-  <body style="font-family: Arial; font-size: 12px; width: 600px; margin: 0; padding: 0;">
+  <body style="font-family: Arial; font-size: 12px; max-width: 600px; margin: 0; padding: 0;">
 
-    <table style="width: 600px; cell-padding: 0; 	border-collapse: collapse;">
+    <table style="width: 100%; cell-padding: 0; border-collapse: collapse; margin: 0">
       <tr style="background-color: F5F5F5; border-bottom: 1px solid #CCC;" >
-        <td>
-          <img src="${base_url+'/assets/img/logo.png'}" style="vertical-align: middle;"/>
-          <span style="font-weight: bold; padding-left: 0.5em; font-size: 1.5em; vertical-align: middle;">${h.CFG.WEBSITE_TITLE}</span>
+        <td style="background-color: #666;">
+          <img src="http://team.trac.im/assets/img/logo.png" style="vertical-align: middle;"/>
         </td>
-      </tr>
-      <tr>
-        <td style="padding: 5px 5px 5px 2em;">
-          <img style="vertical-align: middle;" src="${base_url+'/assets/icons/32x32/places/folder-remote.png'}"/>
-          <span style="font-weight: bold; padding-left: 0.5em; font-size: 1.2em; vertical-align: middle;">${result.item.workspace.label}</span>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding: 5px 5px 5px 4em;">
-          <img style="vertical-align: middle;" src="${base_url+'/assets/icons/32x32/'+result.item.icon+'.png'}"/>
-          <span style="font-weight: bold; padding-left: 0.5em; font-size: 1em; vertical-align: middle;">
-            ${result.item.label} &mdash;
-            <span style="font-weight: bold; color: #999; font-weight: bold;">
+        <td style="padding: 0.5em; background-color: #666; text-align: left;">
+          <span style="font-size: 1.3em; color: #FFF; font-weight: bold;">
+            ${main_title}
+            &mdash;&nbsp;<span style="font-weight: bold; color: #999; font-weight: bold;">
                 ${result.item.status.label}
-                <img src="${base_url+'/assets/icons/16x16/{}.png'.format(result.item.status.icon)}" style="vertical-align: middle;">
+                <img alt="" src="${base_url+'/assets/icons/16x16/{}.png'.format(result.item.status.icon)}" style="vertical-align: middle;">
             </span>
-          </span>
         </td>
       </tr>
     </table>
 
-    <hr style="border: 0px solid #CCC; border-width: 1px 0 0 0;">
-
-    <div style="margin-left: 0.5em; border: 1em solid #DDD; border-width: 0 0 0 1em; padding-left: 1em;">
-      <p>
-        ${_('Some activity has been detected')|n}
-        ##
-        ## TODO - D.A. - Show last action in the notification message
-        ##
-        ## &mdash;
-        ## <img style="vertical-align: middle; " src="${base_url+'/assets/icons/16x16/'+result.item.last_action.icon+'.png'}"/>
-        ## ${result.item.last_action.label}
-        ##
-        ${_('<span style="{style}">&mdash; by {actor_name}</span>').format(style='color: #666; font-weight: bold;', actor_name=result.actor.name)}
-      </p>
-      <p>
-        % if result.item.is_deleted:
-            <img style="vertical-align: middle; " src="${base_url+'/assets/icons/16x16/status/user-trash-full.png'}"/>
-            ${_('This item has been deleted.')}
-        % elif result.item.is_archived:
-            <img style="vertical-align: middle; " src="${base_url+'/assets/icons/16x16/mimetypes/package-x-generic.png'}"/>
-            ${_('This item has been archived.')}
-        % else:
-            <a href="${result.item.url}" style="background-color: #5CB85C; border: 1px solid #4CAE4C; color: #FFF; text-decoration: none; font-weight: bold; padding: 4px; border-radius: 3px;">
-              <img style="vertical-align: middle; " src="${base_url+'/assets/icons/16x16/actions/system-search.png'}"/>
-              ${_('Go to information')}
-            </a>
-        % endif
-        <div style="clear:both;"></div>
-      </p>
+    <p id="content-intro">${content_intro|n}</p>
+    <div id="content-body">
+        <div>${content_text|n}</div>
+        <div id="call-to-action-container">
+            <span style="">
+                <a href="${result.item.url}" id='call-to-action-button'>${call_to_action_text}</a>
+            </span>
+        </div>
     </div>
-
-    <hr style="border: 0px solid #CCC; border-width: 1px 0 0 0;">
-
-    <p style="color: #999; margin-left: 0.5em;">
-      ${_('{user_display_name}, you receive this email because you are <b>{user_role_label}</b> in the workspace <a href="{workspace_url}">{workspace_label}</a>').format(user_display_name=user_display_name, user_role_label=user_role_label, workspace_url=result.item.workspace.url, workspace_label=workspace_label)|n}
-    </p>
+    
+    <div id="footer">
+        <p>
+            ${_('{user_display_name}, you receive this email because you are registered on <i>{website_title}</i> and you are <i>{user_role_label}</i> in the workspace <a href="{workspace_url}">{workspace_label}</a>.').format(user_display_name=user_display_name, user_role_label=user_role_label, workspace_url=result.item.workspace.url, workspace_label=workspace_label, website_title=h.CFG.WEBSITE_TITLE)|n}
+        </p>
+        <hr/>
+        <p>
+            ${_('This email was automatically sent by <i>Tracim</i>, a collaborative software developped by Algoo.')}<br/>
+            Algoo SAS &mdash; 9 rue du rocher de Lorzier, 38430 Moirans, France &mdash; <a style="text-decoration: none;" href="http://algoo.fr">www.algoo.fr</a>
+        </p>
+    </div>
   </body>
 </html>

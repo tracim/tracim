@@ -267,18 +267,45 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         workspace = tmpl_context.workspace
 
         try:
+            item_saved = False
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
-            if comment or label:
-                api.update_content(item, label if label else item.label, comment if comment else '')
-                action_description = ActionDescription.EDITION
-                # The action_description is overwritten by ActionDescription.REVISION if the file content is also updated
 
-            if isinstance(file_data, FieldStorage):
-                api.update_file_data(item, file_data.filename, file_data.type, file_data.file.read())
-                action_description = ActionDescription.REVISION
+            # TODO - D.A. - 2015-03-19
+            # refactor this method in order to make code easier to understand
 
-            api.save(item, action_description)
+            if comment and label:
+                updated_item = api.update_content(
+                    item, label if label else item.label,
+                    comment if comment else ''
+                )
+                api.save(updated_item, ActionDescription.EDITION)
+
+                # This case is the default "file title and description update"
+                # In this case the file itself is not revisionned
+
+            else:
+                # So, now we may have a comment and/or a file revision
+                if comment and ''==label:
+                    comment_item = api.create_comment(workspace,
+                                                      item, comment,
+                                                      do_save=False)
+
+                    if not isinstance(file_data, FieldStorage):
+                        api.save(comment_item, ActionDescription.COMMENT)
+                    else:
+                        # The notification is only sent
+                        # if the file is NOT updated
+                        #
+                        #  If the file is also updated,
+                        #  then a 'file revision' notification will be sent.
+                        api.save(comment_item,
+                                 ActionDescription.COMMENT,
+                                 do_notify=False)
+
+                if isinstance(file_data, FieldStorage):
+                    api.update_file_data(item, file_data.filename, file_data.type, file_data.file.read())
+                    api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
@@ -376,11 +403,33 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
 
         page = api.create(ContentType.Page, workspace, tmpl_context.folder, label)
         page.description = content
-        api.save(page, ActionDescription.CREATION)
+        api.save(page, ActionDescription.CREATION, do_notify=True)
 
         tg.flash(_('Page created'), CST.STATUS_OK)
         tg.redirect(tg.url('/workspaces/{}/folders/{}/pages/{}').format(tmpl_context.workspace_id, tmpl_context.folder_id, page.content_id))
 
+
+    @tg.require(current_user_is_contributor())
+    @tg.expose()
+    def put(self, item_id, label='',content=''):
+        # INFO - D.A. This method is a raw copy of
+        # TODO - SECURE THIS
+        workspace = tmpl_context.workspace
+
+        try:
+            api = ContentApi(tmpl_context.current_user)
+            item = api.get_one(int(item_id), self._item_type, workspace)
+            api.update_content(item, label, content)
+            api.save(item, ActionDescription.REVISION)
+
+            msg = _('{} updated').format(self._item_type_label)
+            tg.flash(msg, CST.STATUS_OK)
+            tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item.content_id))
+
+        except ValueError as e:
+            msg = _('{} not updated - error: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(self._err_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item_id))
 
 
 class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController):
@@ -452,12 +501,13 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
 
         thread = api.create(ContentType.Thread, workspace, tmpl_context.folder, label)
         # FIXME - DO NOT DUPLCIATE FIRST MESSAGE thread.description = content
-        api.save(thread, ActionDescription.CREATION)
+        api.save(thread, ActionDescription.CREATION, do_notify=False)
 
         comment = api.create(ContentType.Comment, workspace, thread, label)
         comment.label = ''
         comment.description = content
-        api.save(comment, ActionDescription.COMMENT)
+        api.save(comment, ActionDescription.COMMENT, do_notify=False)
+        api.do_notify(thread)
 
         tg.flash(_('Thread created'), CST.STATUS_OK)
         tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, thread.content_id))

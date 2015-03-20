@@ -259,7 +259,10 @@ def serialize_breadcrumb_item(content: Content, context: Context):
 
 @pod_serializer(Content, CTX.EMAIL_NOTIFICATION)
 def serialize_item(content: Content, context: Context):
-    return DictLikeClass(
+    if ContentType.Comment==content.type:
+        content = content.parent
+
+    result = DictLikeClass(
         id = content.content_id,
         label = content.label if content.label else content.file_name,
         icon = ContentType.icon(content.type),
@@ -268,8 +271,11 @@ def serialize_item(content: Content, context: Context):
         workspace = context.toDict(content.workspace),
         is_deleted = content.is_deleted,
         is_archived = content.is_archived,
-        url = context.url('/workspaces/{wid}/folders/{fid}/{ctype}/{cid}'.format(wid = content.workspace_id, fid=content.parent_id, ctype=content.type+'s', cid=content.content_id))
+        url = context.url('/workspaces/{wid}/folders/{fid}/{ctype}/{cid}'.format(wid = content.workspace_id, fid=content.parent_id, ctype=content.type+'s', cid=content.content_id)),
+        last_action = context.toDict(content.get_last_action())
     )
+
+    return result
 
 
 @pod_serializer(Content, CTX.MENU_API)
