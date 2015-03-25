@@ -15,3 +15,6 @@ def exec_time_monitor():
         return wrapper_func
     return decorator_func
 
+
+class SameValueError(ValueError):
+    pass

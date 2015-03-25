@@ -18,6 +18,7 @@ from tracim.controllers import TIMWorkspaceContentRestController
 from tracim.lib import CST
 from tracim.lib.base import BaseController
 from tracim.lib.base import logger
+from tracim.lib.utils import SameValueError
 from tracim.lib.content import ContentApi
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.predicates import current_user_is_reader
@@ -425,6 +426,11 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(self._std_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item.content_id))
+
+        except SameValueError as e:
+            msg = _('{} not updated: the content did not change').format(self._item_type_label)
+            tg.flash(msg, CST.STATUS_WARNING)
+            tg.redirect(self._err_url.format(tmpl_context.workspace_id, tmpl_context.folder_id, item_id))
 
         except ValueError as e:
             msg = _('{} not updated - error: {}').format(self._item_type_label, str(e))
