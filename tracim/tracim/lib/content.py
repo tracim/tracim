@@ -15,6 +15,7 @@ from sqlalchemy import not_
 from sqlalchemy import or_
 from tracim.lib import cmp_to_key
 from tracim.lib.notifications import NotifierFactory
+from tracim.lib.utils import SameValueError
 from tracim.model import DBSession
 from tracim.model.auth import User
 from tracim.model.data import ActionDescription
@@ -335,6 +336,8 @@ class ContentApi(object):
 
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
+        if item.label==new_label and item.description==new_content:
+            raise SameValueError(_('The content did not changed'))
         item.owner = self._user
         item.label = new_label
         item.description = new_content if new_content else item.description # TODO: convert urls into links

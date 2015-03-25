@@ -282,7 +282,7 @@ class EmailNotifier(object):
 
         action = content.get_last_action().id
         if ActionDescription.COMMENT == action:
-            content_intro = _('<span id="content-intro-username">{}</span> added a comment:'.format(actor.display_name))
+            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
             content_text = content.description
             call_to_action_text = _('Answer')
 
@@ -332,6 +332,13 @@ class EmailNotifier(object):
 
             elif ContentType.Thread == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
+                previous_revision = content.get_previous_revision()
+                title_diff = ''
+                if previous_revision.label != content.label:
+                    title_diff = htmldiff(previous_revision.label, content.label)
+                content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                    title_diff + \
+                    htmldiff(previous_revision.description, content.description)
 
             # elif ContentType.Thread == content.type:
             #     content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
@@ -359,18 +366,17 @@ class EmailNotifier(object):
             )
             raise ValueError('Unexpected empty notification')
 
-        # Thread - create
-        # logger.debug(self, 'This is a NOT comment <--------------------- {}'.format(content.type))
-        body_content = template.render(base_url=self._global_config.WEBSITE_BASE_URL,
-                               _=_,
-                               h=helpers,
-                               user_display_name=role.user.display_name,
-                               user_role_label=role.role_as_label(),
-                               workspace_label=role.workspace.label,
-                               content_intro=content_intro,
-                               content_text=content_text,
-                               main_title=main_title,
-                               call_to_action_text=call_to_action_text,
-                               result = DictLikeClass(item=dictified_item, actor=dictified_actor))
+        body_content = template.render(
+            base_url=self._global_config.WEBSITE_BASE_URL,
+            _=_,
+            h=helpers,
+            user_display_name=role.user.display_name,
+            user_role_label=role.role_as_label(),
+            workspace_label=role.workspace.label,
+            content_intro=content_intro,
+            content_text=content_text,
+            main_title=main_title,
+            call_to_action_text=call_to_action_text,
+            result = DictLikeClass(item=dictified_item, actor=dictified_actor))
 
         return body_content

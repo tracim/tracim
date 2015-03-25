@@ -25,7 +25,7 @@
       #content-body del { background-color: #FAA; }
 
 
-      #call-to-action-button { background-color: #5CB85C; border: 1px solid #4CAE4C; color: #FFF; text-decoration: none; font-weight: bold; padding: 4px; border-radius: 3px; font-size: 2em; padding-right: 0.5em;}
+      #call-to-action-button { background-color: #5CB85C; border: 1px solid #4CAE4C; color: #FFF; text-decoration: none; font-weight: bold; border-radius: 3px; font-size: 2em; padding: 4px 0.3em;}
       #call-to-action-container { text-align: right; margin-top: 2em; }
 
       #footer hr { border: 0px solid #CCC; border-top-width: 1px; width: 8em; max-width:25%; margin-left: 0;}
@@ -38,7 +38,7 @@
     <table style="width: 100%; cell-padding: 0; border-collapse: collapse; margin: 0">
       <tr style="background-color: F5F5F5; border-bottom: 1px solid #CCC;" >
         <td style="background-color: #666;">
-          <img src="http://team.trac.im/assets/img/logo.png" style="vertical-align: middle;"/>
+          <img src="${base_url+'/assets/img/logo.png'}" style="vertical-align: middle;" alt=""/>
         </td>
         <td style="padding: 0.5em; background-color: #666; text-align: left;">
           <span style="font-size: 1.3em; color: #FFF; font-weight: bold;">
