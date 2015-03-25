@@ -66,6 +66,7 @@ class ContentApi(object):
 
     def __init__(self, current_user: User, show_archived=False, show_deleted=False, all_content_in_treeview=True):
         self._user = current_user
+        self._user_id = current_user.user_id if current_user else None
         self._show_archived = show_archived
         self._show_deleted = show_deleted
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
@@ -134,8 +135,9 @@ class ContentApi(object):
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
         if self._user:
+            user = DBSession.query(User).get(self._user_id)
             # Filter according to user workspaces
-            workspace_ids = [r.workspace_id for r in self._user.roles \
+            workspace_ids = [r.workspace_id for r in user.roles \
                              if r.role>=UserRoleInWorkspace.READER]
             result = result.filter(Content.workspace_id.in_(workspace_ids))
 
@@ -222,7 +224,7 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace=None, parent: Content=None, label:str ='', do_save=False) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False) -> Content:
         assert content_type in ContentType.allowed_types()
         content = Content()
         content.owner = self._user

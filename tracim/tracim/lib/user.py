@@ -44,9 +44,17 @@ class UserApi(object):
         except:
             return False
 
-    def create_user(self, save_now=False) -> User:
+    def create_user(self, email=None, groups=[], save_now=False) -> User:
         user = User()
+
+        if email:
+            user.email = email
+
+        for group in groups:
+            user.groups.append(group)
+
         DBSession.add(user)
+
         if save_now:
             DBSession.flush()
 
