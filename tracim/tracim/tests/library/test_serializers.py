@@ -208,8 +208,6 @@ class TestSerializers(TestStandard):
 
         s2 = Context(CTX.DEFAULT).toDict(mylist, 'subitems', 'subitems_nb')
 
-        print('----------------->  ---> ', s2)
-        print('----------------->  ', s2.items)
         ok_('subitems' in s2.keys(), s2)
 
         ok_('name' in s2.subitems[0].keys())
@@ -246,7 +244,6 @@ class TestSerializers(TestStandard):
         eq_(True, res['children'])
 
         for curtype in ContentType.all():
-            print( 'iteration: ', curtype)
             if curtype not in (ContentType.Folder, ContentType.Comment):
                 item = Content()
                 item.type = curtype
