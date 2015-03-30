@@ -422,7 +422,7 @@ class Content(DeclarativeBase):
     def get_child_nb(self, content_type: ContentType, content_status = ''):
         child_nb = 0
         for child in self.valid_children:
-            if child.type==content_type:
+            if child.type == content_type or content_type == ContentType.Any:
                 if not content_status:
                     child_nb = child_nb+1
                 elif content_status==child.status:
