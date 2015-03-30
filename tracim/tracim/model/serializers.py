@@ -283,11 +283,15 @@ def serialize_content_for_menu_api(content: Content, context: Context):
     content_id = content.content_id
     workspace_id = content.workspace_id
 
+    has_children = False
+    if content.type == ContentType.Folder:
+        has_children = content.get_child_nb(ContentType.Any) > 0
+
     result = DictLikeClass(
         id = CST.TREEVIEW_MENU.ID_TEMPLATE__FULL.format(workspace_id, content_id),
-        children = True, # TODO: make this dynamic
+        children = has_children,
         text = content.get_label(),
-        a_attr = { 'href' : context.url(ContentType.fill_url(content)) },
+        a_attr = { 'href' : context.url(ContentType.fill_url(content))},
         li_attr = { 'title': content.get_label(), 'class': 'tracim-tree-item-is-a-folder' },
         type = content.type,
         state = { 'opened': True if ContentType.Folder!=content.type else False, 'selected': False }

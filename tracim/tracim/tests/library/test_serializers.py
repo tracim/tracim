@@ -8,6 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
 
+from tracim.model import DBSession
+
 from tg.util import LazyString
 from tracim.model.data import Content
 from tracim.model.data import ContentType
@@ -222,6 +224,40 @@ class TestSerializers(TestStandard):
         eq_(3, s2.subitems_nb)
         eq_(3, len(s2.subitems))
 
-
-
         eq_(2, len(s2))
+
+
+    def test_serializer_content__menui_api_context__children(self):
+        self.app.get('/_test_vars')  # Allow to create fake context
+
+        folder_without_child = Content()
+        folder_without_child.type = ContentType.Folder
+        res = Context(CTX.MENU_API).toDict(folder_without_child)
+        eq_(False, res['children'])
+
+        folder_with_child = Content()
+        folder_with_child.type = ContentType.Folder
+        folder_without_child.parent = folder_with_child
+        DBSession.add(folder_with_child)
+        DBSession.add(folder_without_child)
+        DBSession.flush()
+
+        res = Context(CTX.MENU_API).toDict(folder_with_child)
+        eq_(True, res['children'])
+
+        for curtype in ContentType.all():
+            print( 'iteration: ', curtype)
+            if curtype not in (ContentType.Folder, ContentType.Comment):
+                item = Content()
+                item.type = curtype
+
+                fake_child = Content()
+                fake_child.type = curtype
+                fake_child.parent = item
+
+                DBSession.add(item)
+                DBSession.add(fake_child)
+                DBSession.flush()
+
+                res = Context(CTX.MENU_API).toDict(item)
+                eq_(False, res['children'])
