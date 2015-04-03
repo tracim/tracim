@@ -407,7 +407,13 @@ class Content(DeclarativeBase):
         :return: a list of LinkItem
         """
         links = []
-        soup = BeautifulSoup(self.description if not other_content else other_content)
+
+        soup = BeautifulSoup(
+            self.description if not other_content else other_content,
+            'html.parser'  # Fixes hanging bug - http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
+        )
+
+
         for link in soup.findAll('a'):
             href = link.get('href')
             label = link.contents
@@ -474,6 +480,10 @@ class Content(DeclarativeBase):
 
         return None
 
+    def description_as_raw_text(self):
+        # 'html.parser' fixes a hanging bug
+        # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
+        return BeautifulSoup(self.description, 'html.parser').text
 
 
 class ContentChecker(object):

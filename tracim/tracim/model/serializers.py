@@ -594,7 +594,7 @@ def serialize_content_for_search_result(content: Content, context: Context):
             type = content.type,
 
             content = data_container.description,
-            content_raw = BeautifulSoup(data_container.description).text,
+            content_raw = data_container.description_as_raw_text(),
 
             created = data_container.created,
             label = data_container.label,
