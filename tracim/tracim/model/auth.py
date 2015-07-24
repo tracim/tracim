@@ -211,6 +211,14 @@ class User(DeclarativeBase):
         else:
             return self.email
 
+    def get_role(self, workspace: 'Workspace') -> int:
+        for role in self.roles:
+            print('IS EQUALS ? ', role.workspace, workspace)
+            if role.workspace == workspace:
+                return role.role
+
+        from tracim.model.data import UserRoleInWorkspace
+        return UserRoleInWorkspace.NOT_APPLICABLE
 
 class Permission(DeclarativeBase):
     """

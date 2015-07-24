@@ -114,7 +114,6 @@ class RoleInWorkspaceRestController(TIMRestController, BaseController):
 
         tg.redirect(self.parent_controller.url(tg.tmpl_context.workspace_id))
 
-
     @tg.expose()
     def change(self, user_id, new_role):
         # FIXME CHECK RIGHTS
@@ -158,7 +157,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
     def current_item_id_key_in_context(cls):
         return 'workspace_id'
 
-    @tg.expose('tracim.templates.workspace_get_all')
+    @tg.expose('tracim.templates.admin.workspace_getall')
     def get_all(self, *args, **kw):
 
         user = tmpl_context.current_user
@@ -172,7 +171,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         dictified_workspaces = Context(CTX.ADMIN_WORKSPACES).toDict(workspaces, 'workspaces', 'workspace_nb')
         return DictLikeClass(result = dictified_workspaces, fake_api=fake_api)
 
-    @tg.expose('tracim.templates.workspace_get_one')
+    @tg.expose('tracim.templates.admin.workspace_getone')
     def get_one(self, workspace_id):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
@@ -203,7 +202,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         tg.redirect(self.url())
         return
 
-    @tg.expose('tracim.templates.workspace_edit')
+    @tg.expose('tracim.templates.workspace.edit')
     def edit(self, id):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
@@ -213,7 +212,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         dictified_workspace = Context(CTX.ADMIN_WORKSPACE).toDict(workspace, 'workspace')
         return DictLikeClass(result = dictified_workspace)
 
-    @tg.expose('tracim.templates.workspace_edit')
+    @tg.expose('tracim.templates.workspace.edit')
     def put(self, id, name, description):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)

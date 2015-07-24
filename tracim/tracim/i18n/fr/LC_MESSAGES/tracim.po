@@ -7,28 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pod 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-"POT-Creation-Date: 2015-03-02 22:28+0100\n"
-"PO-Revision-Date: 2015-03-02 22:32+0100\n"
-=======
-"POT-Creation-Date: 2015-03-09 16:56+0100\n"
-"PO-Revision-Date: 2015-03-09 17:00+0100\n"
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
-=======
-"POT-Creation-Date: 2015-03-10 18:35+0100\n"
-"PO-Revision-Date: 2015-03-10 18:32+0100\n"
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
-"POT-Creation-Date: 2015-03-10 18:35+0100\n"
-"PO-Revision-Date: 2015-03-10 18:32+0100\n"
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
-"POT-Creation-Date: 2015-03-20 00:44+0100\n"
+"POT-Creation-Date: 2015-03-25 12:53+0100\n"
 "PO-Revision-Date: 2015-03-20 00:37+0100\n"
->>>>>>> b67ad8598a3cfae087b99a8b7bf905ae8b8ec991
 "Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
 "Language-Team: fr_FR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -101,55 +81,6 @@ msgstr "Echec de la requête de réinitialisation du mot de passe"
 msgid "Password changed successfully"
 msgstr "Mot de passe changé"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-#: tracim/controllers/__init__.py:139
-#: tracim/templates/dashboard.mak:36
-#: tracim/templates/master_authenticated.mak:94
-#: tracim/templates/master_no_toolbar_no_login.mak:112
-#: tracim/templates/user_get_one.mak:42
-#: tracim/templates/user_profile.mak:39
-#: tracim/templates/user_workspace_folder_file_get_one.mak:10
-#: tracim/templates/user_workspace_folder_get_one.mak:11
-#: tracim/templates/user_workspace_folder_page_get_one.mak:11
-#: tracim/templates/user_workspace_folder_thread_get_one.mak:11
-#: tracim/templates/user_workspace_get_all.mak:11
-#: tracim/templates/user_workspace_get_one.mak:11
-#: tracim/templates/workspace_get_all.mak:13
-msgid "Workspaces"
-msgstr "Espaces de travail"
-
-#: tracim/controllers/__init__.py:274
-=======
-#: tracim/controllers/__init__.py:247
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
-#: tracim/controllers/content.py:283
-msgid "{} updated"
-msgstr "{} mis(e) à jour"
-
-<<<<<<< HEAD
-#: tracim/controllers/__init__.py:279
-=======
-#: tracim/controllers/__init__.py:252
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
-#: tracim/controllers/content.py:288
-=======
-#: tracim/controllers/__init__.py:247 tracim/controllers/content.py:283
-msgid "{} updated"
-msgstr "{} mis(e) à jour"
-
-#: tracim/controllers/__init__.py:252 tracim/controllers/content.py:288
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
-#: tracim/controllers/__init__.py:247 tracim/controllers/content.py:283
-msgid "{} updated"
-msgstr "{} mis(e) à jour"
-
-#: tracim/controllers/__init__.py:252 tracim/controllers/content.py:288
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
 #: tracim/controllers/__init__.py:247 tracim/controllers/content.py:310
 #: tracim/controllers/content.py:425
 msgid "{} updated"
@@ -157,21 +88,9 @@ msgstr "{} mis(e) à jour"
 
 #: tracim/controllers/__init__.py:252 tracim/controllers/content.py:315
 #: tracim/controllers/content.py:430
->>>>>>> b67ad8598a3cfae087b99a8b7bf905ae8b8ec991
 msgid "{} not updated - error: {}"
 msgstr "{} pas mis(e) à jour - erreur : {}"
 
-<<<<<<< HEAD
-#: tracim/controllers/__init__.py:293
-msgid "{} status updated"
-msgstr "Statut de {} mis(e) à jour"
-
-#: tracim/controllers/__init__.py:297
-msgid "{} status not updated: {}"
-msgstr "Statut de {} non mis(e) à jour : {}"
-
-#: tracim/controllers/__init__.py:329
-=======
 #: tracim/controllers/__init__.py:266
 msgid "{} status updated"
 msgstr "Statut de {} mis(e) à jour"
@@ -180,43 +99,7 @@ msgstr "Statut de {} mis(e) à jour"
 msgid "{} status not updated: {}"
 msgstr "Statut de {} non mis(e) à jour : {}"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-#: tracim/controllers/__init__.py:302
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
-#: tracim/controllers/content.py:748
-msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
-msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
-
-<<<<<<< HEAD
-#: tracim/controllers/__init__.py:338
-=======
-#: tracim/controllers/__init__.py:311
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
-#: tracim/controllers/content.py:757
-msgid "{} not archived: {}"
-msgstr "{} non archivé(e) : {}"
-
-<<<<<<< HEAD
-#: tracim/controllers/__init__.py:352
-#: tracim/controllers/content.py:772
-msgid "{} unarchived."
-msgstr "{} désarchivé(e)"
-
-#: tracim/controllers/__init__.py:360
-#: tracim/controllers/content.py:780
-msgid "{} not un-archived: {}"
-msgstr "{} non désarchivé(e) : {}"
-
-#: tracim/controllers/__init__.py:378
-#: tracim/controllers/content.py:88
-#: tracim/controllers/content.py:797
-=======
-#: tracim/controllers/__init__.py:302 tracim/controllers/content.py:748
-=======
 #: tracim/controllers/__init__.py:302 tracim/controllers/content.py:798
->>>>>>> b67ad8598a3cfae087b99a8b7bf905ae8b8ec991
 msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
 msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
 
@@ -233,56 +116,7 @@ msgid "{} not un-archived: {}"
 msgstr "{} non désarchivé(e) : {}"
 
 #: tracim/controllers/__init__.py:351 tracim/controllers/content.py:88
-<<<<<<< HEAD
-#: tracim/controllers/content.py:796
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
-msgstr ""
-"{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler "
-"l'opération</a>"
-
-<<<<<<< HEAD
-#: tracim/controllers/__init__.py:387
-#: tracim/controllers/content.py:99
-#: tracim/controllers/content.py:806
-msgid "{} not deleted: {}"
-msgstr "{} non supprimé(e) : {}"
-
-#: tracim/controllers/__init__.py:402
-#: tracim/controllers/content.py:116
-#: tracim/controllers/content.py:821
-msgid "{} undeleted."
-msgstr "{} restauré(e)."
-
-#: tracim/controllers/__init__.py:412
-#: tracim/controllers/content.py:128
-#: tracim/controllers/content.py:831
-=======
-#: tracim/controllers/__init__.py:325
-#: tracim/controllers/content.py:771
-=======
-#: tracim/controllers/__init__.py:302 tracim/controllers/content.py:748
-msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
-msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
-
-#: tracim/controllers/__init__.py:311 tracim/controllers/content.py:757
-msgid "{} not archived: {}"
-msgstr "{} non archivé(e) : {}"
-
-#: tracim/controllers/__init__.py:325 tracim/controllers/content.py:771
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-msgid "{} unarchived."
-msgstr "{} désarchivé(e)"
-
-#: tracim/controllers/__init__.py:333 tracim/controllers/content.py:779
-msgid "{} not un-archived: {}"
-msgstr "{} non désarchivé(e) : {}"
-
-#: tracim/controllers/__init__.py:351 tracim/controllers/content.py:88
-#: tracim/controllers/content.py:796
-=======
 #: tracim/controllers/content.py:846
->>>>>>> b67ad8598a3cfae087b99a8b7bf905ae8b8ec991
 msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
 msgstr ""
 "{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler "
@@ -298,25 +132,8 @@ msgstr "{} non supprimé(e) : {}"
 msgid "{} undeleted."
 msgstr "{} restauré(e)."
 
-=======
-#: tracim/controllers/__init__.py:360 tracim/controllers/content.py:99
-#: tracim/controllers/content.py:805
-msgid "{} not deleted: {}"
-msgstr "{} non supprimé(e) : {}"
-
-#: tracim/controllers/__init__.py:375 tracim/controllers/content.py:116
-#: tracim/controllers/content.py:820
-msgid "{} undeleted."
-msgstr "{} restauré(e)."
-
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 #: tracim/controllers/__init__.py:385 tracim/controllers/content.py:128
-<<<<<<< HEAD
-#: tracim/controllers/content.py:830
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
-=======
 #: tracim/controllers/content.py:880
->>>>>>> b67ad8598a3cfae087b99a8b7bf905ae8b8ec991
 msgid "{} not un-deleted: {}"
 msgstr "{} non restauré(e) : {}"
 
@@ -379,11 +196,7 @@ msgstr "Dossier non mis à jour : {}"
 
 #: tracim/controllers/content.py:780
 msgid "Folder"
-<<<<<<< HEAD
 msgstr "Dossier"
-=======
-msgstr "Dossiers"
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 
 #: tracim/controllers/root.py:72
 msgid "Wrong credentials"
@@ -529,25 +342,10 @@ msgstr "Espace de travail {} restauré."
 msgid "%B %d at %I:%M%p"
 msgstr "le %d %B à %H:%M"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-#: tracim/lib/content.py:98
-#: tracim/templates/dashboard.mak:36
-=======
-#: tracim/lib/content.py:98 tracim/templates/dashboard.mak:36
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
-#: tracim/lib/content.py:98 tracim/templates/dashboard.mak:36
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
-#: tracim/lib/content.py:100 tracim/templates/dashboard.mak:36
->>>>>>> b67ad8598a3cfae087b99a8b7bf905ae8b8ec991
+#: tracim/lib/content.py:101 tracim/templates/dashboard.mak:36
 #: tracim/templates/master_authenticated.mak:94
 #: tracim/templates/master_no_toolbar_no_login.mak:112
-#: tracim/templates/search.mak:11 tracim/templates/user_get_one.mak:39
+#: tracim/templates/search.mak:11 tracim/templates/user_get_one.mak:42
 #: tracim/templates/user_profile.mak:39
 #: tracim/templates/user_workspace_folder_file_get_one.mak:10
 #: tracim/templates/user_workspace_folder_get_one.mak:11
@@ -559,55 +357,52 @@ msgstr "le %d %B à %H:%M"
 msgid "Workspaces"
 msgstr "Espaces de travail"
 
-<<<<<<< HEAD
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
-=======
-#: tracim/lib/notifications.py:289
+#: tracim/lib/notifications.py:285
 msgid "<span id=\"content-intro-username\">{}</span> added a comment:"
 msgstr "<span id=\"content-intro-username\">{}</span> a ajouté un commentaire :"
 
-#: tracim/lib/notifications.py:291 tracim/lib/notifications.py:300
+#: tracim/lib/notifications.py:287 tracim/lib/notifications.py:296
 msgid "Answer"
 msgstr "Répondre"
 
-#: tracim/lib/notifications.py:297 tracim/lib/notifications.py:321
-#: tracim/lib/notifications.py:347
+#: tracim/lib/notifications.py:293 tracim/lib/notifications.py:317
+#: tracim/lib/notifications.py:350
 msgid "View online"
 msgstr "Voir en ligne"
 
-#: tracim/lib/notifications.py:301
+#: tracim/lib/notifications.py:297
 msgid "<span id=\"content-intro-username\">{}</span> started a thread entitled:"
 msgstr ""
 "<span id=\"content-intro-username\">{}</span> a lancé une discussion "
 "intitulée :"
 
-#: tracim/lib/notifications.py:306
+#: tracim/lib/notifications.py:302
 msgid "<span id=\"content-intro-username\">{}</span> added a file entitled:"
 msgstr ""
 "<span id=\"content-intro-username\">{}</span> a ajouté un fichier "
 "intitulé :"
 
-#: tracim/lib/notifications.py:316
+#: tracim/lib/notifications.py:312
 msgid "<span id=\"content-intro-username\">{}</span> added a page entitled:"
 msgstr ""
 "<span id=\"content-intro-username\">{}</span> a ajouté une page intitulée"
 " :"
 
-#: tracim/lib/notifications.py:324
+#: tracim/lib/notifications.py:320
 msgid "<span id=\"content-intro-username\">{}</span> uploaded a new revision."
 msgstr ""
 "<span id=\"content-intro-username\">{}</span> a téléchargé une nouvelle "
 "version."
 
-#: tracim/lib/notifications.py:328
+#: tracim/lib/notifications.py:324
 msgid "<span id=\"content-intro-username\">{}</span> updated this page."
 msgstr "<span id=\"content-intro-username\">{}</span> a mis à jour cette page."
 
-#: tracim/lib/notifications.py:333
+#: tracim/lib/notifications.py:329 tracim/lib/notifications.py:339
 msgid "<p id=\"content-body-intro\">Here is an overview of the changes:</p>"
 msgstr "<p id=\"content-body-intro\">Voici un aperçu des modifications :</p>"
 
-#: tracim/lib/notifications.py:338
+#: tracim/lib/notifications.py:334
 msgid ""
 "<span id=\"content-intro-username\">{}</span> updated the thread "
 "description."
@@ -615,7 +410,7 @@ msgstr ""
 "<span id=\"content-intro-username\">{}</span> a mis à jour la description"
 " de la discussion."
 
-#: tracim/lib/notifications.py:350
+#: tracim/lib/notifications.py:353
 msgid ""
 "<span id=\"content-intro-username\">{}</span> updated the file "
 "description."
@@ -623,7 +418,6 @@ msgstr ""
 "<span id=\"content-intro-username\">{}</span> a mis à jour la description"
 " du fichier."
 
->>>>>>> b67ad8598a3cfae087b99a8b7bf905ae8b8ec991
 #: tracim/lib/predicates.py:17
 msgid "You are not authorized to access this resource"
 msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
@@ -741,11 +535,7 @@ msgstr "discussion close — annulée"
 
 #: tracim/model/data.py:291
 msgid "Delete this workspace"
-<<<<<<< HEAD
 msgstr "Supprimer cet espace de travail"
-=======
-msgstr "Supprimer l'espace de travail"
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 
 #: tracim/model/data.py:292
 msgid "Delete this folder"
@@ -753,11 +543,7 @@ msgstr "Supprimer ce dossier"
 
 #: tracim/model/data.py:293
 msgid "Delete this file"
-<<<<<<< HEAD
 msgstr "Supprimer ce fichier"
-=======
-msgstr "Supprimer le fichier"
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 
 #: tracim/model/data.py:294
 msgid "Delete this page"
@@ -867,21 +653,8 @@ msgstr "Archiver la discussion"
 msgid "Delete thread"
 msgstr "Supprimer la discussion"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#: tracim/templates/index.mak:30
-#: tracim/templates/index.mak:51
-<<<<<<< HEAD
-#: tracim/templates/master_authenticated.mak:147
-=======
-=======
 #: tracim/templates/index.mak:30 tracim/templates/index.mak:51
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
-#: tracim/templates/index.mak:30 tracim/templates/index.mak:51
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
 #: tracim/templates/master_authenticated.mak:154
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 msgid "Login"
 msgstr "Login"
 
@@ -925,9 +698,6 @@ msgstr "Admin"
 msgid "you MUST desactivate debug in production"
 msgstr "vous DEVEZ désactiver le mode \"debug\" en production"
 
-<<<<<<< HEAD
-#: tracim/templates/master_authenticated.mak:137
-=======
 #: tracim/templates/master_authenticated.mak:119
 msgid "Search for..."
 msgstr "Rechercher..."
@@ -937,16 +707,11 @@ msgid "Search"
 msgstr "Rechercher..."
 
 #: tracim/templates/master_authenticated.mak:144
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 #: tracim/templates/master_no_toolbar_no_login.mak:144
 msgid "My account"
 msgstr "Mon compte"
 
-<<<<<<< HEAD
-#: tracim/templates/master_authenticated.mak:142
-=======
 #: tracim/templates/master_authenticated.mak:149
->>>>>>> b2e4664ae2ad0cc8fbc3344f6fa37845cf7e344d
 #: tracim/templates/master_no_toolbar_no_login.mak:149
 msgid "Logout"
 msgstr "Fermer la session"
@@ -1206,16 +971,7 @@ msgstr "Cet utilisateur peut créer des espaces de travail."
 msgid "This user is an administrator."
 msgstr "Cet utilisateur est un administrateur"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#: tracim/templates/user_get_one.mak:45
-#: tracim/templates/user_profile.mak:42
-=======
-#: tracim/templates/user_get_one.mak:42 tracim/templates/user_profile.mak:42
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
-=======
-#: tracim/templates/user_get_one.mak:42 tracim/templates/user_profile.mak:42
->>>>>>> 139e854c54cbb438fb69dda1149d450228cf2e8a
+#: tracim/templates/user_get_one.mak:45 tracim/templates/user_profile.mak:42
 msgid "This user is not member of any workspace."
 msgstr "Cet utilisateur n'est membre d'aucun espace de travail"
 
@@ -2394,15 +2150,4 @@ msgstr ""
 
 #~ msgid "Go to information:"
 #~ msgstr "Voir en ligne :"
-
-#~ msgid ""
-#~ "*{user_display_name}*, you receive this email"
-#~ " because you are *{user_role_label}* in "
-#~ "the workspace {workspace_label} - "
-#~ "{workspace_url}"
-#~ msgstr ""
-#~ "*{user_display_name}*, vous recevez cet email"
-#~ " car vous êtes *{user_role_label}* dans "
-#~ "l'espace de travail {workspace_label} - "
-#~ "{workspace_url}"
 

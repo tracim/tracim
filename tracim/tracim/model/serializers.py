@@ -2,7 +2,12 @@
 import types
 
 from bs4 import BeautifulSoup
+from babel.dates import format_timedelta
+from babel.dates import format_datetime
+
+from datetime import datetime
 import tg
+from tg.i18n import ugettext as _
 from tg.util import LazyString
 from tracim.lib.base import logger
 from tracim.lib.utils import exec_time_monitor
@@ -58,12 +63,14 @@ class CTX(object):
     """ constants that are used for serialization / dictification of models"""
     ADMIN_WORKSPACE = 'ADMIN_WORKSPACE'
     ADMIN_WORKSPACES = 'ADMIN_WORKSPACES'
+    CONTENT_LIST = 'CONTENT_LIST'
     CURRENT_USER = 'CURRENT_USER'
     DEFAULT = 'DEFAULT' # default context. This will allow to define a serialization method to be used by default
     EMAIL_NOTIFICATION = 'EMAIL_NOTIFICATION'
     FILE = 'FILE'
     FILES = 'FILES'
     FOLDER = 'FOLDER'
+    FOLDER_CONTENT_LIST = 'FOLDER_CONTENT_LIST'
     FOLDERS = 'FOLDERS'
     MENU_API = 'MENU_API'
     MENU_API_BUILD_FROM_TREE_ITEM = 'MENU_API_BUILD_FROM_TREE_ITEM'
@@ -265,7 +272,7 @@ def serialize_item(content: Content, context: Context):
     result = DictLikeClass(
         id = content.content_id,
         label = content.label if content.label else content.file_name,
-        icon = ContentType.icon(content.type),
+        icon = ContentType.get_icon(content.type),
         status = context.toDict(content.get_status()),
         folder = context.toDict(DictLikeClass(id = content.parent.content_id if content.parent else None)),
         workspace = context.toDict(content.workspace),
@@ -362,7 +369,7 @@ def serialize_node_for_page(content: Content, context: Context):
             content = data_container.description,
             created = data_container.created,
             label = data_container.label,
-            icon = ContentType.icon(content.type),
+            icon = ContentType.get_icon(content.type),
             owner = context.toDict(data_container.owner),
             status = context.toDict(data_container.get_status()),
             links = context.toDict(content.extract_links_from_content(data_container.description)),
@@ -394,7 +401,7 @@ def serialize_node_for_page(item: Content, context: Context):
         return DictLikeClass(
             content = item.description,
             created = item.created,
-            icon = ContentType.icon(item.type),
+            icon = ContentType.get_icon(item.type),
             id = item.content_id,
             label = item.label,
             links = context.toDict(item.extract_links_from_content(item.description)),
@@ -411,7 +418,8 @@ def serialize_node_for_page(item: Content, context: Context):
         return DictLikeClass(
             content = item.description,
             created = item.created,
-            icon = ContentType.icon(item.type),
+            created_as_delta = item.created_as_delta(),
+            icon = ContentType.get_icon(item.type),
             id = item.content_id,
             label = item.label,
             owner = context.toDict(item.owner),
@@ -432,10 +440,12 @@ def serialize_node_for_thread_list(content: Content, context: Context):
     if content.type==ContentType.Thread:
         return DictLikeClass(
             id = content.content_id,
-            label = content.label,
-            status = context.toDict(content.get_status()),
-            folder = context.toDict(content.parent),
-            comment_nb = len(content.get_comments())
+            url=ContentType.fill_url(content),
+            label=content.get_label(),
+            status=context.toDict(content.get_status()),
+            folder=context.toDict(content.parent),
+            workspace=context.toDict(content.workspace) if content.workspace else None,
+            comment_nb=len(content.get_comments())
         )
 
     if content.type==ContentType.Folder:
@@ -514,32 +524,27 @@ def serialize_content_for_workspace_and_folder(content: Content, context: Contex
 
     result = None
     if content.type==ContentType.Folder:
+        allowed_content = DictLikeClass(content.properties['allowed_content']),
+
         result = DictLikeClass(
-            id = content.content_id,
-            label = content.label,
-            created = content.created,
-            workspace = context.toDict(content.workspace),
-            allowed_content = DictLikeClass(content.properties['allowed_content']),
-            selected_revision = 'latest',
-            status = context.toDict(content.get_status()),
-            owner = context.toDict(content.owner),
-            thread_nb = DictLikeClass(
-                all = thread_nb_all,
-                open = thread_nb_open,
-            ),
-            file_nb = DictLikeClass(
-                all = file_nb_all,
-                open = file_nb_open,
-            ),
-            folder_nb = DictLikeClass(
-                all = folder_nb_all,
-                open = folder_nb_open,
-            ),
-            page_nb = DictLikeClass(
-                all = page_nb_all,
-                open = page_nb_open,
-            ),
-            content_nb = DictLikeClass(all = content_nb_all)
+            id=content.content_id,
+            label=content.label,
+            created=content.created,
+            workspace=context.toDict(content.workspace),
+            allowed_content=DictLikeClass(content.properties['allowed_content']),
+            allowed_content_types=context.toDict(content.get_allowed_content_types()),
+            selected_revision='latest',
+            status=context.toDict(content.get_status()),
+            owner=context.toDict(content.owner),
+            thread_nb=DictLikeClass(all=thread_nb_all,
+                                    open=thread_nb_open),
+            file_nb=DictLikeClass(all=file_nb_all,
+                                  open=file_nb_open),
+            folder_nb=DictLikeClass(all=folder_nb_all,
+                                    open=folder_nb_open),
+            page_nb=DictLikeClass(all=page_nb_all,
+                                  open=page_nb_open),
+            content_nb=DictLikeClass(all = content_nb_all)
         )
 
     elif content.type==ContentType.Page:
@@ -558,7 +563,102 @@ def serialize_content_for_workspace_and_folder(content: Content, context: Contex
     return result
 
 
-from tg import cache
+@pod_serializer(Content, CTX.CONTENT_LIST)
+def serialize_content_for_general_list(content: Content, context: Context):
+    content_type = ContentType(content.type)
+
+    last_activity_date = content.get_last_activity_date()
+    last_activity_date_formatted = format_datetime(last_activity_date,
+                                                   locale=tg.i18n.get_lang()[0])
+    last_activity_label = format_timedelta(datetime.now() - last_activity_date,
+                                           locale=tg.i18n.get_lang()[0])
+    last_activity_label = last_activity_label.replace(' ', '\u00A0') # espace insécable
+
+    return DictLikeClass(
+        id=content.content_id,
+        folder = DictLikeClass({'id': content.parent_id}) if content.parent else None,
+        workspace=context.toDict(content.workspace) if content.workspace else None,
+        label=content.get_label(),
+        url=ContentType.fill_url(content),
+        type=DictLikeClass(content_type.toDict()),
+        status=context.toDict(content.get_status()),
+        last_activity = DictLikeClass({'date': last_activity_date,
+                                       'label': last_activity_date_formatted,
+                                       'delta': last_activity_label})
+    )
+
+@pod_serializer(Content, CTX.FOLDER_CONTENT_LIST)
+def serialize_content_for_folder_content_list(content: Content, context: Context):
+    content_type = ContentType(content.type)
+
+    last_activity_date = content.get_last_activity_date()
+    last_activity_date_formatted = format_datetime(last_activity_date,
+                                                   locale=tg.i18n.get_lang()[0])
+    last_activity_label = format_timedelta(datetime.now() - last_activity_date,
+                                           locale=tg.i18n.get_lang()[0])
+    last_activity_label = last_activity_label.replace(' ', '\u00A0') # espace insécable
+
+
+    item = None
+    if ContentType.Thread == content.type:
+        item = Context(CTX.THREADS).toDict(content)
+        item.type = context.toDict(content_type)
+        item.folder = DictLikeClass({'id': content.parent_id}) if content.parent else None
+        item.workspace = DictLikeClass({'id': content.workspace.workspace_id}) if content.workspace else None
+        item.last_activity = DictLikeClass({'date': last_activity_date,
+                                            'label': last_activity_date_formatted,
+                                            'delta': last_activity_label})
+
+        comments = content.get_comments()
+        if len(comments)>1:
+            item.notes = _('{nb} messages').format(nb=len(comments))
+        else:
+            item.notes = _('1 message')
+
+    elif ContentType.File == content.type:
+        item = Context(CTX.CONTENT_LIST).toDict(content)
+        if len(content.revisions)>1:
+            item.notes = _('{nb} revisions').format(nb=len(content.revisions))
+        else:
+            item.notes = _('1 revision')
+
+    elif ContentType.Folder == content.type:
+        item = Context(CTX.CONTENT_LIST).toDict(content)
+        item.notes = ''
+
+        folder_nb = content.get_child_nb(ContentType.Folder)
+        if folder_nb == 1:
+            item.notes += _('1 subfolder<br/>\n')
+        elif folder_nb > 1:
+            item.notes += _('{} subfolders<br/>').format(folder_nb)
+
+        file_nb = content.get_child_nb(ContentType.File, ContentStatus.OPEN)
+        if file_nb == 1:
+            item.notes += _('1 open file<br/>\n')
+        elif file_nb > 1:
+            item.notes += _('{} open files<br/>').format(file_nb)
+
+        thread_nb = content.get_child_nb(ContentType.Thread, ContentStatus.OPEN)
+        if thread_nb == 1:
+            item.notes += _('1 open thread<br/>\n')
+        elif thread_nb > 1:
+            item.notes += _('{} open threads<br/>').format(thread_nb)
+
+        page_nb = content.get_child_nb(ContentType.Page, ContentStatus.OPEN)
+        if page_nb == 1:
+            item.notes += _('1 open page<br/>\n')
+        elif page_nb > 1:
+            item.notes += _('{} open pages<br/>').format(page_nb)
+    else:
+        item = Context(CTX.CONTENT_LIST).toDict(content)
+        item.notes = ''
+
+    return item
+
+
+@pod_serializer(ContentType, CTX.DEFAULT)
+def serialize_breadcrumb_item(content_type: ContentType, context: Context):
+    return DictLikeClass(content_type.toDict())
 
 @pod_serializer(Content, CTX.SEARCH)
 def serialize_content_for_search_result(content: Content, context: Context):
@@ -587,22 +687,25 @@ def serialize_content_for_search_result(content: Content, context: Context):
         if comments:
             last_comment_datetime = max(last_comment_datetime, max(comment.updated for comment in comments))
 
+        content_type = ContentType(content.type)
         result = DictLikeClass(
             id = content.content_id,
+            type = DictLikeClass(content_type.toDict()),
             parent = context.toDict(content.parent),
             workspace = context.toDict(content.workspace),
-            type = content.type,
 
             content = data_container.description,
             content_raw = data_container.description_as_raw_text(),
 
             created = data_container.created,
+            created_as_delta = data_container.created_as_delta(),
             label = data_container.label,
-            icon = ContentType.icon(content.type),
+            icon = ContentType.get_icon(content.type),
             owner = context.toDict(data_container.owner),
             status = context.toDict(data_container.get_status()),
             breadcrumb = context.toDict(breadcrumbs),
-            last_activity = last_comment_datetime
+            last_activity=last_comment_datetime,
+            last_activity_as_delta=content.datetime_as_delta(last_comment_datetime)
         )
 
         if content.type==ContentType.File:
@@ -663,6 +766,7 @@ def serialize_role_list_for_select_field_in_workspace(role_type: RoleType, conte
     """
     result = DictLikeClass()
     result['id'] = role_type.role_type_id
+    result['icon'] = role_type.icon
     result['label'] = role_type.role_label
     result['style'] = role_type.css_style
     return result
@@ -738,11 +842,14 @@ def serialize_role_in_workspace(role: UserRoleInWorkspace, context: Context):
     """
     result = DictLikeClass()
     result['id'] = role.user_id
+    result['icon'] = role.icon
     result['name'] = role.user.display_name
     result['role'] = role.role
     result['style'] = role.style
     result['role_description'] = role.role_as_label()
     result['email'] = role.user.email
+    result['user'] = role.user
+    result['notifications_subscribed'] = role.do_notify
     return result
 
 
@@ -757,9 +864,11 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
     """
     result = DictLikeClass()
     result['id'] = role.role
+    result['icon'] = role.icon
     result['label'] = role.role_as_label()
     result['style'] = RoleType(role.role).css_style
     result['workspace'] =  context.toDict(role.workspace)
+    result['user'] = role.user
     result['notifications_subscribed'] = role.do_notify
 
     # result['workspace_name'] = role.workspace.label
@@ -816,6 +925,7 @@ def serialize_workspace_complete(workspace: pmd.Workspace, context: Context):
     result['created'] = workspace.created
     result['members'] = context.toDict(workspace.roles)
     result['member_nb'] = len(workspace.roles)
+    result['allowed_content_types'] = context.toDict(workspace.get_allowed_content_types())
 
     return result
 

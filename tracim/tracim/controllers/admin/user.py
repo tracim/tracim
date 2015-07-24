@@ -181,7 +181,7 @@ class UserPasswordAdminRestController(TIMRestController):
         tg.tmpl_context.user = user
 
 
-    @tg.expose('tracim.templates.user_password_edit')
+    @tg.expose('tracim.templates.admin.user_password_edit')
     def edit(self):
         current_user = tmpl_context.current_user
         api = UserApi(current_user)
@@ -189,32 +189,27 @@ class UserPasswordAdminRestController(TIMRestController):
         return DictLikeClass(result = dictified_user)
 
     @tg.expose()
-    def put(self, current_password, new_password1, new_password2):
+    def put(self, new_password1, new_password2, next_url=''):
         # FIXME - Manage
         current_user = tmpl_context.current_user
         user = tmpl_context.user
 
-        redirect_url = tg.lurl('/admin/users/{}'.format(user.user_id))
-        if current_user.user_id==user.user_id:
-            redirect_url = tg.lurl('/admin/users/me')
+        if not next_url:
+            next_url = tg.lurl('/admin/users/{}'.format(user.user_id))
 
-        if not current_password or not new_password1 or not new_password2:
+        if not new_password1 or not new_password2:
             tg.flash(_('Empty password is not allowed.'), CST.STATUS_ERROR)
-            tg.redirect(redirect_url)
-
-        if user.validate_password(current_password) is False:
-            tg.flash(_('The current password you typed is wrong'))
-            tg.redirect(redirect_url)
+            tg.redirect(next_url)
 
         if new_password1!=new_password2:
             tg.flash(_('New passwords do not match.'), CST.STATUS_ERROR)
-            tg.redirect(redirect_url)
+            tg.redirect(next_url)
 
         user.password = new_password1
         pm.DBSession.flush()
 
-        tg.flash(_('Your password has been changed'), CST.STATUS_OK)
-        tg.redirect(redirect_url)
+        tg.flash(_('The password has been changed'), CST.STATUS_OK)
+        tg.redirect(next_url)
 
 
 class UserRestController(TIMRestController):
@@ -232,7 +227,7 @@ class UserRestController(TIMRestController):
 
 
     @tg.require(predicates.in_group(Group.TIM_MANAGER_GROUPNAME))
-    @tg.expose('tracim.templates.user_get_all')
+    @tg.expose('tracim.templates.admin.user_getall')
     def get_all(self, *args, **kw):
         current_user = tmpl_context.current_user
         api = UserApi(current_user)
@@ -285,7 +280,7 @@ class UserRestController(TIMRestController):
         tg.redirect(self.url())
 
 
-    @tg.expose('tracim.templates.user_get_one')
+    @tg.expose('tracim.templates.admin.user_getone')
     def get_one(self, user_id):
         current_user = tmpl_context.current_user
         api = UserApi(current_user )
@@ -302,7 +297,7 @@ class UserRestController(TIMRestController):
         return DictLikeClass(result = dictified_user, fake_api=fake_api)
 
 
-    @tg.expose('tracim.templates.user_edit')
+    @tg.expose('tracim.templates.admin.user_edit')
     def edit(self, id):
         current_user = tmpl_context.current_user
         api = UserApi(current_user)
@@ -313,20 +308,22 @@ class UserRestController(TIMRestController):
         return DictLikeClass(result = dictified_user)
 
     @tg.require(predicates.in_group(Group.TIM_MANAGER_GROUPNAME))
-    @tg.expose('tracim.templates.workspace_edit')
-    def put(self, user_id, name, email):
+    @tg.expose()
+    def put(self, user_id, name, email, next_url=''):
         api = UserApi(tmpl_context.current_user)
 
         user = api.get_one(int(user_id))
         api.update(user, name, email, True)
 
         tg.flash(_('User {} updated.').format(user.get_display_name()), CST.STATUS_OK)
+        if next_url:
+            tg.redirect(next_url)
         tg.redirect(self.url())
-        return
+
 
     @tg.require(predicates.in_group(Group.TIM_ADMIN_GROUPNAME))
     @tg.expose()
-    def enable(self, id):
+    def enable(self, id, next_url=None):
         current_user = tmpl_context.current_user
         api = UserApi(current_user)
 
@@ -334,12 +331,14 @@ class UserRestController(TIMRestController):
         user.is_active = True
         api.save(user)
 
-        tg.flash(_('User {} activated.').format(user.get_display_name()), CST.STATUS_OK)
+        tg.flash(_('User {} enabled.').format(user.get_display_name()), CST.STATUS_OK)
+        if next_url=='user':
+            tg.redirect(self.url(id=user.user_id))
         tg.redirect(self.url())
 
     @tg.require(predicates.in_group(Group.TIM_ADMIN_GROUPNAME))
     @tg.expose()
-    def disable(self, id):
+    def disable(self, id, next_url=None):
         id = int(id)
         current_user = tmpl_context.current_user
         api = UserApi(current_user)
@@ -350,8 +349,10 @@ class UserRestController(TIMRestController):
             user = api.get_one(id)
             user.is_active = False
             api.save(user)
-            tg.flash(_('User {} desactivated').format(user.get_display_name()), CST.STATUS_OK)
+            tg.flash(_('User {} disabled').format(user.get_display_name()), CST.STATUS_OK)
 
+        if next_url=='user':
+            tg.redirect(self.url(id=user.user_id))
         tg.redirect(self.url())
 
 

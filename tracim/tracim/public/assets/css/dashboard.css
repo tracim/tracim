@@ -23,18 +23,27 @@ body {
  */
 .navbar-fixed-top {
   border: 0;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #CCC;
+  /* background-color: #f5f5f5;*/
+  border-bottom: 0px solid #CCF;
+
+
+  background-color: #555;
+      color: #DDD;
 }
 
 .navbar-fixed-top-transparent {
   border: 0;
   background-color: #f5f5f5;
+    background-color: #555;
   background-color: transparent;
 }
 
 .navbar-fixed-top-transparent .navbar-brand img {
     border: 0;
+}
+
+.navbar-fixed-top a, #sidebar #toggle-left-sidebar-width {
+    color: #DDD;
 }
 
 /*
@@ -56,16 +65,21 @@ body {
     padding: 20px;
     overflow-x: hidden;
     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #f5f5f5;
+/*    background-color: #333;
+      color: #FFF;*/
+    background-color: #555;
+      color: #DDD;
     border-right: 1px solid #CCC;
-    
+
   }
 }
 
 #sidebar-right {
   overflow-x: visible;
   overflow-y: auto;
-  
+    background-color: #F5F5F5;
+    border-left: 1px solid #CCC;
+
 }
 
 /* Sidebar navigation */
@@ -117,8 +131,8 @@ body {
   border-radius: 50%;
 }
 
-.page-header {
-    font-size: 20px;
+h1.page-header {
+    font-size: 30px;
 }
 
 /*************************************
@@ -155,8 +169,12 @@ iframe { border: 5px solid #b3e7ff; }
 .tracim-status-selected { background-color: #EEE; }
 .tracim-panel-separator { border-width: 12px 0 0 0; }
 
-.tracim-timeline-item {}
-.tracim-timeline-item-content { margin-left: 12px; border-left: 8px solid #EEE; padding: 0 0.5em; }
+.t-status-open-color { color: #759ac5; }
+.t-status-closed-validated-color { color: #1fdb11;}
+.t-status-closed-unvalidated-color { color: #F00;}
+.t-status-closed-deprecated-color { color: #ea983d;}
+.t-status-selected-color { background-color: #EEE; }
+
 
 #tracim-footer-separator { margin-bottom: 30px; }
 .pod-footer {
@@ -200,4 +218,135 @@ table.first_column_headers tr td:first-child {
     color: #090;
     margin-top: -1em;
     margin-bottom: 0;
+}
+
+#sidebar-right, a.btn { font-size: 1.2em; text-align: left;}
+#sidebar-right .btn-group-vertical { width: 100%; }
+
+th { text-align: center; }
+
+.t-green { color: green; }
+.t-orange { color: orange; }
+.t-red { color: red; }
+.tracim-less-visible { color: #999; } /* TODO REMOVE THIS CSS */
+.t-less-visible { color: #999; }
+.t-less-visible-border, .page-header.t-less-visible-border { border-color: #999; }
+
+.t-folder-color { color: #CCCC00; }
+.t-folder-color-border, .page-header.t-folder-color-border  { border-color: #CCCC00; }
+
+.t-thread-color { color: #428BCA; }
+.t-thread-color-border, .page-header.t-thread-color-border  { border-color: #428BCA; }
+
+.t-file-color { color: orange;}
+.t-file-color-border, .page-header.t-file-color-border  { border-color: orange; }
+
+.t-page-color { color: #00CC00; }
+.t-page-color-border, .page-header.t-page-color-border  { border-color: #00CC00; }
+
+.t-search-color { color: #AAA; }
+.t-search-color-border, .page-header.t-search-color-border  { border-color: #AAA; }
+
+.t-user-color { color: #428BCA; }
+.t-enabled-color { color: #0C0; }
+.t-disabled-color { color: #CCC; }
+
+.t-bg-grey {background-color: #F5F5F5; }
+
+.t-spacer-left { margin-left: 1em; }
+.t-spacer-right { margin-right: 1em; }
+
+.t-spacer-above { margin-top: 2em; }
+.t-half-spacer-above { margin-top: 1em; }
+.t-half-spacer-below { margin-bottom: 1em; }
+.t-spacer-below { margin-bottom: 2em; }
+
+a.btn.disabled { color: #CCC; }
+a.btn.disabled i.fa { color: #DDD; }
+
+.t-active-color { color: #428BCA; }
+.t-inactive-color { color: #CCC; }
+.t-bold { font-weight: bold; }
+.t-red-on-hover:Hover {
+    color: red;
+}
+
+div.t-page-header-row {
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #CCC;
+}
+
+div.t-page-metadata-row, div.t-metadata-row {
+    background-color: #F5F5F5;
+    border-top: 1px solid #CCC;
+}
+
+.t-modal-form-submit-button { margin-top: 0.5em;}
+.modal-header h4 { font-size: 1.5em; }
+.modal-header { background-color: #F5F5F5; border-radius: 5px 5px 0 0; }
+.modal-footer { background-color: #F5F5F5; border-radius: 0 0 5px 5px; }
+
+/* left bar is almost black, so links must be almost white */
+#sidebar-left .btn.btn-link,
+#sidebar-left .list-unstyled a {
+    color: #DDD;
+}
+
+h1.page-header {
+    border-bottom-style: solid;
+    border-bottom-width: 4px;
+}
+
+h3 { background-color: #f5f5f5;}
+
+
+.sidebar .list-group-item { background-color: transparent; }
+
+/* show button disabled even when it has been selected - and has the focus) */
+.btn.t-inactive-color:focus { color: #CCC; background-color: #fff;}
+
+/* INFO - D.A - 2015-07-20 - Allow real fullscreen edition for page content */
+.mce-fullscreen .modal-dialog {
+    margin: 0 0 0 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    padding: 0;
+}
+
+.t-odd-or-even:nth-child(odd) {
+    background-color:#FFF;
+}
+.t-odd-or-even:nth-child(even) {
+    background-color:#F5F5F5;
+}
+
+.t-hacky-thread-comment-border-top {
+    border-top: 1px solid #CCC;
+}
+
+.t-timeline-item-icon {
+    margin-left: -1.5em;
+    float:left;
+}
+
+.t-timeline-item h5 {
+    margin-bottom: 1em;
+    font-size: 1.2em;
+}
+
+.t-timeline-item { padding: 1em; padding-left: 5em;}
+.t-timeline-item-content { margin-top: 0.5em; padding: 0 0.5em 0.5em 0; }
+
+.t-timeline-item-moment { font-size: 1em; color: #999; }
+.t-timeline-comment-delete-button { font-size: 0.8em; }
+
+#sidebar-right h3 { color: #555; margin: 0.5em 0 1em 0; }
+#sidebar-right h4 { color: #555; margin: 1.5em 0 1em 0; }
+
+#t-full-app-alert-message-id {
+    z-index: 10001;
+    padding: 0;
+    position: absolute;
+    top: 0;
 }

@@ -1,5 +1,7 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 
+<%namespace name="ICON" file="tracim.templates.widgets.icon"/>
+
 <%def name="BREADCRUMB(dom_id, breadcrumb_items)">
     <ul id="${dom_id}" class="breadcrumb" style="margin-top: -1.5em; display: none;">
         % for item in breadcrumb_items:
@@ -74,11 +76,36 @@
         ${EMPTY_CONTENT(_('No page found.'))}
     % else:
         <table id="${dom_id}" class="table table-striped table-hover">
+            <tr>
+                <th>${_('Type')}</th>
+                <th>${_('Title')}</th>
+                <th colspan="2">${_('Status')}</th>
+            </tr>
             % for page in pages:
                 <tr>
-                    <td><a href="${tg.url('/workspaces/{}/folders/{}/pages/{}'.format(workspace_id, page.folder.id, page.id))}">${TIM.ICO(16, 'mimetypes/text-html')} ${page.label}</a></td>
                     <td>
-                        ${TIM.ICO(16, page.status.icon)} <span class="${page.status.css}">${page.status.label}</span>
+                        <span class="tracim-less-visible"><i class="fa fa-file-text-o fa-tw"></i> page</span>
+                    </td>
+                    <td>
+                        <a href="${tg.url('/workspaces/{}/folders/{}/pages/{}'.format(workspace_id, page.folder.id, page.id))}">${page.label}</a>
+                    </td>
+                    <td>
+                        % if 'open' == page.status.id:
+                            <i class="fa fa-fw fa-square-o"></i>
+                        % elif 'closed-validated' == page.status.id:
+                            <i class="fa fa-fw fa-check-square-o"></i>
+                        % elif 'closed-unvalidated' == page.status.id:
+                            <i class="fa fa-fw fa-check-square-o"></i>
+                        % elif 'closed-deprecated' == page.status.id:
+                            <i class="fa fa-fw fa-bell-slash-o"></i>
+                        % else:
+                            <i class="fa fa-fw fa-close"></i>
+                        % endif
+                    </td>
+                    <td>
+                        ${page.status.label}
+##                        ${page.status.id}
+##                        ${TIM.ICO(16, page.status.icon)} <span class="${page.status.css}">${page.status.label}</span>
                     </td>
                 </tr>
             % endfor
@@ -127,32 +154,34 @@
     ${TREEVIEW_DYNAMIC(dom_id, selected_id, get_root_url, get_children_url)}
 </%def>
 
-<%def name="TREEVIEW_DYNAMIC(dom_id, selected_id, get_root_url, get_children_url, mode='link_to_document')">
+<%def name="TREEVIEW_DYNAMIC(dom_id, selected_id, get_root_url, get_children_url, mode='link_to_document', updatable_field_id=None)">
     ## If mode is 'link to document', then a click on a tree item will open the given document as main page
     ## If mode is 'move_mode', then a click will update the value of hidden field with dom id: '${dom_id}-treeview-hidden-field'
     ## TODO - D.A. - 2014-09-25 - Select default node
     <div id="${dom_id}">
         <div id="${dom_id}-treeview"></div>
-        <input type='hidden' id='${dom_id}-treeview-hidden-field' name='folder_id' value=''/>
+        % if not updatable_field_id:
+            <input type='hidden' id='${dom_id}-treeview-hidden-field' name='folder_id' value=''/>
+        % endif
         <script>
             $(function () {
                 $('#${dom_id}-treeview').jstree({
                     'plugins' : [ 'wholerow', 'types' ],
                     "types" : {
                         "default" : {
-                            "icon" : "${TIM.ICO_URL(16, 'places/jstree-folder')}"
+                            "icon" : "fa fa-folder-open-o t-folder-color"
                         },
                         "page" : {
-                            "icon" : "${TIM.ICO_URL(16, 'mimetypes/text-html')}"
+                            "icon" : "fa fa-file-text-o t-page-color"
                         },
                         "file" : {
-                            "icon" : "${TIM.ICO_URL(16, 'status/mail-attachment')}"
+                            "icon" : "fa fa-paperclip t-file-color"
                         },
                         "thread" : {
-                            "icon" : "${TIM.ICO_URL(16, 'apps/internet-group-chat')}"
+                            "icon" : "fa fa-comments-o t-thread-color"
                         },
                         "workspace" : {
-                            "icon" : "${TIM.ICO_URL(16, 'places/folder-remote')}"
+                            "icon" : "fa fa-bank"
                         },
                     },
                     'core' : {
@@ -166,7 +195,7 @@
                                 if (node.id==='#') {
                                     return '${get_root_url|n}'
                                 } else {
-                                    return '${get_children_url}'
+                                    return '${get_children_url|n}'
                                 }
                             },
                             'data' : function(node) {
@@ -200,7 +229,11 @@
                         ## FIXME - REMOVE alert('about to update value of field '+'#${dom_id}-treeview-hidden-field');
                         ## FIXME - REMOVE alert('new value will be '+$('#'+data.selected[0]+' > a').attr('id'));
                         ## FIXME - REMOVE alert('data is '+data.selected[0]+ ' => '+$('#'+data.selected[0]+' > a')[0]);
-                        $('#${dom_id}-treeview-hidden-field').val(data.selected[0]);
+                        % if not updatable_field_id:
+                            $('#${dom_id}-treeview-hidden-field').val(data.selected[0]);
+                        % else:  # in this case, we will update another hidden field
+                            $('#${updatable_field_id}').val(data.selected[0]);
+                        % endif
                     });
                 % endif
                 
@@ -242,23 +275,27 @@
 </%def>
 
 <%def name="SHOW_CHANGE_STATUS(item, target_url, allow_to_change_status=False)">
-    <div class="btn-group">
+    <div class="btn-group pull-right">
         % if not allow_to_change_status:
-            <button type="button" class="btn btn-default disable btn-link">
-                ${TIM.ICO(16, item.status.icon)} <span class="${item.status.css}">${item.status.label}</span>
+            <button type="button" class="btn btn-default disable btn-link" title="${_('This operation is locked')}">
+                <span class="${item.status.css}">${item.status.label} ${ICON.FA_FW_2X(item.status.icon)}</span>
             </button>
         % else:
             <button type="button" class="btn btn-default btn-link dropdown-toggle" data-toggle="dropdown">
-                ${TIM.ICO(16, item.status.icon)} <span class="${item.status.css}">${item.status.label}</span>
+                <span class="${item.status.css}">${item.status.label} ${ICON.FA_FW_2X(item.status.icon)}</span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 % for status in h.AllStatus(item.type):
                     % if status.id == 'closed-deprecated':
                         <li class="divider"></li>
                     % endif
-                    <li><a
+                    <li class="text-right"><a
                         class="${('', 'pod-status-selected')[status.id==item.status.id]}"
-                        href="${target_url.format(status_id=status.id)}"> ${TIM.ICO(16, status.icon)} <span class="${status.css}">${status.label}</span></a></li>
+                        href="${target_url.format(status_id=status.id)}">
+                        <span class="${status.css}">
+                            ${status.label} ${ICON.FA_FW(status.icon)}
+                        </span>
+                    </a></li>
                 % endfor
             </ul>
         % endif
@@ -266,26 +303,34 @@
 </%def>
 
 <%def name="SECURED_TIMELINE_ITEM(user, item)">
-    <div class="tracim-timeline-item">
-        <h5 style="margin: 0;">
-            ${TIM.ICO(32, item.icon)}
-            <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(item.owner.name)|n}</span>
+    <div class="row t-odd-or-even t-hacky-thread-comment-border-top">
+        <div class="col-sm-7 col-sm-offset-3">
+            <div class="t-timeline-item">
+##                <i class="fa fa-fw fa-3x fa-comment-o t-less-visible" style="margin-left: -1.5em; float:left;"></i>
+                ${ICON.FA_FW('fa fa-3x fa-comment-o t-less-visible t-timeline-item-icon')}
 
-            <div class="pull-right text-right">
-                <div class="label" style="font-size: 10px; border: 1px solid #CCC; color: #777; ">
-                    ${h.format_short(item.created)|n}
-                </div>
-                % if h.is_item_still_editable(item) and item.owner.id==user.id:
-                    <br/>
-                    <div class="btn-group">
-                    <a class="btn btn-default btn-xs" style="margin-top: 8px; padding-bottom: 3px;" href="${item.urls.delete}">${TIM.ICO_TOOLTIP(16, 'status/user-trash-full', h.delete_label_for_item(item))}</a>
+                <h5 style="margin: 0;">
+                    <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(item.owner.name)|n}</span>
+
+                    <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(item.created)|n}">
+                        ${_('{delta} ago').format(delta=item.created_as_delta)}
+
+                        % if h.is_item_still_editable(item) and item.owner.id==user.id:
+                            <br/>
+##                            <div class="btn-group">
+                                <a class="t-timeline-comment-delete-button" href="${item.urls.delete}">
+                                    ${_('delete')} ${ICON.FA('fa fa-trash-o')}
+##                                    ${TIM.ICO_TOOLTIP(16, 'status/user-trash-full', h.delete_label_for_item(item))}
+                                </a>
+##                            </div>
+                        % endif
                     </div>
-                % endif
+                </h5>
+                <div class="t-timeline-item-content">
+                    <div>${item.content|n}</div>
+                    <br/>
+                </div>
             </div>
-        </h5>
-        <div class="tracim-timeline-item-content">
-            <div>${item.content|n}</div>
-            <br/>
         </div>
     </div>
 </%def>
