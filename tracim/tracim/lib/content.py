@@ -11,6 +11,7 @@ import sqlalchemy
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy import desc
 from sqlalchemy import not_
 from sqlalchemy import or_
 from tracim.lib import cmp_to_key
@@ -99,8 +100,8 @@ class ContentApi(object):
         breadcrumb = []
 
         if not skip_root:
-            breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Dashboard), _('Workspaces'), tg.url('/workspaces')))
-        breadcrumb.append(BreadcrumbItem(ContentType.icon(ContentType.FAKE_Workspace), workspace.label, tg.url('/workspaces/{}'.format(workspace.workspace_id))))
+            breadcrumb.append(BreadcrumbItem(ContentType.get_icon(ContentType.FAKE_Dashboard), _('Workspaces'), tg.url('/workspaces')))
+        breadcrumb.append(BreadcrumbItem(ContentType.get_icon(ContentType.FAKE_Workspace), workspace.label, tg.url('/workspaces/{}'.format(workspace.workspace_id))))
 
         if item_id:
             breadcrumb_folder_items = []
@@ -112,7 +113,7 @@ class ContentApi(object):
                 next_url = tg.url('/workspaces/{}/folders/{}/{}s/{}'.format(workspace_id, current_item.parent_id, current_item.type, current_item.content_id))
 
             while current_item:
-                breadcrumb_item = BreadcrumbItem(ContentType.icon(current_item.type),
+                breadcrumb_item = BreadcrumbItem(ContentType.get_icon(current_item.type),
                                                  current_item.label,
                                                  next_url,
                                                  is_active)
@@ -302,6 +303,38 @@ class ContentApi(object):
 
         return resultset.all()
 
+    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> Content:
+        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
+        assert content_type is not None# DYN_REMOVE
+        assert isinstance(content_type, str) # DYN_REMOVE
+
+        resultset = self._base_query(workspace).order_by(desc(Content.updated))
+
+        if content_type!=ContentType.Any:
+            resultset = resultset.filter(Content.type==content_type)
+
+        if parent_id:
+            resultset = resultset.filter(Content.parent_id==parent_id)
+
+        result = []
+        for item in resultset:
+            new_item = None
+            if ContentType.Comment == item.type:
+                new_item = item.parent
+            else:
+                new_item = item
+
+            # INFO - D.A. - 2015-05-20
+            # We do not want to show only one item if the last 10 items are
+            # comments about one thread for example
+            if new_item not in result:
+                result.append(new_item)
+
+            if len(result) >= limit:
+                break
+
+        return result
+
     def set_allowed_content(self, folder: Content, allowed_content_dict:dict):
         """
         :param folder: the given folder instance
@@ -326,14 +359,30 @@ class ContentApi(object):
             raise ValueError('The given value {} is not allowed'.format(new_status))
 
 
-    def move(self, item: Content, new_parent: Content, must_stay_in_same_workspace:bool=True):
+    def move(self, item: Content,
+             new_parent: Content,
+             must_stay_in_same_workspace:bool=True,
+             new_workspace:Workspace=None):
         if must_stay_in_same_workspace:
-            if new_parent and new_parent.workspace_id!=item.workspace_id:
+            if new_parent and new_parent.workspace_id != item.workspace_id:
                 raise ValueError('the item should stay in the same workspace')
 
         item.parent = new_parent
+        if new_parent:
+            item.workspace = new_parent.workspace
+        elif new_workspace:
+            item.workspace = new_workspace
+
         item.revision_type = ActionDescription.EDITION
 
+    def move_recursively(self, item: Content,
+                         new_parent: Content, new_workspace: Workspace):
+        self.move(item, new_parent, False, new_workspace)
+        self.save(item, do_notify=False)
+        print('saved item #', item.content_id, new_workspace)
+        for child in item.children:
+            self.move_recursively(child, item, new_workspace)
+        return
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
         if item.label==new_label and item.description==new_content:
@@ -441,4 +490,12 @@ class ContentApi(object):
             options(joinedload('parent'))
 
         return title_keyworded_items
+
+    def get_all_types(self) -> [ContentType]:
+        labels = ContentType.all()
+        content_types = []
+        for label in labels:
+            content_types.append(ContentType(label))
+
+        return ContentType.sorted(content_types)
 

@@ -1,6 +1,7 @@
 <%inherit file="local:templates.master_authenticated"/>
 <%namespace name="TIM" file="tracim.templates.pod"/>
 
+<%def name="TITLE_ROW()"></%def>
 <%def name="SIDEBAR_LEFT_CONTENT()"></%def>
 <%def name="SIDEBAR_RIGHT_CONTENT()"></%def>
 <%def name="REQUIRED_DIALOGS()"></%def>
@@ -11,7 +12,7 @@
         <div class="row-fluid">
         
             ## SIDEBAR LEFT
-            <div id="sidebar-left" class="fixed-width-sidebar col-sm-2 sidebar" >
+            <div id="sidebar-left" class="fixed-width-sidebar col-sm-3 sidebar" >
                 <div class="btn-group" style="position: absolute; right: 2px; top: 4px; ">
                     <button id="toggle-left-sidebar-width" type="button" class="btn btn-link"><i class="fa fa-angle-double-right"></i></button>
                 </div>
@@ -20,20 +21,14 @@
             ## SIDEBAR LEFT [END]
 
             ## SIDEBAR RIGHT
-            <div id="sidebar-right" class="col-sm-1 col-md-1 col-sm-offset-11 sidebar" style="background-color: #FFF;">
+            <div id="sidebar-right" class="col-sm-2 col-md-2 col-sm-offset-10 sidebar">
                 ${self.SIDEBAR_RIGHT_CONTENT()}
             </div> <!-- # End of side bar right -->
             ## SIDEBAR RIGHT [END]
             
-        <div>
-            ${TIM.FLASH_MSG('col-sm-9 col-sm-offset-2')}
-            
-            <div class="row">
-                <div class="col-sm-9 col-sm-offset-2 main">
-                    ## BODY
-                    ${self.body()}
-                    ## BODY [END]
-                </div>
+            <div>
+                ${self.TITLE_ROW()}
+                ${self.body()}
             </div>
         </div>
     </div>
@@ -54,13 +49,13 @@
               buttonIcon = $('> i', this);
               if (sidebar.hasClass('fixed-width-sidebar')) {
                 sidebar.removeClass('fixed-width-sidebar')
-                sidebar.removeClass('col-sm-2');
+                sidebar.removeClass('col-sm-3');
                 
                 buttonIcon.removeClass('fa-angle-double-right');
                 buttonIcon.addClass('fa-angle-double-left');
               } else {
                 sidebar.addClass('fixed-width-sidebar')
-                sidebar.addClass('col-sm-2');
+                sidebar.addClass('col-sm-3');
                 buttonIcon.removeClass('fa-angle-double-left');
                 buttonIcon.addClass('fa-angle-double-right');
               }
@@ -75,10 +70,16 @@
     <script src="${tg.url('/assets/tinymce/js/tinymce/tinymce.min.js')}"></script>
     ${TIM.TINYMCE_INIT_SCRIPT('.pod-rich-textarea')}
 
-
     <!-- JSTree ================================================== -->
     <link rel="stylesheet" href="${tg.url('/assets/jstree/themes/default/style.min.css')}" />
+    <link rel="stylesheet" href="${tg.url('/assets/jstree/themes/tracim/style.css')}" />
     <script src="${tg.url('/assets/jstree/jstree.min.js')}"></script>
 
+##     <link rel="stylesheet" href="${tg.url('/assets/tablesorter/themes/tracim/style.css')}"/>
+##    <script src="${tg.url('/assets/tablesorter/jquery.tablesorter.min.js')}"></script>
+
+
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css"/>
+    <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
 </%def>
 

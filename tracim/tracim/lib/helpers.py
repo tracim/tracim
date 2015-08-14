@@ -5,10 +5,12 @@
 #from webhelpers import date, feedgenerator, html, number, misc, text
 
 import datetime
+
+from babel.dates import format_date, format_time
 from markupsafe import Markup
 
 import tg
-
+from tg.i18n import ugettext as _
 from tracim.config.app_cfg import CFG
 
 from tracim.lib import app_globals as plag
@@ -25,10 +27,23 @@ from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
 
 def date_time_in_long_format(datetime_object, format=''):
-    if not format:
-        format = plag.Globals.LONG_DATE_FORMAT
-    return datetime_object.strftime(format.__str__())
 
+    current_locale = tg.i18n.get_lang()[0]
+    date = format_date(datetime_object, locale=current_locale)
+    time = format_time(datetime_object, locale=current_locale)
+    return _('{date} at {time}').format(date=date, time=time)
+
+def date_time(datetime_object):
+    return date_time_in_long_format(datetime_object)
+
+def date(datetime_object):
+    current_locale = tg.i18n.get_lang()[0]
+    return format_date(datetime_object, locale=current_locale)
+
+
+def time(datetime_object):
+    current_locale = tg.i18n.get_lang()[0]
+    return format_time(datetime_object, locale=current_locale)
 
 def format_short(datetime_object):
     return datetime_object.strftime(format = plag.Globals.SHORT_DATE_FORMAT.__str__())

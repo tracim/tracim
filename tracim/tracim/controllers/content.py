@@ -30,6 +30,7 @@ from tracim.model.serializers import Context, CTX, DictLikeClass
 from tracim.model.data import ActionDescription
 from tracim.model.data import Content
 from tracim.model.data import ContentType
+from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
 
 class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
@@ -136,6 +137,9 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
     manage a path like this: /workspaces/1/folders/XXX/files/4
     """
 
+    TEMPLATE_NEW = 'mako:tracim.templates.file.new'
+    TEMPLATE_EDIT = 'mako:tracim.templates.file.edit'
+
     @property
     def _std_url(self):
         return tg.url('/workspaces/{}/folders/{}/files/{}')
@@ -160,13 +164,8 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
     def _get_all_context(self) -> str:
         return CTX.FILES
 
-    @property
-    def _edit_template(self) -> str:
-        return 'mako:tracim.templates.user_workspace_folder_file_edit'
-
-
     @tg.require(current_user_is_reader())
-    @tg.expose('tracim.templates.user_workspace_folder_file_get_one')
+    @tg.expose('tracim.templates.file.getone')
     def get_one(self, file_id, revision_id=None):
         file_id = int(file_id)
         user = tmpl_context.current_user
@@ -324,6 +323,9 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
     manage a path like this: /workspaces/1/folders/XXX/pages/4
     """
 
+    TEMPLATE_NEW = 'mako:tracim.templates.page.new'
+    TEMPLATE_EDIT = 'mako:tracim.templates.page.edit'
+
     @property
     def _std_url(self):
         return tg.url('/workspaces/{}/folders/{}/pages/{}')
@@ -348,13 +350,8 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
     def _get_all_context(self) -> str:
         return CTX.PAGES
 
-    @property
-    def _edit_template(self) -> str:
-        return 'mako:tracim.templates.user_workspace_folder_page_edit'
-
-
     @tg.require(current_user_is_reader())
-    @tg.expose('tracim.templates.user_workspace_folder_page_get_one')
+    @tg.expose('tracim.templates.page.getone')
     def get_one(self, page_id, revision_id=None):
         page_id = int(page_id)
         user = tmpl_context.current_user
@@ -442,29 +439,28 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
     """
     manage a path like this: /workspaces/1/folders/XXX/pages/4
     """
-    comments = UserWorkspaceFolderThreadCommentRestController()
 
+    TEMPLATE_NEW = 'mako:tracim.templates.thread.new'
+    TEMPLATE_EDIT = 'mako:tracim.templates.thread.edit'
+
+    comments = UserWorkspaceFolderThreadCommentRestController()
 
     def _before(self, *args, **kw):
         TIMRestPathContextSetup.current_user()
         TIMRestPathContextSetup.current_workspace()
         TIMRestPathContextSetup.current_folder()
 
-
     @property
     def _std_url(self):
         return tg.url('/workspaces/{}/folders/{}/threads/{}')
-
 
     @property
     def _err_url(self):
         return self._std_url
 
-
     @property
     def _parent_url(self):
         return tg.url('/workspaces/{}/folders/{}')
-
 
     @property
     def _item_type(self):
@@ -480,20 +476,13 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
     def _get_one_context(self) -> str:
         return CTX.THREAD
 
-
     @property
     def _get_all_context(self) -> str:
         return CTX.THREADS
 
-
-    @property
-    def _edit_template(self) -> str:
-        return 'mako:tracim.templates.user_workspace_folder_thread_edit'
-
-
     @tg.require(current_user_is_contributor())
     @tg.expose()
-    def post(self, label='', content=''):
+    def post(self, label='', content='', parent_id=None):
         """
         Creates a new thread. Actually, on POST, the content will be included in a user comment instead of being the thread description
         :param label:
@@ -520,7 +509,7 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
 
 
     @tg.require(current_user_is_reader())
-    @tg.expose('tracim.templates.user_workspace_folder_thread_get_one')
+    @tg.expose('tracim.templates.thread.getone')
     def get_one(self, thread_id):
         thread_id = int(thread_id)
         user = tmpl_context.current_user
@@ -556,7 +545,7 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
 
 
     @tg.require(current_user_is_content_manager())
-    @tg.expose('tracim.templates.item_location_edit')
+    @tg.expose('tracim.templates.folder.move')
     def edit(self, item_id):
         """
         Show the edit form (do not really edit the data)
@@ -577,17 +566,12 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         dictified_item = Context(CTX.DEFAULT).toDict(item, 'item')
         return DictLikeClass(result = dictified_item, fake_api=fake_api)
 
-
-
-
-
-
     @tg.require(current_user_is_content_manager())
     @tg.expose()
     def put(self, item_id, folder_id='0'):
         """
         :param item_id:
-        :param folder_id: id of the folder, in the 'workspace_14__content_1586' style
+        :param folder_id: id of the folder, in a style like 'workspace_14__content_1586'
         :return:
         """
         # TODO - SECURE THIS
@@ -595,20 +579,56 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
         item_id = int(item_id)
         new_workspace, new_parent = convert_id_into_instances(folder_id)
 
-        api = ContentApi(tmpl_context.current_user)
-        item = api.get_one(item_id, ContentType.Any, workspace)
-        api.move(item, new_parent)
-        next_url = self.parent_controller.url(item_id)
-        if new_parent:
-            tg.flash(_('Item moved to {}').format(new_parent.label), CST.STATUS_OK)
-        else:
-            tg.flash(_('Item moved to workspace root'))
+        if new_workspace != workspace:
+            # check that user is at least
+            # - content manager in current workspace
+            # - content manager in new workspace
+            user = tmpl_context.current_user
 
-        tg.redirect(next_url)
+            if user.get_role(workspace) < UserRoleInWorkspace.CONTENT_MANAGER:
+                tg.flash(_('You are not allowed '
+                           'to move this folder'), CST.STATUS_ERROR)
+                tg.redirect(self.parent_controller.url(item_id))
+
+            if user.get_role(new_workspace) < UserRoleInWorkspace.CONTENT_MANAGER:
+                tg.flash(_('You are not allowed to move '
+                           'this folder to this workspace'), CST.STATUS_ERROR)
+                tg.redirect(self.parent_controller.url(item_id))
+
+            api = ContentApi(tmpl_context.current_user)
+            item = api.get_one(item_id, ContentType.Any, workspace)
+            api.move_recursively(item, new_parent, new_workspace)
+
+            next_url = tg.url('/workspaces/{}/folders/{}'.format(
+                new_workspace.workspace_id, item_id))
+            if new_parent:
+                tg.flash(_('Item moved to {} (workspace {})').format(
+                    new_parent.label,
+                    new_workspace.label), CST.STATUS_OK)
+            else:
+                tg.flash(_('Item moved to workspace {}').format(
+                    new_workspace.label))
+
+            tg.redirect(next_url)
+
+        else:
+            # Default move inside same workspace
+            api = ContentApi(tmpl_context.current_user)
+            item = api.get_one(item_id, ContentType.Any, workspace)
+            api.move(item, new_parent)
+            next_url = self.parent_controller.url(item_id)
+            if new_parent:
+                tg.flash(_('Item moved to {}').format(new_parent.label), CST.STATUS_OK)
+            else:
+                tg.flash(_('Item moved to workspace root'))
+
+            tg.redirect(next_url)
 
 
 
 class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
+
+    TEMPLATE_NEW = 'mako:tracim.templates.folder.new'
 
     location = ItemLocationController()
 
@@ -622,7 +642,7 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
 
 
     @tg.require(current_user_is_content_manager())
-    @tg.expose('tracim.templates.folder_edit')
+    @tg.expose('tracim.templates.folder.edit')
     def edit(self, folder_id):
         """
         Show the edit form (do not really edit the data)
@@ -643,7 +663,7 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
 
 
     @tg.require(current_user_is_reader())
-    @tg.expose('tracim.templates.user_workspace_folder_get_one')
+    @tg.expose('tracim.templates.folder.getone')
     def get_one(self, folder_id):
         folder_id = int(folder_id)
         user = tmpl_context.current_user
@@ -663,15 +683,24 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         fake_api_threads = self.threads.get_all_fake(workspace, folder).result
 
         fake_api_content = DictLikeClass(
-            current_user = current_user_content,
-            breadcrumb = fake_api_breadcrumb,
-            current_folder_subfolders = fake_api_subfolders,
-            current_folder_pages = fake_api_pages,
-            current_folder_files = fake_api_files,
-            current_folder_threads = fake_api_threads
+            current_user=current_user_content,
+            breadcrumb=fake_api_breadcrumb,
+            current_folder_subfolders=fake_api_subfolders,
+            current_folder_pages=fake_api_pages,
+            current_folder_files=fake_api_files,
+            current_folder_threads=fake_api_threads,
         )
+
         fake_api = Context(CTX.FOLDER).toDict(fake_api_content)
 
+        fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(
+            folder.get_valid_children([ContentType.Folder,
+                                       ContentType.File,
+                                       ContentType.Page,
+                                       ContentType.Thread]))
+
+        fake_api.content_types = Context(CTX.DEFAULT).toDict(
+            content_api.get_all_types())
 
         dictified_folder = Context(CTX.FOLDER).toDict(folder, 'folder')
         return DictLikeClass(result = dictified_folder, fake_api=fake_api)
@@ -759,7 +788,9 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
                 file = True if can_contain_files=='on' else False,
                 page = True if can_contain_pages=='on' else False
             )
-            api.update_content(folder, label, folder.description)
+            if label != folder.label:
+                # TODO - D.A. - 2015-05-25 - Allow to set folder description
+                api.update_content(folder, label, folder.description)
             api.set_allowed_content(folder, subcontent)
             api.save(folder)
 

@@ -82,7 +82,6 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="${tg.url('/')}">
-##                  <img src="${tg.url('/assets/img/tracim.png')}" class="pull-left" style="height: 48px; margin: -13px 0.5em 0 -13px;"/>
                   <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" style="margin: -13px 0.5em 0 -13px;"/>
                 </a>
             </div>

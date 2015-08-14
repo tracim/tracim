@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import tg
+from datetime import datetime
+from babel.dates import format_timedelta
+
 from bs4 import BeautifulSoup
 import datetime as datetime_root
 import json
@@ -61,6 +65,19 @@ class Workspace(DeclarativeBase):
         """ this method is for interoperability with Content class"""
         return self.label
 
+    def get_allowed_content_types(self):
+        # @see Content.get_allowed_content_types()
+        return [ContentType('folder')]
+
+    def get_valid_children(self, content_types: list=None):
+        for child in self.contents:
+            # we search only direct children
+            if not child.parent \
+                    and not child.is_deleted \
+                    and not child.is_archived:
+                if not content_types or child.type in content_types:
+                    yield child
+
 class UserRoleInWorkspace(DeclarativeBase):
 
     __tablename__ = 'user_workspace'
@@ -93,6 +110,17 @@ class UserRoleInWorkspace(DeclarativeBase):
     STYLE[4] = 'color: #ea983d;'
     STYLE[8] = 'color: #F00;'
 
+    ICON = dict()
+    ICON[0] = ''
+    ICON[1] = 'fa-eye'
+    ICON[2] = 'fa-pencil'
+    ICON[4] = 'fa-graduation-cap'
+    ICON[8] = 'fa-legal'
+
+
+    @property
+    def icon(self):
+        return UserRoleInWorkspace.ICON[self.role]
 
     @property
     def style(self):
@@ -113,6 +141,7 @@ class UserRoleInWorkspace(DeclarativeBase):
 class RoleType(object):
     def __init__(self, role_id):
         self.role_type_id = role_id
+        self.icon = UserRoleInWorkspace.ICON[role_id]
         self.role_label = UserRoleInWorkspace.LABEL[role_id]
         self.css_style = UserRoleInWorkspace.STYLE[role_id]
 
@@ -142,27 +171,27 @@ class ActionDescription(object):
     UNDELETION = 'undeletion'
 
     _ICONS = {
-        'archiving': 'mimetypes/package-x-generic',
-        'content-comment': 'apps/internet-group-chat',
-        'creation': 'actions/document-new',
-        'deletion': 'status/user-trash-full',
-        'edition': 'apps/accessories-text-editor',
-        'revision': 'apps/accessories-text-editor',
-        'status-update': 'apps/utilities-system-monitor',
-        'unarchiving': 'mimetypes/package-x-generic',
-        'undeletion': 'places/user-trash'
+        'archiving': 'fa fa-archive',
+        'content-comment': 'fa-comment-o',
+        'creation': 'fa-magic',
+        'deletion': 'fa fa-trash',
+        'edition': 'fa fa-edit',
+        'revision': 'fa-history',
+        'status-update': 'fa-random',
+        'unarchiving': 'fa fa-file-archive-o',
+        'undeletion': 'fa-trash-o'
     }
 
     _LABELS = {
-        'archiving': l_('Item archived'),
-        'content-comment': l_('Item commented'),
-        'creation': l_('Item created'),
-        'deletion': l_('Item deleted'),
-        'edition': l_('Item modified'),
-        'revision': l_('New revision'),
-        'status-update': l_('Status modified'),
-        'unarchiving': l_('Item un-archived'),
-        'undeletion': l_('Item undeleted'),
+        'archiving': l_('archive'),
+        'content-comment': l_('commente'),
+        'creation': l_('creation'),
+        'deletion': l_('deletion'),
+        'edition': l_('modified'),
+        'revision': l_('revision'),
+        'status-update': l_('statut'),
+        'unarchiving': l_('un-archived'),
+        'undeletion': l_('un-deleted'),
     }
 
     def __init__(self, id):
@@ -214,10 +243,10 @@ class ContentStatus(object):
                     'closed-deprecated': l_('deprecated')}
 
     _ICONS = {
-        'open': 'status/status-open',
-        'closed-validated': 'emblems/emblem-checked',
-        'closed-unvalidated': 'emblems/emblem-unreadable',
-        'closed-deprecated': 'status/status-outdated',
+        'open': 'fa fa-square-o',
+        'closed-validated': 'fa fa-check-square-o',
+        'closed-unvalidated': 'fa fa-close',
+        'closed-deprecated': 'fa fa-warning',
     }
 
     _CSS = {
@@ -268,14 +297,34 @@ class ContentType(object):
 
     _STRING_LIST_SEPARATOR = ','
 
-    _ICONS = {
-        'dashboard': 'places/user-desktop',
-        'workspace': 'places/folder-remote',
-        'folder': 'places/jstree-folder',
-        'file': 'mimetypes/text-x-generic-template',
-        'page': 'mimetypes/text-html',
-        'thread': 'apps/internet-group-chat',
-        'comment': 'apps/internet-group-chat',
+    _ICONS = {  # Deprecated
+        'dashboard': 'fa-home',
+        'workspace': 'fa-bank',
+        'folder': 'fa fa-folder-open-o',
+        'file': 'fa fa-paperclip',
+        'page': 'fa fa-file-text-o',
+        'thread': 'fa fa-comments-o',
+        'comment': 'fa fa-comment-o',
+    }
+
+    _CSS_ICONS = {
+        'dashboard': 'fa fa-home',
+        'workspace': 'fa fa-bank',
+        'folder': 'fa fa-folder-open-o',
+        'file': 'fa fa-paperclip',
+        'page': 'fa fa-file-text-o',
+        'thread': 'fa fa-comments-o',
+        'comment': 'fa fa-comment-o'
+    }
+
+    _CSS_COLORS = {
+        'dashboard': 't-dashboard-color',
+        'workspace': 't-less-visible',
+        'folder': 't-folder-color',
+        'file': 't-file-color',
+        'page': 't-page-color',
+        'thread': 't-thread-color',
+        'comment': 't-thread-color'
     }
 
     _ORDER_WEIGHT = {
@@ -284,6 +333,16 @@ class ContentType(object):
         'thread': 2,
         'file': 3,
         'comment': 4,
+    }
+
+    _LABEL = {
+        'dashboard': '',
+        'workspace': l_('workspace'),
+        'folder': l_('folder'),
+        'file': l_('file'),
+        'page': l_('page'),
+        'thread': l_('thread'),
+        'comment': l_('comment'),
     }
 
     _DELETE_LABEL = {
@@ -297,7 +356,7 @@ class ContentType(object):
     }
 
     @classmethod
-    def icon(cls, type: str):
+    def get_icon(cls, type: str):
         assert(type in ContentType._ICONS) # DYN_REMOVE
         return ContentType._ICONS[type]
 
@@ -343,6 +402,24 @@ class ContentType(object):
         # Make this code dynamic loading data types
         return '/workspaces/{}'.format(workspace.workspace_id)
 
+    @classmethod
+    def sorted(cls, types: ['ContentType']) -> ['ContentType']:
+        return sorted(types, key=lambda content_type: content_type.priority)
+
+    def __init__(self, type):
+        self.type = type
+        self.icon = ContentType._CSS_ICONS[type]
+        self.color = ContentType._CSS_COLORS[type]
+        self.label = ContentType._LABEL[type]
+        self.priority = ContentType._ORDER_WEIGHT[type]
+
+    def toDict(self):
+        return dict(id=self.type,
+                    type=self.type,
+                    icon=self.icon,
+                    color=self.color,
+                    label=self.label,
+                    priority=self.priority)
 
 class Content(DeclarativeBase):
 
@@ -381,11 +458,11 @@ class Content(DeclarativeBase):
     parent = relationship('Content', remote_side=[content_id], backref='children')
     owner = relationship('User', remote_side=[User.user_id])
 
-    @property
-    def valid_children(self):
+    def get_valid_children(self, content_types: list=None):
         for child in self.children:
             if not child.is_deleted and not child.is_archived:
-                yield child
+                if not content_types or child.type in content_types:
+                    yield child
 
     @hybrid_property
     def properties(self):
@@ -399,6 +476,20 @@ class Content(DeclarativeBase):
         """ encode a given structure into json and store it in _properties attribute"""
         self._properties = json.dumps(properties_struct)
         ContentChecker.check_properties(self)
+
+    def created_as_delta(self, delta_from_datetime:datetime=None):
+        if not delta_from_datetime:
+            delta_from_datetime = datetime.now()
+        return format_timedelta(delta_from_datetime - self.created,
+                                locale=tg.i18n.get_lang()[0])
+
+    def datetime_as_delta(self, datetime_object,
+                          delta_from_datetime:datetime=None):
+        if not delta_from_datetime:
+            delta_from_datetime = datetime.now()
+        return format_timedelta(delta_from_datetime - datetime_object,
+                                locale=tg.i18n.get_lang()[0])
+
 
     def extract_links_from_content(self, other_content: str=None) -> [LinkItem]:
         """
@@ -427,7 +518,7 @@ class Content(DeclarativeBase):
 
     def get_child_nb(self, content_type: ContentType, content_status = ''):
         child_nb = 0
-        for child in self.valid_children:
+        for child in self.get_valid_children():
             if child.type == content_type or content_type == ContentType.Any:
                 if not content_status:
                     child_nb = child_nb+1
@@ -441,10 +532,19 @@ class Content(DeclarativeBase):
     def get_status(self) -> ContentStatus:
         return ContentStatus(self.status, self.type.__str__())
 
-
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
 
+    def get_last_activity_date(self) -> datetime_root.datetime:
+        last_revision_date = self.updated
+        for revision in self.revisions:
+            if revision.updated > last_revision_date:
+                last_revision_date = revision.updated
+
+        for child in self.children:
+            if child.updated > last_revision_date:
+                last_revision_date = child.updated
+        return last_revision_date
 
     def get_comments(self):
         children = []
@@ -466,7 +566,6 @@ class Content(DeclarativeBase):
 
         return last_comment
 
-
     def get_previous_revision(self) -> 'ContentRevisionRO':
         rev_ids = [revision.revision_id for revision in self.revisions]
         rev_ids.sort()
@@ -484,6 +583,20 @@ class Content(DeclarativeBase):
         # 'html.parser' fixes a hanging bug
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
         return BeautifulSoup(self.description, 'html.parser').text
+
+    def get_allowed_content_types(self):
+        types = []
+        try:
+            allowed_types = self.properties['allowed_content']
+            for type_label, is_allowed in allowed_types.items():
+                if is_allowed:
+                    types.append(ContentType(type_label))
+        except Exception as e:
+            print(e.__str__())
+            print('----- /*\ *****')
+            raise ValueError('No allowed content property')
+
+        return ContentType.sorted(types)
 
 
 class ContentChecker(object):

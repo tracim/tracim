@@ -15,7 +15,7 @@
                 <div class="col-sm-4" id='user-profile-global-info'>
                     <div class="well well-sm">
                         <h3>
-                            
+
                         </h3>
                         <p>
                             ${TIM.ICO(16, 'apps/internet-mail')}

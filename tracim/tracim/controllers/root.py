@@ -15,6 +15,7 @@ from tg.i18n import ugettext as _
 from tracim.lib import CST
 from tracim.lib.base import logger
 from tracim.lib.user import UserStaticApi
+from tracim.lib.content import ContentApi
 
 from tracim.controllers import StandardController
 from tracim.controllers.admin import AdminController
@@ -24,6 +25,7 @@ from tracim.controllers.help import HelpController
 from tracim.controllers.user import UserRestController
 from tracim.controllers.workspace import UserWorkspaceRestController
 
+from tracim.model.data import ContentType
 from tracim.model.serializers import DictLikeClass
 from tracim.model.serializers import CTX
 from tracim.model.serializers import Context
@@ -65,7 +67,7 @@ class RootController(StandardController):
                 logger.info(self, 'Will redirect to {}'.format(came_from))
                 redirect(url(came_from))
             else:
-                redirect(self.url(None, self.dashboard.__name__))
+                redirect(self.url(None, self.home.__name__))
 
         login_counter = request.environ.get('repoze.who.logins', 0)
         if login_counter > 0:
@@ -90,7 +92,7 @@ class RootController(StandardController):
 
 
     @expose()
-    def post_login(self, came_from=lurl('/dashboard')):
+    def post_login(self, came_from=lurl('/home')):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
@@ -115,17 +117,45 @@ class RootController(StandardController):
         
 
     @require(predicates.not_anonymous())
-    @expose('tracim.templates.dashboard')
-    def dashboard(self):
+    @expose('tracim.templates.home')
+    def home(self):
         user = tmpl_context.current_user
 
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
-        fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
+        fake_api = Context(CTX.CURRENT_USER).toDict({
+            'current_user': current_user_content})
 
+
+        last_active_contents = ContentApi(user).get_last_active(None, ContentType.Any, None)
+        fake_api.last_actives = Context(CTX.CONTENT_LIST).toDict(last_active_contents, 'contents', 'nb')
+
+        # INFO - D.A. - 2015-05-20
+        # For now, we do not have favorties and read/unread status
+        # so we only show:
+        # - workspaces
+        # - last activity
+        # - oldest open stuff
+
+        items = ContentApi(user).get_all(None, ContentType.Any, None)[:4]
+        fake_api.favorites = Context(CTX.CONTENT_LIST).toDict(items, 'contents', 'nb')
         return DictLikeClass(fake_api=fake_api)
 
+        # user_id = tmpl_context.current_user.user_id
+        #
+        # current_user = tmpl_context.current_user
+        # assert user_id==current_user.user_id
+        # api = UserApi(current_user)
+        # current_user = api.get_one(current_user.user_id)
+        # dictified_user = Context(CTX.USER).toDict(current_user, 'user')
+        # current_user_content = Context(CTX.CURRENT_USER).toDict(tmpl_context.current_user)
+        # fake_api_content = DictLikeClass(current_user=current_user_content)
+        # fake_api = Context(CTX.WORKSPACE).toDict(fake_api_content)
+        #
+        # return DictLikeClass(result = dictified_user, fake_api=fake_api)
+
+
     @require(predicates.not_anonymous())
-    @expose('tracim.templates.search')
+    @expose('tracim.templates.search.display')
     def search(self, keywords = ''):
         from tracim.lib.content import ContentApi
 

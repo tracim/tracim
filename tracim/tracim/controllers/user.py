@@ -45,23 +45,29 @@ class UserWorkspaceRestController(TIMRestController):
         user = tmpl_context.current_user
 
     @tg.expose()
-    def enable_notifications(self, workspace_id):
+    def enable_notifications(self, workspace_id, next_url=None):
         workspace_id = int(workspace_id)
         api = WorkspaceApi(tg.tmpl_context.current_user)
 
         workspace = api.get_one(workspace_id)
         api.enable_notifications(tg.tmpl_context.current_user, workspace)
         tg.flash(_('Notification enabled for workspace {}').format(workspace.label))
+
+        if next_url:
+            tg.redirect(tg.url(next_url))
         tg.redirect(self.parent_controller.url(None, 'me'))
 
     @tg.expose()
-    def disable_notifications(self, workspace_id):
+    def disable_notifications(self, workspace_id, next_url=None):
         workspace_id = int(workspace_id)
         api = WorkspaceApi(tg.tmpl_context.current_user)
 
         workspace = api.get_one(workspace_id)
         api.disable_notifications(tg.tmpl_context.current_user, workspace)
         tg.flash(_('Notification disabled for workspace {}').format(workspace.label))
+
+        if next_url:
+            tg.redirect(tg.url(next_url))
         tg.redirect(self.parent_controller.url(None, 'me'))
 
 
@@ -95,7 +101,7 @@ class UserPasswordRestController(TIMRestController):
         # FIXME - Allow only self password or operation for managers
         current_user = tmpl_context.current_user
 
-        redirect_url = tg.lurl('/user/me')
+        redirect_url = tg.lurl('/home')
 
         if not current_password or not new_password1 or not new_password2:
             tg.flash(_('Empty password is not allowed.'))
@@ -150,19 +156,20 @@ class UserRestController(TIMRestController):
         fake_api_content = DictLikeClass(current_user=current_user_content)
         fake_api = Context(CTX.WORKSPACE).toDict(fake_api_content)
 
-        return DictLikeClass(result = dictified_user, fake_api=fake_api)
+        return DictLikeClass(result=dictified_user, fake_api=fake_api)
 
     @tg.expose('tracim.templates.user_edit_me')
-    def edit(self, id):
+    def edit(self, id, next_url=None):
         id = tmpl_context.current_user.user_id
         current_user = tmpl_context.current_user
         assert id==current_user.user_id
 
         dictified_user = Context(CTX.USER).toDict(current_user, 'user')
-        return DictLikeClass(result = dictified_user)
+        fake_api = DictLikeClass(next_url=next_url)
+        return DictLikeClass(result=dictified_user, fake_api=fake_api)
 
-    @tg.expose('tracim.templates.workspace_edit')
-    def put(self, user_id, name, email):
+    @tg.expose('tracim.templates.workspace.edit')
+    def put(self, user_id, name, email, next_url=None):
         user_id = tmpl_context.current_user.user_id
         current_user = tmpl_context.current_user
         assert user_id==current_user.user_id
@@ -170,5 +177,6 @@ class UserRestController(TIMRestController):
         api = UserApi(tmpl_context.current_user)
         api.update(current_user, name, email, True)
         tg.flash(_('profile updated.'))
+        if next_url:
+            tg.redirect(tg.url(next_url))
         tg.redirect(self.url())
-        return

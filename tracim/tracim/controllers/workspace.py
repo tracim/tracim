@@ -37,21 +37,11 @@ class UserWorkspaceRestController(TIMRestController):
         return 'workspace_id'
 
 
-    @tg.expose('tracim.templates.user_workspace_get_all')
+    @tg.expose()
     def get_all(self, *args, **kw):
-        user = tmpl_context.current_user
+        tg.redirect(tg.url('/home'))
 
-        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
-        current_user_content.roles.sort(key=lambda role: role.workspace.name)
-
-        workspace_api = WorkspaceApi(user)
-        workspaces = workspace_api.get_all_for_user(user)
-        fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
-        dictified_workspaces = Context(CTX.ADMIN_WORKSPACES).toDict(workspaces, 'workspaces', 'workspace_nb')
-
-        return DictLikeClass(result = dictified_workspaces, fake_api=fake_api)
-
-    @tg.expose('tracim.templates.user_workspace_get_one')
+    @tg.expose('tracim.templates.workspace.getone')
     def get_one(self, workspace_id):
         user = tmpl_context.current_user
 
@@ -63,20 +53,36 @@ class UserWorkspaceRestController(TIMRestController):
 
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)
         dictified_folders = self.folders.get_all_fake(workspace).result
-        fake_api = DictLikeClass(current_user = dictified_current_user, current_workspace_folders = dictified_folders)
+        fake_api = DictLikeClass(current_user=dictified_current_user,
+                                 current_workspace_folders=dictified_folders)\
+        # ,
+        #                      sub_items=Context(CTX.FOLDER_CONTENT_LIST).toDict(dictified_folders))
+
+        fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(workspace.get_valid_children())
+
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
 
         return DictLikeClass(result = dictified_workspace, fake_api=fake_api)
 
 
     @tg.expose('json')
-    def treeview_root(self, id='#', current_id=None, all_workspaces=True, folder_allowed_content_types='', ignore_id=None):
+    def treeview_root(self, id='#',
+                      current_id=None,
+                      all_workspaces=True,
+                      folder_allowed_content_types='',
+                      ignore_id=None,
+                      ignore_workspace_id=None):
         all_workspaces = bool(int(all_workspaces))
+
+        # ignore_workspace_id is a string like 3,12,78,15
+        ignored_ids = [int(id) for id in ignore_workspace_id.split(',')] if ignore_workspace_id else None
 
         if not current_id:
             # Default case is to return list of workspaces
+            print('ignore : ', ignored_ids)
             api = WorkspaceApi(tmpl_context.current_user)
-            workspaces = api.get_all_for_user(tmpl_context.current_user)
+            workspaces = api.get_all_for_user(tmpl_context.current_user,
+                                              ignored_ids)
             dictified_workspaces = Context(CTX.MENU_API).toDict(workspaces, 'd')
             return dictified_workspaces
 
@@ -179,7 +185,9 @@ class UserWorkspaceRestController(TIMRestController):
 
 
     @tg.expose('json')
-    def treeview_children(self, id='#', ignore_id=None):
+    def treeview_children(self, id='#',
+                          ignore_id=None,
+                          allowed_content_types = None):
         """
         id must be "#" or something like "workspace_3__document_8"
         """
@@ -189,7 +197,11 @@ class UserWorkspaceRestController(TIMRestController):
         ignore_item_ids = [int(ignore_id)] if ignore_id else []
         workspace, content = convert_id_into_instances(id)
 
-        viewable_content_types = self._get_treeviewable_content_types_or_none()
+        viewable_content_types = []
+        if allowed_content_types:
+            viewable_content_types = allowed_content_types.split(',')
+        else:
+            viewable_content_types = self._get_treeviewable_content_types_or_none()
         contents = ContentApi(tmpl_context.current_user).get_child_folders(content, workspace, [], ignore_item_ids, viewable_content_types)
         # This allow to show contents and folders group by type
         sorted_contents = ContentApi.sort_content(contents)
