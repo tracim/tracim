@@ -35,13 +35,7 @@
 
             ## <span class="tracim-less-visible"><i class="fa fa-file-text-o fa-tw"></i> ${content}</span>
         </td>
-        <td>
-            % if content.folder:
-                <a href="${tg.url('/workspaces/{}/folders/{}/pages/{}'.format(content.workspace.id, content.folder.id, content.id))}">${content.label}</a>
-            % else:
-                <a href="${tg.url('/workspaces/{}/{}s/{}'.format(content.workspace.id, content.type.id, content.id))}">${content.label}</a>
-            % endif
-        </td>
+        <td><a href="${content.url}">${content.label}</a></td>
         % if 'folder' == content.type.id:
             <td class="text-center t-less-visible">-</td>
         % else:
@@ -60,8 +54,6 @@
                 <span class="t-less-visible">${content.status.label}</span>
             </td>
         % endif
-        <td>
-            <span class="t-less-visible">${content.notes|n}</span>
-        </td>
+        <td><span class="t-less-visible">${content.notes|n}</span></td>
     </tr>
 </%def>
