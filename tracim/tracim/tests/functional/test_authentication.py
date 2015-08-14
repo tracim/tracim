@@ -37,7 +37,7 @@ class TestAuthentication(TestController):
         """
 
         # Requesting a protected area
-        resp = self.app.get('/dashboard/', status=302)
+        resp = self.app.get('/home/', status=302)
         ok_( resp.location.startswith('http://localhost/login'))
         # Getting the login form:
         resp = resp.follow(status=200)
@@ -51,7 +51,7 @@ class TestAuthentication(TestController):
         initial_page = post_login.follow(status=302)
         ok_('authtkt' in initial_page.request.cookies,
             "Session cookie wasn't defined: %s" % initial_page.request.cookies)
-        ok_(initial_page.location.startswith('http://localhost/dashboard/'),
+        ok_(initial_page.location.startswith('http://localhost/home/'),
             initial_page.location)
 
 
@@ -72,7 +72,7 @@ class TestAuthentication(TestController):
         real_home_page = home_page.follow(status=302)
         ok_('authtkt' in real_home_page.request.cookies,
             'Session cookie was not defined: %s' % real_home_page.request.cookies)
-        eq_(real_home_page.location, 'http://localhost/dashboard')
+        eq_(real_home_page.location, 'http://localhost/home')
 
     def test_logout(self):
         """Logouts must work correctly"""
