@@ -53,7 +53,7 @@
 ##                            </div>
 ##                        </div>
 
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title"><i class="fa fa-line-chart"></i> ${_('Recent activity')}</h3>
