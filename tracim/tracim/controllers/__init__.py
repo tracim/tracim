@@ -115,6 +115,9 @@ class TIMRestController(RestController, BaseController):
         so that the object is available in any controller method
     """
 
+    TEMPLATE_NEW = 'unknown "template new"'
+    TEMPLATE_EDIT = 'unknown "template edit"'
+
     def _before(self, *args, **kw):
         """
         Instantiate the current workspace in tg.tmpl_context
@@ -134,6 +137,25 @@ class TIMRestControllerWithBreadcrumb(TIMRestController):
         :return:
         """
         return ContentApi(tmpl_context.current_user).build_breadcrumb(tmpl_context.workspace, item_id)
+
+    def _struct_new_serialized(self, workspace_id, parent_id):
+        print('values are: ', workspace_id, parent_id)
+        result = DictLikeClass(
+            item=DictLikeClass(parent=DictLikeClass(id=parent_id),
+                               workspace=DictLikeClass(id=workspace_id)))
+
+        return result
+
+    @tg.require(current_user_is_contributor())
+    @tg.expose()
+    def new(self, parent_id=None, workspace_id=None):
+        """ Show the add form """
+        tg.override_template(self.new, self.TEMPLATE_NEW)
+
+        workspace_id = tg.request.GET['workspace_id']
+        parent_id = tg.request.GET['parent_id'] if 'parent_id' in tg.request.GET else None
+
+        return DictLikeClass(result=self._struct_new_serialized(workspace_id, parent_id))
 
 
 class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
@@ -197,17 +219,19 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         """
         raise NotImplementedError('You must implement this method in child controllers')
 
-
-    @property
-    def _edit_template(self) -> str:
+    @tg.require(current_user_is_contributor())
+    @tg.expose()
+    def new(self, parent_id=None, workspace_id=None):
+        """ Show the add form
+         Note: parent is the /folders/{parent_id} value
+         When refactoring urls, this may be need somme update
         """
-        dotted path to the template used for edit form.
-        This path must include the engine (mako, genshi...)
-        like it is explained in the override_template() function documentation
+        tg.override_template(self.new, self.TEMPLATE_NEW)
 
-        example: mako:tracim.templates.user_workspace_folder_page_edit
-        """
-        raise NotImplementedError('You must implement this method in child controllers')
+        workspace_id = tg.request.GET['workspace_id']
+        parent_id = tg.request.GET['parent_id'] if 'parent_id' in tg.request.GET else None
+
+        return DictLikeClass(result=self._struct_new_serialized(workspace_id, parent_id))
 
     @tg.require(current_user_is_contributor())
     @tg.expose()
@@ -220,7 +244,7 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         """
 
         # the follwing line allow to define the template to use in child classes.
-        tg.override_template(self.edit, self._edit_template)
+        tg.override_template(self.edit, self.TEMPLATE_EDIT)
 
         item_id = int(item_id)
         user = tmpl_context.current_user
@@ -231,7 +255,6 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
 
         dictified_item = Context(self._get_one_context).toDict(item, 'item')
         return DictLikeClass(result = dictified_item)
-
 
     @tg.require(current_user_is_contributor())
     @tg.expose()

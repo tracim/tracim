@@ -3,5 +3,5 @@
 
 <%def name="title()"></%def>
 
-${FORMS.USER_EDIT_FORM('user-edit-form', result.user, tg.url('/user/{}?_method=PUT'.format(result.user.id)))}
+${FORMS.USER_EDIT_FORM('user-edit-form', result.user, tg.url('/user/{}?_method=PUT'.format(result.user.id)), next_url=fake_api.next_url)}
 

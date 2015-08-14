@@ -68,8 +68,18 @@ class WorkspaceApi(object):
     def get_all(self):
         return self._base_query().all()
 
-    def get_all_for_user(self, user: User):
-        workspaces = [role.workspace for role in user.roles if not role.workspace.is_deleted]
+    def get_all_for_user(self, user: User, ignored_ids=None):
+        workspaces = []
+
+        for role in user.roles:
+            if not role.workspace.is_deleted:
+                if not ignored_ids:
+                    workspaces.append(role.workspace)
+                elif role.workspace.workspace_id not in ignored_ids:
+                        workspaces.append(role.workspace)
+                else:
+                    pass  # do not return workspace
+
         workspaces.sort(key=lambda workspace: workspace.label.lower())
         return workspaces
 

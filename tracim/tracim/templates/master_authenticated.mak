@@ -2,9 +2,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-	    ${self.meta()}
+        ${self.meta()}
         <meta charset="utf-8">
-	    <title>${self.title()}</title>
+        <title>${self.title()}</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
@@ -67,6 +67,28 @@
 
 <%def name="main_menu()">
     <div class="navbar navbar-fixed-top" role="navigation">
+        ${TIM.FLASH_MSG('col-sm-7 col-sm-offset-3')}
+##
+##         <div class="row" id="flashgordon">
+##             <div class="col-sm-7 col-sm-offset-3" style="z-index: 10001; padding: 0; position: absolute; top: 0;">
+##                 <div class="alert alert-info" style="margin-top: 1em; ">
+##                     <button type="button" class="close" data-dismiss="alert">×</button>
+##                     <div id="flash">
+##                         <img src="/assets/icons/32x32/status/flash-ok.png">
+##                         Statut de Fichier mis(e) à jour
+##                     </div>
+##                 </div>
+##
+##                 <script>
+##                     window.setTimeout(function() {
+##                         $("#flashgordon").fadeTo(5000, 0.5);
+##                     }, 5000);
+##                 </script>
+##             </div>
+##         </div>
+
+
+
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
@@ -80,18 +102,32 @@
                   <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" style="height: 48px; margin: -13px 0.5em 0 -13px;"/>
                 </a>
             </div>
+
             <div class="navbar-collapse collapse">
                 % if request.identity:
                     <ul class="nav navbar-nav navbar-left">
-                        <li><a href="${tg.url('/dashboard')}">${TIM.ICO(16, 'places/user-desktop')} ${_('Dashboard')}</a></li>
-                        <li><a href="${tg.url('/workspaces')}">${TIM.ICO(16, 'places/folder-remote')} ${_('Workspace')}</a></li>
+                        <li class="active"><a href="${tg.url('/home')}">${TIM.FA('fa-home fa-lg')} ${_('My Home')}</a></li>
+                    </ul>
+                % endif
 
-                        % if fake_api.current_user.profile.id>=2:
+                <ul class="nav navbar-nav navbar-right">
+
+                    % if request.identity:
+
+                        <form id="search-form" class="navbar-form navbar-left" role="search" action="${tg.url('/search?')}">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="${_('Search for...')}" name="keywords" value="${','.join(search.keywords) if search else ''}">
+                                <i class="fa fa-search t-less-visible" style="margin-left: -2em;" onclick="$('#search-form').submit()"></i>
+                            </div>
+                            ## <button type="submit" class="btn btn-default">${_('Search')}</button>
+                        </form>
+
+                        % if fake_api.current_user.profile.id>=8: #2:
                             <li class="dropdown">
-                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.ICO(16, 'categories/preferences-system')} ${_('Admin')} <b class="caret"></b></a>
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.FA('fa-lg fa-cogs')} ${_('Admin')} <b class="caret"></b></a>
                               <ul class="dropdown-menu">
-                                <li><a href="${tg.url('/admin/users')}">${TIM.ICO(16, 'apps/system-users')} ${_('Users')}</a></li>
-                                <li><a href="${tg.url('/admin/workspaces')}">${TIM.ICO(16, 'places/folder-remote')} ${_('Workspaces')}</a></li>
+                                <li><a href="${tg.url('/admin/users')}">${TIM.FA('fa-users tracim-less-visible')} ${_('Users')}</a></li>
+                                <li><a href="${tg.url('/admin/workspaces')}">${TIM.FA('fa-bank tracim-less-visible')} ${_('Workspaces')}</a></li>
 ## TODO - D.A. - 2014-10-20 - Restore global configuration screen
 ##                                <li class="divider" role="presentation"></li>
 ##                                <li><a href="${tg.url('/admin/configuration')}">${TIM.ICO(16, 'categories/preferences-system')} ${_('Global configuration')}</a></li>
@@ -99,54 +135,28 @@
                             </li>
                         % endif
 
-                        % if h.is_debug_mode():
+                        % if False and h.is_debug_mode():
                             <li class="dropdown text-danger" >
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.ICO(16, 'status/dialog-warning')} Debug <b class="caret"></b></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.FA('fa-warning t-orange')} Debug <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     <li><a class="text-danger" href=""><strong>${_('you MUST desactivate debug in production')}</strong></a></li>
                                     <li class="divider" role="presentation"></li>
-                                    <li><a href="${tg.url('/debug/environ')}">${TIM.ICO(16, 'apps/internet-web-browser')} request.environ</a></li>
-                                    <li><a href="${tg.url('/debug/identity')}">${TIM.ICO(16, 'actions/contact-new')} request.identity</a></li>
+                                    <li><a href="${tg.url('/debug/environ')}">${TIM.FA('fa-globe fa-fw t-less-visible')} request.environ</a></li>
+                                    <li><a href="${tg.url('/debug/identity')}">${TIM.FA('fa-user fa-fw t-less-visible')} request.identity</a></li>
                                     <li class="divider" role="presentation"></li>
-                                    <li><a href="${tg.url('/debug/iconset-fa')}">${TIM.ICO(16, 'mimetypes/image-x-generic')} Icon set - Font Awesome</a></li>
-                                    <li><a href="${tg.url('/debug/iconset-tango')}">${TIM.ICO(16, 'mimetypes/image-x-generic')} Icon set - Tango Icons</a></li>
+                                    <li><a href="${tg.url('/debug/iconset-fa')}">${TIM.FA('fa-file-image-o t-less-visible')} Icon set - Font Awesome</a></li>
+                                    <li><a href="${tg.url('/debug/iconset-tango')}">${TIM.FA('fa-file-image-o t-less-visible')} Icon set - Tango Icons</a></li>
                                 </ul>
                             </li>
                         % endif
-                        
-                        <form class="navbar-form navbar-left" role="search" action="${tg.url('/search?')}">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="${_('Search for...')}" name="keywords" value="${','.join(search.keywords) if search else ''}">
-                            </div>
-                            <button type="submit" class="btn btn-default">${_('Search')}</button>
-                        </form>
-                    </ul>
-                % endif
-
-                <ul class="nav navbar-nav navbar-right">
-
-                    % if request.identity:
-## TODO - D.A. - 2014-10-19 - RESTORE SEARCH FEATURE
-##                        <li>
-##                            <form class="navbar-form navbar-right" action="${tg.url('/search')}">
-##                                <input type="text" name="keywords" class="form-control" placeholder="${_('Search...')}" value="${context.get('search_string', '')}">
-##                                <button type="submit" class="btn btn-default">
-##                                    ${TIM.ICO(16, 'actions/system-search')}
-##                                </button>
-##                            </form>
-##                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                              ${TIM.ICO(16, 'categories/applications-system')} ${fake_api.current_user.name}
+                                ${TIM.FA('fa-lg fa-user')} ${fake_api.current_user.name}
+
                             </a>
                             <ul class="dropdown-menu pull-right">
                                 <li>
-                                  <a href="${tg.url('/user/me')}">${TIM.ICO(16, 'actions/contact-new')|n} ${_('My account')}</a>
-                                </li>
-                                <li class="divider" role="presentation"></li>
-                                <li>
-                                  <a href="${tg.url('/logout_handler')}">
-                                  ${TIM.ICO(16, 'status/status-locked')|n} ${_('Logout')}</a>
+                                  <a href="${tg.url('/logout_handler')}">${TIM.FA('fa-sign-out fa-fw t-orange')} ${_('Logout')}</a>
                                 </li>
                             </ul>
                         </li>
@@ -171,5 +181,4 @@
         </div>
     </div>
 </%def>
-
 </html>
