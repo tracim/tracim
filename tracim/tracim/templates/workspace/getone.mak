@@ -120,13 +120,18 @@
                                 %>
                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
                             % else:
-                                ## Only show 'new folder' to content managers
-                                <%
-                                    new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
-                                    modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
-                                    icon_classes = content_type.icon+' '+content_type.color
-                                %>
-                                <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
+                                <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT('', _('You are not allowed to create content'), '', 't-less-visible fa fa-ban')}</li>
+## Show new content entries in the menu is currently not available at root of a workspace
+## TODO - D.A. - 2015-08-20 - Allow to put content at root (and show related entry in the menu
+##                             % if user_role == 2:
+##                                 ## Only show 'new folder' to content managers
+##                                 <%
+##                                     new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
+##                                     modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
+##                                     icon_classes = content_type.icon+' '+content_type.color
+##                                 %>
+##                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
+##                             % endif
                             % endif
                         % endfor
                     </ul>
