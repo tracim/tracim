@@ -373,13 +373,13 @@ class ContentApi(object):
         elif new_workspace:
             item.workspace = new_workspace
 
-        item.revision_type = ActionDescription.EDITION
+        item.revision_type = ActionDescription.MOVE
 
     def move_recursively(self, item: Content,
                          new_parent: Content, new_workspace: Workspace):
         self.move(item, new_parent, False, new_workspace)
         self.save(item, do_notify=False)
-        print('saved item #', item.content_id, new_workspace)
+
         for child in item.children:
             self.move_recursively(child, item, new_workspace)
         return

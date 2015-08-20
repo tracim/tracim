@@ -303,34 +303,100 @@
 </%def>
 
 <%def name="SECURED_TIMELINE_ITEM(user, item)">
+##     <div class="row t-odd-or-even t-hacky-thread-comment-border-top">
+##         <div class="col-sm-7 col-sm-offset-3">
+##             <div class="t-timeline-item">
+## ##                <i class="fa fa-fw fa-3x fa-comment-o t-less-visible" style="margin-left: -1.5em; float:left;"></i>
+##                 ${ICON.FA_FW('fa fa-3x fa-comment-o t-less-visible t-timeline-item-icon')}
+##
+##                 <h5 style="margin: 0;">
+##                     <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(item.owner.name)|n}</span>
+##
+##                     <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(item.created)|n}">
+##                         ${_('{delta} ago').format(delta=item.created_as_delta)}
+##
+##                         % if h.is_item_still_editable(item) and item.owner.id==user.id:
+##                             <br/>
+## ##                            <div class="btn-group">
+##                                 <a class="t-timeline-comment-delete-button" href="${item.urls.delete}">
+##                                     ${_('delete')} ${ICON.FA('fa fa-trash-o')}
+## ##                                    ${TIM.ICO_TOOLTIP(16, 'status/user-trash-full', h.delete_label_for_item(item))}
+##                                 </a>
+## ##                            </div>
+##                         % endif
+##                     </div>
+##                 </h5>
+##                 <div class="t-timeline-item-content">
+##                     <div>${item.content|n}</div>
+##                     <br/>
+##                 </div>
+##             </div>
+##         </div>
+##     </div>
+</%def>
+
+<%def name="SECURED_HISTORY_VIRTUAL_EVENT(user, event)">
     <div class="row t-odd-or-even t-hacky-thread-comment-border-top">
         <div class="col-sm-7 col-sm-offset-3">
             <div class="t-timeline-item">
 ##                <i class="fa fa-fw fa-3x fa-comment-o t-less-visible" style="margin-left: -1.5em; float:left;"></i>
-                ${ICON.FA_FW('fa fa-3x fa-comment-o t-less-visible t-timeline-item-icon')}
+
+                ${ICON.FA_FW('fa fa-3x t-less-visible t-timeline-item-icon '+event.type.icon)}
 
                 <h5 style="margin: 0;">
-                    <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(item.owner.name)|n}</span>
 
-                    <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(item.created)|n}">
-                        ${_('{delta} ago').format(delta=item.created_as_delta)}
+                    % if 'comment' == event.type.id:
+                        <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(event.owner.name)|n}</span>
+                    %else:
+                        <span class="tracim-less-visible">${_('{} by <strong>{}</strong>').format(event.label, event.owner.name)|n}</span>
+                    % endif
 
-                        % if h.is_item_still_editable(item) and item.owner.id==user.id:
+                    <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(event.created)|n}">
+                        ${_('{delta} ago').format(delta=event.created_as_delta)}
+
+                        % if h.is_item_still_editable(event) and event.owner.id==user.id:
                             <br/>
-##                            <div class="btn-group">
-                                <a class="t-timeline-comment-delete-button" href="${item.urls.delete}">
+                                <a class="t-timeline-comment-delete-button" href="${event.urls.delete}">
                                     ${_('delete')} ${ICON.FA('fa fa-trash-o')}
-##                                    ${TIM.ICO_TOOLTIP(16, 'status/user-trash-full', h.delete_label_for_item(item))}
                                 </a>
-##                            </div>
                         % endif
                     </div>
                 </h5>
                 <div class="t-timeline-item-content">
-                    <div>${item.content|n}</div>
+                    <div>${event.content|n}</div>
                     <br/>
                 </div>
             </div>
         </div>
     </div>
+</%def>
+
+<%def name="SECURED_HISTORY_VIRTUAL_EVENT_AS_TABLE_ROW(user, event, current_revision_id)">
+    <% warning_or_not = ('', 'warning')[current_revision_id==event.id] %>
+    <tr class="${warning_or_not}">
+        <td class="t-less-visible">
+            <span class="label label-default">${ICON.FA_FW(event.type.icon)} ${event.type.label}</span>
+        </td>
+        <td title="${h.date_time(event.created)|n}">${_('{delta} ago').format(delta=event.created_as_delta)}</td>
+        <td>${event.owner.name}</td>
+## FIXME - REMOVE                            <td>${event}</td>
+
+        % if 'comment' == event.type.id:
+            <td colspan="2">
+                ${event.content|n}
+            </td>
+        % else:
+
+            <td>
+                % if event.type.id in ('creation', 'edition', 'revision'):
+                    <a href="${'?revision_id={}'.format(event.id)}">${_('View revision')}</a>
+                % endif
+            </td>
+            <td class="t-less-visible" title="${_('Currently shown')}">
+                % if warning_or_not:
+                    ${ICON.FA_FW('fa fa-caret-left')}&nbsp;${_('shown')}
+                % endif
+            </td>
+        % endif
+    </tr>
 </%def>

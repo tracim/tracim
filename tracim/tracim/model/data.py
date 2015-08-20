@@ -24,7 +24,7 @@ from sqlalchemy.types import LargeBinary
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
-from tg.i18n import lazy_ugettext as l_
+from tg.i18n import lazy_ugettext as l_, ugettext as _
 
 from tracim.model import DeclarativeBase
 from tracim.model.auth import User
@@ -169,29 +169,32 @@ class ActionDescription(object):
     STATUS_UPDATE = 'status-update'
     UNARCHIVING = 'unarchiving'
     UNDELETION = 'undeletion'
+    MOVE = 'move'
 
     _ICONS = {
         'archiving': 'fa fa-archive',
         'content-comment': 'fa-comment-o',
         'creation': 'fa-magic',
-        'deletion': 'fa fa-trash',
-        'edition': 'fa fa-edit',
+        'deletion': 'fa-trash',
+        'edition': 'fa-edit',
         'revision': 'fa-history',
         'status-update': 'fa-random',
-        'unarchiving': 'fa fa-file-archive-o',
-        'undeletion': 'fa-trash-o'
+        'unarchiving': 'fa-file-archive-o',
+        'undeletion': 'fa-trash-o',
+        'move': 'fa-arrows'
     }
 
     _LABELS = {
         'archiving': l_('archive'),
-        'content-comment': l_('commente'),
-        'creation': l_('creation'),
-        'deletion': l_('deletion'),
-        'edition': l_('modified'),
-        'revision': l_('revision'),
-        'status-update': l_('statut'),
-        'unarchiving': l_('un-archived'),
-        'undeletion': l_('un-deleted'),
+        'content-comment': l_('Item commented'),
+        'creation': l_('Item created'),
+        'deletion': l_('Item deleted'),
+        'edition': l_('item modified'),
+        'revision': l_('New revision'),
+        'status-update': l_('New status'),
+        'unarchiving': l_('Item unarchived'),
+        'undeletion': l_('Item undeleted'),
+        'move': l_('Item moved')
     }
 
     def __init__(self, id):
@@ -199,6 +202,7 @@ class ActionDescription(object):
         self.id = id
         self.label = ActionDescription._LABELS[id]
         self.icon = ActionDescription._ICONS[id]
+        self.css = ''
 
     @classmethod
     def allowed_values(cls):
@@ -210,7 +214,8 @@ class ActionDescription(object):
                 cls.REVISION,
                 cls.STATUS_UPDATE,
                 cls.UNARCHIVING,
-                cls.UNDELETION]
+                cls.UNDELETION,
+                cls.MOVE]
 
 
 class ContentStatus(object):
@@ -406,10 +411,15 @@ class ContentType(object):
     def sorted(cls, types: ['ContentType']) -> ['ContentType']:
         return sorted(types, key=lambda content_type: content_type.priority)
 
+    @property
+    def type(self):
+        return self.id
+
     def __init__(self, type):
-        self.type = type
+        self.id = type
         self.icon = ContentType._CSS_ICONS[type]
-        self.color = ContentType._CSS_COLORS[type]
+        self.color = ContentType._CSS_COLORS[type]  # deprecated
+        self.css = ContentType._CSS_COLORS[type]
         self.label = ContentType._LABEL[type]
         self.priority = ContentType._ORDER_WEIGHT[type]
 
@@ -594,9 +604,20 @@ class Content(DeclarativeBase):
         except Exception as e:
             print(e.__str__())
             print('----- /*\ *****')
-            raise ValueError('No allowed content property')
+            raise ValueError('Not allowed content property')
 
         return ContentType.sorted(types)
+
+    def get_history(self) -> '[VirtualEvent]':
+        events = []
+        for comment in self.get_comments():
+            events.append(VirtualEvent.create_from_content(comment))
+        for revision in self.revisions:
+            events.append(VirtualEvent.create_from_content_revision(revision))
+
+        sorted_events = sorted(events,
+                               key=lambda event: event.created, reverse=True)
+        return sorted_events
 
 
 class ContentChecker(object):
@@ -649,6 +670,7 @@ class ContentRevisionRO(DeclarativeBase):
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
     file_content = deferred(Column(LargeBinary(), unique=False, nullable=False, default=None))
 
+    type = Column(Unicode(32), unique=False, nullable=False)
     status = Column(Unicode(32), unique=False, nullable=False)
     created = Column(DateTime, unique=False, nullable=False)
     updated = Column(DateTime, unique=False, nullable=False)
@@ -665,6 +687,9 @@ class ContentRevisionRO(DeclarativeBase):
     def get_status(self):
         return ContentStatus(self.status)
 
+    def get_label(self):
+        return self.label if self.label else self.file_name if self.file_name else ''
+
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
 
@@ -678,3 +703,60 @@ class NodeTreeItem(object):
         self.node = node
         self.children = children
         self.is_selected = is_selected
+
+class VirtualEvent(object):
+    @classmethod
+    def create_from(cls, object):
+        if Content == object.__class__:
+            return cls.create_from_content(object)
+        elif ContentRevisionRO == object.__class__:
+            return cls.create_from_content_revision(object)
+
+    @classmethod
+    def create_from_content(cls, content: Content):
+        content_type = ContentType(content.type)
+
+        label = content.get_label()
+        if content.type==ContentType.Comment:
+            label = _('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
+
+        return VirtualEvent(id=content.content_id,
+                            created=content.created,
+                            owner=content.owner,
+                            type=content_type,
+                            label=label,
+                            content=content.description,
+                            ref_object=content)
+
+    @classmethod
+    def create_from_content_revision(cls, revision: ContentRevisionRO):
+        action_description = ActionDescription(revision.revision_type)
+
+        return VirtualEvent(id=revision.revision_id,
+                            created=revision.created,
+                            owner=revision.owner,
+                            type=action_description,
+                            label=action_description.label,
+                            content='',
+                            ref_object=revision)
+
+    def __init__(self, id, created, owner, type, label, content, ref_object):
+        self.id = id
+        self.created = created
+        self.owner = owner
+        self.type = type
+        self.label = label
+        self.content = content
+        self.ref_object = ref_object
+
+        print(type)
+        assert hasattr(type, 'id')
+        assert hasattr(type, 'css')
+        assert hasattr(type, 'icon')
+        assert hasattr(type, 'label')
+
+    def created_as_delta(self, delta_from_datetime:datetime=None):
+        if not delta_from_datetime:
+            delta_from_datetime = datetime.now()
+        return format_timedelta(delta_from_datetime - self.created,
+                                locale=tg.i18n.get_lang()[0])

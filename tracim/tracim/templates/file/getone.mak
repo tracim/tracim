@@ -154,31 +154,15 @@
     <div class="col-sm-7 col-sm-offset-3">
         <div class="t-spacer-above">
             <span id="associated-revisions" ></span>
-            <h4 class="anchored-title">${_('File revisions')}</h4>
+            <h4 class="anchored-title">${_('File history')}</h4>
             <div>
                 <table class="table table-striped table-hover">
-                    % for revid, revision in reversed(list(enumerate(reversed(result.file.revisions)))):
-                        <% warning_or_not = ('', 'warning')[result.file.selected_revision==revision.id] %>
-                        <tr class="${warning_or_not}">
-## FIXME - 2015-07-22 - D.A. - Do we really need to show a rev. id ?!
-## <td><span class="label label-default">v${revid}</span></td>
-                            <td class="t-less-visible">
-                                <span class="label label-default">${ICON.FA_FW(revision.action.icon)}
-                                ${revision.action.label}</span>
-                            </td>
-                            <td>${h.date(revision.created)}</td>
-                            <td>${h.time(revision.created)}</td>
-                            <td>${revision.owner.name}</td>
-                            <td><a href="${tg.url('/workspaces/{}/folders/{}/files/{}?revision_id={}').format(result.file.workspace.id, result.file.parent.id, result.file.id, revision.id)}">${revision.label}</a></td>
-                            <td class="t-less-visible" title="${_('Currently shown')}">
-                                % if warning_or_not:
-                                    ${ICON.FA_FW('fa fa-caret-left')} ${_('shown').format(result.file.selected_revision)}
-                                % endif
-                            </td>
-                        </tr>
+                    % for event in result.file.history:
+                        ${WIDGETS.SECURED_HISTORY_VIRTUAL_EVENT_AS_TABLE_ROW(fake_api.current_user, event, result.file.selected_revision)}
                     % endfor
                 </table>
             </div>
         </div>
     </div>
 <div/>
+
