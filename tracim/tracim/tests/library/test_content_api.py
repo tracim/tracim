@@ -342,6 +342,7 @@ class TestContentApi(TestStandard):
 
         RoleApi(user1).create_one(user2, workspace,
                                   UserRoleInWorkspace.CONTENT_MANAGER,
+                                  with_notif=False,
                                   flush=True)
 
         # Test starts here
@@ -405,6 +406,7 @@ class TestContentApi(TestStandard):
 
         RoleApi(user1).create_one(user2, workspace,
                                   UserRoleInWorkspace.CONTENT_MANAGER,
+                                  with_notif=True,
                                   flush=True)
 
         # Test starts here
@@ -471,6 +473,7 @@ class TestContentApi(TestStandard):
 
         RoleApi(user1).create_one(user2, workspace,
                                   UserRoleInWorkspace.CONTENT_MANAGER,
+                                  with_notif=True,
                                   flush=True)
 
         # show archived is used at the top end of the test
@@ -545,6 +548,7 @@ class TestContentApi(TestStandard):
 
         RoleApi(user1).create_one(user2, workspace,
                                   UserRoleInWorkspace.CONTENT_MANAGER,
+                                  with_notif=True,
                                   flush=True)
 
         # show archived is used at the top end of the test

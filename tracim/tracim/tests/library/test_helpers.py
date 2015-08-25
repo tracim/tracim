@@ -25,9 +25,15 @@ class TestHelpers(TestStandard):
 
         h.CFG.DATA_UPDATE_ALLOWED_DURATION = 0
         item.created = datetime.datetime.now() - datetime.timedelta(0, 10)
+
+        item.type = DictLikeClass({'id': 5})
+        eq_(False, h.is_item_still_editable(item))
+
+        item.type.id = 'comment'
         eq_(False, h.is_item_still_editable(item))
 
         h.CFG.DATA_UPDATE_ALLOWED_DURATION = -1
+        item.type.id = 'comment'
         item.created = datetime.datetime.now() - datetime.timedelta(0, 10)
         eq_(True, h.is_item_still_editable(item))
 
