@@ -61,7 +61,7 @@
                             ${ICON.FA('fa-bar-chart t-less-visible')}
                             ${_('Global profile')}
                         </h3>
-                        ${P.USER_PROFILE(result.user)}
+                        ${P.USER_PROFILE(fake_api.current_user, result.user)}
                     </div>
                     <div style="margin-top: 4em;">
                         <h3>
@@ -81,7 +81,11 @@
                                     </tr>
                                 </thead>
                                 % for role in result.user.roles:
-                                    ${TABLE_ROW.USER_ROLE_IN_WORKSPACE(role)}
+<%
+    enable_link = '/admin/users/{user}/workspaces/{workspace}/enable_notifications?next_url=/admin/users/{user}'
+    disable_link = '/admin/users/{user}/workspaces/{workspace}/disable_notifications?next_url=/admin/users/{user}'
+%>
+                                    ${TABLE_ROW.USER_ROLE_IN_WORKSPACE(fake_api.current_user, role, show_id=True, enable_link=enable_link, disable_link=disable_link)}
                                 % endfor
                             </table>
                         % endif

@@ -62,6 +62,7 @@ class ContextConverterNotFoundException(Exception):
 
 class CTX(object):
     """ constants that are used for serialization / dictification of models"""
+    ADMIN_USER = 'ADMIN_USER'
     ADMIN_WORKSPACE = 'ADMIN_WORKSPACE'
     ADMIN_WORKSPACES = 'ADMIN_WORKSPACES'
     CONTENT_LIST = 'CONTENT_LIST'
@@ -785,6 +786,7 @@ def serialize_user_list_default(profile: Profile, context: Context):
 
 
 @pod_serializer(RoleType, CTX.ADMIN_WORKSPACE)
+@pod_serializer(RoleType, CTX.ADMIN_USER)
 def serialize_role_list_for_select_field_in_workspace(role_type: RoleType, context: Context):
     """
     Actually, roles are serialized as users (with minimal information)
@@ -838,6 +840,7 @@ def serialize_user_list_default(user: User, context: Context):
 
 
 @pod_serializer(User, CTX.USER)
+@pod_serializer(User, CTX.ADMIN_USER)
 @pod_serializer(User, CTX.CURRENT_USER)
 def serialize_user_for_user(user: User, context: Context):
     """
@@ -876,13 +879,14 @@ def serialize_role_in_workspace(role: UserRoleInWorkspace, context: Context):
     result['style'] = role.style
     result['role_description'] = role.role_as_label()
     result['email'] = role.user.email
-    result['user'] = role.user
+    result['user'] = context.toDict(role.user)
     result['notifications_subscribed'] = role.do_notify
     return result
 
 
 @pod_serializer(UserRoleInWorkspace, CTX.USER)
 @pod_serializer(UserRoleInWorkspace, CTX.CURRENT_USER)
+@pod_serializer(UserRoleInWorkspace, CTX.ADMIN_USER)
 def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context):
     """
     Actually, roles are serialized as users (with minimal information)
@@ -896,7 +900,7 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
     result['label'] = role.role_as_label()
     result['style'] = RoleType(role.role).css_style
     result['workspace'] =  context.toDict(role.workspace)
-    result['user'] = role.user
+    result['user'] = Context(CTX.DEFAULT).toDict(role.user)
     result['notifications_subscribed'] = role.do_notify
 
     # result['workspace_name'] = role.workspace.label
@@ -910,7 +914,8 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
 def serialize_workspace_default(workspace: Workspace, context: Context):
     result = DictLikeClass(
         id = workspace.workspace_id,
-        label = workspace.label,
+        label = workspace.label,  # FIXME - 2015-08-20 - remove this property
+        name = workspace.label,  # use name instead of label
         url = context.url('/workspaces/{}'.format(workspace.workspace_id))
     )
     return result

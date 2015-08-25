@@ -62,7 +62,7 @@
                             </table>
                         % endif
                     </div>
-                    % if len(result.user.roles)>0:
+                    % if len(result.user.roles) > 0:
                         <p class="alert alert-info">${_('You can configure your email notifications by clicking on the email icons above')}</p>
                     % endif
                 </div>

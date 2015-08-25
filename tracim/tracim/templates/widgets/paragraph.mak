@@ -1,7 +1,7 @@
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
 <%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 
-<%def name="USER_PROFILE(user)">
+<%def name="USER_PROFILE(current_user, user)">
     % if user.profile.id >= 1:
         <p>${ICON.FA('fa-male t-green fa-lg fa-fw')}<span> ${_('This user a standard user.')}</span></p>
     %else:
