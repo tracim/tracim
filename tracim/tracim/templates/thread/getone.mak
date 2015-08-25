@@ -100,27 +100,15 @@
     </div>
 </div>
 
-% for comment in result.thread.comments:
-    ${WIDGETS.SECURED_TIMELINE_ITEM(fake_api.current_user, comment)}
+% for event in result.thread.history:
+    ## TODO - D.A. - 2015-08-20
+    ## Allow to show full history (with status change and archive/unarchive)
+    % if event.type.id in ('comment', 'creation'):
+        ${WIDGETS.SECURED_HISTORY_VIRTUAL_EVENT(fake_api.current_user, event)}
+    % endif
 % endfor
 
-## <hr class="tracim-panel-separator"/>
-## <div>
-##     <h4 id="associated-links" class="anchored-title" >${_('Links extracted from the thread')}</h4>
-##     <div>
-##         % if len(result.thread.links)<=0:
-##             <p class="pod-empty">${_('No link found.')}</p>
-##         % else:
-##             <ul>
-##                 % for link in result.thread.links:
-##                     <li><a href="${link.href}">${link.label if link.label else link.href}</a></li>
-##                 % endfor
-##             </ul>
-##         % endif
-##     </div>
-##     <hr/>
-## 
-##     % for comment in result.thread.comments:
-##         ${comment}
-##     % endfor
-## </div>
+## % for comment in result.thread.comments:
+##     ${WIDGETS.SECURED_TIMELINE_ITEM(fake_api.current_user, comment)}
+## % endfor
+##

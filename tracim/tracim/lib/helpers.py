@@ -177,6 +177,9 @@ def delete_label_for_item(item) -> str:
     return ContentType._DELETE_LABEL[item.type]
 
 def is_item_still_editable(item):
+    if item.type.id != 'comment':
+        return False
+
     # HACK - D.A - 2014-12-24 - item contains a datetime object!!!
     # 'item' is a variable which is created by serialization and it should be an instance of DictLikeClass.
     # therefore, it contains strins, integers and booleans (something json-ready or almost json-ready)

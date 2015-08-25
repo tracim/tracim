@@ -22,6 +22,7 @@ from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import RoleType
 from tracim.model.data import UserRoleInWorkspace
+from tracim.model.data import VirtualEvent
 from tracim.model.data import Workspace
 
 from tracim.model import data as pmd
@@ -61,9 +62,11 @@ class ContextConverterNotFoundException(Exception):
 
 class CTX(object):
     """ constants that are used for serialization / dictification of models"""
+    ADMIN_USER = 'ADMIN_USER'
     ADMIN_WORKSPACE = 'ADMIN_WORKSPACE'
     ADMIN_WORKSPACES = 'ADMIN_WORKSPACES'
     CONTENT_LIST = 'CONTENT_LIST'
+    CONTENT_HISTORY = 'CONTENT_HISTORY'
     CURRENT_USER = 'CURRENT_USER'
     DEFAULT = 'DEFAULT' # default context. This will allow to define a serialization method to be used by default
     EMAIL_NOTIFICATION = 'EMAIL_NOTIFICATION'
@@ -351,8 +354,6 @@ def serialize_node_for_page(content: Content, context: Context):
     if content.type in (ContentType.Page, ContentType.File) :
         data_container = content
 
-
-
         # The following properties are overriden by revision values
         if content.revision_to_serialize>0:
             for revision in content.revisions:
@@ -361,20 +362,21 @@ def serialize_node_for_page(content: Content, context: Context):
                     break
 
         result = DictLikeClass(
-            id = content.content_id,
-            parent = context.toDict(content.parent),
-            workspace = context.toDict(content.workspace),
-            type = content.type,
+            id=content.content_id,
+            parent=context.toDict(content.parent),
+            workspace=context.toDict(content.workspace),
+            type=content.type,
 
-            content = data_container.description,
-            created = data_container.created,
-            label = data_container.label,
-            icon = ContentType.get_icon(content.type),
-            owner = context.toDict(data_container.owner),
-            status = context.toDict(data_container.get_status()),
-            links = context.toDict(content.extract_links_from_content(data_container.description)),
-            revisions = context.toDict(sorted(content.revisions, key=lambda v: v.created, reverse=True)),
-            selected_revision = 'latest' if content.revision_to_serialize<=0 else content.revision_to_serialize
+            content=data_container.description,
+            created=data_container.created,
+            label=data_container.label,
+            icon=ContentType.get_icon(content.type),
+            owner=context.toDict(data_container.owner),
+            status=context.toDict(data_container.get_status()),
+            links=context.toDict(content.extract_links_from_content(data_container.description)),
+            revisions=context.toDict(sorted(content.revisions, key=lambda v: v.created, reverse=True)),
+            selected_revision='latest' if content.revision_to_serialize<=0 else content.revision_to_serialize,
+            history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history())
         )
 
         if content.type==ContentType.File:
@@ -395,6 +397,31 @@ def serialize_node_for_page(content: Content, context: Context):
     raise NotImplementedError
 
 
+@pod_serializer(VirtualEvent, CTX.CONTENT_HISTORY)
+def serialize_content_for_history(event: VirtualEvent, context: Context):
+    urls = DictLikeClass({'delete': None})
+    if ContentType.Comment == event.type.id:
+        urls = context.toDict({
+          'delete': context.url('/workspaces/{wid}/folders/{fid}/{ctype}/{cid}/comments/{commentid}/put_delete'.format(
+              wid = event.ref_object.workspace_id,
+              fid=event.ref_object.parent.parent_id,
+              ctype=event.ref_object.parent.type+'s',
+              cid=event.ref_object.parent.content_id,
+              commentid=event.ref_object.content_id))
+        })
+
+    return DictLikeClass(
+        owner=context.toDict(event.owner),
+        id=event.id,
+        label=event.label,
+        type=context.toDict(event.type),
+        created=event.created,
+        created_as_delta=event.created_as_delta(),
+        content=event.content,
+        urls = urls
+    )
+
+
 @pod_serializer(Content, CTX.THREAD)
 def serialize_node_for_page(item: Content, context: Context):
     if item.type==ContentType.Thread:
@@ -411,7 +438,8 @@ def serialize_node_for_page(item: Content, context: Context):
             status = context.toDict(item.get_status()),
             type = item.type,
             workspace = context.toDict(item.workspace),
-            comments = reversed(context.toDict(item.get_comments()))
+            comments = reversed(context.toDict(item.get_comments())),
+            history = Context(CTX.CONTENT_HISTORY).toDict(item.get_history())
         )
 
     if item.type==ContentType.Comment:
@@ -660,6 +688,7 @@ def serialize_content_for_folder_content_list(content: Content, context: Context
 def serialize_breadcrumb_item(content_type: ContentType, context: Context):
     return DictLikeClass(content_type.toDict())
 
+
 @pod_serializer(Content, CTX.SEARCH)
 def serialize_content_for_search_result(content: Content, context: Context):
 
@@ -757,6 +786,7 @@ def serialize_user_list_default(profile: Profile, context: Context):
 
 
 @pod_serializer(RoleType, CTX.ADMIN_WORKSPACE)
+@pod_serializer(RoleType, CTX.ADMIN_USER)
 def serialize_role_list_for_select_field_in_workspace(role_type: RoleType, context: Context):
     """
     Actually, roles are serialized as users (with minimal information)
@@ -810,6 +840,7 @@ def serialize_user_list_default(user: User, context: Context):
 
 
 @pod_serializer(User, CTX.USER)
+@pod_serializer(User, CTX.ADMIN_USER)
 @pod_serializer(User, CTX.CURRENT_USER)
 def serialize_user_for_user(user: User, context: Context):
     """
@@ -848,13 +879,14 @@ def serialize_role_in_workspace(role: UserRoleInWorkspace, context: Context):
     result['style'] = role.style
     result['role_description'] = role.role_as_label()
     result['email'] = role.user.email
-    result['user'] = role.user
+    result['user'] = context.toDict(role.user)
     result['notifications_subscribed'] = role.do_notify
     return result
 
 
 @pod_serializer(UserRoleInWorkspace, CTX.USER)
 @pod_serializer(UserRoleInWorkspace, CTX.CURRENT_USER)
+@pod_serializer(UserRoleInWorkspace, CTX.ADMIN_USER)
 def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context):
     """
     Actually, roles are serialized as users (with minimal information)
@@ -868,7 +900,7 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
     result['label'] = role.role_as_label()
     result['style'] = RoleType(role.role).css_style
     result['workspace'] =  context.toDict(role.workspace)
-    result['user'] = role.user
+    result['user'] = Context(CTX.DEFAULT).toDict(role.user)
     result['notifications_subscribed'] = role.do_notify
 
     # result['workspace_name'] = role.workspace.label
@@ -882,7 +914,8 @@ def serialize_role_in_list_for_user(role: UserRoleInWorkspace, context: Context)
 def serialize_workspace_default(workspace: Workspace, context: Context):
     result = DictLikeClass(
         id = workspace.workspace_id,
-        label = workspace.label,
+        label = workspace.label,  # FIXME - 2015-08-20 - remove this property
+        name = workspace.label,  # use name instead of label
         url = context.url('/workspaces/{}'.format(workspace.workspace_id))
     )
     return result

@@ -45,7 +45,10 @@ class WorkspaceApi(object):
         workspace.description = description
 
         # By default, we force the current user to be the workspace manager
-        role = RoleApi(self._user).create_one(self._user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER)
+        # And to receive email notifications
+        role = RoleApi(self._user).create_one(self._user, workspace,
+                                              UserRoleInWorkspace.WORKSPACE_MANAGER,
+                                              with_notif=True)
 
         DBSession.add(workspace)
         DBSession.add(role)

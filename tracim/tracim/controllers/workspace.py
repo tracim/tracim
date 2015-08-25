@@ -79,7 +79,6 @@ class UserWorkspaceRestController(TIMRestController):
 
         if not current_id:
             # Default case is to return list of workspaces
-            print('ignore : ', ignored_ids)
             api = WorkspaceApi(tmpl_context.current_user)
             workspaces = api.get_all_for_user(tmpl_context.current_user,
                                               ignored_ids)

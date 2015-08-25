@@ -350,3 +350,7 @@ h3 { background-color: #f5f5f5;}
     position: absolute;
     top: 0;
 }
+
+#t-full-app-alert-message-id > div.alert {
+    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.3);
+}

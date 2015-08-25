@@ -18,6 +18,8 @@ from formencode import Schema
 from formencode.validators import FieldsMatch
 
 from tracim.controllers import TIMRestController
+from tracim.controllers.user import UserWorkspaceRestController
+
 from tracim.lib import CST
 from tracim.lib import helpers as h
 from tracim.lib.base import logger
@@ -212,6 +214,52 @@ class UserPasswordAdminRestController(TIMRestController):
         tg.redirect(next_url)
 
 
+class UserWorkspaceRestController(TIMRestController):
+
+    def _before(self, *args, **kw):
+        """
+        Instantiate the current workspace in tg.tmpl_context
+        :param args:
+        :param kw:
+        :return:
+        """
+        super(self.__class__, self)._before(args, kw)
+
+        api = UserApi(tg.tmpl_context.current_user)
+        user_id = tg.request.controller_state.routing_args.get('user_id')
+        user = api.get_one(user_id)
+        tg.tmpl_context.user_id = user_id
+        tg.tmpl_context.user = user
+
+    @tg.expose()
+    def enable_notifications(self, workspace_id, next_url=None):
+        workspace_id = int(workspace_id)
+        api = WorkspaceApi(tg.tmpl_context.current_user)
+
+        workspace = api.get_one(workspace_id)
+        api.enable_notifications(tg.tmpl_context.user, workspace)
+        tg.flash(_('User {}: notification enabled for workspace {}').format(
+            tg.tmpl_context.user.get_display_name(), workspace.label))
+
+        if next_url:
+            tg.redirect(tg.url(next_url))
+        tg.redirect(self.parent_controller.url(None, 'me'))
+
+    @tg.expose()
+    def disable_notifications(self, workspace_id, next_url=None):
+        workspace_id = int(workspace_id)
+        api = WorkspaceApi(tg.tmpl_context.current_user)
+
+        workspace = api.get_one(workspace_id)
+        api.disable_notifications(tg.tmpl_context.user, workspace)
+        tg.flash(_('User {}: notification disabled for workspace {}').format(
+            tg.tmpl_context.user.get_display_name(), workspace.label))
+
+        if next_url:
+            tg.redirect(tg.url(next_url))
+        tg.redirect(self.parent_controller.url(None, 'me'))
+
+
 class UserRestController(TIMRestController):
     """
      CRUD Controller allowing to manage Users
@@ -220,6 +268,7 @@ class UserRestController(TIMRestController):
 
     password = UserPasswordAdminRestController()
     profile = UserProfileAdminRestController()
+    workspaces = UserWorkspaceRestController()
 
     @classmethod
     def current_item_id_key_in_context(cls):
@@ -289,10 +338,14 @@ class UserRestController(TIMRestController):
 
         user = api.get_one(user_id) # FIXME
 
-        dictified_user = Context(CTX.USER).toDict(user, 'user')
+        role_api = RoleApi(tg.tmpl_context.current_user)
+        role_list = role_api.get_roles_for_select_field()
+
+        dictified_user = Context(CTX.ADMIN_USER).toDict(user, 'user')
         current_user_content = Context(CTX.CURRENT_USER).toDict(tmpl_context.current_user)
-        fake_api_content = DictLikeClass(current_user=current_user_content)
-        fake_api = Context(CTX.WORKSPACE).toDict(fake_api_content)
+        fake_api_content = DictLikeClass(current_user=current_user_content,
+                                         role_types=role_list)
+        fake_api = Context(CTX.ADMIN_USER).toDict(fake_api_content)
 
         return DictLikeClass(result = dictified_user, fake_api=fake_api)
 

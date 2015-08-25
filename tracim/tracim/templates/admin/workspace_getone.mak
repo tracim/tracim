@@ -83,6 +83,12 @@
                                             % endfor
                                         </div>
 
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="with_notif" name="with_notif" checked="checked"/> ${_('Subscribe to mail notifications')}
+                                            </label>
+                                        </div>
+
                                         <span class="pull-right" style="margin-top: 0.5em;">
                                             <button id="current-document-add-comment-save-button" type="submit" class="btn btn-small btn-success" title="Add first comment"><i class=" fa fa-check"></i> ${_('Validate')}</button>
                                         </span>
