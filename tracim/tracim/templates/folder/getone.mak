@@ -123,7 +123,7 @@
                             <th>${_('Type')}</th>
                             <th>${_('Title')}</th>
                             <th>${_('Status')}</th>
-                            <th>${_('Remarques')}</th>
+                            <th>${_('Notes')}</th>
                         </tr>
                     </thead>
                     <tbody>
