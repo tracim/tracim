@@ -2,6 +2,7 @@
 
 __author__ = 'damien'
 
+import datetime
 import re
 
 import tg
@@ -12,6 +13,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy import desc
+from sqlalchemy import distinct
 from sqlalchemy import not_
 from sqlalchemy import or_
 from tracim.lib import cmp_to_key
@@ -26,8 +28,9 @@ from tracim.model.data import ContentRevisionRO
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import NodeTreeItem
-from tracim.model.data import Workspace
+from tracim.model.data import RevisionReadStatus
 from tracim.model.data import UserRoleInWorkspace
+from tracim.model.data import Workspace
 
 def compare_content_for_sorting_by_type_and_name(content1: Content,
                                                  content2: Content):
@@ -153,6 +156,32 @@ class ContentApi(object):
 
         if not self._show_archived:
             result = result.filter(Content.is_archived==False)
+
+        return result
+
+    def __revisions_real_base_query(self, workspace: Workspace=None):
+        result = DBSession.query(ContentRevisionRO)
+
+        if workspace:
+            result = result.filter(ContentRevisionRO.workspace_id==workspace.workspace_id)
+
+        if self._user:
+            user = DBSession.query(User).get(self._user_id)
+            # Filter according to user workspaces
+            workspace_ids = [r.workspace_id for r in user.roles \
+                             if r.role>=UserRoleInWorkspace.READER]
+            result = result.filter(ContentRevisionRO.workspace_id.in_(workspace_ids))
+
+        return result
+
+    def _revisions_base_query(self, workspace: Workspace=None):
+        result = self.__revisions_real_base_query(workspace)
+
+        if not self._show_deleted:
+            result = result.filter(ContentRevisionRO.is_deleted==False)
+
+        if not self._show_archived:
+            result = result.filter(ContentRevisionRO.is_archived==False)
 
         return result
 
@@ -303,7 +332,7 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> Content:
+    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -318,6 +347,56 @@ class ContentApi(object):
 
         result = []
         for item in resultset:
+            new_item = None
+            if ContentType.Comment == item.type:
+                new_item = item.parent
+            else:
+                new_item = item
+
+            # INFO - D.A. - 2015-05-20
+            # We do not want to show only one item if the last 10 items are
+            # comments about one thread for example
+            if new_item not in result:
+                result.append(new_item)
+
+            if len(result) >= limit:
+                break
+
+        return result
+
+    def get_last_unread(self, parent_id: int, content_type: str,
+                        workspace: Workspace=None, limit=10) -> [Content]:
+        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
+        assert content_type is not None# DYN_REMOVE
+        assert isinstance(content_type, str) # DYN_REMOVE
+
+        read_revision_ids = DBSession.query(RevisionReadStatus.revision_id) \
+            .filter(RevisionReadStatus.user_id==self._user_id)
+
+        not_read_revisions = self._revisions_base_query(workspace) \
+            .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
+            .subquery()
+
+        not_read_content_ids = DBSession.query(
+            distinct(not_read_revisions.c.content_id)).all()
+
+        not_read_contents = self._base_query(workspace) \
+            .filter(Content.content_id.in_(not_read_content_ids)) \
+            .order_by(desc(Content.updated))
+
+        if content_type != ContentType.Any:
+            not_read_contents = not_read_contents.filter(
+                Content.type==content_type)
+        else:
+            not_read_contents = not_read_contents.filter(
+                Content.type!=ContentType.Folder)
+
+        if parent_id:
+            not_read_contents = not_read_contents.filter(
+                Content.parent_id==parent_id)
+
+        result = []
+        for item in not_read_contents:
             new_item = None
             if ContentType.Comment == item.type:
                 new_item = item.parent
@@ -350,14 +429,12 @@ class ContentApi(object):
         properties = dict(allowed_content = allowed_content_dict)
         folder.properties = properties
 
-
     def set_status(self, content: Content, new_status: str):
         if new_status in ContentStatus.allowed_values():
             content.status = new_status
             content.revision_type = ActionDescription.STATUS_UPDATE
         else:
             raise ValueError('The given value {} is not allowed'.format(new_status))
-
 
     def move(self, item: Content,
              new_parent: Content,
@@ -422,6 +499,54 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
+    def mark_read(self, content: Content,
+                  read_datetime: datetime=None,
+                  do_flush=True) -> Content:
+
+        assert self._user
+        assert content
+
+        # The algorithm is:
+        # 1. define the read datetime
+        # 2. update all revisions related to current Content
+        # 3. do the same for all child revisions
+        #    (ie parent_id is content_id of current content)
+
+        if not read_datetime:
+            read_datetime = datetime.datetime.now()
+
+        viewed_revisions = DBSession.query(ContentRevisionRO) \
+            .filter(ContentRevisionRO.content_id==content.content_id).all()
+
+        for revision in viewed_revisions:
+            revision.read_by[self._user] = read_datetime
+
+        for child in content.get_valid_children():
+            self.mark_read(child, read_datetime=read_datetime, do_flush=False)
+
+        if do_flush:
+            self.flush()
+
+        return content
+
+    def mark_unread(self, content: Content, do_flush=True) -> Content:
+        assert self._user
+        assert content
+
+        revisions = DBSession.query(ContentRevisionRO) \
+            .filter(ContentRevisionRO.content_id==content.content_id).all()
+
+        for revision in revisions:
+            del revision.read_by[self._user]
+
+        for child in content.get_valid_children():
+            self.mark_unread(child, do_flush=False)
+
+        if do_flush:
+            self.flush()
+
+        return content
+
     def flush(self):
         DBSession.flush()
 
@@ -442,7 +567,6 @@ class ContentApi(object):
 
         if action_description:
             content.revision_type = action_description
-
 
         if do_flush:
             DBSession.add(content)

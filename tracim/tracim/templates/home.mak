@@ -39,107 +39,88 @@
 <div class="container-fluid">
     <div class="row-fluid">
         <div>
-            <div class="row">
+            ## NOT READ
+            <div class="row" id="unread-content-panel">
                 <div class="col-md-offset-3 col-sm-7">
                     <div class="row t-spacer-above">
-##                        <div class="col-sm-6">
-##                            <div class="panel panel-default">
-##                              <div class="panel-heading">
-##                                <h3 class="panel-title"><i class="fa fa-eye-slash"></i> ${_('Unread content')}</h3>
-##                              </div>
-##                              <div class="panel-body">
-##                                Panel content
-##                              </div>
-##                            </div>
-##                        </div>
-
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="fa fa-line-chart"></i> ${_('Recent activity')}</h3>
-                                </div>
-                                % if fake_api.last_actives.nb <= 0:
-                                    ${P.EMPTY_CONTENT(_('There\'s no activity yet.'))}
-                                % else:
-                                    <table class="table table-hover">
-                                        % for item in fake_api.last_actives.contents:
-                                            <tr>
-                                                <td>
-                                                    <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
-                                                    <a href="${item.url}">${item.label}</a>
-                                                    <br/>
-                                                    <span class="t-less-visible">${item.workspace.label}</span>
-                                                </td>
-                                                <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
-                                                    ${item.last_activity.delta}
-                                                </td>
-                                            </tr>
-                                        % endfor
-                                    </table>
-                                % endif
+                            <div class="t-half-spacer-above">
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><i class="fa fa-fw fa-eye-slash"></i> ${_('Unread')}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        % if fake_api.last_unread.nb <= 0:
+                                            ${P.EMPTY_CONTENT(_('No unread content.'))}
+                                        % else:
+                                            <table class="table table-hover">
+                                                % for item in fake_api.last_unread.contents:
+                                                    <tr>
+                                                        <td>
+                                                            <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
+                                                            <a href="${item.url}">${item.label}</a>
+                                                            <br/>
+                                                            <span class="t-less-visible">${item.workspace.label}</span>
+                                                        </td>
+                                                        <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
+                                                            ${item.last_activity.delta}
+                                                        </td>
+                                                    </tr>
+                                                % endfor
+                                            </table>
+                                        % endif
+                                     </div>
+                                 </div>
                             </div>
                         </div>
-
-##                        <div class="col-sm-6">
-##                            <div class="panel panel-default">
-##                                <div class="panel-heading">
-##                                    <h3 class="panel-title"><i class="fa fa-thumbs-down"></i> ${_('Still open after...')}</h3>
-##                                </div>
-##                                % if fake_api.oldest_opens.nb <= 0:
-##                                    ${P.EMPTY_CONTENT(_('Nothing to close.'))}
-##                                % else:
-##                                    <table class="table table-hover">
-##                                        % for item in fake_api.oldest_opens.contents:
-##                                            <tr>
-##                                                <td>
-##                                                    <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
-##                                                    <a href="${item.url}">${item.label}</a>
-##                                                </td>
-##                                                <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
-##                                                    ${item.last_activity.delta}
-##                                                </td>
-##                                            </tr>
-##                                        % endfor
-##                                    </table>
-##                                % endif
-##                            </div>
-##                        </div>
-
-
-##                        <div class="col-sm-6">
-##                            <div class="panel panel-default">
-##                                <div class="panel-heading">
-##                                    <h3 class="panel-title"><i class="fa fa-star"></i> ${_('Favorites')}</h3>
-##                                </div>
-##
-##                                last_active_contents
-##
-##                                    % if fake_api.favorites.nb <= 0:
-##                                        ${P.EMPTY_CONTENT(_('You did not set any favorite yet.'))}
-##                                    % else:
-##                                        <table class="table table-hover">
-##                                            % for item in fake_api.favorites.contents:
-##                                                <tr>
-##                                                    <td>
-##                                                        <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
-##                                                        <a href="${item.url}">${item.label}</a>
-##                                                    </td>
-##                                                    <td class="text-right">
-##                                                        <i class="${item.status.icon} fa-fw ${item.status.css}" title="${item.status.label}"></i>
-##                                                    </td>
-##                                                </tr>
-##                                            % endfor
-##                                        </table>
-##                                    % endif
-####                                </div>
-##                            </div>
-##                        </div>
                     </div>
+                </div>
+            </div>
 
-                    ## Workspace list and notifications
-                    <div class="row">
+            ## RECENT ACTIVITY
+            <div class="row" id="recent-activity-panel">
+                <div class="col-md-offset-3 col-sm-7">
+                    <div class="row t-spacer-above">
                         <div class="col-sm-12">
-                            <div class="panel panel-default">
+                            <div class="t-half-spacer-above">
+                                <div class="panel panel-warning">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><i class="fa fa-fw fa-line-chart"></i> ${_('Recent Activity')}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        % if fake_api.last_actives.nb <= 0:
+                                            ${P.EMPTY_CONTENT(_('There\'s no activity yet.'))}
+                                        % else:
+                                            <table class="table table-hover">
+                                                % for item in fake_api.last_actives.contents:
+                                                    <tr>
+                                                        <td>
+                                                            <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
+                                                            <a href="${item.url}">${item.label}</a>
+                                                            <br/>
+                                                            <span class="t-less-visible">${item.workspace.label}</span>
+                                                        </td>
+                                                        <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
+                                                            ${item.last_activity.delta}
+                                                        </td>
+                                                    </tr>
+                                                % endfor
+                                            </table>
+                                        % endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            ## Workspace list and notifications
+            <div class="row t-half-spacer-above" id="workspaces-panel">
+                <div class="col-md-offset-3 col-sm-7">
+                    <div class="row t-spacer-above">
+                        <div class="col-sm-12">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">
                                     <h3 class="panel-title"><i class="fa fa-bank"></i> ${_('Your workspaces')}</h3>
                                 </div>

@@ -6,6 +6,7 @@ import tg
 from tg import RestController
 from tg import tmpl_context
 from tg.i18n import ugettext as _
+from tg.predicates import not_anonymous
 
 from tracim.lib import CST
 from tracim.lib.base import BaseController
@@ -341,7 +342,6 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             tg.flash(msg, CST.STATUS_ERROR)
             tg.redirect(next_url)
 
-
     @tg.require(current_user_is_content_manager())
     @tg.expose()
     def put_archive_undo(self, item_id):
@@ -415,6 +415,49 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             tg.flash(msg, CST.STATUS_ERROR)
             tg.redirect(back_url)
 
+    @tg.expose()
+    @tg.require(not_anonymous())
+    def put_read(self, item_id):
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user, True, True) # Here we do not filter deleted items
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+
+        item_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
+
+        try:
+            msg = _('{} marked as read.').format(self._item_type_label)
+            content_api.mark_read(item)
+
+            tg.flash(msg, CST.STATUS_OK)
+            tg.redirect(item_url)
+
+        except ValueError as e:
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            msg = _('{} not marked as read: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(item_url)
+
+    @tg.expose()
+    @tg.require(not_anonymous())
+    def put_unread(self, item_id):
+        item_id = int(item_id)
+        content_api = ContentApi(tmpl_context.current_user, True, True) # Here we do not filter deleted items
+        item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
+
+        item_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
+
+        try:
+            msg = _('{} marked unread.').format(self._item_type_label)
+            content_api.mark_unread(item)
+
+            tg.flash(msg, CST.STATUS_OK)
+            tg.redirect(item_url)
+
+        except ValueError as e:
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            msg = _('{} not marked unread: {}').format(self._item_type_label, str(e))
+            tg.flash(msg, CST.STATUS_ERROR)
+            tg.redirect(item_url)
 
 class StandardController(BaseController):
 

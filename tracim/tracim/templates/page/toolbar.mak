@@ -1,6 +1,12 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
+<%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 
 <%def name="SECURED_PAGE(user, workspace, page)">
+    <div class="btn-group btn-group-vertical">
+        ${BUTTON.MARK_CONTENT_READ_OR_UNREAD(user, workspace, page)}
+    </div>
+    <p></p>
+
     <% edit_disabled = ('', 'disabled')[page.selected_revision!='latest' or page.status.id[:6]=='closed'] %>
     <% delete_or_archive_disabled = ('', 'disabled')[page.selected_revision!='latest'] %> 
     % if h.user_role(user, workspace)>1:

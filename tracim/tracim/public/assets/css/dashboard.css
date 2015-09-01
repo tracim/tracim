@@ -297,7 +297,7 @@ h1.page-header {
     border-bottom-width: 4px;
 }
 
-h3 { background-color: #f5f5f5;}
+/* FIXME - 2015-09-01 - D.A. - CAN WE REMOVE THIS ? h3 { background-color: #f5f5f5;}*/
 
 
 .sidebar .list-group-item { background-color: transparent; }
@@ -354,3 +354,9 @@ h3 { background-color: #f5f5f5;}
 #t-full-app-alert-message-id > div.alert {
     box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.3);
 }
+
+tr.t-is-new-content td, div.row.t-is-new-content {
+    background-color: #DFF0D8;
+}
+
+.panel-heading > h3 { font-size: 1.5em;}

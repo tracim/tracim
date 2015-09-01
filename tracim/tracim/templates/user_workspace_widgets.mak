@@ -336,7 +336,9 @@
 </%def>
 
 <%def name="SECURED_HISTORY_VIRTUAL_EVENT(user, event)">
-    <div class="row t-odd-or-even t-hacky-thread-comment-border-top">
+    <% is_new_css_class = 't-is-new-content' if event.is_new else '' %>
+
+    <div class="row t-odd-or-even t-hacky-thread-comment-border-top ${is_new_css_class}">
         <div class="col-sm-7 col-sm-offset-3">
             <div class="t-timeline-item">
 ##                <i class="fa fa-fw fa-3x fa-comment-o t-less-visible" style="margin-left: -1.5em; float:left;"></i>
@@ -372,8 +374,11 @@
 </%def>
 
 <%def name="SECURED_HISTORY_VIRTUAL_EVENT_AS_TABLE_ROW(user, event, current_revision_id)">
-    <% warning_or_not = ('', 'warning')[current_revision_id==event.id] %>
-    <tr class="${warning_or_not}">
+    <%
+        warning_or_not = ('', 'warning')[current_revision_id==event.id]
+        row_css = 't-is-new-content' if event.is_new else warning_or_not
+    %>
+    <tr class="${row_css}">
         <td class="t-less-visible">
             <span class="label label-default">${ICON.FA_FW(event.type.icon)} ${event.type.label}</span>
         </td>

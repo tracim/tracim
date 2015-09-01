@@ -8,14 +8,18 @@ from bs4 import BeautifulSoup
 import datetime as datetime_root
 import json
 
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import Column
+from sqlalchemy import func
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import deferred
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
@@ -468,7 +472,7 @@ class Content(DeclarativeBase):
     parent = relationship('Content', remote_side=[content_id], backref='children')
     owner = relationship('User', remote_side=[User.user_id])
 
-    def get_valid_children(self, content_types: list=None):
+    def get_valid_children(self, content_types: list=None) -> ['Content']:
         for child in self.children:
             if not child.is_deleted and not child.is_archived:
                 if not content_types or child.type in content_types:
@@ -556,6 +560,27 @@ class Content(DeclarativeBase):
                 last_revision_date = child.updated
         return last_revision_date
 
+    def has_new_information_for(self, user: User) -> bool:
+        """
+        :param user: the session current user
+        :return: bool, True if there is new information for given user else False
+                       False if the user is None
+        """
+        revision = self.get_current_revision()
+
+        if not user:
+            return False
+
+        if user not in revision.read_by.keys():
+            # The user did not read this item, so yes!
+            return True
+
+        for child in self.get_valid_children():
+            if child.has_new_information_for(user):
+                return True
+
+        return False
+
     def get_comments(self):
         children = []
         for child in self.children:
@@ -589,6 +614,19 @@ class Content(DeclarativeBase):
 
         return None
 
+    def get_current_revision(self) -> 'ContentRevisionRO':
+        # TODO - D.A. - 2015-08-26
+        # This code is not efficient at all!!!
+        # We should get the revision id directly from the view
+        rev_ids = [revision.revision_id for revision in self.revisions]
+        rev_ids.sort()
+
+        for revision in self.revisions:
+            if revision.revision_id == rev_ids[-1]:
+                return revision
+
+        return None
+
     def description_as_raw_text(self):
         # 'html.parser' fixes a hanging bug
         # see http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
@@ -618,6 +656,14 @@ class Content(DeclarativeBase):
         sorted_events = sorted(events,
                                key=lambda event: event.created, reverse=True)
         return sorted_events
+
+    @classmethod
+    def format_path(cls, url_template: str, content: 'Content') -> str:
+        wid = content.workspace.workspace_id
+        fid = content.parent_id  # May be None if no parent
+        ctype = content.type
+        cid = content.content_id
+        return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
 
 class ContentChecker(object):
@@ -692,6 +738,57 @@ class ContentRevisionRO(DeclarativeBase):
 
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
+
+    # Read by must be used like this:
+    # read_datetime = revision.ready_by[<User instance>]
+    # if user did not read the content, then a key error is raised
+    read_by = association_proxy(
+        'revision_read_statuses',  # name of the attribute
+        'view_datetime',  # attribute the value is taken from
+        creator=lambda k, v: \
+            RevisionReadStatus(user=k, view_datetime=v)
+    )
+
+    def has_new_information_for(self, user: User) -> bool:
+        """
+        :param user: the session current user
+        :return: bool, True if there is new information for given user else False
+                       False if the user is None
+        """
+        if not user:
+            return False
+
+        if user not in self.read_by.keys():
+            return True
+
+        return False
+
+class RevisionReadStatus(DeclarativeBase):
+
+    __tablename__ = 'revision_read_status'
+
+    revision_id = Column(Integer, ForeignKey('content_revisions.revision_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
+    view_datetime = Column(DateTime, unique=False, nullable=False, server_default=func.now())
+
+    # content_revision = relationship(
+    #     'ContentRevisionRO',
+    #     remote_side=[ContentRevisionRO.revision_id],
+    #     backref='revision_read_statuses')
+
+    content_revision = relationship(
+        'ContentRevisionRO',
+        backref=backref(
+            'revision_read_statuses',
+            collection_class=attribute_mapped_collection('user'),
+            cascade='all, delete-orphan'
+        ))
+
+    user = relationship('User', backref=backref(
+        'revision_readers',
+        collection_class=attribute_mapped_collection('view_datetime'),
+        cascade='all, delete-orphan'
+    ))
 
 
 class NodeTreeItem(object):
