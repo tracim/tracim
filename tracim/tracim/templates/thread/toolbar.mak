@@ -1,7 +1,13 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
+<%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 
 <%def name="SECURED_THREAD(user, workspace, thread)">
+    <div class="btn-group btn-group-vertical">
+        ${BUTTON.MARK_CONTENT_READ_OR_UNREAD(user, workspace, thread)}
+    </div>
+    <p></p>
+
     <% edit_disabled = ('', 'disabled')[thread.selected_revision!='latest' or thread.status.id[:6]=='closed'] %>
     <% delete_or_archive_disabled = ('', 'disabled')[thread.selected_revision!='latest'] %> 
     % if h.user_role(user, workspace)>1:

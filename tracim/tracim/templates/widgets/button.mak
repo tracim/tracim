@@ -34,3 +34,22 @@
         % endif
     </div>
 </%def>
+
+<%def name="MARK_CONTENT_READ_OR_UNREAD(current_user, workspace, content)">
+    <%
+        disabled_or_not = ''
+        if 'latest' != content.selected_revision:
+            disabled_or_not = 'disabled'
+    %>
+    % if content.is_new:
+       <a href="${content.urls.mark_read}" class="btn btn-success ${disabled_or_not}" style="text-align: center;">
+           <i class="fa fa-4x fa-fw fa-eye"></i><br/>
+           <span style="color: #FFF">${_('Mark read')}</span>
+       </a>
+    % else:
+       <a href="${content.urls.mark_unread}" class="btn btn-default ${disabled_or_not}" style="text-align: center;">
+           <i class="fa fa-4x fa-fw fa-eye-slash tracim-less-visible"></i><br/>
+           <span class="tracim-less-visible">${_('Mark unread')}</span>
+       </a>
+    % endif
+</%def>

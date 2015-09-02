@@ -10,6 +10,7 @@ import tg
 from tg.i18n import ugettext as _
 from tg.util import LazyString
 from tracim.lib.base import logger
+from tracim.lib.user import UserStaticApi
 from tracim.lib.utils import exec_time_monitor
 from tracim.model.auth import Profile
 from tracim.model.auth import User
@@ -144,10 +145,14 @@ class Context(object):
 
             raise ContextConverterNotFoundException(context_string, model_class)
 
-    def __init__(self, context_string, base_url=''):
+    def __init__(self, context_string, base_url='', current_user=None):
         """
         """
         self.context_string = context_string
+        self._current_user = current_user  # Allow to define the current user if any
+        if not current_user:
+            self._current_user = UserStaticApi.get_current_user()
+
         self._base_url = base_url # real root url like http://mydomain.com:8080
 
     def url(self, base_url='/', params=None, qualified=False) -> str:
@@ -156,6 +161,9 @@ class Context(object):
         if self._base_url:
             url = '{}{}'.format(self._base_url, url)
         return  url
+
+    def get_user(self):
+        return self._current_user
 
     def toDict(self, serializableObject, key_value_for_a_list_object='', key_value_for_list_item_nb=''):
         """
@@ -351,6 +359,7 @@ def serialize_node_for_page_list(content: Content, context: Context):
 @pod_serializer(Content, CTX.PAGE)
 @pod_serializer(Content, CTX.FILE)
 def serialize_node_for_page(content: Content, context: Context):
+
     if content.type in (ContentType.Page, ContentType.File) :
         data_container = content
 
@@ -366,7 +375,7 @@ def serialize_node_for_page(content: Content, context: Context):
             parent=context.toDict(content.parent),
             workspace=context.toDict(content.workspace),
             type=content.type,
-
+            is_new=content.has_new_information_for(context.get_user()),
             content=data_container.description,
             created=data_container.created,
             label=data_container.label,
@@ -376,7 +385,11 @@ def serialize_node_for_page(content: Content, context: Context):
             links=context.toDict(content.extract_links_from_content(data_container.description)),
             revisions=context.toDict(sorted(content.revisions, key=lambda v: v.created, reverse=True)),
             selected_revision='latest' if content.revision_to_serialize<=0 else content.revision_to_serialize,
-            history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history())
+            history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history()),
+            urls = context.toDict({
+                'mark_read': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_read', content)),
+                'mark_unread': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_unread', content))
+            })
         )
 
         if content.type==ContentType.File:
@@ -389,8 +402,9 @@ def serialize_node_for_page(content: Content, context: Context):
 
     if content.type==ContentType.Folder:
         value = DictLikeClass(
-            id = content.content_id,
-            label = content.label,
+            id=content.content_id,
+            label=content.label,
+            is_new=content.has_new_information_for(context.get_user()),
         )
         return value
 
@@ -418,9 +432,9 @@ def serialize_content_for_history(event: VirtualEvent, context: Context):
         created=event.created,
         created_as_delta=event.created_as_delta(),
         content=event.content,
+        is_new=event.ref_object.has_new_information_for(context.get_user()),
         urls = urls
     )
-
 
 @pod_serializer(Content, CTX.THREAD)
 def serialize_node_for_page(item: Content, context: Context):
@@ -439,11 +453,17 @@ def serialize_node_for_page(item: Content, context: Context):
             type = item.type,
             workspace = context.toDict(item.workspace),
             comments = reversed(context.toDict(item.get_comments())),
-            history = Context(CTX.CONTENT_HISTORY).toDict(item.get_history())
+            is_new=item.has_new_information_for(context.get_user()),
+            history = Context(CTX.CONTENT_HISTORY).toDict(item.get_history()),
+            urls = context.toDict({
+                'mark_read': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_read', item)),
+                'mark_unread': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_unread', item))
+            }),
         )
 
     if item.type==ContentType.Comment:
         return DictLikeClass(
+            is_new=item.has_new_information_for(context.get_user()),
             content = item.description,
             created = item.created,
             created_as_delta = item.created_as_delta(),

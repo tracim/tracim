@@ -129,6 +129,9 @@ class RootController(StandardController):
         last_active_contents = ContentApi(user).get_last_active(None, ContentType.Any, None)
         fake_api.last_actives = Context(CTX.CONTENT_LIST).toDict(last_active_contents, 'contents', 'nb')
 
+        unread_contents = ContentApi(user).get_last_unread(None, ContentType.Any, None)
+        fake_api.last_unread = Context(CTX.CONTENT_LIST).toDict(unread_contents, 'contents', 'nb')
+
         # INFO - D.A. - 2015-05-20
         # For now, we do not have favorties and read/unread status
         # so we only show:

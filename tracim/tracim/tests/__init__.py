@@ -7,6 +7,8 @@ from paste.deploy import loadapp
 from webtest import TestApp
 
 from gearbox.commands.setup_app import SetupAppCommand
+
+import tg
 from tg import config
 from tg.util import Bunch
 
@@ -128,8 +130,10 @@ def teardown_db():
 
 class TestStandard(object):
 
+    application_under_test = application_name
+
     def setUp(self):
-        self.app = load_app('main')
+        self.app = load_app(self.application_under_test)
 
         logger.debug(self, 'Start setUp() by trying to clean database...')
         try:
@@ -145,6 +149,9 @@ class TestStandard(object):
         logger.debug(self, 'Start Database Setup...')
         setup_db()
         logger.debug(self, 'Start Database Setup... -> done')
+
+        self.app.get('/_test_vars')  # Allow to create fake context
+        tg.i18n.set_lang('en')  # Set a default lang
 
     def tearDown(self):
         transaction.commit()

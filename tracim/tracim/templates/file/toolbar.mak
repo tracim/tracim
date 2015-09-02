@@ -1,7 +1,13 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
+<%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 
 <%def name="SECURED_FILE(user, workspace, file)">
+    <div class="btn-group btn-group-vertical text-center">
+        ${BUTTON.MARK_CONTENT_READ_OR_UNREAD(user, workspace, file)}
+    </div>
+    <p></p>
+
     <% download_url = tg.url('/workspaces/{}/folders/{}/files/{}/download?revision_id={}'.format(result.file.workspace.id, result.file.parent.id,result.file.id,result.file.selected_revision)) %>
     <% edit_disabled = ('', 'disabled')[file.selected_revision!='latest' or file.status.id[:6]=='closed'] %>
     <% delete_or_archive_disabled = ('', 'disabled')[file.selected_revision!='latest'] %> 

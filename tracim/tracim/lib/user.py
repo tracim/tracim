@@ -68,10 +68,13 @@ class UserStaticApi(object):
 
     @classmethod
     def get_current_user(cls) -> User:
-        identity = tg.request.identity
-
-        if tg.request.identity:
-            return cls._get_user(tg.request.identity['repoze.who.userid'])
+        # HACK - D.A. - 2015-09-02
+        # In tests, the tg.request.identity may not be set
+        # (this is a buggy case, but for now this is how the software is;)
+        if tg.request != None:
+            if hasattr(tg.request, 'identity'):
+                if tg.request.identity != None:
+                    return cls._get_user(tg.request.identity['repoze.who.userid'])
 
         return None
 

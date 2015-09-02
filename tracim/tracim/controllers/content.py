@@ -172,7 +172,8 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         workspace = tmpl_context.workspace
         workspace_id = tmpl_context.workspace_id
 
-        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
+        current_user_content = Context(CTX.CURRENT_USER,
+                                       current_user=user).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
         content_api = ContentApi(user)
@@ -183,9 +184,11 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb, current_user=current_user_content)
-        fake_api = Context(CTX.FOLDER).toDict(fake_api_content)
+        fake_api = Context(CTX.FOLDER,
+                           current_user=user).toDict(fake_api_content)
 
-        dictified_file = Context(self._get_one_context).toDict(file, 'file')
+        dictified_file = Context(self._get_one_context,
+                                 current_user=user).toDict(file, 'file')
         return DictLikeClass(result = dictified_file, fake_api=fake_api)
 
     @tg.require(current_user_is_reader())
@@ -670,7 +673,8 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         workspace = tmpl_context.workspace
         workspace_id = tmpl_context.workspace_id
 
-        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
+        current_user_content = Context(CTX.CURRENT_USER,
+                                       current_user=user).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
         content_api = ContentApi(user)

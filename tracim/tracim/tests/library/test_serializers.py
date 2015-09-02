@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from nose.tools import eq_
 from nose.tools import ok_
 from nose.tools import raises
@@ -7,6 +8,7 @@ from nose.tools import raises
 from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
+import tg
 
 from tracim.model import DBSession
 
@@ -73,6 +75,8 @@ class TestSerializers(TestStandard):
         eq_(3, len(res.keys()))
 
     def test_serialize_Content_DEFAULT(self):
+        self.app.get('/_test_vars')  # Allow to create fake context
+
         obj = Content()
         obj.content_id = 132
         obj.label = 'Some label'
@@ -92,61 +96,50 @@ class TestSerializers(TestStandard):
         eq_(None, res.workspace, res)
         eq_(4, len(res.keys()), res)
 
+    def test_serialize_Content_comment_THREAD(self):
+        wor = Workspace()
+        wor.workspace_id = 4
 
+        fol = Content()
+        fol.type = ContentType.Folder
+        fol.content_id = 72
+        fol.workspace = wor
 
-    # def test_serialize_Content_comment_THREAD(self):
-    #
-    #     wor = Workspace()
-    #     wor.workspace_id = 4
-    #
-    #     fol = Content()
-    #     fol.type = ContentType.Folder
-    #     fol.content_id = 72
-    #     fol.workspace = wor
-    #
-    #     par = Content()
-    #     par.type = ContentType.Thread
-    #     par.content_id = 37
-    #     par.parent = fol
-    #     par.workspace = wor
-    #
-    #     obj = Content()
-    #     obj.type = ContentType.Comment
-    #     obj.content_id = 132
-    #     obj.label = 'some label'
-    #     obj.description = 'Some Description'
-    #     obj.parent = par
-    #
-    #     res = Context(CTX.THREAD).toDict(obj)
-    #     eq_(res.__class__, DictLikeClass, res)
-    #
-    #     ok_('label' in res.keys())
-    #     eq_(obj.label, res.label, res)
-    #
-    #     ok_('content' in res.keys())
-    #     eq_(obj.description, res.content, res)
-    #
-    #     ok_('created' in res.keys())
-    #
-    #     ok_('icon' in res.keys())
-    #     eq_(ContentType.icon(obj.type), res.icon, res)
-    #
-    #     ok_('id' in res.folder.keys())
-    #     eq_(obj.content_id, res.id, res)
-    #
-    #     ok_('owner' in res.folder.keys())
-    #     eq_(None, res.owner, res) # TODO - test with a owner value
-    #
-    #     ok_('type' in res.folder.keys())
-    #     eq_(obj.type, res.type, res)
-    #
-    #     ok_('urls' in res.folder.keys())
-    #     ok_('delete' in res.urls.keys())
-    #
-    #     eq_(8, len(res.keys()), res)
+        par = Content()
+        par.type = ContentType.Thread
+        par.content_id = 37
+        par.parent = fol
+        par.workspace = wor
+        par.created = datetime.now()
+
+        obj = Content()
+        obj.type = ContentType.Comment
+        obj.content_id = 132
+        obj.label = 'some label'
+        obj.description = 'Some Description'
+        obj.parent = par
+        obj.created = datetime.now()
+
+        print('LANGUAGES #2 ARE', tg.i18n.get_lang())
+        res = Context(CTX.THREAD).toDict(obj)
+        eq_(res.__class__, DictLikeClass, res)
+
+        ok_('label' in res.keys())
+        eq_(obj.label, res.label, res)
+
+        ok_('content' in res.keys())
+        eq_(obj.description, res.content, res)
+
+        ok_('created' in res.keys())
+
+        ok_('icon' in res.keys())
+        eq_(ContentType.get_icon(obj.type), res.icon, res)
+
+        ok_('delete' in res.urls.keys())
+
+        eq_(10, len(res.keys()), len(res.keys()))
 
     def test_serializer_get_converter_return_CTX_DEFAULT(self):
-
         class A(object):
             pass
 
@@ -168,8 +161,9 @@ class TestSerializers(TestStandard):
 
         converter = Context.get_converter(CTX.FILE, A)
 
-    def test_serializer_toDict_int_str_and_LazyString(self):
 
+
+    def test_serializer_toDict_int_str_and_LazyString(self):
         s = Context(CTX.DEFAULT).toDict(5)
         ok_(isinstance(s, int))
         eq_(5, s)
@@ -184,7 +178,6 @@ class TestSerializers(TestStandard):
         eq_(lazystr, s3)
 
     def test_serializer_toDict_for_list_of_objects(self):
-
         class A(object):
             def __init__(self, name):
                 self.name = name
@@ -226,8 +219,6 @@ class TestSerializers(TestStandard):
 
 
     def test_serializer_content__menui_api_context__children(self):
-        self.app.get('/_test_vars')  # Allow to create fake context
-
         folder_without_child = Content()
         folder_without_child.type = ContentType.Folder
         res = Context(CTX.MENU_API).toDict(folder_without_child)
