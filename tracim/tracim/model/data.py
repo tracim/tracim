@@ -494,6 +494,7 @@ class Content(DeclarativeBase):
     def created_as_delta(self, delta_from_datetime:datetime=None):
         if not delta_from_datetime:
             delta_from_datetime = datetime.now()
+
         return format_timedelta(delta_from_datetime - self.created,
                                 locale=tg.i18n.get_lang()[0])
 
