@@ -23,7 +23,6 @@ install:
   - "pip install coveralls"
 
 before_script:
-/home/travis/build/tracim/tracim/tracim/
   - "psql -c 'create database tracim_test;' -U postgres"
   - "cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini"
   - "cd tracim && gearbox setup-app -c ${TRAVIS_BUILD_DIR}/tracim/test.ini"
