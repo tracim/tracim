@@ -26,7 +26,7 @@ before_script:
   - "psql -c 'create database tracim_test;' -U postgres"
   - "cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini"
   - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox setup-app -c ${TRAVIS_BUILD_DIR}/tracim/test.ini"
-  - "gearbox migrate -c ${TRAVIS_BUILD_DIR}/tracim/test.ini upgrade"
+  - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox migrate -c ${TRAVIS_BUILD_DIR}/tracim/test.ini upgrade"
 
 # command to run tests
 script: "cd ${TRAVIS_BUILD_DIR}/tracim && nosetests -v --with-coverage --cover-package=tracim --cover-erase"
