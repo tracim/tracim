@@ -23,10 +23,11 @@ install:
   - "pip install coveralls"
 
 before_script:
+/home/travis/build/tracim/tracim/tracim/
   - "psql -c 'create database tracim_test;' -U postgres"
-  - "cp tracim/development.ini.base tracim/development.ini"
-  - "cd tracim && gearbox setup-app -c test.ini"
-  - "gearbox migrate -c test.ini upgrade"
+  - "cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini"
+  - "cd tracim && gearbox setup-app -c ${TRAVIS_BUILD_DIR}/tracim/test.ini"
+  - "gearbox migrate -c ${TRAVIS_BUILD_DIR}/tracim/test.ini upgrade"
 
 # command to run tests
 script: "cd tracim && nosetests -v --with-coverage --cover-package=tracim --cover-erase"
