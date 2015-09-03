@@ -21,7 +21,7 @@ install:
   - "pip install -r install/requirements.txt; echo"
   - "./bin/tg2env-patch 2 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
   - "pip install coveralls"
-  - "cd tracim && gearbox migration upgrade"
+  - "cd tracim && gearbox migrate upgrade"
   
 before_script:
   - "psql -c 'create database tracim_test;' -U postgres"
