@@ -6,6 +6,7 @@
     <div class="btn-group btn-group-vertical">
         ${BUTTON.MARK_CONTENT_READ_OR_UNREAD(user, workspace, thread)}
     </div>
+    <hr class="t-toolbar-btn-group-separator"/>
     <p></p>
 
     <% edit_disabled = ('', 'disabled')[thread.selected_revision!='latest' or thread.status.id[:6]=='closed'] %>

@@ -28,6 +28,9 @@ def setup_schema(command, conf, vars):
 
     # <websetup.websetup.schema.after.metadata.create_all>
     transaction.commit()
+    print("Create additionnal tables.")
+    model.metadata.create_all(bind=config['tg.app_globals'].sa_engine)
+
     print('Initializing Migrations')
     import alembic.config, alembic.command
     alembic_cfg = alembic.config.Config()

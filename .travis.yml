@@ -1,3 +1,4 @@
+sudo: false
 language: python
 python:
   - "3.2"
@@ -20,13 +21,16 @@ install:
   - "pip install -r install/requirements.txt; echo"
   - "./bin/tg2env-patch 2 /home/travis/virtualenv/python3.2.5/lib/python3.2/site-packages"
   - "pip install coveralls"
-  
+
 before_script:
   - "psql -c 'create database tracim_test;' -U postgres"
-  - "cp tracim/development.ini.base tracim/development.ini"
+  - "cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini"
+#  - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox setup-app -c ${TRAVIS_BUILD_DIR}/tracim/test.ini"
+  - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox setup-app"
+#  - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox migrate -c ${TRAVIS_BUILD_DIR}/tracim/test.ini upgrade"
 
 # command to run tests
-script: "cd tracim && nosetests -v --with-coverage --cover-package=tracim --cover-erase"
+script: "cd ${TRAVIS_BUILD_DIR}/tracim && nosetests -c ${TRAVIS_BUILD_DIR}/tracim/test.ini -v --with-coverage --cover-package=tracim --cover-erase"
 
 after_success:
 - coveralls

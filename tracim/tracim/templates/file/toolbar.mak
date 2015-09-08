@@ -6,6 +6,7 @@
     <div class="btn-group btn-group-vertical text-center">
         ${BUTTON.MARK_CONTENT_READ_OR_UNREAD(user, workspace, file)}
     </div>
+    <hr class="t-toolbar-btn-group-separator"/>
     <p></p>
 
     <% download_url = tg.url('/workspaces/{}/folders/{}/files/{}/download?revision_id={}'.format(result.file.workspace.id, result.file.parent.id,result.file.id,result.file.selected_revision)) %>

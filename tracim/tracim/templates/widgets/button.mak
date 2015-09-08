@@ -41,15 +41,17 @@
         if 'latest' != content.selected_revision:
             disabled_or_not = 'disabled'
     %>
+
     % if content.is_new:
-       <a href="${content.urls.mark_read}" class="btn btn-success ${disabled_or_not}" style="text-align: center;">
-           <i class="fa fa-4x fa-fw fa-eye"></i><br/>
+       <a href="${content.urls.mark_read}" class="btn btn-success ${disabled_or_not}">
+           <i class="fa fa-fw fa-inverse fa-eye"></i>
            <span style="color: #FFF">${_('Mark read')}</span>
        </a>
     % else:
-       <a href="${content.urls.mark_unread}" class="btn btn-default ${disabled_or_not}" style="text-align: center;">
-           <i class="fa fa-4x fa-fw fa-eye-slash tracim-less-visible"></i><br/>
+       <a href="${content.urls.mark_unread}" class="btn btn-default ${disabled_or_not}">
+           <i class="fa fa-fw fa-eye-slash t-less-visible"></i>
            <span class="tracim-less-visible">${_('Mark unread')}</span>
        </a>
     % endif
 </%def>
+

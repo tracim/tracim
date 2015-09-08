@@ -501,7 +501,7 @@ class ContentApi(object):
 
     def mark_read(self, content: Content,
                   read_datetime: datetime=None,
-                  do_flush=True) -> Content:
+                  do_flush: bool=True, recursive: bool=True) -> Content:
 
         assert self._user
         assert content
@@ -521,8 +521,23 @@ class ContentApi(object):
         for revision in viewed_revisions:
             revision.read_by[self._user] = read_datetime
 
-        for child in content.get_valid_children():
-            self.mark_read(child, read_datetime=read_datetime, do_flush=False)
+        if recursive:
+            # mark read :
+            # - all children
+            # - parent stuff (if you mark a comment as read,
+            #                 then you have seen the parent)
+            # - parent comments
+            for child in content.get_valid_children():
+                self.mark_read(child, read_datetime=read_datetime,
+                               do_flush=False)
+
+            if ContentType.Comment == content.type:
+                self.mark_read(content.parent, read_datetime=read_datetime,
+                               do_flush=False, recursive=False)
+                for comment in content.parent.get_comments():
+                    if comment != content:
+                        self.mark_read(comment, read_datetime=read_datetime,
+                                       do_flush=False, recursive=False)
 
         if do_flush:
             self.flush()
@@ -569,8 +584,21 @@ class ContentApi(object):
             content.revision_type = action_description
 
         if do_flush:
+            # INFO - 2015-09-03 - D.A.
+            # There are 2 flush because of the use
+            # of triggers for content creation
+            #
+            # (when creating a content, actually this is an insert of a new
+            # revision in content_revisions ; so the mark_read operation need
+            # to get full real data from database before to be prepared.
+
             DBSession.add(content)
             DBSession.flush()
+
+            # TODO - 2015-09-03 - D.A. - Do not use triggers
+            # We should create a new ContentRevisionRO object instead of Content
+            # This would help managing view/not viewed status
+            self.mark_read(content, do_flush=True)
 
         if do_notify:
             self.do_notify(content)

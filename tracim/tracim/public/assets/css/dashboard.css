@@ -360,3 +360,5 @@ tr.t-is-new-content td, div.row.t-is-new-content {
 }
 
 .panel-heading > h3 { font-size: 1.5em;}
+
+hr.t-toolbar-btn-group-separator { border-color: #CCC; border-style: dotted; }

@@ -47,7 +47,7 @@ setup(
     description='Tracim is plateform software designed to improve traceability and productivity in collaborative work.',
     author='Damien ACCORSI',
     author_email='damien.accorsi@free.fr',
-    url='https://bitbucket.org/lebouquetin/tracim',
+    url='https://github.com/tracim/tracim',
     packages=find_packages(exclude=['ez_setup']),
     install_requires=install_requires,
     include_package_data=True,

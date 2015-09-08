@@ -18,7 +18,7 @@
 
                 <div class="form-group">
                     <label for="page-content">${_('Content')}</label>
-                    <iframe id="page-content-textarea" name="content" class="form-control pod-rich-textarea" id="page-content" placeholder="${_('Write here the page content')}"></iframe>
+                    <textarea id="page-content-textarea" name="content" class="form-control pod-rich-textarea" id="page-content" placeholder="${_('Write here the page content')}"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
