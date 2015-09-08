@@ -47,11 +47,11 @@
                             <div class="t-half-spacer-above">
                                 <div class="panel panel-success">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title"><i class="fa fa-fw fa-eye-slash"></i> ${_('Unread')}</h3>
+                                        <h3 class="panel-title"><i class="fa fa-fw fa-eye-slash"></i> ${_('Not Read')}</h3>
                                     </div>
                                     <div class="panel-body">
                                         % if fake_api.last_unread.nb <= 0:
-                                            ${P.EMPTY_CONTENT(_('No unread content.'))}
+                                            ${P.EMPTY_CONTENT(_('No new content.'))}
                                         % else:
                                             <table class="table table-hover">
                                                 % for item in fake_api.last_unread.contents:
@@ -122,7 +122,7 @@
                         <div class="col-sm-12">
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title"><i class="fa fa-bank"></i> ${_('Your workspaces')}</h3>
+                                    <h3 class="panel-title"><i class="fa fa-bank"></i> ${_('Workspaces')}</h3>
                                 </div>
                                 <div class="panel-body">
 

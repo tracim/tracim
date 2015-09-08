@@ -52,7 +52,7 @@
                 user_edit_url = tg.url('/user/{}/edit'.format(current_user.id), {'next_url': '/home'})
                 user_password_edit_url = tg.url('/user/{}/password/edit'.format(current_user.id))
             %>
-            <a title="${_('Unread')}" class="btn btn-default" href="#unread-content-panel" >${ICON.FA('fa-fw fa-eye-slash t-less-visible')} ${_('Unread')}</a>
+            <a title="${_('Not read')}" class="btn btn-default" href="#unread-content-panel" >${ICON.FA('fa-fw fa-eye-slash t-less-visible')} ${_('Not Read')}</a>
             <a title="${_('Recent Activity')}" class="btn btn-default" href="#recent-activity-panel" >${ICON.FA('fa-fw fa-line-chart t-less-visible')} ${_('Activity')}</a>
             <a title="${_('My Workspaces')}" class="btn btn-default" href="#workspaces-panel" >${ICON.FA('fa-fw fa-bank t-less-visible')} ${_('Spaces')}</a>
         </div>
