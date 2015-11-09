@@ -141,13 +141,17 @@ _Reminder : Tracim is developped and tested using python3._
 Tracim uses virtualenv as deployment environment. This ensure that there will be no 
 conflict between system-wide python installation and Tracim required ones.
 
+**Note**: If you're using python3.4 or more, modify ``install/requirements.txt`` file to remove
+``wsgiref`` package and change ``tgext.pluggable`` to ``0.5.4`` version.
+
+    SITE_PACKAGES_PATH=`python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`
     virtualenv -p /usr/bin/python3 tg2env
     source tg2env/bin/activate
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
-    ./bin/tg2env-patch 1 tg2env/lib/python3.2/site-packages
+    ./bin/tg2env-patch 1 $SITE_PACKAGES_PATH
     pip install -r install/requirements.txt
-    ./bin/tg2env-patch 2 tg2env/lib/python3.2/site-packages
+    ./bin/tg2env-patch 2 $SITE_PACKAGES_PATH
     
 Notes:
 
