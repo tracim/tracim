@@ -68,7 +68,7 @@ Tracim is licensed under the terms of the
 
 Tracim is a web application:
 
-* developed with python 3.
+* developed with python >=3.4.
 * based on the [TurboGears](http://www.turbogears.org/) web framework.
 * relying on [PostgreSQL](http://www.postgresql.org/) as the storage engine.
 
@@ -136,13 +136,10 @@ Get the sources from Bitbucket:
 
 ### Setting-up python virtualenv ###
 
-_Reminder : Tracim is developped and tested using python3._
+_Reminder : Tracim is developped and tested using python3.4._
 
 Tracim uses virtualenv as deployment environment. This ensure that there will be no 
 conflict between system-wide python installation and Tracim required ones.
-
-**Note**: If you're using python3.4 or more, modify ``install/requirements.txt`` file to remove
-``wsgiref`` package and change ``tgext.pluggable`` to ``0.5.4`` version.
 
     SITE_PACKAGES_PATH=`python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`
     virtualenv -p /usr/bin/python3 tg2env
@@ -155,9 +152,6 @@ conflict between system-wide python installation and Tracim required ones.
     
 Notes:
 
-* Patchs are applied in a two-step process because some dependencies require to be patched before other packages installation
-* Debian: you may get errors with stevedore/pbr which is not supported by python 3.2
-(debian version of python 3). This is not a real problem
 * Ubuntu (at least 14.04): please update the site-package path with your version of python
 
 ## Database Setup ##

@@ -11,7 +11,6 @@ from markupsafe import Markup
 
 import tg
 from tg.i18n import ugettext as _
-from tracim.config.app_cfg import CFG
 
 from tracim.lib import app_globals as plag
 
@@ -82,15 +81,6 @@ def icon(icon_name, white=False):
 class ICON(object):
   Shared = '<i class="fa fa-group"></i>'
   Private = '<i class="fa fa-key"></i>'
-
-def show_email_stuff():
-    """
-    this function is used in order to show/hide link for sending password reset through email
-    """
-    return CFG.get_instance().EMAIL_NOTIFICATION_ACTIVATED
-
-def tracker_js():
-    return CFG.get_instance().TRACKER_JS_CONTENT
 
 def IconPath(icon_size, icon_path):
     return tg.url('/assets/icons/{0}x{0}/{1}.png'.format(icon_size, icon_path))
@@ -176,7 +166,7 @@ def delete_label_for_item(item) -> str:
     """
     return ContentType._DELETE_LABEL[item.type]
 
-def is_item_still_editable(item):
+def is_item_still_editable(CFG, item):
     if item.type.id != 'comment':
         return False
 
@@ -208,6 +198,3 @@ def shorten(text: str, maxlength: int, add_three_points=True) -> str:
             result += '…'
 
     return result
-
-from tracim.config.app_cfg import CFG as CFG_ORI
-CFG = CFG_ORI.get_instance() # local CFG var is an instance of CFG class found in app_cfg

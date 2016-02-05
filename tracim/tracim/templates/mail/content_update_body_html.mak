@@ -63,7 +63,7 @@
     
     <div id="footer">
         <p>
-            ${_('{user_display_name}, you receive this email because you are registered on <i>{website_title}</i> and you are <i>{user_role_label}</i> in the workspace <a href="{workspace_url}">{workspace_label}</a>.').format(user_display_name=user_display_name, user_role_label=user_role_label, workspace_url=result.item.workspace.url, workspace_label=workspace_label, website_title=h.CFG.WEBSITE_TITLE)|n}
+            ${_('{user_display_name}, you receive this email because you are registered on <i>{website_title}</i> and you are <i>{user_role_label}</i> in the workspace <a href="{workspace_url}">{workspace_label}</a>.').format(user_display_name=user_display_name, user_role_label=user_role_label, workspace_url=result.item.workspace.url, workspace_label=workspace_label, website_title=CFG.WEBSITE_TITLE)|n}
         </p>
         <hr/>
         <p>

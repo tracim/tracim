@@ -24,6 +24,7 @@ from tg.i18n import lazy_ugettext as l_
 
 import tracim
 from tracim import model
+from tracim.lib import app_globals, helpers
 from tracim.lib.base import logger
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
@@ -288,4 +289,10 @@ class CFG(object):
 #
 # OR
 #
+
+# Add some variable to each templates
+base_config.variable_provider = lambda: {
+    'CFG': CFG.get_instance()
+}
+
 plug(base_config, 'tgext.asyncjob')
