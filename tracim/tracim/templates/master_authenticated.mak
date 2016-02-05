@@ -32,7 +32,7 @@
         ${self.footer()}
 
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
-        ${h.tracker_js()|n}
+        ${CFG.TRACKER_JS_CONTENT|n}
     </body>
 
 <%def name="content_wrapper()">

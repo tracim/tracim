@@ -1,13 +1,13 @@
 <%inherit file="local:templates.master_anonymous"/>
 
-<%def name="title()">${h.CFG.WEBSITE_TITLE|n} - ${_('Password Reset Request')}</%def>
+<%def name="title()">${CFG.WEBSITE_TITLE|n} - ${_('Password Reset Request')}</%def>
 
 <div class="container-fluid">
     <div class="row-fluid">
         <div>
             <div class="row">
                 <div class="col-sm-offset-3 col-sm-5">
-                    <h1 class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};"><b>${h.CFG.WEBSITE_TITLE}</b></h1>
+                    <h1 class="text-center" style="color: ${CFG.WEBSITE_HOME_TITLE_COLOR};"><b>${CFG.WEBSITE_TITLE}</b></h1>
                 </div>
             </div>
             <div class="row">

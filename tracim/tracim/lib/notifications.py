@@ -11,8 +11,6 @@ from mako.template import Template
 from tg.i18n import lazy_ugettext as l_
 from tg.i18n import ugettext as _
 
-from tracim.config.app_cfg import CFG
-
 from tracim.lib.base import logger
 from tracim.lib.email import SmtpConfiguration
 from tracim.lib.email import EmailSender
@@ -46,6 +44,8 @@ class NotifierFactory(object):
 
     @classmethod
     def create(cls, current_user: User=None) -> INotifier:
+        # TODO: Find a way to import properly without cyclic import
+        from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
         if not cfg.EMAIL_NOTIFICATION_ACTIVATED:
             return DummyNotifier(current_user)
@@ -69,6 +69,8 @@ class RealNotifier(object):
         :return:
         """
         logger.info(self, 'Instantiating Real Notifier')
+        # TODO: Find a way to import properly without cyclic import
+        from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
 
         self._user = current_user
@@ -78,6 +80,8 @@ class RealNotifier(object):
                                        cfg.EMAIL_NOTIFICATION_SMTP_PASSWORD)
 
     def notify_content_update(self, content: Content):
+        # TODO: Find a way to import properly without cyclic import
+        from tracim.config.app_cfg import CFG
         global_config = CFG.get_instance()
 
         if content.get_last_action().id not \
@@ -174,7 +178,7 @@ class EmailNotifier(object):
     and other stuff related to the turbogears environment)
     """
 
-    def __init__(self, smtp_config: SmtpConfiguration, global_config: CFG):
+    def __init__(self, smtp_config: SmtpConfiguration, global_config):
         self._smtp_config = smtp_config
         self._global_config = global_config
 

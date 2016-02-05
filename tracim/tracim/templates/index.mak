@@ -2,7 +2,7 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 
 <%def name="title()">
-  ${h.CFG.WEBSITE_TITLE|n}
+  ${CFG.WEBSITE_TITLE|n}
 </%def>
 
 
@@ -11,17 +11,17 @@
         <div>
             <div class="row">
                 <div class="col-sm-offset-3 col-sm-6">
-                    <h1 class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};"><b>${h.CFG.WEBSITE_TITLE|n}</b></h1>
-                    <p class="text-center" style="color: ${h.CFG.WEBSITE_HOME_TITLE_COLOR};">${h.CFG.WEBSITE_SUBTITLE|n}</p>
+                    <h1 class="text-center" style="color: ${CFG.WEBSITE_HOME_TITLE_COLOR};"><b>${CFG.WEBSITE_TITLE|n}</b></h1>
+                    <p class="text-center" style="color: ${CFG.WEBSITE_HOME_TITLE_COLOR};">${CFG.WEBSITE_SUBTITLE|n}</p>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-sm-offset-3 col-sm-2">
                     <a class="thumbnail">
-                        <img src="${h.CFG.WEBSITE_HOME_IMAGE_URL}" alt="">
+                        <img src="${CFG.WEBSITE_HOME_IMAGE_URL}" alt="">
                     </a>
-                    <p>${h.CFG.WEBSITE_HOME_TAG_LINE|n}</p>
+                    <p>${CFG.WEBSITE_HOME_TAG_LINE|n}</p>
                     
 
                 </div>
@@ -50,7 +50,7 @@
                                 <button type="submit" class="btn btn-small btn-success text-right">
                                     <i class="fa fa-check"></i> ${_('Login')}
                                 </button>
-                                % if h.show_email_stuff():
+                                % if CFG.EMAIL_NOTIFICATION_ACTIVATED:
                                     <div class="pull-left">
                                         <a class="btn btn-link" href="${tg.url('/reset_password')}"><i class="fa fa-magic"></i> ${_('Forgot password?')}</a>
                                     </div>
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-offset-3 col-sm-6 text-center">${h.CFG.WEBSITE_HOME_BELOW_LOGIN_FORM|n}</div>
+                <div class="col-sm-offset-3 col-sm-6 text-center">${CFG.WEBSITE_HOME_BELOW_LOGIN_FORM|n}</div>
             </div>
 
 

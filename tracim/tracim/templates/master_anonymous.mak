@@ -17,7 +17,7 @@
 
     <body class="${self.body_class()}" style="
     height: 100%;
-    background: url(${h.CFG.WEBSITE_HOME_BACKGROUND_IMAGE_URL}) no-repeat center bottom scroll;
+    background: url(${CFG.WEBSITE_HOME_BACKGROUND_IMAGE_URL}) no-repeat center bottom scroll;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
@@ -44,7 +44,7 @@
             });
         </script>
 
-        ${h.tracker_js()|n}
+        ${CFG.TRACKER_JS_CONTENT|n}
     </body>
 
 <%def name="content_wrapper()">

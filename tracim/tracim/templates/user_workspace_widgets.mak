@@ -356,7 +356,7 @@
                     <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(event.created)|n}">
                         ${_('{delta} ago').format(delta=event.created_as_delta)}
 
-                        % if h.is_item_still_editable(event) and event.owner.id==user.id:
+                        % if h.is_item_still_editable(CFG, event) and event.owner.id==user.id:
                             <br/>
                                 <a class="t-timeline-comment-delete-button" href="${event.urls.delete}">
                                     ${_('delete')} ${ICON.FA('fa fa-trash-o')}
