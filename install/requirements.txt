@@ -13,7 +13,7 @@ WebOb==1.6.0a0
 WebTest==1.4.2
 alembic==0.8.4
 argparse==1.2.1
-backlash==0.0.6
+backlash==0.0.7
 beautifulsoup4==4.3.2
 cliff==1.8.0
 cmd2==0.6.7
