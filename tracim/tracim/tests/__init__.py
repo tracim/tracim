@@ -3,6 +3,9 @@
 
 from os import getcwd, path
 
+import ldap3
+from ldap_test import LdapServer
+from nose.tools import ok_
 from paste.deploy import loadapp
 from webtest import TestApp
 
@@ -23,6 +26,7 @@ from sqlalchemy.schema import Sequence
 from sqlalchemy.schema import Table
 
 import transaction
+from who_ldap import make_connection
 
 from tracim.lib.base import logger
 
@@ -191,3 +195,55 @@ class TestController(object):
         """Tear down test fixture for each functional test method."""
         # model.DBSession.remove()
         teardown_db()
+
+
+class TracimTestController(TestController):
+
+    def _connect_user(self, login, password):
+        # Going to the login form voluntarily:
+        resp = self.app.get('/', status=200)
+        form = resp.form
+        # Submitting the login form:
+        form['login'] = login
+        form['password'] = password
+        return form.submit(status=302)
+
+
+class LDAPTest:
+
+    """
+    Server fixtures, see https://github.com/zoldar/python-ldap-test
+    """
+    ldap_server_data = NotImplemented
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._ldap_test_server = None
+        self._ldap_connection = None
+
+    def setUp(self):
+        super().setUp()
+        self._ldap_test_server = LdapServer(self.ldap_server_data)
+        self._ldap_test_server.start()
+        ldap3_server = ldap3.Server('localhost', port=self._ldap_test_server.config['port'])
+        self._ldap_connection = ldap3.Connection(
+            ldap3_server,
+            user=self._ldap_test_server.config['bind_dn'],
+            password=self._ldap_test_server.config['password'],
+            auto_bind=True
+        )
+
+    def tearDown(self):
+        super().tearDown()
+        self._ldap_test_server.stop()
+
+    def test_ldap_connectivity(self):
+        with make_connection(
+                'ldap://%s:%d' % ('localhost', self._ldap_test_server.config['port']),
+                self._ldap_test_server.config['bind_dn'],
+                'toor'
+        ) as conn:
+            if not conn.bind():
+                ok_(False, "Cannot establish connection with LDAP test server")
+            else:
+                ok_(True)
