@@ -69,6 +69,9 @@ setup(
         ],
         'gearbox.plugins': [
             'turbogears-devtools = tg.devtools'
+        ],
+        'gearbox.commands': [
+            'ldap_server = tracim.command.ldap_test_server:LDAPTestServerCommand',
         ]
     },
     dependency_links=[

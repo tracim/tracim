@@ -2,8 +2,8 @@
 """
 Integration tests for the ldap authentication sub-system.
 """
+from tracim.fixtures.ldap import ldap_test_server_fixtures
 from nose.tools import eq_
-from tg import config
 
 from tracim.model import DBSession, User
 from tracim.tests import LDAPTest, TracimTestController
@@ -11,53 +11,7 @@ from tracim.tests import LDAPTest, TracimTestController
 
 class TestAuthentication(LDAPTest, TracimTestController):
     application_under_test = 'ldap'
-    ldap_server_data = {
-            'port': 3333,
-            'password': 'toor',
-
-            'bind_dn': 'cn=admin,dc=directory,dc=fsf,dc=org',
-            'base': {
-                'objectclass': ['dcObject', 'organization'],
-                'dn': 'dc=directory,dc=fsf,dc=org',
-                'attributes': {
-                    'o': 'Free Software Foundation',
-                    'dc': 'directory'
-                }
-            },
-
-            'entries': [
-                {
-                    'objectclass': ['organizationalRole'],
-                    'dn': 'cn=admin,dc=directory,dc=fsf,dc=org',
-                    'attributes': {
-                        'cn': 'admin'
-                    }
-                },
-                {
-                    'objectclass': ['organizationalUnit'],
-                    'dn': 'ou=people,dc=directory,dc=fsf,dc=org',
-                    'attributes': {
-                        'ou': 'people',
-                    }
-                },
-                {
-                    'objectclass': ['organizationalUnit'],
-                    'dn': 'ou=groups,dc=directory,dc=fsf,dc=org',
-                    'attributes': {
-                        'ou': 'groups',
-                    }
-                },
-                {
-                    'objectclass': ['account', 'top'],
-                    'dn': 'cn=richard-not-real-email@fsf.org,ou=people,dc=directory,dc=fsf,dc=org',
-                    'attributes': {
-                        'uid': 'richard-not-real-email@fsf.org',
-                        'userPassword': 'rms',
-                        'mail': 'richard-not-real-email@fsf.org'
-                    }
-                },
-            ]
-        }
+    ldap_server_data = ldap_test_server_fixtures
 
     def test_ldap_auth_fail(self):
         # User is unknown in tracim database
