@@ -51,6 +51,8 @@ base_config.use_sqlalchemy = True
 base_config.model = tracim.model
 base_config.DBSession = tracim.model.DBSession
 
+# This value can be modified by tracim.lib.auth.wrapper.AuthConfigWrapper but have to be specified before
+base_config.auth_backend = 'sqlalchemy'
 
 # base_config.flash.cookie_name
 # base_config.flash.default_status -> Default message status if not specified (ok by default)

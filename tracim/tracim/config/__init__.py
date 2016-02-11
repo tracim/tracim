@@ -10,10 +10,8 @@ class TracimAppConfig(AppConfig):
     """
 
     def after_init_config(self, conf):
-        self._set_up_auth(conf)
+        AuthConfigWrapper.wrap(conf)
         #  Fix an tg2 strange thing: auth_backend is set in config, but instance
         #  of AppConfig has None in auth_backend attr
         self.auth_backend = conf['auth_backend']
-
-    def _set_up_auth(self, conf):
-        AuthConfigWrapper.wrap(conf)
+        self.sa_auth = conf.get('sa_auth')
