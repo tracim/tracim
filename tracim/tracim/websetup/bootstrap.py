@@ -13,35 +13,35 @@ def bootstrap(command, conf, vars):
     # <websetup.bootstrap.before.auth
     from sqlalchemy.exc import IntegrityError
     try:
-        # u = model.User()
-        # u.display_name = 'Global manager'
-        # u.email = 'admin@admin.admin'
-        # u.password = 'admin@admin.admin'
-        # model.DBSession.add(u)
-        #
-        # g1 = model.Group()
-        # g1.group_id = 1
-        # g1.group_name = 'users'
-        # g1.display_name = 'Users'
-        # g1.users.append(u)
-        # model.DBSession.add(g1)
-        #
-        # g2 = model.Group()
-        # g2.group_id = 2
-        # g2.group_name = 'managers'
-        # g2.display_name = 'Global Managers'
-        # g2.users.append(u)
-        # model.DBSession.add(g2)
-        #
-        # g3 = model.Group()
-        # g3.group_id = 3
-        # g3.group_name = 'administrators'
-        # g3.display_name = 'Administrators'
-        # g3.users.append(u)
-        # model.DBSession.add(g3)
-        #
-        # model.DBSession.flush()
-        # transaction.commit()
+        u = model.User()
+        u.display_name = 'Global manager'
+        u.email = 'admin@admin.admin'
+        u.password = 'admin@admin.admin'
+        model.DBSession.add(u)
+
+        g1 = model.Group()
+        g1.group_id = 1
+        g1.group_name = 'users'
+        g1.display_name = 'Users'
+        g1.users.append(u)
+        model.DBSession.add(g1)
+
+        g2 = model.Group()
+        g2.group_id = 2
+        g2.group_name = 'managers'
+        g2.display_name = 'Global Managers'
+        g2.users.append(u)
+        model.DBSession.add(g2)
+
+        g3 = model.Group()
+        g3.group_id = 3
+        g3.group_name = 'administrators'
+        g3.display_name = 'Administrators'
+        g3.users.append(u)
+        model.DBSession.add(g3)
+
+        model.DBSession.flush()
+        transaction.commit()
         pass
 
     except IntegrityError:
