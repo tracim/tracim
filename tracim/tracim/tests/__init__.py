@@ -183,7 +183,7 @@ class TestController(object):
         except Exception as e:
             print('-> err ({})'.format(e.__str__()))
 
-        setup_app()
+        setup_app(section_name=self.application_under_test)
         setup_db()
 
 
