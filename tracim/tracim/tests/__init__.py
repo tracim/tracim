@@ -36,7 +36,7 @@ def load_app(name=application_name):
     return TestApp(loadapp('config:test.ini#%s' % name, relative_to=getcwd()))
 
 
-def setup_app():
+def setup_app(section_name=None):
     """Setup the application."""
 
     engine = config['tg.app_globals'].sa_engine
@@ -48,7 +48,7 @@ def setup_app():
     cmd = SetupAppCommand(Bunch(options=Bunch(verbose_level=1)), Bunch())
     logger.debug(setup_app, 'After setup, before run...')
 
-    cmd.run(Bunch(config_file='config:test.ini', section_name=None))
+    cmd.run(Bunch(config_file='config:test.ini', section_name=section_name))
     logger.debug(setup_app, 'After run...')
 
 
