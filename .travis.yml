@@ -34,4 +34,3 @@ script: "cd ${TRAVIS_BUILD_DIR}/tracim && nosetests -c ${TRAVIS_BUILD_DIR}/traci
 
 after_success:
 - coveralls
-
