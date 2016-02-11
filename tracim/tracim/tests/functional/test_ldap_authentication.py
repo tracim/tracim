@@ -21,7 +21,6 @@ class TestAuthentication(LDAPTest, TracimTestController):
 
         # User is registered in tracim database
         eq_(0, DBSession.query(User).filter(User.email == 'unknown-user@fsf.org').count())
-        DBSession.close()
 
     def test_ldap_auth_sync(self):
         # User is unknown in tracim database
@@ -31,4 +30,3 @@ class TestAuthentication(LDAPTest, TracimTestController):
 
         # User is registered in tracim database
         eq_(1, DBSession.query(User).filter(User.email == 'richard-not-real-email@fsf.org').count())
-        DBSession.close()

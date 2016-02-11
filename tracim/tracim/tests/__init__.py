@@ -29,6 +29,7 @@ import transaction
 from who_ldap import make_connection
 
 from tracim.lib.base import logger
+from tracim.model import DBSession
 
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
@@ -193,7 +194,7 @@ class TestController(object):
 
     def tearDown(self):
         """Tear down test fixture for each functional test method."""
-        # model.DBSession.remove()
+        DBSession.close()
         teardown_db()
 
 
