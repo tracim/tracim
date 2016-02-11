@@ -26,15 +26,15 @@ class LDAPAuth(Auth):
 
     def wrap_config(self):
         super().wrap_config()
-        self._config.auth_backend = 'ldapauth'
-        self._config.sa_auth.authenticators = [('ldapauth', self.ldap_auth)]
+        self._config['auth_backend'] = 'ldapauth'
+        self._config['sa_auth'].authenticators = [('ldapauth', self.ldap_auth)]
 
         mdproviders = [('ldapuser', self.ldap_user_provider)]
         if self._config.get('ldap_group_enabled', False):
             mdproviders.append(('ldapgroups', self.ldap_groups_provider))
-        self._config.sa_auth.mdproviders = mdproviders
+        self._config['sa_auth'].mdproviders = mdproviders
 
-        self._config.sa_auth.authmetadata = LDAPApplicationAuthMetadata(self._config.sa_auth)
+        self._config['sa_auth'].authmetadata = LDAPApplicationAuthMetadata(self._config.get('sa_auth'))
 
     def _get_ldap_auth(self):
         auth_plug = LDAPSearchAuthenticatorPlugin(

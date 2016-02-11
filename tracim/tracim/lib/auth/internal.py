@@ -13,10 +13,10 @@ class InternalAuth(Auth):
     def wrap_config(self):
         super().wrap_config()
 
-        self._config.sa_auth.user_class = User
-        self._config.auth_backend = 'sqlalchemy'
-        self._config.sa_auth.dbsession = DBSession
-        self._config.sa_auth.authmetadata = InternalApplicationAuthMetadata(self._config.sa_auth)
+        self._config['sa_auth'].user_class = User
+        self._config['auth_backend'] = 'sqlalchemy'
+        self._config['sa_auth'].dbsession = DBSession
+        self._config['sa_auth'].authmetadata = InternalApplicationAuthMetadata(self._config.get('sa_auth'))
 
 
 class InternalApplicationAuthMetadata(TGAuthMetadata):
