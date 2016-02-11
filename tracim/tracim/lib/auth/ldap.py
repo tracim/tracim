@@ -4,6 +4,7 @@ from who_ldap import LDAPAttributesPlugin, LDAPGroupsPlugin
 from who_ldap import LDAPSearchAuthenticatorPlugin as BaseLDAPSearchAuthenticatorPlugin
 
 from tracim.lib.auth.base import Auth
+from tracim.lib.helpers import ini_conf_to_bool
 from tracim.lib.user import UserApi
 from tracim.model import auth, DBSession, User
 
@@ -44,7 +45,7 @@ class LDAPAuth(Auth):
             returned_id='login',
             # the LDAP attribute that holds the user name:
             naming_attribute=self._config.get('ldap_naming_attribute'),
-            start_tls=self._config.get('ldap_tls', False),
+            start_tls=ini_conf_to_bool(self._config.get('ldap_tls', False)),
         )
         auth_plug.set_auth(self)
         return auth_plug
@@ -58,7 +59,7 @@ class LDAPAuth(Auth):
             # map from LDAP attributes to TurboGears user attributes:
             attributes=self._config.get('ldap_user_attributes', 'mail=email'),
             flatten=True,
-            start_tls=self._config.get('ldap_tls', False)
+            start_tls=ini_conf_to_bool(self._config.get('ldap_tls', False)),
         )
 
     def _get_ldap_groups_provider(self):
@@ -69,7 +70,7 @@ class LDAPAuth(Auth):
             bind_pass=self._config.get('ldap_bind_pass'),
             filterstr=self._config.get('ldap_group_filter', '(&(objectClass=group)(member=%(dn)s))'),
             name='groups',
-            start_tls=self._config.get('ldap_tls', False)
+            start_tls=ini_conf_to_bool(self._config.get('ldap_tls', False)),
         )
 
 

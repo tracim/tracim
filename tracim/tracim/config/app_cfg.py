@@ -16,7 +16,6 @@ convert them into boolean, for example, you should use the
 import tg
 from paste.deploy.converters import asbool
 
-from tg.configuration import AppConfig
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
 
@@ -24,13 +23,14 @@ from tg.i18n import lazy_ugettext as l_
 
 import tracim
 from tracim import model
+from tracim.config import TracimAppConfig
 from tracim.lib import app_globals, helpers
 from tracim.lib.auth.wrapper import AuthConfigWrapper
 from tracim.lib.base import logger
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
-base_config = AppConfig()
+base_config = TracimAppConfig()
 base_config.renderers = []
 base_config.use_toscawidgets = False
 base_config.use_toscawidgets2 = True
@@ -72,21 +72,6 @@ base_config['flash.template'] = '''
 
 # YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP 
 base_config.sa_auth.cookie_secret = "3283411b-1904-4554-b0e1-883863b53080"
-
-base_config.auth_type = 'ldap'
-
-# ldap_base_dn = 'ou=users,dc=ad,dc=snake-oil-company,dc=com'
-# ldap_bind_dn = 'cn=bind,cn=users,dc=ad,dc=snake-oil-company,dc=com'
-
-base_config.ldap_url = 'ldap://localhost:3333'
-base_config.ldap_base_dn = 'dc=directory,dc=fsf,dc=org'
-base_config.ldap_bind_dn = 'cn=admin,dc=directory,dc=fsf,dc=org'
-base_config.ldap_bind_pass = 'toor'
-base_config.ldap_ldap_naming_attribute = 'uid'
-base_config.ldap_user_attributes = 'mail=email'
-base_config.ldap_tls = False
-
-AuthConfigWrapper.wrap(base_config)
 
 # INFO - This is the way to specialize the resetpassword email properties
 # plug(base_config, 'resetpassword', None, mail_subject=reset_password_email_subject)

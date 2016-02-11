@@ -198,3 +198,15 @@ def shorten(text: str, maxlength: int, add_three_points=True) -> str:
             result += '…'
 
     return result
+
+
+def ini_conf_to_bool(value):
+    """
+    Depending INI file interpreter, False values are simple parsed as string,
+    so use this function to consider them as boolean
+    :param value: value of ini parameter
+    :return: bollean value
+    """
+    if value in ('False', 'false', '0', 'off', 'no'):
+        return False
+    return bool(value)
