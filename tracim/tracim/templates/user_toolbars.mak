@@ -16,7 +16,7 @@
             %>
         <a title="${_('Edit current user')}" class="btn btn-default" data-toggle="modal" data-target="#user-edit-modal-dialog" data-remote="${user_edit_url}" >${ICON.FA('fa-edit t-less-visible')} ${_('Edit user')}</a>
 
-            % if auth_is_internal:
+            % if tmpl_context.auth_is_internal:
                 <a title="${_('Change password')}" class="btn btn-default" data-toggle="modal" data-target="#user-edit-password-modal-dialog" data-remote="${user_password_edit_url}" >${ICON.FA('fa-key t-less-visible')} ${_('Password')}</a>
             % endif
 
@@ -43,10 +43,10 @@
                 user_edit_url = tg.url('/user/{}/edit'.format(current_user.id), {'next_url': '/home'})
                 user_password_edit_url = tg.url('/user/{}/password/edit'.format(current_user.id))
             %>
-            <a title="${_('Edit my profile')}" class="btn btn-default" data-toggle="modal" data-target="#user-edit-modal-dialog" data-remote="${user_edit_url}" >${ICON.FA('fa-edit t-less-visible')} ${_('Edit my profile')}</a>
+            <a title="${_('Edit my profile')}" class="btn btn-default edit-profile-btn" data-toggle="modal" data-target="#user-edit-modal-dialog" data-remote="${user_edit_url}" >${ICON.FA('fa-edit t-less-visible')} ${_('Edit my profile')}</a>
 
-            % if auth_is_internal:
-                <a title="${_('Change password')}" class="btn btn-default" data-toggle="modal" data-target="#user-edit-password-modal-dialog" data-remote="${user_password_edit_url}" >${ICON.FA('fa-key t-less-visible')} ${_('Password')}</a>
+            % if tmpl_context.auth_is_internal:
+                <a title="${_('Change password')}" class="btn btn-default change-password-btn" data-toggle="modal" data-target="#user-edit-password-modal-dialog" data-remote="${user_password_edit_url}" >${ICON.FA('fa-key t-less-visible')} ${_('Password')}</a>
             % endif
 
         </div>
