@@ -13,7 +13,6 @@ from tracim.model import DBSession, User
 class LDAPAuth(Auth):
     """
     LDAP auth management.
-    TODO: Group connection
 
     """
     name = 'ldap'
