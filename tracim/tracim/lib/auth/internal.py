@@ -11,6 +11,10 @@ class InternalAuth(Auth):
     name = 'internal'
 
     def wrap_config(self):
+        """
+        Fill config with internal (database) auth information.
+        :return:
+        """
         super().wrap_config()
 
         self._config['sa_auth'].user_class = User

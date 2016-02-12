@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from tg.util import Bunch
 
+""" Backup of config.sa_auth """
 _original_sa_auth = None
 
 
 def _get_clean_sa_auth(config):
     """
-    TODO COMMENT
-    :param config:
-    :return:
+    Return the original sa_auth parameter. Consider Original as it's content before first fill in configuration.
+    :param config: tg2 app config
+    :return: original sa_auth parameter
     """
     global _original_sa_auth
 
@@ -21,13 +22,21 @@ def _get_clean_sa_auth(config):
 
 
 class Auth:
+    """
+    Auth strategy base class
+    """
 
+    """ Auth strategy must be named: .ini config will use this name in auth_type parameter """
     name = NotImplemented
 
     def __init__(self, config):
         self._config = config
 
     def wrap_config(self):
+        """
+        Fill config with auth needed. You must overload with whild implementation.
+        :return:
+        """
         self._config['sa_auth'] = _get_clean_sa_auth(self._config)
 
         # override this if you would like to provide a different who plugin for
