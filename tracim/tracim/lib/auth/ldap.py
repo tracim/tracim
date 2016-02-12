@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from tg.configuration.auth import TGAuthMetadata
-from who_ldap import LDAPAttributesPlugin, LDAPGroupsPlugin
+from who_ldap import LDAPAttributesPlugin as BaseLDAPAttributesPlugin
+from who_ldap import LDAPGroupsPlugin as BaseLDAPGroupsPlugin
 from who_ldap import LDAPSearchAuthenticatorPlugin as BaseLDAPSearchAuthenticatorPlugin
 
 from tracim.lib.auth.base import Auth
 from tracim.lib.helpers import ini_conf_to_bool
 from tracim.lib.user import UserApi
-from tracim.model import auth, DBSession, User
+from tracim.model import DBSession, User
 
 
 class LDAPAuth(Auth):
@@ -21,7 +22,7 @@ class LDAPAuth(Auth):
         super().__init__(config)
         self.ldap_auth = self._get_ldap_auth()
         self.ldap_user_provider = self._get_ldap_user_provider()
-        if self._config.get('ldap_group_enabled', False):
+        if ini_conf_to_bool(self._config.get('ldap_group_enabled', False)):
             self.ldap_groups_provider = self._get_ldap_groups_provider()
 
     def wrap_config(self):
@@ -30,7 +31,7 @@ class LDAPAuth(Auth):
         self._config['sa_auth'].authenticators = [('ldapauth', self.ldap_auth)]
 
         mdproviders = [('ldapuser', self.ldap_user_provider)]
-        if self._config.get('ldap_group_enabled', False):
+        if ini_conf_to_bool(self._config.get('ldap_group_enabled', False)):
             mdproviders.append(('ldapgroups', self.ldap_groups_provider))
         self._config['sa_auth'].mdproviders = mdproviders
 
@@ -105,32 +106,53 @@ class LDAPSearchAuthenticatorPlugin(BaseLDAPSearchAuthenticatorPlugin):
 
 class LDAPApplicationAuthMetadata(TGAuthMetadata):
 
-    # map from LDAP group names to TurboGears group names
-    group_map = {'operators': 'managers'}
-
-    # set of permissions for all mapped groups
-    permissions_for_groups = {'managers': {'manage'}}
-
-    def __init__(self, sa_auth):
-        self.sa_auth = sa_auth
+    def __init__(self, config):
+        self.sa_auth = config.get('sa_auth')
+        self._config = config
 
     def get_user(self, identity, userid):
-        user = identity.get('user')
-        if user:
-            name = '{email}'.format(**user).strip()
-            user.update(user_name=userid, display_name=name)
-        return user
+        return identity.get('user')
 
     def get_groups(self, identity, userid):
-        get_group = self.group_map.get
-        return [get_group(g, g) for g in identity.get('groups', [])]
+        if not ini_conf_to_bool(self._config.get('ldap_group_enabled')):
 
-    def get_permissions_for_group(self, group):
-        return self.permissions_for_groups.get(group, set())
+            # TODO - B.S. - 20160212: récupérer identity['user'].groups directement produit
+            # Parent instance XXX is not bound to a Session. Voir avec Damien.
+            user = DBSession.query(User).filter(User.email == identity['user'].email).one()
+            return [g.group_name for g in user.groups]
+
+            return [g.group_name for g in identity['user'].groups]
+        else:
+            raise NotImplementedError()
 
     def get_permissions(self, identity, userid):
-        permissions = set()
-        get_permissions = self.get_permissions_for_group
-        for group in self.get_groups(identity, userid):
-            permissions |= get_permissions(group)
-        return permissions
+        if not ini_conf_to_bool(self._config.get('ldap_group_enabled')):
+
+            # TODO - B.S. - 20160212: récupérer identity['user'].groups directement produit
+            # Parent instance XXX is not bound to a Session. Voir avec Damien.
+            user = DBSession.query(User).filter(User.email == identity['user'].email).one()
+            return [p.permission_name for p in user.permissions]
+
+            return [p.permission_name for p in identity['user'].permissions]
+        else:
+            raise NotImplementedError()
+
+
+class LDAPGroupsPlugin(BaseLDAPGroupsPlugin):
+
+    def add_metadata(self, environ, identity):
+        super().add_metadata(environ, identity)
+        groups_names = identity[self.name]
+        raise NotImplementedError()  # Should sync groups etc ...
+
+
+class LDAPAttributesPlugin(BaseLDAPAttributesPlugin):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._user_api = UserApi(None)
+
+    def add_metadata(self, environ, identity):
+        super().add_metadata(environ, identity)
+        # TODO - B.S. - 20160212: identity contains now som information from LDAP what we can save in local database
+        identity[self.name] = self._user_api.get_one_by_email(identity.get('repoze.who.userid'))

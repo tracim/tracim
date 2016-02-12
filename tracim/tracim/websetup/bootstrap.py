@@ -40,6 +40,15 @@ def bootstrap(command, conf, vars):
         g3.users.append(u)
         model.DBSession.add(g3)
 
+        # TODO: - B.S. - 20160212: Following fixture is LDAP tests specific, should make an little fixture management
+        # for tests
+        lawrence = model.User()
+        lawrence.display_name = 'Lawrence Lessig'
+        lawrence.email = 'lawrence-not-real-email@fsf.org'
+        lawrence.password = 'foobarbaz'
+        model.DBSession.add(lawrence)
+        g2.users.append(lawrence)
+
         model.DBSession.flush()
         transaction.commit()
         pass

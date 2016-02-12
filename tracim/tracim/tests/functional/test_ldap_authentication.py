@@ -24,12 +24,12 @@ class TestAuthentication(LDAPTest, TracimTestController):
 
     def test_ldap_auth_fail_wrong_pass(self):
         # User is unknown in tracim database
-        eq_(0, DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').count())
+        eq_(0, DBSession.query(User).filter(User.email == 'richard-not-real-email@fsf.org').count())
 
-        self._connect_user('lawrence-not-real-email@fsf.org', 'wrong-pass')
+        self._connect_user('richard-not-real-email@fsf.org', 'wrong-pass')
 
         # User is registered in tracim database
-        eq_(0, DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').count())
+        eq_(0, DBSession.query(User).filter(User.email == 'richard-not-real-email@fsf.org').count())
 
     def test_ldap_auth_sync(self):
         # User is unknown in tracim database
