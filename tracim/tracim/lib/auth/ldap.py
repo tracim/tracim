@@ -16,6 +16,7 @@ class LDAPAuth(Auth):
 
     """
     name = 'ldap'
+    _internal = False
 
     def __init__(self, config):
         super().__init__(config)
@@ -23,9 +24,10 @@ class LDAPAuth(Auth):
         self.ldap_user_provider = self._get_ldap_user_provider()
         if ini_conf_to_bool(self._config.get('ldap_group_enabled', False)):
             self.ldap_groups_provider = self._get_ldap_groups_provider()
+        self._managed_fields = self.ldap_user_provider.local_fields
 
-    def wrap_config(self):
-        super().wrap_config()
+    def feed_config(self):
+        super().feed_config()
         self._config['auth_backend'] = 'ldapauth'
         self._config['sa_auth'].authenticators = [('ldapauth', self.ldap_auth)]
 
@@ -155,3 +157,10 @@ class LDAPAttributesPlugin(BaseLDAPAttributesPlugin):
         super().add_metadata(environ, identity)
         # TODO - B.S. - 20160212: identity contains now som information from LDAP what we can save in local database
         identity[self.name] = self._user_api.get_one_by_email(identity.get('repoze.who.userid'))
+
+    @property
+    def local_fields(self):
+        """
+        :return: list of ldap side managed field names
+        """
+        return list(self._attributes_map.values())

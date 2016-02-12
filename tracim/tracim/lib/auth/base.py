@@ -29,15 +29,29 @@ class Auth:
     """ Auth strategy must be named: .ini config will use this name in auth_type parameter """
     name = NotImplemented
 
+    """ When Auth is not internal, user account management are disabled (forgotten password, etc.) """
+    _internal = NotImplemented
+
     def __init__(self, config):
         self._config = config
+        self._managed_fields = []
 
-    def wrap_config(self):
+    @property
+    def is_internal(self):
+        return bool(self._internal)
+
+    @property
+    def managed_fields(self):
+        return self._managed_fields
+
+    def feed_config(self):
         """
         Fill config with auth needed. You must overload with whild implementation.
         :return:
         """
         self._config['sa_auth'] = _get_clean_sa_auth(self._config)
+
+        self._config['auth_is_internal'] = self.is_internal
 
         # override this if you would like to provide a different who plugin for
         # managing login and logout of your application

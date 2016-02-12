@@ -9,14 +9,14 @@ from tracim.model import DBSession, User
 class InternalAuth(Auth):
 
     name = 'internal'
+    _internal = True
 
-    def wrap_config(self):
+    def feed_config(self):
         """
         Fill config with internal (database) auth information.
         :return:
         """
-        super().wrap_config()
-
+        super().feed_config()
         self._config['sa_auth'].user_class = User
         self._config['auth_backend'] = 'sqlalchemy'
         self._config['sa_auth'].dbsession = DBSession

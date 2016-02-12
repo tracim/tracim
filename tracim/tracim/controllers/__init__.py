@@ -126,6 +126,7 @@ class TIMRestController(RestController, BaseController):
         :param kw:
         :return:
         """
+        super()._before(*args, **kw)
         TIMRestPathContextSetup.current_user()
 
 
@@ -468,6 +469,7 @@ class StandardController(BaseController):
         :param kw:
         :return:
         """
+        super()._before(*args, **kw)
         TIMRestPathContextSetup.current_user()
 
     @classmethod

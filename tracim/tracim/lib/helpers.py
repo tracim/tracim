@@ -210,3 +210,9 @@ def ini_conf_to_bool(value):
     if value in ('False', 'false', '0', 'off', 'no'):
         return False
     return bool(value)
+
+
+def is_user_externalized_field(field_name):
+    if not tg.config.get('auth_instance').is_internal:
+        return field_name in tg.config.get('auth_instance').managed_fields
+    return False

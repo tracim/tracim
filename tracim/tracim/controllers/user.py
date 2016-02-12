@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from webob.exc import HTTPForbidden
 
 from tracim import model  as pm
 
@@ -93,11 +94,17 @@ class UserPasswordRestController(TIMRestController):
 
     @tg.expose('tracim.templates.user_password_edit_me')
     def edit(self):
+        if not tg.config.get('auth_is_internal'):
+            raise HTTPForbidden()
+
         dictified_user = Context(CTX.USER).toDict(tmpl_context.current_user, 'user')
         return DictLikeClass(result = dictified_user)
 
     @tg.expose()
     def put(self, current_password, new_password1, new_password2):
+        if not tg.config.get('auth_is_internal'):
+            raise HTTPForbidden()
+
         # FIXME - Allow only self password or operation for managers
         current_user = tmpl_context.current_user
 
@@ -129,6 +136,10 @@ class UserRestController(TIMRestController):
 
     password = UserPasswordRestController()
     workspaces = UserWorkspaceRestController()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._auth_instance = tg.config.get('auth_instance')
 
     @classmethod
     def current_item_id_key_in_context(cls):
@@ -174,9 +185,29 @@ class UserRestController(TIMRestController):
         current_user = tmpl_context.current_user
         assert user_id==current_user.user_id
 
+        # Only keep allowed field update
+        updated_fields = self._clean_update_fields({
+            'name': name,
+            'email': email
+        })
+
         api = UserApi(tmpl_context.current_user)
-        api.update(current_user, name, email, True)
+        api.update(current_user, do_save=True, **updated_fields)
         tg.flash(_('profile updated.'))
         if next_url:
             tg.redirect(tg.url(next_url))
         tg.redirect(self.url())
+
+    def _clean_update_fields(self, fields: dict):
+        """
+        Remove field key who are not allowed to be updated
+        :param fields: dict with field name key to be cleaned
+        :rtype fields: dict
+        :return:
+        """
+        if not self._auth_instance.is_internal:
+            externalized_fields_names = self._auth_instance.managed_fields
+            for externalized_field_name in externalized_fields_names:
+                if externalized_field_name in fields:
+                    fields.pop(externalized_field_name)
+        return fields
