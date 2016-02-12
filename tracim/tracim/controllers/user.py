@@ -137,10 +137,6 @@ class UserRestController(TIMRestController):
     password = UserPasswordRestController()
     workspaces = UserWorkspaceRestController()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._auth_instance = tg.config.get('auth_instance')
-
     @classmethod
     def current_item_id_key_in_context(cls):
         return 'user_id'
@@ -205,8 +201,9 @@ class UserRestController(TIMRestController):
         :rtype fields: dict
         :return:
         """
-        if not self._auth_instance.is_internal:
-            externalized_fields_names = self._auth_instance.managed_fields
+        auth_instance = tg.config.get('auth_instance')
+        if not auth_instance.is_internal:
+            externalized_fields_names = auth_instance.managed_fields
             for externalized_field_name in externalized_fields_names:
                 if externalized_field_name in fields:
                     fields.pop(externalized_field_name)
