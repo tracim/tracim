@@ -37,7 +37,7 @@ class LDAPAuth(Auth):
         self._config['sa_auth'].authmetadata = LDAPApplicationAuthMetadata(self._config.get('sa_auth'))
 
     def _get_ldap_auth(self):
-        auth_plug = LDAPSearchAuthenticatorPlugin(
+        return LDAPSearchAuthenticatorPlugin(
             url=self._config.get('ldap_url'),
             base_dn=self._config.get('ldap_base_dn'),
             bind_dn=self._config.get('ldap_bind_dn'),
@@ -47,8 +47,6 @@ class LDAPAuth(Auth):
             naming_attribute=self._config.get('ldap_naming_attribute'),
             start_tls=ini_conf_to_bool(self._config.get('ldap_tls', False)),
         )
-        auth_plug.set_auth(self)
-        return auth_plug
 
     def _get_ldap_user_provider(self):
         return LDAPAttributesPlugin(
@@ -75,14 +73,6 @@ class LDAPAuth(Auth):
 
 
 class LDAPSearchAuthenticatorPlugin(BaseLDAPSearchAuthenticatorPlugin):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._auth = None
-        self._user_api = UserApi(None)
-
-    def set_auth(self, auth):
-        self._auth = auth
 
     def authenticate(self, environ, identity):
         # Note: super().authenticate return None if already authenticated or not found
