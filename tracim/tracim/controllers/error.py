@@ -30,7 +30,7 @@ class ErrorController(object):
     @expose('tracim.templates.error')
     def document(self, *args, **kwargs):
         """Render the error document"""
-        resp = request.environ.get('pylons.original_response')
+        resp = request.environ.get('tg.original_response')
         default_message = ('<p>We\'re sorry but we weren\'t able to process '
                            ' this request.</p>')
 

@@ -75,7 +75,7 @@ setup(
         ]
     },
     dependency_links=[
-        "http://tg.gy/230"
+        "http://tg.gy/230",
         ],
     zip_safe=False
 )

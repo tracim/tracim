@@ -261,7 +261,7 @@ msgstr "Le mot de passe ne doit pas être vide"
 
 #: tracim/controllers/user.py:111
 msgid "The current password you typed is wrong"
-msgstr "Le mot de passe que vous avez tapé est erroné"
+msgstr "Le mot de passe saisi est erroné"
 
 #: tracim/controllers/user.py:115 tracim/controllers/admin/user.py:207
 msgid "New passwords do not match."
