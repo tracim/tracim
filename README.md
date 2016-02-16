@@ -297,7 +297,7 @@ To use LDAP authentication, set ``auth_type`` parameter to "ldap":
 
     auth_type = ldap
 
-Than add LDAP parameters
+Then add LDAP parameters
 
     # LDAP server address
     ldap_url = ldap://localhost:389
