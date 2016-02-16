@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
 """Unit and functional test suite for tracim."""
-
-from os import getcwd, path
+import argparse
+from os import getcwd
 
 import ldap3
+import tg
+import transaction
+from gearbox.commands.setup_app import SetupAppCommand
 from ldap_test import LdapServer
 from nose.tools import ok_
 from paste.deploy import loadapp
-from webtest import TestApp
-
-from gearbox.commands.setup_app import SetupAppCommand
-
-import tg
-from tg import config
-from tg.util import Bunch
-
 from sqlalchemy.engine import reflection
-
 from sqlalchemy.schema import DropConstraint
 from sqlalchemy.schema import DropSequence
 from sqlalchemy.schema import DropTable
@@ -24,10 +18,12 @@ from sqlalchemy.schema import ForeignKeyConstraint
 from sqlalchemy.schema import MetaData
 from sqlalchemy.schema import Sequence
 from sqlalchemy.schema import Table
-
-import transaction
+from tg import config
+from tg.util import Bunch
+from webtest import TestApp
 from who_ldap import make_connection
 
+from tracim.command import BaseCommand
 from tracim.lib.base import logger
 from tracim.model import DBSession
 
@@ -161,6 +157,38 @@ class TestStandard(object):
     def tearDown(self):
         transaction.commit()
 
+
+class TestCommand(TestStandard):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # We disable app loading from commands classes
+        BaseCommand.auto_setup_app = False
+        # Hack parser object to test conditions
+        BaseCommand.get_parser = self._get_test_parser()
+
+    def _get_test_parser(self):
+        def get_parser(self, prog_name):
+            parser = ArgumentParser(
+                description=self.get_description(),
+                prog=prog_name,
+                add_help=False
+            )
+            return parser
+        return get_parser
+
+    def _execute_command(self, command_class, command_name, sub_argv):
+        parser = argparse.ArgumentParser()
+        command = command_class(self.app, parser)
+        cmd_parser = command.get_parser(command_name)
+        parsed_args = cmd_parser.parse_args(sub_argv)
+        return command.run(parsed_args)
+
+    def setUp(self):
+        super().setUp()
+        # Ensure app config is loaded
+        self.app.get('/_test_vars')
+
+
 class TestController(object):
     """Base functional test case for the controllers.
 
@@ -248,3 +276,8 @@ class LDAPTest:
                 ok_(False, "Cannot establish connection with LDAP test server")
             else:
                 ok_(True)
+
+
+class ArgumentParser(argparse.ArgumentParser):
+    def exit(self, status=0, message=None):
+        raise Exception(message)

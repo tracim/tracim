@@ -72,6 +72,8 @@ setup(
         ],
         'gearbox.commands': [
             'ldap_server = tracim.command.ldap_test_server:LDAPTestServerCommand',
+            'user_create = tracim.command.user:CreateUserCommand',
+            'user_update = tracim.command.user:UpdateUserCommand',
         ]
     },
     dependency_links=[
