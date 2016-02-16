@@ -5,6 +5,10 @@ class TracimError(Exception):
     pass
 
 
+class ConfigurationError(TracimError):
+    pass
+
+
 class AlreadyExistError(TracimError):
     pass
 

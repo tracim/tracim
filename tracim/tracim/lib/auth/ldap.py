@@ -5,6 +5,7 @@ from who_ldap import LDAPGroupsPlugin as BaseLDAPGroupsPlugin
 from who_ldap import LDAPSearchAuthenticatorPlugin as BaseLDAPSearchAuthenticatorPlugin
 
 from tracim.lib.auth.base import Auth
+from tracim.lib.exception import ConfigurationError
 from tracim.lib.helpers import ini_conf_to_bool
 from tracim.lib.user import UserApi
 from tracim.model import DBSession, User
@@ -33,6 +34,7 @@ class LDAPAuth(Auth):
 
         mdproviders = [('ldapuser', self.ldap_user_provider)]
         if ini_conf_to_bool(self._config.get('ldap_group_enabled', False)):
+            raise ConfigurationError("ldap_group_enabled is not yet available")
             mdproviders.append(('ldapgroups', self.ldap_groups_provider))
         self._config['sa_auth'].mdproviders = mdproviders
 
