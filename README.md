@@ -301,18 +301,25 @@ Then add LDAP parameters
 
     # LDAP server address
     ldap_url = ldap://localhost:389
+
     # Base dn to make queries
     ldap_base_dn = dc=directory,dc=fsf,dc=org
+
     # Bind dn to identify the search
     ldap_bind_dn = cn=admin,dc=directory,dc=fsf,dc=org
+
     # The bind password
     ldap_bind_pass = toor
+
     # Attribute name of user record who contain user login (email)
     ldap_ldap_naming_attribute = uid
+
     # Matching between ldap attribute and ldap user field
     ldap_user_attributes = mail=email
+
     # TLS usage to communicate with your LDAP server
     ldap_tls = False
+
     # If True, LDAP own tracim group managment (not available for now!)
     ldap_group_enabled = False
 
