@@ -314,7 +314,7 @@ Then add LDAP parameters
     # Attribute name of user record who contain user login (email)
     ldap_ldap_naming_attribute = uid
 
-    # Matching between ldap attribute and ldap user field
+    # Matching between ldap attribute and ldap user field (ldap_attr1=user_field1,ldap_attr2=user_field2,...)
     ldap_user_attributes = mail=email
 
     # TLS usage to communicate with your LDAP server
