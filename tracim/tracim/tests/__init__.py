@@ -255,7 +255,7 @@ class TracimTestController(TestController):
         return form.submit(status=302)
 
 
-class LDAPTest:
+class LDAPTest(object):
 
     """
     Server fixtures, see https://github.com/zoldar/python-ldap-test

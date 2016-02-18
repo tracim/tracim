@@ -3,7 +3,7 @@ from tracim.lib.auth.internal import InternalAuth
 from tracim.lib.auth.ldap import LDAPAuth
 
 
-class AuthConfigWrapper:
+class AuthConfigWrapper(object):
 
     # TODO: Dynamic load, like plugins ?
     AUTH_CLASSES = (InternalAuth, LDAPAuth)

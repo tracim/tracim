@@ -21,7 +21,7 @@ def _get_clean_sa_auth(config):
     return sa_auth
 
 
-class Auth:
+class Auth(object):
     """
     Auth strategy base class
     """
