@@ -3,7 +3,7 @@
 Integration tests for the ldap authentication sub-system.
 """
 from tracim.fixtures.ldap import ldap_test_server_fixtures
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 from tracim.model import DBSession, User
 from tracim.tests import LDAPTest, TracimTestController
@@ -39,3 +39,16 @@ class TestAuthentication(LDAPTest, TracimTestController):
 
         # User is registered in tracim database
         eq_(1, DBSession.query(User).filter(User.email == 'richard-not-real-email@fsf.org').count())
+
+    def test_ldap_attributes_sync(self):
+        # User is already know in database
+        eq_(1, DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').count())
+
+        # His display name is Lawrence L.
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
+        eq_('Lawrence L.', lawrence.display_name)
+
+        # After connexion with LDAP, his display_name is updated (see ldap fixtures)
+        self._connect_user('lawrence-not-real-email@fsf.org', 'foobarbaz')
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
+        eq_('Lawrence Lessig', lawrence.display_name)

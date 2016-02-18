@@ -40,7 +40,8 @@ ldap_test_server_fixtures = {
             'attributes': {
                 'uid': 'richard-not-real-email@fsf.org',
                 'userPassword': 'rms',
-                'mail': 'richard-not-real-email@fsf.org'
+                'mail': 'richard-not-real-email@fsf.org',
+                'pubname': 'Richard Stallman',
             }
         },
         {
@@ -49,7 +50,8 @@ ldap_test_server_fixtures = {
             'attributes': {
                 'uid': 'lawrence-not-real-email@fsf.org',
                 'userPassword': 'foobarbaz',
-                'mail': 'lawrence-not-real-email@fsf.org'
+                'mail': 'lawrence-not-real-email@fsf.org',
+                'pubname': 'Lawrence Lessig',
             }
         },
     ]

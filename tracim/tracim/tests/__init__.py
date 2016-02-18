@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Unit and functional test suite for tracim."""
 import argparse
+import os
 from os import getcwd
 
 import ldap3
 import tg
+import time
 import transaction
 from gearbox.commands.setup_app import SetupAppCommand
 from ldap_test import LdapServer
@@ -20,7 +22,7 @@ from sqlalchemy.schema import Sequence
 from sqlalchemy.schema import Table
 from tg import config
 from tg.util import Bunch
-from webtest import TestApp
+from webtest import TestApp as BaseTestApp, AppError
 from who_ldap import make_connection
 
 from tracim.command import BaseCommand
@@ -30,6 +32,21 @@ from tracim.model import DBSession
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
 application_name = 'main_without_authn'
+
+
+class TestApp(BaseTestApp):
+    def _check_status(self, status, res):
+        """ Simple override to print html content when error"""
+        try:
+            super()._check_status(status, res)
+        except AppError as exc:
+            dump_file_path = "/tmp/debug_%d_%s.html" % (time.time() * 1000, res.request.path_qs[1:])
+            if os.path.exists("/tmp"):
+                with open(dump_file_path, 'w') as dump_file:
+                    print(res.ubody, file=dump_file)
+                # Update exception message with info about this dumped file
+                exc.args = ('%s html error file dump in %s' % (exc.args[0], dump_file_path), ) + exc.args[1:]
+            raise exc
 
 
 def load_app(name=application_name):

@@ -59,7 +59,7 @@ class TestAuthentication(LDAPTest, TracimTestController):
 
         # If we force edit of user, "email" field will be not updated
         eq_(lawrence.email, 'lawrence-not-real-email@fsf.org')
-        eq_(lawrence.display_name, 'Lawrence Lessig')
+        eq_(lawrence.display_name, 'Lawrence L.')
 
         try_post_user = self.app.post(
             '/user/%d?_method=PUT' % lawrence.user_id,

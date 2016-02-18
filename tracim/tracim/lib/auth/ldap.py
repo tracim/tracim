@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import transaction
 from tg.configuration.auth import TGAuthMetadata
 from who_ldap import LDAPAttributesPlugin as BaseLDAPAttributesPlugin
 from who_ldap import LDAPGroupsPlugin as BaseLDAPGroupsPlugin
@@ -92,19 +93,27 @@ class LDAPSearchAuthenticatorPlugin(BaseLDAPSearchAuthenticatorPlugin):
         # Note: super().authenticate return None if already authenticated or not found
         email = super().authenticate(environ, identity)
         if email:
-            self._sync_ldap_user(email)
+            self._sync_ldap_user(email, environ, identity)
         return email
 
-    def _sync_ldap_user(self, email):
+    def _sync_ldap_user(self, email, environ, identity):
+        # Create or get user for connected email
         if not self._user_api.user_with_email_exists(email):
             user = User(email=email, imported_from=LDAPAuth.name)
             DBSession.add(user)
-            import transaction
-            transaction.commit()
+        else:
+            user = self._user_api.get_one_by_email(email)
 
-            # TODO - B.S. - 20160208: Voir avec Damien, si je ne fait pas de transaction.commit()
-            # manuellement la donnée n'est pas en base.
-            # self._user_api.create_user(email=email, save_now=True)
+        # Retrieve ldap user attributes
+        self._auth.ldap_user_provider.add_metadata_for_auth(environ, identity)
+
+        # Update user with ldap attributes
+        user_ldap_values = identity.get('user').copy()
+        for field_name in user_ldap_values:
+            setattr(user, field_name, user_ldap_values[field_name])
+
+        DBSession.flush()
+        transaction.commit()
 
 
 class LDAPApplicationAuthMetadata(TGAuthMetadata):
@@ -156,9 +165,11 @@ class LDAPAttributesPlugin(BaseLDAPAttributesPlugin):
         self._user_api = UserApi(None)
 
     def add_metadata(self, environ, identity):
+        # We disable metadata recuperation, we do it at connection in LDAPSearchAuthenticatorPlugin._sync_ldap_user
+        return
+
+    def add_metadata_for_auth(self, environ, identity):
         super().add_metadata(environ, identity)
-        # TODO - B.S. - 20160212: identity contains now som information from LDAP what we can save in local database
-        identity[self.name] = self._user_api.get_one_by_email(identity.get('repoze.who.userid'))
 
     @property
     def local_fields(self):

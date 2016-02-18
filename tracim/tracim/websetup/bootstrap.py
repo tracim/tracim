@@ -43,7 +43,7 @@ def bootstrap(command, conf, vars):
         # TODO: - B.S. - 20160212: Following fixture is LDAP tests specific, should make an little fixture management
         # for tests
         lawrence = model.User()
-        lawrence.display_name = 'Lawrence Lessig'
+        lawrence.display_name = 'Lawrence L.'
         lawrence.email = 'lawrence-not-real-email@fsf.org'
         lawrence.password = 'foobarbaz'
         model.DBSession.add(lawrence)
