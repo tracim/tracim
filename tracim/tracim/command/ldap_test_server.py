@@ -5,6 +5,10 @@ from ldap_test import LdapServer
 
 
 class LDAPTestServerCommand(Command):
+
+    def get_description(self):
+        return '''Run a test LDAP server.'''
+
     def take_action(self, parsed_args):
         # TODO - B.S. - 20160210: paramètre argv pour preciser les fixtures
         server = LdapServer(ldap_test_server_fixtures)

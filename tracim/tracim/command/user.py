@@ -23,6 +23,9 @@ class UserCommand(AppContextCommand):
         self._user_api = UserApi(None)
         self._group_api = GroupApi(None)
 
+    def get_description(self):
+        return '''Create or update user.'''
+
     def get_parser(self, prog_name):
         parser = super().get_parser(prog_name)
 
@@ -41,14 +44,6 @@ class UserCommand(AppContextCommand):
             dest='password',
             required=False,
             default=None
-        )
-
-        parser.add_argument(
-            "-u",
-            "--update",
-            help='Update user password if exist',
-            dest='update',
-            action='store_true'
         )
 
         parser.add_argument(

@@ -323,6 +323,14 @@ Then add LDAP parameters
     # If True, LDAP own tracim group managment (not available for now!)
     ldap_group_enabled = False
 
+You may need an administrator account to manage Tracim. Use the following command (from ``/install/dir/of/tracim/tracim``):
+
+```
+gearbox user create -l admin-email@domain.com -p new_password -g managers -g administrators
+```
+
+Keep in mind ``admin-email@domain.com`` must match with LDAP user.
+
 #### Other parameters  ####
 
 There are other parameters which may be of some interest for you. For example, you can:
