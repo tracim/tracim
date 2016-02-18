@@ -25,7 +25,8 @@ from tg.util import Bunch
 from webtest import TestApp as BaseTestApp, AppError
 from who_ldap import make_connection
 
-from tracim.command import BaseCommand
+from tracim.fixtures import FixturesLoader
+from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.lib.base import logger
 from tracim.model import DBSession
 
@@ -149,6 +150,7 @@ def teardown_db():
 class TestStandard(object):
 
     application_under_test = application_name
+    fixtures = [BaseFixture, ]
 
     def setUp(self):
         self.app = load_app(self.application_under_test)
@@ -167,6 +169,11 @@ class TestStandard(object):
         logger.debug(self, 'Start Database Setup...')
         setup_db()
         logger.debug(self, 'Start Database Setup... -> done')
+
+        logger.debug(self, 'Load extra fixtures...')
+        fixtures_loader = FixturesLoader([BaseFixture])  # BaseFixture is already loaded in bootstrap
+        fixtures_loader.loads(self.fixtures)
+        logger.debug(self, 'Load extra fixtures... -> done')
 
         self.app.get('/_test_vars')  # Allow to create fake context
         tg.i18n.set_lang('en')  # Set a default lang
@@ -207,6 +214,7 @@ class TestController(object):
     """
 
     application_under_test = application_name
+    fixtures = [BaseFixture, ]
 
     def setUp(self):
         """Setup test fixture for each functional test method."""
@@ -219,6 +227,9 @@ class TestController(object):
 
         setup_app(section_name=self.application_under_test)
         setup_db()
+
+        fixtures_loader = FixturesLoader([BaseFixture])  # BaseFixture is already loaded in bootstrap
+        fixtures_loader.loads(self.fixtures)
 
 
     def tearDown(self):

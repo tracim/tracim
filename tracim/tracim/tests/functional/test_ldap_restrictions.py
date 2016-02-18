@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from nose.tools import eq_, ok_
 
 from tracim.fixtures.ldap import ldap_test_server_fixtures
+from tracim.fixtures.users_and_groups import Test as TestFixture
 from tracim.lib.base import current_user
 from tracim.model import DBSession, User
 from tracim.tests import LDAPTest, TracimTestController
@@ -13,6 +14,7 @@ from tracim.tests import LDAPTest, TracimTestController
 class TestAuthentication(LDAPTest, TracimTestController):
     application_under_test = 'ldap'
     ldap_server_data = ldap_test_server_fixtures
+    fixtures = [TestFixture, ]
 
     def test_password_disabled(self):
         """

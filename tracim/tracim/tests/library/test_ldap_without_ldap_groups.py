@@ -3,6 +3,7 @@ from nose.tools import eq_
 from tg import config
 
 from tracim.fixtures.ldap import ldap_test_server_fixtures
+from tracim.fixtures.users_and_groups import Test as TestFixtures
 from tracim.lib.auth.ldap import LDAPAuth
 from tracim.lib.helpers import ini_conf_to_bool
 from tracim.model import DBSession, User, Group
@@ -15,6 +16,7 @@ class TestContentApi(LDAPTest, TestStandard):
     """
     application_under_test = 'ldap'
     ldap_server_data = ldap_test_server_fixtures
+    fixtures = [TestFixtures]
 
     def _check_db_user(self, email, count=1):
         eq_(count, DBSession.query(User).filter(User.email == email).count())

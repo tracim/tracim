@@ -5,6 +5,7 @@ Integration tests for the ldap authentication sub-system.
 from tracim.fixtures.ldap import ldap_test_server_fixtures
 from nose.tools import eq_, ok_
 
+from tracim.fixtures.users_and_groups import Test as TestFixture
 from tracim.model import DBSession, User
 from tracim.tests import LDAPTest, TracimTestController
 
@@ -12,6 +13,7 @@ from tracim.tests import LDAPTest, TracimTestController
 class TestAuthentication(LDAPTest, TracimTestController):
     application_under_test = 'ldap'
     ldap_server_data = ldap_test_server_fixtures
+    fixtures = [TestFixture, ]
 
     def test_ldap_auth_fail_no_account(self):
         # User is unknown in tracim database
