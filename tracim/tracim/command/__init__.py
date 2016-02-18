@@ -19,7 +19,21 @@ class BaseCommand(Command):
         try:
             super().run(parsed_args)
         except CommandAbortedError as exc:
+            if parsed_args.raise_error:
+                raise
             print(exc)
+
+    def get_parser(self, prog_name):
+        parser = super().get_parser(prog_name)
+
+        parser.add_argument(
+            "--raise",
+            help='Raise CommandAbortedError errors instead print it\'s message',
+            dest='raise_error',
+            action='store_true',
+        )
+
+        return parser
 
 
 class AppContextCommand(BaseCommand):

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import transaction
 from sqlalchemy.exc import IntegrityError
+from tg import config
 
 from tracim.command import AppContextCommand, Extender
+from tracim.lib.auth.ldap import LDAPAuth
 from tracim.lib.exception import AlreadyExistError, CommandAbortedError
 from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
@@ -88,7 +90,9 @@ class UserCommand(AppContextCommand):
 
     def _create_user(self, login, password, **kwargs):
         if not password:
-            raise CommandAbortedError("You must provide -p/--password parameter")
+            if self._password_required():
+                raise CommandAbortedError("You must provide -p/--password parameter")
+            password = ''
 
         try:
             user = User(email=login, password=password, **kwargs)
@@ -115,6 +119,8 @@ class UserCommand(AppContextCommand):
         print("User created/updated")
 
     def _proceed_user(self, parsed_args):
+        self._check_context(parsed_args)
+
         if self.action == self.ACTION_CREATE:
             try:
                 user = self._create_user(login=parsed_args.login, password=parsed_args.password)
@@ -137,6 +143,19 @@ class UserCommand(AppContextCommand):
         for group_name in parsed_args.remove_from_group:
             self._remove_user_from_named_group(user, group_name)
 
+    def _password_required(self):
+        if config.get('auth_type') == LDAPAuth.name:
+            return False
+        return True
+
+    def _check_context(self, parsed_args):
+        if config.get('auth_type') == LDAPAuth.name:
+            auth_instance = config.get('auth_instance')
+            if not auth_instance.ldap_auth.user_exist(parsed_args.login):
+                raise LDAPUserUnknown(
+                    "LDAP is enabled and user with login/email \"%s\" not found in LDAP" % parsed_args.login
+                )
+
 
 class CreateUserCommand(UserCommand):
     action = UserCommand.ACTION_CREATE
@@ -144,3 +163,7 @@ class CreateUserCommand(UserCommand):
 
 class UpdateUserCommand(UserCommand):
     action = UserCommand.ACTION_UPDATE
+
+
+class LDAPUserUnknown(CommandAbortedError):
+    pass

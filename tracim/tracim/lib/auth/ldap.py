@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import transaction
 from tg.configuration.auth import TGAuthMetadata
-from who_ldap import LDAPAttributesPlugin as BaseLDAPAttributesPlugin
+from who_ldap import LDAPAttributesPlugin as BaseLDAPAttributesPlugin, make_connection
 from who_ldap import LDAPGroupsPlugin as BaseLDAPGroupsPlugin
 from who_ldap import LDAPSearchAuthenticatorPlugin as BaseLDAPSearchAuthenticatorPlugin
 
@@ -114,6 +114,22 @@ class LDAPSearchAuthenticatorPlugin(BaseLDAPSearchAuthenticatorPlugin):
 
         DBSession.flush()
         transaction.commit()
+
+    def user_exist(self, email):
+        with make_connection(self.url, self.bind_dn, self.bind_pass) as conn:
+            if self.start_tls:
+                conn.start_tls()
+
+            if not conn.bind():
+                return False
+
+            search = self.search_pattern % email
+            conn.search(self.base_dn, search, self.search_scope)
+
+            if len(conn.response) > 0:
+                return True
+
+            return False
 
 
 class LDAPApplicationAuthMetadata(TGAuthMetadata):

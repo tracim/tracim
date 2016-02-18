@@ -176,26 +176,10 @@ class TestStandard(object):
 
 
 class TestCommand(TestStandard):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # We disable app loading from commands classes
-        BaseCommand.auto_setup_app = False
-        # Hack parser object to test conditions
-        BaseCommand.get_parser = self._get_test_parser()
-
-    def _get_test_parser(self):
-        def get_parser(self, prog_name):
-            parser = ArgumentParser(
-                description=self.get_description(),
-                prog=prog_name,
-                add_help=False
-            )
-            return parser
-        return get_parser
-
     def _execute_command(self, command_class, command_name, sub_argv):
         parser = argparse.ArgumentParser()
         command = command_class(self.app, parser)
+        command.auto_setup_app = False
         cmd_parser = command.get_parser(command_name)
         parsed_args = cmd_parser.parse_args(sub_argv)
         return command.run(parsed_args)
