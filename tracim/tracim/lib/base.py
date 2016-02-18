@@ -32,7 +32,7 @@ class BaseController(TGController):
         return TGController.__call__(self, environ, context)
 
     def _before(self, *args, **kwargs):
-        tmpl_context.auth_is_internal = tg.config.get('auth_is_internal')
+        tmpl_context.auth_is_internal = tg.config.get('auth_is_internal', True)
         tmpl_context.auth_instance = tg.config.get('auth_instance')
 
     @property

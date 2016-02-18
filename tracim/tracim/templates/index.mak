@@ -50,7 +50,7 @@
                                 <button type="submit" class="btn btn-small btn-success text-right">
                                     <i class="fa fa-check"></i> ${_('Login')}
                                 </button>
-                                % if CFG.EMAIL_NOTIFICATION_ACTIVATED:
+                                % if CFG.EMAIL_NOTIFICATION_ACTIVATED and tmpl_context.auth_is_internal:
                                     <div class="pull-left">
                                         <a class="btn btn-link" href="${tg.url('/reset_password')}"><i class="fa fa-magic"></i> ${_('Forgot password?')}</a>
                                     </div>
