@@ -326,7 +326,7 @@ Then add LDAP parameters
 You may need an administrator account to manage Tracim. Use the following command (from ``/install/dir/of/tracim/tracim``):
 
 ```
-gearbox user create -l admin-email@domain.com -p new_password -g managers -g administrators
+gearbox user create -l admin-email@domain.com -g managers -g administrators
 ```
 
 Keep in mind ``admin-email@domain.com`` must match with LDAP user.
