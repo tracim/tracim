@@ -17,3 +17,6 @@ class GroupApi(object):
 
     def get_one(self, group_id) -> Group:
         return self._base_query().filter(Group.group_id==group_id).one()
+
+    def get_one_with_name(self, group_name) -> Group:
+        return self._base_query().filter(Group.group_name==group_name).one()

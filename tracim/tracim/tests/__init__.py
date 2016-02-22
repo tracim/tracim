@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 """Unit and functional test suite for tracim."""
+import argparse
+import os
+from os import getcwd
 
-from os import getcwd, path
-
-from paste.deploy import loadapp
-from webtest import TestApp
-
-from gearbox.commands.setup_app import SetupAppCommand
-
+import ldap3
 import tg
-from tg import config
-from tg.util import Bunch
-
+import time
+import transaction
+from gearbox.commands.setup_app import SetupAppCommand
+from ldap_test import LdapServer
+from nose.tools import ok_
+from paste.deploy import loadapp
 from sqlalchemy.engine import reflection
-
 from sqlalchemy.schema import DropConstraint
 from sqlalchemy.schema import DropSequence
 from sqlalchemy.schema import DropTable
@@ -21,14 +20,34 @@ from sqlalchemy.schema import ForeignKeyConstraint
 from sqlalchemy.schema import MetaData
 from sqlalchemy.schema import Sequence
 from sqlalchemy.schema import Table
+from tg import config
+from tg.util import Bunch
+from webtest import TestApp as BaseTestApp, AppError
+from who_ldap import make_connection
 
-import transaction
-
+from tracim.fixtures import FixturesLoader
+from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.lib.base import logger
+from tracim.model import DBSession
 
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
 application_name = 'main_without_authn'
+
+
+class TestApp(BaseTestApp):
+    def _check_status(self, status, res):
+        """ Simple override to print html content when error"""
+        try:
+            super()._check_status(status, res)
+        except AppError as exc:
+            dump_file_path = "/tmp/debug_%d_%s.html" % (time.time() * 1000, res.request.path_qs[1:])
+            if os.path.exists("/tmp"):
+                with open(dump_file_path, 'w') as dump_file:
+                    print(res.ubody, file=dump_file)
+                # Update exception message with info about this dumped file
+                exc.args = ('%s html error file dump in %s' % (exc.args[0], dump_file_path), ) + exc.args[1:]
+            raise exc
 
 
 def load_app(name=application_name):
@@ -131,6 +150,7 @@ def teardown_db():
 class TestStandard(object):
 
     application_under_test = application_name
+    fixtures = [BaseFixture, ]
 
     def setUp(self):
         self.app = load_app(self.application_under_test)
@@ -150,11 +170,32 @@ class TestStandard(object):
         setup_db()
         logger.debug(self, 'Start Database Setup... -> done')
 
+        logger.debug(self, 'Load extra fixtures...')
+        fixtures_loader = FixturesLoader([BaseFixture])  # BaseFixture is already loaded in bootstrap
+        fixtures_loader.loads(self.fixtures)
+        logger.debug(self, 'Load extra fixtures... -> done')
+
         self.app.get('/_test_vars')  # Allow to create fake context
         tg.i18n.set_lang('en')  # Set a default lang
 
     def tearDown(self):
         transaction.commit()
+
+
+class TestCommand(TestStandard):
+    def _execute_command(self, command_class, command_name, sub_argv):
+        parser = argparse.ArgumentParser()
+        command = command_class(self.app, parser)
+        command.auto_setup_app = False
+        cmd_parser = command.get_parser(command_name)
+        parsed_args = cmd_parser.parse_args(sub_argv)
+        return command.run(parsed_args)
+
+    def setUp(self):
+        super().setUp()
+        # Ensure app config is loaded
+        self.app.get('/_test_vars')
+
 
 class TestController(object):
     """Base functional test case for the controllers.
@@ -173,6 +214,7 @@ class TestController(object):
     """
 
     application_under_test = application_name
+    fixtures = [BaseFixture, ]
 
     def setUp(self):
         """Setup test fixture for each functional test method."""
@@ -186,8 +228,68 @@ class TestController(object):
         setup_app(section_name=self.application_under_test)
         setup_db()
 
+        fixtures_loader = FixturesLoader([BaseFixture])  # BaseFixture is already loaded in bootstrap
+        fixtures_loader.loads(self.fixtures)
+
 
     def tearDown(self):
         """Tear down test fixture for each functional test method."""
-        # model.DBSession.remove()
+        DBSession.close()
         teardown_db()
+
+
+class TracimTestController(TestController):
+
+    def _connect_user(self, login, password):
+        # Going to the login form voluntarily:
+        resp = self.app.get('/', status=200)
+        form = resp.form
+        # Submitting the login form:
+        form['login'] = login
+        form['password'] = password
+        return form.submit(status=302)
+
+
+class LDAPTest(object):
+
+    """
+    Server fixtures, see https://github.com/zoldar/python-ldap-test
+    """
+    ldap_server_data = NotImplemented
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._ldap_test_server = None
+        self._ldap_connection = None
+
+    def setUp(self):
+        super().setUp()
+        self._ldap_test_server = LdapServer(self.ldap_server_data)
+        self._ldap_test_server.start()
+        ldap3_server = ldap3.Server('localhost', port=self._ldap_test_server.config['port'])
+        self._ldap_connection = ldap3.Connection(
+            ldap3_server,
+            user=self._ldap_test_server.config['bind_dn'],
+            password=self._ldap_test_server.config['password'],
+            auto_bind=True
+        )
+
+    def tearDown(self):
+        super().tearDown()
+        self._ldap_test_server.stop()
+
+    def test_ldap_connectivity(self):
+        with make_connection(
+                'ldap://%s:%d' % ('localhost', self._ldap_test_server.config['port']),
+                self._ldap_test_server.config['bind_dn'],
+                'toor'
+        ) as conn:
+            if not conn.bind():
+                ok_(False, "Cannot establish connection with LDAP test server")
+            else:
+                ok_(True)
+
+
+class ArgumentParser(argparse.ArgumentParser):
+    def exit(self, status=0, message=None):
+        raise Exception(message)

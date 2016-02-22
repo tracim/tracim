@@ -28,6 +28,9 @@ beaker.session.key = pod
 beaker.session.secret = ${app_instance_secret}
 app_instance_uuid = ${app_instance_uuid}
 
+# Auth type (internal or ldap)
+auth_type = internal
+
 # If you'd like to fine-tune the individual locations of the cache data dirs
 # for the Cache data, or the Session saves, un-comment the desired settings
 # here:

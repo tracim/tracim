@@ -174,7 +174,8 @@ CREATE TABLE users (
     display_name character varying(255),
     password character varying(128),
     created timestamp without time zone,
-    is_active boolean DEFAULT true NOT NULL
+    is_active boolean DEFAULT true NOT NULL,
+    imported_from character varying(32)
 );
 
 CREATE TABLE user_group (

@@ -32,13 +32,15 @@ testpkgs=['WebTest >= 1.2.3',
                ]
 
 install_requires=[
-    "TurboGears2 >= 2.3.7",
+    "TurboGears2==2.3.7",
     "Genshi",
     "Mako",
     "zope.sqlalchemy >= 0.4",
     "sqlalchemy",
     "alembic",
     "repoze.who",
+    "who-ldap==3.1.0",
+    "python-ldap-test==0.2.0",
     ]
 
 setup(
@@ -67,10 +69,15 @@ setup(
         ],
         'gearbox.plugins': [
             'turbogears-devtools = tg.devtools'
+        ],
+        'gearbox.commands': [
+            'ldap_server = tracim.command.ldap_test_server:LDAPTestServerCommand',
+            'user_create = tracim.command.user:CreateUserCommand',
+            'user_update = tracim.command.user:UpdateUserCommand',
         ]
     },
     dependency_links=[
-        "http://tg.gy/230"
+        "http://tg.gy/230",
         ],
     zip_safe=False
 )

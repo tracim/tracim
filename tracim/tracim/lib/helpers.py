@@ -198,3 +198,21 @@ def shorten(text: str, maxlength: int, add_three_points=True) -> str:
             result += '…'
 
     return result
+
+
+def ini_conf_to_bool(value):
+    """
+    Depending INI file interpreter, False values are simple parsed as string,
+    so use this function to consider them as boolean
+    :param value: value of ini parameter
+    :return: bollean value
+    """
+    if value in ('False', 'false', '0', 'off', 'no'):
+        return False
+    return bool(value)
+
+
+def is_user_externalized_field(field_name):
+    if not tg.config.get('auth_instance').is_internal:
+        return field_name in tg.config.get('auth_instance').managed_fields
+    return False

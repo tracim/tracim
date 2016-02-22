@@ -27,9 +27,13 @@ class UserApi(object):
     def get_one_by_email(self, email: str):
         return self._base_query().filter(User.email==email).one()
 
-    def update(self, user: User, name: str, email: str, do_save):
-        user.display_name = name
-        user.email = email
+    def update(self, user: User, name: str=None, email: str=None, do_save=True):
+        if name is not None:
+            user.display_name = name
+
+        if email is not None:
+            user.email = email
+
         if do_save:
             self.save(user)
 

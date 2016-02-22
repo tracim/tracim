@@ -119,6 +119,7 @@ class User(DeclarativeBase):
     _password = Column('password', Unicode(128))
     created = Column(DateTime, default=datetime.now)
     is_active = Column(Boolean, default=True, nullable=False)
+    imported_from = Column(Unicode(32), nullable=True)
 
     @hybrid_property
     def email_address(self):

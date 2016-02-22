@@ -98,11 +98,17 @@
         <div class="modal-body">
             <div class="form-group">
                 <label for="name">${_('Name')}</label>
-                <input name="name" type="text" class="form-control" id="name" placeholder="${_('Name')}" value="${user.name}">
+                % if h.is_user_externalized_field('name'):
+                    <span class="info readonly">${_('This information is managed by an external application')}</span>
+                % endif
+                <input name="name" type="text" class="form-control" id="name" placeholder="${_('Name')}" value="${user.name}" ${'readonly="readonly"' if h.is_user_externalized_field('name') else '' | n}>
             </div>
             <div class="form-group">
                 <label for="email">${_('Email')}</label>
-                <input name="email" type="text" class="form-control" id="email" placeholder="${_('Name')}" value="${user.email}">
+                % if h.is_user_externalized_field('email'):
+                    <span class="info readonly">${_('This information is managed by an external application')}</span>
+                % endif
+                <input name="email" type="text" class="form-control" id="email" placeholder="${_('Name')}" value="${user.email}" ${'readonly="readonly"' if h.is_user_externalized_field('email') else '' | n}>
             </div>
         </div>
         <div class="modal-footer">
