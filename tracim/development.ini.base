@@ -38,7 +38,7 @@ cache_dir = %(here)s/data
 beaker.session.key = tracim
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
 
-# Auth type
+# Auth type (internal or ldap)
 auth_type = internal
 
 #By default session is store in cookies to avoid the overhead
