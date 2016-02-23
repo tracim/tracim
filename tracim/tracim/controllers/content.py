@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+
 __author__ = 'damien'
 
 from cgi import FieldStorage
@@ -27,7 +29,7 @@ from tracim.lib.predicates import current_user_is_content_manager
 from tracim.lib.predicates import require_current_user_is_owner
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
-from tracim.model.data import ActionDescription
+from tracim.model.data import ActionDescription, new_revision
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
@@ -88,8 +90,9 @@ class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
                                                                                                          item_id)
 
             msg = _('{} deleted. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
-            content_api.delete(item)
-            content_api.save(item, ActionDescription.DELETION)
+            with new_revision(item):
+                content_api.delete(item)
+                content_api.save(item, ActionDescription.DELETION)
 
             tg.flash(msg, CST.STATUS_OK, no_escape=True)
             tg.redirect(next_url)
@@ -116,8 +119,9 @@ class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
                                                                              tmpl_context.folder_id,
                                                                              tmpl_context.thread_id)
             msg = _('{} undeleted.').format(self._item_type_label)
-            content_api.undelete(item)
-            content_api.save(item, ActionDescription.UNDELETION)
+            with new_revision(item):
+                content_api.undelete(item)
+                content_api.save(item, ActionDescription.UNDELETION)
 
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(next_url)
@@ -277,38 +281,40 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             # TODO - D.A. - 2015-03-19
             # refactor this method in order to make code easier to understand
 
-            if comment and label:
-                updated_item = api.update_content(
-                    item, label if label else item.label,
-                    comment if comment else ''
-                )
-                api.save(updated_item, ActionDescription.EDITION)
+            with new_revision(item):
 
-                # This case is the default "file title and description update"
-                # In this case the file itself is not revisionned
+                if comment and label:
+                    updated_item = api.update_content(
+                        item, label if label else item.label,
+                        comment if comment else ''
+                    )
+                    api.save(updated_item, ActionDescription.EDITION)
 
-            else:
-                # So, now we may have a comment and/or a file revision
-                if comment and ''==label:
-                    comment_item = api.create_comment(workspace,
-                                                      item, comment,
-                                                      do_save=False)
+                    # This case is the default "file title and description update"
+                    # In this case the file itself is not revisionned
 
-                    if not isinstance(file_data, FieldStorage):
-                        api.save(comment_item, ActionDescription.COMMENT)
-                    else:
-                        # The notification is only sent
-                        # if the file is NOT updated
-                        #
-                        #  If the file is also updated,
-                        #  then a 'file revision' notification will be sent.
-                        api.save(comment_item,
-                                 ActionDescription.COMMENT,
-                                 do_notify=False)
+                else:
+                    # So, now we may have a comment and/or a file revision
+                    if comment and ''==label:
+                        comment_item = api.create_comment(workspace,
+                                                          item, comment,
+                                                          do_save=False)
 
-                if isinstance(file_data, FieldStorage):
-                    api.update_file_data(item, file_data.filename, file_data.type, file_data.file.read())
-                    api.save(item, ActionDescription.REVISION)
+                        if not isinstance(file_data, FieldStorage):
+                            api.save(comment_item, ActionDescription.COMMENT)
+                        else:
+                            # The notification is only sent
+                            # if the file is NOT updated
+                            #
+                            #  If the file is also updated,
+                            #  then a 'file revision' notification will be sent.
+                            api.save(comment_item,
+                                     ActionDescription.COMMENT,
+                                     do_notify=False)
+
+                    if isinstance(file_data, FieldStorage):
+                        api.update_file_data(item, file_data.filename, file_data.type, file_data.file.read())
+                        api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
@@ -420,8 +426,9 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
         try:
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
-            api.update_content(item, label, content)
-            api.save(item, ActionDescription.REVISION)
+            with new_revision(item):
+                api.update_content(item, label, content)
+                api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
@@ -600,7 +607,9 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
 
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(item_id, ContentType.Any, workspace)
-            api.move_recursively(item, new_parent, new_workspace)
+
+            with new_revision(item):
+                api.move_recursively(item, new_parent, new_workspace)
 
             next_url = tg.url('/workspaces/{}/folders/{}'.format(
                 new_workspace.workspace_id, item_id))
@@ -618,7 +627,8 @@ class ItemLocationController(TIMWorkspaceContentRestController, BaseController):
             # Default move inside same workspace
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(item_id, ContentType.Any, workspace)
-            api.move(item, new_parent)
+            with new_revision(item):
+                api.move(item, new_parent)
             next_url = self.parent_controller.url(item_id)
             if new_parent:
                 tg.flash(_('Item moved to {}').format(new_parent.label), CST.STATUS_OK)
@@ -761,7 +771,8 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             logger.error(self, 'An unexpected exception has been catched. Look at the traceback below.')
             traceback.print_exc()
 
-            tg.flash(_('Folder not created: {}').format(e.with_traceback()), CST.STATUS_ERROR)
+            tb = sys.exc_info()[2]
+            tg.flash(_('Folder not created: {}').format(e.with_traceback(tb)), CST.STATUS_ERROR)
             if parent_id:
                 redirect_url = redirect_url_tmpl.format(tmpl_context.workspace_id, parent_id)
             else:
@@ -792,11 +803,12 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
                 file = True if can_contain_files=='on' else False,
                 page = True if can_contain_pages=='on' else False
             )
-            if label != folder.label:
-                # TODO - D.A. - 2015-05-25 - Allow to set folder description
-                api.update_content(folder, label, folder.description)
-            api.set_allowed_content(folder, subcontent)
-            api.save(folder)
+            with new_revision(folder):
+                if label != folder.label:
+                    # TODO - D.A. - 2015-05-25 - Allow to set folder description
+                    api.update_content(folder, label, folder.description)
+                api.set_allowed_content(folder, subcontent)
+                api.save(folder)
 
             tg.flash(_('Folder updated'), CST.STATUS_OK)
 
@@ -838,8 +850,9 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             undo_url = self._std_url.format(item.workspace_id, item.content_id)+'/put_archive_undo'
             msg = _('{} archived. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
 
-            content_api.archive(item)
-            content_api.save(item, ActionDescription.ARCHIVING)
+            with new_revision(item):
+                content_api.archive(item)
+                content_api.save(item, ActionDescription.ARCHIVING)
 
             tg.flash(msg, CST.STATUS_OK, no_escape=True) # TODO allow to come back
             tg.redirect(next_url)
@@ -860,8 +873,9 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         try:
             next_url = self._std_url.format(item.workspace_id, item.content_id)
             msg = _('{} unarchived.').format(self._item_type_label)
-            content_api.unarchive(item)
-            content_api.save(item, ActionDescription.UNARCHIVING)
+            with new_revision(item):
+                content_api.unarchive(item)
+                content_api.save(item, ActionDescription.UNARCHIVING)
 
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(next_url )
@@ -885,8 +899,9 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             next_url = self._parent_url.format(item.workspace_id, item.parent_id)
             undo_url = self._std_url.format(item.workspace_id, item.content_id)+'/put_delete_undo'
             msg = _('{} deleted. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
-            content_api.delete(item)
-            content_api.save(item, ActionDescription.DELETION)
+            with new_revision(item):
+                content_api.delete(item)
+                content_api.save(item, ActionDescription.DELETION)
 
             tg.flash(msg, CST.STATUS_OK, no_escape=True)
             tg.redirect(next_url)
@@ -909,8 +924,9 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         try:
             next_url = self._std_url.format(item.workspace_id, item.content_id)
             msg = _('{} undeleted.').format(self._item_type_label)
-            content_api.undelete(item)
-            content_api.save(item, ActionDescription.UNDELETION)
+            with new_revision(item):
+                content_api.undelete(item)
+                content_api.save(item, ActionDescription.UNDELETION)
 
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(next_url)

@@ -12,10 +12,11 @@ from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
+from tracim.model import DBSession
 
 from tracim.model.auth import Group
 
-from tracim.model.data import ActionDescription
+from tracim.model.data import ActionDescription, ContentRevisionRO, Workspace, new_revision
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
@@ -123,7 +124,8 @@ class TestContentApi(TestStandard):
         eq_(2, len(items))
 
         items = api.get_all(None, ContentType.Any, workspace)
-        api.delete(items[0])
+        with new_revision(items[0]):
+            api.delete(items[0])
         transaction.commit()
 
         # Refresh instances after commit
@@ -172,7 +174,8 @@ class TestContentApi(TestStandard):
         eq_(2, len(items))
 
         items = api.get_all(None, ContentType.Any, workspace)
-        api.archive(items[0])
+        with new_revision(items[0]):
+            api.archive(items[0])
         transaction.commit()
 
         # Refresh instances after commit
@@ -276,7 +279,8 @@ class TestContentApi(TestStandard):
                                                         save_now=True)
         api = ContentApi(user)
         c = api.create(ContentType.Folder, workspace, None, 'parent', True)
-        api.set_status(c, 'unknown-status')
+        with new_revision(c):
+            api.set_status(c, 'unknown-status')
 
     def test_set_status_ok(self):
         uapi = UserApi(None)
@@ -291,11 +295,13 @@ class TestContentApi(TestStandard):
                                                         save_now=True)
         api = ContentApi(user)
         c = api.create(ContentType.Folder, workspace, None, 'parent', True)
-        for new_status in ['open', 'closed-validated', 'closed-unvalidated',
-                           'closed-deprecated']:
-            api.set_status(c, new_status)
-            eq_(new_status, c.status)
-            eq_(ActionDescription.STATUS_UPDATE, c.revision_type)
+        with new_revision(c):
+            for new_status in ['open', 'closed-validated', 'closed-unvalidated',
+                               'closed-deprecated']:
+                api.set_status(c, new_status)
+
+                eq_(new_status, c.status)
+                eq_(ActionDescription.STATUS_UPDATE, c.revision_type)
 
     def test_create_comment_ok(self):
         uapi = UserApi(None)
@@ -370,7 +376,8 @@ class TestContentApi(TestStandard):
         u2 = UserApi(None).get_one(u2id)
         api2 = ContentApi(u2)
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
-        api2.update_content(content2, 'this is an updated page', 'new content')
+        with new_revision(content2):
+            api2.update_content(content2, 'this is an updated page', 'new content')
         api2.save(content2)
         transaction.commit()
 
@@ -435,8 +442,9 @@ class TestContentApi(TestStandard):
         u2 = UserApi(None).get_one(u2id)
         api2 = ContentApi(u2)
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
-        api2.update_file_data(content2, 'index.html', 'text/html',
-                              b'<html>hello world</html>')
+        with new_revision(content2):
+            api2.update_file_data(content2, 'index.html', 'text/html',
+                                  b'<html>hello world</html>')
         api2.save(content2)
         transaction.commit()
 
@@ -501,7 +509,8 @@ class TestContentApi(TestStandard):
         u2 = UserApi(None).get_one(u2id)
         api2 = ContentApi(u2, show_archived=True)
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
-        api2.archive(content2)
+        with new_revision(content2):
+            api2.archive(content2)
         api2.save(content2)
         transaction.commit()
 
@@ -522,7 +531,8 @@ class TestContentApi(TestStandard):
         ####
 
         updated2 = api.get_one(pcid, ContentType.Any, workspace)
-        api.unarchive(updated)
+        with new_revision(updated):
+            api.unarchive(updated)
         api.save(updated2)
         eq_(False, updated2.is_archived)
         eq_(ActionDescription.UNARCHIVING, updated2.revision_type)
@@ -574,7 +584,8 @@ class TestContentApi(TestStandard):
         u2 = UserApi(None).get_one(u2id)
         api2 = ContentApi(u2, show_deleted=True)
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
-        api2.delete(content2)
+        with new_revision(content2):
+            api2.delete(content2)
         api2.save(content2)
         transaction.commit()
 
@@ -597,7 +608,8 @@ class TestContentApi(TestStandard):
         ####
 
         updated2 = api.get_one(pcid, ContentType.Any, workspace)
-        api.undelete(updated)
+        with new_revision(updated2):
+            api.undelete(updated2)
         api.save(updated2)
         eq_(False, updated2.is_deleted)
         eq_(ActionDescription.UNDELETION, updated2.revision_type)
@@ -623,7 +635,10 @@ class TestContentApi(TestStandard):
                        'this is randomized folder', True)
         p = api.create(ContentType.Page, workspace, a,
                        'this is randomized label content', True)
-        p.description = 'This is some amazing test'
+
+        with new_revision(p):
+            p.description = 'This is some amazing test'
+
         api.save(p)
         original_id = p.content_id
 
@@ -653,7 +668,10 @@ class TestContentApi(TestStandard):
                        'this is randomized folder', True)
         p = api.create(ContentType.Page, workspace, a,
                        'this is dummy label content', True)
-        p.description = 'This is some amazing test'
+
+        with new_revision(p):
+            p.description = 'This is some amazing test'
+
         api.save(p)
         original_id = p.content_id
 
@@ -685,14 +703,26 @@ class TestContentApi(TestStandard):
                        'this is randomized folder', True)
         p1 = api.create(ContentType.Page, workspace, a,
                         'this is dummy label content', True)
-        p1.description = 'This is some amazing test'
         p2 = api.create(ContentType.Page, workspace, a, 'Hey ! Jon !', True)
-        p2.description = 'What\'s up ?'
+
+        with new_revision(p1):
+            p1.description = 'This is some amazing test'
+
+        with new_revision(p2):
+            p2.description = 'What\'s up ?'
+
         api.save(p1)
         api.save(p2)
 
         id1 = p1.content_id
         id2 = p2.content_id
+
+        eq_(1, DBSession.query(Workspace).filter(Workspace.label == 'test workspace').count())
+        eq_(1, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'this is randomized folder').count())
+        eq_(2, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'this is dummy label content').count())
+        eq_(1, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.description == 'This is some amazing test').count())
+        eq_(2, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'Hey ! Jon !').count())
+        eq_(1, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.description == 'What\'s up ?').count())
 
         res = api.search(['dummy', 'jon'])
         eq_(2, len(res.all()))

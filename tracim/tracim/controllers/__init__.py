@@ -16,7 +16,7 @@ from tracim.lib.predicates import current_user_is_contributor
 from tracim.lib.predicates import current_user_is_content_manager
 
 from tracim.model.auth import User
-from tracim.model.data import ActionDescription
+from tracim.model.data import ActionDescription, new_revision
 from tracim.model.data import BreadcrumbItem
 from tracim.model.data import Content
 from tracim.model.data import ContentType
@@ -267,8 +267,9 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         try:
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
-            api.update_content(item, label, content)
-            api.save(item, ActionDescription.REVISION)
+            with new_revision(item):
+                api.update_content(item, label, content)
+                api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
@@ -292,8 +293,9 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         content_api = ContentApi(tmpl_context.current_user)
         item = content_api.get_one(item_id, self._item_type, tmpl_context.workspace)
         try:
-            content_api.set_status(item, status)
-            content_api.save(item, ActionDescription.STATUS_UPDATE)
+            with new_revision(item):
+                content_api.set_status(item, status)
+                content_api.save(item, ActionDescription.STATUS_UPDATE)
             msg = _('{} status updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(self._std_url.format(item.workspace_id, item.parent_id, item.content_id))
@@ -332,8 +334,9 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             undo_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)+'/put_archive_undo'
             msg = _('{} archived. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
 
-            content_api.archive(item)
-            content_api.save(item, ActionDescription.ARCHIVING)
+            with new_revision(item):
+                content_api.archive(item)
+                content_api.save(item, ActionDescription.ARCHIVING)
 
             tg.flash(msg, CST.STATUS_OK, no_escape=True) # TODO allow to come back
             tg.redirect(next_url)
@@ -353,8 +356,9 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         try:
             next_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
             msg = _('{} unarchived.').format(self._item_type_label)
-            content_api.unarchive(item)
-            content_api.save(item, ActionDescription.UNARCHIVING)
+            with new_revision(item):
+                content_api.unarchive(item)
+                content_api.save(item, ActionDescription.UNARCHIVING)
 
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(next_url )
@@ -379,8 +383,9 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             next_url = self._parent_url.format(item.workspace_id, item.parent_id)
             undo_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)+'/put_delete_undo'
             msg = _('{} deleted. <a class="alert-link" href="{}">Cancel action</a>').format(self._item_type_label, undo_url)
-            content_api.delete(item)
-            content_api.save(item, ActionDescription.DELETION)
+            with new_revision(item):
+                content_api.delete(item)
+                content_api.save(item, ActionDescription.DELETION)
 
             tg.flash(msg, CST.STATUS_OK, no_escape=True)
             tg.redirect(next_url)
@@ -403,8 +408,9 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
         try:
             next_url = self._std_url.format(item.workspace_id, item.parent_id, item.content_id)
             msg = _('{} undeleted.').format(self._item_type_label)
-            content_api.undelete(item)
-            content_api.save(item, ActionDescription.UNDELETION)
+            with new_revision(item):
+                content_api.undelete(item)
+                content_api.save(item, ActionDescription.UNDELETION)
 
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(next_url)

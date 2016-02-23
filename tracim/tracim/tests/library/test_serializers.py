@@ -5,9 +5,6 @@ from nose.tools import eq_
 from nose.tools import ok_
 from nose.tools import raises
 
-from sqlalchemy.orm.exc import NoResultFound
-
-import transaction
 import tg
 
 from tracim.model import DBSession
@@ -24,8 +21,6 @@ from tracim.model.serializers import DictLikeClass
 from tracim.model.serializers import pod_serializer
 
 from tracim.model.data import ActionDescription
-
-from tracim.lib.user import UserApi
 
 from tracim.tests import TestStandard
 
@@ -221,11 +216,13 @@ class TestSerializers(TestStandard):
     def test_serializer_content__menui_api_context__children(self):
         folder_without_child = Content()
         folder_without_child.type = ContentType.Folder
+        folder_without_child.label = 'folder_without_child'
         res = Context(CTX.MENU_API).toDict(folder_without_child)
         eq_(False, res['children'])
 
         folder_with_child = Content()
         folder_with_child.type = ContentType.Folder
+        folder_with_child.label = 'folder_with_child'
         folder_without_child.parent = folder_with_child
         DBSession.add(folder_with_child)
         DBSession.add(folder_without_child)
@@ -238,9 +235,11 @@ class TestSerializers(TestStandard):
             if curtype not in (ContentType.Folder, ContentType.Comment):
                 item = Content()
                 item.type = curtype
+                item.label = 'item'
 
                 fake_child = Content()
                 fake_child.type = curtype
+                fake_child.label = 'fake_child'
                 fake_child.parent = item
 
                 DBSession.add(item)

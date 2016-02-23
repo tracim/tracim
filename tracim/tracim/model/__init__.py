@@ -1,10 +1,32 @@
 # -*- coding: utf-8 -*-
 """The application's model objects"""
+from sqlalchemy import event, inspect
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 from zope.sqlalchemy import ZopeTransactionExtension
-from sqlalchemy.orm import scoped_session, sessionmaker
-#from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import declarative_base
+
+from tracim.lib.exception import ContentRevisionUpdateError, ContentRevisionDeleteError
+
+
+class RevisionsIntegrity(object):
+    _updatable_revisions = []
+
+    @classmethod
+    def add_to_updatable(cls, revision):
+        if inspect(revision).has_identity:
+            raise ContentRevisionUpdateError("ContentRevision is not updatable. %s already have identity." % revision)
+
+        if revision not in cls._updatable_revisions:
+            cls._updatable_revisions.append(revision)
+
+    @classmethod
+    def remove_from_updatable(cls, revision):
+        cls._updatable_revisions.remove(revision)
+
+    @classmethod
+    def is_updatable(cls, revision):
+        return revision in cls._updatable_revisions
 
 # Global session manager: DBSession() returns the Thread-local
 # session object appropriate for the current web request.
@@ -38,6 +60,7 @@ metadata = DeclarativeBase.metadata
 #
 ######
 
+
 def init_model(engine):
     """Call me before using any of the tables or classes in the model."""
     DBSession.configure(bind=engine)
@@ -60,4 +83,13 @@ def init_model(engine):
 
 # Import your model modules here.
 from tracim.model.auth import User, Group, Permission
-from tracim.model.data import Content
+from tracim.model.data import Content, ContentRevisionRO
+
+
+@event.listens_for(DBSession, 'before_flush')
+def prevent_content_revision_delete(session, flush_context, instances):
+    for instance in session.deleted:
+        if isinstance(instance, ContentRevisionRO) and instance.revision_id is not None:
+            raise ContentRevisionDeleteError("ContentRevision is not deletable. You must make a new revision with" +
+                                             "is_deleted set to True. Look at tracim.model.data.new_revision context " +
+                                             "manager to make a new revision")
