@@ -334,6 +334,10 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
         return tg.url('/workspaces/{}/folders/{}/pages/{}')
 
     @property
+    def _err_url(self):
+        return tg.url('/workspaces/{}/folders/{}/pages/{}')
+
+    @property
     def _parent_url(self):
         return tg.url('/workspaces/{}/folders/{}')
 
