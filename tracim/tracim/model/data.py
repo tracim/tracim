@@ -515,7 +515,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
-        'content_id', 'owner_id', 'label', 'description', 'file_name', 'file_mimetype',
+        'content_id', 'owner_id', 'label', 'description', 'file_name', 'file_mimetype', 'properties',
         'file_content', 'type', 'status', 'created', 'updated', 'is_deleted', 'is_archived',
         'revision_type', 'workspace_id', 'workspace', 'parent_id', 'parent', 'node', 'owner'
     )
