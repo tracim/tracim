@@ -12,11 +12,11 @@ from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
-from tracim.model import DBSession
+from tracim.model import DBSession, new_revision
 
 from tracim.model.auth import Group
 
-from tracim.model.data import ActionDescription, ContentRevisionRO, Workspace, new_revision
+from tracim.model.data import ActionDescription, ContentRevisionRO, Workspace
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace

@@ -16,7 +16,8 @@ from tracim.lib.predicates import current_user_is_contributor
 from tracim.lib.predicates import current_user_is_content_manager
 
 from tracim.model.auth import User
-from tracim.model.data import ActionDescription, new_revision
+from tracim.model.data import ActionDescription
+from tracim.model import new_revision
 from tracim.model.data import BreadcrumbItem
 from tracim.model.data import Content
 from tracim.model.data import ContentType

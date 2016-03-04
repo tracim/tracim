@@ -29,7 +29,8 @@ from tracim.lib.predicates import current_user_is_content_manager
 from tracim.lib.predicates import require_current_user_is_owner
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
-from tracim.model.data import ActionDescription, new_revision
+from tracim.model.data import ActionDescription
+from tracim.model import new_revision
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace

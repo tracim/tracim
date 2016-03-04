@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from nose.tools import raises
-from sqlalchemy.orm import aliased
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.testing import eq_
 
 from tracim.lib.content import ContentApi
 from tracim.lib.exception import ContentRevisionUpdateError
-from tracim.model import DBSession, User, Content
-from tracim.model.data import ContentRevisionRO, Workspace, ActionDescription, ContentType, new_revision
+from tracim.model import DBSession, User, Content, new_revision
+from tracim.model.data import ContentRevisionRO, Workspace, ActionDescription, ContentType
 from tracim.tests import TestStandard
 
 

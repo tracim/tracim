@@ -7,7 +7,6 @@ from datetime import datetime
 import tg
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
-from decorator import contextmanager
 from sqlalchemy import Column, inspect
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
@@ -27,7 +26,7 @@ from sqlalchemy.types import Unicode
 from tg.i18n import lazy_ugettext as l_, ugettext as _
 
 from tracim.lib.exception import ContentRevisionUpdateError
-from tracim.model import DeclarativeBase, DBSession, RevisionsIntegrity
+from tracim.model import DeclarativeBase, RevisionsIntegrity
 from tracim.model.auth import User
 
 
@@ -555,7 +554,7 @@ class ContentRevisionRO(DeclarativeBase):
                 and key in self._cloned_columns \
                 and not RevisionsIntegrity.is_updatable(self):
                 raise ContentRevisionUpdateError(
-                    "Can't modify revision. To work on new revision use tracim.model.data.new_revision " +
+                    "Can't modify revision. To work on new revision use tracim.model.new_revision " +
                     "context manager.")
 
         super().__setattr__(key, value)
@@ -602,7 +601,7 @@ class Content(DeclarativeBase):
 
     # UPDATE A CONTENT
 
-    To update an existing Content, you must use tracim.model.data.new_revision context manager:
+    To update an existing Content, you must use tracim.model.new_revision context manager:
     content = my_sontent_getter_method()
     with new_revision(content):
         content.description = 'foo bar baz'
@@ -1118,23 +1117,6 @@ class Content(DeclarativeBase):
         ctype = content.type
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
-
-
-@contextmanager
-def new_revision(content):
-    """
-    Prepare context to update a Content. It will add a new updatable revision to the content.
-    :param content: Content instance to update
-    :return:
-    """
-    with DBSession.no_autoflush:
-        try:
-            if inspect(content.revision).has_identity:
-                content.new_revision()
-            RevisionsIntegrity.add_to_updatable(content.revision)
-            yield content.revision
-        finally:
-            RevisionsIntegrity.remove_from_updatable(content.revision)
 
 
 class RevisionReadStatus(DeclarativeBase):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """The application's model objects"""
+from decorator import contextmanager
 from sqlalchemy import event, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -91,5 +92,22 @@ def prevent_content_revision_delete(session, flush_context, instances):
     for instance in session.deleted:
         if isinstance(instance, ContentRevisionRO) and instance.revision_id is not None:
             raise ContentRevisionDeleteError("ContentRevision is not deletable. You must make a new revision with" +
-                                             "is_deleted set to True. Look at tracim.model.data.new_revision context " +
+                                             "is_deleted set to True. Look at tracim.model.new_revision context " +
                                              "manager to make a new revision")
+
+
+@contextmanager
+def new_revision(content):
+    """
+    Prepare context to update a Content. It will add a new updatable revision to the content.
+    :param content: Content instance to update
+    :return:
+    """
+    with DBSession.no_autoflush:
+        try:
+            if inspect(content.revision).has_identity:
+                content.new_revision()
+            RevisionsIntegrity.add_to_updatable(content.revision)
+            yield content.revision
+        finally:
+            RevisionsIntegrity.remove_from_updatable(content.revision)
