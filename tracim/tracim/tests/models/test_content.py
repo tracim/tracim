@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from nose.tools import raises
+import time
+from nose.tools import raises, ok_
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.testing import eq_
 
@@ -63,6 +64,7 @@ class TestContent(TestStandard):
         eq_(1, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
 
         with new_revision(content):
+            time.sleep(0.00001)
             content.description = 'TEST_CONTENT_DESCRIPTION_1_UPDATED'
         DBSession.flush()
 
@@ -70,12 +72,24 @@ class TestContent(TestStandard):
         eq_(1, DBSession.query(Content).filter(Content.id == created_content.id).count())
 
         with new_revision(content):
+            time.sleep(0.00001)
             content.description = 'TEST_CONTENT_DESCRIPTION_1_UPDATED_2'
             content.label = 'TEST_CONTENT_1_UPDATED_2'
         DBSession.flush()
 
         eq_(1, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1_UPDATED_2').count())
         eq_(1, DBSession.query(Content).filter(Content.id == created_content.id).count())
+
+        revision_1 = DBSession.query(ContentRevisionRO)\
+            .filter(ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1').one()
+        revision_2 = DBSession.query(ContentRevisionRO)\
+            .filter(ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1_UPDATED').one()
+        revision_3 = DBSession.query(ContentRevisionRO)\
+            .filter(ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1_UPDATED_2').one()
+
+        # Updated dates must be different
+        ok_(revision_1.updated < revision_2.updated < revision_3.updated)
+        ok_(revision_1.created < revision_2.created < revision_3.created)
 
     def test_creates(self):
         eq_(0, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())

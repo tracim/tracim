@@ -538,6 +538,9 @@ class ContentRevisionRO(DeclarativeBase):
             column_value = getattr(revision, column_name)
             setattr(new_rev, column_name, column_value)
 
+        new_rev.created = datetime.now()
+        new_rev.updated = datetime.now()
+
         return new_rev
 
     def __setattr__(self, key, value):
