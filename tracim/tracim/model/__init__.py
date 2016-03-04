@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """The application's model objects"""
 from decorator import contextmanager
-from sqlalchemy import event, inspect
+from sqlalchemy import event, inspect, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -38,7 +38,16 @@ DBSession = scoped_session(maker)
 # Base class for all of our model classes: By default, the data model is
 # defined with SQLAlchemy's declarative extension, but if you need more
 # control, you can switch to the traditional method.
-DeclarativeBase = declarative_base()
+convention = {
+  "ix": 'ix__%(column_0_label)s',
+  "uq": "uk__%(table_name)s__%(column_0_name)s",
+  "ck": "ck__%(table_name)s__%(constraint_name)s",
+  "fk": "fk__%(table_name)s__%(column_0_name)s__%(referred_table_name)s",
+  "pk": "pk__%(table_name)s"
+}
+
+metadata = MetaData(naming_convention=convention)
+DeclarativeBase = declarative_base(metadata=metadata)
 
 # There are two convenient ways for you to spare some typing.
 # You can have a query property on all your model classes by doing this:

@@ -7,7 +7,7 @@ from datetime import datetime
 import tg
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
-from sqlalchemy import Column, inspect
+from sqlalchemy import Column, inspect, Index
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy import func
@@ -486,7 +486,7 @@ class ContentRevisionRO(DeclarativeBase):
     __tablename__ = 'content_revisions'
 
     revision_id = Column(Integer, primary_key=True)
-    content_id = Column(Integer, ForeignKey('content.id'))
+    content_id = Column(Integer, ForeignKey('content.id'), nullable=False)
     owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
 
     label = Column(Unicode(1024), unique=False, nullable=False)
@@ -498,8 +498,8 @@ class ContentRevisionRO(DeclarativeBase):
 
     type = Column(Unicode(32), unique=False, nullable=False)
     status = Column(Unicode(32), unique=False, nullable=False, default=ContentStatus.OPEN)
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.now())
-    updated = Column(DateTime, unique=False, nullable=False, default=datetime.now())
+    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
     revision_type = Column(Unicode(32), unique=False, nullable=False, default='')
@@ -594,6 +594,9 @@ class ContentRevisionRO(DeclarativeBase):
             return True
 
         return False
+
+Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
+Index('idx__content_revisions__parent_id', ContentRevisionRO.parent_id)
 
 
 class Content(DeclarativeBase):
