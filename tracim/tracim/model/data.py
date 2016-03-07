@@ -1130,7 +1130,7 @@ class RevisionReadStatus(DeclarativeBase):
 
     revision_id = Column(Integer, ForeignKey('content_revisions.revision_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
-    view_datetime = Column(DateTime, unique=False, nullable=False, server_default=func.now())
+    view_datetime = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     content_revision = relationship(
         'ContentRevisionRO',
