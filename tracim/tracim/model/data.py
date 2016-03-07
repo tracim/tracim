@@ -51,8 +51,8 @@ class Workspace(DeclarativeBase):
     label   = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
 
-    created = Column(DateTime, unique=False, nullable=False, default=datetime.now())
-    updated = Column(DateTime, unique=False, nullable=False, default=datetime.now())
+    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
 
