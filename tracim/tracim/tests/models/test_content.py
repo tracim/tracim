@@ -89,7 +89,8 @@ class TestContent(TestStandard):
 
         # Updated dates must be different
         ok_(revision_1.updated < revision_2.updated < revision_3.updated)
-        ok_(revision_1.created < revision_2.created < revision_3.created)
+        # Created dates must be equal
+        ok_(revision_1.created == revision_2.created == revision_3.created)
 
     def test_creates(self):
         eq_(0, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())

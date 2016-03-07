@@ -538,7 +538,6 @@ class ContentRevisionRO(DeclarativeBase):
             column_value = getattr(revision, column_name)
             setattr(new_rev, column_name, column_value)
 
-        new_rev.created = datetime.now()
         new_rev.updated = datetime.now()
 
         return new_rev
@@ -1187,7 +1186,7 @@ class VirtualEvent(object):
         action_description = ActionDescription(revision.revision_type)
 
         return VirtualEvent(id=revision.revision_id,
-                            created=revision.created,
+                            created=revision.updated,
                             owner=revision.owner,
                             type=action_description,
                             label=action_description.label,
