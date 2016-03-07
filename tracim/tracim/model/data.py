@@ -487,7 +487,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     revision_id = Column(Integer, primary_key=True)
     content_id = Column(Integer, ForeignKey('content.id'), nullable=False)
-    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
 
     label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default='')
