@@ -1,30 +1,34 @@
 sudo: false
 language: python
-python:
-#  - "3.2"
-#  - "3.3"
-  - "3.4"
+python: "3.4"
+
+env:
+  - DB=postgres
+  - DB=mysql
 
 addons:
   postgresql: "9.3"
+  mysql: "5.5"
 
-# command to install dependencies
-# Note: there's an echo at the end of pip install. It allows to override the default return code which is not 0
-# because some packages need to be ugraded to python3 (invalid python syntax because of python2 source code)
-#
-# pip install -r is run 2 times in order to really install tgapp-resetpassword (to investigate)
-#
 install:
-  - "cd tracim && python setup.py develop; cd -"
-  - "pip install -r install/requirements.txt; echo"
-  - "pip install coveralls"
+  - cd tracim && python setup.py develop; cd -
+  - pip install -r install/requirements.txt; echo
+  - pip install coveralls
 
 before_script:
-  - "psql -c 'create database tracim_test;' -U postgres"
-  - "cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini"
-#  - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox setup-app -c ${TRAVIS_BUILD_DIR}/tracim/test.ini"
-  - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox setup-app"
-#  - "cd ${TRAVIS_BUILD_DIR}/tracim && gearbox migrate -c ${TRAVIS_BUILD_DIR}/tracim/test.ini upgrade"
+  - cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini
+
+  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database tracim_test;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'postgres' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/\(sqlalchemy.url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" test.ini; fi"
+  - sh -c "if [ '$DB' = 'postgres' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/\(sqlalchemy.url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" development.ini; fi"
+
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/\(sqlalchemy.url *= *\).*/\mysql+oursql:\/\/root@localhost\/tracim_test/\" test.ini; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/<replace_database_uri_here>/mysql+oursql:\/\/root@localhost\/tracim_test/\" development.ini; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip; fi"
+
+  - cd ${TRAVIS_BUILD_DIR}/tracim && cat development.ini | grep sqlalchemy
+  - cd ${TRAVIS_BUILD_DIR}/tracim && gearbox setup-app --debug
 
 # command to run tests
 script: "cd ${TRAVIS_BUILD_DIR}/tracim && nosetests -c ${TRAVIS_BUILD_DIR}/tracim/test.ini -v --with-coverage --cover-package=tracim --cover-erase"
