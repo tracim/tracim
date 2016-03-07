@@ -74,6 +74,9 @@ def upgrade():
                     existing_type=sa.VARCHAR(length=32),
                     nullable=False,
                     server_default='')
+    op.alter_column('content_revisions', 'owner_id',
+                    existing_type=sa.INTEGER(),
+                    nullable=False)
     op.alter_column('content_revisions', 'status',
                     existing_type=sa.VARCHAR(length=32),
                     nullable=False,
@@ -152,6 +155,9 @@ def downgrade():
                     existing_server_default=sa.text("'new'::character varying"))
     op.alter_column('content_revisions', 'revision_type',
                     existing_type=sa.VARCHAR(length=32),
+                    nullable=True)
+    op.alter_column('content_revisions', 'owner_id',
+                    existing_type=sa.INTEGER(),
                     nullable=True)
     op.alter_column('content_revisions', 'properties',
                     existing_type=sa.TEXT(),
