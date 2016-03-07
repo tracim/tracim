@@ -11,6 +11,14 @@ from tracim.lib.exception import ContentRevisionUpdateError, ContentRevisionDele
 
 
 class RevisionsIntegrity(object):
+    """
+    Simple static used class to manage a list with list of ContentRevisionRO who are allowed to be updated.
+
+    When modify an already existing (understood have an identity in databse) ContentRevisionRO, if it's not in
+    RevisionsIntegrity._updatable_revisions list, a ContentRevisionUpdateError thrown.
+
+    This class is used by tracim.model.new_revision context manager.
+    """
     _updatable_revisions = []
 
     @classmethod
