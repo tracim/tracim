@@ -91,7 +91,7 @@ class ContentApi(object):
                     .correlate(Content))
 
     @classmethod
-    def get_base_query(cls):
+    def get_canonical_query(cls):
         """
         Return the Content/ContentRevision base query who join these table on the last revision.
         :return: Content/ContentRevision Query
@@ -156,7 +156,7 @@ class ContentApi(object):
         return breadcrumb
 
     def __real_base_query(self, workspace: Workspace=None):
-        result = self.get_base_query()
+        result = self.get_canonical_query()
 
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)

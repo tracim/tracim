@@ -300,11 +300,10 @@ class ArgumentParser(argparse.ArgumentParser):
 
 class BaseTest(object):
 
-    def _create_workspace(self, name, *args, **kwargs):
+    def _create_workspace(self, name, *args, **kwargs) -> Workspace:
         """
         All extra parameters (*args, **kwargs) are for Workspace init
         :return: Created workspace instance
-        :rtype: Workspace
         """
         workspace = Workspace(label=name, *args, **kwargs)
         DBSession.add(workspace)
@@ -313,11 +312,10 @@ class BaseTest(object):
         eq_(1, DBSession.query(Workspace).filter(Workspace.label == name).count())
         return DBSession.query(Workspace).filter(Workspace.label == name).one()
 
-    def _create_content(self, name, workspace, *args, **kwargs):
+    def _create_content(self, name, workspace, *args, **kwargs) -> Content:
         """
         All extra parameters (*args, **kwargs) are for Content init
         :return: Created Content instance
-        :rtype: Content
         """
         content = Content(*args, **kwargs)
         content.label = name
@@ -325,16 +323,15 @@ class BaseTest(object):
         DBSession.add(content)
         DBSession.flush()
 
-        eq_(1, ContentApi.get_base_query().filter(Content.label == name).count())
-        return ContentApi.get_base_query().filter(Content.label == name).one()
+        eq_(1, ContentApi.get_canonical_query().filter(Content.label == name).count())
+        return ContentApi.get_canonical_query().filter(Content.label == name).one()
 
 
 class BaseTestThread(BaseTest):
 
-    def _create_thread(self, workspace_name='workspace_1', folder_name='folder_1', thread_name='thread_1'):
+    def _create_thread(self, workspace_name='workspace_1', folder_name='folder_1', thread_name='thread_1') -> Content:
         """
         :return: Thread
-        :rtype: Content
         """
         workspace = self._create_workspace(workspace_name)
         folder = self._create_content(folder_name, workspace, type=ContentType.Folder)
