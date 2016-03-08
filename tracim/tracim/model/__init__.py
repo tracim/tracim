@@ -3,8 +3,8 @@
 from decorator import contextmanager
 from sqlalchemy import event, inspect, MetaData
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker
-
+from sqlalchemy.orm import scoped_session, sessionmaker, Session
+from sqlalchemy.orm.unitofwork import UOWTransaction
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from tracim.lib.exception import ContentRevisionUpdateError, ContentRevisionDeleteError
@@ -22,7 +22,7 @@ class RevisionsIntegrity(object):
     _updatable_revisions = []
 
     @classmethod
-    def add_to_updatable(cls, revision):
+    def add_to_updatable(cls, revision: 'ContentRevisionRO') -> None:
         if inspect(revision).has_identity:
             raise ContentRevisionUpdateError("ContentRevision is not updatable. %s already have identity." % revision)
 
@@ -30,11 +30,11 @@ class RevisionsIntegrity(object):
             cls._updatable_revisions.append(revision)
 
     @classmethod
-    def remove_from_updatable(cls, revision):
+    def remove_from_updatable(cls, revision: 'ContentRevisionRO') -> None:
         cls._updatable_revisions.remove(revision)
 
     @classmethod
-    def is_updatable(cls, revision):
+    def is_updatable(cls, revision: 'ContentRevisionRO') -> bool:
         return revision in cls._updatable_revisions
 
 # Global session manager: DBSession() returns the Thread-local
@@ -47,11 +47,11 @@ DBSession = scoped_session(maker)
 # defined with SQLAlchemy's declarative extension, but if you need more
 # control, you can switch to the traditional method.
 convention = {
-  "ix": 'ix__%(column_0_label)s',
-  "uq": "uk__%(table_name)s__%(column_0_name)s",
-  "ck": "ck__%(table_name)s__%(constraint_name)s",
-  "fk": "fk__%(table_name)s__%(column_0_name)s__%(referred_table_name)s",
-  "pk": "pk__%(table_name)s"
+  "ix": 'ix__%(column_0_label)s',  # Indexes
+  "uq": "uq__%(table_name)s__%(column_0_name)s",  # Unique constrains
+  "ck": "ck__%(table_name)s__%(constraint_name)s",  # Other column constrains
+  "fk": "fk__%(table_name)s__%(column_0_name)s__%(referred_table_name)s",  # Foreign keys
+  "pk": "pk__%(table_name)s"  # Primary keys
 }
 
 metadata = MetaData(naming_convention=convention)
@@ -105,7 +105,8 @@ from tracim.model.data import Content, ContentRevisionRO
 
 
 @event.listens_for(DBSession, 'before_flush')
-def prevent_content_revision_delete(session, flush_context, instances):
+def prevent_content_revision_delete(session: Session, flush_context: UOWTransaction,
+                                    instances: [DeclarativeBase]) -> None:
     for instance in session.deleted:
         if isinstance(instance, ContentRevisionRO) and instance.revision_id is not None:
             raise ContentRevisionDeleteError("ContentRevision is not deletable. You must make a new revision with" +
@@ -114,7 +115,7 @@ def prevent_content_revision_delete(session, flush_context, instances):
 
 
 @contextmanager
-def new_revision(content):
+def new_revision(content: Content) -> Content:
     """
     Prepare context to update a Content. It will add a new updatable revision to the content.
     :param content: Content instance to update
@@ -125,6 +126,6 @@ def new_revision(content):
             if inspect(content.revision).has_identity:
                 content.new_revision()
             RevisionsIntegrity.add_to_updatable(content.revision)
-            yield content.revision
+            yield content
         finally:
             RevisionsIntegrity.remove_from_updatable(content.revision)

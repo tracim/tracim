@@ -16,6 +16,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import deferred
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
@@ -51,7 +52,9 @@ class Workspace(DeclarativeBase):
     label   = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
 
+    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
@@ -515,13 +518,23 @@ class ContentRevisionRO(DeclarativeBase):
 
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
-        'content_id', 'owner_id', 'label', 'description', 'file_name', 'file_mimetype', 'properties',
-        'file_content', 'type', 'status', 'created', 'updated', 'is_deleted', 'is_archived',
-        'revision_type', 'workspace_id', 'workspace', 'parent_id', 'parent', 'node', 'owner'
+        'content_id', 'created', 'description', 'file_content', 'file_mimetype', 'file_name', 'is_archived',
+        'is_deleted', 'label', 'node', 'owner' 'owner_id', 'parent', 'parent_id', 'properties', 'revision_type',
+        'status', 'type', 'updated', 'workspace', 'workspace_id',
+    )
+
+    # Read by must be used like this:
+    # read_datetime = revision.ready_by[<User instance>]
+    # if user did not read the content, then a key error is raised
+    read_by = association_proxy(
+        'revision_read_statuses',  # name of the attribute
+        'view_datetime',  # attribute the value is taken from
+        creator=lambda k, v: \
+            RevisionReadStatus(user=k, view_datetime=v)
     )
 
     @classmethod
-    def new_from(cls, revision):
+    def new_from(cls, revision: 'ContentRevisionRO') -> 'ContentRevisionRO':
         """
 
         Return new instance of ContentRevisionRO where properties are copied from revision parameter.
@@ -542,7 +555,7 @@ class ContentRevisionRO(DeclarativeBase):
 
         return new_rev
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key: str, value: 'mixed'):
         """
         ContentRevisionUpdateError is raised if tried to update column and revision own identity
         :param key: attribute name
@@ -561,24 +574,14 @@ class ContentRevisionRO(DeclarativeBase):
 
         super().__setattr__(key, value)
 
-    def get_status(self):
+    def get_status(self) -> ContentStatus:
         return ContentStatus(self.status)
 
-    def get_label(self):
+    def get_label(self) -> str:
         return self.label if self.label else self.file_name if self.file_name else ''
 
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
-
-    # Read by must be used like this:
-    # read_datetime = revision.ready_by[<User instance>]
-    # if user did not read the content, then a key error is raised
-    read_by = association_proxy(
-        'revision_read_statuses',  # name of the attribute
-        'view_datetime',  # attribute the value is taken from
-        creator=lambda k, v: \
-            RevisionReadStatus(user=k, view_datetime=v)
-    )
 
     def has_new_information_for(self, user: User) -> bool:
         """
@@ -621,9 +624,9 @@ class Content(DeclarativeBase):
                   .filter(Content.label == 'foo')
                   .one()
 
-    ContentApi provide also prepared Content at tracim.lib.content.ContentApi#get_base_query:
+    ContentApi provide also prepared Content at tracim.lib.content.ContentApi#get_canonical_query:
 
-    content = ContentApi.get_base_query()
+    content = ContentApi.get_canonical_query()
               .filter(Content.label == 'foo')
               .one()
     """
@@ -641,87 +644,87 @@ class Content(DeclarativeBase):
                                       back_populates="parent")
 
     @hybrid_property
-    def content_id(self):
+    def content_id(self) -> int:
         return self.revision.content_id
 
     @content_id.setter
-    def content_id(self, value):
+    def content_id(self, value: int) -> None:
         self.revision.content_id = value
 
     @content_id.expression
-    def content_id(cls):
+    def content_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.content_id
 
     @hybrid_property
-    def revision_id(self):
+    def revision_id(self) -> int:
         return self.revision.revision_id
 
     @revision_id.setter
-    def revision_id(self, value):
+    def revision_id(self, value: int):
         self.revision.revision_id = value
 
     @revision_id.expression
-    def revision_id(cls):
+    def revision_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.revision_id
 
     @hybrid_property
-    def owner_id(self):
+    def owner_id(self) -> int:
         return self.revision.owner_id
 
     @owner_id.setter
-    def owner_id(self, value):
+    def owner_id(self, value: int) -> None:
         self.revision.owner_id = value
 
     @owner_id.expression
-    def owner_id(cls):
+    def owner_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.owner_id
 
     @hybrid_property
-    def label(self):
+    def label(self) -> str:
         return self.revision.label
 
     @label.setter
-    def label(self, value):
+    def label(self, value: str) -> None:
         self.revision.label = value
 
     @label.expression
-    def label(cls):
+    def label(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.label
 
     @hybrid_property
-    def description(self):
+    def description(self) -> str:
         return self.revision.description
 
     @description.setter
-    def description(self, value):
+    def description(self, value: str) -> None:
         self.revision.description = value
 
     @description.expression
-    def description(cls):
+    def description(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.description
 
     @hybrid_property
-    def file_name(self):
+    def file_name(self) -> str:
         return self.revision.file_name
 
     @file_name.setter
-    def file_name(self, value):
+    def file_name(self, value: str) -> None:
         self.revision.file_name = value
 
     @file_name.expression
-    def file_name(cls):
+    def file_name(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.file_name
 
     @hybrid_property
-    def file_mimetype(self):
+    def file_mimetype(self) -> str:
         return self.revision.file_mimetype
 
     @file_mimetype.setter
-    def file_mimetype(self, value):
+    def file_mimetype(self, value: str) -> None:
         self.revision.file_mimetype = value
 
     @file_mimetype.expression
-    def file_mimetype(cls):
+    def file_mimetype(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.file_mimetype
 
     @hybrid_property
@@ -733,179 +736,179 @@ class Content(DeclarativeBase):
         self.revision.file_content = value
 
     @file_content.expression
-    def file_content(cls):
+    def file_content(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.file_content
 
     @hybrid_property
-    def _properties(self):
+    def _properties(self) -> str:
         return self.revision.properties
 
     @_properties.setter
-    def _properties(self, value):
+    def _properties(self, value: str) -> None:
         self.revision.properties = value
 
     @_properties.expression
-    def _properties(cls):
+    def _properties(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.properties
 
     @hybrid_property
-    def type(self):
+    def type(self) -> str:
         return self.revision.type
 
     @type.setter
-    def type(self, value):
+    def type(self, value: str) -> None:
         self.revision.type = value
 
     @type.expression
-    def type(cls):
+    def type(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.type
 
     @hybrid_property
-    def status(self):
+    def status(self) -> str:
         return self.revision.status
 
     @status.setter
-    def status(self, value):
+    def status(self, value: str) -> None:
         self.revision.status = value
 
     @status.expression
-    def status(cls):
+    def status(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.status
 
     @hybrid_property
-    def created(self):
+    def created(self) -> datetime:
         return self.revision.created
 
     @created.setter
-    def created(self, value):
+    def created(self, value: datetime) -> None:
         self.revision.created = value
 
     @created.expression
-    def created(cls):
+    def created(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.created
 
     @hybrid_property
-    def updated(self):
+    def updated(self) -> datetime:
         return self.revision.updated
 
     @updated.setter
-    def updated(self, value):
+    def updated(self, value: datetime) -> None:
         self.revision.updated = value
 
     @updated.expression
-    def updated(cls):
+    def updated(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.updated
 
     @hybrid_property
-    def is_deleted(self):
+    def is_deleted(self) -> bool:
         return self.revision.is_deleted
 
     @is_deleted.setter
-    def is_deleted(self, value):
+    def is_deleted(self, value: bool) -> None:
         self.revision.is_deleted = value
 
     @is_deleted.expression
-    def is_deleted(cls):
+    def is_deleted(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.is_deleted
 
     @hybrid_property
-    def is_archived(self):
+    def is_archived(self) -> bool:
         return self.revision.is_archived
 
     @is_archived.setter
-    def is_archived(self, value):
+    def is_archived(self, value: bool) -> None:
         self.revision.is_archived = value
 
     @is_archived.expression
-    def is_archived(cls):
+    def is_archived(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.is_archived
 
     @hybrid_property
-    def revision_type(self):
+    def revision_type(self) -> str:
         return self.revision.revision_type
 
     @revision_type.setter
-    def revision_type(self, value):
+    def revision_type(self, value: str) -> None:
         self.revision.revision_type = value
 
     @revision_type.expression
-    def revision_type(cls):
+    def revision_type(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.revision_type
 
     @hybrid_property
-    def workspace_id(self):
+    def workspace_id(self) -> int:
         return self.revision.workspace_id
 
     @workspace_id.setter
-    def workspace_id(self, value):
+    def workspace_id(self, value: int) -> None:
         self.revision.workspace_id = value
 
     @workspace_id.expression
-    def workspace_id(cls):
+    def workspace_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.workspace_id
 
     @hybrid_property
-    def workspace(self):
+    def workspace(self) -> Workspace:
         return self.revision.workspace
 
     @workspace.setter
-    def workspace(self, value):
+    def workspace(self, value: Workspace) -> None:
         self.revision.workspace = value
 
     @workspace.expression
-    def workspace(cls):
+    def workspace(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.workspace
 
     @hybrid_property
-    def parent_id(self):
+    def parent_id(self) -> int:
         return self.revision.parent_id
 
     @parent_id.setter
-    def parent_id(self, value):
+    def parent_id(self, value: int) -> None:
         self.revision.parent_id = value
 
     @parent_id.expression
-    def parent_id(cls):
+    def parent_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.parent_id
 
     @hybrid_property
-    def parent(self):
+    def parent(self) -> 'Content':
         return self.revision.parent
 
     @parent.setter
-    def parent(self, value):
+    def parent(self, value: 'Content') -> None:
         self.revision.parent = value
 
     @parent.expression
-    def parent(cls):
+    def parent(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.parent
 
     @hybrid_property
-    def node(self):
+    def node(self) -> 'Content':
         return self.revision.node
 
     @node.setter
-    def node(self, value):
+    def node(self, value: 'Content') -> None:
         self.revision.node = value
 
     @node.expression
-    def node(cls):
+    def node(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.node
 
     @hybrid_property
-    def owner(self):
+    def owner(self) -> User:
         return self.revision.owner
 
     @owner.setter
-    def owner(self, value):
+    def owner(self, value: User) -> None:
         self.revision.owner = value
 
     @owner.expression
-    def owner(cls):
+    def owner(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.owner
 
     @hybrid_property
-    def children(self):
+    def children(self) -> ['Content']:
         """
         :return: list of children Content
         :rtype Content
@@ -914,10 +917,10 @@ class Content(DeclarativeBase):
         return list(set([revision.node for revision in self.children_revisions]))
 
     @property
-    def revision(self):
+    def revision(self) -> ContentRevisionRO:
         return self.get_current_revision()
 
-    def get_current_revision(self):
+    def get_current_revision(self) -> ContentRevisionRO:
         if not self.revisions:
             return self.new_revision()
 
@@ -929,7 +932,7 @@ class Content(DeclarativeBase):
         revisions = sorted(self.revisions, key=lambda revision: revision.revision_id)
         return revisions[-1]
 
-    def new_revision(self):
+    def new_revision(self) -> None:
         """
         Return and assign to this content a new revision.
         If it's a new content, revision is totally new.
@@ -951,14 +954,14 @@ class Content(DeclarativeBase):
                     yield child.node
 
     @hybrid_property
-    def properties(self):
+    def properties(self) -> dict:
         """ return a structure decoded from json content of _properties """
         if not self._properties:
             ContentChecker.reset_properties(self)
         return json.loads(self._properties)
 
     @properties.setter
-    def properties(self, properties_struct):
+    def properties(self, properties_struct: dict) -> None:
         """ encode a given structure into json and store it in _properties attribute"""
         self._properties = json.dumps(properties_struct)
         ContentChecker.check_properties(self)
@@ -1130,7 +1133,8 @@ class RevisionReadStatus(DeclarativeBase):
 
     revision_id = Column(Integer, ForeignKey('content_revisions.revision_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
-    view_datetime = Column(DateTime, unique=False, nullable=False, server_default=func.now())
+    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
+    view_datetime = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     content_revision = relationship(
         'ContentRevisionRO',

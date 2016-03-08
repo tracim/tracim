@@ -17,5 +17,5 @@ class TestThread(BaseTestThread, TestStandard):
             thread_name='thread_1',
         )
         workspace = DBSession.query(Workspace).filter(Workspace.label == 'workspace_1').one()
-        folder = ContentApi.get_base_query().filter(Content.label == 'folder_1').one()
+        folder = ContentApi.get_canonical_query().filter(Content.label == 'folder_1').one()
         eq_([folder, ], list(workspace.get_valid_children()))
