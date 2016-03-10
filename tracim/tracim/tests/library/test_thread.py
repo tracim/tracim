@@ -8,7 +8,7 @@ from tracim.tests import BaseTestThread, TestStandard
 class TestThread(BaseTestThread, TestStandard):
 
     def test_create_thread(self, key='1'):
-        return self._create_thread(
+        return self._create_thread_and_test(
             workspace_name='workspace_%s' % key,
             folder_name='folder_%s' % key,
             thread_name='thread_%s' % key,
