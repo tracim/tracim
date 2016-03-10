@@ -11,7 +11,7 @@ from tracim.tests import BaseTestThread, TestStandard
 class TestThread(BaseTestThread, TestStandard):
 
     def test_children(self):
-        self._create_thread(
+        self._create_thread_and_test(
             workspace_name='workspace_1',
             folder_name='folder_1',
             thread_name='thread_1',

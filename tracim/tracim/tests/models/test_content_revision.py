@@ -32,9 +32,9 @@ class TestContentRevision(BaseTest, TestStandard):
 
     def test_new_revision(self):
         admin = DBSession.query(User).filter(User.email == 'admin@admin.admin').one()
-        workspace = self._create_workspace(name='workspace_1')
-        folder = self._create_content(name='folder_1', workspace=workspace, type=ContentType.Folder)
-        page = self._create_content(
+        workspace = self._create_workspace_and_test(name='workspace_1')
+        folder = self._create_content_and_test(name='folder_1', workspace=workspace, type=ContentType.Folder)
+        page = self._create_content_and_test(
             workspace=workspace,
             parent=folder,
             name='file_1',
