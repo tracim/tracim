@@ -49,7 +49,6 @@ DBSession = scoped_session(maker)
 convention = {
   "ix": 'ix__%(column_0_label)s',  # Indexes
   "uq": "uq__%(table_name)s__%(column_0_name)s",  # Unique constrains
-  "ck": "ck__%(table_name)s__%(constraint_name)s",  # Other column constrains
   "fk": "fk__%(table_name)s__%(column_0_name)s__%(referred_table_name)s",  # Foreign keys
   "pk": "pk__%(table_name)s"  # Primary keys
 }
