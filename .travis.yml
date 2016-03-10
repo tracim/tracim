@@ -27,7 +27,6 @@ before_script:
   - sh -c "if [ '$DB' = 'mysql' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/<replace_database_uri_here>/mysql+oursql:\/\/root@localhost\/tracim_test/\" development.ini; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip; fi"
 
-  - cd ${TRAVIS_BUILD_DIR}/tracim && cat development.ini | grep sqlalchemy
   - cd ${TRAVIS_BUILD_DIR}/tracim && gearbox setup-app --debug
 
 # command to run tests
