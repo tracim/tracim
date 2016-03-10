@@ -17,7 +17,7 @@ backlash==0.0.7
 beautifulsoup4==4.3.2
 cliff==1.8.0
 cmd2==0.6.7
-coverage==4.0a1
+coverage==4.0b1
 crank==0.7.3
 decorator==3.4.0
 gearbox==0.0.7
