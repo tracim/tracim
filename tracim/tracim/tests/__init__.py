@@ -2,14 +2,15 @@
 """Unit and functional test suite for tracim."""
 import argparse
 import os
+import time
 from os import getcwd
 
 import ldap3
 import tg
-import time
 import transaction
 from gearbox.commands.setup_app import SetupAppCommand
 from ldap_test import LdapServer
+from nose.tools import eq_
 from nose.tools import ok_
 from paste.deploy import loadapp
 from sqlalchemy.engine import reflection
@@ -28,7 +29,9 @@ from who_ldap import make_connection
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.lib.base import logger
-from tracim.model import DBSession
+from tracim.lib.content import ContentApi
+from tracim.model import DBSession, Content
+from tracim.model.data import Workspace, ContentType, ContentRevisionRO
 
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
@@ -293,3 +296,44 @@ class LDAPTest(object):
 class ArgumentParser(argparse.ArgumentParser):
     def exit(self, status=0, message=None):
         raise Exception(message)
+
+
+class BaseTest(object):
+
+    def _create_workspace_and_test(self, name, *args, **kwargs) -> Workspace:
+        """
+        All extra parameters (*args, **kwargs) are for Workspace init
+        :return: Created workspace instance
+        """
+        workspace = Workspace(label=name, *args, **kwargs)
+        DBSession.add(workspace)
+        DBSession.flush()
+
+        eq_(1, DBSession.query(Workspace).filter(Workspace.label == name).count())
+        return DBSession.query(Workspace).filter(Workspace.label == name).one()
+
+    def _create_content_and_test(self, name, workspace, *args, **kwargs) -> Content:
+        """
+        All extra parameters (*args, **kwargs) are for Content init
+        :return: Created Content instance
+        """
+        content = Content(*args, **kwargs)
+        content.label = name
+        content.workspace = workspace
+        DBSession.add(content)
+        DBSession.flush()
+
+        eq_(1, ContentApi.get_canonical_query().filter(Content.label == name).count())
+        return ContentApi.get_canonical_query().filter(Content.label == name).one()
+
+
+class BaseTestThread(BaseTest):
+
+    def _create_thread_and_test(self, workspace_name='workspace_1', folder_name='folder_1', thread_name='thread_1') -> Content:
+        """
+        :return: Thread
+        """
+        workspace = self._create_workspace_and_test(workspace_name)
+        folder = self._create_content_and_test(folder_name, workspace, type=ContentType.Folder)
+        thread = self._create_content_and_test(thread_name, workspace, type=ContentType.Thread, parent=folder)
+        return thread

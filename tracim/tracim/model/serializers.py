@@ -138,7 +138,7 @@ class Context(object):
         try:
             converter = Context._converters[context_string][model_class]
             return converter
-        except:
+        except KeyError:
             if CTX.DEFAULT in Context._converters:
                 if model_class in Context._converters[CTX.DEFAULT]:
                     return Context._converters[CTX.DEFAULT][model_class]

@@ -5,6 +5,18 @@ class TracimError(Exception):
     pass
 
 
+class RunTimeError(TracimError):
+    pass
+
+
+class ContentRevisionUpdateError(RuntimeError):
+    pass
+
+
+class ContentRevisionDeleteError(ContentRevisionUpdateError):
+    pass
+
+
 class ConfigurationError(TracimError):
     pass
 

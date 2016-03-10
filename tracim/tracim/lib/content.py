@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 __author__ = 'damien'
 
 import datetime
@@ -14,12 +13,12 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy import desc
 from sqlalchemy import distinct
-from sqlalchemy import not_
 from sqlalchemy import or_
+from sqlalchemy.sql.elements import and_
 from tracim.lib import cmp_to_key
 from tracim.lib.notifications import NotifierFactory
 from tracim.lib.utils import SameValueError
-from tracim.model import DBSession
+from tracim.model import DBSession, new_revision
 from tracim.model.auth import User
 from tracim.model.data import ActionDescription
 from tracim.model.data import BreadcrumbItem
@@ -76,6 +75,29 @@ class ContentApi(object):
         self._show_deleted = show_deleted
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
 
+    @classmethod
+    def get_revision_join(cls):
+        """
+        Return the Content/ContentRevision query join condition
+        :return: Content/ContentRevision query join condition
+        :rtype sqlalchemy.sql.elements.BooleanClauseList
+        """
+        return and_(Content.id == ContentRevisionRO.content_id,
+                    ContentRevisionRO.revision_id == DBSession.query(
+                        ContentRevisionRO.revision_id)
+                    .filter(ContentRevisionRO.content_id == Content.id)
+                    .order_by(ContentRevisionRO.revision_id.desc())
+                    .limit(1)
+                    .correlate(Content))
+
+    @classmethod
+    def get_canonical_query(cls):
+        """
+        Return the Content/ContentRevision base query who join these table on the last revision.
+        :return: Content/ContentRevision Query
+        :rtype sqlalchemy.orm.query.Query
+        """
+        return DBSession.query(Content).join(ContentRevisionRO, cls.get_revision_join())
 
     @classmethod
     def sort_tree_items(cls, content_list: [NodeTreeItem])-> [Content]:
@@ -134,7 +156,7 @@ class ContentApi(object):
         return breadcrumb
 
     def __real_base_query(self, workspace: Workspace=None):
-        result = DBSession.query(Content)
+        result = self.get_canonical_query()
 
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
@@ -458,7 +480,8 @@ class ContentApi(object):
         self.save(item, do_notify=False)
 
         for child in item.children:
-            self.move_recursively(child, item, new_workspace)
+            with new_revision(child):
+                self.move_recursively(child, item, new_workspace)
         return
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
@@ -487,7 +510,6 @@ class ContentApi(object):
         content.owner = self._user
         content.is_archived = False
         content.revision_type = ActionDescription.UNARCHIVING
-
 
     def delete(self, content: Content):
         content.owner = self._user
@@ -576,7 +598,7 @@ class ContentApi(object):
 
         if not action_description:
             # See if the last action has been modified
-            if content.revision_type==None or len(get_history(content, 'revision_type'))<=0:
+            if content.revision_type==None or len(get_history(content.revision, 'revision_type'))<=0:
                 # The action has not been modified, so we set it to default edition
                 action_description = ActionDescription.EDITION
 
@@ -638,7 +660,7 @@ class ContentApi(object):
         filter_group_desc = list(Content.description.ilike('%{}%'.format(keyword)) for keyword in keywords)
         title_keyworded_items = self._hard_filtered_base_query().\
             filter(or_(*(filter_group_label+filter_group_desc))).\
-            options(joinedload('children')).\
+            options(joinedload('children_revisions')).\
             options(joinedload('parent'))
 
         return title_keyworded_items

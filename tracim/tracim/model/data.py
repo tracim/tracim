@@ -1,37 +1,35 @@
 # -*- coding: utf-8 -*-
 
-import tg
-from datetime import datetime
-from babel.dates import format_timedelta
-
-from bs4 import BeautifulSoup
 import datetime as datetime_root
 import json
+from datetime import datetime
 
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy import Column
-from sqlalchemy import func
+import tg
+from babel.dates import format_timedelta
+from bs4 import BeautifulSoup
+from sqlalchemy import Column, inspect, Index
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
-
+from sqlalchemy import func
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
-
 from sqlalchemy.orm import backref
-from sqlalchemy.orm import relationship
 from sqlalchemy.orm import deferred
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.collections import attribute_mapped_collection
-
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import LargeBinary
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
-
 from tg.i18n import lazy_ugettext as l_, ugettext as _
 
-from tracim.model import DeclarativeBase
+from tracim.lib.exception import ContentRevisionUpdateError
+from tracim.model import DeclarativeBase, RevisionsIntegrity
 from tracim.model.auth import User
+
 
 class BreadcrumbItem(object):
 
@@ -54,10 +52,19 @@ class Workspace(DeclarativeBase):
     label   = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
 
-    created = Column(DateTime, unique=False, nullable=False)
-    updated = Column(DateTime, unique=False, nullable=False)
+    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
+    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
+    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
+
+    revisions = relationship("ContentRevisionRO")
+
+    @hybrid_property
+    def contents(self):
+        # Return a list of unique revisions parent content
+        return list(set([revision.node for revision in self.revisions]))
 
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
@@ -435,58 +442,526 @@ class ContentType(object):
                     label=self.label,
                     priority=self.priority)
 
-class Content(DeclarativeBase):
 
-    __tablename__ = 'contents'
+class ContentChecker(object):
 
-    revision_to_serialize = -0  # This flag allow to serialize a given revision if required by the user
+    @classmethod
+    def check_properties(cls, item):
+        if item.type==ContentType.Folder:
+            properties = item.properties
+            if 'allowed_content' not in properties.keys():
+                return False
+            if 'folders' not in properties['allowed_content']:
+                return False
+            if 'files' not in properties['allowed_content']:
+                return False
+            if 'pages' not in properties['allowed_content']:
+                return False
+            if 'threads' not in properties['allowed_content']:
+                return False
 
-    content_id = Column(Integer, Sequence('seq__contents__content_id'), autoincrement=True, primary_key=True)
-    parent_id = Column(Integer, ForeignKey('contents.content_id'), nullable=True, default=None)
-    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True, default=None)
+            return True
+
+        raise NotImplementedError
+
+    @classmethod
+    def reset_properties(cls, item):
+        if item.type==ContentType.Folder:
+            item.properties = dict(
+                allowed_content = dict (
+                    folder = True,
+                    file = True,
+                    page = True,
+                    thread = True
+                )
+            )
+            return
+
+        raise NotImplementedError
+
+
+class ContentRevisionRO(DeclarativeBase):
+    """
+    Revision of Content. It's immutable, update or delete an existing ContentRevisionRO will throw
+    ContentRevisionUpdateError errors.
+    """
+
+    __tablename__ = 'content_revisions'
+
+    revision_id = Column(Integer, primary_key=True)
+    content_id = Column(Integer, ForeignKey('content.id'), nullable=False)
+    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
+
+    label = Column(Unicode(1024), unique=False, nullable=False)
+    description = Column(Text(), unique=False, nullable=False, default='')
+    file_name = Column(Unicode(255),  unique=False, nullable=False, default='')
+    file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
+    file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
+    properties = Column('properties', Text(), unique=False, nullable=False, default='')
 
     type = Column(Unicode(32), unique=False, nullable=False)
     status = Column(Unicode(32), unique=False, nullable=False, default=ContentStatus.OPEN)
-
-    created = Column(DateTime, unique=False, nullable=False)
-    updated = Column(DateTime, unique=False, nullable=False)
-
-    workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), unique=False, nullable=True)
-
-    workspace = relationship('Workspace', remote_side=[Workspace.workspace_id], backref='contents')
-
-
+    created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
-
-    label = Column(Unicode(1024), unique=False, nullable=False, default='')
-    description = Column(Text(), unique=False, nullable=False, default='')
-    _properties = Column('properties', Text(), unique=False, nullable=False, default='')
-
-    file_name = Column(Unicode(255),  unique=False, nullable=False, default='')
-    file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
-    file_content = deferred(Column(LargeBinary(), unique=False, nullable=False, default=None))
-
     revision_type = Column(Unicode(32), unique=False, nullable=False, default='')
 
-    parent = relationship('Content', remote_side=[content_id], backref='children')
+    workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), unique=False, nullable=True)
+    workspace = relationship('Workspace', remote_side=[Workspace.workspace_id])
+
+    parent_id = Column(Integer, ForeignKey('content.id'), nullable=True, default=None)
+    parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
+
+    node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
     owner = relationship('User', remote_side=[User.user_id])
+
+    """ List of column copied when make a new revision from another """
+    _cloned_columns = (
+        'content_id', 'created', 'description', 'file_content', 'file_mimetype', 'file_name', 'is_archived',
+        'is_deleted', 'label', 'node', 'owner', 'owner_id', 'parent', 'parent_id', 'properties', 'revision_type',
+        'status', 'type', 'updated', 'workspace', 'workspace_id',
+    )
+
+    # Read by must be used like this:
+    # read_datetime = revision.ready_by[<User instance>]
+    # if user did not read the content, then a key error is raised
+    read_by = association_proxy(
+        'revision_read_statuses',  # name of the attribute
+        'view_datetime',  # attribute the value is taken from
+        creator=lambda k, v: \
+            RevisionReadStatus(user=k, view_datetime=v)
+    )
+
+    @classmethod
+    def new_from(cls, revision: 'ContentRevisionRO') -> 'ContentRevisionRO':
+        """
+
+        Return new instance of ContentRevisionRO where properties are copied from revision parameter.
+        Look at ContentRevisionRO._cloned_columns to see what columns are copieds.
+
+        :param revision: revision to copy
+        :type revision: ContentRevisionRO
+        :return: new revision from revision parameter
+        :rtype: ContentRevisionRO
+        """
+        new_rev = cls()
+
+        for column_name in cls._cloned_columns:
+            column_value = getattr(revision, column_name)
+            setattr(new_rev, column_name, column_value)
+
+        new_rev.updated = datetime.now()
+
+        return new_rev
+
+    def __setattr__(self, key: str, value: 'mixed'):
+        """
+        ContentRevisionUpdateError is raised if tried to update column and revision own identity
+        :param key: attribute name
+        :param value: attribute value
+        :return:
+        """
+        if key in ('_sa_instance_state', ):  # Prevent infinite loop from SQLAlchemy code and altered set
+            return super().__setattr__(key, value)
+
+        if inspect(self).has_identity \
+                and key in self._cloned_columns \
+                and not RevisionsIntegrity.is_updatable(self):
+                raise ContentRevisionUpdateError(
+                    "Can't modify revision. To work on new revision use tracim.model.new_revision " +
+                    "context manager.")
+
+        super().__setattr__(key, value)
+
+    def get_status(self) -> ContentStatus:
+        return ContentStatus(self.status)
+
+    def get_label(self) -> str:
+        return self.label if self.label else self.file_name if self.file_name else ''
+
+    def get_last_action(self) -> ActionDescription:
+        return ActionDescription(self.revision_type)
+
+    def has_new_information_for(self, user: User) -> bool:
+        """
+        :param user: the session current user
+        :return: bool, True if there is new information for given user else False
+                       False if the user is None
+        """
+        if not user:
+            return False
+
+        if user not in self.read_by.keys():
+            return True
+
+        return False
+
+Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
+Index('idx__content_revisions__parent_id', ContentRevisionRO.parent_id)
+
+
+class Content(DeclarativeBase):
+    """
+    Content is used as a virtual representation of ContentRevisionRO.
+    content.PROPERTY (except for content.id, content.revisions, content.children_revisions) will return
+    value of most recent revision of content.
+
+    # UPDATE A CONTENT
+
+    To update an existing Content, you must use tracim.model.new_revision context manager:
+    content = my_sontent_getter_method()
+    with new_revision(content):
+        content.description = 'foo bar baz'
+    DBSession.flush()
+
+    # QUERY CONTENTS
+
+    To query contents you will need to join your content query with ContentRevisionRO. Join
+    condition is available at tracim.lib.content.ContentApi#get_revision_join:
+
+    content = DBSession.query(Content).join(ContentRevisionRO, ContentApi.get_revision_join())
+                  .filter(Content.label == 'foo')
+                  .one()
+
+    ContentApi provide also prepared Content at tracim.lib.content.ContentApi#get_canonical_query:
+
+    content = ContentApi.get_canonical_query()
+              .filter(Content.label == 'foo')
+              .one()
+    """
+
+    __tablename__ = 'content'
+
+    revision_to_serialize = -0  # This flag allow to serialize a given revision if required by the user
+
+    id = Column(Integer, primary_key=True)
+    revisions = relationship("ContentRevisionRO",
+                             foreign_keys=[ContentRevisionRO.content_id],
+                             back_populates="node")
+    children_revisions = relationship("ContentRevisionRO",
+                                      foreign_keys=[ContentRevisionRO.parent_id],
+                                      back_populates="parent")
+
+    @hybrid_property
+    def content_id(self) -> int:
+        return self.revision.content_id
+
+    @content_id.setter
+    def content_id(self, value: int) -> None:
+        self.revision.content_id = value
+
+    @content_id.expression
+    def content_id(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.content_id
+
+    @hybrid_property
+    def revision_id(self) -> int:
+        return self.revision.revision_id
+
+    @revision_id.setter
+    def revision_id(self, value: int):
+        self.revision.revision_id = value
+
+    @revision_id.expression
+    def revision_id(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.revision_id
+
+    @hybrid_property
+    def owner_id(self) -> int:
+        return self.revision.owner_id
+
+    @owner_id.setter
+    def owner_id(self, value: int) -> None:
+        self.revision.owner_id = value
+
+    @owner_id.expression
+    def owner_id(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.owner_id
+
+    @hybrid_property
+    def label(self) -> str:
+        return self.revision.label
+
+    @label.setter
+    def label(self, value: str) -> None:
+        self.revision.label = value
+
+    @label.expression
+    def label(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.label
+
+    @hybrid_property
+    def description(self) -> str:
+        return self.revision.description
+
+    @description.setter
+    def description(self, value: str) -> None:
+        self.revision.description = value
+
+    @description.expression
+    def description(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.description
+
+    @hybrid_property
+    def file_name(self) -> str:
+        return self.revision.file_name
+
+    @file_name.setter
+    def file_name(self, value: str) -> None:
+        self.revision.file_name = value
+
+    @file_name.expression
+    def file_name(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.file_name
+
+    @hybrid_property
+    def file_mimetype(self) -> str:
+        return self.revision.file_mimetype
+
+    @file_mimetype.setter
+    def file_mimetype(self, value: str) -> None:
+        self.revision.file_mimetype = value
+
+    @file_mimetype.expression
+    def file_mimetype(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.file_mimetype
+
+    @hybrid_property
+    def file_content(self):
+        return self.revision.file_content
+
+    @file_content.setter
+    def file_content(self, value):
+        self.revision.file_content = value
+
+    @file_content.expression
+    def file_content(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.file_content
+
+    @hybrid_property
+    def _properties(self) -> str:
+        return self.revision.properties
+
+    @_properties.setter
+    def _properties(self, value: str) -> None:
+        self.revision.properties = value
+
+    @_properties.expression
+    def _properties(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.properties
+
+    @hybrid_property
+    def type(self) -> str:
+        return self.revision.type
+
+    @type.setter
+    def type(self, value: str) -> None:
+        self.revision.type = value
+
+    @type.expression
+    def type(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.type
+
+    @hybrid_property
+    def status(self) -> str:
+        return self.revision.status
+
+    @status.setter
+    def status(self, value: str) -> None:
+        self.revision.status = value
+
+    @status.expression
+    def status(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.status
+
+    @hybrid_property
+    def created(self) -> datetime:
+        return self.revision.created
+
+    @created.setter
+    def created(self, value: datetime) -> None:
+        self.revision.created = value
+
+    @created.expression
+    def created(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.created
+
+    @hybrid_property
+    def updated(self) -> datetime:
+        return self.revision.updated
+
+    @updated.setter
+    def updated(self, value: datetime) -> None:
+        self.revision.updated = value
+
+    @updated.expression
+    def updated(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.updated
+
+    @hybrid_property
+    def is_deleted(self) -> bool:
+        return self.revision.is_deleted
+
+    @is_deleted.setter
+    def is_deleted(self, value: bool) -> None:
+        self.revision.is_deleted = value
+
+    @is_deleted.expression
+    def is_deleted(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.is_deleted
+
+    @hybrid_property
+    def is_archived(self) -> bool:
+        return self.revision.is_archived
+
+    @is_archived.setter
+    def is_archived(self, value: bool) -> None:
+        self.revision.is_archived = value
+
+    @is_archived.expression
+    def is_archived(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.is_archived
+
+    @hybrid_property
+    def revision_type(self) -> str:
+        return self.revision.revision_type
+
+    @revision_type.setter
+    def revision_type(self, value: str) -> None:
+        self.revision.revision_type = value
+
+    @revision_type.expression
+    def revision_type(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.revision_type
+
+    @hybrid_property
+    def workspace_id(self) -> int:
+        return self.revision.workspace_id
+
+    @workspace_id.setter
+    def workspace_id(self, value: int) -> None:
+        self.revision.workspace_id = value
+
+    @workspace_id.expression
+    def workspace_id(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.workspace_id
+
+    @hybrid_property
+    def workspace(self) -> Workspace:
+        return self.revision.workspace
+
+    @workspace.setter
+    def workspace(self, value: Workspace) -> None:
+        self.revision.workspace = value
+
+    @workspace.expression
+    def workspace(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.workspace
+
+    @hybrid_property
+    def parent_id(self) -> int:
+        return self.revision.parent_id
+
+    @parent_id.setter
+    def parent_id(self, value: int) -> None:
+        self.revision.parent_id = value
+
+    @parent_id.expression
+    def parent_id(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.parent_id
+
+    @hybrid_property
+    def parent(self) -> 'Content':
+        return self.revision.parent
+
+    @parent.setter
+    def parent(self, value: 'Content') -> None:
+        self.revision.parent = value
+
+    @parent.expression
+    def parent(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.parent
+
+    @hybrid_property
+    def node(self) -> 'Content':
+        return self.revision.node
+
+    @node.setter
+    def node(self, value: 'Content') -> None:
+        self.revision.node = value
+
+    @node.expression
+    def node(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.node
+
+    @hybrid_property
+    def owner(self) -> User:
+        return self.revision.owner
+
+    @owner.setter
+    def owner(self, value: User) -> None:
+        self.revision.owner = value
+
+    @owner.expression
+    def owner(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.owner
+
+    @hybrid_property
+    def children(self) -> ['Content']:
+        """
+        :return: list of children Content
+        :rtype Content
+        """
+        # Return a list of unique revisions parent content
+        return list(set([revision.node for revision in self.children_revisions]))
+
+    @property
+    def revision(self) -> ContentRevisionRO:
+        return self.get_current_revision()
+
+    def get_current_revision(self) -> ContentRevisionRO:
+        if not self.revisions:
+            return self.new_revision()
+
+        # If last revisions revision don't have revision_id, return it we just add it.
+        if self.revisions[-1].revision_id is None:
+            return self.revisions[-1]
+
+        # Revisions should be ordred by revision_id but we ensure that here
+        revisions = sorted(self.revisions, key=lambda revision: revision.revision_id)
+        return revisions[-1]
+
+    def new_revision(self) -> None:
+        """
+        Return and assign to this content a new revision.
+        If it's a new content, revision is totally new.
+        If this content already own revision, revision is build from last revision.
+        :return:
+        """
+        if not self.revisions:
+            self.revisions.append(ContentRevisionRO())
+            return self.revisions[0]
+
+        new_rev = ContentRevisionRO.new_from(self.get_current_revision())
+        self.revisions.append(new_rev)
+        return new_rev
 
     def get_valid_children(self, content_types: list=None) -> ['Content']:
         for child in self.children:
             if not child.is_deleted and not child.is_archived:
                 if not content_types or child.type in content_types:
-                    yield child
+                    yield child.node
 
     @hybrid_property
-    def properties(self):
+    def properties(self) -> dict:
         """ return a structure decoded from json content of _properties """
         if not self._properties:
             ContentChecker.reset_properties(self)
         return json.loads(self._properties)
 
     @properties.setter
-    def properties(self, properties_struct):
+    def properties(self, properties_struct: dict) -> None:
         """ encode a given structure into json and store it in _properties attribute"""
         self._properties = json.dumps(properties_struct)
         ContentChecker.check_properties(self)
@@ -519,7 +994,6 @@ class Content(DeclarativeBase):
             'html.parser'  # Fixes hanging bug - http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
         )
 
-
         for link in soup.findAll('a'):
             href = link.get('href')
             label = link.contents
@@ -529,7 +1003,6 @@ class Content(DeclarativeBase):
         sorted_links = sorted(links, key=lambda link: link.label if link.label else link.href, reverse=True)
         ## FIXME - Does this return a sorted list ???!
         return sorted_links
-
 
     def get_child_nb(self, content_type: ContentType, content_status = ''):
         child_nb = 0
@@ -586,7 +1059,7 @@ class Content(DeclarativeBase):
         children = []
         for child in self.children:
             if ContentType.Comment==child.type and not child.is_deleted and not child.is_archived:
-                children.append(child)
+                children.append(child.node)
         return children
 
     def get_last_comment_from(self, user: User) -> 'Content':
@@ -612,19 +1085,6 @@ class Content(DeclarativeBase):
             for revision in self.revisions:
                 if revision.revision_id == revision_rev_id:
                     return revision
-
-        return None
-
-    def get_current_revision(self) -> 'ContentRevisionRO':
-        # TODO - D.A. - 2015-08-26
-        # This code is not efficient at all!!!
-        # We should get the revision id directly from the view
-        rev_ids = [revision.revision_id for revision in self.revisions]
-        rev_ids.sort()
-
-        for revision in self.revisions:
-            if revision.revision_id == rev_ids[-1]:
-                return revision
 
         return None
 
@@ -667,115 +1127,14 @@ class Content(DeclarativeBase):
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
 
-class ContentChecker(object):
-
-    @classmethod
-    def check_properties(cls, item: Content):
-        if item.type==ContentType.Folder:
-            properties = item.properties
-            if 'allowed_content' not in properties.keys():
-                return False
-            if 'folders' not in properties['allowed_content']:
-                return False
-            if 'files' not in properties['allowed_content']:
-                return False
-            if 'pages' not in properties['allowed_content']:
-                return False
-            if 'threads' not in properties['allowed_content']:
-                return False
-
-            return True
-
-        raise NotImplementedError
-
-    @classmethod
-    def reset_properties(cls, item: Content):
-        if item.type==ContentType.Folder:
-            item.properties = dict(
-                allowed_content = dict (
-                    folder = True,
-                    file = True,
-                    page = True,
-                    thread = True
-                )
-            )
-            return
-
-        raise NotImplementedError
-
-
-class ContentRevisionRO(DeclarativeBase):
-
-    __tablename__ = 'content_revisions'
-
-    revision_id = Column(Integer, Sequence('seq__content_revisions__revision_id'), primary_key=True)
-    content_id = Column(Integer, ForeignKey('contents.content_id'))
-    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
-    label = Column(Unicode(1024), unique=False, nullable=False)
-    description = Column(Text(), unique=False, nullable=False, default='')
-    file_name = Column(Unicode(255),  unique=False, nullable=False, default='')
-    file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
-    file_content = deferred(Column(LargeBinary(), unique=False, nullable=False, default=None))
-
-    type = Column(Unicode(32), unique=False, nullable=False)
-    status = Column(Unicode(32), unique=False, nullable=False)
-    created = Column(DateTime, unique=False, nullable=False)
-    updated = Column(DateTime, unique=False, nullable=False)
-    is_deleted = Column(Boolean, unique=False, nullable=False)
-    is_archived = Column(Boolean, unique=False, nullable=False)
-    revision_type = Column(Unicode(32), unique=False, nullable=False, default='')
-
-    workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), unique=False, nullable=True)
-    workspace = relationship('Workspace', remote_side=[Workspace.workspace_id])
-
-    node = relationship('Content', remote_side=[Content.content_id], backref='revisions')
-    owner = relationship('User', remote_side=[User.user_id])
-
-    def get_status(self):
-        return ContentStatus(self.status)
-
-    def get_label(self):
-        return self.label if self.label else self.file_name if self.file_name else ''
-
-    def get_last_action(self) -> ActionDescription:
-        return ActionDescription(self.revision_type)
-
-    # Read by must be used like this:
-    # read_datetime = revision.ready_by[<User instance>]
-    # if user did not read the content, then a key error is raised
-    read_by = association_proxy(
-        'revision_read_statuses',  # name of the attribute
-        'view_datetime',  # attribute the value is taken from
-        creator=lambda k, v: \
-            RevisionReadStatus(user=k, view_datetime=v)
-    )
-
-    def has_new_information_for(self, user: User) -> bool:
-        """
-        :param user: the session current user
-        :return: bool, True if there is new information for given user else False
-                       False if the user is None
-        """
-        if not user:
-            return False
-
-        if user not in self.read_by.keys():
-            return True
-
-        return False
-
 class RevisionReadStatus(DeclarativeBase):
 
     __tablename__ = 'revision_read_status'
 
     revision_id = Column(Integer, ForeignKey('content_revisions.revision_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
-    view_datetime = Column(DateTime, unique=False, nullable=False, server_default=func.now())
-
-    # content_revision = relationship(
-    #     'ContentRevisionRO',
-    #     remote_side=[ContentRevisionRO.revision_id],
-    #     backref='revision_read_statuses')
+    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
+    view_datetime = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     content_revision = relationship(
         'ContentRevisionRO',
@@ -831,7 +1190,7 @@ class VirtualEvent(object):
         action_description = ActionDescription(revision.revision_type)
 
         return VirtualEvent(id=revision.revision_id,
-                            created=revision.created,
+                            created=revision.updated,
                             owner=revision.owner,
                             type=action_description,
                             label=action_description.label,
