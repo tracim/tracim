@@ -30,6 +30,7 @@ from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
+from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession, Content
 from tracim.model.data import Workspace, ContentType, ContentRevisionRO
 
@@ -300,14 +301,12 @@ class ArgumentParser(argparse.ArgumentParser):
 
 class BaseTest(object):
 
-    def _create_workspace_and_test(self, name, *args, **kwargs) -> Workspace:
+    def _create_workspace_and_test(self, name, user) -> Workspace:
         """
         All extra parameters (*args, **kwargs) are for Workspace init
         :return: Created workspace instance
         """
-        workspace = Workspace(label=name, *args, **kwargs)
-        DBSession.add(workspace)
-        DBSession.flush()
+        WorkspaceApi(user).create_workspace(name, save_now=True)
 
         eq_(1, DBSession.query(Workspace).filter(Workspace.label == name).count())
         return DBSession.query(Workspace).filter(Workspace.label == name).one()
@@ -329,11 +328,19 @@ class BaseTest(object):
 
 class BaseTestThread(BaseTest):
 
-    def _create_thread_and_test(self, workspace_name='workspace_1', folder_name='folder_1', thread_name='thread_1') -> Content:
+    def _create_thread_and_test(self,
+                                user,
+                                workspace_name='workspace_1',
+                                folder_name='folder_1',
+                                thread_name='thread_1') -> Content:
         """
         :return: Thread
         """
-        workspace = self._create_workspace_and_test(workspace_name)
-        folder = self._create_content_and_test(folder_name, workspace, type=ContentType.Folder)
-        thread = self._create_content_and_test(thread_name, workspace, type=ContentType.Thread, parent=folder)
+        workspace = self._create_workspace_and_test(workspace_name, user)
+        folder = self._create_content_and_test(folder_name, workspace, type=ContentType.Folder, owner=user)
+        thread = self._create_content_and_test(thread_name,
+                                               workspace,
+                                               type=ContentType.Thread,
+                                               parent=folder,
+                                               owner=user)
         return thread

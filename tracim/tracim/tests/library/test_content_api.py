@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 from nose.tools import raises
 from tracim.lib.group import GroupApi
 
@@ -12,7 +12,7 @@ from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
-from tracim.model import DBSession, new_revision
+from tracim.model import DBSession, new_revision, User
 
 from tracim.model.auth import Group
 
@@ -21,10 +21,10 @@ from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
 
-from tracim.tests import TestStandard
+from tracim.tests import TestStandard, BaseTest
 
 
-class TestContentApi(TestStandard):
+class TestContentApi(BaseTest, TestStandard):
 
     def test_compare_content_for_sorting_by_type(self):
         c1 = Content()
@@ -729,3 +729,44 @@ class TestContentApi(TestStandard):
 
         eq_(True, id1 in [o.content_id for o in res.all()])
         eq_(True, id2 in [o.content_id for o in res.all()])
+
+    def test_unit__search_exclude_content_under_deleted_or_archived_parents__ok(self):
+        admin = DBSession.query(User).filter(User.email == 'admin@admin.admin').one()
+        workspace = self._create_workspace_and_test('workspace_1', admin)
+        folder_1 = self._create_content_and_test('folder_1', workspace=workspace, type=ContentType.Folder)
+        folder_2 = self._create_content_and_test('folder_2', workspace=workspace, type=ContentType.Folder)
+        page_1 = self._create_content_and_test('foo', workspace=workspace, type=ContentType.Page, parent=folder_1)
+        page_2 = self._create_content_and_test('bar', workspace=workspace, type=ContentType.Page, parent=folder_2)
+
+        api = ContentApi(admin)
+
+        foo_result = api.search(['foo']).all()
+        eq_(1, len(foo_result))
+        ok_(page_1 in foo_result)
+
+        bar_result = api.search(['bar']).all()
+        eq_(1, len(bar_result))
+        ok_(page_2 in bar_result)
+
+        with new_revision(folder_1):
+            api.delete(folder_1)
+        with new_revision(folder_2):
+            api.archive(folder_2)
+
+        # Actually ContentApi.search don't filter it
+        foo_result = api.search(['foo']).all()
+        eq_(1, len(foo_result))
+        ok_(page_1 in foo_result)
+
+        bar_result = api.search(['bar']).all()
+        eq_(1, len(bar_result))
+        ok_(page_2 in bar_result)
+
+        # ContentApi offer exclude_unavailable method to do it
+        foo_result = api.search(['foo']).all()
+        api.exclude_unavailable(foo_result)
+        eq_(0, len(foo_result))
+
+        bar_result = api.search(['bar']).all()
+        api.exclude_unavailable(bar_result)
+        eq_(0, len(bar_result))

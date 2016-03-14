@@ -171,6 +171,7 @@ class RootController(StandardController):
         result = api.search(keyword_list)
         if result:
             items = result.limit(ContentApi.SEARCH_DEFAULT_RESULT_NB).all()
+        api.exclude_unavailable(items)
 
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
