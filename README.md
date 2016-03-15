@@ -140,18 +140,10 @@ _Reminder : Tracim is developped and tested using python3.4._
 Tracim uses virtualenv as deployment environment. This ensure that there will be no 
 conflict between system-wide python installation and Tracim required ones.
 
-    SITE_PACKAGES_PATH=`python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`
     virtualenv -p /usr/bin/python3 tg2env
     source tg2env/bin/activate
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
-    ./bin/tg2env-patch 1 $SITE_PACKAGES_PATH
-    pip install -r install/requirements.txt
-    ./bin/tg2env-patch 2 $SITE_PACKAGES_PATH
-    
-Notes:
-
-* Ubuntu (at least 14.04): please update the site-package path with your version of python
 
 ## Database Setup ##
 

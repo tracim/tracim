@@ -673,3 +673,28 @@ class ContentApi(object):
 
         return ContentType.sorted(content_types)
 
+    def exclude_unavailable(self, contents: [Content]) -> [Content]:
+        """
+        Update and return list with content under archived/deleted removed.
+        :param contents: List of contents to parse
+        """
+        for content in contents[:]:
+            if self.content_under_deleted(content) or self.content_under_archived(content):
+                contents.remove(content)
+        return contents
+
+    def content_under_deleted(self, content: Content) -> bool:
+        if content.parent:
+            if content.parent.is_deleted:
+                return True
+            if content.parent.parent:
+                return self.content_under_deleted(content.parent)
+        return False
+
+    def content_under_archived(self, content: Content) -> bool:
+        if content.parent:
+            if content.parent.is_archived:
+                return True
+            if content.parent.parent:
+                return self.content_under_archived(content.parent)
+        return False
