@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """The application's model objects"""
-from decorator import contextmanager
+from contextlib import contextmanager
 from sqlalchemy import event, inspect, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker, Session
