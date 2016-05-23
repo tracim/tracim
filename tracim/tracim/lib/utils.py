@@ -18,3 +18,24 @@ def exec_time_monitor():
 
 class SameValueError(ValueError):
     pass
+
+
+def replace_reset_password_templates(engines):
+    try:
+        if engines['text/html'][1] == 'resetpassword.templates.index':
+            engines['text/html'] = (
+                'mako',
+                'tracim.templates.reset_password_index',
+                engines['text/html'][2],
+                engines['text/html'][3]
+            )
+
+        if engines['text/html'][1] == 'resetpassword.templates.change_password':
+            engines['text/html'] = (
+                'mako',
+                'tracim.templates.reset_password_change_password',
+                engines['text/html'][2],
+                engines['text/html'][3]
+            )
+    except IndexError:
+        pass

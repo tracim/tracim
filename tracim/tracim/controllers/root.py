@@ -24,6 +24,7 @@ from tracim.controllers.error import ErrorController
 from tracim.controllers.help import HelpController
 from tracim.controllers.user import UserRestController
 from tracim.controllers.workspace import UserWorkspaceRestController
+from tracim.lib.utils import replace_reset_password_templates
 
 from tracim.model.data import ContentType
 from tracim.model.serializers import DictLikeClass
@@ -54,6 +55,10 @@ class RootController(StandardController):
     # Rest controllers
     workspaces = UserWorkspaceRestController()
     user = UserRestController()
+
+    def _render_response(self, tgl, controller, response):
+        replace_reset_password_templates(controller.decoration.engines)
+        return super()._render_response(tgl, controller, response)
 
     def _before(self, *args, **kw):
         super(RootController, self)._before(args, kw)
