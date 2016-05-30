@@ -39,3 +39,5 @@ def replace_reset_password_templates(engines):
             )
     except IndexError:
         pass
+    except KeyError:
+        pass
