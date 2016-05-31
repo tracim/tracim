@@ -99,6 +99,6 @@ class RadicaleDaemon(Daemon):
             cfg.RADICALE_SERVER_HOST,
             cfg.RADICALE_SERVER_PORT,
             RadicaleApplication(),
-            RadicaleHTTPServer if cfg.RADICALE_SERVER_SSL else RadicaleHTTPSServer,
+            RadicaleHTTPSServer if cfg.RADICALE_SERVER_SSL else RadicaleHTTPServer,
             RadicaleRequestHandler
         )
