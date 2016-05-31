@@ -204,6 +204,7 @@ class CFG(object):
 
         self.RADICALE_SERVER_HOST = '0.0.0.0'
         self.RADICALE_SERVER_PORT = 5232
+        # Note: Other parameters needed to work in SSL (cert file, etc)
         self.RADICALE_SERVER_SSL = False
 
         self.RADICALE_CLIENT_HOST = None  # If None, current host will be used
