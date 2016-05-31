@@ -212,13 +212,14 @@ class WorkspaceRestController(TIMRestController, BaseController):
         return DictLikeClass(result = dictified_workspace)
 
     @tg.expose('tracim.templates.workspace.edit')
-    def put(self, id, name, description):
+    def put(self, id, name, description, calendar_enabled):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
 
         workspace = workspace_api_controller.get_one(id)
         workspace.label = name
         workspace.description = description
+        workspace.calendar_enabled = calendar_enabled
         workspace_api_controller.save(workspace)
 
         tg.flash(_('{} workspace updated.').format(workspace.label), CST.STATUS_OK)

@@ -49,3 +49,4 @@ git+https://github.com/algoo/tgapp-resetpassword.git@master
 lxml
 python-ldap-test==0.2.0
 who-ldap==3.1.0
+unicode-slugify==0.1.3

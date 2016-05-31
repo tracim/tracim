@@ -59,6 +59,11 @@
         % else:
             <p class="t-less-visible">${_('No description available')}</p>
         % endif
+        % if result.workspace.calendar_enabled:
+            <p>
+                ${_('Calendar URL')}: ${result.workspace.calendar_url}
+            </p>
+        % endif
 
         <% member_nb = len(result.workspace.members) %>
         % if member_nb<=0:

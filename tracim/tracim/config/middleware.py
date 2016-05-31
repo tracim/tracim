@@ -3,7 +3,8 @@
 
 from tracim.config.app_cfg import base_config
 from tracim.config.environment import load_environment
-
+from tracim.lib.daemons import DaemonsManager
+from tracim.lib.daemons import RadicaleDaemon
 
 __all__ = ['make_app']
 
@@ -35,5 +36,7 @@ def make_app(global_conf, full_stack=True, **app_conf):
     app = make_base_app(global_conf, full_stack=True, **app_conf)
     
     # Wrap your base TurboGears 2 application with custom middleware here
-    
+    daemons = DaemonsManager(app)
+    daemons.run(RadicaleDaemon.name, RadicaleDaemon)
+
     return app

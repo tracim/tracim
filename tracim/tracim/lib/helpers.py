@@ -6,6 +6,7 @@
 
 import datetime
 
+import slugify
 from babel.dates import format_date, format_time
 from markupsafe import Markup
 
@@ -216,3 +217,7 @@ def is_user_externalized_field(field_name):
     if not tg.config.get('auth_instance').is_internal:
         return field_name in tg.config.get('auth_instance').managed_fields
     return False
+
+
+def slug(string):
+    return slugify.slugify(string, only_ascii=True)

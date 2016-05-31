@@ -7,10 +7,10 @@ from datetime import datetime
 import tg
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
+from slugify import slugify
 from sqlalchemy import Column, inspect, Index
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
-from sqlalchemy import func
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
@@ -51,6 +51,7 @@ class Workspace(DeclarativeBase):
 
     label   = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
+    calendar_enabled = Column(Boolean, unique=False, nullable=False, default=False)
 
     #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
@@ -65,6 +66,19 @@ class Workspace(DeclarativeBase):
     def contents(self):
         # Return a list of unique revisions parent content
         return list(set([revision.node for revision in self.revisions]))
+
+    @property
+    def calendar_url(self) -> str:
+        # TODO - 20160531 - Bastien: Cyclic import if import in top of file
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+        return '{proto}://{domain}:{port}/workspace/{id}--{slug}.ics'.format(
+            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
+            domain=cfg.RADICALE_CLIENT_HOST or tg.request.domain,
+            port=cfg.RADICALE_CLIENT_PORT,
+            id=self.workspace_id,
+            slug=slugify(self.label)
+        )
 
     def get_user_role(self, user: User) -> int:
         for role in user.roles:

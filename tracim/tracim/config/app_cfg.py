@@ -202,6 +202,14 @@ class CFG(object):
             # ContentType.Folder -- Folder is skipped
         ]
 
+        self.RADICALE_SERVER_HOST = '0.0.0.0'
+        self.RADICALE_SERVER_PORT = 5232
+        self.RADICALE_SERVER_SSL = False
+
+        self.RADICALE_CLIENT_HOST = None  # If None, current host will be used
+        self.RADICALE_CLIENT_PORT = 5232
+        self.RADICALE_CLIENT_SSL = False
+
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)

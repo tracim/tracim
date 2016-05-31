@@ -41,3 +41,8 @@ def replace_reset_password_templates(engines):
         pass
     except KeyError:
         pass
+
+
+@property
+def NotImplemented():
+    raise NotImplementedError()
