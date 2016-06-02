@@ -206,6 +206,10 @@ class CFG(object):
         self.RADICALE_SERVER_PORT = tg.config.get('radicale.server.port', 5232)
         # Note: Other parameters needed to work in SSL (cert file, etc)
         self.RADICALE_SERVER_SSL = asbool(tg.config.get('radicale.server.ssl', False))
+        self.RADICALE_SERVER_FILE_SYSTEM_FOLDER = tg.config.get(
+            'radicale.server.filesystem.folder',
+            '~/.config/radicale/collections'
+        )
 
         # If None, current host will be used
         self.RADICALE_CLIENT_HOST = tg.config.get('radicale.client.host', None)

@@ -187,6 +187,7 @@ email.notification.smtp.password = your_smtp_password
 # radicale.server.host = 0.0.0.0
 # radicale.server.port = 5232
 # radicale.server.ssl = false
+# radicale.server.filesystem.folder = ~/.config/radicale/collections
 ## If '', current host will be used
 # radicale.client.host = ''
 # radicale.client.port = 5232
