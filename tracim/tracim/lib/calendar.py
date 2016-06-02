@@ -165,7 +165,11 @@ class CalendarManager(object):
             raise UnknownCalendarType('Type "{0}" is not implemented'
                                       .format(type(calendar)))
 
-        content_api = ContentApi(current_user, force_show_all_types=True)
+        content_api = ContentApi(
+            current_user,
+            force_show_all_types=True,
+            disable_user_workspaces_filter=True
+        )
         content = content_api.find_one_by_unique_property(
             property_name='name',
             property_value=event_name,

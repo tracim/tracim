@@ -82,6 +82,7 @@ class ContentApi(object):
             show_deleted=False,
             all_content_in_treeview=True,
             force_show_all_types=False,
+            disable_user_workspaces_filter=False,
     ):
         self._user = current_user
         self._user_id = current_user.user_id if current_user else None
@@ -89,6 +90,7 @@ class ContentApi(object):
         self._show_deleted = show_deleted
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
+        self._disable_user_workspaces_filter = disable_user_workspaces_filter
 
     @classmethod
     def get_revision_join(cls):
@@ -180,7 +182,7 @@ class ContentApi(object):
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
-        if self._user:
+        if self._user and not self._disable_user_workspaces_filter:
             user = DBSession.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = [r.workspace_id for r in user.roles \
