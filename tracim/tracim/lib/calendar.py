@@ -124,6 +124,7 @@ class CalendarManager(object):
             content.description = event.get('description')
             content.properties = {
                 'name': event_name,
+                'location': event.get('location'),
                 'raw': event.to_ical().decode("utf-8"),
                 'start': event.get('dtend').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
                 'end': event.get('dtstart').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
@@ -170,6 +171,7 @@ class CalendarManager(object):
                 content.description = event.get('description')
                 content.properties = {
                     'name': event_name,
+                    'location': event.get('location'),
                     'raw': event.to_ical().decode("utf-8"),
                     'start': event.get('dtend').dt.strftime(
                         '%Y-%m-%d %H:%M:%S%z'
