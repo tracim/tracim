@@ -85,12 +85,16 @@ class RadicaleDaemon(Daemon):
     def _prepare_config(self):
         tracim_auth = 'tracim.lib.radicale.auth'
         tracim_rights = 'tracim.lib.radicale.rights'
+        tracim_storage = 'tracim.lib.radicale.storage'
 
         radicale_config.set('auth', 'type', 'custom')
         radicale_config.set('auth', 'custom_handler', tracim_auth)
 
         radicale_config.set('rights', 'type', 'custom')
         radicale_config.set('rights', 'custom_handler', tracim_rights)
+
+        radicale_config.set('storage', 'type', 'custom')
+        radicale_config.set('storage', 'custom_handler', tracim_storage)
 
     def _get_server(self):
         from tracim.config.app_cfg import CFG

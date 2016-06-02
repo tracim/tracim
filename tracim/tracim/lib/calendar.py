@@ -1,10 +1,19 @@
 import re
+import transaction
 
+from icalendar import Event as iCalendarEvent
+
+from tracim.lib.content import ContentApi
 from tracim.lib.exceptions import UnknownCalendarType
 from tracim.lib.exceptions import NotFound
 from tracim.lib.user import UserApi
-from tracim.lib.workspace import WorkspaceApi
+from tracim.lib.workspace import UnsafeWorkspaceApi
 from tracim.model import User
+from tracim.model import DBSession
+from tracim.model import new_revision
+from tracim.model.data import ActionDescription
+from tracim.model.data import Content
+from tracim.model.data import ContentType
 from tracim.model.organizational import Calendar
 from tracim.model.organizational import UserCalendar
 from tracim.model.organizational import WorkspaceCalendar
@@ -12,8 +21,8 @@ from tracim.model.organizational import WorkspaceCalendar
 CALENDAR_USER_PATH_RE = 'user\/([0-9]+)--([a-z-]*).ics'
 CALENDAR_WORKSPACE_PATH_RE = 'workspace\/([0-9]+)--([a-z0-9-]*).ics'
 
-CALENDAR_TYPE_USER = 'USER'
-CALENDAR_TYPE_WORKSPACE = 'WORKSPACE'
+CALENDAR_TYPE_USER = UserCalendar
+CALENDAR_TYPE_WORKSPACE = WorkspaceCalendar
 
 
 class CalendarManager(object):
@@ -84,7 +93,125 @@ class CalendarManager(object):
             return UserCalendar(user, path=path)
 
         if type == CALENDAR_TYPE_WORKSPACE:
-            workspace = WorkspaceApi(self._user).get_one(id)
+            workspace = UnsafeWorkspaceApi(self._user).get_one(id)
             return WorkspaceCalendar(workspace, path=path)
 
         raise UnknownCalendarType('Type "{0}" is not implemented'.format(type))
+
+    def add_event(
+            self,
+            calendar: Calendar,
+            event: iCalendarEvent,
+            event_name: str,
+            owner: User,
+    ) -> Content:
+        """
+        Create Content event type.
+        :param calendar: Event calendar owner
+        :param event: ICS event
+        :param event_name: Event name (ID) like
+        20160602T083511Z-18100-1001-1-71_Bastien-20160602T083516Z.ics
+        :param owner: Event Owner
+        :return: Created Content
+        """
+        if isinstance(calendar, WorkspaceCalendar):
+            content = ContentApi(owner).create(
+                content_type=ContentType.Event,
+                workspace=calendar.related_object,
+                label=event.get('summary'),
+                do_save=False
+            )
+            content.description = event.get('description')
+            content.properties = {
+                'name': event_name,
+                'raw': event.to_ical().decode("utf-8"),
+                'start': event.get('dtend').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
+                'end': event.get('dtstart').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
+            }
+            content.revision_type = ActionDescription.CREATION
+            DBSession.add(content)
+            DBSession.flush()
+            transaction.commit()
+            return content
+
+        if isinstance(calendar, UserCalendar):
+            # TODO - 20160531 - Bastien: UserCalendar currently not managed
+            raise NotImplementedError()
+
+        raise UnknownCalendarType('Type "{0}" is not implemented'
+                                  .format(type(calendar)))
+
+    def update_event(
+            self,
+            calendar: Calendar,
+            event: iCalendarEvent,
+            event_name: str,
+            current_user: User,
+    ) -> Content:
+        """
+        Update Content Event
+        :param calendar: Event calendar owner
+        :param event: ICS event
+        :param event_name: Event name (ID) like
+        20160602T083511Z-18100-1001-1-71_Bastien-20160602T083516Z.ics
+        :param current_user: Current modification asking user
+        :return: Updated Content
+        """
+        if isinstance(calendar, WorkspaceCalendar):
+            content_api = ContentApi(current_user, force_show_all_types=True)
+            content = content_api.find_one_by_unique_property(
+                property_name='name',
+                property_value=event_name,
+                workspace=calendar.related_object
+            )
+
+            with new_revision(content):
+                content.label = event.get('summary')
+                content.description = event.get('description')
+                content.properties = {
+                    'name': event_name,
+                    'raw': event.to_ical().decode("utf-8"),
+                    'start': event.get('dtend').dt.strftime(
+                        '%Y-%m-%d %H:%M:%S%z'
+                    ),
+                    'end': event.get('dtstart').dt.strftime(
+                        '%Y-%m-%d %H:%M:%S%z'
+                    ),
+                }
+                content.revision_type = ActionDescription.EDITION
+
+            DBSession.flush()
+            transaction.commit()
+
+            return content
+
+        if isinstance(calendar, UserCalendar):
+            # TODO - 20160531 - Bastien: UserCalendar currently not managed
+            raise NotImplementedError()
+
+        raise UnknownCalendarType('Type "{0}" is not implemented'
+                                  .format(type(calendar)))
+
+    def delete_event_with_name(self, event_name: str, current_user: User)\
+            -> Content:
+        """
+        Delete Content Event
+        :param event_name: Event name (ID) like
+        20160602T083511Z-18100-1001-1-71_Bastien-20160602T083516Z.ics
+        :param current_user: Current deletion asking user
+        :return: Deleted Content
+        """
+        content_api = ContentApi(current_user, force_show_all_types=True)
+        content = content_api.find_one_by_unique_property(
+            property_name='name',
+            property_value=event_name,
+            workspace=None
+        )
+
+        with new_revision(content):
+            content_api.delete(content)
+
+        DBSession.flush()
+        transaction.commit()
+
+        return content

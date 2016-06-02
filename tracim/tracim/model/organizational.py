@@ -11,6 +11,10 @@ class Calendar(object):
         self._related_object = related_object
         self._path = path
 
+    @property
+    def related_object(self):
+        return self._related_object
+
     def user_can_read(self, user: User) -> bool:
         raise NotImplementedError()
 

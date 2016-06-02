@@ -320,6 +320,7 @@ class ContentType(object):
     Comment = 'comment'
     Thread = 'thread'
     Page = 'page'
+    Event = 'event'
 
     # Fake types, used for breadcrumb only
     FAKE_Dashboard = 'dashboard'
@@ -335,6 +336,7 @@ class ContentType(object):
         'page': 'fa fa-file-text-o',
         'thread': 'fa fa-comments-o',
         'comment': 'fa fa-comment-o',
+        'event': 'fa fa-calendar-o',
     }
 
     _CSS_ICONS = {
@@ -344,7 +346,8 @@ class ContentType(object):
         'file': 'fa fa-paperclip',
         'page': 'fa fa-file-text-o',
         'thread': 'fa fa-comments-o',
-        'comment': 'fa fa-comment-o'
+        'comment': 'fa fa-comment-o',
+        'event': 'fa fa-calendar-o',
     }
 
     _CSS_COLORS = {
@@ -354,7 +357,8 @@ class ContentType(object):
         'file': 't-file-color',
         'page': 't-page-color',
         'thread': 't-thread-color',
-        'comment': 't-thread-color'
+        'comment': 't-thread-color',
+        'event': 't-event-color',
     }
 
     _ORDER_WEIGHT = {
@@ -363,6 +367,7 @@ class ContentType(object):
         'thread': 2,
         'file': 3,
         'comment': 4,
+        'event': 5,
     }
 
     _LABEL = {
@@ -373,6 +378,7 @@ class ContentType(object):
         'page': l_('page'),
         'thread': l_('thread'),
         'comment': l_('comment'),
+        'event': l_('event'),
     }
 
     _DELETE_LABEL = {
@@ -383,6 +389,7 @@ class ContentType(object):
         'page': l_('Delete this page'),
         'thread': l_('Delete this thread'),
         'comment': l_('Delete this comment'),
+        'event': l_('Delete this event'),
     }
 
     @classmethod
@@ -396,7 +403,8 @@ class ContentType(object):
 
     @classmethod
     def allowed_types(cls):
-        return [cls.Folder, cls.File, cls.Comment, cls.Thread, cls.Page]
+        return [cls.Folder, cls.File, cls.Comment, cls.Thread, cls.Page,
+                cls.Event]
 
     @classmethod
     def allowed_types_for_folding(cls):
@@ -473,7 +481,18 @@ class ContentChecker(object):
                 return False
             if 'threads' not in properties['allowed_content']:
                 return False
+            return True
 
+        if item.type == ContentType.Event:
+            properties = item.properties
+            if 'name' not in properties.keys():
+                return False
+            if 'raw' not in properties.keys():
+                return False
+            if 'start' not in properties.keys():
+                return False
+            if 'end' not in properties.keys():
+                return False
             return True
 
         raise NotImplementedError

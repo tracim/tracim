@@ -67,13 +67,28 @@ class ContentApi(object):
     SEARCH_SEPARATORS = ',| '
     SEARCH_DEFAULT_RESULT_NB = 50
 
+    DISPLAYABLE_CONTENTS = (
+        ContentType.Folder,
+        ContentType.File,
+        ContentType.Comment,
+        ContentType.Thread,
+        ContentType.Page,
+    )
 
-    def __init__(self, current_user: User, show_archived=False, show_deleted=False, all_content_in_treeview=True):
+    def __init__(
+            self,
+            current_user: User,
+            show_archived=False,
+            show_deleted=False,
+            all_content_in_treeview=True,
+            force_show_all_types=False,
+    ):
         self._user = current_user
         self._user_id = current_user.user_id if current_user else None
         self._show_archived = show_archived
         self._show_deleted = show_deleted
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
+        self._force_show_all_types = force_show_all_types
 
     @classmethod
     def get_revision_join(cls):
@@ -158,6 +173,10 @@ class ContentApi(object):
     def __real_base_query(self, workspace: Workspace=None):
         result = self.get_canonical_query()
 
+        # Exclude non displayable types
+        if not self._force_show_all_types:
+            result = result.filter(Content.type.in_(self.DISPLAYABLE_CONTENTS))
+
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
@@ -183,6 +202,10 @@ class ContentApi(object):
 
     def __revisions_real_base_query(self, workspace: Workspace=None):
         result = DBSession.query(ContentRevisionRO)
+
+        # Exclude non displayable types
+        if not self._force_show_all_types:
+            result = result.filter(Content.type.in_(self.DISPLAYABLE_CONTENTS))
 
         if workspace:
             result = result.filter(ContentRevisionRO.workspace_id==workspace.workspace_id)
@@ -698,3 +721,31 @@ class ContentApi(object):
             if content.parent.parent:
                 return self.content_under_archived(content.parent)
         return False
+
+    def find_one_by_unique_property(
+            self,
+            property_name: str,
+            property_value: str,
+            workspace: Workspace=None,
+    ) -> Content:
+        """
+        Return Content who contains given property.
+        Raise sqlalchemy.orm.exc.MultipleResultsFound if more than one Content
+        contains this property value.
+        :param property_name: Name of property
+        :param property_value: Value of property
+        :param workspace: Workspace who contains Content
+        :return: Found Content
+        """
+        # TODO - 20160602 - Bastien: Should be JSON type query
+        # see https://www.compose.io/articles/using-json-extensions-in-\
+        # postgresql-from-python-2/
+        query = self._base_query(workspace=workspace).filter(
+            Content._properties.like(
+                '%"{property_name}": "{property_value}"%'.format(
+                    property_name=property_name,
+                    property_value=property_value,
+                )
+            )
+        )
+        return query.one()

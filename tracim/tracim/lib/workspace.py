@@ -121,3 +121,8 @@ class WorkspaceApi(object):
             DBSession.flush()
 
         return workspace
+
+
+class UnsafeWorkspaceApi(WorkspaceApi):
+    def _base_query(self):
+        return DBSession.query(Workspace).filter(Workspace.is_deleted==False)
