@@ -183,6 +183,14 @@ email.notification.smtp.port = 25
 email.notification.smtp.user = your_smtp_user
 email.notification.smtp.password = your_smtp_password
 
+## Radical (CalDav server) configuration
+# radicale.server.host = 0.0.0.0
+# radicale.server.port = 5232
+# radicale.server.ssl = false
+## If '', current host will be used
+# radicale.client.host = ''
+# radicale.client.port = 5232
+# radicale.client.ssl = false
 
 #####
 #

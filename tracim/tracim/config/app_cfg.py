@@ -202,14 +202,15 @@ class CFG(object):
             # ContentType.Folder -- Folder is skipped
         ]
 
-        self.RADICALE_SERVER_HOST = '0.0.0.0'
-        self.RADICALE_SERVER_PORT = 5232
+        self.RADICALE_SERVER_HOST = tg.config.get('radicale.server.host', '0.0.0.0')
+        self.RADICALE_SERVER_PORT = tg.config.get('radicale.server.port', 5232)
         # Note: Other parameters needed to work in SSL (cert file, etc)
-        self.RADICALE_SERVER_SSL = False
+        self.RADICALE_SERVER_SSL = asbool(tg.config.get('radicale.server.ssl', False))
 
-        self.RADICALE_CLIENT_HOST = None  # If None, current host will be used
-        self.RADICALE_CLIENT_PORT = 5232
-        self.RADICALE_CLIENT_SSL = False
+        # If None, current host will be used
+        self.RADICALE_CLIENT_HOST = tg.config.get('radicale.client.host', None)
+        self.RADICALE_CLIENT_PORT = tg.config.get('radicale.client.port', 5232)
+        self.RADICALE_CLIENT_SSL = asbool(tg.config.get('radicale.client.ssl', False))
 
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
