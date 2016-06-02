@@ -114,33 +114,31 @@ class CalendarManager(object):
         :param owner: Event Owner
         :return: Created Content
         """
+        workspace = None
         if isinstance(calendar, WorkspaceCalendar):
-            content = ContentApi(owner).create(
-                content_type=ContentType.Event,
-                workspace=calendar.related_object,
-                label=event.get('summary'),
-                do_save=False
-            )
-            content.description = event.get('description')
-            content.properties = {
-                'name': event_name,
-                'location': event.get('location'),
-                'raw': event.to_ical().decode("utf-8"),
-                'start': event.get('dtend').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
-                'end': event.get('dtstart').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
-            }
-            content.revision_type = ActionDescription.CREATION
-            DBSession.add(content)
-            DBSession.flush()
-            transaction.commit()
-            return content
+            workspace = calendar.related_object
+        elif isinstance(calendar, UserCalendar):
+            pass
+        else:
+            raise UnknownCalendarType('Type "{0}" is not implemented'
+                                      .format(type(calendar)))
 
-        if isinstance(calendar, UserCalendar):
-            # TODO - 20160531 - Bastien: UserCalendar currently not managed
-            raise NotImplementedError()
+        content = ContentApi(owner).create(
+            content_type=ContentType.Event,
+            workspace=workspace,
+            do_save=False
+        )
+        self.populate_content_with_event(
+            content,
+            event,
+            event_name
+        )
+        content.revision_type = ActionDescription.CREATION
+        DBSession.add(content)
+        DBSession.flush()
+        transaction.commit()
 
-        raise UnknownCalendarType('Type "{0}" is not implemented'
-                                  .format(type(calendar)))
+        return content
 
     def update_event(
             self,
@@ -158,41 +156,34 @@ class CalendarManager(object):
         :param current_user: Current modification asking user
         :return: Updated Content
         """
+        workspace = None
         if isinstance(calendar, WorkspaceCalendar):
-            content_api = ContentApi(current_user, force_show_all_types=True)
-            content = content_api.find_one_by_unique_property(
-                property_name='name',
-                property_value=event_name,
-                workspace=calendar.related_object
+            workspace = calendar.related_object
+        elif isinstance(calendar, UserCalendar):
+            pass
+        else:
+            raise UnknownCalendarType('Type "{0}" is not implemented'
+                                      .format(type(calendar)))
+
+        content_api = ContentApi(current_user, force_show_all_types=True)
+        content = content_api.find_one_by_unique_property(
+            property_name='name',
+            property_value=event_name,
+            workspace=workspace
+        )
+
+        with new_revision(content):
+            self.populate_content_with_event(
+                content,
+                event,
+                event_name
             )
+            content.revision_type = ActionDescription.EDITION
 
-            with new_revision(content):
-                content.label = event.get('summary')
-                content.description = event.get('description')
-                content.properties = {
-                    'name': event_name,
-                    'location': event.get('location'),
-                    'raw': event.to_ical().decode("utf-8"),
-                    'start': event.get('dtend').dt.strftime(
-                        '%Y-%m-%d %H:%M:%S%z'
-                    ),
-                    'end': event.get('dtstart').dt.strftime(
-                        '%Y-%m-%d %H:%M:%S%z'
-                    ),
-                }
-                content.revision_type = ActionDescription.EDITION
+        DBSession.flush()
+        transaction.commit()
 
-            DBSession.flush()
-            transaction.commit()
-
-            return content
-
-        if isinstance(calendar, UserCalendar):
-            # TODO - 20160531 - Bastien: UserCalendar currently not managed
-            raise NotImplementedError()
-
-        raise UnknownCalendarType('Type "{0}" is not implemented'
-                                  .format(type(calendar)))
+        return content
 
     def delete_event_with_name(self, event_name: str, current_user: User)\
             -> Content:
@@ -217,3 +208,19 @@ class CalendarManager(object):
         transaction.commit()
 
         return content
+
+    def populate_content_with_event(
+            self,
+            content: Content,
+            event: iCalendarEvent,
+            event_name: str,
+    ) -> Content:
+        content.label = event.get('summary')
+        content.description = event.get('description')
+        content.properties = {
+            'name': event_name,
+            'location': event.get('location'),
+            'raw': event.to_ical().decode("utf-8"),
+            'start': event.get('dtend').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
+            'end': event.get('dtstart').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
+        }
