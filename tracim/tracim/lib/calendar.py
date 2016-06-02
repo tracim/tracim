@@ -18,8 +18,8 @@ from tracim.model.organizational import Calendar
 from tracim.model.organizational import UserCalendar
 from tracim.model.organizational import WorkspaceCalendar
 
-CALENDAR_USER_PATH_RE = 'user\/([0-9]+)--([a-z-]*).ics'
-CALENDAR_WORKSPACE_PATH_RE = 'workspace\/([0-9]+)--([a-z0-9-]*).ics'
+CALENDAR_USER_PATH_RE = 'user\/([0-9]+).ics'
+CALENDAR_WORKSPACE_PATH_RE = 'workspace\/([0-9]+).ics'
 
 CALENDAR_TYPE_USER = UserCalendar
 CALENDAR_TYPE_WORKSPACE = WorkspaceCalendar
