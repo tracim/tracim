@@ -17,6 +17,14 @@
             <label for="workspaceDescription">${_('Description')}</label>
             <textarea name="description" class="form-control" id="workspaceDescription" placeholder="${_('You may add a description of the workspace')}">${result.workspace.description}</textarea>
         </div>
+        <div class="form-group">
+            <label for="workspaceCalendarEnabled">${_('Calendar enabled')}</label>
+            <input id="workspaceCalendarEnabled" name="calendar_enabled" class="form-control" type="checkbox" ${'checked' if result.workspace.calendar_enabled else ''} />
+        </div>
+        <div class="form-group calendar-url">
+            <label for="workspaceCalendarUrl">${_('Calendar URL')}</label>
+            <input id="workspaceCalendarUrl" type="text" class="form-control"  disabled="disabled" value="${result.workspace.calendar_url}" />
+        </div>
     </div>
     <div class="modal-footer">
         <span class="pull-right" style="margin-top: 0.5em;">

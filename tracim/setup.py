@@ -41,6 +41,7 @@ install_requires=[
     "repoze.who",
     "who-ldap==3.1.0",
     "python-ldap-test==0.2.0",
+    "unicode-slugify==0.1.3",
     ]
 
 setup(

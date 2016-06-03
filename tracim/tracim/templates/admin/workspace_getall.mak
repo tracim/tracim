@@ -46,6 +46,10 @@
                                         <textarea name="description" class="form-control" id="workspaceDescription" placeholder="${_('You may add a description of the workspace')}"></textarea>
                                     </div>
                                     <div class="form-group">
+                                        <label for="workspaceCalendarEnabled">${_('Calendar enabled')}</label>
+                                        <input id="workspaceCalendarEnabled" name="calendar_enabled" class="form-control" type="checkbox" checked />
+                                    </div>
+                                    <div class="form-group">
                                         <p class="form-control-static">${_('<u>Note</u>: members will be added during next step.')|n}</p>
                                     </div>
                                         

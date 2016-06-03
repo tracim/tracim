@@ -14,6 +14,7 @@ from tracim.lib.user import UserApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
+from tracim.model import DBSession
 
 from tracim.model.auth import Group
 from tracim.model.data import NodeTreeItem
@@ -190,12 +191,14 @@ class WorkspaceRestController(TIMRestController, BaseController):
         return dict(result = dictified_workspace, fake_api = fake_api)
 
     @tg.expose()
-    def post(self, name, description):
+    def post(self, name, description, calendar_enabled=False):
         # FIXME - Check user profile
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
 
         workspace = workspace_api_controller.create_workspace(name, description)
+        workspace.calendar_enabled = calendar_enabled
+        DBSession.flush()
 
         tg.flash(_('{} workspace created.').format(workspace.label), CST.STATUS_OK)
         tg.redirect(self.url())
@@ -212,13 +215,14 @@ class WorkspaceRestController(TIMRestController, BaseController):
         return DictLikeClass(result = dictified_workspace)
 
     @tg.expose('tracim.templates.workspace.edit')
-    def put(self, id, name, description):
+    def put(self, id, name, description, calendar_enabled):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
 
         workspace = workspace_api_controller.get_one(id)
         workspace.label = name
         workspace.description = description
+        workspace.calendar_enabled = calendar_enabled
         workspace_api_controller.save(workspace)
 
         tg.flash(_('{} workspace updated.').format(workspace.label), CST.STATUS_OK)

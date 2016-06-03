@@ -58,7 +58,9 @@ class UserWorkspaceRestController(TIMRestController):
         # ,
         #                      sub_items=Context(CTX.FOLDER_CONTENT_LIST).toDict(dictified_folders))
 
-        fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(workspace.get_valid_children())
+        fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(
+            workspace.get_valid_children(ContentApi.DISPLAYABLE_CONTENTS)
+        )
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
 

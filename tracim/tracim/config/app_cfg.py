@@ -15,6 +15,7 @@ convert them into boolean, for example, you should use the
 
 import tg
 from paste.deploy.converters import asbool
+from tg.configuration.milestones import environment_loaded
 
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
@@ -27,6 +28,8 @@ from tracim.config import TracimAppConfig
 from tracim.lib import app_globals, helpers
 from tracim.lib.auth.wrapper import AuthConfigWrapper
 from tracim.lib.base import logger
+from tracim.lib.daemons import DaemonsManager
+from tracim.lib.daemons import RadicaleDaemon
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
@@ -69,6 +72,7 @@ base_config['flash.template'] = '''
 # flash.js_call -> javascript code which will be run when displaying the flash from javascript. Default is webflash.render(), you can use webflash.payload() to retrieve the message and show it with your favourite library.
 # flash.js_template -> string.Template instance used to replace full javascript support for flash messages. When rendering flash message for javascript usage the following code will be used instead of providing the standard webflash object. If you replace js_template you must also ensure cookie parsing and delete it for already displayed messages. The template will receive: $container_id, $cookie_name, $js_call variables.
 
+base_config['templating.genshi.name_constant_patch'] = True
 
 # Configure the authentication backend
 
@@ -81,6 +85,17 @@ plug(base_config, 'resetpassword', 'reset_password')
 
 replace_template(base_config, 'resetpassword.templates.index', 'tracim.templates.reset_password_index')
 replace_template(base_config, 'resetpassword.templates.change_password', 'mako:tracim.templates.reset_password_change_password')
+
+daemons = DaemonsManager()
+
+
+def start_daemons(manager: DaemonsManager):
+    """
+    Sart Tracim daemons
+    """
+    manager.run('radicale', RadicaleDaemon)
+
+environment_loaded.register(lambda: start_daemons(daemons))
 
 # Note: here are fake translatable strings that allow to translate messages for reset password email content
 duplicated_email_subject = l_('Password reset request')
@@ -200,6 +215,20 @@ class CFG(object):
             ContentType.Comment,
             # ContentType.Folder -- Folder is skipped
         ]
+
+        self.RADICALE_SERVER_HOST = tg.config.get('radicale.server.host', '0.0.0.0')
+        self.RADICALE_SERVER_PORT = tg.config.get('radicale.server.port', 5232)
+        # Note: Other parameters needed to work in SSL (cert file, etc)
+        self.RADICALE_SERVER_SSL = asbool(tg.config.get('radicale.server.ssl', False))
+        self.RADICALE_SERVER_FILE_SYSTEM_FOLDER = tg.config.get(
+            'radicale.server.filesystem.folder',
+            '~/.config/radicale/collections'
+        )
+
+        # If None, current host will be used
+        self.RADICALE_CLIENT_HOST = tg.config.get('radicale.client.host', None)
+        self.RADICALE_CLIENT_PORT = tg.config.get('radicale.client.port', 5232)
+        self.RADICALE_CLIENT_SSL = asbool(tg.config.get('radicale.client.ssl', False))
 
 
     def get_tracker_js_content(self, js_tracker_file_path = None):

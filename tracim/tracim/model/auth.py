@@ -11,6 +11,7 @@ though.
 import os
 from datetime import datetime
 from hashlib import sha256
+from slugify import slugify
 from sqlalchemy.ext.hybrid import hybrid_property
 from tg.i18n import lazy_ugettext as l_
 
@@ -26,7 +27,7 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Boolean
 from sqlalchemy.orm import relation, relationship, synonym
-
+from tg import request
 from tracim.model import DeclarativeBase, metadata, DBSession
 
 # This is the association table for the many-to-many relationship between
@@ -147,6 +148,22 @@ class User(DeclarativeBase):
             profile_id = max(group.group_id for group in self.groups)
         return Profile(profile_id)
 
+    @property
+    def calendar_url(self) -> str:
+        # TODO - 20160531 - Bastien: Cyclic import if import in top of file
+        from tracim.config.app_cfg import CFG
+        from tracim.lib.calendar import CALENDAR_USER_URL_TEMPLATE
+        cfg = CFG.get_instance()
+        return CALENDAR_USER_URL_TEMPLATE.format(
+            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
+            domain=cfg.RADICALE_CLIENT_HOST or request.domain,
+            port=cfg.RADICALE_CLIENT_PORT,
+            id=self.user_id,
+            slug=slugify(self.get_display_name(
+                remove_email_part=True
+            ), only_ascii=True)
+        )
+
     @classmethod
     def by_email_address(cls, email):
         """Return the user object whose email address is ``email``."""
@@ -206,10 +223,18 @@ class User(DeclarativeBase):
         hash.update((password + self.password[:64]).encode('utf-8'))
         return self.password[64:] == hash.hexdigest()
 
-    def get_display_name(self):
+    def get_display_name(self, remove_email_part=False):
+        """
+        :param remove_email_part: If True and display name based on email,
+         remove @xxx.xxx part of email in returned value
+        :return: display name based on user name or email.
+        """
         if self.display_name!=None and self.display_name!='':
             return self.display_name
         else:
+            if remove_email_part:
+                at_pos = self.email.index('@')
+                return self.email[0:at_pos]
             return self.email
 
     def get_role(self, workspace: 'Workspace') -> int:

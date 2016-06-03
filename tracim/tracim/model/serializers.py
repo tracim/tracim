@@ -876,6 +876,7 @@ def serialize_user_for_user(user: User, context: Context):
     result['roles'] = context.toDict(user.roles)
     result['enabled'] = user.is_active
     result['profile'] = user.profile
+    result['calendar_url'] = user.calendar_url
 
     return result
 
@@ -979,6 +980,8 @@ def serialize_workspace_complete(workspace: pmd.Workspace, context: Context):
     result['members'] = context.toDict(workspace.roles)
     result['member_nb'] = len(workspace.roles)
     result['allowed_content_types'] = context.toDict(workspace.get_allowed_content_types())
+    result['calendar_enabled'] = workspace.calendar_enabled
+    result['calendar_url'] = workspace.calendar_url
 
     return result
 
