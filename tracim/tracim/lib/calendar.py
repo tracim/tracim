@@ -14,9 +14,9 @@ from tracim.model import new_revision
 from tracim.model.data import ActionDescription
 from tracim.model.data import Content
 from tracim.model.data import ContentType
-from tracim.model.organizational import Calendar
-from tracim.model.organizational import UserCalendar
-from tracim.model.organizational import WorkspaceCalendar
+from tracim.model.organisational import Calendar
+from tracim.model.organisational import UserCalendar
+from tracim.model.organisational import WorkspaceCalendar
 
 CALENDAR_USER_PATH_RE = 'user\/([0-9]+).ics'
 CALENDAR_WORKSPACE_PATH_RE = 'workspace\/([0-9]+).ics'
@@ -85,7 +85,7 @@ class CalendarManager(object):
 
     def get_calendar(self, type: str, id: str, path: str) -> Calendar:
         """
-        Return tracim.model.organizational.Calendar instance for given
+        Return tracim.model.organisational.Calendar instance for given
         parameters.
         :param type: Type of calendar, can be one of CALENDAR_TYPE_USER,
         CALENDAR_TYPE_WORKSPACE

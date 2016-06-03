@@ -1,7 +1,7 @@
 from tracim.lib.calendar import CalendarManager
 from tracim.lib.exceptions import NotFound
 from tracim.lib.user import UserApi
-from tracim.model.organizational import CALENDAR_PERMISSION_READ
+from tracim.model.organisational import CALENDAR_PERMISSION_READ
 
 
 def authorized(user, collection, permission):
