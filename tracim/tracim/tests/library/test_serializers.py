@@ -232,7 +232,11 @@ class TestSerializers(TestStandard):
         eq_(True, res['children'])
 
         for curtype in ContentType.all():
-            if curtype not in (ContentType.Folder, ContentType.Comment):
+            if curtype not in (
+                    ContentType.Folder,
+                    ContentType.Comment,
+                    ContentType.Event
+            ):
                 item = Content()
                 item.type = curtype
                 item.label = 'item'
