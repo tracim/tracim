@@ -28,7 +28,6 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Boolean
 from sqlalchemy.orm import relation, relationship, synonym
 from tg import request
-from tracim.lib.calendar import CALENDAR_USER_URL_TEMPLATE
 from tracim.model import DeclarativeBase, metadata, DBSession
 
 # This is the association table for the many-to-many relationship between
@@ -153,6 +152,7 @@ class User(DeclarativeBase):
     def calendar_url(self) -> str:
         # TODO - 20160531 - Bastien: Cyclic import if import in top of file
         from tracim.config.app_cfg import CFG
+        from tracim.lib.calendar import CALENDAR_USER_URL_TEMPLATE
         cfg = CFG.get_instance()
         return CALENDAR_USER_URL_TEMPLATE.format(
             proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',

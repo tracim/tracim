@@ -26,7 +26,6 @@ from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 from tg.i18n import lazy_ugettext as l_, ugettext as _
 
-from tracim.lib.calendar import CALENDAR_WORKSPACE_URL_TEMPLATE
 from tracim.lib.exception import ContentRevisionUpdateError
 from tracim.model import DeclarativeBase, RevisionsIntegrity
 from tracim.model.auth import User
@@ -72,6 +71,7 @@ class Workspace(DeclarativeBase):
     def calendar_url(self) -> str:
         # TODO - 20160531 - Bastien: Cyclic import if import in top of file
         from tracim.config.app_cfg import CFG
+        from tracim.lib.calendar import CALENDAR_WORKSPACE_URL_TEMPLATE
         cfg = CFG.get_instance()
         return CALENDAR_WORKSPACE_URL_TEMPLATE.format(
             proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
