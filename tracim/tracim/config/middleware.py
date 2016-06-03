@@ -37,6 +37,6 @@ def make_app(global_conf, full_stack=True, **app_conf):
     
     # Wrap your base TurboGears 2 application with custom middleware here
     daemons = DaemonsManager(app)
-    daemons.run(RadicaleDaemon.name, RadicaleDaemon)
+    daemons.run('radicale', RadicaleDaemon)
 
     return app

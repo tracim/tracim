@@ -2,6 +2,7 @@ import threading
 from wsgiref.simple_server import make_server
 
 import signal
+
 from radicale import Application as RadicaleApplication
 from radicale import HTTPServer as RadicaleHTTPServer
 from radicale import HTTPSServer as RadicaleHTTPSServer
@@ -16,6 +17,8 @@ class DaemonsManager(object):
     def __init__(self, app: TGApp):
         self._app = app
         self._daemons = {}
+        signal.signal(signal.SIGTERM, lambda *_: self.stop_all())
+        signal.signal(signal.SIGINT, lambda *_: self.stop_all())
 
     def run(self, name: str, daemon_class: object, **kwargs) -> None:
         """
@@ -32,55 +35,57 @@ class DaemonsManager(object):
                 'Daemon with name "{0}" already running'.format(name)
             )
 
-        kwargs['app'] = self._app
-        shutdown_program = threading.Event()
-        # SIGTERM and SIGINT (aka KeyboardInterrupt) should just mark this for
-        # shutdown
-        signal.signal(signal.SIGTERM, lambda *_: shutdown_program.set())
-        signal.signal(signal.SIGINT, lambda *_: shutdown_program.set())
+        daemon = daemon_class(name=name, kwargs=kwargs, daemon=True)
+        daemon.start()
+        self._daemons[name] = daemon
 
-        try:
-            threading.Thread(target=daemon_class.start, kwargs=kwargs).start()
-            self._daemons[name] = daemon_class
-        finally:
-            shutdown_program.set()
+    def stop(self, name: str) -> None:
+        """
+        Stop daemon with his name and wait for him.
+        Where name is given name when daemon started
+        with run method. If daemon name unknow, raise IndexError.
+        :param name:
+        """
+        self._daemons[name].stop()
+        self._daemons[name].join()
+
+    def stop_all(self) -> None:
+        """
+        Stop all started daemons and w<ait for them.
+        """
+        for daemon_name in self._daemons:
+            self._daemons[daemon_name].stop()
+        for daemon_name in self._daemons:
+            self._daemons[daemon_name].join()
 
 
-class Daemon(object):
-    _name = NotImplemented
-
-    def __init__(self, app: TGApp):
-        self._app = app
-
-    @classmethod
-    def start(cls, **kwargs):
-        return cls(**kwargs)
-
-    @classmethod
-    def kill(cls):
+class Daemon(threading.Thread):
+    """
+    Thread who contains daemon. You must implement start and stop methods to
+    manage daemon life correctly.
+    """
+    def run(self):
         raise NotImplementedError()
 
-    @property
-    def name(self):
-        return self._name
+    def stop(self):
+        raise NotImplementedError()
 
 
 class RadicaleDaemon(Daemon):
-    _name = 'tracim-radicale-server'
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._prepare_config()
+        self._server = self._get_server()
 
-    @classmethod
-    def kill(cls):
-        pass  # TODO
-
-    def __init__(self, app: TGApp):
+    def run(self):
         """
         To see origin radical server start method, refer to
         radicale.__main__.run
         """
-        super().__init__(app)
-        self._prepare_config()
-        server = self._get_server()
-        server.serve_forever()
+        self._server.serve_forever()
+
+    def stop(self):
+        self._server.shutdown()
 
     def _prepare_config(self):
         from tracim.config.app_cfg import CFG
