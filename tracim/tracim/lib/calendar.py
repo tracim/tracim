@@ -24,6 +24,11 @@ CALENDAR_WORKSPACE_PATH_RE = 'workspace\/([0-9]+).ics'
 CALENDAR_TYPE_USER = UserCalendar
 CALENDAR_TYPE_WORKSPACE = WorkspaceCalendar
 
+CALENDAR_USER_URL_TEMPLATE = \
+    '{proto}://{domain}:{port}/user/{id}.ics#{slug}'
+CALENDAR_WORKSPACE_URL_TEMPLATE = \
+    '{proto}://{domain}:{port}/workspace/{id}.ics#{slug}'
+
 
 class CalendarManager(object):
     def __init__(self, user: User):
