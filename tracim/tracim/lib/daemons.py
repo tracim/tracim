@@ -10,15 +10,17 @@ from radicale import RequestHandler as RadicaleRequestHandler
 from radicale import config as radicale_config
 from tg import TGApp
 
+from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
+from tracim.lib.utils import add_signal_handler
 
 
 class DaemonsManager(object):
     def __init__(self, app: TGApp):
         self._app = app
-        self._daemons = {}
-        signal.signal(signal.SIGTERM, lambda *_: self.stop_all())
-        signal.signal(signal.SIGINT, lambda *_: self.stop_all())
+        self._running_daemons = {}
+        add_signal_handler(signal.SIGTERM, self.stop_all)
+        add_signal_handler(signal.SIGINT, self.stop_all)
 
     def run(self, name: str, daemon_class: object, **kwargs) -> None:
         """
@@ -30,33 +32,47 @@ class DaemonsManager(object):
         :param kwargs: Other kwargs will be given to daemon class
         instantiation.
         """
-        if name in self._daemons:
+        if name in self._running_daemons:
             raise AlreadyRunningDaemon(
                 'Daemon with name "{0}" already running'.format(name)
             )
 
+        logger.info(self, 'Starting daemon with name "{0}" and class "{1}" ...'
+                          .format(name, daemon_class))
         daemon = daemon_class(name=name, kwargs=kwargs, daemon=True)
         daemon.start()
-        self._daemons[name] = daemon
+        self._running_daemons[name] = daemon
 
     def stop(self, name: str) -> None:
         """
         Stop daemon with his name and wait for him.
         Where name is given name when daemon started
-        with run method. If daemon name unknow, raise IndexError.
+        with run method.
         :param name:
         """
-        self._daemons[name].stop()
-        self._daemons[name].join()
+        if name in self._running_daemons:
+            logger.info(self, 'Stopping daemon with name "{0}" ...'
+                              .format(name))
+            self._running_daemons[name].stop()
+            self._running_daemons[name].join()
+            del self._running_daemons[name]
+            logger.info(self, 'Stopping daemon with name "{0}": OK'
+                              .format(name))
 
-    def stop_all(self) -> None:
+    def stop_all(self, *args, **kwargs) -> None:
         """
         Stop all started daemons and w<ait for them.
         """
-        for daemon_name in self._daemons:
-            self._daemons[daemon_name].stop()
-        for daemon_name in self._daemons:
-            self._daemons[daemon_name].join()
+        logger.info(self, 'Stopping all daemons')
+        for name, daemon in self._running_daemons.items():
+            logger.info(self, 'Stopping daemon "{0}" ...'.format(name))
+            daemon.stop()
+
+        for name, daemon in self._running_daemons.items():
+            daemon.join()
+            logger.info(self, 'Stopping daemon "{0}" OK'.format(name))
+
+        self._running_daemons = {}
 
 
 class Daemon(threading.Thread):
@@ -75,13 +91,14 @@ class RadicaleDaemon(Daemon):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._prepare_config()
-        self._server = self._get_server()
+        self._server = None
 
     def run(self):
         """
         To see origin radical server start method, refer to
         radicale.__main__.run
         """
+        self._server = self._get_server()
         self._server.serve_forever()
 
     def stop(self):

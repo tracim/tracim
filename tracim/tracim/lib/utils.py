@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import signal
 
 from tracim.lib.base import logger
 
@@ -46,3 +47,25 @@ def replace_reset_password_templates(engines):
 @property
 def NotImplemented():
     raise NotImplementedError()
+
+
+def add_signal_handler(signal_id, handler, execute_before=True) -> None:
+    """
+    Add a callback attached to python signal.
+    :param signal_id: signal identifier (eg. signal.SIGTERM)
+    :param handler: callback to execute when signal trig
+    :param execute_before: If True, callback is executed before eventual
+    existing callback on given dignal id.
+    """
+    previous_handler = signal.getsignal(signal_id)
+
+    def call_callback(*args, **kwargs):
+        if not execute_before and callable(previous_handler):
+            previous_handler(*args, **kwargs)
+
+        handler(*args, **kwargs)
+
+        if execute_before and callable(previous_handler):
+            previous_handler(*args, **kwargs)
+
+    signal.signal(signal_id, call_callback)
