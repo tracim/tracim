@@ -15,6 +15,7 @@ convert them into boolean, for example, you should use the
 
 import tg
 from paste.deploy.converters import asbool
+from tg.configuration.milestones import environment_loaded
 
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
@@ -27,6 +28,8 @@ from tracim.config import TracimAppConfig
 from tracim.lib import app_globals, helpers
 from tracim.lib.auth.wrapper import AuthConfigWrapper
 from tracim.lib.base import logger
+from tracim.lib.daemons import DaemonsManager
+from tracim.lib.daemons import RadicaleDaemon
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
@@ -82,6 +85,17 @@ plug(base_config, 'resetpassword', 'reset_password')
 
 replace_template(base_config, 'resetpassword.templates.index', 'tracim.templates.reset_password_index')
 replace_template(base_config, 'resetpassword.templates.change_password', 'mako:tracim.templates.reset_password_change_password')
+
+daemons = DaemonsManager()
+
+
+def start_daemons(manager: DaemonsManager):
+    """
+    Sart Tracim daemons
+    """
+    manager.run('radicale', RadicaleDaemon)
+
+environment_loaded.register(lambda: start_daemons(daemons))
 
 # Note: here are fake translatable strings that allow to translate messages for reset password email content
 duplicated_email_subject = l_('Password reset request')
