@@ -3,6 +3,8 @@
 import argparse
 import os
 import time
+
+import shutil
 from os import getcwd
 
 import ldap3
@@ -364,7 +366,7 @@ class TestCalendar(TestController):
         try:
             files = os.listdir(radicale_fs_path)
             for file in files:
-                os.remove('{0}/{1}'.format(radicale_fs_path, file))
+                shutil.rmtree('{0}/{1}'.format(radicale_fs_path, file))
         except FileNotFoundError:
             pass  # Dir not exists yet, no need to clear it
 
