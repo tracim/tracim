@@ -78,7 +78,7 @@ class Workspace(DeclarativeBase):
             domain=cfg.RADICALE_CLIENT_HOST or tg.request.domain,
             port=cfg.RADICALE_CLIENT_PORT,
             id=self.workspace_id,
-            slug=slugify(self.label)
+            extra='#' + slugify(self.label),
         )
 
     def get_user_role(self, user: User) -> int:

@@ -24,11 +24,11 @@ CALENDAR_WORKSPACE_PATH_RE = 'workspace\/([0-9]+).ics'
 CALENDAR_TYPE_USER = UserCalendar
 CALENDAR_TYPE_WORKSPACE = WorkspaceCalendar
 
-CALENDAR_BASE_URL = '{proto}://{domain}:{port}'
+CALENDAR_BASE_URL_TEMPLATE = '{proto}://{domain}:{port}'
 CALENDAR_USER_URL_TEMPLATE = \
-    CALENDAR_BASE_URL + '/user/{id}.ics#{slug}'
+    CALENDAR_BASE_URL_TEMPLATE + '/user/{id}.ics{extra}/'
 CALENDAR_WORKSPACE_URL_TEMPLATE = \
-    CALENDAR_BASE_URL + '/workspace/{id}.ics#{slug}'
+    CALENDAR_BASE_URL_TEMPLATE + '/workspace/{id}.ics{extra}/'
 
 
 class CalendarManager(object):
