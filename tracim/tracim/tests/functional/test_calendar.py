@@ -63,12 +63,12 @@ class TestCalendar(BaseTestCalendar):
         user = DBSession.query(User).filter(
             User.email == 'lawrence-not-real-email@fsf.local'
         ).one()
-        calendar_base_url = self._get_user_calendar_url(user.user_id)
+        user_calendar_url = self._get_user_calendar_url(user.user_id)
         try:
             caldav.Calendar(
                 parent=client,
                 client=client,
-                url=calendar_base_url
+                url=user_calendar_url
             ).events()
 
             ok_(True, 'User can access it\'s own calendar')
@@ -85,12 +85,12 @@ class TestCalendar(BaseTestCalendar):
         other_user = DBSession.query(User).filter(
             User.email == 'admin@admin.admin'
         ).one()
-        calendar_base_url = self._get_user_calendar_url(other_user.user_id)
+        user_calendar_url = self._get_user_calendar_url(other_user.user_id)
         try:
             caldav.Calendar(
                 parent=client,
                 client=client,
-                url=calendar_base_url
+                url=user_calendar_url
             ).events()
 
             ok_(False, 'User can\'t acces other user calendar')
