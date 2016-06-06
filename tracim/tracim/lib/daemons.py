@@ -1,6 +1,8 @@
 import threading
 from wsgiref.simple_server import make_server
 import signal
+
+import collections
 import transaction
 
 from radicale import Application as RadicaleApplication
@@ -59,7 +61,7 @@ class DaemonsManager(object):
 
     def stop_all(self, *args, **kwargs) -> None:
         """
-        Stop all started daemons and w<ait for them.
+        Stop all started daemons and wait for them.
         """
         logger.info(self, 'Stopping all daemons')
         for name, daemon in self._running_daemons.items():
@@ -72,12 +74,27 @@ class DaemonsManager(object):
 
         self._running_daemons = {}
 
+    def execute_in_thread(self, thread_name, callback):
+        self._running_daemons[thread_name].append_thread_callback(callback)
+
 
 class TracimSocketServerMixin(object):
     """
     Mixin to use with socketserver.BaseServer who add _after_serve_actions
     method executed after end of server execution.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._daemon_execute_callbacks = []
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        """
+        Add callback to self._daemon_execute_callbacks. See service_actions
+        function to their usages.
+        :param callback: callback to execute in daemon
+        """
+        self._daemon_execute_callbacks.append(callback)
+
     def serve_forever(self, *args, **kwargs):
         super().serve_forever(*args, **kwargs)
         # After serving (in case of stop) do following:
@@ -88,7 +105,15 @@ class TracimSocketServerMixin(object):
         Override (and call super if needed) to execute actions when server
         finish it's job.
         """
-        transaction.commit()
+        pass
+
+    def service_actions(self):
+        if len(self._daemon_execute_callbacks):
+            try:
+                while True:
+                    self._daemon_execute_callbacks.pop()()
+            except IndexError:
+                pass  # Finished to iter
 
 
 class Daemon(threading.Thread):
@@ -96,10 +121,26 @@ class Daemon(threading.Thread):
     Thread who contains daemon. You must implement start and stop methods to
     manage daemon life correctly.
     """
-    def run(self):
+    def run(self) -> None:
+        """
+        Place here code who have to be executed in Daemon.
+        """
         raise NotImplementedError()
 
-    def stop(self):
+    def stop(self) -> None:
+        """
+        Place here code who stop your daemon
+        """
+        raise NotImplementedError()
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        """
+        Place here the logic who permit to execute a callback in your daemon.
+        To get an exemple of that, take a look at
+        socketserver.BaseServer#service_actions  and how we use it in
+        tracim.lib.daemons.TracimSocketServerMixin#service_actions .
+        :param callback: callback to execute in your thread.
+        """
         raise NotImplementedError()
 
 
@@ -157,3 +198,11 @@ class RadicaleDaemon(Daemon):
             RadicaleHTTPSServer if cfg.RADICALE_SERVER_SSL else RadicaleHTTPServer,
             RadicaleRequestHandler
         )
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        """
+        Give the callback to running server through
+        tracim.lib.daemons.TracimSocketServerMixin#append_thread_callback
+        :param callback: callback to execute in daemon
+        """
+        self._server.append_thread_callback(callback)

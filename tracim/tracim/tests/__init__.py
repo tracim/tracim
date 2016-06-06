@@ -28,12 +28,14 @@ from who_ldap import make_connection
 
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
-from tracim.config.app_cfg import daemons
+from tracim.fixtures.users_and_groups import Test as TestFixture
+from tracim.config.app_cfg import daemons, start_daemons
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession, Content
 from tracim.model.data import Workspace, ContentType, ContentRevisionRO
+from tracim.lib.calendar import CALENDAR_BASE_URL
 
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
@@ -240,7 +242,7 @@ class TestController(object):
     def tearDown(self):
         """Tear down test fixture for each functional test method."""
         DBSession.close()
-        daemons.stop_all()
+        daemons.execute_in_thread('radicale', lambda: transaction.commit())
         teardown_db()
 
 
@@ -349,6 +351,7 @@ class BaseTestThread(BaseTest):
 
 
 class TestCalendar(TestController):
+    fixtures = [BaseFixture, TestFixture]
     application_under_test = 'radicale'
 
     def setUp(self):
@@ -364,3 +367,13 @@ class TestCalendar(TestController):
                 os.remove('{0}/{1}'.format(radicale_fs_path, file))
         except FileNotFoundError:
             pass  # Dir not exists yet, no need to clear it
+
+    def _get_base_url(self):
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        return CALENDAR_BASE_URL.format(
+            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
+            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
+            port=str(cfg.RADICALE_CLIENT_PORT)
+        )
