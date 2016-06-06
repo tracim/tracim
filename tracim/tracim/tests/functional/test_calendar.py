@@ -1,11 +1,13 @@
 import time
 
 import caldav
+import transaction
 from caldav.lib.error import AuthorizationError
 from nose.tools import eq_, ok_
 import requests
 from requests.exceptions import ConnectionError
 
+from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession
 from tracim.tests import TestCalendar as BaseTestCalendar
 from tracim.model.auth import User
@@ -53,7 +55,7 @@ class TestCalendar(BaseTestCalendar):
         except AuthorizationError:
             ok_(True, 'AuthorizationError thrown correctly')
 
-    def test_func__radicale_rights_read_user_calendar__ok__as_lawrence(self):
+    def test_func__rights_read_user_calendar__ok__as_lawrence(self):
         radicale_base_url = self._get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
@@ -75,7 +77,7 @@ class TestCalendar(BaseTestCalendar):
         except AuthorizationError:
             ok_(False, 'User should not access that')
 
-    def test_func__radicale_rights_read_user_calendar__fail__as_john_doe(self):
+    def test_func__rights_read_user_calendar__fail__as_john_doe(self):
         radicale_base_url = self._get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
@@ -96,3 +98,71 @@ class TestCalendar(BaseTestCalendar):
             ok_(False, 'User can\'t acces other user calendar')
         except AuthorizationError:
             ok_(True, 'User should not acces other user calendar')
+
+    def test_func__rights_read_workspace_calendar__ok__as_owner(self):
+        lawrence = DBSession.query(User).filter(
+            User.email == 'lawrence-not-real-email@fsf.local'
+        ).one()
+        workspace = WorkspaceApi(lawrence).create_workspace(
+            'workspace_1',
+            save_now=False
+        )
+        workspace.calendar_enabled = True
+        DBSession.flush()
+
+        workspace_calendar_url = self._get_workspace_calendar_url(
+            workspace.workspace_id
+        )
+
+        transaction.commit()
+
+        radicale_base_url = self._get_base_url()
+        client = caldav.DAVClient(
+            radicale_base_url,
+            username='lawrence-not-real-email@fsf.local',
+            password='foobarbaz'
+        )
+        try:
+            caldav.Calendar(
+                parent=client,
+                client=client,
+                url=workspace_calendar_url
+            ).events()
+
+            ok_(True, 'User can acces own workspace calendar')
+        except AuthorizationError:
+            ok_(False, 'User should not acces own workspace calendar')
+
+    def test_func__rights_read_workspace_calendar__fail__as_unauthorized(self):
+        lawrence = DBSession.query(User).filter(
+            User.email == 'lawrence-not-real-email@fsf.local'
+        ).one()
+        workspace = WorkspaceApi(lawrence).create_workspace(
+            'workspace_1',
+            save_now=False
+        )
+        workspace.calendar_enabled = True
+        DBSession.flush()
+
+        workspace_calendar_url = self._get_workspace_calendar_url(
+            workspace.workspace_id
+        )
+
+        transaction.commit()
+
+        radicale_base_url = self._get_base_url()
+        client = caldav.DAVClient(
+            radicale_base_url,
+            username='bob@fsf.local',
+            password='foobarbaz'
+        )
+        try:
+            caldav.Calendar(
+                parent=client,
+                client=client,
+                url=workspace_calendar_url
+            ).events()
+
+            ok_(False, 'User can\'t access unright workspace calendar')
+        except AuthorizationError:
+            ok_(True, 'User should not access unright workspace calendar')

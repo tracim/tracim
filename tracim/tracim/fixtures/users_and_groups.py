@@ -47,3 +47,10 @@ class Test(Fixture):
         lawrence.password = 'foobarbaz'
         self._session.add(lawrence)
         g2.users.append(lawrence)
+
+        bob = model.User()
+        bob.display_name = 'Bob i.'
+        bob.email = 'bob@fsf.local'
+        bob.password = 'foobarbaz'
+        self._session.add(bob)
+        g2.users.append(bob)
