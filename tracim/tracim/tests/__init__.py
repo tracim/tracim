@@ -37,7 +37,8 @@ from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession, Content
 from tracim.model.data import Workspace, ContentType, ContentRevisionRO
-from tracim.lib.calendar import CALENDAR_BASE_URL
+from tracim.lib.calendar import CALENDAR_BASE_URL_TEMPLATE
+from tracim.lib.calendar import CALENDAR_USER_URL_TEMPLATE
 
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
@@ -374,8 +375,20 @@ class TestCalendar(TestController):
         from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
 
-        return CALENDAR_BASE_URL.format(
+        return CALENDAR_BASE_URL_TEMPLATE.format(
             proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
             domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
             port=str(cfg.RADICALE_CLIENT_PORT)
+        )
+
+    def _get_user_calendar_url(self, user_id):
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        return CALENDAR_USER_URL_TEMPLATE.format(
+            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
+            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
+            port=str(cfg.RADICALE_CLIENT_PORT),
+            id=user_id,
+            extra='',
         )
