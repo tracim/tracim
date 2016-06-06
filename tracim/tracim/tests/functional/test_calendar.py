@@ -204,6 +204,8 @@ END:VCALENDAR
         user_calendar.save()
 
         daemons.execute_in_thread('radicale', lambda: transaction.commit())
+        # TODO - 20160606 - Bastien: lock should be better here ?
+        time.sleep(3)  # Wait for be sure transaction commited in daemon
 
         try:
             event = DBSession.query(Content).filter(
