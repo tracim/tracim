@@ -44,13 +44,13 @@ class TestAuthentication(LDAPTest, TracimTestController):
 
     def test_ldap_attributes_sync(self):
         # User is already know in database
-        eq_(1, DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').count())
+        eq_(1, DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').count())
 
         # His display name is Lawrence L.
-        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').one()
         eq_('Lawrence L.', lawrence.display_name)
 
         # After connexion with LDAP, his display_name is updated (see ldap fixtures)
-        self._connect_user('lawrence-not-real-email@fsf.org', 'foobarbaz')
-        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
+        self._connect_user('lawrence-not-real-email@fsf.local', 'foobarbaz')
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').one()
         eq_('Lawrence Lessig', lawrence.display_name)

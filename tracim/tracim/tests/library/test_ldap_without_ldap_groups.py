@@ -68,12 +68,12 @@ class TestContentApi(LDAPTest, TestStandard):
         LDAP don't manage groups here: We must retrieve internal groups of tested user
         :return:
         """
-        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').one()
         managers = DBSession.query(Group).filter(Group.group_name == 'managers').one()
         lawrence_identity = {'user': lawrence}
 
         # Lawrence is in fixtures: he is in managers group
-        self._check_db_user('lawrence-not-real-email@fsf.org', 1)
+        self._check_db_user('lawrence-not-real-email@fsf.local', 1)
         assert lawrence in managers.users
         assert False is ini_conf_to_bool(config.get('ldap_group_enabled', False))
         assert ['managers'] == config.get('sa_auth').authmetadata.get_groups(
@@ -95,12 +95,12 @@ class TestContentApi(LDAPTest, TestStandard):
         LDAP don't manage groups here: We must retrieve internal groups permission of tested user
         :return:
         """
-        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').one()
         managers = DBSession.query(Group).filter(Group.group_name == 'managers').one()
         lawrence_identity = {'user': lawrence}
 
         # Lawrence is in fixtures: he is in managers group
-        self._check_db_user('lawrence-not-real-email@fsf.org', 1)
+        self._check_db_user('lawrence-not-real-email@fsf.local', 1)
         assert lawrence in managers.users
         assert False is ini_conf_to_bool(config.get('ldap_group_enabled', False))
 
