@@ -10,12 +10,15 @@ from tracim.tests import TestCalendar as BaseTestCalendar
 
 
 class TestCalendar(BaseTestCalendar):
+    def setUp(self):
+        super().setUp()
+        time.sleep(3)  # TODO - 20160606 - Bastien: sleep to wait ...
+        # ... radicale daemon started. We should lock something somewhere !
+
     def test_func__radicale_connectivity__ok__nominal_case(self):
         radicale_base_url = self._get_base_url()
 
         try:
-            time.sleep(2)  # TODO - 20160606 - Bastien: sleep to wait ...
-            # ... radicale daemon started. We should lock something somewhere !
             response = requests.get(radicale_base_url)
             eq_(response.status_code, 401, 'Radicale http response is 401')
         except ConnectionError:

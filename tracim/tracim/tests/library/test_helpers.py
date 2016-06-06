@@ -17,12 +17,11 @@ from tracim.model.serializers import DictLikeClass
 
 from tracim.tests import TestStandard
 
-config = CFG.get_instance()
-
 
 class TestHelpers(TestStandard):
 
     def test_is_item_still_editable(self):
+        config = CFG.get_instance()
         item = DictLikeClass()
 
         config.DATA_UPDATE_ALLOWED_DURATION = 0
