@@ -6,11 +6,14 @@ from caldav.lib.error import AuthorizationError
 from nose.tools import eq_, ok_
 import requests
 from requests.exceptions import ConnectionError
+from sqlalchemy.orm.exc import NoResultFound
 
+from tracim.config.app_cfg import daemons
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession
 from tracim.tests import TestCalendar as BaseTestCalendar
 from tracim.model.auth import User
+from tracim.model.data import Content
 
 
 class TestCalendar(BaseTestCalendar):
@@ -166,3 +169,50 @@ class TestCalendar(BaseTestCalendar):
             ok_(False, 'User can\'t access unright workspace calendar')
         except AuthorizationError:
             ok_(True, 'User should not access unright workspace calendar')
+
+    def test_func__event_create__ok__nominal_case(self):
+        lawrence = DBSession.query(User).filter(
+            User.email == 'lawrence-not-real-email@fsf.local'
+        ).one()
+        radicale_base_url = self._get_base_url()
+        client = caldav.DAVClient(
+            radicale_base_url,
+            username='lawrence-not-real-email@fsf.local',
+            password='foobarbaz'
+        )
+        user_calendar_url = self._get_user_calendar_url(lawrence.user_id)
+        user_calendar = caldav.Calendar(
+            parent=client,
+            client=client,
+            url=user_calendar_url
+        )
+
+        event_ics = """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example Corp.//CalDAV Client//EN
+BEGIN:VEVENT
+UID:1234567890
+DTSTAMP:20100510T182145Z
+DTSTART:20100512T170000Z
+DTEND:20100512T180000Z
+SUMMARY:This is an event
+LOCATION:Here
+END:VEVENT
+END:VCALENDAR
+"""
+        user_calendar.add_event(event_ics)
+        user_calendar.save()
+
+        daemons.execute_in_thread('radicale', lambda: transaction.commit())
+
+        try:
+            event = DBSession.query(Content).filter(
+                Content.label == 'This is an event'
+            ).one()
+        except NoResultFound:
+            ok_(False, 'Content record should exist for '
+                       '"This is an event" label')
+
+        eq_(event.properties['location'], 'Here')
+        eq_(event.properties['start'], '2010-05-12 18:00:00+0000')
+        eq_(event.properties['end'], '2010-05-12 17:00:00+0000')
