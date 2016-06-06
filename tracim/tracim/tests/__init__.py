@@ -28,6 +28,7 @@ from who_ldap import make_connection
 
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
+from tracim.config.app_cfg import daemons
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
@@ -239,6 +240,7 @@ class TestController(object):
     def tearDown(self):
         """Tear down test fixture for each functional test method."""
         DBSession.close()
+        daemons.stop_all()
         teardown_db()
 
 
@@ -344,3 +346,21 @@ class BaseTestThread(BaseTest):
                                                parent=folder,
                                                owner=user)
         return thread
+
+
+class TestCalendar(TestController):
+    application_under_test = 'radicale'
+
+    def setUp(self):
+        super().setUp()
+        self._clear_radicale_fs()
+
+    @staticmethod
+    def _clear_radicale_fs():
+        radicale_fs_path = config.radicale.server.filesystem.folder
+        try:
+            files = os.listdir(radicale_fs_path)
+            for file in files:
+                os.remove('{0}/{1}'.format(radicale_fs_path, file))
+        except FileNotFoundError:
+            pass  # Dir not exists yet, no need to clear it

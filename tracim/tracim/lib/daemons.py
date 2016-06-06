@@ -1,14 +1,13 @@
 import threading
 from wsgiref.simple_server import make_server
-
 import signal
+import transaction
 
 from radicale import Application as RadicaleApplication
-from radicale import HTTPServer as RadicaleHTTPServer
-from radicale import HTTPSServer as RadicaleHTTPSServer
+from radicale import HTTPServer as BaseRadicaleHTTPServer
+from radicale import HTTPSServer as BaseRadicaleHTTPSServer
 from radicale import RequestHandler as RadicaleRequestHandler
 from radicale import config as radicale_config
-from tg import TGApp
 
 from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
@@ -74,6 +73,24 @@ class DaemonsManager(object):
         self._running_daemons = {}
 
 
+class TracimSocketServerMixin(object):
+    """
+    Mixin to use with socketserver.BaseServer who add _after_serve_actions
+    method executed after end of server execution.
+    """
+    def serve_forever(self, *args, **kwargs):
+        super().serve_forever(*args, **kwargs)
+        # After serving (in case of stop) do following:
+        self._after_serve_actions()
+
+    def _after_serve_actions(self):
+        """
+        Override (and call super if needed) to execute actions when server
+        finish it's job.
+        """
+        transaction.commit()
+
+
 class Daemon(threading.Thread):
     """
     Thread who contains daemon. You must implement start and stop methods to
@@ -84,6 +101,14 @@ class Daemon(threading.Thread):
 
     def stop(self):
         raise NotImplementedError()
+
+
+class RadicaleHTTPSServer(TracimSocketServerMixin, BaseRadicaleHTTPSServer):
+    pass
+
+
+class RadicaleHTTPServer(TracimSocketServerMixin, BaseRadicaleHTTPServer):
+    pass
 
 
 class RadicaleDaemon(Daemon):
