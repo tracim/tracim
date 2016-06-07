@@ -43,7 +43,14 @@ class Test(Fixture):
 
         lawrence = model.User()
         lawrence.display_name = 'Lawrence L.'
-        lawrence.email = 'lawrence-not-real-email@fsf.org'
+        lawrence.email = 'lawrence-not-real-email@fsf.local'
         lawrence.password = 'foobarbaz'
         self._session.add(lawrence)
         g2.users.append(lawrence)
+
+        bob = model.User()
+        bob.display_name = 'Bob i.'
+        bob.email = 'bob@fsf.local'
+        bob.password = 'foobarbaz'
+        self._session.add(bob)
+        g2.users.append(bob)

@@ -21,8 +21,8 @@ class TestAuthentication(LDAPTest, TracimTestController):
         Password change is disabled
         :return:
         """
-        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
-        self._connect_user('lawrence-not-real-email@fsf.org', 'foobarbaz')
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').one()
+        self._connect_user('lawrence-not-real-email@fsf.local', 'foobarbaz')
         home = self.app.get('/home/',)
 
         # HTML button is not here
@@ -45,8 +45,8 @@ class TestAuthentication(LDAPTest, TracimTestController):
         Some fields (email) are not editable on user interface: they are managed by LDAP
         :return:
         """
-        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
-        self._connect_user('lawrence-not-real-email@fsf.org', 'foobarbaz')
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').one()
+        self._connect_user('lawrence-not-real-email@fsf.local', 'foobarbaz')
 
         edit = self.app.get('/user/5/edit')
 
@@ -60,7 +60,7 @@ class TestAuthentication(LDAPTest, TracimTestController):
         ok_('readonly' not in name_input.attrs)
 
         # If we force edit of user, "email" field will be not updated
-        eq_(lawrence.email, 'lawrence-not-real-email@fsf.org')
+        eq_(lawrence.email, 'lawrence-not-real-email@fsf.local')
         eq_(lawrence.display_name, 'Lawrence L.')
 
         try_post_user = self.app.post(
@@ -73,6 +73,6 @@ class TestAuthentication(LDAPTest, TracimTestController):
 
         eq_(try_post_user.status_code, 302, "Code should be 302, but is %d" % try_post_user.status_code)
 
-        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.org').one()
-        eq_(lawrence.email, 'lawrence-not-real-email@fsf.org', "email should be unmodified")
+        lawrence = DBSession.query(User).filter(User.email == 'lawrence-not-real-email@fsf.local').one()
+        eq_(lawrence.email, 'lawrence-not-real-email@fsf.local', "email should be unmodified")
         eq_(lawrence.display_name, 'Lawrence Lessig YEAH', "Name should be updated")

@@ -159,7 +159,7 @@ class User(DeclarativeBase):
             domain=cfg.RADICALE_CLIENT_HOST or request.domain,
             port=cfg.RADICALE_CLIENT_PORT,
             id=self.user_id,
-            slug=slugify(self.get_display_name(
+            extra='#' + slugify(self.get_display_name(
                 remove_email_part=True
             ), only_ascii=True)
         )

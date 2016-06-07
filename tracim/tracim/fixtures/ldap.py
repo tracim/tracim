@@ -46,11 +46,11 @@ ldap_test_server_fixtures = {
         },
         {
             'objectclass': ['account', 'top'],
-            'dn': 'cn=lawrence-not-real-email@fsf.org,ou=people,dc=directory,dc=fsf,dc=org',
+            'dn': 'cn=lawrence-not-real-email@fsf.local,ou=people,dc=directory,dc=fsf,dc=org',
             'attributes': {
-                'uid': 'lawrence-not-real-email@fsf.org',
+                'uid': 'lawrence-not-real-email@fsf.local',
                 'userPassword': 'foobarbaz',
-                'mail': 'lawrence-not-real-email@fsf.org',
+                'mail': 'lawrence-not-real-email@fsf.local',
                 'pubname': 'Lawrence Lessig',
             }
         },

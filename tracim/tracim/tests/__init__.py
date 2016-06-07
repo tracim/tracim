@@ -3,6 +3,8 @@
 import argparse
 import os
 import time
+
+import shutil
 from os import getcwd
 
 import ldap3
@@ -11,6 +13,7 @@ import transaction
 from gearbox.commands.setup_app import SetupAppCommand
 from ldap_test import LdapServer
 from nose.tools import eq_
+from nose.tools import make_decorator
 from nose.tools import ok_
 from paste.deploy import loadapp
 from sqlalchemy.engine import reflection
@@ -28,11 +31,14 @@ from who_ldap import make_connection
 
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
+from tracim.fixtures.users_and_groups import Test as TestFixture
+from tracim.config.app_cfg import daemons
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession, Content
-from tracim.model.data import Workspace, ContentType, ContentRevisionRO
+from tracim.model.data import Workspace
+from tracim.model.data import ContentType
 
 __all__ = ['setup_app', 'setup_db', 'teardown_db', 'TestController']
 
@@ -239,6 +245,7 @@ class TestController(object):
     def tearDown(self):
         """Tear down test fixture for each functional test method."""
         DBSession.close()
+        daemons.execute_in_thread('radicale', lambda: transaction.commit())
         teardown_db()
 
 
@@ -344,3 +351,45 @@ class BaseTestThread(BaseTest):
                                                parent=folder,
                                                owner=user)
         return thread
+
+
+class TestCalendar(TestController):
+    fixtures = [BaseFixture, TestFixture]
+    application_under_test = 'radicale'
+
+    def setUp(self):
+        super().setUp()
+        self._clear_radicale_fs()
+
+    @staticmethod
+    def _clear_radicale_fs():
+        radicale_fs_path = config.radicale.server.filesystem.folder
+        try:
+            files = os.listdir(radicale_fs_path)
+            for file in files:
+                shutil.rmtree('{0}/{1}'.format(radicale_fs_path, file))
+        except FileNotFoundError:
+            pass  # Dir not exists yet, no need to clear it
+
+
+def not_raises(*exceptions):
+    """
+    Test must not raise one of expected exceptions to pass.
+    """
+    valid = ' or '.join([e.__name__ for e in exceptions])
+
+    def decorate(func):
+        name = func.__name__
+
+        def newfunc(*arg, **kw):
+            try:
+                func(*arg, **kw)
+            except exceptions as exc:
+                message = '{0} raise {1} exception and should be not'\
+                    .format(name, exc)
+                raise AssertionError(message)
+            except:
+                raise
+        newfunc = make_decorator(func)(newfunc)
+        return newfunc
+    return decorate
