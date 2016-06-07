@@ -3,7 +3,9 @@ import time
 import caldav
 import transaction
 from caldav.lib.error import AuthorizationError
-from nose.tools import eq_, ok_
+from nose.tools import eq_
+from nose.tools import ok_
+from nose.tools import raises
 import requests
 from requests.exceptions import ConnectionError
 from sqlalchemy.orm.exc import NoResultFound
@@ -13,6 +15,7 @@ from tracim.lib.calendar import CalendarManager
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession
 from tracim.tests import TestCalendar as BaseTestCalendar
+from tracim.tests import not_raises
 from tracim.model.auth import User
 from tracim.model.data import Content
 
@@ -34,6 +37,7 @@ class TestCalendar(BaseTestCalendar):
         except ConnectionError as exc:
             ok_(False, 'Unable to contact radicale on HTTP: {0}'.format(exc))
 
+    @not_raises(AuthorizationError)
     def test_func__radicale_auth__ok__as_lawrence(self):
         radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
@@ -41,12 +45,9 @@ class TestCalendar(BaseTestCalendar):
             username='lawrence-not-real-email@fsf.local',
             password='foobarbaz'
         )
-        try:
-            client.propfind()
-            ok_(True, 'No auth error when communicate with radicale server')
-        except AuthorizationError:
-            ok_(False, 'AuthorizationError when communicate with radicale')
+        client.propfind()
 
+    @raises(AuthorizationError)
     def test_func__radicale_auth__fail__as_john_doe(self):
         radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
@@ -54,13 +55,9 @@ class TestCalendar(BaseTestCalendar):
             username='john.doe@foo.local',
             password='nopasswd'
         )
-        try:
-            client.propfind()
-            ok_(False, 'Auth with unknown user should be raise'
-                       ' AuthorizationError !')
-        except AuthorizationError:
-            ok_(True, 'AuthorizationError thrown correctly')
+        client.propfind()
 
+    @not_raises(AuthorizationError)
     def test_func__rights_read_user_calendar__ok__as_lawrence(self):
         radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
@@ -72,17 +69,13 @@ class TestCalendar(BaseTestCalendar):
             User.email == 'lawrence-not-real-email@fsf.local'
         ).one()
         user_calendar_url = CalendarManager.get_user_calendar_url(user.user_id)
-        try:
-            caldav.Calendar(
-                parent=client,
-                client=client,
-                url=user_calendar_url
-            ).events()
+        caldav.Calendar(
+            parent=client,
+            client=client,
+            url=user_calendar_url
+        ).events()
 
-            ok_(True, 'User can access it\'s own calendar')
-        except AuthorizationError:
-            ok_(False, 'User should not access that')
-
+    @raises(AuthorizationError)
     def test_func__rights_read_user_calendar__fail__as_john_doe(self):
         radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
@@ -94,17 +87,13 @@ class TestCalendar(BaseTestCalendar):
             User.email == 'admin@admin.admin'
         ).one()
         user_calendar_url = CalendarManager.get_user_calendar_url(other_user.user_id)
-        try:
-            caldav.Calendar(
-                parent=client,
-                client=client,
-                url=user_calendar_url
-            ).events()
+        caldav.Calendar(
+            parent=client,
+            client=client,
+            url=user_calendar_url
+        ).events()
 
-            ok_(False, 'User can\'t acces other user calendar')
-        except AuthorizationError:
-            ok_(True, 'User should not acces other user calendar')
-
+    @not_raises(AuthorizationError)
     def test_func__rights_read_workspace_calendar__ok__as_owner(self):
         lawrence = DBSession.query(User).filter(
             User.email == 'lawrence-not-real-email@fsf.local'
@@ -128,17 +117,13 @@ class TestCalendar(BaseTestCalendar):
             username='lawrence-not-real-email@fsf.local',
             password='foobarbaz'
         )
-        try:
-            caldav.Calendar(
-                parent=client,
-                client=client,
-                url=workspace_calendar_url
-            ).events()
+        caldav.Calendar(
+            parent=client,
+            client=client,
+            url=workspace_calendar_url
+        ).events()
 
-            ok_(True, 'User can acces own workspace calendar')
-        except AuthorizationError:
-            ok_(False, 'User should not acces own workspace calendar')
-
+    @raises(AuthorizationError)
     def test_func__rights_read_workspace_calendar__fail__as_unauthorized(self):
         lawrence = DBSession.query(User).filter(
             User.email == 'lawrence-not-real-email@fsf.local'
@@ -162,16 +147,11 @@ class TestCalendar(BaseTestCalendar):
             username='bob@fsf.local',
             password='foobarbaz'
         )
-        try:
-            caldav.Calendar(
-                parent=client,
-                client=client,
-                url=workspace_calendar_url
-            ).events()
-
-            ok_(False, 'User can\'t access unright workspace calendar')
-        except AuthorizationError:
-            ok_(True, 'User should not access unright workspace calendar')
+        caldav.Calendar(
+            parent=client,
+            client=client,
+            url=workspace_calendar_url
+        ).events()
 
     def test_func__event_create__ok__nominal_case(self):
         lawrence = DBSession.query(User).filter(
