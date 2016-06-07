@@ -32,6 +32,43 @@ CALENDAR_WORKSPACE_URL_TEMPLATE = \
 
 
 class CalendarManager(object):
+    @staticmethod
+    def get_base_url():
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        return CALENDAR_BASE_URL_TEMPLATE.format(
+            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
+            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
+            port=str(cfg.RADICALE_CLIENT_PORT)
+        )
+
+    @staticmethod
+    def get_user_calendar_url(user_id: int, extra: str=''):
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        return CALENDAR_USER_URL_TEMPLATE.format(
+            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
+            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
+            port=str(cfg.RADICALE_CLIENT_PORT),
+            id=str(user_id),
+            extra=extra,
+        )
+
+    @staticmethod
+    def get_workspace_calendar_url(workspace_id: int, extra: str=''):
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        return CALENDAR_WORKSPACE_URL_TEMPLATE.format(
+            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
+            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
+            port=str(cfg.RADICALE_CLIENT_PORT),
+            id=str(workspace_id),
+            extra=extra,
+        )
+
     def __init__(self, user: User):
         self._user = user
 
@@ -224,7 +261,15 @@ class CalendarManager(object):
             content: Content,
             event: iCalendarEvent,
             event_name: str,
-    ) -> Content:
+    ) -> None:
+        """
+        Populate Content content instance from iCalendarEvent event attributes.
+        :param content: content to populate
+        :param event: event with data to insert in content
+        :param event_name: Event name (ID) like
+        20160602T083511Z-18100-1001-1-71_Bastien-20160602T083516Z.ics
+        :return: given content
+        """
         content.label = event.get('summary')
         content.description = event.get('description')
         content.properties = {

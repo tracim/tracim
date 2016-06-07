@@ -9,6 +9,7 @@ from requests.exceptions import ConnectionError
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim.config.app_cfg import daemons
+from tracim.lib.calendar import CalendarManager
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession
 from tracim.tests import TestCalendar as BaseTestCalendar
@@ -23,7 +24,7 @@ class TestCalendar(BaseTestCalendar):
         # ... radicale daemon started. We should lock something somewhere !
 
     def test_func__radicale_connectivity__ok__nominal_case(self):
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
 
         try:
             response = requests.get(radicale_base_url)
@@ -32,7 +33,7 @@ class TestCalendar(BaseTestCalendar):
             ok_(False, 'Unable to contact radicale on HTTP')
 
     def test_func__radicale_auth__ok__as_lawrence(self):
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
             username='lawrence-not-real-email@fsf.local',
@@ -45,7 +46,7 @@ class TestCalendar(BaseTestCalendar):
             ok_(False, 'AuthorizationError when communicate with radicale')
 
     def test_func__radicale_auth__fail__as_john_doe(self):
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
             username='john.doe@foo.local',
@@ -59,7 +60,7 @@ class TestCalendar(BaseTestCalendar):
             ok_(True, 'AuthorizationError thrown correctly')
 
     def test_func__rights_read_user_calendar__ok__as_lawrence(self):
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
             username='lawrence-not-real-email@fsf.local',
@@ -68,7 +69,7 @@ class TestCalendar(BaseTestCalendar):
         user = DBSession.query(User).filter(
             User.email == 'lawrence-not-real-email@fsf.local'
         ).one()
-        user_calendar_url = self._get_user_calendar_url(user.user_id)
+        user_calendar_url = CalendarManager.get_user_calendar_url(user.user_id)
         try:
             caldav.Calendar(
                 parent=client,
@@ -81,7 +82,7 @@ class TestCalendar(BaseTestCalendar):
             ok_(False, 'User should not access that')
 
     def test_func__rights_read_user_calendar__fail__as_john_doe(self):
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
             username='john.doe@foo.local',
@@ -90,7 +91,7 @@ class TestCalendar(BaseTestCalendar):
         other_user = DBSession.query(User).filter(
             User.email == 'admin@admin.admin'
         ).one()
-        user_calendar_url = self._get_user_calendar_url(other_user.user_id)
+        user_calendar_url = CalendarManager.get_user_calendar_url(other_user.user_id)
         try:
             caldav.Calendar(
                 parent=client,
@@ -113,13 +114,13 @@ class TestCalendar(BaseTestCalendar):
         workspace.calendar_enabled = True
         DBSession.flush()
 
-        workspace_calendar_url = self._get_workspace_calendar_url(
+        workspace_calendar_url = CalendarManager.get_workspace_calendar_url(
             workspace.workspace_id
         )
 
         transaction.commit()
 
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
             username='lawrence-not-real-email@fsf.local',
@@ -147,13 +148,13 @@ class TestCalendar(BaseTestCalendar):
         workspace.calendar_enabled = True
         DBSession.flush()
 
-        workspace_calendar_url = self._get_workspace_calendar_url(
+        workspace_calendar_url = CalendarManager.get_workspace_calendar_url(
             workspace.workspace_id
         )
 
         transaction.commit()
 
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
             username='bob@fsf.local',
@@ -174,13 +175,15 @@ class TestCalendar(BaseTestCalendar):
         lawrence = DBSession.query(User).filter(
             User.email == 'lawrence-not-real-email@fsf.local'
         ).one()
-        radicale_base_url = self._get_base_url()
+        radicale_base_url = CalendarManager.get_base_url()
         client = caldav.DAVClient(
             radicale_base_url,
             username='lawrence-not-real-email@fsf.local',
             password='foobarbaz'
         )
-        user_calendar_url = self._get_user_calendar_url(lawrence.user_id)
+        user_calendar_url = CalendarManager.get_user_calendar_url(
+            lawrence.user_id
+        )
         user_calendar = caldav.Calendar(
             parent=client,
             client=client,

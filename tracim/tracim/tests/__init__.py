@@ -371,37 +371,3 @@ class TestCalendar(TestController):
                 shutil.rmtree('{0}/{1}'.format(radicale_fs_path, file))
         except FileNotFoundError:
             pass  # Dir not exists yet, no need to clear it
-
-    def _get_base_url(self):
-        from tracim.config.app_cfg import CFG
-        cfg = CFG.get_instance()
-
-        return CALENDAR_BASE_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
-            port=str(cfg.RADICALE_CLIENT_PORT)
-        )
-
-    def _get_user_calendar_url(self, user_id):
-        from tracim.config.app_cfg import CFG
-        cfg = CFG.get_instance()
-
-        return CALENDAR_USER_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
-            port=str(cfg.RADICALE_CLIENT_PORT),
-            id=user_id,
-            extra='',
-        )
-
-    def _get_workspace_calendar_url(self, workspace_id):
-        from tracim.config.app_cfg import CFG
-        cfg = CFG.get_instance()
-
-        return CALENDAR_WORKSPACE_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
-            port=str(cfg.RADICALE_CLIENT_PORT),
-            id=workspace_id,
-            extra='',
-        )
