@@ -28,9 +28,11 @@ class TestCalendar(BaseTestCalendar):
 
         try:
             response = requests.get(radicale_base_url)
-            eq_(response.status_code, 401, 'Radicale http response is 401')
-        except ConnectionError:
-            ok_(False, 'Unable to contact radicale on HTTP')
+            eq_(response.status_code, 401, 'Radicale http response should be '
+                                           '401, its {0}'
+                .format(response.status_code))
+        except ConnectionError as exc:
+            ok_(False, 'Unable to contact radicale on HTTP: {0}'.format(exc))
 
     def test_func__radicale_auth__ok__as_lawrence(self):
         radicale_base_url = CalendarManager.get_base_url()
