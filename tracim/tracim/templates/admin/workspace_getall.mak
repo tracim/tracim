@@ -45,10 +45,13 @@
                                         <label for="workspaceDescription">${_('Description')}</label>
                                         <textarea name="description" class="form-control" id="workspaceDescription" placeholder="${_('You may add a description of the workspace')}"></textarea>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="workspaceCalendarEnabled">${_('Calendar enabled')}</label>
-                                        <input id="workspaceCalendarEnabled" name="calendar_enabled" class="form-control" type="checkbox" checked />
+                                    <div class="checkbox form-group">
+                                        <label for="workspaceCalendarEnabled">
+                                            <input id="workspaceCalendarEnabled" name="calendar_enabled" type="checkbox" checked >
+                                            <b>${_('Activate associated calendar')}</b>
+                                        </label>
                                     </div>
+
                                     <div class="form-group">
                                         <p class="form-control-static">${_('<u>Note</u>: members will be added during next step.')|n}</p>
                                     </div>
@@ -80,6 +83,7 @@
                                     <th>${_('Workspace')}</th>
                                     <th>${_('Description')}</th>
                                     <th>${_('User Nb')}</th>
+                                    <th>${_('Calendar')}</th>
                                 </tr>
                             </thead>
                             % for workspace in result.workspaces:
@@ -88,6 +92,14 @@
                                     <td><a href="${tg.url('/admin/workspaces/{}'.format(workspace.id))}">${workspace.label}</a></td>
                                     <td>${workspace.description}</td>
                                     <td>${workspace.member_nb}</td>
+                                    <td class="text-center">
+                                        % if workspace.calendar_enabled:
+                                            ${ICON.FA('fa-check-square-o fa-lg t-enabled-color')}
+                                        % else:
+                                            ${ICON.FA('fa-square-o fa-lg t-disabled-color')}
+                                        % endif
+
+                                    </td>
                                 </tr>
                             % endfor
                         </table>
