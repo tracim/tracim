@@ -963,9 +963,9 @@ def serialize_workspace_in_list(workspace: pmd.Workspace, context: Context):
     result['label'] = workspace.label
     result['description'] = workspace.description
     result['member_nb'] = len(workspace.roles)
+    result['calendar_enabled'] = workspace.calendar_enabled
+    result['calendar_url'] = workspace.calendar_url
 
-    #    roles = serializableObject.roles
-    #    result['users'] = context.toDict(serializableObject.roles)
     return result
 
 

@@ -17,13 +17,30 @@
             <label for="workspaceDescription">${_('Description')}</label>
             <textarea name="description" class="form-control" id="workspaceDescription" placeholder="${_('You may add a description of the workspace')}">${result.workspace.description}</textarea>
         </div>
-        <div class="form-group">
-            <label for="workspaceCalendarEnabled">${_('Calendar enabled')}</label>
-            <input id="workspaceCalendarEnabled" name="calendar_enabled" class="form-control" type="checkbox" ${'checked' if result.workspace.calendar_enabled else ''} />
+        <div class="checkbox form-group">
+            <label for="workspaceCalendarEnabled">
+                <input id="workspaceCalendarEnabled" name="calendar_enabled" type="checkbox" checked >
+                <b>${_('Activate associated calendar')}</b>
+            </label>
         </div>
+        <script>
+            $('#workspaceCalendarEnabled').click(function() {
+                console.log('Value is' + $(this).val());
+                if($(this).is(':checked')) {
+                    console.log('hide url');
+                    $('.calendar-url').css('display', 'block');
+                } else {
+                    console.log('show url');
+                    $('.calendar-url').css('display', 'none');
+                }
+            });
+        </script>
         <div class="form-group calendar-url">
-            <label for="workspaceCalendarUrl">${_('Calendar URL')}</label>
+            <label for="workspace-name1">${_('Calendar Url')}</label>
             <input id="workspaceCalendarUrl" type="text" class="form-control"  disabled="disabled" value="${result.workspace.calendar_url}" />
+            <p>
+                ${_('This url is the one to configure in your calendar software: Outlook, Thunderbird, etc.')}
+            </p>
         </div>
     </div>
     <div class="modal-footer">

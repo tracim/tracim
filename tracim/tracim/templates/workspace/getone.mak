@@ -59,11 +59,6 @@
         % else:
             <p class="t-less-visible">${_('No description available')}</p>
         % endif
-        % if result.workspace.calendar_enabled:
-            <p>
-                ${_('Calendar URL')}: ${result.workspace.calendar_url}
-            </p>
-        % endif
 
         <% member_nb = len(result.workspace.members) %>
         % if member_nb<=0:
@@ -75,22 +70,33 @@
                 % else:
                     ${_('This workspace has {a_open}{member_nb} members{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', member_nb=member_nb, a_close='</a>')|n}
                 % endif
-                </p>
-                <div class="collapse" id="memberList">
-                    <table class="table">
-                        % for member in result.workspace.members:
-                            <tr>
-                                <td><strong>${member.name}</strong></td>
-                                <td>
-                                    ${TIM.ICO_FA_BADGED('fa fa-fw fa-flag', member.role_description, member.style)}
-                                    ${member.role_description}
-                                </td>
-                            </tr>
-                        % endfor
-                    </table>
-                </div>
             </p>
+            <div class="collapse" id="memberList">
+                <table class="table">
+                    % for member in result.workspace.members:
+                        <tr>
+                            <td><strong>${member.name}</strong></td>
+                            <td>
+                                ${TIM.ICO_FA_BADGED('fa fa-fw fa-flag', member.role_description, member.style)}
+                                ${member.role_description}
+                            </td>
+                        </tr>
+                    % endfor
+                </table>
+            </div>
         % endif
+
+        % if result.workspace.calendar_enabled:
+            <p>
+                ${_('This workspace has {a_open}an associated calendar{a_close}').format(a_open='<a data-toggle="collapse" href="#calendarConfig" aria-expanded="false" aria-controls="calendarConfig">', a_close='</a>')|n}
+            </p>
+            <div class="collapse" id="calendarConfig">
+                <p>${_('You can access the calendar using your own software: Outlook, Thunderbird, etc.')}</p>
+                <p>${_('The url to setup is the following one:')}</p>
+                <p class="form-control">${result.workspace.calendar_url}"</p>
+            </div>
+        % endif
+
     </div>
 </div>
 

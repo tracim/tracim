@@ -48,6 +48,22 @@
             </div>
 
             <div class="row">
+                % if not result.workspace.calendar_enabled:
+                    <div class="col-sm-7 col-md-offset-3">
+                        ${_('The calendar is disabled.')}
+                    </div>
+                % else:
+                    <div class="col-sm-7 col-md-offset-3">
+                        ${TITLE.H3(_('Calendar'), 'fa-calendar', 'workspace-members')}
+                        <p>${_('This workspace offers a calendar that you can configure in your software: Outlook, Thunderbird, etc.')}</p>
+                        <p>${_('The url to configure is the following one:')}</p>
+                        <p class="form-control">${result.workspace.calendar_url}"</p>
+
+                    </div>
+                % endif
+            </div>
+
+            <div class="row">
                 <div class="col-sm-7 col-md-offset-3">
                     <div>
                         <% potential_new_user_nb = sum(1 for user in fake_api.users if user.id not in (user.id for user in result.workspace.members)) %>
