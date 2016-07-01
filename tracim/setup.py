@@ -40,7 +40,7 @@ install_requires=[
     "alembic",
     "repoze.who",
     "who-ldap==3.1.0",
-    "python-ldap-test==0.2.0",
+    "python-ldap-test==0.2.1",
     "unicode-slugify==0.1.3",
     ]
 
