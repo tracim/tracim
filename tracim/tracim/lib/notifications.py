@@ -370,6 +370,8 @@ class EmailNotifier(object):
             )
             raise ValueError('Unexpected empty notification')
 
+        # Import done here because cyclic import
+        from tracim.config.app_cfg import CFG
         body_content = template.render(
             base_url=self._global_config.WEBSITE_BASE_URL,
             _=_,
@@ -381,6 +383,8 @@ class EmailNotifier(object):
             content_text=content_text,
             main_title=main_title,
             call_to_action_text=call_to_action_text,
-            result = DictLikeClass(item=dictified_item, actor=dictified_actor))
+            result = DictLikeClass(item=dictified_item, actor=dictified_actor),
+            CFG=CFG.get_instance(),
+        )
 
         return body_content
