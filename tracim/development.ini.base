@@ -169,6 +169,8 @@ website.treeview.content = all
 # The following base_url is used for links and icons
 # integrated in the email notifcations
 website.base_url = http://127.0.0.1:8080
+# If config not provided, it will be extracted from website.base_url
+website.server_name = 127.0.0.1
     
 email.notification.activated = False
 email.notification.from = Tracim Notification <noreply@trac.im>
@@ -188,10 +190,9 @@ email.notification.smtp.password = your_smtp_password
 # radicale.server.port = 5232
 # radicale.server.ssl = false
 # radicale.server.filesystem.folder = ~/.config/radicale/collections
-## If '', current host will be used
-# radicale.client.host = ''
-# radicale.client.port = 5232
-# radicale.client.ssl = false
+## url can be extended like http://127.0.0.1:5232/calendar
+## in this case, you have to create your own proxy behind this url.
+# radicale.client.base_url = http://127.0.0.1:5232
 
 #####
 #

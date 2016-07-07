@@ -151,18 +151,10 @@ class User(DeclarativeBase):
     @property
     def calendar_url(self) -> str:
         # TODO - 20160531 - Bastien: Cyclic import if import in top of file
-        from tracim.config.app_cfg import CFG
-        from tracim.lib.calendar import CALENDAR_USER_URL_TEMPLATE
-        cfg = CFG.get_instance()
-        return CALENDAR_USER_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or request.domain,
-            port=cfg.RADICALE_CLIENT_PORT,
-            id=self.user_id,
-            extra='#' + slugify(self.get_display_name(
-                remove_email_part=True
-            ), only_ascii=True)
-        )
+        from tracim.lib.calendar import CalendarManager
+        calendar_manager = CalendarManager(None)
+
+        return calendar_manager.get_user_calendar_url(self.user_id)
 
     @classmethod
     def by_email_address(cls, email):

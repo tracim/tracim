@@ -70,16 +70,10 @@ class Workspace(DeclarativeBase):
     @property
     def calendar_url(self) -> str:
         # TODO - 20160531 - Bastien: Cyclic import if import in top of file
-        from tracim.config.app_cfg import CFG
-        from tracim.lib.calendar import CALENDAR_WORKSPACE_URL_TEMPLATE
-        cfg = CFG.get_instance()
-        return CALENDAR_WORKSPACE_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or tg.request.domain,
-            port=cfg.RADICALE_CLIENT_PORT,
-            id=self.workspace_id,
-            extra='#' + slugify(self.label),
-        )
+        from tracim.lib.calendar import CalendarManager
+        calendar_manager = CalendarManager(None)
+
+        return calendar_manager.get_workspace_calendar_url(self.workspace_id)
 
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
