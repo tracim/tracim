@@ -190,7 +190,7 @@ email.notification.smtp.password = your_smtp_password
 # radicale.server.port = 5232
 # radicale.server.ssl = false
 # radicale.server.filesystem.folder = ~/.config/radicale/collections
-# radicale.client.base_url = http://{server_name}:{radicale_port}
+# radicale.client.base_url = http://127.0.0.1:5232
 
 #####
 #

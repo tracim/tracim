@@ -182,6 +182,12 @@ class CFG(object):
 
         if not self.WEBSITE_SERVER_NAME:
             self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
+            logger.warning(
+                self,
+                'NOTE: Generated website.server_name parameter from '
+                'website.base_url parameter -> {0}'
+                .format(self.WEBSITE_SERVER_NAME)
+            )
 
         self.WEBSITE_HOME_TAG_LINE = tg.config.get('website.home.tag_line', '')
         self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle', '')
@@ -232,10 +238,22 @@ class CFG(object):
             '~/.config/radicale/collections'
         )
 
-        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = tg.config.get(
-            'radicale.client.base_url',
-            'http://{server_name}:{radicale_port}',
-        )
+        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
+            tg.config.get('radicale.client.base_url', None)
+
+        if not self.RADICALE_CLIENT_BASE_URL_TEMPLATE:
+            self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
+                'http://{0}:{1}'.format(
+                    self.WEBSITE_SERVER_NAME,
+                    self.RADICALE_SERVER_PORT,
+                )
+            logger.warning(
+                self,
+                'NOTE: Generated radicale.client.base_url parameter with '
+                'followings parameters: website.server_name, '
+                'radicale.server.port -> {0}'
+                .format(self.RADICALE_CLIENT_BASE_URL_TEMPLATE)
+            )
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)

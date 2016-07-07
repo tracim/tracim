@@ -35,11 +35,7 @@ class CalendarManager(object):
     def get_base_url(cls):
         from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
-
-        return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE.format(
-            server_name=cfg.WEBSITE_SERVER_NAME,
-            radicale_port=cfg.RADICALE_SERVER_PORT,
-        )
+        return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE
 
     @classmethod
     def get_user_calendar_url(cls, user_id: int):
