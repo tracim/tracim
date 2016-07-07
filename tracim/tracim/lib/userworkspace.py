@@ -28,6 +28,42 @@ from tracim.model.serializers import DictLikeClass
 class RoleApi(object):
 
     ALL_ROLE_VALUES = UserRoleInWorkspace.get_all_role_values()
+    # Dict containing readable members roles for given role
+    members_read_rights = {
+        UserRoleInWorkspace.NOT_APPLICABLE: [],
+        UserRoleInWorkspace.READER: [
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+        ],
+        UserRoleInWorkspace.CONTRIBUTOR: [
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserRoleInWorkspace.CONTRIBUTOR,
+        ],
+        UserRoleInWorkspace.CONTENT_MANAGER: [
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            UserRoleInWorkspace.READER,
+        ],
+        UserRoleInWorkspace.WORKSPACE_MANAGER: [
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            UserRoleInWorkspace.READER,
+        ],
+    }
+
+    @classmethod
+    def role_can_read_member_role(cls, reader_role: int, tested_role: int) \
+            -> bool:
+        """
+        :param reader_role: role as viewer
+        :param tested_role: role as viwed
+        :return: True if given role can view member role in workspace.
+        """
+        if reader_role in cls.members_read_rights:
+            return tested_role in cls.members_read_rights[reader_role]
+        return False
 
     def __init__(self, current_user: User):
         self._user = current_user
