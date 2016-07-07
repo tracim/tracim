@@ -53,10 +53,11 @@ class UserWorkspaceRestController(TIMRestController):
 
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)
         dictified_folders = self.folders.get_all_fake(workspace).result
-        fake_api = DictLikeClass(current_user=dictified_current_user,
-                                 current_workspace_folders=dictified_folders)\
-        # ,
-        #                      sub_items=Context(CTX.FOLDER_CONTENT_LIST).toDict(dictified_folders))
+        fake_api = DictLikeClass(
+            current_user=dictified_current_user,
+            current_workspace_folders=dictified_folders,
+            current_user_workspace_role=workspace.get_user_role(user)
+        )
 
         fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(
             workspace.get_valid_children(ContentApi.DISPLAYABLE_CONTENTS)

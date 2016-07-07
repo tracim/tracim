@@ -18,7 +18,9 @@ from tracim.lib import app_globals as plag
 from tracim.lib import CST
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
+from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
+from tracim.model import User
 
 from tracim.model.data import ContentStatus
 from tracim.model.data import Content
@@ -221,3 +223,21 @@ def is_user_externalized_field(field_name):
 
 def slug(string):
     return slugify.slugify(string, only_ascii=True)
+
+
+def get_viewable_members_for_role(role: int, members: [dict]) -> [dict]:
+    """
+    Return given users list with viewable members by given role.
+    :param role: One of tracim.model.data.UserRoleInWorkspace roles
+    :param members: list of workspace members. Where member object own "role"
+    property containing tracim.model.data.UserRoleInWorkspace role.
+    :return: filtered member list
+    """
+    viewable_users = []
+    for member in members:
+        if RoleApi.role_can_read_member_role(
+                reader_role=role,
+                tested_role=member.role
+        ):
+            viewable_users.append(member)
+    return viewable_users

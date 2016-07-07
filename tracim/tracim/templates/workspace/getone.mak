@@ -61,6 +61,8 @@
         % endif
 
         <% member_nb = len(result.workspace.members) %>
+        <% viewable_members = h.get_viewable_members_for_role(fake_api.current_user_workspace_role, result.workspace.members) %>
+        <% viewable_member_nb = len(viewable_members) %>
         % if member_nb<=0:
             ${P.EMPTY_CONTENT(_('There are no members in this workspace'))}
         % else:
@@ -69,11 +71,14 @@
                     ${_('This workspace has {a_open}one member{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', a_close='</a>')|n}
                 % else:
                     ${_('This workspace has {a_open}{member_nb} members{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', member_nb=member_nb, a_close='</a>')|n}
+                    % if viewable_member_nb != member_nb:
+                        <span id="members-whose" style="display: none;">${ _('whose') }:</span>
+                    % endif
                 % endif
             </p>
             <div class="collapse" id="memberList">
                 <table class="table">
-                    % for member in result.workspace.members:
+                    % for member in viewable_members:
                         <tr>
                             <td><strong>${member.name}</strong></td>
                             <td>
@@ -84,6 +89,16 @@
                     % endfor
                 </table>
             </div>
+            <script>
+                $(document).ready(function(){
+                    $('#memberList').on('show.bs.collapse', function() {
+                        $('#members-whose').show();
+                    });
+                    $('#memberList').on('hide.bs.collapse', function() {
+                        $('#members-whose').hide();
+                    });
+                });
+            </script>
         % endif
 
         % if result.workspace.calendar_enabled:

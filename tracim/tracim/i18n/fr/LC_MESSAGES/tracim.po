@@ -1925,6 +1925,10 @@ msgstr "Modifier l'espace de travail courant"
 msgid "Delete current workspace"
 msgstr "Supprimer l'espace de travail"
 
+#: tracim/templates/workspace/getone.mak:75
+msgid "whose"
+msgstr "dont"
+
 #~ msgid "You have no document yet."
 #~ msgstr "Vous n'avez pas de document pour le moment."
 
