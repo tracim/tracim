@@ -1,3 +1,5 @@
+import os
+
 import re
 import transaction
 
@@ -24,50 +26,32 @@ CALENDAR_WORKSPACE_PATH_RE = 'workspace\/([0-9]+).ics'
 CALENDAR_TYPE_USER = UserCalendar
 CALENDAR_TYPE_WORKSPACE = WorkspaceCalendar
 
-CALENDAR_BASE_URL_TEMPLATE = '{proto}://{domain}:{port}'
-CALENDAR_USER_URL_TEMPLATE = \
-    CALENDAR_BASE_URL_TEMPLATE + '/user/{id}.ics{extra}/'
-CALENDAR_WORKSPACE_URL_TEMPLATE = \
-    CALENDAR_BASE_URL_TEMPLATE + '/workspace/{id}.ics{extra}/'
+CALENDAR_USER_URL_TEMPLATE = 'user/{id}.ics/'
+CALENDAR_WORKSPACE_URL_TEMPLATE = 'workspace/{id}.ics/'
 
 
 class CalendarManager(object):
-    @staticmethod
-    def get_base_url():
+    @classmethod
+    def get_base_url(cls):
         from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
 
-        return CALENDAR_BASE_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
-            port=str(cfg.RADICALE_CLIENT_PORT)
+        return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE.format(
+            server_name=cfg.WEBSITE_SERVER_NAME,
+            radicale_port=cfg.RADICALE_SERVER_PORT,
         )
 
-    @staticmethod
-    def get_user_calendar_url(user_id: int, extra: str=''):
-        from tracim.config.app_cfg import CFG
-        cfg = CFG.get_instance()
+    @classmethod
+    def get_user_calendar_url(cls, user_id: int):
+        user_path = CALENDAR_USER_URL_TEMPLATE.format(id=str(user_id))
+        return os.path.join(cls.get_base_url(), user_path)
 
-        return CALENDAR_USER_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
-            port=str(cfg.RADICALE_CLIENT_PORT),
-            id=str(user_id),
-            extra=extra,
+    @classmethod
+    def get_workspace_calendar_url(cls, workspace_id: int):
+        workspace_path = CALENDAR_WORKSPACE_URL_TEMPLATE.format(
+            id=str(workspace_id)
         )
-
-    @staticmethod
-    def get_workspace_calendar_url(workspace_id: int, extra: str=''):
-        from tracim.config.app_cfg import CFG
-        cfg = CFG.get_instance()
-
-        return CALENDAR_WORKSPACE_URL_TEMPLATE.format(
-            proto='https' if cfg.RADICALE_CLIENT_SSL else 'http',
-            domain=cfg.RADICALE_CLIENT_HOST or '127.0.0.1',
-            port=str(cfg.RADICALE_CLIENT_PORT),
-            id=str(workspace_id),
-            extra=extra,
-        )
+        return os.path.join(cls.get_base_url(), workspace_path)
 
     def __init__(self, user: User):
         self._user = user

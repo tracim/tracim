@@ -12,6 +12,7 @@ convert them into boolean, for example, you should use the
     setting = asbool(global_conf.get('the_setting'))
  
 """
+from urllib.parse import urlparse
 
 import tg
 from paste.deploy.converters import asbool
@@ -177,6 +178,10 @@ class CFG(object):
         self.WEBSITE_HOME_IMAGE_URL = tg.lurl('/assets/img/home_illustration.jpg')
         self.WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl('/assets/img/bg.jpg')
         self.WEBSITE_BASE_URL = tg.config.get('website.base_url', '')
+        self.WEBSITE_SERVER_NAME = tg.config.get('website.server_name', None)
+
+        if not self.WEBSITE_SERVER_NAME:
+            self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
 
         self.WEBSITE_HOME_TAG_LINE = tg.config.get('website.home.tag_line', '')
         self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle', '')
@@ -227,11 +232,10 @@ class CFG(object):
             '~/.config/radicale/collections'
         )
 
-        # If None, current host will be used
-        self.RADICALE_CLIENT_HOST = tg.config.get('radicale.client.host', None)
-        self.RADICALE_CLIENT_PORT = tg.config.get('radicale.client.port', 5232)
-        self.RADICALE_CLIENT_SSL = asbool(tg.config.get('radicale.client.ssl', False))
-
+        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = tg.config.get(
+            'radicale.client.base_url',
+            'http://{server_name}:{radicale_port}',
+        )
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
