@@ -61,6 +61,11 @@
                                         <input type="checkbox" class="checkbox" disabled name="is_tracim_admin" id="is-tracim-admin"> ${_('This user is an administrator')}
                                       </label>
                                     </div>
+                                    <div class="checkbox">
+                                      <label>
+                                        <input type="checkbox" class="checkbox" checked name="send_email" id="send-email"> ${_('Send email to user')}
+                                      </label>
+                                    </div>
                                         
                                     <span class="pull-right" style="margin-top: 0.5em;">
                                         <button type="submit" class="btn btn-small btn-success" title="Add first comment"><i class=" fa fa-check"></i> ${_('Validate')}</button>

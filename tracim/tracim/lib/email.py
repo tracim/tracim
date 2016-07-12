@@ -2,8 +2,14 @@
 
 from email.mime.multipart import MIMEMultipart
 import smtplib
+from email.mime.text import MIMEText
+
+from mako.template import Template
+from tgext.asyncjob import asyncjob_perform
+from tg.i18n import ugettext as _
 
 from tracim.lib.base import logger
+from tracim.model import User
 
 
 class SmtpConfiguration(object):
@@ -59,3 +65,118 @@ class EmailSender(object):
             self.connect() # Acutally, this connects to SMTP only if required
             logger.info(self, 'Sending email to {}'.format(message['To']))
             self._smtp_connection.send_message(message)
+
+
+class EmailManager(object):
+    def __init__(self, smtp_config: SmtpConfiguration, global_config):
+        self._smtp_config = smtp_config
+        self._global_config = global_config
+
+    def notify_created_account(
+            self,
+            user: User,
+            password: str,
+    ) -> None:
+        """
+        Send created account email to given user
+        :param password: choosed password
+        :param user: user to notify
+        """
+        # TODO BS 20160712: Cyclic import
+        from tracim.lib.notifications import EST
+
+        logger.debug(self, 'user: {}'.format(user.user_id))
+        logger.info(self, 'Sending asynchronous email to 1 user ({0})'.format(
+            user.email,
+        ))
+
+        async_email_sender = EmailSender(
+            self._smtp_config,
+            self._global_config.EMAIL_NOTIFICATION_ACTIVATED
+        )
+
+        subject = \
+            self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT \
+            .replace(
+                EST.WEBSITE_TITLE,
+                self._global_config.WEBSITE_TITLE.__str__()
+            )
+        message = MIMEMultipart('alternative')
+        message['Subject'] = subject
+        message['From'] = self._global_config.EMAIL_NOTIFICATION_FROM
+        message['To'] = user.email
+
+        text_template_file_path = self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT  # nopep8
+        html_template_file_path = self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML  # nopep8
+
+        body_text = self._render(
+            mako_template_filepath=text_template_file_path,
+            context={
+                'user': user,
+                'password': password,
+                'login_url': self._global_config.WEBSITE_BASE_URL,
+            }
+        )
+
+        body_html = self._render(
+            mako_template_filepath=html_template_file_path,
+            context={
+                'user': user,
+                'password': password,
+                'login_url': self._global_config.WEBSITE_BASE_URL,
+            }
+        )
+
+        part1 = MIMEText(body_text, 'plain', 'utf-8')
+        part2 = MIMEText(body_html, 'html', 'utf-8')
+
+        # Attach parts into message container.
+        # According to RFC 2046, the last part of a multipart message,
+        # in this case the HTML message, is best and preferred.
+        message.attach(part1)
+        message.attach(part2)
+
+        asyncjob_perform(async_email_sender.send_mail, message)
+
+        # Note: The following action allow to close the SMTP connection.
+        # This will work only if the async jobs are done in the right order
+        asyncjob_perform(async_email_sender.disconnect)
+
+    def _render(self, mako_template_filepath: str, context: dict):
+        """
+        Render mako template with all needed current variables
+        :param mako_template_filepath: file path of mako template
+        :param context: dict with template context
+        :return: template rendered string
+        """
+        # TODO - D.A. - 2014-11-06 - move this
+        # Import is here for circular import problem
+        import tracim.lib.helpers as helpers
+        from tracim.config.app_cfg import CFG
+
+        template = Template(filename=mako_template_filepath)
+        return template.render(
+            base_url=self._global_config.WEBSITE_BASE_URL,
+            _=_,
+            h=helpers,
+            CFG=CFG.get_instance(),
+            **context
+        )
+
+
+def get_email_manager():
+    """
+    :return: EmailManager instance
+    """
+    #  TODO: Find a way to import properly without cyclic import
+    from tracim.config.app_cfg import CFG
+
+    global_config = CFG.get_instance()
+    smtp_config = SmtpConfiguration(
+        global_config.EMAIL_NOTIFICATION_SMTP_SERVER,
+        global_config.EMAIL_NOTIFICATION_SMTP_PORT,
+        global_config.EMAIL_NOTIFICATION_SMTP_USER,
+        global_config.EMAIL_NOTIFICATION_SMTP_PASSWORD
+    )
+
+    return EmailManager(global_config=global_config, smtp_config=smtp_config)
