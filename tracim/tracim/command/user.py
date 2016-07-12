@@ -5,6 +5,7 @@ from tg import config
 
 from tracim.command import AppContextCommand, Extender
 from tracim.lib.auth.ldap import LDAPAuth
+from tracim.lib.email import get_email_manager
 from tracim.lib.exception import AlreadyExistError, CommandAbortedError
 from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
@@ -68,6 +69,15 @@ class UserCommand(AppContextCommand):
             default=[],
         )
 
+        parser.add_argument(
+            "--send-email",
+            help='Send mail to user',
+            dest='send_email',
+            required=False,
+            action='store_true',
+            default=False,
+        )
+
         return parser
 
     def _user_exist(self, login):
@@ -126,6 +136,13 @@ class UserCommand(AppContextCommand):
                 user = self._create_user(login=parsed_args.login, password=parsed_args.password)
             except AlreadyExistError:
                 raise CommandAbortedError("Error: User already exist (use `user update` command instead)")
+            if parsed_args.send_email:
+                email_manager = get_email_manager()
+                email_manager.notify_created_account(
+                    user=user,
+                    password=parsed_args.password,
+                )
+
         else:
             if parsed_args.password:
                 self._update_password_for_login(login=parsed_args.login, password=parsed_args.password)

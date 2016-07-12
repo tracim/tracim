@@ -197,7 +197,19 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_FROM = tg.config.get('email.notification.from')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get('email.notification.content_update.template.html')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = tg.config.get('email.notification.content_update.template.text')
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = tg.config.get(
+            'email.notification.created_account.template.html',
+            './tracim/templates/mail/created_account_body_html.mak',
+        )
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT = tg.config.get(
+            'email.notification.created_account.template.text',
+            './tracim/templates/mail/created_account_body_text.mak',
+        )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = tg.config.get('email.notification.content_update.subject')
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = tg.config.get(
+            'email.notification.created_account.subject',
+            '[{website_title}] Created account',
+        )
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = tg.config.get('email.notification.processing_mode')
 
 
