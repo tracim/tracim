@@ -52,8 +52,6 @@ tgext.admin==0.6.4
 tgext.asyncjob==0.3.1
 tgext.crud==0.7.3
 tgext.pluggable==0.5.5
-## FIXME: could not find svn URL in dependency_links for this package:
-tracim==1.0.0dev-r0
 transaction==1.4.4
 tw2.core==2.2.2
 tw2.forms==2.2.2.1
