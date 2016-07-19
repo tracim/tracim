@@ -12,6 +12,7 @@ convert them into boolean, for example, you should use the
     setting = asbool(global_conf.get('the_setting'))
  
 """
+from urllib.parse import urlparse
 
 import tg
 from paste.deploy.converters import asbool
@@ -177,6 +178,16 @@ class CFG(object):
         self.WEBSITE_HOME_IMAGE_URL = tg.lurl('/assets/img/home_illustration.jpg')
         self.WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl('/assets/img/bg.jpg')
         self.WEBSITE_BASE_URL = tg.config.get('website.base_url', '')
+        self.WEBSITE_SERVER_NAME = tg.config.get('website.server_name', None)
+
+        if not self.WEBSITE_SERVER_NAME:
+            self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
+            logger.warning(
+                self,
+                'NOTE: Generated website.server_name parameter from '
+                'website.base_url parameter -> {0}'
+                .format(self.WEBSITE_SERVER_NAME)
+            )
 
         self.WEBSITE_HOME_TAG_LINE = tg.config.get('website.home.tag_line', '')
         self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle', '')
@@ -186,7 +197,19 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_FROM = tg.config.get('email.notification.from')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get('email.notification.content_update.template.html')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = tg.config.get('email.notification.content_update.template.text')
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = tg.config.get(
+            'email.notification.created_account.template.html',
+            './tracim/templates/mail/created_account_body_html.mak',
+        )
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT = tg.config.get(
+            'email.notification.created_account.template.text',
+            './tracim/templates/mail/created_account_body_text.mak',
+        )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = tg.config.get('email.notification.content_update.subject')
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = tg.config.get(
+            'email.notification.created_account.subject',
+            '[{website_title}] Created account',
+        )
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = tg.config.get('email.notification.processing_mode')
 
 
@@ -227,11 +250,22 @@ class CFG(object):
             '~/.config/radicale/collections'
         )
 
-        # If None, current host will be used
-        self.RADICALE_CLIENT_HOST = tg.config.get('radicale.client.host', None)
-        self.RADICALE_CLIENT_PORT = tg.config.get('radicale.client.port', 5232)
-        self.RADICALE_CLIENT_SSL = asbool(tg.config.get('radicale.client.ssl', False))
+        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
+            tg.config.get('radicale.client.base_url', None)
 
+        if not self.RADICALE_CLIENT_BASE_URL_TEMPLATE:
+            self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
+                'http://{0}:{1}'.format(
+                    self.WEBSITE_SERVER_NAME,
+                    self.RADICALE_SERVER_PORT,
+                )
+            logger.warning(
+                self,
+                'NOTE: Generated radicale.client.base_url parameter with '
+                'followings parameters: website.server_name, '
+                'radicale.server.port -> {0}'
+                .format(self.RADICALE_CLIENT_BASE_URL_TEMPLATE)
+            )
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)

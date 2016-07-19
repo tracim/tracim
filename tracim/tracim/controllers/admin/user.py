@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import uuid
 
 from tracim import model  as pm
 
@@ -23,6 +24,7 @@ from tracim.controllers.user import UserWorkspaceRestController
 from tracim.lib import CST
 from tracim.lib import helpers as h
 from tracim.lib.base import logger
+from tracim.lib.email import get_email_manager
 from tracim.lib.user import UserApi
 from tracim.lib.group import GroupApi
 from tracim.lib.user import UserStaticApi
@@ -291,9 +293,18 @@ class UserRestController(TIMRestController):
 
     @tg.require(predicates.in_group(Group.TIM_MANAGER_GROUPNAME))
     @tg.expose()
-    def post(self, name, email, password, is_tracim_manager='off', is_tracim_admin='off'):
+    def post(
+            self,
+            name: str,
+            email: str,
+            password: str,
+            is_tracim_manager: str='off',
+            is_tracim_admin: str='off',
+            send_email: str='off',
+    ):
         is_tracim_manager = h.on_off_to_boolean(is_tracim_manager)
         is_tracim_admin = h.on_off_to_boolean(is_tracim_admin)
+        send_email = h.on_off_to_boolean(send_email)
         current_user = tmpl_context.current_user
 
         if current_user.profile.id < Group.TIM_ADMIN:
@@ -313,6 +324,10 @@ class UserRestController(TIMRestController):
         user.display_name = name
         if password:
             user.password = password
+        elif send_email:
+            # Setup a random password to send email at user
+            password = str(uuid.uuid4())
+            user.password = password
         api.save(user)
 
         # Now add the user to related groups
@@ -324,6 +339,10 @@ class UserRestController(TIMRestController):
                 user.groups.append(group_api.get_one(Group.TIM_ADMIN))
 
         api.save(user)
+
+        if send_email:
+            email_manager = get_email_manager()
+            email_manager.notify_created_account(user, password=password)
 
         tg.flash(_('User {} created.').format(user.get_display_name()), CST.STATUS_OK)
         tg.redirect(self.url())
