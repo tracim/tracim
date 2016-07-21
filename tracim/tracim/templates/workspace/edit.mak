@@ -25,12 +25,9 @@
         </div>
         <script>
             $('#workspaceCalendarEnabled').click(function() {
-                console.log('Value is' + $(this).val());
                 if($(this).is(':checked')) {
-                    console.log('hide url');
                     $('.calendar-url').css('display', 'block');
                 } else {
-                    console.log('show url');
                     $('.calendar-url').css('display', 'none');
                 }
             });
