@@ -94,6 +94,11 @@ def start_daemons(manager: DaemonsManager):
     """
     Sart Tracim daemons
     """
+    from tg import config
+    # Don't start daemons if they are disabled
+    if 'disable_daemons' in config and config['disable_daemons']:
+        return
+
     manager.run('radicale', RadicaleDaemon)
 
 environment_loaded.register(lambda: start_daemons(daemons))
