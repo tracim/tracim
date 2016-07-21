@@ -179,6 +179,7 @@ class RadicaleDaemon(Daemon):
         tracim_storage = 'tracim.lib.radicale.storage'
         fs_path = cfg.RADICALE_SERVER_FILE_SYSTEM_FOLDER
         allow_origin = cfg.RADICALE_SERVER_ALLOW_ORIGIN
+        realm_message = cfg.RADICALE_SERVER_REALM_MESSAGE
 
         radicale_config.set('auth', 'type', 'custom')
         radicale_config.set('auth', 'custom_handler', tracim_auth)
@@ -189,6 +190,8 @@ class RadicaleDaemon(Daemon):
         radicale_config.set('storage', 'type', 'custom')
         radicale_config.set('storage', 'custom_handler', tracim_storage)
         radicale_config.set('storage', 'filesystem_folder', fs_path)
+
+        radicale_config.set('server', 'realm', realm_message)
 
         if allow_origin:
             try:

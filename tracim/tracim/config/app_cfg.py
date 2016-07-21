@@ -258,6 +258,10 @@ class CFG(object):
             'radicale.server.allow_origin',
             '*',
         )
+        self.RADICALE_SERVER_REALM_MESSAGE = tg.config.get(
+            'radicale.server.realm_message',
+            'Tracim Calendar - Password Required',
+        )
 
         self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
             tg.config.get('radicale.client.base_url', None)
