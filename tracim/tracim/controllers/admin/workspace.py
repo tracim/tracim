@@ -215,7 +215,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         return DictLikeClass(result = dictified_workspace)
 
     @tg.expose('tracim.templates.workspace.edit')
-    def put(self, id, name, description, calendar_enabled):
+    def put(self, id, name, description, calendar_enabled=False):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
 
