@@ -177,6 +177,7 @@ class RadicaleDaemon(Daemon):
         tracim_rights = 'tracim.lib.radicale.rights'
         tracim_storage = 'tracim.lib.radicale.storage'
         fs_path = cfg.RADICALE_SERVER_FILE_SYSTEM_FOLDER
+        allow_origin = cfg.RADICALE_SERVER_ALLOW_ORIGIN
 
         radicale_config.set('auth', 'type', 'custom')
         radicale_config.set('auth', 'custom_handler', tracim_auth)
@@ -187,6 +188,12 @@ class RadicaleDaemon(Daemon):
         radicale_config.set('storage', 'type', 'custom')
         radicale_config.set('storage', 'custom_handler', tracim_storage)
         radicale_config.set('storage', 'filesystem_folder', fs_path)
+
+        radicale_config.set(
+            'header',
+            'Access-Control-Allow-Origin',
+            allow_origin,
+        )
 
     def _get_server(self):
         from tracim.config.app_cfg import CFG

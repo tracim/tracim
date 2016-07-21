@@ -193,6 +193,7 @@ email.notification.smtp.password = your_smtp_password
 # radicale.server.port = 5232
 # radicale.server.ssl = false
 # radicale.server.filesystem.folder = ~/.config/radicale/collections
+# radicale.server.allow_origin = *
 ## url can be extended like http://127.0.0.1:5232/calendar
 ## in this case, you have to create your own proxy behind this url.
 # radicale.client.base_url = http://127.0.0.1:5232

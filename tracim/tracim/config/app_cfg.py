@@ -249,6 +249,10 @@ class CFG(object):
             'radicale.server.filesystem.folder',
             '~/.config/radicale/collections'
         )
+        self.RADICALE_SERVER_ALLOW_ORIGIN = tg.config.get(
+            'radicale.server.allow_origin',
+            '*',
+        )
 
         self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
             tg.config.get('radicale.client.base_url', None)
