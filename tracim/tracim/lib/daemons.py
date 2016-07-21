@@ -1,4 +1,5 @@
 import threading
+from configparser import DuplicateSectionError
 from wsgiref.simple_server import make_server
 import signal
 
@@ -189,11 +190,17 @@ class RadicaleDaemon(Daemon):
         radicale_config.set('storage', 'custom_handler', tracim_storage)
         radicale_config.set('storage', 'filesystem_folder', fs_path)
 
-        radicale_config.set(
-            'header',
-            'Access-Control-Allow-Origin',
-            allow_origin,
-        )
+        if allow_origin:
+            try:
+                radicale_config.add_section('headers')
+            except DuplicateSectionError:
+                pass  # It is not a problem, we just want it exist
+
+            radicale_config.set(
+                'headers',
+                'Access-Control-Allow-Origin',
+                allow_origin,
+            )
 
     def _get_server(self):
         from tracim.config.app_cfg import CFG
