@@ -69,7 +69,7 @@ Tracim is a web application:
 
 * developed with python >=3.4.
 * based on the [TurboGears](http://www.turbogears.org/) web framework.
-* relying on [PostgreSQL](http://www.postgresql.org/) as the storage engine.
+* relying on [PostgreSQL](http://www.postgresql.org/) or [MySQL](https://www.mysql.fr/) as the storage engine.
 
 The user interface is based on the following resources and technologies:
 
@@ -79,11 +79,9 @@ The user interface is based on the following resources and technologies:
 * Icons are taken from [Tango Icons](http://tango.freedesktop.org/) and [Font Awesome](http://fortawesome.github.io/Font-Awesome/)
 * The design is based on the [Bootstrap dashboard example](http://getbootstrap.com/examples/dashboard/) and uses some images from [Start Boostrap free templates](http://startbootstrap.com/)
 
-
-
 It runs on [Debian GNU/Linux](http://www.debian.org/), it should work out-of-the-box on [Ubuntu](http://www.ubuntu.com/) and also on other GNU/Linux distributions.
 
-Hopefully it works on BSD and Windows OSes (but this has not been tested yet)
+Hopefully it works on BSD and Windows OSes (but this has not been tested yet).
 
 ----
 
@@ -113,37 +111,49 @@ Following the installation documentation below, you'll be able to run your own i
 
 _Note: the following information is for Debian. For other OS, adapt the package names._
 
-You'll need to install the following packages:
+You'll need to install the following packages on your Operating System:
 
-    apt-get install realpath python3 python-virtualenv python3-dev python-pip build-essential postgresql-server-dev-all libxml2-dev libxslt1-dev python-lxml
+    apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml
 
-If you work on a local database, then you also need to install PostgreSQL:
+## Database ##
 
-    apt-get install postgresql postgresql-client
+If you want use PostgreSQL as database engine:
+
+    apt-get install postgresql-server-dev-all postgresql postgresql-client
+
+Or if you want to use MySQL as database engine
+
+    apt-get install mysql-server mysql-client libmysqlclient-dev 
 
 ## Installation ##
 
 ### Get the source ###
 
-Get the sources from Bitbucket:
+Get the sources from github with git:
 
     git clone https://github.com/tracim/tracim.git
     cd tracim/
 
 *Note: Now everything is documented to be executed from the tracim directory newly created.*
 
-
 ### Setting-up python virtualenv ###
 
-_Reminder : Tracim is developped and tested using python3.4._
+_Reminder : Tracim is developed and tested using python3.4._
 
-Tracim uses virtualenv as deployment environment. This ensure that there will be no 
-conflict between system-wide python installation and Tracim required ones.
+We strongly recommend to use virtualenv as deployment environment. This ensure that there will be no conflict between system-wide python installation and Tracim required ones. To Create the virtual environment:
 
-    virtualenv -p /usr/bin/python3 tg2env
+    virtualenv -p /usr/bin/python3.4 tg2env
+
+And to activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**)):
+
     source tg2env/bin/activate
+ 
+To install tracim and it's dependencies:
+ 
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
+
+**Note**: If you want to use MySQL database, please refer to Documentation/database schema note to install required package.
 
 ## Database Setup ##
 
@@ -220,12 +230,40 @@ In case of failure, you would get something like this:
 
 In this case, delete the user and database you previously created (using pgtool) and do it again. Do not forget to run the grant_all_rights command!
 
+### Minimalist introduction to MySQL ###
+
+## Create database ##
+
+Connect to mysql with root user (password has been set at "Installation" -> "Dependencies" chapter, when installing package)
+
+    mysql -u root -p
+
+Create a database with following command:
+
+    CREATE DATABASE tracimdb;
+
+Create a user with following command:
+
+    CREATE USER 'tracimuser'@'localhost' IDENTIFIED BY 'tracimpassword';
+
+And allow him to manipulate created database with following command:
+
+    GRANT ALL PRIVILEGES ON tracimdb . * TO 'tracimuser'@'localhost';
+
+Then flush privileges:
+
+    FLUSH PRIVILEGES;
+
+You can now quit mysql prompt:
+
+    \q
+
 ## Configuration ##
 
 At this point, you have :
 
 * an installation of Tracim with its dedicated python3-ready virtualenv
-* a PostgreSQL server and dedicated database
+* a PostgreSQL/MySQL server and dedicated database
 
 What you have to do now is to configure the application and to initialize the database content.
 
@@ -237,10 +275,13 @@ You can now edit the file and setup required files. Here are the main ones:
 
 #### Database access ####
 
-Configure database in the development.ini file. This is defined as sqlalchemy.url
-and the default value is below:
+Configure database in the development.ini file. This is defined as sqlalchemy.url. There is an example value for PostgreSQL below:
 
     sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
+
+There is an example value for MySQL below (please refer to Documentation/database schema note to install required package):
+
+    sqlalchemy.url = mysql+oursql://tracimuser:tracimpassword@127.0.0.1/tracimdb
 
 #### Listening port
 
@@ -256,7 +297,7 @@ The default language is English. You can change it to French by uncommenting the
 
 #### SMTP parameters for resetpassword and notifications
 
-for some reason, you have to configure SMTP parameters for rest password process and SMTP parameters for notifications in separate places.
+for technical reason, you have to configure SMTP parameters for rest password process and SMTP parameters for notifications in separate places.
 
 The reset password related parameters are the follwoing ones :
 
@@ -316,9 +357,7 @@ Then add LDAP parameters
 
 You may need an administrator account to manage Tracim. Use the following command (from ``/install/dir/of/tracim/tracim``):
 
-```
-gearbox user create -l admin-email@domain.com -g managers -g administrators
-```
+    gearbox user create -l admin@admin.admin -p admin@admin.admin -g managers -g administrators
 
 Keep in mind ``admin-email@domain.com`` must match with LDAP user.
 
@@ -336,7 +375,8 @@ There are other parameters which may be of some interest for you. For example, y
 
 The last step before to run the application is to initialize the database schema. This is done through the following command:
 
-    source tg2env/bin/activate
+**Note**: If you want to use MySQL database, please install this pip package: ```pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip```
+
     cd tracim && gearbox setup-app && cd -
 
 ## Running the server ##
@@ -356,10 +396,9 @@ Which should result in something like this:
     13:53:50,862 INFO  [gearbox] Starting server in PID 11174.
     Starting HTTP server on http://0.0.0.0:8080
     
-You can now enter the application at [http://localhost:8080](http://localhost:8080) and login:
+You can now enter the application at [http://localhost:8080](http://localhost:8080) and login with admin created user. If admin user not created yet, execute following command:
 
-* user : admin@admin.admin
-* password : admin@admin.admin
+    gearbox user create -l admin@admin.admin -p admin@admin.admin -g managers -g administrators
     
 Enjoy :)
 
@@ -397,4 +436,3 @@ Example of Apache WSGI configuration. This configuration refers to productionapp
 Building the community is a work in progress.
 
 Need help ? Do not hesitate to contact me : damien.accorsi@free.fr
-
