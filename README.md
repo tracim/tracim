@@ -69,7 +69,7 @@ Tracim is a web application:
 
 * developed with python >=3.4.
 * based on the [TurboGears](http://www.turbogears.org/) web framework.
-* relying on [PostgreSQL](http://www.postgresql.org/) or [MySQL](https://www.mysql.fr/) as the storage engine.
+* relying on [PostgreSQL](http://www.postgresql.org/) or [MySQL](https://www.mysql.fr/) or [sqlite](https://www.sqlite.org/) as the storage engine.
 
 The user interface is based on the following resources and technologies:
 
@@ -124,6 +124,10 @@ If you want use PostgreSQL as database engine:
 Or if you want to use MySQL as database engine
 
     apt-get install mysql-server mysql-client libmysqlclient-dev
+
+Or if you want to use SQLite as database engine
+
+    apt-get install sqlite3
 
 ## Installation ##
 
@@ -263,7 +267,7 @@ You can now quit mysql prompt:
 At this point, you have :
 
 * an installation of Tracim with its dedicated python3-ready virtualenv
-* a PostgreSQL/MySQL server and dedicated database
+* a PostgreSQL/MySQL server and dedicated database (if you don't use sqlite)
 
 What you have to do now is to configure the application and to initialize the database content.
 
@@ -282,6 +286,10 @@ Configure database in the development.ini file. This is defined as sqlalchemy.ur
 There is an example value for MySQL below (please refer to Configuration/database schema note to install required package):
 
     sqlalchemy.url = mysql+oursql://tracimuser:tracimpassword@127.0.0.1/tracimdb
+
+There is an example value for SQLite below :
+
+    sqlalchemy.url = sqlite:///tracimdb.sqlite
 
 #### Listening port
 

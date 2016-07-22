@@ -10,6 +10,7 @@ from tracim.controllers import TIMRestPathContextSetup
 
 from tracim.lib import CST
 from tracim.lib.base import BaseController
+from tracim.lib.helpers import on_off_to_boolean
 from tracim.lib.user import UserApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.content import ContentApi
@@ -191,10 +192,11 @@ class WorkspaceRestController(TIMRestController, BaseController):
         return dict(result = dictified_workspace, fake_api = fake_api)
 
     @tg.expose()
-    def post(self, name, description, calendar_enabled=False):
+    def post(self, name, description, calendar_enabled: str='off'):
         # FIXME - Check user profile
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
+        calendar_enabled = on_off_to_boolean(calendar_enabled)
 
         workspace = workspace_api_controller.create_workspace(name, description)
         workspace.calendar_enabled = calendar_enabled
@@ -215,9 +217,10 @@ class WorkspaceRestController(TIMRestController, BaseController):
         return DictLikeClass(result = dictified_workspace)
 
     @tg.expose('tracim.templates.workspace.edit')
-    def put(self, id, name, description, calendar_enabled=False):
+    def put(self, id, name, description, calendar_enabled: str='off'):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
+        calendar_enabled = on_off_to_boolean(calendar_enabled)
 
         workspace = workspace_api_controller.get_one(id)
         workspace.label = name
