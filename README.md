@@ -153,7 +153,7 @@ To install tracim and it's dependencies:
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
 
-**Note**: If you want to use MySQL database, please refer to Documentation/database schema note to install required package.
+**Note**: If you want to use MySQL database, please refer to Configuration/database schema note to install required package.
 
 ## Database Setup ##
 
@@ -279,7 +279,7 @@ Configure database in the development.ini file. This is defined as sqlalchemy.ur
 
     sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
 
-There is an example value for MySQL below (please refer to Documentation/database schema note to install required package):
+There is an example value for MySQL below (please refer to Configuration/database schema note to install required package):
 
     sqlalchemy.url = mysql+oursql://tracimuser:tracimpassword@127.0.0.1/tracimdb
 
