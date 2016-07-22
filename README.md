@@ -60,7 +60,7 @@ The user interface is easy to use: it's based on the well-known folders and file
 
 ## Licence ##
 
-Tracim is licensed under the terms of the 
+Tracim is licensed under the terms of the
 [GNU Affero General Public License](http://www.gnu.org/licenses/agpl.txt) as published by the [Free Software Foundation](http://www.fsf.org/).
 
 ## Technical information ##
@@ -123,7 +123,7 @@ If you want use PostgreSQL as database engine:
 
 Or if you want to use MySQL as database engine
 
-    apt-get install mysql-server mysql-client libmysqlclient-dev 
+    apt-get install mysql-server mysql-client libmysqlclient-dev
 
 ## Installation ##
 
@@ -147,9 +147,9 @@ We strongly recommend to use virtualenv as deployment environment. This ensure t
 And to activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**)):
 
     source tg2env/bin/activate
- 
+
 To install tracim and it's dependencies:
- 
+
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
 
@@ -211,7 +211,7 @@ The result is similar to the following :
     database:   tracimdb
     username:   bibi
 
-                  now              
+                  now
     -------------------------------
      2014-11-10 09:40:23.306199+01
     (1 row)
@@ -386,17 +386,17 @@ The last step before to run the application is to initialize the database schema
 Now you can run the standalone server:
 
     ./bin/run.sh
-    
+
 Which should result in something like this:
 
     13:53:49,982 INFO  [gearbox] Starting subprocess with file monitor
     13:53:50,646 WARNI [py.warnings] /tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/validation.py:12: ImportWarning: Not importing directory '/tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/i18n': missing __init__.py
       from .i18n import _
-    
+
     13:53:50,862 INFO  [gearbox] Starting server in PID 11174.
     Starting HTTP server on http://0.0.0.0:8080
-    
-You can now enter the application at [http://localhost:8080](http://localhost:8080) and login with admin user. 
+
+You can now enter the application at [http://localhost:8080](http://localhost:8080) and login with admin user.
 
  * user : admin@admin.admin
  * password : admin@admin.admin
@@ -404,7 +404,7 @@ You can now enter the application at [http://localhost:8080](http://localhost:80
 If admin user not created yet, execute following command:
 
     gearbox user create -l admin@admin.admin -p admin@admin.admin -g managers -g administrators
-    
+
 Enjoy :)
 
 ### Running Tracim through Apache WSGI ###
