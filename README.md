@@ -396,7 +396,12 @@ Which should result in something like this:
     13:53:50,862 INFO  [gearbox] Starting server in PID 11174.
     Starting HTTP server on http://0.0.0.0:8080
     
-You can now enter the application at [http://localhost:8080](http://localhost:8080) and login with admin created user. If admin user not created yet, execute following command:
+You can now enter the application at [http://localhost:8080](http://localhost:8080) and login with admin user. 
+
+ * user : admin@admin.admin
+ * password : admin@admin.admin
+
+If admin user not created yet, execute following command:
 
     gearbox user create -l admin@admin.admin -p admin@admin.admin -g managers -g administrators
     
