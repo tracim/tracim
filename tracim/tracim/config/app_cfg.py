@@ -256,8 +256,17 @@ class CFG(object):
         )
         self.RADICALE_SERVER_ALLOW_ORIGIN = tg.config.get(
             'radicale.server.allow_origin',
-            '*',
+            None,
         )
+        if not self.RADICALE_SERVER_ALLOW_ORIGIN:
+            self.RADICALE_SERVER_ALLOW_ORIGIN = self.WEBSITE_SERVER_NAME
+            logger.warning(
+                self,
+                'NOTE: Generated radicale.server.allow_origin parameter with '
+                'followings parameters: website.server_name ({0})'
+                .format(self.WEBSITE_SERVER_NAME)
+            )
+
         self.RADICALE_SERVER_REALM_MESSAGE = tg.config.get(
             'radicale.server.realm_message',
             'Tracim Calendar - Password Required',
