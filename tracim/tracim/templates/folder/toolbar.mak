@@ -48,7 +48,7 @@
         ## if the user can see the toolbar, it means he is the workspace manager.
         ## So now, we need to know if he alsa has right to delete workspaces
         <div class="btn-group btn-group-vertical">
-            <a title="${_('Archive thread')}" class="btn btn-default ${delete_or_archive_disabled}" href="${tg.url('/workspaces/{}/folders/{}/put_archive'.format(folder.workspace.id, folder.id))}"><i class="fa fa-archive fa-fw tracim-less-visible"></i> ${_('Archive')}</a>
+## SHOW_ARCHIVE_BUTTON__BUG_#81            <a title="${_('Archive thread')}" class="btn btn-default ${delete_or_archive_disabled}" href="${tg.url('/workspaces/{}/folders/{}/put_archive'.format(folder.workspace.id, folder.id))}"><i class="fa fa-archive fa-fw tracim-less-visible"></i> ${_('Archive')}</a>
             <a title="${_('Delete thread')}" class="btn btn-default ${delete_or_archive_disabled}" href="${tg.url('/workspaces/{}/folders/{}/put_delete'.format(folder.workspace.id, folder.id))}"><i class="fa fa-trash-o fa-fw tracim-less-visible"></i> ${_('Delete')}</a>
         </div>
         <p></p>
