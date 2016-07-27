@@ -364,6 +364,34 @@ class ContentApi(object):
 
         return self._base_query(workspace).filter(Content.content_id==content_id).filter(Content.type==content_type).one()
 
+    # TODO : temporary code for webdav support; make it clean !
+    def get_one_revision(self, revision_id: int = None) -> Content:
+
+        return DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id).one_or_none()
+
+    def get_one_revision2(self, revision_id: int = None):
+        ro = self.get_one_revision(revision_id)
+
+        return DBSession.query(Content).filter(Content.id == ro.content_id).one()
+
+    def get_one_by_label_and_parent(self, content_label: str, content_parent: Content = None,
+                                    workspace: Workspace = None) -> Content:
+
+        if not content_label:
+            return None
+
+        query = self._base_query(workspace)
+
+        parent_id = content_parent.content_id if content_parent else None
+
+        query = query.filter(Content.parent_id == parent_id)
+
+        res = query.filter(Content.label == content_label).one_or_none()
+
+        return res if res is not None else query.filter(Content.file_name==content_label).one_or_none()
+
+    # TODO : end of the webdav's code
+
     def get_all(self, parent_id: int, content_type: str, workspace: Workspace=None) -> Content:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE

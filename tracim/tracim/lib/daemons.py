@@ -220,3 +220,130 @@ class RadicaleDaemon(Daemon):
         :param callback: callback to execute in daemon
         """
         self._server.append_thread_callback(callback)
+
+
+# TODO : webdav deamon, make it clean !
+
+import sys, os
+from wsgidav.wsgidav_app import DEFAULT_CONFIG
+from wsgidav.xml_tools import useLxml
+from wsgidav.wsgidav_app import WsgiDAVApp
+from wsgidav._version import __version__
+
+from inspect import isfunction
+import traceback
+
+DEFAULT_CONFIG_FILE = "wsgidav.conf"
+PYTHON_VERSION = "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
+
+class WsgiDavDaemon(Daemon):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.config = self._initConfig()
+        self._server = None
+
+    def _initConfig(self):
+        """Setup configuration dictionary from default, command line and configuration file."""
+
+        # Set config defaults
+        config = DEFAULT_CONFIG.copy()
+        temp_verbose = config["verbose"]
+
+        # Configuration file overrides defaults
+        config_file = os.path.abspath(DEFAULT_CONFIG_FILE)
+        if config_file:
+            fileConf = self._readConfigFile(config_file, temp_verbose)
+            config.update(fileConf)
+        else:
+            if temp_verbose >= 2:
+                print("Running without configuration file.")
+
+        if not useLxml and config["verbose"] >= 1:
+            print(
+                "WARNING: Could not import lxml: using xml instead (slower). Consider installing lxml from http://codespeak.net/lxml/.")
+
+        if not config["provider_mapping"]:
+            print("ERROR: No DAV provider defined. Try --help option.", file=sys.stderr)
+            sys.exit(-1)
+
+        return config
+
+    def _readConfigFile(self, config_file, verbose):
+        """Read configuration file options into a dictionary."""
+
+        if not os.path.exists(config_file):
+            raise RuntimeError("Couldn't open configuration file '%s'." % config_file)
+
+        try:
+            import imp
+            conf = {}
+            configmodule = imp.load_source("configuration_module", config_file)
+
+            for k, v in vars(configmodule).items():
+                if k.startswith("__"):
+                    continue
+                elif isfunction(v):
+                    continue
+                conf[k] = v
+        except Exception as e:
+            exceptioninfo = traceback.format_exception_only(sys.exc_type, sys.exc_value)  # @UndefinedVariable
+            exceptiontext = ""
+            for einfo in exceptioninfo:
+                exceptiontext += einfo + "\n"
+
+            print("Failed to read configuration file: " + config_file + "\nDue to " + exceptiontext, file=sys.stderr)
+            raise
+
+        return conf
+
+    def run(self):
+        app = WsgiDAVApp(self.config)
+
+        # Try running WsgiDAV inside the following external servers:
+        self._runCherryPy(app, self.config, "cherrypy-bundled")
+
+    def _runCherryPy(self, app, config, mode):
+        """Run WsgiDAV using cherrypy.wsgiserver, if CherryPy is installed."""
+        assert mode in ("cherrypy", "cherrypy-bundled")
+
+        try:
+            from wsgidav.server.cherrypy import wsgiserver
+
+            version = "WsgiDAV/%s %s Python/%s" % (
+                __version__,
+                wsgiserver.CherryPyWSGIServer.version,
+                PYTHON_VERSION)
+
+            wsgiserver.CherryPyWSGIServer.version = version
+            protocol = "http"
+
+            if config["verbose"] >= 1:
+                print("Running %s" % version)
+                print("Listening on %s://%s:%s ..." % (protocol, config["host"], config["port"]))
+            self._server = wsgiserver.CherryPyWSGIServer(
+                (config["host"], config["port"]),
+                app,
+                server_name=version,
+            )
+
+            self._server.start()
+        except ImportError as e:
+            if config["verbose"] >= 1:
+                print("Could not import wsgiserver.CherryPyWSGIServer.")
+            return False
+        return True
+
+    def stop(self):
+        self._server.stop()
+        print("WsgiDav : je m'arrête")
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        """
+        Place here the logic who permit to execute a callback in your daemon.
+        To get an exemple of that, take a look at
+        socketserver.BaseServer#service_actions  and how we use it in
+        tracim.lib.daemons.TracimSocketServerMixin#service_actions .
+        :param callback: callback to execute in your thread.
+        """
+        raise NotImplementedError()
