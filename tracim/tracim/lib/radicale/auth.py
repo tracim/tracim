@@ -22,7 +22,7 @@ class Auth(object):
         email = config.get('sa_auth').authmetadata.authenticate({}, {
             'login': user,
             'password': password
-        })
+        }, allow_auth_token=True)
         if email:
             cls.current_user = UserApi(None).get_one_by_email(email)
 

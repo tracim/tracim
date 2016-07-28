@@ -67,6 +67,9 @@ auth_type = internal
 # If True, LDAP own tracim group managment (not available for now!)
 # ldap_group_enabled = False
 
+# User auth token validity in seconds (used to interfaces like web calendars)
+user.auth_token.validity = 604800
+
 #By default session is store in cookies to avoid the overhead
 #of having to manage a session storage. On production you might
 #want to switch to a better session storage.

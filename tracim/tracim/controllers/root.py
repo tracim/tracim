@@ -22,6 +22,8 @@ from tracim.controllers.admin import AdminController
 from tracim.controllers.debug import DebugController
 from tracim.controllers.error import ErrorController
 from tracim.controllers.help import HelpController
+from tracim.controllers.calendar import CalendarController
+from tracim.controllers.calendar import CalendarConfigController
 from tracim.controllers.user import UserRestController
 from tracim.controllers.workspace import UserWorkspaceRestController
 from tracim.lib.utils import replace_reset_password_templates
@@ -48,6 +50,8 @@ class RootController(StandardController):
 
     admin = AdminController()
     help = HelpController()
+    calendar = CalendarController()
+    calendar_config = CalendarConfigController()
 
     debug = DebugController()
     error = ErrorController()

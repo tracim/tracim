@@ -259,12 +259,12 @@ class CFG(object):
             None,
         )
         if not self.RADICALE_SERVER_ALLOW_ORIGIN:
-            self.RADICALE_SERVER_ALLOW_ORIGIN = self.WEBSITE_SERVER_NAME
+            self.RADICALE_SERVER_ALLOW_ORIGIN = self.WEBSITE_BASE_URL
             logger.warning(
                 self,
                 'NOTE: Generated radicale.server.allow_origin parameter with '
-                'followings parameters: website.server_name ({0})'
-                .format(self.WEBSITE_SERVER_NAME)
+                'followings parameters: website.base_url ({0})'
+                .format(self.WEBSITE_BASE_URL)
             )
 
         self.RADICALE_SERVER_REALM_MESSAGE = tg.config.get(
@@ -288,6 +288,11 @@ class CFG(object):
                 'radicale.server.port -> {0}'
                 .format(self.RADICALE_CLIENT_BASE_URL_TEMPLATE)
             )
+
+        self.USER_AUTH_TOKEN_VALIDITY = int(tg.config.get(
+            'user.auth_token.validity',
+            '604800',
+        ))
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)

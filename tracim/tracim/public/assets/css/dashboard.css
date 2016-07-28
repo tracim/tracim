@@ -373,3 +373,7 @@ span.info.readonly {
         font-size: 12px;
     }
 }
+
+.no-padding {
+    padding: 0px;
+}

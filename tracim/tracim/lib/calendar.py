@@ -10,6 +10,7 @@ from tracim.lib.exceptions import UnknownCalendarType
 from tracim.lib.exceptions import NotFound
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import UnsafeWorkspaceApi
+from tracim.lib.workspace import WorkspaceApi
 from tracim.model import User
 from tracim.model import DBSession
 from tracim.model import new_revision
@@ -259,3 +260,15 @@ class CalendarManager(object):
             'start': event.get('dtend').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
             'end': event.get('dtstart').dt.strftime('%Y-%m-%d %H:%M:%S%z'),
         }
+
+    @classmethod
+    def get_readable_calendars_urls_for_user(cls, user: User) -> [str]:
+        calendar_urls = [cls.get_user_calendar_url(user.user_id)]
+        workspace_api = WorkspaceApi(user)
+        for workspace in workspace_api.get_all_for_user(user):
+            if workspace.calendar_enabled:
+                calendar_urls.append(cls.get_workspace_calendar_url(
+                    workspace_id=workspace.workspace_id,
+                ))
+
+        return calendar_urls
