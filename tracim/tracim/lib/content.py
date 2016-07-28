@@ -364,35 +364,43 @@ class ContentApi(object):
 
         return self._base_query(workspace).filter(Content.content_id==content_id).filter(Content.type==content_type).one()
 
-    # TODO : temporary code for webdav support; make it clean !
     def get_one_revision(self, revision_id: int = None) -> Content:
+        """
+        This method allow us to get directly any revision with its id
+        :param revision_id: The content's revision's id that we want to return
+        :return: An item Content linked with the correct revision
+        """
+        assert revision_id is not None# DYN_REMOVE
 
-        return DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id).one_or_none()
+        revision = DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id)
+        
+        result = self._base_query(None)
 
-    def get_one_revision2(self, revision_id: int = None):
-        ro = self.get_one_revision(revision_id)
-
-        return DBSession.query(Content).filter(Content.id == ro.content_id).one()
+        return result.filter(Content.revision_id == revision_id).one()
 
     def get_one_by_label_and_parent(self, content_label: str, content_parent: Content = None,
                                     workspace: Workspace = None) -> Content:
+        """
+        This method let us request the database to obtain a Content with its name and parent
+        :param content_label: Either the content's label or the content's filename if the label is None
+        :param content_parent: The parent's content
+        :param workspace: The workspace's content
+        :return The corresponding Content
+        """
+        assert content_label is not None# DYN_REMOVE
 
-        if not content_label:
-            return None
-
-        query = self._base_query(workspace)
+        resultset = self._base_query(workspace)
 
         parent_id = content_parent.content_id if content_parent else None
 
-        query = query.filter(Content.parent_id == parent_id)
+        resultset = resultset.filter(Content.parent_id == parent_id)
 
-        res = query.filter(Content.label == content_label).one_or_none()
+        try:
+            return resultset.filter(Content.label == content_label).one()
+        except:
+            return resultset.filter(Content.file_name == content_label).one()
 
-        return res if res is not None else query.filter(Content.file_name==content_label).one_or_none()
-
-    # TODO : end of the webdav's code
-
-    def get_all(self, parent_id: int, content_type: str, workspace: Workspace=None) -> Content:
+    def get_all(self, parent_id: int, content_type: str, workspace: Workspace=None) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -402,8 +410,17 @@ class ContentApi(object):
         if content_type!=ContentType.Any:
             resultset = resultset.filter(Content.type==content_type)
 
-        if parent_id:
-            resultset = resultset.filter(Content.parent_id==parent_id)
+        resultset = resultset.filter(Content.parent_id==parent_id)
+
+        return resultset.all()
+
+    def get_all_without_exception(self, content_type: str) -> [Content]:
+        assert content_type is not None# DYN_REMOVE
+
+        resultset = self._base_query(None)
+
+        if content_type != ContentType.Any:
+            resultset = resultset.filter(Content.type==content_type)
 
         return resultset.all()
 

@@ -61,8 +61,8 @@ class WorkspaceApi(object):
     def get_one(self, id):
         return self._base_query().filter(Workspace.workspace_id==id).one()
 
-    def get_one_by_label(self, label: str):
-        return self._base_query().filter(Workspace.label==label).one()
+    def get_one_by_label(self, label: str) -> Workspace:
+        return self._base_query().filter(Workspace.label == label).one()
 
     """
     def get_one_for_current_user(self, id):

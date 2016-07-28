@@ -56,15 +56,14 @@ class Provider(DAVProvider):
 
         norm_path = normpath(working_path)
 
-        user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
-        workspace_api = WorkspaceApi(user)
+        workspace_api = WorkspaceApi(environ['user'])
 
         if dirname(norm_path) == "/":
             workspace = self.get_workspace_from_path(norm_path, workspace_api)
             return sql_resources.Workspace(path, environ, workspace)
 
 
-        api = ContentApi(user, show_archived=True, show_deleted=True)
+        api = ContentApi(environ['user'], show_archived=True, show_deleted=True)
 
         working_path = self.reduce_path(path)
 
@@ -129,15 +128,15 @@ class Provider(DAVProvider):
         elif dirname(path) == "/":
             return self.get_workspace_from_path(
                 path,
-                WorkspaceApi(UserApi(None).get_one_by_email(environ['http_authenticator.username']))
+                WorkspaceApi(environ['user'])
             ) is not None
 
         api = ContentApi(
-            current_user=UserApi(None).get_one_by_email(environ['http_authenticator.username']),
+            current_user=environ['user'],
             show_archived=True,
             show_deleted=True
         )
-        wapi = WorkspaceApi(UserApi(None).get_one_by_email(environ['http_authenticator.username']))
+        wapi = WorkspaceApi(environ['user'])
 
         norm_path = normpath(path)
 

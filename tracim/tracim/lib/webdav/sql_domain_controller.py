@@ -21,7 +21,7 @@ class SQLDomainController(object):
         travailler dans la bdd pour vérifier si utilisateur existe
         """
         try:
-            self._api.get_one_by_email(username)
+            environ['user'] = self._api.get_one_by_email(username)
             return True
         except:
             return False
