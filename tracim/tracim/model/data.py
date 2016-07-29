@@ -1246,3 +1246,28 @@ class VirtualEvent(object):
             delta_from_datetime = datetime.now()
         return format_timedelta(delta_from_datetime - self.created,
                                 locale=tg.i18n.get_lang()[0])
+
+    def create_readable_date(self, delta_from_datetime:datetime=None):
+        aff = ''
+
+        if not delta_from_datetime:
+            delta_from_datetime = datetime.now()
+
+        delta = delta_from_datetime - self.created
+        
+        if delta.days > 0:
+            if delta.days >= 365:
+                aff = '%d year%s ago' % (delta.days/365, 's' if delta.days/365>=2 else '')
+            elif delta.days >= 30:
+                aff = '%d month%s ago' % (delta.days/30, 's' if delta.days/30>=2 else '')
+            else:
+                aff = '%d day%s ago' % (delta.days, 's' if delta.days>=2 else '')
+        else:
+            if delta.seconds < 60:
+                aff = '%d second%s ago' % (delta.seconds, 's' if delta.seconds>1 else '')
+            elif delta.seconds/60 < 60:
+                aff = '%d minute%s ago' % (delta.seconds/60, 's' if delta.seconds/60>=2 else '')
+            else:
+                aff = '%d hour%s ago' % (delta.seconds/3600, 's' if delta.seconds/3600>=2 else '')
+
+        return aff
