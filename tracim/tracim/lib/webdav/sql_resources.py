@@ -6,7 +6,7 @@ import transaction
 from os.path import normpath, dirname, basename
 from tracim.lib.content import ContentApi
 from tracim.lib.webdav import HistoryType
-from tracim.lib.webdav import MyFileStream, MyFileStream2
+from tracim.lib.webdav import FileStream
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import WorkspaceApi
 from wsgidav import compat
@@ -25,28 +25,6 @@ _CONTENTS = {
     ContentType.Page: OtherFile,
     ContentType.Thread: OtherFile
 }
-
-def create_readable_date(some_date):
-    aff = ''
-
-    delta = datetime.now() - some_date
-
-    if delta.days > 0:
-        if delta.days >= 365:
-            aff = '%d year%s ago' % (delta.days/365, 's' if delta.days/365>=2 else '')
-        elif delta.days >= 30:
-            aff = '%d month%s ago' % (delta.days/30, 's' if delta.days/30>=2 else '')
-        else:
-            aff = '%d day%s ago' % (delta.days, 's' if delta.days>=2 else '')
-    else:
-        if delta.seconds < 60:
-            aff = '%d second%s ago' % (delta.seconds, 's' if delta.seconds>1 else '')
-        elif delta.seconds/60 < 60:
-            aff = '%d minute%s ago' % (delta.seconds/60, 's' if delta.seconds/60>=2 else '')
-        else:
-            aff = '%d hour%s ago' % (delta.seconds/3600, 's' if delta.seconds/3600>=2 else '')
-
-    return aff
 
 class Encapsuler(object):
     def __init__(self, type: str, api: ContentApi, content: Content):
@@ -68,31 +46,6 @@ class Encapsuler(object):
             self._api.save(self._content, self._type)
 
         transaction.commit()
-
-class DummyResource(object):
-    def __init__(self, file_name: str, content: Content, content_api: ContentApi):
-        self._file_name = file_name
-        self._content = content
-        self._api = content_api
-
-    def beginWrite(self, contentType) -> MyFileStream2:
-        return MyFileStream2(file_name=self._file_name, content=self._content, content_api=self._api)
-
-    def endWrite(self, withErrors):
-        pass
-
-
-class DummyResource2(object):
-    def __init__(self, content: Content, content_api: ContentApi, file_name: str=''):
-        self._content = content
-        self._api = content_api
-        self._file_name = file_name
-
-    def beginWrite(self, contentType) -> MyFileStream:
-        return MyFileStream(content=self._content, content_api=self._api, file_name=self._file_name)
-
-    def endWrite(self, withErrors: bool):
-        pass
 
 
 class Root(DAVCollection):
@@ -304,8 +257,13 @@ class Folder(DAVCollection):
             environ=self.environ
             )
 
-    def createEmptyResource(self, file_name: str) -> DummyResource:
-        return DummyResource(file_name=file_name, content=self._content, content_api=self._api)
+    def createEmptyResource(self, file_name: str) -> FileStream:
+        return FileStream(
+            file_name=file_name,
+            content=self._content,
+            content_api=self._api,
+            new_file=True
+            )
 
     def createCollection(self, label: str) -> Folder:
 
@@ -687,11 +645,17 @@ class HistoryFileFolder(HistoryFolder):
     def createCollection(self, name):
         raise DAVError(HTTP_FORBIDDEN)
 
-    def createEmptyResource(self, name) -> DummyResource2:
-        return DummyResource2(content=self._content, content_api=self._api, file_name=name)
+    def createEmptyResource(self, name) -> FileStream:
+        return FileStream(
+            content=self._content,
+            content_api=self._api,
+            file_name=name,
+            new_file=False
+            )
 
     def getMemberNames(self) -> [str]:
-        return [content.revision_id for content in self._content.revisions]
+        return [content.revision_id for content in self._content.revisions \
+                if content.revision_type in [ActionDescription.CREATION, ActionDescription.EDITION, ActionDescription.REVISION]]
 
     def getMember(self, item_id) -> DAVCollection:
 
@@ -883,7 +847,7 @@ class OtherFile(File):
         histHTML = '<table class="table table-striped table-hover">'
         for event in hist:
             if isinstance(event, VirtualEvent):
-                date = create_readable_date(event.created)
+                date = event.create_readable_date()
                 _LABELS = {
                     'archiving': 'Item archived',
                     'content-comment': 'Item commented',
@@ -995,7 +959,7 @@ class OtherFile(File):
                             %s
                         </div>
                     </div>
-                    ''' % (t.owner.display_name, create_readable_date(t.created), t.description)
+                    ''' % (t.owner.display_name, t.create_readable_date(), t.description)
 
                 if t.owner.display_name not in participants:
                     participants[t.owner.display_name] = [1, t.created]
@@ -1032,18 +996,9 @@ class OtherFile(File):
                     </div>
                     ''' % (t.type.icon,
                            t.owner.display_name,
-                           create_readable_date(t.created),
+                           t.create_readable_date(),
                            label,
                            '''<span><a href="#">(View revision)</a></span>''' if t.type.id == 'revision' else '')
-
-        descP = ''
-        for name, infos in participants.items():
-            descP = '''
-            <div><b>%s</b> - %d message%s - last %s</div>
-            ''' % (name,
-                 infos[0],
-                 's' if infos[0]>1 else '',
-                   create_readable_date(infos[1]))
 
         page = '''
 <html>
@@ -1055,7 +1010,7 @@ class OtherFile(File):
 	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
 </head>
 <body>
-    <div id="left" class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+    <div id="left" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="title thread">
             <div class="title-text">
                 <i class="fa fa-comments-o title-icon thread"></i>
@@ -1080,10 +1035,6 @@ class OtherFile(File):
             %s
         </div>
     </div>
-    <div id="right" class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-        <h4>Participants</h4>
-        %s
-    </div>
 </body>
 </html>
         ''' % (content.label,
@@ -1091,8 +1042,7 @@ class OtherFile(File):
                self._content.created.strftime("%B %d, %Y at %H:%m"),
                self._content.owner.display_name,
                content.description,
-               disc,
-               descP)
+               disc)
 
         return page
 
