@@ -1203,7 +1203,8 @@ class VirtualEvent(object):
 
         label = content.get_label()
         if content.type==ContentType.Comment:
-            label = _('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
+            # todo :voir le _('.... si le _ est utile
+            label = ('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
 
         return VirtualEvent(id=content.content_id,
                             created=content.created,

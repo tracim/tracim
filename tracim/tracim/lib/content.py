@@ -402,8 +402,8 @@ class ContentApi(object):
         if content_type!=ContentType.Any:
             resultset = resultset.filter(Content.type==content_type)
 
-        if parent_id:
-            resultset = resultset.filter(Content.parent_id==parent_id)
+        # todo : check utilité if parent_id:
+        resultset = resultset.filter(Content.parent_id==parent_id)
 
         return resultset.all()
 

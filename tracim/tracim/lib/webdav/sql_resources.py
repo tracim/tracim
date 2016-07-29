@@ -123,11 +123,15 @@ class Workspace(DAVCollection):
 
     def getMember(self, content_label):
 
+        if content_label=='':
+            return None
+
         content = self._api.get_one_by_label_and_parent(
             content_label=content_label,
             workspace=self._workspace
         )
 
+        print("ok : ", content_label)
         return Folder(self.path + content.get_label(), self.environ, content)
 
     def createEmptyResource(self, name):
@@ -709,15 +713,24 @@ class File(DAVNonCollection):
         if dirname(destpath).endswith('.deleted') or dirname(destpath).endswith('.archived'):
             if basename(dirname(dirname(destpath))) == self._content.parent.label:
                 if dirname(destpath).endswith('.deleted'):
+                    if self._content.label != '':
+                        self._content.label += 'deleted now'
+                    else:
+                        self._content.file_name += 'deleted now'
                     Encapsuler(ActionDescription.DELETION, self._api, self._content).action()
                 else:
                     Encapsuler(ActionDescription.ARCHIVING, self._api, self._content).action()
+                    if self._content.label != '':
+                        self._content.label += 'archived now'
+                    else:
+                        self._content.file_name += 'archived now'
             else:
                 raise DAVError(HTTP_FORBIDDEN)
         elif (dirname(npath).endswith('.deleted') or dirname(npath).endswith('.archived')):
             if dirname(dirname(npath)) == dirname(destpath):
                 if dirname(npath).endswith('.deleted'):
                     Encapsuler(ActionDescription.UNDELETION, self._api, self._content).action()
+                    
                 else:
                     Encapsuler(ActionDescription.UNARCHIVING, self._api, self._content).action()
             else:
@@ -842,21 +855,20 @@ class OtherFile(File):
                 label = _LABELS[event.type.id]
 
                 histHTML += '''
-                <tr>
+                <tr class="%s">
                     <td class="my-align"><span class="label label-default"><i class="fa %s"></i> %s</span></td>
                     <td>%s</td>
                     <td>%s</td>
                     <td>%s</td>
                 </tr>
-                ''' % (event.type.icon,
+                ''' % ('warning' if event.id == content.revision_id else '',
+                       event.type.icon,
                        label,
                        date,
                        event.owner.display_name,
-                       '''<span><a href="#">View revision</a></span>''' if event.type.id == 'revision' else '')
+                       '<i class="fa fa-caret-left"></i> shown' if event.id == content.revision_id else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (self._content.label, event.id, event.ref_object.label) if event.type.id == 'revision' else '')
 
         histHTML+='</table>'
-
-        #pdf = pdfkit.from_string(self._content.description, False)
 
         file = '''
 <html>
@@ -877,11 +889,8 @@ class OtherFile(File):
             </div>
             <div class="pull-right">
                 <div class="btn-group btn-group-vertical">
-                    <a class="btn btn-default" onclick="download_pdf()">
-                        <i class="fa fa-download"></i> Download as pdf</a>
-                    </a>
                     <a class="btn btn-default">
-                        <i class="fa fa-external-link"></i> Access webdav</a>
+                        <i class="fa fa-external-link"></i> View in tracim</a>
                     </a>
                 </div>
             </div>
@@ -894,9 +903,14 @@ class OtherFile(File):
         <h4>History</h4>
         %s
     </div>
-    <script>
-        function download_pdf() {
-            download("%s", "%s.pdf", "application/pdf")
+    <script type="text/javascript">
+        window.onload = function() {
+            elems = document.getElementsByClassName('revision-link');
+            for(var i = 0; i<elems.length; i++) {
+                test = window.location.href
+                test += "/.." + elems[i].href.replace(/file:\/\//, "")
+                elems[i].href = test
+            }
         }
     </script>
 </body>
@@ -906,9 +920,7 @@ class OtherFile(File):
                self._content.created.strftime("%B %d, %Y at %H:%m"),
                self._content.owner.display_name,
                content.description,
-               histHTML,
-               "Meh.",
-               self._content.label)
+               histHTML)
 
         return file
 
@@ -976,7 +988,10 @@ class OtherFile(File):
                            t.owner.display_name,
                            create_readable_date(t.created),
                            label,
-                           '''<span><a href="#">(View revision)</a></span>''' if t.type.id == 'revision' else '')
+                           '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
+                               self._content.label,
+                               t.id,
+                               t.ref_object.label) if t.type.id == 'revision' else '')
 
         descP = ''
         for name, infos in participants.items():
@@ -1006,11 +1021,8 @@ class OtherFile(File):
             </div>
             <div class="pull-right">
                 <div class="btn-group btn-group-vertical">
-                    <a class="btn btn-default" onclick="download_pdf()">
-                        <i class="fa fa-download"></i> Download as pdf</a>
-                    </a>
                     <a class="btn btn-default">
-                        <i class="fa fa-external-link"></i> Access webdav</a>
+                        <i class="fa fa-external-link"></i> View in tracim</a>
                     </a>
                 </div>
             </div>
@@ -1026,6 +1038,16 @@ class OtherFile(File):
         <h4>Participants</h4>
         %s
     </div>
+    <script type="text/javascript">
+        window.onload = function() {
+            elems = document.getElementsByClassName('revision-link');
+            for(var i = 0; i<elems.length; i++) {
+                test = window.location.href
+                test += "/.." + elems[i].href.replace(/file:\/\//, "")
+                elems[i].href = test
+            }
+        }
+    </script>
 </body>
 </html>
         ''' % (content.label,

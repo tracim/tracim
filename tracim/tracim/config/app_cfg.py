@@ -31,6 +31,7 @@ from tracim.lib.auth.wrapper import AuthConfigWrapper
 from tracim.lib.base import logger
 from tracim.lib.daemons import DaemonsManager
 from tracim.lib.daemons import RadicaleDaemon
+from tracim.lib.daemons import WsgiDavDaemon
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
@@ -95,6 +96,7 @@ def start_daemons(manager: DaemonsManager):
     Sart Tracim daemons
     """
     manager.run('radicale', RadicaleDaemon)
+    manager.run('webdav', WsgiDavDaemon)
 
 environment_loaded.register(lambda: start_daemons(daemons))
 
