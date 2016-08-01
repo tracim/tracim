@@ -1,9 +1,25 @@
 // Values copied from caldavzap config.js file.
 
 var globalAccountSettings=[
-% for clendar_url in clendar_urls:
     {
-        href: '${clendar_url}',
+        href: '${user_base_url}',
+        userAuth:
+        {
+            userName: '${fake_api.current_user.email}',
+            userPassword: '${auth_token}'
+        },
+        timeOut: 90000,
+        lockTimeOut: 10000,
+        checkContentType: true,
+        settingsAccount: false,
+        delegation: false,
+        forceReadOnly: null,
+        ignoreAlarms: false,
+        backgroundCalendars: ['1.ics']
+    },
+% if workspace_clendar_urls:
+    {
+        href: '${workspace_base_url}',
         userAuth:
         {
             userName: '${fake_api.current_user.email}',
@@ -18,56 +34,7 @@ var globalAccountSettings=[
         ignoreAlarms: false,
         backgroundCalendars: []
     },
-% endfor
-/**    {
-        href: 'http://127.0.0.1:5232/user/1.ics/',
-        userAuth:
-        {
-            userName: 'admin@admin.admin',
-            userPassword: 'admin@admin.admin'
-        },
-        timeOut: 90000,
-        lockTimeOut: 10000,
-        checkContentType: true,
-        settingsAccount: false,
-        delegation: false,
-        forceReadOnly: null,
-        ignoreAlarms: false,
-        backgroundCalendars: []
-    },
-    {
-        href: 'http://127.0.0.1:5232/workspace/1.ics/',
-        userAuth:
-        {
-            userName: 'admin@admin.admin',
-            userPassword: 'admin@admin.admin'
-        },
-        timeOut: 90000,
-        lockTimeOut: 10000,
-        checkContentType: true,
-        settingsAccount: false,
-        delegation: false,
-        forceReadOnly: null,
-        ignoreAlarms: false,
-        backgroundCalendars: []
-    },
-    {
-        href: 'http://127.0.0.1:5232/workspace/2.ics/',
-        userAuth:
-        {
-            userName: 'admin@admin.admin',
-            userPassword: 'admin@admin.admin'
-        },
-        timeOut: 90000,
-        lockTimeOut: 10000,
-        checkContentType: true,
-        settingsAccount: false,
-        delegation: false,
-        forceReadOnly: null,
-        ignoreAlarms: false,
-        backgroundCalendars: []
-    },
-*/
+% endif
 ] ;
 
 var globalBackgroundSync=true;

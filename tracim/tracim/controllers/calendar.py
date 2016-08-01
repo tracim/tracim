@@ -34,21 +34,25 @@ class CalendarConfigController(BaseController):
 
     @tg.expose('tracim.templates.calendar.config')
     def index(self):
-        # TODO: S'assurer d'être identifié !
+        # TODO BS 20160720: S'assurer d'être identifié !
         user = tmpl_context.identity.get('user')
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)
 
         fake_api = DictLikeClass(
             current_user=dictified_current_user,
         )
-        calendar_urls = CalendarManager\
-            .get_readable_calendars_urls_for_user(user)
+        user_base_url = CalendarManager.get_user_base_url()
+        workspace_base_url = CalendarManager.get_workspace_base_url()
+        workspace_calendar_urls = CalendarManager\
+            .get_workspace_readable_calendars_urls_for_user(user)
 
         # Template will use User.auth_token, ensure it's validity
         user.ensure_auth_token()
 
         return DictLikeClass(
             fake_api=fake_api,
-            clendar_urls=calendar_urls,
+            user_base_url=user_base_url,
+            workspace_base_url=workspace_base_url,
+            workspace_clendar_urls=workspace_calendar_urls,
             auth_token=user.auth_token,
         )

@@ -30,6 +30,9 @@ CALENDAR_TYPE_WORKSPACE = WorkspaceCalendar
 CALENDAR_USER_URL_TEMPLATE = 'user/{id}.ics/'
 CALENDAR_WORKSPACE_URL_TEMPLATE = 'workspace/{id}.ics/'
 
+CALENDAR_USER_BASE_URL = '/user/'
+CALENDAR_WORKSPACE_BASE_URL = '/workspace/'
+
 
 class CalendarManager(object):
     @classmethod
@@ -37,6 +40,18 @@ class CalendarManager(object):
         from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
         return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE
+
+    @classmethod
+    def get_user_base_url(cls):
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+        return os.path.join(cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE, 'user/')
+
+    @classmethod
+    def get_workspace_base_url(cls):
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+        return os.path.join(cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE, 'workspace/')
 
     @classmethod
     def get_user_calendar_url(cls, user_id: int):
@@ -262,8 +277,9 @@ class CalendarManager(object):
         }
 
     @classmethod
-    def get_readable_calendars_urls_for_user(cls, user: User) -> [str]:
-        calendar_urls = [cls.get_user_calendar_url(user.user_id)]
+    def get_workspace_readable_calendars_urls_for_user(cls, user: User)\
+            -> [str]:
+        calendar_urls = []
         workspace_api = WorkspaceApi(user)
         for workspace in workspace_api.get_all_for_user(user):
             if workspace.calendar_enabled:
@@ -272,3 +288,12 @@ class CalendarManager(object):
                 ))
 
         return calendar_urls
+
+    def is_discovery_path(self, path: str) -> bool:
+        """
+        If collection url in one of them, Caldav client is tring to discover
+        collections.
+        :param path: collection path
+        :return: True if given collection path is an discover path
+        """
+        return path in ('user', 'workspace')
