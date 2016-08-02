@@ -14,6 +14,7 @@ from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
 from tracim.model.data import ContentType
 
+from tracim.lib.content import ContentRevisionRO
 ######################################
 
 __docformat__ = "reStructuredText"
@@ -39,52 +40,83 @@ class Provider(DAVProvider):
         if manage_lock:
             self.lockManager = LockManager(LockStorage())
 
+        self._show_archive = True
+        self._show_delete = True
+        self._show_history = True
+
+    def show_history(self):
+        return self._show_history
+
+    def show_delete(self):
+        return self._show_delete
+
+    def show_archive(self):
+        return self._show_archive
+
     def __repr__(self):
         return 'Provider'
 
     #########################################################
     # Everything override from DAVProvider
     def getResourceInst(self, path, environ):
+        #if not self.exists(path, environ):
+        #    return None
 
-        working_path = path
-
-        if not self.exists(path, environ):
-            return None
-
-        if path == "/":
-            return sql_resources.Root(path, environ)
-
-        norm_path = normpath(working_path)
+        norm_path = normpath(path)
+        root_path = environ['http_authenticator.realm']
+        parent_path = dirname(norm_path)
 
         workspace_api = WorkspaceApi(environ['user'])
+        content_api = ContentApi(
+            environ['user'],
+            show_archived=self._show_archive,
+            show_deleted=self._show_delete
+        )
 
-        if dirname(norm_path) == "/":
-            workspace = self.get_workspace_from_path(norm_path, workspace_api)
-            return sql_resources.Workspace(path, environ, workspace)
+        # case we're requesting the root racine of webdav
+        if path == root_path:
+            return sql_resources.Root(path, environ)
+        # case we're at the root racine of a workspace
+        elif parent_path == root_path:
+            return sql_resources.Workspace(
+                path=norm_path,
+                environ=environ,
+                workspace=self.get_workspace_from_path(
+                    norm_path,
+                    workspace_api
+                )
+            )
 
-
-        api = ContentApi(environ['user'], show_archived=True, show_deleted=True)
-
-        working_path = self.reduce_path(path)
-
-        content = self.get_content_from_path(working_path, api, workspace_api)
+        content = self.get_content_from_path(
+            path=norm_path,
+            content_api=content_api,
+            workspace_api=workspace_api
+        )
 
         # is archive
         is_archived_folder = re.search(r'/\.archived$', norm_path) is not None
 
-        if is_archived_folder:
-            return sql_resources.ArchivedFolder(path, environ, content)
+        if self._show_archive and is_archived_folder:
+            return sql_resources.ArchivedFolder(
+                path=norm_path,
+                environ=environ,
+                content=content,
+            )
 
         # is delete
         is_deleted_folder = re.search(r'/\.deleted$', norm_path) is not None
 
-        if is_deleted_folder:
-            return sql_resources.DeletedFolder(path, environ, content)
+        if self._show_delete and is_deleted_folder:
+            return sql_resources.DeletedFolder(
+                path=norm_path,
+                environ=environ,
+                content=content
+            )
 
         # is history
         is_history_folder = re.search(r'/\.history$', norm_path) is not None
 
-        if is_history_folder:
+        if self._show_history and is_history_folder:
             is_deleted_folder = re.search(r'/\.deleted/\.history$', norm_path) is not None
             is_archived_folder = re.search(r'/\.archived/\.history$', norm_path) is not None
 
@@ -92,20 +124,29 @@ class Provider(DAVProvider):
                 else HistoryType.Archived if is_archived_folder \
                 else HistoryType.Standard
 
-            return sql_resources.HistoryFolder(path, environ, content, type)
+            return sql_resources.HistoryFolder(
+                path=norm_path,
+                environ=environ,
+                content=content,
+                type=type
+            )
 
         # is history
         is_history_file_folder = re.search(r'/\.history/([^/]+)$', norm_path) is not None
 
-        if is_history_file_folder:
-            return sql_resources.HistoryFileFolder(path, environ, content)
+        if self._show_history and is_history_file_folder:
+            return sql_resources.HistoryFileFolder(
+                path=norm_path,
+                environ=environ,
+                content=content
+            )
 
         # is history
         is_history_file = re.search(r'/\.history/[^/]+/(\d+)-.+', norm_path) is not None
 
-        if is_history_file:
-            content = api.get_one_revision2(re.search(r'/\.history/[^/]+/(\d+)-.+', norm_path).group(1))
-            content_revision = self.get_content_from_revision(re.search(r'/\.history/[^/]+/(\d+)-.+', norm_path).group(1), api)
+        if self._show_history and is_history_file:
+            content_revision = content_api.get_one_revision(re.search(r'/\.history/[^/]+/(\d+)-.+', norm_path).group(1))
+            content = self.get_content_from_revision(content_revision, content_api)
 
             if content.type == ContentType.File:
                 return sql_resources.HistoryFile(path, environ, content, content_revision)
@@ -115,30 +156,36 @@ class Provider(DAVProvider):
         # other
         if content.type == ContentType.Folder:
             return sql_resources.Folder(path, environ, content)
-
-        if content.type == ContentType.File:
+        elif content.type == ContentType.File:
             return sql_resources.File(path, environ, content, False)
-        else:
+        elif content.type in [ContentType.Page, ContentType.Thread]:
             return sql_resources.OtherFile(path, environ, content)
+        else:
+            return None
 
     def exists(self, path, environ):
-        path = normpath(path)
-        if path == "/":
-            return True
-        elif dirname(path) == "/":
-            return self.get_workspace_from_path(
-                path,
-                WorkspaceApi(environ['user'])
-            ) is not None
+        norm_path = normpath(path)
+        parent_path = dirname(norm_path)
+        root_path = environ['http_authenticator.realm']
 
-        api = ContentApi(
+        workspace_api = WorkspaceApi(environ['user'])
+        content_api = ContentApi(
             current_user=environ['user'],
             show_archived=True,
             show_deleted=True
         )
-        wapi = WorkspaceApi(environ['user'])
 
-        norm_path = normpath(path)
+        if path == root_path:
+            return sql_resources.Root(path, environ)
+        elif parent_path == root_path:
+            return sql_resources.Workspace(
+                path=norm_path,
+                environ=environ,
+                workspace=self.get_workspace_from_path(
+                    norm_path,
+                    workspace_api
+                )
+            ) is not None
 
         is_archived = re.search(r'/\.archived/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$', norm_path) is not None
 
@@ -148,16 +195,13 @@ class Provider(DAVProvider):
 
         if revision_id:
             revision_id = revision_id.group(1)
-            return self.get_content_from_revision(revision_id, api) is not None
-
-        working_path = self.reduce_path(path)
-
-        content = self.get_content_from_path(working_path, api, wapi)
+            content = content_api.get_one_revision(revision_id)
+        else:
+            content = self.get_content_from_path(norm_path, content_api, workspace_api)
 
         return content is not None \
             and content.is_deleted == is_deleted \
-            and content.is_archived == is_archived \
-            and (revision_id is None or content.revision_id == revision_id)
+            and content.is_archived == is_archived
 
     def reduce_path(self, path):
         path = re.sub(r'/\.archived', r'', path)
@@ -168,20 +212,30 @@ class Provider(DAVProvider):
 
         return path
 
-    def get_content_from_path(self, path, api: ContentApi, workspace_api: WorkspaceApi):
-        path = normpath(path)
+    def get_content_from_path(self, path, content_api: ContentApi, workspace_api: WorkspaceApi):
+        path = self.reduce_path(path)
+
         workspace = self.get_workspace_from_path(path, workspace_api)
 
         if basename(dirname(path)) == workspace.label:
-            return api.get_one_by_label_and_parent(basename(path), workspace=workspace)
+            try:
+                return content_api.get_one_by_label_and_parent(basename(path), workspace=workspace)
+            except:
+                return None
         else:
-            parent = self.get_parent_from_path(path, api, workspace_api)
+            parent = self.get_parent_from_path(path, content_api, workspace_api)
             if parent is not None:
-                return api.get_one_by_label_and_parent(basename(path), content_parent=parent)
+                try:
+                    return content_api.get_one_by_label_and_parent(basename(path), content_parent=parent)
+                except:
+                    return None
             return None
 
-    def get_content_from_revision(self, revision_id: int, api:ContentApi):
-        return api.get_one_revision(revision_id)
+    def get_content_from_revision(self, revision: ContentRevisionRO, api:ContentApi):
+        try:
+            return api.get_one(revision.content_id, ContentType.Any)
+        except:
+            return None
 
     def get_parent_from_path(self, path, api: ContentApi, workspace_api: WorkspaceApi):
         return self.get_content_from_path(dirname(path), api, workspace_api)
@@ -189,7 +243,11 @@ class Provider(DAVProvider):
     def get_workspace_from_path(self, path: str, api: WorkspaceApi):
         assert path.startswith('/')
 
-        return api.get_one_by_label(path.split('/')[1])
+        print(path)
+        try:
+            return api.get_one_by_label(path.split('/')[1])
+        except:
+            return None
 
     #########################################################
     # Everything that transform path
@@ -494,3 +552,54 @@ class Provider(DAVProvider):
         last_item.child_revision_id = new_item.id
 
         self.session.commit()'''
+
+"""
+
+{'wsgidav.dump_request_body': False,
+ 'wsgi.run_once': False,
+ 'wsgi.multiprocess': False,
+ 'wsgi.multithread': True,
+ 'QUERY_STRING': '',
+ 'REQUEST_URI': b'/nouveau/',
+ 'wsgidav.dump_response_body': False,
+ 'SERVER_PROTOCOL': 'HTTP/1.1',
+ 'REMOTE_ADDR': '127.0.0.1',
+ 'wsgidav.verbose': 1,
+ 'wsgi.version': (1, 0),
+ 'wsgidav.config': {
+     'middleware_stack':[],
+                       'propsmanager': None,
+                       'add_header_MS_Author_Via': True,
+                       'acceptbasic': True,
+                       'user_mapping': {},
+                       'enable_loggers': [],
+                       'locksmanager': True,
+                       'mount_path': None,
+                       'catchall': False,
+                       'unquote_path_info': False,
+                       'provider_mapping': {'': Provider},
+                       'port': 3030,
+                       'Provider': [],
+                       'verbose': 1,
+                       'SQLDomainController': [],
+                       'domaincontroller': [],
+     'acceptdigest': True,
+     'dir_browser': {
+         'ms_sharepoint_urls': False,
+         'ms_mount': False,
+         'davmount': False,
+         'enable': True,
+         'ms_sharepoint_plugin': True,
+         'response_trailer': ''
+     },
+     'defaultdigest': True,
+     'host': '0.0.0.0',
+     'ext_servers': ['cherrypy-bundled', 'wsgidav']
+ },
+ 'http_authenticator.realm': '/',
+ 'HTTP_AUTHORIZATION': 'Digest username="admin@admin.admin", realm="/", nonce="=", uri="/nouveau/", algorithm=MD5, response="9c78c484263409b3385ead95ea7bf65b", '
+                       'cnonce="MHgyMzNkZjkwOjQ4OTU6MTQ2OTc3OTI1NQ==", nc=00000471, qop=auth',
+ 'HTTP_ACCEPT_ENCODING': 'gzip, deflate',
+ 'HTTP_USER_AGENT': 'gvfs/1.22.2', 'wsgidav.debug_break': False,
+ 'HTTP_CONNECTION': 'Keep-Alive', 'SERVER_PORT': '3030', 'CONTENT_LENGTH': '235', 'HTTP_HOST': '127.0.0.1:3030', 'REQUEST_METHOD': 'PROPFIND', 'HTTP_APPLY_TO_REDIRECT_REF': 'T', 'SERVER_NAME': 'WsgiDAV/3.0.0pre1 CherryPy/3.2.4 Python/3.4.2', 'wsgi.errors': <_io.TextIOWrapper name='<stderr>' mode='w' encoding='UTF-8'>, 'wsgi.url_scheme': 'http', 'user': <User: email='admin@admin.admin', display='Global manager'>, 'HTTP_ACCEPT_LANGUAGE': 'en-us, en;q=0.9', 'ACTUAL_SERVER_PROTOCOL': 'HTTP/1.1', 'REMOTE_PORT': '48375', 'CONTENT_TYPE': 'application/xml', 'SCRIPT_NAME': '', 'wsgi.input': <wsgidav.server.cherrypy.wsgiserver.wsgiserver3.KnownLengthRFile object at 0x7fbc8410ce48>, 'wsgidav.username': 'admin@admin.admin', 'http_authenticator.username': 'admin@admin.admin', 'wsgidav.provider': Provider, 'PATH_INFO': '/nouveau/', 'HTTP_DEPTH': '1', 'SERVER_SOFTWARE': 'WsgiDAV/3.0.0pre1 CherryPy/3.2.4 Python/3.4.2 Server'}
+"""

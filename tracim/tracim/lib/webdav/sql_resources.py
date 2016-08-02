@@ -15,16 +15,11 @@ from wsgidav.compat import PY3
 from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
 from wsgidav.dav_provider import DAVCollection, DAVNonCollection
 from tracim.model import data, new_revision
-from tracim.model.data import Content, ActionDescription, VirtualEvent
+from tracim.model.data import Content, ActionDescription
 from tracim.model.data import ContentType
-from wsgidav.dav_provider import DAVResource
+from wsgidav.dav_provider import _DAVResource
 
-_CONTENTS = {
-    ContentType.Folder: Folder,
-    ContentType.File: File,
-    ContentType.Page: OtherFile,
-    ContentType.Thread: OtherFile
-}
+from tracim.lib.webdav.design import designThread, designPage
 
 class Encapsuler(object):
     def __init__(self, type: str, api: ContentApi, content: Content):
@@ -40,13 +35,32 @@ class Encapsuler(object):
 
         self._type = type
 
+        self._new_name = self.make_name()
+
     def action(self):
         with new_revision(self._content):
             self._actions[self._type](self._content)
+
+            if self._content.label == '':
+                self._content.file_name = self._new_name
+            else:
+                self._content.label = self._new_name
+
             self._api.save(self._content, self._type)
 
         transaction.commit()
 
+    def make_name(self):
+        new_name = self._content.get_label()
+        is_file_name = self._content.label == ''
+        add = ''
+
+        if self._type in [ActionDescription.ARCHIVING, ActionDescription.DELETION]:
+            new_name += ' - %s the %s' % (self._type, datetime.now())
+        else:
+            pass
+
+        return new_name
 
 class Root(DAVCollection):
     def __init__(self, path: str, environ: dict):
@@ -69,7 +83,7 @@ class Root(DAVCollection):
     def getMemberNames(self) -> [str]:
         return [workspace.label for workspace in self._workspace_api.get_all()]
 
-    def getMember(self, label: str) -> Workspace:
+    def getMember(self, label: str) -> _DAVResource:
 
         workspace = self._workspace_api.get_one_by_label(label)
 
@@ -122,7 +136,7 @@ class Workspace(DAVCollection):
 
         return retlist
 
-    def getMember(self, content_label: str) -> DAVResource:
+    def getMember(self, content_label: str) -> _DAVResource:
 
         content = self._content_api.get_one_by_label_and_parent(
             content_label=content_label,
@@ -130,7 +144,7 @@ class Workspace(DAVCollection):
         )
 
         return _CONTENTS[content.type](
-            path=self.path + content.get_label(),
+            path=self.path + '/' + content.get_label(),
             environ=self.environ,
             content=content
             )
@@ -138,7 +152,7 @@ class Workspace(DAVCollection):
     def createEmptyResource(self, name: str):
         raise DAVError(HTTP_FORBIDDEN)
 
-    def createCollection(self, label: str) -> Folder:
+    def createCollection(self, label: str) -> 'Folder':
 
         folder = self._content_api.create(
             content_type=ContentType.Folder,
@@ -158,7 +172,7 @@ class Workspace(DAVCollection):
 
         transaction.commit()
 
-        return Folder(self.path + label, self.environ, folder)
+        return Folder(self.path + '/' + label, self.environ, folder)
 
     def delete(self):
         raise DAVError(HTTP_FORBIDDEN)
@@ -175,7 +189,7 @@ class Workspace(DAVCollection):
     def setLastModified(self, destpath, timestamp, dryrun):
         return False
 
-    def getMemberList(self) -> [DAVResource]:
+    def getMemberList(self) -> [_DAVResource]:
         memberlist = []
 
         if self.environ['REQUEST_METHOD'] not in ['MOVE', 'COPY', 'DELETE']:
@@ -187,26 +201,26 @@ class Workspace(DAVCollection):
             if memberlist != [] and self._file_count > 0:
                 memberlist.append(
                     HistoryFolder(
-                        path=self.path + ".history",
+                        path=self.path + '/' + ".history",
                         environ=self.environ,
-                        content=self._content,
+                        content=None,
                         type=HistoryType.Standard
                         )
                     )
 
             memberlist.append(
                 DeletedFolder(
-                    path=self.path + ".deleted",
+                    path=self.path + '/' + ".deleted",
                     environ=self.environ,
-                    content=self._content
+                    content=None
                     )
                 )
 
             memberlist.append(
                 ArchivedFolder(
-                    path=self.path + ".archived",
+                    path=self.path + '/' + ".archived",
                     environ=self.environ,
-                    content=self._content
+                    content=None
                     )
                 )
 
@@ -245,7 +259,7 @@ class Folder(DAVCollection):
 
         return retlist
 
-    def getMember(self, content_label: str) -> DAVResource:
+    def getMember(self, content_label: str) -> _DAVResource:
 
         content = self._api.get_one_by_label_and_parent(
             content_label=content_label,
@@ -253,7 +267,7 @@ class Folder(DAVCollection):
         )
 
         return self.provider.getResourceInst(
-            path=self.path + content.get_label(),
+            path=self.path + '/' + content.get_label(),
             environ=self.environ
             )
 
@@ -265,7 +279,7 @@ class Folder(DAVCollection):
             new_file=True
             )
 
-    def createCollection(self, label: str) -> Folder:
+    def createCollection(self, label: str) -> _DAVResource:
 
         folder = self._api.create(ContentType.Folder, self._content.workspace, self._content, label)
 
@@ -281,7 +295,7 @@ class Folder(DAVCollection):
 
         transaction.commit()
 
-        return Folder(self.path + label, self.environ, folder)
+        return Folder(self.path + '/' + label, self.environ, folder)
 
     def delete(self):
         Encapsuler(ActionDescription.DELETION, self._api, self._content).action()
@@ -337,7 +351,7 @@ class Folder(DAVCollection):
         #self.item.updated = datetime.fromtimestamp(timestamp)
         #return True
 
-    def getMemberList(self) -> [DAVResource]:
+    def getMemberList(self) -> [_DAVResource]:
         memberlist = []
 
         for name in self.getMemberNames():
@@ -349,7 +363,7 @@ class Folder(DAVCollection):
             if memberlist != [] and self._file_count > 0:
                 memberlist.append(
                     HistoryFolder(
-                        path=self.path + ".history",
+                        path=self.path + '/' + ".history",
                         environ=self.environ,
                         content=self._content,
                         type=HistoryType.Standard
@@ -358,7 +372,7 @@ class Folder(DAVCollection):
 
             memberlist.append(
                 DeletedFolder(
-                    path=self.path + ".deleted",
+                    path=self.path + '/' + ".deleted",
                     environ=self.environ,
                     content=self._content
                     )
@@ -366,14 +380,13 @@ class Folder(DAVCollection):
 
             memberlist.append(
                 ArchivedFolder(
-                    path=self.path + ".archived",
+                    path=self.path + '/' + ".archived",
                     environ=self.environ,
                     content=self._content
                     )
                 )
 
         return memberlist
-
 
 class HistoryFolder(Folder):
     def __init__(self, path, environ, content: data.Content, type):
@@ -399,14 +412,14 @@ class HistoryFolder(Folder):
     def getLastModified(self) -> float:
         return mktime(datetime.now().timetuple())
 
-    def getMember(self, content_label: str) -> HistoryFileFolder:
+    def getMember(self, content_label: str) -> _DAVResource:
         content = self._api.get_one_by_label_and_parent(
             content_label=content_label,
             content_parent=self._content
         )
 
         return HistoryFileFolder(
-            path=self.path + content.get_label(),
+            path=self.path + '/' + content.get_label(),
             environ=self.environ,
             content=content)
 
@@ -442,7 +455,7 @@ class HistoryFolder(Folder):
     def setLastModified(self, destpath: str, timestamp: float, dryrun: bool):
         return False
 
-    def getMemberList(self) -> [HistoryFileFolder]:
+    def getMemberList(self) -> [_DAVResource]:
         memberlist = []
         for name in self.getMemberNames():
             member = self.getMember(name)
@@ -456,7 +469,7 @@ class DeletedFolder(HistoryFolder):
         super(DeletedFolder, self).__init__(path, environ, content, HistoryType.Deleted)
 
         self._api = ContentApi(
-            current_user=self._user,
+            current_user=environ['user'],
             show_deleted=True
         )
 
@@ -474,7 +487,7 @@ class DeletedFolder(HistoryFolder):
     def getLastModified(self) -> float:
         return mktime(datetime.now().timetuple())
 
-    def getMember(self, content_label) -> DAVResource:
+    def getMember(self, content_label) -> _DAVResource:
 
         content = self._api.get_one_by_label_and_parent(
             content_label=content_label,
@@ -482,7 +495,7 @@ class DeletedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path=self.path + content.get_label(),
+            path=self.path + '/' + content.get_label(),
             environ=self.environ
             )
 
@@ -519,7 +532,7 @@ class DeletedFolder(HistoryFolder):
     def setLastModified(self, destpath: str, timestamp: float, dryrun: bool):
         return False
 
-    def getMemberList(self) -> [DAVResource]:
+    def getMemberList(self) -> [_DAVResource]:
         memberlist = []
 
         if self.environ['REQUEST_METHOD'] not in ['MOVE', 'COPY', 'DELETE']:
@@ -532,7 +545,7 @@ class DeletedFolder(HistoryFolder):
             if self._file_count > 0:
                 memberlist.append(
                     HistoryFolder(
-                        path=self.path + ".history",
+                        path=self.path + '/' + ".history",
                         environ=self.environ,
                         content=self._content, 
                         type=HistoryType.Deleted
@@ -565,7 +578,7 @@ class ArchivedFolder(HistoryFolder):
     def getLastModified(self) -> float:
         return mktime(datetime.now().timetuple())
 
-    def getMember(self, content_label) -> DAVResource:
+    def getMember(self, content_label) -> _DAVResource:
 
         content = self._api.get_one_by_label_and_parent(
             content_label=content_label,
@@ -573,7 +586,7 @@ class ArchivedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path=self.path + content.get_label(),
+            path=self.path + '/' + content.get_label(),
             environ=self.environ
             )
 
@@ -610,7 +623,7 @@ class ArchivedFolder(HistoryFolder):
     def setLastModified(self, destpath: str, timestamp: float, dryrun: bool):
         return False
 
-    def getMemberList(self) -> [DAVResource]:
+    def getMemberList(self) -> [_DAVResource]:
         memberlist = []
         
         if self.environ['REQUEST_METHOD'] not in ['MOVE', 'COPY', 'DELETE']:
@@ -622,7 +635,7 @@ class ArchivedFolder(HistoryFolder):
             if self._file_count > 0:
                 memberlist.append(
                     HistoryFolder(
-                        path=self.path + ".history",
+                        path=self.path + '/' + ".history",
                         environ=self.environ,
                         content=self._content,
                         type=HistoryType.Archived
@@ -663,13 +676,13 @@ class HistoryFileFolder(HistoryFolder):
         
         if self._content.type == ContentType.File:
             return HistoryFile(
-                path=self.path + str(rev.revision_id) + '-' + rev.file_name,
+                path=self.path + '/' + str(revision.revision_id) + '-' + revision.file_name,
                 environ=self.environ,
                 content=self._content, 
                 content_revision=revision)
         else:
             return HistoryOtherFile(
-                path=self.path + str(rev.revision_id) + '-' + rev.get_label(),
+                path=self.path + '/' + str(revision.revision_id) + '-' + revision.get_label(),
                 environ=self.environ,
                 content=self._content,
                 content_revision=revision)
@@ -677,9 +690,21 @@ class HistoryFileFolder(HistoryFolder):
     def delete(self):
         raise DAVError(HTTP_FORBIDDEN)
 
+    def getMemberList(self) -> [_DAVResource]:
+        memberlist = []
+
+        if self.environ['REQUEST_METHOD'] not in ['MOVE', 'COPY', 'DELETE']:
+
+            for name in self.getMemberNames():
+                member = self.getMember(name)
+                if member is not None:
+                    memberlist.append(member)
+
+        return memberlist
+
 
 class File(DAVNonCollection):
-    def __init__(self, path: str, environ: environ, content: Content, is_new_file: bool):
+    def __init__(self, path: str, environ: dict, content: Content, is_new_file: bool):
         super(File, self).__init__(path, environ)
 
         self._content = content
@@ -690,10 +715,15 @@ class File(DAVNonCollection):
             show_deleted=True
         )
 
-        self.filestream = MyFileStream(content=self._content, content_api=self._api)
+        self.filestream = FileStream(
+            content=self._content,
+            content_api=self._api,
+            file_name=self._content.get_label(),
+            new_file=False
+            )
 
     def __repr__(self) -> str:
-        return "<DAVNonCollectio: File (%s)>" % self._content.get_label()
+        return "<DAVNonCollection: File (%s)>" % self._content.get_label()
 
     def getContentLength(self) -> int:
         return len(self._content.file_content)
@@ -720,14 +750,18 @@ class File(DAVNonCollection):
 
         return filestream
 
-    def beginWrite(self, contentType: str=None) -> MyFileStream:
+    def beginWrite(self, contentType: str=None) -> FileStream:
         return self.filestream
 
     def copyMoveSingle(self, destpath: str, ismove: bool):
         destpath = normpath(destpath)
 
         if ismove:
-            parent = self.provider.get_parent_from_path(normpath(destpath), self._api, WorkspaceApi(self._user))
+            parent = self.provider.get_parent_from_path(
+                normpath(destpath),
+                self._api,
+                WorkspaceApi(self.environ['user'])
+            )
 
             with new_revision(self._content):
                 if basename(destpath) != self._content.label:
@@ -801,7 +835,7 @@ class HistoryFile(File):
         raise DAVError(HTTP_FORBIDDEN)
 
     def handleDelete(self):
-        return True
+        return False
 
     def handleCopy(self, destPath, depthInfinity):
         return True
@@ -825,9 +859,9 @@ class OtherFile(File):
 
     def getContentLength(self) -> int:
         if self._content.type == ContentType.Page:
-            return len(self.designPage(self._content))
+            return len(designPage(self._content, self._content.revision))
         else:
-            return len(self.designThread(self._content))
+            return len(designThread(self._content, self._content.revision, self._api.get_all(self._content.content_id, ContentType.Comment)))
 
     def getContentType(self) -> str:
         return 'text/html'
@@ -839,231 +873,13 @@ class OtherFile(File):
             filestream = compat.StringIO()
 
         if self._content.type == ContentType.Page:
-            self._content_page = self.designPage(self._content)
+            self._content_page = designPage(self._content, self._content.revision)
         else:
-            self._content_page = self.designThread(self._content)
+            self._content_page = designThread(self._content, self._content.revision, self._api.get_all(self._content.content_id, ContentType.Comment))
 
         filestream.write(bytes(self._content_page, 'utf-8'))
         filestream.seek(0)
         return filestream
-
-    def designPage(self, content: data.Content) -> str:
-        #f = open('wsgidav/addons/webdav/style.css', 'r')
-        style = ''#f.read()
-        #f.close()
-
-        hist = self._content.get_history()
-        histHTML = '<table class="table table-striped table-hover">'
-        for event in hist:
-            if isinstance(event, VirtualEvent):
-                date = event.create_readable_date()
-                _LABELS = {
-                    'archiving': 'Item archived',
-                    'content-comment': 'Item commented',
-                    'creation': 'Item created',
-                    'deletion': 'Item deleted',
-                    'edition': 'item modified',
-                    'revision': 'New revision',
-                    'status-update': 'New status',
-                    'unarchiving': 'Item unarchived',
-                    'undeletion': 'Item undeleted',
-                    'move': 'Item moved'
-                }
-
-                label = _LABELS[event.type.id]
-
-                histHTML += '''
-                <tr class="%s">
-                    <td class="my-align"><span class="label label-default"><i class="fa %s"></i> %s</span></td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                </tr>
-                ''' % ('warning' if event.id == content.revision_id else '',
-                       event.type.icon,
-                       label,
-                       date,
-                       event.owner.display_name,
-                       '<i class="fa fa-caret-left"></i> shown' if event.id == content.revision_id else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (self._content.label, event.id, event.ref_object.label) if event.type.id == 'revision' else '')
-
-        histHTML+='</table>'
-
-        file = '''
-<html>
-<head>
-	<title>%s</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="/home/arnaud/Documents/css/style.css">
-	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
-</head>
-<body>
-    <div id="left" class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
-        <div class="title page">
-            <div class="title-text">
-                <i class="fa fa-file-text-o title-icon page"></i>
-                <h1>%s</h1>
-                <h6>page created on <b>%s</b> by <b>%s</b></h6>
-            </div>
-            <div class="pull-right">
-                <div class="btn-group btn-group-vertical">
-                    <a class="btn btn-default">
-                        <i class="fa fa-external-link"></i> View in tracim</a>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="content col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            %s
-        </div>
-    </div>
-    <div id="right" class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-        <h4>History</h4>
-        %s
-    </div>
-    <script type="text/javascript">
-        window.onload = function() {
-            elems = document.getElementsByClassName('revision-link');
-            for(var i = 0; i<elems.length; i++) {
-                test = window.location.href
-                test += "/.." + elems[i].href.replace(/file:\/\//, "")
-                elems[i].href = test
-            }
-        }
-    </script>
-</body>
-</html>
-        ''' % (content.label,
-               content.label,
-               self._content.created.strftime("%B %d, %Y at %H:%m"),
-               self._content.owner.display_name,
-               content.description,
-               histHTML)
-
-        return file
-
-    def designThread(self, content: data.Content) -> str:
-
-        comments = self._api.get_all(self._content.content_id, ContentType.Comment)
-        hist = self._content.get_history()
-
-        allT = []
-        allT += comments
-        allT += hist
-        allT.sort(key=lambda x: x.created, reverse=True)
-
-        disc = ''
-        participants = {}
-        for t in allT:
-            if t.type == ContentType.Comment:
-                disc += '''
-                    <div class="row comment comment-row">
-                        <i class="fa fa-comment-o comment-icon"></i>
-                            <div class="comment-content">
-                            <h5>
-                                <span class="comment-author"><b>%s</b> wrote :</span>
-                                <div class="pull-right text-right">%s</div>
-                            </h5>
-                            %s
-                        </div>
-                    </div>
-                    ''' % (t.owner.display_name, t.create_readable_date(), t.description)
-
-                if t.owner.display_name not in participants:
-                    participants[t.owner.display_name] = [1, t.created]
-                else:
-                    participants[t.owner.display_name][0] += 1
-            else:
-                if isinstance(t, VirtualEvent) and t.type.id != 'comment':
-                    _LABELS = {
-                        'archiving': 'Item archived',
-                        'content-comment': 'Item commented',
-                        'creation': 'Item created',
-                        'deletion': 'Item deleted',
-                        'edition': 'item modified',
-                        'revision': 'New revision',
-                        'status-update': 'New status',
-                        'unarchiving': 'Item unarchived',
-                        'undeletion': 'Item undeleted',
-                        'move': 'Item moved',
-                        'comment' : 'hmmm'
-                    }
-
-                    label = _LABELS[t.type.id]
-
-                    disc += '''
-                    <div class="row comment comment-row">
-                        <i class="fa %s comment-icon"></i>
-                            <div class="comment-content">
-                            <h5>
-                                <span class="comment-author"><b>%s</b></span>
-                                <div class="pull-right text-right">%s</div>
-                            </h5>
-                            %s %s
-                        </div>
-                    </div>
-                    ''' % (t.type.icon,
-                           t.owner.display_name,
-                           t.create_readable_date(),
-                           label,
-                           '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
-                               self._content.label,
-                               t.id,
-                               t.ref_object.label) if t.type.id == 'revision' else '')
-
-        page = '''
-<html>
-<head>
-	<title>%s</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="/home/arnaud/Documents/css/style.css">
-	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
-</head>
-<body>
-    <div id="left" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="title thread">
-            <div class="title-text">
-                <i class="fa fa-comments-o title-icon thread"></i>
-                <h1>%s</h1>
-                <h6>thread created on <b>%s</b> by <b>%s</b></h6>
-            </div>
-            <div class="pull-right">
-                <div class="btn-group btn-group-vertical">
-                    <a class="btn btn-default">
-                        <i class="fa fa-external-link"></i> View in tracim</a>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="content col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <div class="description">
-                <span class="description-text">%s</span>
-            </div>
-            %s
-        </div>
-    </div>
-    <script type="text/javascript">
-        window.onload = function() {
-            elems = document.getElementsByClassName('revision-link');
-            for(var i = 0; i<elems.length; i++) {
-                test = window.location.href
-                test += "/.." + elems[i].href.replace(/file:\/\//, "")
-                elems[i].href = test
-            }
-        }
-    </script>
-</body>
-</html>
-        ''' % (content.label,
-               content.label,
-               self._content.created.strftime("%B %d, %Y at %H:%m"),
-               self._content.owner.display_name,
-               content.description,
-               disc)
-
-        return page
-
 
 class HistoryOtherFile(OtherFile):
     def __init__(self, path: str, environ: dict, content: data.Content, content_revision: data.ContentRevisionRO):
@@ -1083,9 +899,9 @@ class HistoryOtherFile(OtherFile):
             filestream = compat.StringIO()
 
         if self._content.type == ContentType.Page:
-            self._content_page = self.designPage(self._content_revision)
+            self._content_page = designPage(self._content, self._content_revision)
         else:
-            self._content_page = self.designThread(self._content_revision)
+            self._content_page = designThread(self._content, self._content_revision, self._api.get_all(self._content.content_id, ContentType.Comment))
 
         filestream.write(bytes(self._content_page, 'utf-8'))
         filestream.seek(0)
@@ -1111,3 +927,11 @@ class HistoryOtherFile(OtherFile):
 
     def copyMoveSingle(self, destpath, ismove):
         raise DAVError(HTTP_FORBIDDEN)
+
+
+_CONTENTS = {
+    ContentType.Folder: Folder,
+    ContentType.File: File,
+    ContentType.Page: OtherFile,
+    ContentType.Thread: OtherFile
+}

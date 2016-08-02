@@ -1,7 +1,6 @@
 import time
 
 from tracim.lib.webdav.sql_model import Lock, Url2Token
-from tracim.lib.webdav import Session
 from wsgidav import util
 from wsgidav.lock_manager import normalizeLockRoot, lockString, generateLockToken, validateLock
 from wsgidav.rw_lock import ReadWriteLock
@@ -42,7 +41,7 @@ class LockStorage(object):
     LOCK_TIME_OUT_MAX = 4 * 604800  # 1 month, in seconds
 
     def __init__(self):
-        self._session = Session()
+        self._session = None# todo Session()
         self._lock = ReadWriteLock()
 
     def __repr__(self):

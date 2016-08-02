@@ -20,8 +20,9 @@ class FileStream(object):
         self._file_name = file_name if file_name != '' else self._content.file_name
         self._content = content
         self._api = content_api
+        self._is_new_file = new_file
 
-    def beginWrite(self, contentType) -> FileStream:
+    def beginWrite(self, contentType) -> 'FileStream':
         return self
 
     def endWrite(self, withErrors: bool):
@@ -36,7 +37,7 @@ class FileStream(object):
         for part in self._buffer:
             item_content += part
 
-        if new_file:
+        if self._is_new_file:
             file = self._api.create(
                 content_type=ContentType.File,
                 workspace=self._content.workspace,

@@ -364,7 +364,7 @@ class ContentApi(object):
 
         return self._base_query(workspace).filter(Content.content_id==content_id).filter(Content.type==content_type).one()
 
-    def get_one_revision(self, revision_id: int = None) -> Content:
+    def get_one_revision(self, revision_id: int = None) -> ContentRevisionRO:
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
@@ -372,11 +372,9 @@ class ContentApi(object):
         """
         assert revision_id is not None# DYN_REMOVE
 
-        revision = DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id)
-        
-        result = self._base_query(None)
+        revision = DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id).one()
 
-        return result.filter(Content.revision_id == revision_id).one()
+        return revision
 
     def get_one_by_label_and_parent(self, content_label: str, content_parent: Content = None,
                                     workspace: Workspace = None) -> Content:

@@ -1235,7 +1235,7 @@ class VirtualEvent(object):
         self.content = content
         self.ref_object = ref_object
 
-        print(type)
+        # todo moi ? print(type)
         assert hasattr(type, 'id')
         assert hasattr(type, 'css')
         assert hasattr(type, 'icon')

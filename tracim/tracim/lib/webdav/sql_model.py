@@ -5,13 +5,13 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy.orm import deferred
 from sqlalchemy.types import DateTime, Integer, LargeBinary, Unicode, UnicodeText, Float
-from tracim.lib.webdav import Base
+
 from wsgidav.compat import to_unicode, to_bytes
 
 # ==================================================
 # Content
 # ==================================================
-class Workspace(Base):
+class Workspace(object):
     __tablename__ = 'my_workspaces'
 
     workspace_id = Column(Integer, Sequence('my_seq__workspace__id'), autoincrement=True, primary_key=True)
@@ -24,7 +24,7 @@ class Workspace(Base):
         return "<Workspace %s : %s>" % (self.workspace_id, self.label)
 
 
-class User(Base):
+class User(object):
     __tablename__ = 'my_users'
 
     user_id = Column(Integer, Sequence('my_seq__users__id'), autoincrement=True, primary_key=True)
@@ -35,7 +35,7 @@ class User(Base):
         return "<User %s : %s>" % (self.user_id, self.display_name)
 
 
-class UserWorkspace(Base):
+class UserWorkspace(object):
     __tablename__ = 'my_user_workspace'
 
     workspace_id = Column(Integer, ForeignKey('my_workspaces.workspace_id', ondelete="CASCADE"), nullable=False, primary_key=True)
@@ -46,7 +46,7 @@ class UserWorkspace(Base):
         return "<Role (W:%s, U:%s) : %s" % (self.workspace_id, self.user_id, self.role)
 
 
-class ItemRevision(Base):
+class ItemRevision(object):
     __tablename__ = 'my_items_revisions'
 
     id = Column(Integer, Sequence('my_seq__items__id'), autoincrement=True, primary_key=True)
@@ -67,7 +67,7 @@ class ItemRevision(Base):
         return "<Content %s : %s in %s>" % (self.id, self.item_name, self.parent_id)
 
 
-class Lock(Base):
+class Lock(object):
     __tablename__ = 'my_locks'
 
     token = Column(UnicodeText, primary_key=True, unique=True, nullable=False)
@@ -81,7 +81,7 @@ class Lock(Base):
     timeout = Column(Float, unique=False, nullable=False)
 
 
-class Url2Token(Base):
+class Url2Token(object):
     __tablename__ = 'my_url2token'
 
     token = Column(UnicodeText, primary_key=True, unique=True, nullable=False)
