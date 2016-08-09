@@ -230,6 +230,9 @@ from wsgidav.xml_tools import useLxml
 from wsgidav.wsgidav_app import WsgiDAVApp
 from wsgidav._version import __version__
 
+from tracim.lib.webdav.sql_dav_provider import Provider
+from tracim.lib.webdav.sql_domain_controller import SQLDomainController
+
 from inspect import isfunction
 import traceback
 
@@ -252,21 +255,25 @@ class WsgiDavDaemon(Daemon):
 
         # Configuration file overrides defaults
         config_file = os.path.abspath(DEFAULT_CONFIG_FILE)
-        if config_file:
-            fileConf = self._readConfigFile(config_file, temp_verbose)
-            config.update(fileConf)
-        else:
-            if temp_verbose >= 2:
-                print("Running without configuration file.")
+        fileConf = self._readConfigFile(config_file, temp_verbose)
+        config.update(fileConf)
 
         if not useLxml and config["verbose"] >= 1:
             print(
                 "WARNING: Could not import lxml: using xml instead (slower). Consider installing lxml from http://codespeak.net/lxml/.")
 
-        if not config["provider_mapping"]:
-            print("ERROR: No DAV provider defined. Try --help option.", file=sys.stderr)
-            sys.exit(-1)
+        config['provider_mapping'] = \
+            {
+                config['root_path']: Provider(
+                    show_archived=config['show_archived'],
+                    show_deleted=config['show_deleted'],
+                    show_history=config['show_history'],
+                    manage_locks=config['manager_locks']
+                )
+            }
 
+        config['domaincontroller'] = SQLDomainController(presetdomain=None, presetserver=None)
+        config['defaultdigest'] = False
         return config
 
     def _readConfigFile(self, config_file, verbose):
@@ -336,7 +343,6 @@ class WsgiDavDaemon(Daemon):
 
     def stop(self):
         self._server.stop()
-        print("WsgiDav : je m'arrête")
 
     def append_thread_callback(self, callback: collections.Callable) -> None:
         """

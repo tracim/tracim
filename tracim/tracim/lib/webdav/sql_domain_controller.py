@@ -21,7 +21,7 @@ class SQLDomainController(object):
         travailler dans la bdd pour vérifier si utilisateur existe
         """
         try:
-            environ['user'] = self._api.get_one_by_email(username)
+            self._api.get_one_by_email(username)
             return True
         except:
             return False
@@ -30,7 +30,6 @@ class SQLDomainController(object):
         """Retourne le mdp pour l'utilisateur pour ce real"""
         try:
             user = self._api.get_one_by_email(username)
-            return 'test'
             return user.password
         except:
             return None

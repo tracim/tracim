@@ -396,9 +396,13 @@ class ContentApi(object):
         try:
             return resultset.filter(Content.label == content_label).one()
         except:
-            return resultset.filter(Content.file_name == content_label).one()
+            try:
+                return resultset.filter(Content.file_name == content_label).one()
+            except:
+                import re
+                return resultset.filter(Content.label == re.sub(r'\.[^.]+$', '', content_label)).one()
 
-    def get_all(self, parent_id: int, content_type: str, workspace: Workspace=None) -> [Content]:
+    def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -412,10 +416,10 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_all_without_exception(self, content_type: str) -> [Content]:
+    def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> [Content]:
         assert content_type is not None# DYN_REMOVE
 
-        resultset = self._base_query(None)
+        resultset = self._base_query(workspace)
 
         if content_type != ContentType.Any:
             resultset = resultset.filter(Content.type==content_type)

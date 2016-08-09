@@ -144,7 +144,7 @@ class RootController(StandardController):
         # - last activity
         # - oldest open stuff
 
-        items = ContentApi(user).get_all(None, ContentType.Any, None)[:4]
+        items = ContentApi(user).get_all_without_exception(ContentType.Any, None)[:4]
         fake_api.favorites = Context(CTX.CONTENT_LIST).toDict(items, 'contents', 'nb')
         return DictLikeClass(fake_api=fake_api)
 
