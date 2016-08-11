@@ -239,6 +239,18 @@ import traceback
 DEFAULT_CONFIG_FILE = "wsgidav.conf"
 PYTHON_VERSION = "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
+def _get_checked_path(path, mustExist=True, allowNone=True):
+    """Convert path to absolute if not None."""
+    if path in (None, ""):
+        if allowNone:
+            return None
+        else:
+            raise ValueError("Invalid path %r" % path)
+    path = os.path.abspath(path)
+    if mustExist and not os.path.exists(path):
+        raise ValueError("Invalid path %r" % path)
+    return path
+
 class WsgiDavDaemon(Daemon):
 
     def __init__(self, *args, **kwargs):
@@ -261,6 +273,12 @@ class WsgiDavDaemon(Daemon):
         if not useLxml and config["verbose"] >= 1:
             print(
                 "WARNING: Could not import lxml: using xml instead (slower). Consider installing lxml from http://codespeak.net/lxml/.")
+        from wsgidav.dir_browser import WsgiDavDirBrowser
+        from wsgidav.debug_filter import WsgiDavDebugFilter
+        from tracim.lib.webdav.tracim_http_authenticator import TracimHTTPAuthenticator
+        from wsgidav.error_printer import ErrorPrinter
+
+        config['middleware_stack'] = [ WsgiDavDirBrowser, TracimHTTPAuthenticator, ErrorPrinter, WsgiDavDebugFilter ]
 
         config['provider_mapping'] = \
             {
@@ -273,7 +291,9 @@ class WsgiDavDaemon(Daemon):
             }
 
         config['domaincontroller'] = SQLDomainController(presetdomain=None, presetserver=None)
-        config['defaultdigest'] = False
+        config['defaultdigest'] = True
+        config['acceptdigest'] = True
+
         return config
 
     def _readConfigFile(self, config_file, verbose):
@@ -323,6 +343,7 @@ class WsgiDavDaemon(Daemon):
                 PYTHON_VERSION)
 
             wsgiserver.CherryPyWSGIServer.version = version
+
             protocol = "http"
 
             if config["verbose"] >= 1:

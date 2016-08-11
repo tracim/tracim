@@ -6,6 +6,7 @@ from tracim.model.data import ActionDescription, ContentType, Content, Workspace
 from wsgidav import util
 
 import transaction
+from wsgidav import compat
 
 class HistoryType(object):
     Deleted = 'deleted'
@@ -27,7 +28,8 @@ class FakeFileStream(object):
         :param workspace: content's workspace, necessary if the file is new as we've got no other way to get it
         :param content: either the content to be updated or None if it's a new file
         """
-        self._buffer = []
+        self._buff = compat.BytesIO()
+
         self._file_name = file_name if file_name != '' else self._content.file_name
         self._content = content
         self._api = content_api
@@ -44,20 +46,18 @@ class FakeFileStream(object):
 
     def write(self, s: str):
         """Called by request_server when writing content to files, we stock it in our file"""
-        self._buffer.append(s)
+        self._buff.write(s)
 
     def close(self):
         """Called by request_server when everything has been written and we either update the file or
         create a new file"""
-        item_content = b''
 
-        for part in self._buffer:
-            item_content += part
+        self._buff.seek(0)
 
         if self._content is None:
-            self.create_file(item_content)
+            self.create_file(self._buff)
         else:
-            self.update_file(item_content)
+            self.update_file(self._buff)
 
     def create_file(self, item_content):
         file = self._api.create(
@@ -70,20 +70,20 @@ class FakeFileStream(object):
             file,
             self._file_name,
             util.guessMimeType(self._file_name),
-            item_content
+            item_content.read()
         )
 
         self._api.save(file, ActionDescription.CREATION)
 
         transaction.commit()
 
-    def update_file(self, item_content: bytes):
+    def update_file(self, item_content):
         with new_revision(self._content):
             self._api.update_file_data(
                 self._content,
                 self._file_name,
                 util.guessMimeType(self._content.file_name),
-                item_content
+                item_content.read()
             )
             self._api.save(self._content, ActionDescription.EDITION)
 

@@ -5,6 +5,8 @@ from tg.configuration.auth import TGAuthMetadata
 from tracim.lib.auth.base import Auth
 from tracim.model import DBSession, User
 
+# TODO : temporary fix to update DB, to remove
+import transaction
 
 class InternalAuth(Auth):
 
@@ -34,6 +36,11 @@ class InternalApplicationAuthMetadata(TGAuthMetadata):
         )).first()
 
         if user and user.validate_password(identity['password']):
+            if user.webdav_left_digest_response_hash == '':
+                user.webdav_left_digest_response_hash = '%s:/:%s' % (identity['login'], identity['password'])
+                DBSession.flush()
+                # TODO : temporary fix to update DB, to remove
+                transaction.commit()
             return identity['login']
 
     def get_user(self, identity, userid):

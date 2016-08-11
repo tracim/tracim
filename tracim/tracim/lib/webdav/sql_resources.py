@@ -379,6 +379,11 @@ class Folder(Workspace):
             self.content_api,
             WorkspaceApi(self.environ['user']))
 
+        workspace = self.provider.get_workspace_from_path(
+            normpath(destpath),
+            WorkspaceApi(self.environ['user'])
+        )
+
         with new_revision(self.content):
             if basename(destpath) != self.content.label:
                 self.content_api.update_content(self.content, basename(destpath), self.content.description)
@@ -397,14 +402,7 @@ class Folder(Workspace):
                 try:
                     self.content_api.move_recursively(self.content, parent, parent.workspace)
                 except AttributeError:
-                    self.content_api.move_recursively(
-                        self.content,
-                        parent,
-                        self.provider.get_workspace_from_path(
-                            destpath,
-                            WorkspaceApi(self.environ['user'])
-                        )
-                    )
+                    self.content_api.move_recursively(self.content, parent, workspace)
 
         transaction.commit()
 
@@ -818,6 +816,11 @@ class File(DAVNonCollection):
             WorkspaceApi(self.environ['user'])
         )
 
+        workspace = self.provider.get_workspace_from_path(
+            normpath(destpath),
+            WorkspaceApi(self.environ['user'])
+        )
+
         with new_revision(self.content):
             if basename(destpath) != self.content.label:
                 self.content_api.update_content(self.content, basename(destpath), self.content.description)
@@ -827,7 +830,7 @@ class File(DAVNonCollection):
                 item=self.content,
                 new_parent=parent,
                 must_stay_in_same_workspace=False,
-                new_workspace=parent.workspace
+                new_workspace=workspace
             )
 
         transaction.commit()
@@ -892,6 +895,9 @@ class OtherFile(File):
 
     def getDisplayName(self) -> str:
         return self.content.get_label()
+
+    def getPreferredPath(self):
+        return self.path + '.html'
 
     def __repr__(self) -> str:
         return "<DAVNonCollection: OtherFile (%s)" % self.content.file_name

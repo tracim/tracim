@@ -328,6 +328,9 @@ class UserRestController(TIMRestController):
             # Setup a random password to send email at user
             password = str(uuid.uuid4())
             user.password = password
+
+        user.webdav_left_digest_response_hash = '%s:/:%s' % (email, password)
+
         api.save(user)
 
         # Now add the user to related groups

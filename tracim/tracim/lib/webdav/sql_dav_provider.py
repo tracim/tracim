@@ -61,6 +61,7 @@ class Provider(DAVProvider):
     #########################################################
     # Everything override from DAVProvider
     def getResourceInst(self, path, environ):
+        print("ok : ", path)
         #if not self.exists(path, environ):
         #    return None
         if not self.exists(path, environ):
@@ -178,6 +179,7 @@ class Provider(DAVProvider):
             return None
 
     def exists(self, path, environ):
+        print("ok (exist) : ", path)
         uapi = UserApi(None)
         environ['user'] = uapi.get_one_by_email(environ['http_authenticator.username'])
 
@@ -193,6 +195,7 @@ class Provider(DAVProvider):
         )
 
         if path == root_path:
+            print("ok (pass ici) : ", path)
             return True
         elif parent_path == root_path:
             return self.get_workspace_from_path(

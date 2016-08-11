@@ -14,6 +14,7 @@ from hashlib import sha256
 from slugify import slugify
 from sqlalchemy.ext.hybrid import hybrid_property
 from tg.i18n import lazy_ugettext as l_
+from hashlib import md5
 
 __all__ = ['User', 'Group', 'Permission']
 
@@ -121,6 +122,7 @@ class User(DeclarativeBase):
     created = Column(DateTime, default=datetime.now)
     is_active = Column(Boolean, default=True, nullable=False)
     imported_from = Column(Unicode(32), nullable=True)
+    _webdav_left_digest_response_hash = Column('webdav_left_digest_response_hash', Unicode(128))
 
     @hybrid_property
     def email_address(self):
@@ -196,6 +198,20 @@ class User(DeclarativeBase):
 
     password = synonym('_password', descriptor=property(_get_password,
                                                         _set_password))
+
+    @classmethod
+    def _hash_digest(cls, digest):
+        return md5(bytes(digest, 'utf-8')).hexdigest()
+
+    def _set_hash_digest(self, digest):
+        self._webdav_left_digest_response_hash = self._hash_digest(digest)
+
+    def _get_hash_digest(self):
+        return self._webdav_left_digest_response_hash
+
+    webdav_left_digest_response_hash = synonym('_webdav_left_digest_response_hash',
+                                               descriptor=property(_get_hash_digest,
+                                                                    _set_hash_digest))
 
     def validate_password(self, password):
         """
