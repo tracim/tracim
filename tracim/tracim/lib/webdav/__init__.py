@@ -60,11 +60,14 @@ class FakeFileStream(object):
             self.update_file(self._buff)
 
     def create_file(self, item_content):
+        is_temporary = self._file_name.startswith('.~') or self._file_name.startswith('~')
+
         file = self._api.create(
             content_type=ContentType.File,
             workspace=self._workspace,
-            parent=self._parent
-            )
+            parent=self._parent,
+            is_temporary=is_temporary
+        )
 
         self._api.update_file_data(
             file,

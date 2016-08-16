@@ -11,12 +11,18 @@ revision = 'b4b8d57b54e5'
 down_revision = '534c4594ed29'
 
 from alembic import op
-from sqlalchemy import Column, Unicode
+from sqlalchemy import Column, Unicode, Boolean
 
 
 def upgrade():
     op.add_column('users', Column('webdav_left_digest_response_hash', Unicode(128)))
-
+    op.add_column('content_revisions', Column('is_temporary', Boolean(), unique=False, nullable=True))
+    op.execute('''
+        UPDATE content_revisions
+        SET is_temporary = FALSE
+        ''')
+    op.alter_column('content_revisions', 'is_temporary', nullable=False)
 
 def downgrade():
     op.drop_column('users', 'webdav_left_digest_response_hash')
+    op.drop_column('content_revisions', 'is_temporary')

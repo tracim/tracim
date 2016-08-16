@@ -5,6 +5,7 @@ import re
 _logger = util.getModuleLogger(__name__, True)
 HOTFIX_WINXP_AcceptRootShareLogin = True
 
+
 class TracimHTTPAuthenticator(HTTPAuthenticator):
     def __init__(self, application, config):
         super(TracimHTTPAuthenticator, self).__init__(application, config)
@@ -58,7 +59,7 @@ class TracimHTTPAuthenticator(HTTPAuthenticator):
             # TODO: Chun added this comments, but code was commented out
             # Do not do realm checking - a hotfix for WinXP using some other realm's
             # auth details for this realm - if user/password match
-        print(authheaderdict.get("realm"), realmname)
+
         if 'realm' in authheaderdict:
             if authheaderdict["realm"].upper() != realmname.upper():
                 if HOTFIX_WINXP_AcceptRootShareLogin:

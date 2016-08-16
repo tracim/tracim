@@ -533,6 +533,7 @@ class ContentRevisionRO(DeclarativeBase):
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
+    is_temporary = Column(Boolean, unique=False, nullable=False, default=False)
     revision_type = Column(Unicode(32), unique=False, nullable=False, default='')
 
     workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), unique=False, nullable=True)
@@ -850,6 +851,18 @@ class Content(DeclarativeBase):
     @is_archived.expression
     def is_archived(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.is_archived
+
+    @hybrid_property
+    def is_temporary(self) -> bool:
+        return self.revision.is_temporary
+
+    @is_temporary.setter
+    def is_temporary(self, value: bool) -> None:
+        self.revision.is_temporary = value
+
+    @is_temporary.expression
+    def is_temporary(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.is_temporary
 
     @hybrid_property
     def revision_type(self) -> str:

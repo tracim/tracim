@@ -7,6 +7,7 @@ from os.path import normpath, dirname, basename
 import mimetypes
 
 from tracim.lib.content import ContentApi
+from tracim.lib.user import UserApi
 from tracim.lib.webdav import HistoryType
 from tracim.lib.webdav import FakeFileStream
 from tracim.lib.workspace import WorkspaceApi
@@ -14,13 +15,13 @@ from tracim.model import data, new_revision
 from tracim.model.data import Content, ActionDescription
 from tracim.model.data import ContentType
 from tracim.lib.webdav.design import designThread, designPage
-from tracim.lib.user import UserApi
 
 from wsgidav import compat
 from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
 from wsgidav.dav_provider import DAVCollection, DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
 
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 class Manage(object):
     """Objet qui sert à encapsuler l'exécution des actions de l'api archive/delete..."""
@@ -44,18 +45,17 @@ class Manage(object):
         self._new_name = self.make_name()
 
     def action(self):
-        """Exécute l'action"""
-        with new_revision(self.content):
-            self._actions[self._type](self.content)
+        try:
+            self.content_api.get_one_by_label_and_parent(self._new_name, self.content.parent, self.content.workspace)
+            raise DAVError(HTTP_FORBIDDEN)
+        except NoResultFound:
+            """Exécute l'action"""
+            with new_revision(self.content):
+                self.content_api.update_content(self.content, self._new_name)
+                self._actions[self._type](self.content)
+                self.content_api.save(self.content, self._type)
 
-            if self.content.label == '':
-                self.content.file_name = self._new_name
-            else:
-                self.content.label = self._new_name
-
-            self.content_api.save(self.content, self._type)
-
-        transaction.commit()
+            transaction.commit()
 
     def make_name(self):
         """Créer le nouveau nom : rajoute de - archive date / retrait de - archive date suivant l'action"""
@@ -63,12 +63,13 @@ class Manage(object):
         extension = ''
         is_file_name = self.content.label == ''
 
+
         if is_file_name:
-            extension = re.search(r'(\.[^.]*)', new_name).group(0)
-            new_name = re.sub(r'(\.[^.]*)', '', new_name)
+            extension = re.search(r'(\.[^.]+)$', new_name).group(0)
+            new_name = re.sub(r'(\.[^.]+)$', '', new_name)
 
         if self._type in [ActionDescription.ARCHIVING, ActionDescription.DELETION]:
-            new_name += ' - %s the %s' % (self._to_name[self._type], datetime.now())
+            new_name += ' - %s the %s' % (self._to_name[self._type], datetime.now().strftime('%d-%m-%Y at %H:%M'))
         else:
             new_name = re.sub(r'( - (%s|%s) the .*)$' % (self._to_name[ActionDescription.DELETION], self._to_name[ActionDescription.ARCHIVING]), '', new_name)
 
@@ -83,7 +84,8 @@ class Root(DAVCollection):
     def __init__(self, path: str, environ: dict):
         super(Root, self).__init__(path, environ)
 
-        self.workspace_api = WorkspaceApi(environ['user'])
+        self.user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
+        self.workspace_api = WorkspaceApi(self.user)
 
     def __repr__(self) -> str:
         return '<DAVCollection: Root>'
@@ -100,7 +102,7 @@ class Root(DAVCollection):
         """
         try:
             workspace = self.workspace_api.get_one_by_label(label)
-            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', workspace.label)
+            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', self.provider.transform_to_display(workspace.label))
 
             return Workspace(workspace_path, self.environ, workspace)
         except AttributeError:
@@ -122,11 +124,28 @@ class Root(DAVCollection):
         [For now] we don't allow to create new workspaces through
         webdav client. Though if we come to allow it, deleting the error's raise will
         make it possible."""
-        # TODO : remove comment here] raise DAVError(HTTP_FORBIDDEN)
+        # TODO : remove comment here
+        # raise DAVError(HTTP_FORBIDDEN)
 
         new_workspace = self.workspace_api.create_workspace(name)
         self.workspace_api.save(new_workspace)
+
+        workspace_path = '%s%s%s' % (
+        self.path, '' if self.path == '/' else '/', self.provider.transform_to_display(new_workspace.label))
+
         transaction.commit()
+        return Workspace(workspace_path, self.environ, new_workspace)
+
+    def getMemberList(self):
+        # De base on appellerait getMemberNames puis getMember, mais ça fait trop de requête alors on optimise :
+        # on fait une seule requête en BDD; get_all et voilà !
+
+        members = []
+        for workspace in self.workspace_api.get_all():
+            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', workspace.label)
+            members.append(Workspace(workspace_path, self.environ, workspace))
+
+        return members
 
 
 class Workspace(DAVCollection):
@@ -138,8 +157,9 @@ class Workspace(DAVCollection):
 
         self.workspace = workspace
         self.content = None
+        self.user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
 
-        self.content_api = ContentApi(UserApi(None).get_one_by_email(environ['http_authenticator.username']))
+        self.content_api = ContentApi(self.user, show_temporary=True)
 
         self._file_count = 0
 
@@ -147,7 +167,7 @@ class Workspace(DAVCollection):
         return "<DAVCollection: Workspace (%d)>" % self.workspace.workspace_id
 
     def getPreferredPath(self):
-        return self.provider.transform_to_display(self.path)
+        return self.path
 
     def getCreationDate(self) -> float:
         return mktime(self.workspace.created.timetuple())
@@ -177,7 +197,7 @@ class Workspace(DAVCollection):
     def getMember(self, content_label: str) -> _DAVResource:
 
         return self.provider.getResourceInst(
-            '%s/%s' % (self.path, content_label),
+            '%s/%s' % (self.path, self.provider.transform_to_display(content_label)),
             self.environ
         )
 
@@ -224,36 +244,44 @@ class Workspace(DAVCollection):
 
         transaction.commit()
 
-        return Folder('%s/%s' % (self.path, label), self.environ, folder, self.workspace)
+        return Folder('%s/%s' % (self.path, self.provider.transform_to_display(label)),
+                      self.environ, folder,
+                      self.workspace)
 
     def delete(self):
         """For now, it is not possible to delete a workspace through the webdav client."""
         raise DAVError(HTTP_FORBIDDEN)
 
-    def copyMoveSingle(self, destpath, ismove):
-        raise DAVError(HTTP_FORBIDDEN)
-
     def supportRecursiveMove(self, destpath):
-        # return False
         return True
 
     def moveRecursive(self, destpath):
-        if dirname(normpath(destpath)) == '/':
+        if dirname(normpath(destpath)) == self.provider.root:
             self.workspace.label = basename(normpath(destpath))
             transaction.commit()
         else:
             raise DAVError(HTTP_FORBIDDEN)
 
     def getMemberList(self) -> [_DAVResource]:
-        memberlist = []
+        members = []
+        parent_id = None if self.content is None else self.content.id
 
-        for name in self.getMemberNames():
-            member = self.getMember(name)
-            if member is not None:
-                memberlist.append(member)
+        childs = self.content_api.get_all(parent_id, ContentType.Any, self.workspace)
+
+        for content in childs:
+            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+
+            if content.type == ContentType.Folder:
+                members.append(Folder(content_path, self.environ, content, self.workspace))
+            elif content.type == ContentType.File:
+                self._file_count += 1
+                members.append(File(content_path, self.environ, content))
+            else:
+                self._file_count += 1
+                members.append(OtherFile(content_path, self.environ, content))
 
         if self._file_count > 0 and self.provider.show_history():
-            memberlist.append(
+            members.append(
                 HistoryFolder(
                     path=self.path + '/' + ".history",
                     environ=self.environ,
@@ -264,7 +292,7 @@ class Workspace(DAVCollection):
             )
 
         if self.provider.show_delete():
-            memberlist.append(
+            members.append(
                 DeletedFolder(
                     path=self.path + '/' + ".deleted",
                     environ=self.environ,
@@ -274,7 +302,7 @@ class Workspace(DAVCollection):
             )
 
         if self.provider.show_archive():
-            memberlist.append(
+            members.append(
                 ArchivedFolder(
                     path=self.path + '/' + ".archived",
                     environ=self.environ,
@@ -282,8 +310,7 @@ class Workspace(DAVCollection):
                     workspace=self.workspace
                 )
             )
-
-        return memberlist
+        return members
 
 
 class Folder(Workspace):
@@ -295,11 +322,6 @@ class Folder(Workspace):
         super(Folder, self).__init__(path, environ, workspace)
 
         self.content = content
-        self.path = self.provider.transform_to_display(self.path)
-
-        self.current_path = 'DELETED' if basename(dirname(path)) == '.deleted' \
-            else 'ARCHIVED' if basename(dirname(path)) == '.archived' \
-            else ''
 
     def __repr__(self) -> str:
         return "<DAVCollection: Folder (%s)>" % self.content.label
@@ -313,13 +335,9 @@ class Folder(Workspace):
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
-    def handleDelete(self):
-        Manage(ActionDescription.DELETION, self.content_api, self.content).action()
-        return True
-
     def delete(self):
-        raise DAVError(HTTP_FORBIDDEN)
-        
+        Manage(ActionDescription.DELETION, self.content_api, self.content).action()
+
     def supportRecursiveMove(self, destpath: str):
         return True
 
@@ -377,32 +395,33 @@ class Folder(Workspace):
         parent = self.provider.get_parent_from_path(
             normpath(destpath),
             self.content_api,
-            WorkspaceApi(self.environ['user']))
+            WorkspaceApi(self.user)
+        )
 
         workspace = self.provider.get_workspace_from_path(
             normpath(destpath),
-            WorkspaceApi(self.environ['user'])
+            WorkspaceApi(self.user)
         )
 
         with new_revision(self.content):
-            if basename(destpath) != self.content.label:
-                self.content_api.update_content(self.content, basename(destpath), self.content.description)
+            if basename(destpath) != self.getDisplayName():
+                self.content_api.update_content(self.content, self.provider.transform_to_bdd(basename(destpath)))
                 self.content_api.save(self.content)
-
-            try:
-                workspace_id = parent.workspace.workspace_id
-            except AttributeError:
-                workspace_id = self.provider.get_workspace_from_path(
-                    destpath, WorkspaceApi(self.environ['user'])
-                ).workspace_id
-
-            if workspace_id == self.content.workspace.workspace_id:
-                self.content_api.move(self.content, parent)
             else:
                 try:
-                    self.content_api.move_recursively(self.content, parent, parent.workspace)
+                    workspace_id = parent.workspace.workspace_id
                 except AttributeError:
-                    self.content_api.move_recursively(self.content, parent, workspace)
+                    workspace_id = self.provider.get_workspace_from_path(
+                        destpath, WorkspaceApi(self.user)
+                    ).workspace_id
+
+                if workspace_id == self.content.workspace.workspace_id:
+                    self.content_api.move(self.content, parent)
+                else:
+                    try:
+                        self.content_api.move_recursively(self.content, parent, parent.workspace)
+                    except AttributeError:
+                        self.content_api.move_recursively(self.content, parent, workspace)
 
         transaction.commit()
 
@@ -416,7 +435,7 @@ class HistoryFolder(Folder):
         self._is_deleted = type == HistoryType.Deleted
 
         self.content_api = ContentApi(
-            current_user=UserApi(None).get_one_by_email(environ['http_authenticator.username']),
+            current_user=self.user,
             show_archived=self._is_archived,
             show_deleted=self._is_deleted
         )
@@ -447,7 +466,8 @@ class HistoryFolder(Folder):
     def getMemberNames(self) -> [str]:
         ret = []
 
-        for content in self.content_api.get_all(self.content.id, ContentType.Any):
+        content_id = None if self.content is None else self.content.id
+        for content in self.content_api.get_all(content_id, ContentType.Any, self.workspace):
             if (self._is_archived and content.is_archived or
                 self._is_deleted and content.is_deleted or
                 not (content.is_archived or self._is_archived or content.is_deleted or self._is_deleted))\
@@ -475,22 +495,22 @@ class HistoryFolder(Folder):
         return True
 
     def getMemberList(self) -> [_DAVResource]:
-        memberlist = []
-        for name in self.getMemberNames():
-            member = self.getMember(name)
-            if member is not None:
-                memberlist.append(member)
-        return memberlist
+        members = []
+
+        parent_id = None if self.content is None else self.content.id
+
+        for content in self.content_api.get_all_with_filter(parent_id, ContentType.Any, self.workspace):
+            members.append(HistoryFileFolder(
+                path='%s/%s' % (self.path, content.get_label()),
+                environ=self.environ,
+                content=content))
+
+        return members
 
 
 class DeletedFolder(HistoryFolder):
     def __init__(self, path: str, environ: dict, workspace: data.Workspace, content: data.Content=None):
         super(DeletedFolder, self).__init__(path, environ, workspace, HistoryType.Deleted, content)
-
-        self.content_api = ContentApi(
-            current_user=environ['user'],
-            show_deleted=True
-        )
 
         self._file_count = 0
 
@@ -514,7 +534,7 @@ class DeletedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path='%s/%s' % (self.path, content.get_label()),
+            path='%s/%s' % (self.path, self.provider.transform_to_display(content.get_label())),
             environ=self.environ
             )
 
@@ -541,35 +561,39 @@ class DeletedFolder(HistoryFolder):
         raise DAVError(HTTP_FORBIDDEN)
 
     def getMemberList(self) -> [_DAVResource]:
-        memberlist = []
+        members = []
 
-        for name in self.getMemberNames():
-            member = self.getMember(name)
-            if member is not None:
-                memberlist.append(member)
+        parent_id = None if self.content is None else self.content.id
+
+        for content in self.content_api.get_all_with_filter(parent_id, ContentType.Any, self.workspace):
+            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+
+            if content.type == ContentType.Folder:
+                members.append(Folder(content_path, self.environ, content, self.workspace))
+            elif content.type == ContentType.File:
+                self._file_count += 1
+                members.append(File(content_path, self.environ, content))
+            else:
+                self._file_count += 1
+                members.append(OtherFile(content_path, self.environ, content))
 
         if self._file_count > 0 and self.provider.show_history():
-            memberlist.append(
+            members.append(
                 HistoryFolder(
                     path=self.path + '/' + ".history",
                     environ=self.environ,
                     content=self.content,
-                    type=HistoryType.Deleted,
-                    workspace=self.workspace
+                    workspace=self.workspace,
+                    type=HistoryType.Standard
                 )
             )
 
-        return memberlist
+        return members
 
 
 class ArchivedFolder(HistoryFolder):
     def __init__(self, path: str, environ: dict, workspace: data.Workspace, content: data.Content=None):
         super(ArchivedFolder, self).__init__(path, environ, workspace, HistoryType.Archived, content)
-
-        self.content_api = ContentApi(
-            current_user=environ['user'],
-            show_archived=True
-        )
 
         self._file_count = 0
 
@@ -593,20 +617,19 @@ class ArchivedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path=self.path + '/' + content.get_label(),
+            path=self.path + '/' + self.provider.transform_to_display(content.get_label()),
             environ=self.environ
-            )
+        )
 
     def getMemberNames(self) -> [str]:
         retlist = []
 
-        for content in self.content_api.get_all(
+        for content in self.content_api.get_all_with_filter(
                 self.content if self.content is None else self.content.id, ContentType.Any):
-            if content.is_archived:
-                retlist.append(content.get_label())
+            retlist.append(content.get_label())
 
-                if content.type != ContentType.Folder:
-                    self._file_count += 1
+            if content.type != ContentType.Folder:
+                self._file_count += 1
 
         return retlist
 
@@ -620,25 +643,34 @@ class ArchivedFolder(HistoryFolder):
         raise DAVError(HTTP_FORBIDDEN)
 
     def getMemberList(self) -> [_DAVResource]:
-        memberlist = []
+        members = []
 
-        for name in self.getMemberNames():
-            member = self.getMember(name)
-            if member is not None:
-                memberlist.append(member)
+        parent_id = None if self.content is None else self.content.id
+
+        for content in self.content_api.get_all_with_filter(parent_id, ContentType.Any, self.workspace):
+            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+
+            if content.type == ContentType.Folder:
+                members.append(Folder(content_path, self.environ, content, self.workspace))
+            elif content.type == ContentType.File:
+                self._file_count += 1
+                members.append(File(content_path, self.environ, content))
+            else:
+                self._file_count += 1
+                members.append(OtherFile(content_path, self.environ, content))
 
         if self._file_count > 0 and self.provider.show_history():
-            memberlist.append(
+            members.append(
                 HistoryFolder(
                     path=self.path + '/' + ".history",
                     environ=self.environ,
                     content=self.content,
-                    type=HistoryType.Archived,
-                    workspace=self.workspace
+                    workspace=self.workspace,
+                    type=HistoryType.Standard
                 )
             )
 
-        return memberlist
+        return members
 
 
 class HistoryFileFolder(HistoryFolder):
@@ -663,28 +695,29 @@ class HistoryFileFolder(HistoryFolder):
         )
 
     def getMemberNames(self) -> [int]:
+        """ Usually we would return a string, but here as it can be the same name because that's history, we get the id"""
         ret = []
 
         for content in self.content.revisions:
-            if content.revision_type in \
-                    [ActionDescription.CREATION, ActionDescription.EDITION, ActionDescription.REVISION]:
-                ret.append(content.revision_id)
+            ret.append(content.revision_id)
 
         return ret
 
     def getMember(self, item_id) -> DAVCollection:
 
         revision = self.content_api.get_one_revision(item_id)
-        
+
+        left_side = '%s/(%d - %s) ' % (self.path, revision.revision_id, revision.revision_type)
+
         if self.content.type == ContentType.File:
             return HistoryFile(
-                path=self.path + '/' + str(revision.revision_id) + '-' + revision.file_name,
+                path='%s%s' % (left_side, self.provider.transform_to_display(revision.file_name)),
                 environ=self.environ,
-                content=self.content, 
+                content=self.content,
                 content_revision=revision)
         else:
             return HistoryOtherFile(
-                path=self.path + '/' + str(revision.revision_id) + '-' + revision.get_label(),
+                path='%s%s' % (left_side, self.provider.transform_to_display(revision.get_label())),
                 environ=self.environ,
                 content=self.content,
                 content_revision=revision)
@@ -693,14 +726,28 @@ class HistoryFileFolder(HistoryFolder):
         raise DAVError(HTTP_FORBIDDEN)
 
     def getMemberList(self) -> [_DAVResource]:
-        memberlist = []
+        members = []
 
-        for name in self.getMemberNames():
-            member = self.getMember(name)
-            if member is not None:
-                memberlist.append(member)
+        for content in self.content.revisions:
 
-        return memberlist
+            left_side = '%s/(%d - %s) ' % (self.path, content.revision_id, content.revision_type)
+
+            if self.content.type == ContentType.File:
+                members.append(HistoryFile(
+                    path='%s%s' % (left_side, self.provider.transform_to_display(content.file_name)),
+                    environ=self.environ,
+                    content=self.content,
+                    content_revision=content)
+                )
+            else:
+                members.append(HistoryOtherFile(
+                    path='%s%s' % (left_side, self.provider.transform_to_display(content.file_name)),
+                    environ=self.environ,
+                    content=self.content,
+                    content_revision=content)
+                )
+
+        return members
 
 
 class File(DAVNonCollection):
@@ -708,18 +755,17 @@ class File(DAVNonCollection):
         super(File, self).__init__(path, environ)
 
         self.content = content
+        self.user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
+        self.content_api = ContentApi(self.user)
 
-        self.content_api = ContentApi(
-            current_user=environ['user'],
-            show_archived=True,
-            show_deleted=True
-        )
 
     def getPreferredPath(self):
-        if self.content.label == '' or self.path.endswith(mimetypes.guess_extension(self.getContentType())):
-            return self.provider.transform_to_display(self.path)
+        fix_txt = '.txt' if self.getContentType() == 'text/plain' else mimetypes.guess_extension(self.getContentType())
+
+        if self.content.label == '' or self.path.endswith(fix_txt):
+            return self.path
         else:
-            return self.provider.transform_to_display(self.path + mimetypes.guess_extension(self.getContentType()))
+            return self.path + fix_txt
 
     def __repr__(self) -> str:
         return "<DAVNonCollection: File (%d)>" % self.content.revision_id
@@ -734,8 +780,7 @@ class File(DAVNonCollection):
         return mktime(self.content.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return '%s%s' % (self.content.get_label(), '')
-        # ''.%s' % self.getContentType() if self.content.label != '' else '')
+        return self.content.get_label()
 
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
@@ -754,10 +799,6 @@ class File(DAVNonCollection):
             file_name=self.content.get_label(),
             workspace=self.content.workspace
         )
-
-    def copyMoveSingle(self, destpath: str, ismove: bool):
-        pass #if we use that to move items it'll first call delete function and we get exception about content not
-        # linked to a session, so for now we use moveRecursive
 
     def moveRecursive(self, destpath):
         """As we support recursive move, copymovesingle won't be called, though with copy it'll be called
@@ -813,25 +854,25 @@ class File(DAVNonCollection):
         parent = self.provider.get_parent_from_path(
             normpath(destpath),
             self.content_api,
-            WorkspaceApi(self.environ['user'])
+            WorkspaceApi(self.user)
         )
 
         workspace = self.provider.get_workspace_from_path(
             normpath(destpath),
-            WorkspaceApi(self.environ['user'])
+            WorkspaceApi(self.user)
         )
 
         with new_revision(self.content):
-            if basename(destpath) != self.content.label:
-                self.content_api.update_content(self.content, basename(destpath), self.content.description)
+            if basename(destpath) != self.getDisplayName():
+                self.content_api.update_content(self.content, re.sub('\.[^\.]+$', '', self.provider.transform_to_bdd(basename(destpath))))
                 self.content_api.save(self.content)
-
-            self.content_api.move(
-                item=self.content,
-                new_parent=parent,
-                must_stay_in_same_workspace=False,
-                new_workspace=workspace
-            )
+            else:
+                self.content_api.move(
+                    item=self.content,
+                    new_parent=parent,
+                    must_stay_in_same_workspace=False,
+                    new_workspace=workspace
+                )
 
         transaction.commit()
 
@@ -851,7 +892,8 @@ class HistoryFile(File):
         return "<DAVNonCollection: HistoryFile (%s-%s)" % (self.content.content_id, self.content.file_name)
 
     def getDisplayName(self) -> str:
-        return str(self.content_revision.revision_id) + '-' + self.content_revision.file_name
+        left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
+        return '%s%s' % (left_side, self.provider.transform_to_display(self.content_revision.file_name))
 
     def getContent(self):
         filestream = compat.BytesIO()
@@ -893,11 +935,17 @@ class OtherFile(File):
 
         self.content_designed = self.design()
 
+        # workaroung for consistent request as we have to return a resource with a path ending with .html
+        # when entering folder for windows, but only once because when we select it again it would have .html.html
+        # which is no good
+        if not self.path.endswith('.html'):
+            self.path += '.html'
+
     def getDisplayName(self) -> str:
         return self.content.get_label()
 
     def getPreferredPath(self):
-        return self.path + '.html'
+        return self.path
 
     def __repr__(self) -> str:
         return "<DAVNonCollection: OtherFile (%s)" % self.content.file_name
@@ -917,7 +965,7 @@ class OtherFile(File):
 
     def design(self):
         if self.content.type == ContentType.Page:
-            return designPage(self.content, self.content.revision)
+            return designPage(self.content, self.content_revision)
         else:
             return designThread(
                 self.content,
@@ -930,12 +978,14 @@ class HistoryOtherFile(OtherFile):
     def __init__(self, path: str, environ: dict, content: data.Content, content_revision: data.ContentRevisionRO):
         super(HistoryOtherFile, self).__init__(path, environ, content)
         self.content_revision = content_revision
+        self.content_designed = self.design()
 
     def __repr__(self) -> str:
         return "<DAVNonCollection: HistoryOtherFile (%s-%s)" % (self.content.file_name, self.content.id)
 
     def getDisplayName(self) -> str:
-        return str(self.content_revision.revision_id) + '-' + self.content_revision.get_label()
+        left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
+        return '%s%s' % (left_side, self.provider.transform_to_display(self.content_revision.get_label()))
 
     def getContent(self):
         filestream = compat.BytesIO()
@@ -963,10 +1013,3 @@ class HistoryOtherFile(OtherFile):
     def copyMoveSingle(self, destpath, ismove):
         raise DAVError(HTTP_FORBIDDEN)
 
-
-_CONTENTS = {
-    ContentType.Folder: Folder,
-    ContentType.File: File,
-    ContentType.Page: OtherFile,
-    ContentType.Thread: OtherFile
-}

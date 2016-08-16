@@ -66,7 +66,7 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
                        date,
                        event.owner.display_name,
                        '<i class="fa fa-caret-left"></i> shown' if event.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
-                       content_revision.label, event.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
+                       content.label, event.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
 
     histHTML += '</table>'
 
@@ -78,6 +78,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 	<link rel="stylesheet" href="/home/arnaud/Documents/css/style.css">
 	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
+	<script
+			  src="https://code.jquery.com/jquery-3.1.0.min.js"
+			  integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
+			  crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="left" class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
@@ -105,12 +109,13 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
     </div>
     <script type="text/javascript">
         window.onload = function() {
-            elems = document.getElementsByClassName('revision-link');
-            for(var i = 0; i<elems.length; i++) {
-                test = window.location.href
-                test += "/.." + elems[i].href.replace(/file:\/\//, "")
-                elems[i].href = test
-            }
+            file_location = window.location.href
+            file_location = file_location.replace(/\/[^/]*$/, '')
+            file_location = file_location.replace(/\/.history\/[^/]*$/, '')
+
+            $('.revision-link').each(function() {
+                $(this).attr('href', file_location + $(this).attr('href'))
+            });
         }
     </script>
 </body>
@@ -173,7 +178,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                     label = _LABELS[t.type.id]
 
                     disc += '''
-                    <div class="row comment comment-row to-hide">
+                    <div class="%s row comment comment-row to-hide">
                         <i class="fa %s comment-icon"></i>
                             <div class="comment-content">
                             <h5>
@@ -183,12 +188,13 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                             %s %s
                         </div>
                     </div>
-                    ''' % (t.type.icon,
+                    ''' % ('warning' if t.id == content_revision.revision_id else '',
+                           t.type.icon,
                            t.owner.display_name,
                            t.create_readable_date(),
                            label,
-                           '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
-                               content_revision.label,
+                            '<i class="fa fa-caret-left"></i> shown' if t.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
+                               content.label,
                                t.id,
                                t.ref_object.label) if t.type.id in ['revision', 'creation', 'edition'] else '')
 
@@ -230,12 +236,13 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
     </div>
     <script type="text/javascript">
         window.onload = function() {
-            elems = document.getElementsByClassName('revision-link');
-            for(var i = 0; i<elems.length; i++) {
-                test = window.location.href
-                test += "/.." + elems[i].href.replace(/file:\/\//, "")
-                elems[i].href = test
-            }
+            file_location = window.location.href
+            file_location = file_location.replace(/\/[^/]*$/, '')
+            file_location = file_location.replace(/\/.history\/[^/]*$/, '')
+
+            $('.revision-link').each(function() {
+                $(this).attr('href', file_location + $(this).attr('href'))
+            });
         }
 
         function hide_elements() {
@@ -246,6 +253,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                     $(elems[i]).hide();
                 }
                 while (elems.length>0) {
+                    $(elems[0]).removeClass('comment-row');
                     $(elems[0]).removeClass('to-hide');
                 }
                 $('#hideshow').addClass('fa-eye').removeClass('fa-eye-slash');
@@ -254,6 +262,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
             else {
                 elems = document.getElementsByClassName('to-show');
                 for(var i = 0; i<elems.length; i++) {
+                    $(elems[0]).addClass('comment-row');
                     $(elems[i]).addClass('to-hide');
                     $(elems[i]).show();
                 }

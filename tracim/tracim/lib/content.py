@@ -80,6 +80,7 @@ class ContentApi(object):
             current_user: User,
             show_archived=False,
             show_deleted=False,
+            show_temporary=False,
             all_content_in_treeview=True,
             force_show_all_types=False,
             disable_user_workspaces_filter=False,
@@ -88,6 +89,7 @@ class ContentApi(object):
         self._user_id = current_user.user_id if current_user else None
         self._show_archived = show_archived
         self._show_deleted = show_deleted
+        self._show_temporary = show_temporary
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
@@ -200,6 +202,9 @@ class ContentApi(object):
         if not self._show_archived:
             result = result.filter(Content.is_archived==False)
 
+        if not self._show_temporary:
+            result = result.filter(Content.is_temporary==False)
+
         return result
 
     def __revisions_real_base_query(self, workspace: Workspace=None):
@@ -230,6 +235,9 @@ class ContentApi(object):
         if not self._show_archived:
             result = result.filter(ContentRevisionRO.is_archived==False)
 
+        if not self._show_temporary:
+            result = result.filter(Content.is_temporary==False)
+
         return result
 
     def _hard_filtered_base_query(self, workspace: Workspace=None):
@@ -255,6 +263,12 @@ class ContentApi(object):
             result = result.join(parent, Content.parent).\
                 filter(Content.is_archived==False).\
                 filter(parent.is_archived==False)
+
+        if not self._show_temporary:
+            parent = aliased(Content)
+            result = result.join(parent, Content.parent). \
+                filter(Content.is_temporary == False). \
+                filter(parent.is_temporary == False)
 
         return result
 
@@ -302,7 +316,7 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', is_temporary:bool =False, do_save=False) -> Content:
         assert content_type in ContentType.allowed_types()
         content = Content()
         content.owner = self._user
@@ -310,6 +324,7 @@ class ContentApi(object):
         content.workspace = workspace
         content.type = content_type
         content.label = label
+        content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
 
         if do_save:
@@ -411,6 +426,25 @@ class ContentApi(object):
 
         if content_type!=ContentType.Any:
             resultset = resultset.filter(Content.type==content_type)
+
+        resultset = resultset.filter(Content.parent_id==parent_id)
+
+        return resultset.all()
+
+    # TODO find an other name to filter on is_deleted / is_archived
+    def get_all_with_filter(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
+        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
+        assert content_type is not None# DYN_REMOVE
+        assert isinstance(content_type, str) # DYN_REMOVE
+
+        resultset = self._base_query(workspace)
+
+        if content_type != ContentType.Any:
+            resultset = resultset.filter(Content.type==content_type)
+
+        resultset = resultset.filter(Content.is_deleted == self._show_deleted)
+        resultset = resultset.filter(Content.is_archived == self._show_archived)
+        resultset = resultset.filter(Content.is_temporary == self._show_temporary)
 
         resultset = resultset.filter(Content.parent_id==parent_id)
 

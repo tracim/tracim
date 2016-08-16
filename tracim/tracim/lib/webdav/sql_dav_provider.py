@@ -61,24 +61,21 @@ class Provider(DAVProvider):
     #########################################################
     # Everything override from DAVProvider
     def getResourceInst(self, path, environ):
-        print("ok : ", path)
         #if not self.exists(path, environ):
         #    return None
         if not self.exists(path, environ):
             return None
 
-        uapi = UserApi(None)
-        environ['user'] = uapi.get_one_by_email(environ['http_authenticator.username'])
-
         norm_path = normpath(path)
-        norm_path = self.transform_to_display(norm_path)
 
         root_path = environ['http_authenticator.realm']
         parent_path = dirname(norm_path)
 
-        workspace_api = WorkspaceApi(environ['user'])
+        user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
+
+        workspace_api = WorkspaceApi(user)
         content_api = ContentApi(
-            environ['user'],
+            user,
             show_archived=self._show_archive,
             show_deleted=self._show_delete
         )
@@ -155,47 +152,43 @@ class Provider(DAVProvider):
             )
 
         # is history
-        is_history_file = re.search(r'/\.history/[^/]+/(\d+)-.+', norm_path) is not None
+        is_history_file = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) .+', norm_path) is not None
 
         if self._show_history and is_history_file:
-            content_revision = content_api.get_one_revision(re.search(r'/\.history/[^/]+/(\d+)-.+', norm_path).group(1))
+            content_revision = content_api.get_one_revision(re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) .+', norm_path).group(1))
             content = self.get_content_from_revision(content_revision, content_api)
 
             if content.type == ContentType.File:
-                return sql_resources.HistoryFile(path, environ, content, content_revision)
+                return sql_resources.HistoryFile(norm_path, environ, content, content_revision)
             else:
-                return sql_resources.HistoryOtherFile(path, environ, content, content_revision)
+                return sql_resources.HistoryOtherFile(norm_path, environ, content, content_revision)
 
         # other
         if content is None:
             return None
         if content.type == ContentType.Folder:
-            return sql_resources.Folder(path, environ, content, content.workspace)
+            return sql_resources.Folder(norm_path, environ, content, content.workspace)
         elif content.type == ContentType.File:
-            return sql_resources.File(path, environ, content)
+            return sql_resources.File(norm_path, environ, content)
         elif content.type in [ContentType.Page, ContentType.Thread]:
-            return sql_resources.OtherFile(path, environ, content)
+            return sql_resources.OtherFile(norm_path, environ, content)
         else:
             return None
 
     def exists(self, path, environ):
-        print("ok (exist) : ", path)
-        uapi = UserApi(None)
-        environ['user'] = uapi.get_one_by_email(environ['http_authenticator.username'])
-
         norm_path = normpath(path)
         parent_path = dirname(norm_path)
         root_path = environ['http_authenticator.realm']
 
-        workspace_api = WorkspaceApi(environ['user'])
+        user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
+        workspace_api = WorkspaceApi(user)
         content_api = ContentApi(
-            current_user=environ['user'],
+            current_user=user,
             show_archived=True,
             show_deleted=True
         )
 
         if path == root_path:
-            print("ok (pass ici) : ", path)
             return True
         elif parent_path == root_path:
             return self.get_workspace_from_path(
@@ -207,7 +200,7 @@ class Provider(DAVProvider):
 
         is_deleted = re.search(r'/\.deleted/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$', norm_path) is not None
 
-        revision_id = re.search(r'/\.history/[^/]+/(\d+)-([^/].+)$', norm_path)
+        revision_id = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$', norm_path)
 
         blbl = self.reduce_path(norm_path)
         if dirname(blbl) == '/':
@@ -238,7 +231,7 @@ class Provider(DAVProvider):
         workspace = self.get_workspace_from_path(path, workspace_api)
 
         try:
-            if basename(dirname(path)) == workspace.label:
+            if dirname(dirname(path)) == '/':
                 return content_api.get_one_by_label_and_parent(
                     self.transform_to_bdd(basename(path)),
                     workspace=workspace
@@ -271,7 +264,7 @@ class Provider(DAVProvider):
 
     def transform_to_display(self, string):
         _TO_DISPLAY = {
-            # '/':'⁄',
+            '/':'⧸',
             '\\': '⧹',
             ':': '∶',
             '*': '∗',
@@ -289,7 +282,7 @@ class Provider(DAVProvider):
 
     def transform_to_bdd(self, string):
         _TO_BDD = {
-            # '⁄': '/',
+            '⧸': '/',
             '⧹': '\\',
             '∶': ':',
             '∗': '*',

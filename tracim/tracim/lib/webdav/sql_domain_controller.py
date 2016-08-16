@@ -37,11 +37,14 @@ class SQLDomainController(object):
     def get_left_digest_response_hash(self, realmname, username, environ):
         try:
             user = self._api.get_one_by_email(username)
+            environ['user_api'] = UserApi(user)
+            print("hey ! ", realmname)
             return user.webdav_left_digest_response_hash
         except:
             return None
 
     def authDomainUser(self, realmname, username, password, environ):
         '''Vérifier que l'utilisateur est valide pour ce domaine'''
+
         return self.isRealmUser(realmname, username, environ) and \
             self._api.get_one_by_email(username).validate_password(password)
