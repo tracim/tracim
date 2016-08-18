@@ -60,5 +60,6 @@ tracim/data/
 # Site-local config file
 development.ini
 track.js
+wsgidav.conf
 # Temporary files
 *~

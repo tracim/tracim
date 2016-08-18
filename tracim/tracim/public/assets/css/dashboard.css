@@ -372,3 +372,13 @@ span.info.readonly {
     font-size: 0.8em;
     opacity: 0.7;
 }
+
+@media(min-width: 768px) and (max-width: 992px) {
+    .download-file-button i.fa {
+        font-size: 12px;
+    }
+}
+
+.no-padding {
+    padding: 0px;
+}

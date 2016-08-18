@@ -79,9 +79,8 @@
 <div class="row">
     <% download_url = tg.url('/workspaces/{}/folders/{}/files/{}/download?revision_id={}'.format(result.file.workspace.id, result.file.parent.id,result.file.id,result.file.selected_revision)) %>
     <div class="col-sm-1 col-sm-offset-3">
-        <div class="t-half-spacer-above">
-            <img src="" style="width: 96px; border: 1px solid #999;"/>
-            <a style="margin-top: -116px; margin-left: 16px;" class="btn btn-default" tittle="${_('Download the file')}"
+        <div class="t-half-spacer-above download-file-button">
+            <a style="" class="btn btn-default" tittle="${_('Download the file')}"
                 href="${download_url}" >
                 ${ICON.FA_FW('fa fa-download fa-2x')}
             </a>

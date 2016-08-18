@@ -533,6 +533,7 @@ class ContentRevisionRO(DeclarativeBase):
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
+    is_temporary = Column(Boolean, unique=False, nullable=False, default=False)
     revision_type = Column(Unicode(32), unique=False, nullable=False, default='')
 
     workspace_id = Column(Integer, ForeignKey('workspaces.workspace_id'), unique=False, nullable=True)
@@ -852,6 +853,18 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.is_archived
 
     @hybrid_property
+    def is_temporary(self) -> bool:
+        return self.revision.is_temporary
+
+    @is_temporary.setter
+    def is_temporary(self, value: bool) -> None:
+        self.revision.is_temporary = value
+
+    @is_temporary.expression
+    def is_temporary(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.is_temporary
+
+    @hybrid_property
     def revision_type(self) -> str:
         return self.revision.revision_type
 
@@ -1007,30 +1020,6 @@ class Content(DeclarativeBase):
             delta_from_datetime = datetime.now()
         return format_timedelta(delta_from_datetime - datetime_object,
                                 locale=tg.i18n.get_lang()[0])
-
-
-    def extract_links_from_content(self, other_content: str=None) -> [LinkItem]:
-        """
-        parse html content and extract links. By default, it works on the description property
-        :param other_content: if not empty, then parse the given html content instead of description
-        :return: a list of LinkItem
-        """
-        links = []
-        return links
-        soup = BeautifulSoup(
-            self.description if not other_content else other_content,
-            'html.parser'  # Fixes hanging bug - http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
-        )
-
-        for link in soup.findAll('a'):
-            href = link.get('href')
-            label = link.contents
-            links.append(LinkItem(href, label))
-        links.sort(key=lambda link: link.href if link.href else '')
-
-        sorted_links = sorted(links, key=lambda link: link.label if link.label else link.href, reverse=True)
-        ## FIXME - Does this return a sorted list ???!
-        return sorted_links
 
     def get_child_nb(self, content_type: ContentType, content_status = ''):
         child_nb = 0
@@ -1203,7 +1192,8 @@ class VirtualEvent(object):
 
         label = content.get_label()
         if content.type==ContentType.Comment:
-            label = _('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
+            # todo :voir le _('.... si le _ est utile
+            label = ('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
 
         return VirtualEvent(id=content.content_id,
                             created=content.created,
@@ -1234,7 +1224,7 @@ class VirtualEvent(object):
         self.content = content
         self.ref_object = ref_object
 
-        print(type)
+        # todo moi ? print(type)
         assert hasattr(type, 'id')
         assert hasattr(type, 'css')
         assert hasattr(type, 'icon')
@@ -1245,3 +1235,28 @@ class VirtualEvent(object):
             delta_from_datetime = datetime.now()
         return format_timedelta(delta_from_datetime - self.created,
                                 locale=tg.i18n.get_lang()[0])
+
+    def create_readable_date(self, delta_from_datetime:datetime=None):
+        aff = ''
+
+        if not delta_from_datetime:
+            delta_from_datetime = datetime.now()
+
+        delta = delta_from_datetime - self.created
+        
+        if delta.days > 0:
+            if delta.days >= 365:
+                aff = '%d year%s ago' % (delta.days/365, 's' if delta.days/365>=2 else '')
+            elif delta.days >= 30:
+                aff = '%d month%s ago' % (delta.days/30, 's' if delta.days/30>=2 else '')
+            else:
+                aff = '%d day%s ago' % (delta.days, 's' if delta.days>=2 else '')
+        else:
+            if delta.seconds < 60:
+                aff = '%d second%s ago' % (delta.seconds, 's' if delta.seconds>1 else '')
+            elif delta.seconds/60 < 60:
+                aff = '%d minute%s ago' % (delta.seconds/60, 's' if delta.seconds/60>=2 else '')
+            else:
+                aff = '%d hour%s ago' % (delta.seconds/3600, 's' if delta.seconds/3600>=2 else '')
+
+        return aff

@@ -25,9 +25,6 @@
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
     ## This is the default left sidebar implementation
-    % if fake_api.current_user.profile.id>2:
-        ${LEFT_MENU.ADMIN('')}
-    % endif
     ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
 </%def>
 

@@ -1,4 +1,5 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
+<%namespace name="NAVBAR_MENU" file="tracim.templates.widgets.navbar_menu"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -24,7 +25,7 @@
     <body class="${self.body_class()}">
         <script src="${tg.url('/assets/js/jquery.min.js')}"></script>
 
-        <div class="container-fluid">
+        <div class="container-fluid ${container_classes()}">
             ${self.main_menu()}
             ${self.content_wrapper()}
             <div id="tracim-footer-separator"></div>
@@ -34,6 +35,9 @@
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
         ${CFG.TRACKER_JS_CONTENT|n}
     </body>
+
+
+<%def name="container_classes()"></%def>
 
 <%def name="content_wrapper()">
     ${TIM.FLASH_MSG('col-sm-11')}
@@ -107,6 +111,10 @@
                 % if request.identity:
                     <ul class="nav navbar-nav navbar-left">
                         <li class="active"><a href="${tg.url('/home')}">${TIM.FA('fa-home fa-lg')} ${_('My Home')}</a></li>
+                        % if fake_api.current_user.profile.id>2:
+                            ${NAVBAR_MENU.ADMIN_ITEMS()}
+                        % endif
+                        <li class=""><a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar fa-lg')} ${_('Calendar')}</a></li>
                     </ul>
                 % endif
 
