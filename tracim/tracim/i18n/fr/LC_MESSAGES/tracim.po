@@ -1694,7 +1694,7 @@ msgstr "Page créée le {date} à {time} par <b>{author}</b>"
 
 #: tracim/templates/page/getone.mak:60
 msgid "You are reading <b>an old revision</b> of the current page. (the shown revision is r{})."
-msgstr "Vous consultez <b>une ancienne version</b> de al page courante. (la version affichée est la v{})."
+msgstr "Vous consultez <b>une ancienne version</b> de la page courante. (la version affichée est la v{})."
 
 #: tracim/templates/page/getone.mak:72 tracim/templates/thread/getone.mak:61
 msgid "<b>This information is deprecated</b>"

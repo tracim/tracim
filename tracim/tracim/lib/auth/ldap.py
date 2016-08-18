@@ -4,6 +4,7 @@ from tg.configuration.auth import TGAuthMetadata
 from who_ldap import LDAPAttributesPlugin as BaseLDAPAttributesPlugin, make_connection
 from who_ldap import LDAPGroupsPlugin as BaseLDAPGroupsPlugin
 from who_ldap import LDAPSearchAuthenticatorPlugin as BaseLDAPSearchAuthenticatorPlugin
+from sqlalchemy import and_
 
 from tracim.lib.auth.base import Auth
 from tracim.lib.exception import ConfigurationError
@@ -89,11 +90,26 @@ class LDAPSearchAuthenticatorPlugin(BaseLDAPSearchAuthenticatorPlugin):
     def set_auth(self, auth):
         self._auth = auth
 
-    def authenticate(self, environ, identity):
+    def authenticate(self, environ, identity, allow_auth_token: bool=False):
         # Note: super().authenticate return None if already authenticated or not found
         email = super().authenticate(environ, identity)
+
         if email:
             self._sync_ldap_user(email, environ, identity)
+
+        if not email and allow_auth_token and self.user_exist(email):
+            # Proceed to internal token auth
+            user = self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(
+                and_(
+                    self.sa_auth.user_class.is_active == True,
+                    self.sa_auth.user_class.email == identity['login']
+                )
+            ).first()
+            if user:
+                user.ensure_auth_token()
+                if user.auth_token == identity['password']:
+                    email = identity['login']
+
         return email
 
     def _sync_ldap_user(self, email, environ, identity):

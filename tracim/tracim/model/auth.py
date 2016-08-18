@@ -8,8 +8,11 @@ It's perfectly fine to re-use this definition in the tracim application,
 though.
 
 """
+import uuid
+
 import os
 from datetime import datetime
+import time
 from hashlib import sha256
 from slugify import slugify
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -123,6 +126,8 @@ class User(DeclarativeBase):
     is_active = Column(Boolean, default=True, nullable=False)
     imported_from = Column(Unicode(32), nullable=True)
     _webdav_left_digest_response_hash = Column('webdav_left_digest_response_hash', Unicode(128))
+    auth_token = Column(Unicode(255))
+    auth_token_created = Column(DateTime)
 
     @hybrid_property
     def email_address(self):
@@ -252,6 +257,31 @@ class User(DeclarativeBase):
 
         from tracim.model.data import UserRoleInWorkspace
         return UserRoleInWorkspace.NOT_APPLICABLE
+
+    def ensure_auth_token(self) -> None:
+        """
+        Create auth_token if None, regenerate auth_token if too much old.
+        auth_token validity is set in
+        :return:
+        """
+        from tracim.config.app_cfg import CFG
+        validity_seconds = CFG.get_instance().USER_AUTH_TOKEN_VALIDITY
+
+        if not self.auth_token or not self.auth_token_created:
+            self.auth_token = uuid.uuid4()
+            self.auth_token_created = datetime.utcnow()
+            DBSession.flush()
+            return
+
+        now_seconds = time.mktime(datetime.utcnow().timetuple())
+        auth_token_seconds = time.mktime(self.auth_token_created.timetuple())
+        difference = now_seconds - auth_token_seconds
+
+        if difference > validity_seconds:
+            self.auth_token = uuid.uuid4()
+            self.auth_token_created = datetime.utcnow()
+            DBSession.flush()
+
 
 class Permission(DeclarativeBase):
     """

@@ -15,6 +15,10 @@ def authorized(user, collection, permission):
         return False
     current_user = UserApi(None).get_one_by_email(user)
     manager = CalendarManager(current_user)
+
+    if manager.is_discovery_path(collection.path):
+        return True
+
     try:
         calendar = manager.find_calendar_with_path(collection.path)
     except NotFound:

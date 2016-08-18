@@ -58,7 +58,9 @@ class AppContextCommand(BaseCommand):
         sys.path.insert(0, here_dir)
 
         # Load the wsgi app first so that everything is initialized right
-        wsgi_app = loadapp(config_name, relative_to=here_dir)
+        wsgi_app = loadapp(config_name, relative_to=here_dir, global_conf={
+            'disable_daemons': 'true',
+        })
         test_app = TestApp(wsgi_app)
 
         # Make available the tg.request and other global variables

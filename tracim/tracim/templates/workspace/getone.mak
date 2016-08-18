@@ -108,7 +108,7 @@
             <div class="collapse" id="calendarConfig">
                 <p>${_('You can access the calendar using your own software: Outlook, Thunderbird, etc.')}</p>
                 <p>${_('The url to setup is the following one:')}</p>
-                <p class="form-control">${result.workspace.calendar_url}"</p>
+                <p class="form-control">${result.workspace.calendar_url}</p>
             </div>
         % endif
 
