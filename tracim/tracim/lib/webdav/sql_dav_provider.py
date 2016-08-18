@@ -1,41 +1,29 @@
 # coding: utf8
 
-from tracim.lib.webdav import HistoryType
-from tracim.lib.webdav.lock_storage import LockStorage
-
 import re
 from os.path import basename, dirname, normpath
-from tracim.lib.content import ContentApi
-from tracim.lib.webdav import sql_resources
-from tracim.lib.user import UserApi
-from tracim.lib.workspace import WorkspaceApi
-from wsgidav import util
+
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
+
+from tracim.lib.webdav import HistoryType, SpecialFolderExtension
+from tracim.lib.webdav import sql_resources
+from tracim.lib.webdav.lock_storage import LockStorage
+
+from tracim.lib.content import ContentApi
+from tracim.lib.content import ContentRevisionRO
+from tracim.lib.user import UserApi
+from tracim.lib.workspace import WorkspaceApi
+from tracim.model.data import Content, Workspace
 from tracim.model.data import ContentType
 
-from tracim.lib.content import ContentRevisionRO
-######################################
 
-__docformat__ = "reStructuredText"
-_logger = util.getModuleLogger(__name__)
-
-
-def wsgi_decode(s):
-    return s.encode('latin1').decode()
-
-def wsgi_encode(s):
-    if isinstance(s, bytes):
-        return s.decode('latin1')
-    return s.encode().decode('latin1')
-
-
-
-
-# ============================================================
-# PostgreSQLProvider
-# ============================================================
 class Provider(DAVProvider):
+    """
+    This class' role is to provide to wsgidav _DAVResource. Wsgidav will then use them to execute action and send
+    informations to the client
+    """
+
     def __init__(self, show_history=True, show_deleted=True, show_archived=True, manage_locks=True):
         super(Provider, self).__init__()
 
@@ -55,168 +43,180 @@ class Provider(DAVProvider):
     def show_archive(self):
         return self._show_archive
 
-    def __repr__(self):
-        return 'Provider'
-
     #########################################################
     # Everything override from DAVProvider
-    def getResourceInst(self, path, environ):
-        #if not self.exists(path, environ):
-        #    return None
-        if not self.exists(path, environ):
-            return None
-
-        norm_path = normpath(path)
-
+    def getResourceInst(self, path: str, environ: dict):
+        """
+        Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
+        """
+        path = normpath(path)
         root_path = environ['http_authenticator.realm']
-        parent_path = dirname(norm_path)
+
+        # If the requested path is the root, then we return a Root resource
+        if path == root_path:
+            return sql_resources.Root(path, environ)
 
         user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
-
         workspace_api = WorkspaceApi(user)
+        workspace = self.get_workspace_from_path(path, workspace_api)
+
+        # If the request path is in the form root/name, then we return a Workspace resource
+        parent_path = dirname(path)
+        if parent_path == root_path:
+            return sql_resources.Workspace(path, environ, workspace)
+
+        # And now we'll work on the path to establish which type or resource is requested
+
         content_api = ContentApi(
             user,
             show_archived=self._show_archive,
             show_deleted=self._show_delete
         )
 
-        # case we're requesting the root racine of webdav
-        if path == root_path:
-            return sql_resources.Root(path, environ)
-        # case we're at the root racine of a workspace
-        elif parent_path == root_path:
-            return sql_resources.Workspace(
-                path=norm_path,
-                environ=environ,
-                workspace=self.get_workspace_from_path(
-                    norm_path,
-                    workspace_api
-                )
-            )
-
         content = self.get_content_from_path(
-            path=norm_path,
+            path=path,
             content_api=content_api,
-            workspace_api=workspace_api
+            workspace=workspace
         )
 
-        # is archive
-        is_archived_folder = re.search(r'/\.archived$', norm_path) is not None
 
-        if self._show_archive and is_archived_folder:
-            return sql_resources.ArchivedFolder(
-                path=norm_path,
-                environ=environ,
-                content=content,
-                workspace=self.get_workspace_from_path(norm_path, workspace_api)
-            )
+        # Easy cases : path either end with /.deleted, /.archived or /.history, then we return corresponding resources
+        if path.endswith(SpecialFolderExtension.Archived) and self._show_archive:
+            return sql_resources.ArchivedFolder(path, environ, workspace, content)
 
-        # is delete
-        is_deleted_folder = re.search(r'/\.deleted$', norm_path) is not None
+        if path.endswith(SpecialFolderExtension.Deleted) and self._show_delete:
+            return sql_resources.DeletedFolder(path, environ, workspace, content)
 
-        if self._show_delete and is_deleted_folder:
-            return sql_resources.DeletedFolder(
-                path=norm_path,
-                environ=environ,
-                content=content,
-                workspace=self.get_workspace_from_path(norm_path, workspace_api)
-            )
-
-        # is history
-        is_history_folder = re.search(r'/\.history$', norm_path) is not None
-
-        if self._show_history and is_history_folder:
-            is_deleted_folder = re.search(r'/\.deleted/\.history$', norm_path) is not None
-            is_archived_folder = re.search(r'/\.archived/\.history$', norm_path) is not None
+        if path.endswith(SpecialFolderExtension.History) and self._show_history:
+            is_deleted_folder = re.search(r'/\.deleted/\.history$', path) is not None
+            is_archived_folder = re.search(r'/\.archived/\.history$', path) is not None
 
             type = HistoryType.Deleted if is_deleted_folder \
                 else HistoryType.Archived if is_archived_folder \
                 else HistoryType.Standard
 
-            return sql_resources.HistoryFolder(
-                path=norm_path,
-                environ=environ,
-                content=content,
-                type=type,
-                workspace=self.get_workspace_from_path(norm_path, workspace_api)
-            )
+            return sql_resources.HistoryFolder(path, environ, workspace, content, type)
 
-        # is history
-        is_history_file_folder = re.search(r'/\.history/([^/]+)$', norm_path) is not None
+        # Now that's more complicated, we're trying to find out if the path end with /.history/file_name
+        is_history_file_folder = re.search(r'/\.history/([^/]+)$', path) is not None
 
-        if self._show_history and is_history_file_folder:
+        if is_history_file_folder and self._show_history:
             return sql_resources.HistoryFileFolder(
-                path=norm_path,
+                path=path,
                 environ=environ,
                 content=content
             )
 
-        # is history
-        is_history_file = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) .+', norm_path) is not None
+        # And here next step :
+        is_history_file = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) .+', path) is not None
 
         if self._show_history and is_history_file:
-            content_revision = content_api.get_one_revision(re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) .+', norm_path).group(1))
+
+            revision_id = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$', path).group(1)
+
+            content_revision = content_api.get_one_revision(revision_id)
             content = self.get_content_from_revision(content_revision, content_api)
 
             if content.type == ContentType.File:
-                return sql_resources.HistoryFile(norm_path, environ, content, content_revision)
+                return sql_resources.HistoryFile(path, environ, content, content_revision)
             else:
-                return sql_resources.HistoryOtherFile(norm_path, environ, content, content_revision)
+                return sql_resources.HistoryOtherFile(path, environ, content, content_revision)
 
-        # other
+        # And if we're still going, the client is asking for a standard Folder/File/Page/Thread so we check the type7
+        # and return the corresponding resource
+
         if content is None:
             return None
         if content.type == ContentType.Folder:
-            return sql_resources.Folder(norm_path, environ, content, content.workspace)
+            return sql_resources.Folder(path, environ, content.workspace, content)
         elif content.type == ContentType.File:
-            return sql_resources.File(norm_path, environ, content)
-        elif content.type in [ContentType.Page, ContentType.Thread]:
-            return sql_resources.OtherFile(norm_path, environ, content)
+            return sql_resources.File(path, environ, content)
         else:
-            return None
+            return sql_resources.OtherFile(path, environ, content)
 
-    def exists(self, path, environ):
-        norm_path = normpath(path)
-        parent_path = dirname(norm_path)
+    def exists(self, path, environ) -> bool:
+        """
+        Called by wsgidav to check if a certain path is linked to a _DAVResource
+        """
+
+        path = normpath(path)
+        working_path = self.reduce_path(path)
         root_path = environ['http_authenticator.realm']
-
-        user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
-        workspace_api = WorkspaceApi(user)
-        content_api = ContentApi(
-            current_user=user,
-            show_archived=True,
-            show_deleted=True
-        )
+        parent_path = dirname(working_path)
 
         if path == root_path:
             return True
-        elif parent_path == root_path:
-            return self.get_workspace_from_path(
-                    norm_path,
-                    workspace_api
-                ) is not None
 
-        is_archived = re.search(r'/\.archived/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$', norm_path) is not None
+        user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
 
-        is_deleted = re.search(r'/\.deleted/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$', norm_path) is not None
+        workspace = self.get_workspace_from_path(path, WorkspaceApi(user))
 
-        revision_id = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$', norm_path)
+        if parent_path == root_path:
+            return workspace is not None
 
-        blbl = self.reduce_path(norm_path)
-        if dirname(blbl) == '/':
-            return self.get_workspace_from_path(norm_path, workspace_api) is not None
+        content_api = ContentApi(user, show_archived=True, show_deleted=True)
+
+        revision_id = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$', path)
+
+        is_archived = self.is_path_archive(path)
+
+        is_deleted = self.is_path_delete(path)
 
         if revision_id:
             revision_id = revision_id.group(1)
             content = content_api.get_one_revision(revision_id)
         else:
-            content = self.get_content_from_path(norm_path, content_api, workspace_api)
+            content = self.get_content_from_path(working_path, content_api, workspace)
 
         return content is not None \
             and content.is_deleted == is_deleted \
             and content.is_archived == is_archived
 
-    def reduce_path(self, path):
+    def is_path_archive(self, path):
+        """
+        This function will check if a given path is linked to a file that's archived or not. We're checking if the
+        given path end with one of these string :
+
+        ex:
+            - /a/b/.archived/my_file
+            - /a/b/.archived/.history/my_file
+            - /a/b/.archived/.history/my_file/(3615 - edition) my_file
+        """
+
+        return re.search(
+            r'/\.archived/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$',
+            path
+        ) is not None
+
+    def is_path_delete(self, path):
+        """
+        This function will check if a given path is linked to a file that's deleted or not. We're checking if the
+        given path end with one of these string :
+
+        ex:
+            - /a/b/.deleted/my_file
+            - /a/b/.deleted/.history/my_file
+            - /a/b/.deleted/.history/my_file/(3615 - edition) my_file
+        """
+
+        return re.search(
+            r'/\.deleted/(\.history/)?(?!\.history)[^/]*(/\.)?(history|deleted|archived)?$',
+            path
+        ) is not None
+
+    def reduce_path(self, path: str) -> str:
+        """
+        As we use the given path to request the database
+
+        ex: if the path is /a/b/.deleted/c/.archived, we're trying to get the archived content of the 'c' resource,
+        we need to keep the path /a/b/c
+
+        ex: if the path is /a/b/.history/my_file, we're trying to get the history of the file my_file, thus we need
+        the path /a/b/my_file
+
+        ex: if the path is /a/b/.history/my_file/(1985 - edition) my_old_name, we're looking for,
+        thus we remove all useless information
+        """
         path = re.sub(r'/\.archived', r'', path)
         path = re.sub(r'/\.deleted', r'', path)
         path = re.sub(r'/\.history/[^/]+/(\d+)-.+', r'/\1', path)
@@ -225,44 +225,50 @@ class Provider(DAVProvider):
 
         return path
 
-    def get_content_from_path(self, path, content_api: ContentApi, workspace_api: WorkspaceApi):
+    def get_content_from_path(self, path, content_api: ContentApi, workspace: Workspace) -> Content:
+        """
+        Called whenever we want to get the Content item from the database for a given path
+        """
         path = self.reduce_path(path)
+        parent_path = dirname(path)
 
-        workspace = self.get_workspace_from_path(path, workspace_api)
+        blbl = parent_path.replace('/'+workspace.label, '')
+
+        parents = blbl.split('/')
+
+        parents.remove('')
+        parents = [self.transform_to_bdd(x) for x in parents]
 
         try:
-            if dirname(dirname(path)) == '/':
-                return content_api.get_one_by_label_and_parent(
-                    self.transform_to_bdd(basename(path)),
-                    workspace=workspace
-                )
-            else:
-                parent = self.get_parent_from_path(path, content_api, workspace_api)
-                if parent is not None:
-                    return content_api.get_one_by_label_and_parent(self.transform_to_bdd(basename(path)), content_parent=parent)
-                return None
+            return content_api.get_one_by_label_and_parent_label(
+                self.transform_to_bdd(basename(path)),
+                parents,
+                workspace
+            )
         except:
             return None
 
-    def get_content_from_revision(self, revision: ContentRevisionRO, api:ContentApi):
+    def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:
             return api.get_one(revision.content_id, ContentType.Any)
         except:
             return None
 
-    def get_parent_from_path(self, path, api: ContentApi, workspace_api: WorkspaceApi):
+    def get_parent_from_path(self, path, api: ContentApi, workspace) -> Content:
+        return self.get_content_from_path(dirname(path), api, workspace)
 
-        return self.get_content_from_path(dirname(path), api, workspace_api)
-
-    def get_workspace_from_path(self, path: str, api: WorkspaceApi):
-        assert path.startswith('/')
-
+    def get_workspace_from_path(self, path: str, api: WorkspaceApi) -> Workspace:
         try:
             return api.get_one_by_label(self.transform_to_bdd(path.split('/')[1]))
         except:
             return None
 
     def transform_to_display(self, string):
+        """
+        As characters that Windows does not support may have been inserted through Tracim in names, before displaying
+        information we update path so that all these forbidden characters are replaced with similar shape character
+        that are allowed so that the user isn't trouble and isn't limited in his naming choice
+        """
         _TO_DISPLAY = {
             '/':'⧸',
             '\\': '⧹',
@@ -281,6 +287,9 @@ class Provider(DAVProvider):
         return string
 
     def transform_to_bdd(self, string):
+        """
+        Called before sending request to the database to recover the right names
+        """
         _TO_BDD = {
             '⧸': '/',
             '⧹': '\\',
@@ -297,59 +306,3 @@ class Provider(DAVProvider):
             string = string.replace(key, value)
 
         return string
-
-
-"""
-
-{'wsgidav.dump_request_body': False,
- 'wsgi.run_once': False,
- 'wsgi.multiprocess': False,
- 'wsgi.multithread': True,
- 'QUERY_STRING': '',
- 'REQUEST_URI': b'/nouveau/',
- 'wsgidav.dump_response_body': False,
- 'SERVER_PROTOCOL': 'HTTP/1.1',
- 'REMOTE_ADDR': '127.0.0.1',
- 'wsgidav.verbose': 1,
- 'wsgi.version': (1, 0),
- 'wsgidav.config': {
-     'middleware_stack':[],
-                       'propsmanager': None,
-                       'add_header_MS_Author_Via': True,
-                       'acceptbasic': True,
-                       'user_mapping': {},
-                       'enable_loggers': [],
-                       'locksmanager': True,
-                       'mount_path': None,
-                       'catchall': False,
-                       'unquote_path_info': False,
-                       'provider_mapping': {'': Provider},
-                       'port': 3030,
-                       'Provider': [],
-                       'verbose': 1,
-                       'SQLDomainController': [],
-                       'domaincontroller': [],
-     'acceptdigest': True,
-     'dir_browser': {
-         'ms_sharepoint_urls': False,
-         'ms_mount': False,
-         'davmount': False,
-         'enable': True,
-         'ms_sharepoint_plugin': True,
-         'response_trailer': ''
-     },
-     'defaultdigest': True,
-     'host': '0.0.0.0',
-     'ext_servers': ['cherrypy-bundled', 'wsgidav']
- },
- 'http_authenticator.realm': '/',
- 'HTTP_AUTHORIZATION': 'Digest username="admin@admin.admin",
- realm="/", nonce="=",
- uri="/nouveau/",
- algorithm=MD5,
- response="9c78c484263409b3385ead95ea7bf65b", '
- 'cnonce="MHgyMzNkZjkwOjQ4OTU6MTQ2OTc3OTI1NQ==", nc=00000471, qop=auth',
- 'HTTP_ACCEPT_ENCODING': 'gzip, deflate',
- 'HTTP_USER_AGENT': 'gvfs/1.22.2', 'wsgidav.debug_break': False,
- 'HTTP_CONNECTION': 'Keep-Alive', 'SERVER_PORT': '3030', 'CONTENT_LENGTH': '235', 'HTTP_HOST': '127.0.0.1:3030', 'REQUEST_METHOD': 'PROPFIND', 'HTTP_APPLY_TO_REDIRECT_REF': 'T', 'SERVER_NAME': 'WsgiDAV/3.0.0pre1 CherryPy/3.2.4 Python/3.4.2', 'wsgi.errors': <_io.TextIOWrapper name='<stderr>' mode='w' encoding='UTF-8'>, 'wsgi.url_scheme': 'http', 'user': <User: email='admin@admin.admin', display='Global manager'>, 'HTTP_ACCEPT_LANGUAGE': 'en-us, en;q=0.9', 'ACTUAL_SERVER_PROTOCOL': 'HTTP/1.1', 'REMOTE_PORT': '48375', 'CONTENT_TYPE': 'application/xml', 'SCRIPT_NAME': '', 'wsgi.input': <wsgidav.server.cherrypy.wsgiserver.wsgiserver3.KnownLengthRFile object at 0x7fbc8410ce48>, 'wsgidav.username': 'admin@admin.admin', 'http_authenticator.username': 'admin@admin.admin', 'wsgidav.provider': Provider, 'PATH_INFO': '/nouveau/', 'HTTP_DEPTH': '1', 'SERVER_SOFTWARE': 'WsgiDAV/3.0.0pre1 CherryPy/3.2.4 Python/3.4.2 Server'}
-"""

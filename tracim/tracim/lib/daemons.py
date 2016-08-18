@@ -231,7 +231,7 @@ from wsgidav.wsgidav_app import WsgiDAVApp
 from wsgidav._version import __version__
 
 from tracim.lib.webdav.sql_dav_provider import Provider
-from tracim.lib.webdav.sql_domain_controller import SQLDomainController
+from tracim.lib.webdav.sql_domain_controller import TracimDomainController
 
 from inspect import isfunction
 import traceback
@@ -239,17 +239,6 @@ import traceback
 DEFAULT_CONFIG_FILE = "wsgidav.conf"
 PYTHON_VERSION = "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
-def _get_checked_path(path, mustExist=True, allowNone=True):
-    """Convert path to absolute if not None."""
-    if path in (None, ""):
-        if allowNone:
-            return None
-        else:
-            raise ValueError("Invalid path %r" % path)
-    path = os.path.abspath(path)
-    if mustExist and not os.path.exists(path):
-        raise ValueError("Invalid path %r" % path)
-    return path
 
 class WsgiDavDaemon(Daemon):
 
@@ -280,19 +269,16 @@ class WsgiDavDaemon(Daemon):
 
         config['middleware_stack'] = [ WsgiDavDirBrowser, TracimHTTPAuthenticator, ErrorPrinter, WsgiDavDebugFilter ]
 
-        config['provider_mapping'] = \
-            {
-                config['root_path']: Provider(
-                    show_archived=config['show_archived'],
-                    show_deleted=config['show_deleted'],
-                    show_history=config['show_history'],
-                    manage_locks=config['manager_locks']
-                )
-            }
+        config['provider_mapping'] = {
+            config['root_path']: Provider(
+                show_archived=config['show_archived'],
+                show_deleted=config['show_deleted'],
+                show_history=config['show_history'],
+                manage_locks=config['manager_locks']
+            )
+        }
 
-        config['domaincontroller'] = SQLDomainController(presetdomain=None, presetserver=None)
-        config['defaultdigest'] = True
-        config['acceptdigest'] = True
+        config['domaincontroller'] = TracimDomainController(presetdomain=None, presetserver=None)
 
         return config
 

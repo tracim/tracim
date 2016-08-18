@@ -1,11 +1,11 @@
-from tracim.model.data import VirtualEvent
-from tracim.model import data
-from tracim.model.data import ContentType
+#coding: utf8
 from datetime import datetime
 
-def create_readable_date(created, delta_from_datetime: datetime = None):
-    aff = ''
+from tracim.model.data import VirtualEvent
+from tracim.model.data import ContentType
+from tracim.model import data
 
+def create_readable_date(created, delta_from_datetime: datetime = None):
     if not delta_from_datetime:
         delta_from_datetime = datetime.now()
 
@@ -29,9 +29,9 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
     return aff
 
 def designPage(content: data.Content, content_revision: data.ContentRevisionRO) -> str:
-    # f = open('wsgidav/addons/webdav/style.css', 'r')
-    style = ''  # f.read()
-    # f.close()
+    f = open('tracim/lib/webdav/style.css', 'r')
+    style = f.read()
+    f.close()
 
     hist = content.get_history()
     histHTML = '<table class="table table-striped table-hover">'
@@ -65,8 +65,8 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
                        label,
                        date,
                        event.owner.display_name,
-                       '<i class="fa fa-caret-left"></i> shown' if event.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
-                       content.label, event.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
+                       '<i class="fa fa-caret-left"></i> shown' if event.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/(%s - %s) %s.html">(View revision)</a></span>''' % (
+                       content.label, event.id, event.type.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
 
     histHTML += '</table>'
 
@@ -76,7 +76,7 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
 	<title>%s</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="/home/arnaud/Documents/css/style.css">
+	<style>%s</style>
 	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
 	<script
 			  src="https://code.jquery.com/jquery-3.1.0.min.js"
@@ -121,6 +121,7 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
 </body>
 </html>
         ''' % (content_revision.label,
+               style,
                content_revision.label,
                content.created.strftime("%B %d, %Y at %H:%m"),
                content.owner.display_name,
@@ -130,6 +131,9 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
     return file
 
 def designThread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
+        f = open('tracim/lib/webdav/style.css', 'r')
+        style = f.read()
+        f.close()
 
         hist = content.get_history()
 
@@ -205,7 +209,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-	<link rel="stylesheet" href="/home/arnaud/Documents/css/style.css">
+	<style>%s</style>
 	<script type="text/javascript" src="/home/arnaud/Documents/css/script.js"></script>
 </head>
 <body>
@@ -277,6 +281,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
 </body>
 </html>
         ''' % (content_revision.label,
+               style,
                content_revision.label,
                content.created.strftime("%B %d, %Y at %H:%m"),
                content.owner.display_name,

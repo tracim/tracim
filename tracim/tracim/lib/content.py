@@ -408,14 +408,44 @@ class ContentApi(object):
 
         resultset = resultset.filter(Content.parent_id == parent_id)
 
-        try:
-            return resultset.filter(Content.label == content_label).one()
-        except:
-            try:
-                return resultset.filter(Content.file_name == content_label).one()
-            except:
-                import re
-                return resultset.filter(Content.label == re.sub(r'\.[^.]+$', '', content_label)).one()
+        return resultset.filter(or_(
+            Content.label == content_label,
+            Content.file_name == content_label,
+            Content.label == re.sub(r'\.[^.]+$', '', content_label)
+        )).one()
+
+    def get_one_by_label_and_parent_label(self, content_label: str, content_parent_label: [str]=None, workspace: Workspace=None):
+        assert content_label is not None  # DYN_REMOVE
+        resultset = self._base_query(workspace)
+
+        res =  resultset.filter(or_(
+            Content.label == content_label,
+            Content.file_name == content_label,
+            Content.label == re.sub(r'\.[^.]+$', '', content_label)
+        )).all()
+
+        if content_parent_label:
+            tmp = dict()
+            for content in res:
+                tmp[content] = content.parent
+
+            for parent_label in reversed(content_parent_label):
+                a = []
+                tmp = {content: parent.parent for content, parent in tmp.items()
+                       if parent and parent.label == parent_label}
+
+                if len(tmp) == 1:
+                    content, last_parent = tmp.popitem()
+                    return content
+                elif len(tmp) == 0:
+                    return None
+
+            for content, parent_content in tmp.items():
+                if not parent_content:
+                    return content
+
+            return None
+        return res[0]
 
     def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
