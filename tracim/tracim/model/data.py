@@ -1021,30 +1021,6 @@ class Content(DeclarativeBase):
         return format_timedelta(delta_from_datetime - datetime_object,
                                 locale=tg.i18n.get_lang()[0])
 
-
-    def extract_links_from_content(self, other_content: str=None) -> [LinkItem]:
-        """
-        parse html content and extract links. By default, it works on the description property
-        :param other_content: if not empty, then parse the given html content instead of description
-        :return: a list of LinkItem
-        """
-        links = []
-        return links
-        soup = BeautifulSoup(
-            self.description if not other_content else other_content,
-            'html.parser'  # Fixes hanging bug - http://stackoverflow.com/questions/12618567/problems-running-beautifulsoup4-within-apache-mod-python-django
-        )
-
-        for link in soup.findAll('a'):
-            href = link.get('href')
-            label = link.contents
-            links.append(LinkItem(href, label))
-        links.sort(key=lambda link: link.href if link.href else '')
-
-        sorted_links = sorted(links, key=lambda link: link.label if link.label else link.href, reverse=True)
-        ## FIXME - Does this return a sorted list ???!
-        return sorted_links
-
     def get_child_nb(self, content_type: ContentType, content_status = ''):
         child_nb = 0
         for child in self.get_valid_children():

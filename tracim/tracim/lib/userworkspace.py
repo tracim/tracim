@@ -92,7 +92,8 @@ class RoleApi(object):
         role.workspace = workspace
         role.role = role_level
         if with_notif is not None:
-            role.do_notify = with_notif
+            from tracim.lib.helpers import on_off_to_boolean
+            role.do_notify = on_off_to_boolean(with_notif)
         if flush:
             DBSession.flush()
         return role

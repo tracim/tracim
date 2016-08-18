@@ -1,0 +1,24 @@
+#####################################################################################################
+# Apache configuration (REQUIRED to prevent access for .inc files /especially config files/)
+# You NEED to add the following lines into your Apache vhost configuration (without the # character):
+# <Directory /client/installation/directory/auth/>
+#    AllowOverride Limit
+#     <IfVersion >= 2.3>
+#         Require all granted
+#     </IfVersion>
+#     <IfVersion < 2.3>
+#         Order allow,deny
+#         Allow from all
+#     </IfVersion>
+# </Directory>
+#####################################################################################################
+
+<Files ~ "\.inc$">
+	<IfVersion >= 2.3>
+		Require all granted
+	</IfVersion>
+	<IfVersion < 2.3>
+		Order allow,deny
+		Deny from all
+	</IfVersion>
+</Files>

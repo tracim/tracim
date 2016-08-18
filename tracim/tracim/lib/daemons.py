@@ -179,6 +179,7 @@ class RadicaleDaemon(Daemon):
         tracim_storage = 'tracim.lib.radicale.storage'
         fs_path = cfg.RADICALE_SERVER_FILE_SYSTEM_FOLDER
         allow_origin = cfg.RADICALE_SERVER_ALLOW_ORIGIN
+        realm_message = cfg.RADICALE_SERVER_REALM_MESSAGE
 
         radicale_config.set('auth', 'type', 'custom')
         radicale_config.set('auth', 'custom_handler', tracim_auth)
@@ -190,17 +191,35 @@ class RadicaleDaemon(Daemon):
         radicale_config.set('storage', 'custom_handler', tracim_storage)
         radicale_config.set('storage', 'filesystem_folder', fs_path)
 
-        if allow_origin:
-            try:
-                radicale_config.add_section('headers')
-            except DuplicateSectionError:
-                pass  # It is not a problem, we just want it exist
+        radicale_config.set('server', 'realm', realm_message)
 
+        try:
+            radicale_config.add_section('headers')
+        except DuplicateSectionError:
+            pass  # It is not a problem, we just want it exist
+
+        if allow_origin:
             radicale_config.set(
                 'headers',
                 'Access-Control-Allow-Origin',
                 allow_origin,
             )
+
+        # Radicale is not 100% CALDAV Compliant, we force some Allow-Methods
+        radicale_config.set(
+            'headers',
+            'Access-Control-Allow-Methods',
+            'DELETE, HEAD, GET, MKCALENDAR, MKCOL, MOVE, OPTIONS, PROPFIND, '
+            'PROPPATCH, PUT, REPORT',
+        )
+
+        # Radicale is not 100% CALDAV Compliant, we force some Allow-Headers
+        radicale_config.set(
+            'headers',
+            'Access-Control-Allow-Headers',
+            'X-Requested-With,X-Auth-Token,Content-Type,Content-Length,'
+            'X-Client,Authorization,depth,Prefer,If-None-Match,If-Match',
+        )
 
     def _get_server(self):
         from tracim.config.app_cfg import CFG

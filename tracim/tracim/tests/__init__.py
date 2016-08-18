@@ -135,8 +135,9 @@ def teardown_db():
         tbs.append(t)
         all_fks.extend(fks)
 
-    for fkc in all_fks:
-        connection.execute(DropConstraint(fkc))
+    if not config['sqlalchemy.url'].startswith('sqlite'):
+        for fkc in all_fks:
+            connection.execute(DropConstraint(fkc))
 
     for view in views:
         drop_statement = 'DROP VIEW {}'.format(view.name)

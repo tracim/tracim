@@ -29,7 +29,7 @@ class InternalApplicationAuthMetadata(TGAuthMetadata):
     def __init__(self, sa_auth):
         self.sa_auth = sa_auth
 
-    def authenticate(self, environ, identity):
+    def authenticate(self, environ, identity, allow_auth_token: bool=False):
         user = self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(and_(
             self.sa_auth.user_class.is_active == True,
             self.sa_auth.user_class.email == identity['login']
@@ -42,6 +42,11 @@ class InternalApplicationAuthMetadata(TGAuthMetadata):
                 # TODO : temporary fix to update DB, to remove
                 transaction.commit()
             return identity['login']
+
+        if user and allow_auth_token:
+            user.ensure_auth_token()
+            if user.auth_token == identity['password']:
+                return identity['login']
 
     def get_user(self, identity, userid):
         return self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(

@@ -290,6 +290,11 @@ div.t-page-metadata-row, div.t-metadata-row {
 #sidebar-left .btn.btn-link,
 #sidebar-left .list-unstyled a {
     color: #DDD;
+    margin-bottom: 20px; /* avoid left menu to be overwritten by footer */
+}
+
+#sidebar-left-menu {
+    margin-bottom: 20px; /* add a margin between menu bottom and footer top */
 }
 
 h1.page-header {
@@ -366,4 +371,14 @@ hr.t-toolbar-btn-group-separator { border-color: #CCC; border-style: dotted; }
 span.info.readonly {
     font-size: 0.8em;
     opacity: 0.7;
+}
+
+@media(min-width: 768px) and (max-width: 992px) {
+    .download-file-button i.fa {
+        font-size: 12px;
+    }
+}
+
+.no-padding {
+    padding: 0px;
 }
