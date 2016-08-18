@@ -290,6 +290,11 @@ div.t-page-metadata-row, div.t-metadata-row {
 #sidebar-left .btn.btn-link,
 #sidebar-left .list-unstyled a {
     color: #DDD;
+    margin-bottom: 20px; /* avoid left menu to be overwritten by footer */
+}
+
+#sidebar-left-menu {
+    margin-bottom: 20px; /* add a margin between menu bottom and footer top */
 }
 
 h1.page-header {
