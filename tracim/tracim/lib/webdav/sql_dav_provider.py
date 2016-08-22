@@ -49,6 +49,9 @@ class Provider(DAVProvider):
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
+        if not self.exists(path, environ):
+            return None
+
         path = normpath(path)
         root_path = environ['http_authenticator.realm']
 
@@ -63,6 +66,8 @@ class Provider(DAVProvider):
         # If the request path is in the form root/name, then we return a Workspace resource
         parent_path = dirname(path)
         if parent_path == root_path:
+            if not workspace:
+                return None
             return sql_resources.Workspace(path, environ, workspace)
 
         # And now we'll work on the path to establish which type or resource is requested
@@ -151,7 +156,7 @@ class Provider(DAVProvider):
 
         workspace = self.get_workspace_from_path(path, WorkspaceApi(user))
 
-        if parent_path == root_path:
+        if parent_path == root_path or workspace is None:
             return workspace is not None
 
         content_api = ContentApi(user, show_archived=True, show_deleted=True)

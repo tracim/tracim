@@ -199,6 +199,7 @@ class Workspace(DAVCollection):
         return self.workspace.label
 
     def getLastModified(self) -> float:
+        print("hm....", self.path)
         return mktime(self.workspace.updated.timetuple())
 
     def getMemberNames(self) -> [str]:
@@ -579,10 +580,11 @@ class HistoryFolder(Folder):
             children = self.content_api.get_all(None, ContentType.Any, self.workspace)
         
         for content in children:
-            members.append(HistoryFileFolder(
-                path='%s/%s' % (self.path, content.get_label()),
-                environ=self.environ,
-                content=content))
+            if content.is_archived == self._is_archived and content.is_deleted == self._is_deleted:
+                members.append(HistoryFileFolder(
+                    path='%s/%s' % (self.path, content.get_label()),
+                    environ=self.environ,
+                    content=content))
 
         return members
 
@@ -647,16 +649,17 @@ class DeletedFolder(HistoryFolder):
             children = self.content_api.get_all(None, ContentType.Any, self.workspace)
 
         for content in children:
-            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+            if content.is_deleted:
+                content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
 
-            if content.type == ContentType.Folder:
-                members.append(Folder(content_path, self.environ, self.workspace, content))
-            elif content.type == ContentType.File:
-                self._file_count += 1
-                members.append(File(content_path, self.environ, content))
-            else:
-                self._file_count += 1
-                members.append(OtherFile(content_path, self.environ, content))
+                if content.type == ContentType.Folder:
+                    members.append(Folder(content_path, self.environ, self.workspace, content))
+                elif content.type == ContentType.File:
+                    self._file_count += 1
+                    members.append(File(content_path, self.environ, content))
+                else:
+                    self._file_count += 1
+                    members.append(OtherFile(content_path, self.environ, content))
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
@@ -726,16 +729,17 @@ class ArchivedFolder(HistoryFolder):
             children = self.content_api.get_all(None, ContentType.Any, self.workspace)
 
         for content in children:
-            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+            if content.is_archived:
+                content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
 
-            if content.type == ContentType.Folder:
-                members.append(Folder(content_path, self.environ, self.workspace, content))
-            elif content.type == ContentType.File:
-                self._file_count += 1
-                members.append(File(content_path, self.environ, content))
-            else:
-                self._file_count += 1
-                members.append(OtherFile(content_path, self.environ, content))
+                if content.type == ContentType.Folder:
+                    members.append(Folder(content_path, self.environ, self.workspace, content))
+                elif content.type == ContentType.File:
+                    self._file_count += 1
+                    members.append(File(content_path, self.environ, content))
+                else:
+                    self._file_count += 1
+                    members.append(OtherFile(content_path, self.environ, content))
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
@@ -932,16 +936,18 @@ class File(DAVNonCollection):
             raise DAVError(HTTP_FORBIDDEN)
 
     def move_file(self, destpath):
-        parent = self.provider.get_parent_from_path(
-            normpath(destpath),
-            self.content_api,
-            WorkspaceApi(self.user)
-        )
 
         workspace = self.provider.get_workspace_from_path(
             normpath(destpath),
             WorkspaceApi(self.user)
         )
+
+        parent = self.provider.get_parent_from_path(
+            normpath(destpath),
+            self.content_api,
+            workspace
+        )
+
 
         with new_revision(self.content):
             if basename(destpath) != self.getDisplayName():
