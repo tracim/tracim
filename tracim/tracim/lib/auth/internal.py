@@ -36,7 +36,7 @@ class InternalApplicationAuthMetadata(TGAuthMetadata):
         )).first()
 
         if user and user.validate_password(identity['password']):
-            if user.webdav_left_digest_response_hash == '':
+            if not user.webdav_left_digest_response_hash:
                 user.webdav_left_digest_response_hash = '%s:/:%s' % (identity['login'], identity['password'])
                 DBSession.flush()
                 # TODO : temporary fix to update DB, to remove
