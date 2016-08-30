@@ -199,7 +199,6 @@ class Workspace(DAVCollection):
         return self.workspace.label
 
     def getLastModified(self) -> float:
-        print("hm....", self.path)
         return mktime(self.workspace.updated.timetuple())
 
     def getMemberNames(self) -> [str]:
