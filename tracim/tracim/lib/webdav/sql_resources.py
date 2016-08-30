@@ -451,8 +451,14 @@ class Folder(Workspace):
 
     def getMemberList(self) -> [_DAVResource]:
         members = []
+        content_api = ContentApi(self.user)
+        visible_children = content_api.get_all(
+            self.content.content_id,
+            ContentType.Any,
+            self.workspace,
+        )
 
-        for content in self.content.children:
+        for content in visible_children:
             content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
 
             if content.type == ContentType.Folder:
