@@ -4,6 +4,7 @@ import re
 import transaction
 
 from icalendar import Event as iCalendarEvent
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim.lib.content import ContentApi
 from tracim.lib.exceptions import UnknownCalendarType
@@ -115,7 +116,10 @@ class CalendarManager(object):
         except UnknownCalendarType as exc:
             raise NotFound(str(exc))
 
-        return self.get_calendar(type, id, path)
+        try:
+            return self.get_calendar(type, id, path)
+        except NoResultFound as exc:
+            raise NotFound(str(exc))
 
     def get_calendar(self, type: str, id: str, path: str) -> Calendar:
         """
