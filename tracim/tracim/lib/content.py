@@ -316,7 +316,7 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', is_temporary:bool =False, do_save=False) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False) -> Content:
         assert content_type in ContentType.allowed_types()
         content = Content()
         content.owner = self._user
@@ -457,7 +457,10 @@ class ContentApi(object):
         if content_type!=ContentType.Any:
             resultset = resultset.filter(Content.type==content_type)
 
-        resultset = resultset.filter(Content.parent_id==parent_id)
+        if parent_id:
+            resultset = resultset.filter(Content.parent_id==parent_id)
+        if parent_id is False:
+            resultset = resultset.filter(Content.parent_id == None)
 
         return resultset.all()
 

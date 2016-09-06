@@ -293,7 +293,7 @@ class Workspace(DAVCollection):
     def getMemberList(self) -> [_DAVResource]:
         members = []
 
-        children = self.content_api.get_all(None, ContentType.Any, self.workspace)
+        children = self.content_api.get_all(False, ContentType.Any, self.workspace)
 
         for content in children:
             content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
@@ -582,7 +582,7 @@ class HistoryFolder(Folder):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(None, ContentType.Any, self.workspace)
+            children = self.content_api.get_all(False, ContentType.Any, self.workspace)
         
         for content in children:
             if content.is_archived == self._is_archived and content.is_deleted == self._is_deleted:
@@ -634,7 +634,7 @@ class DeletedFolder(HistoryFolder):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(None, ContentType.Any, self.workspace)
+            children = self.content_api.get_all(False, ContentType.Any, self.workspace)
 
         for content in children:
             if content.is_deleted:
@@ -651,7 +651,7 @@ class DeletedFolder(HistoryFolder):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(None, ContentType.Any, self.workspace)
+            children = self.content_api.get_all(False, ContentType.Any, self.workspace)
 
         for content in children:
             if content.is_deleted:
@@ -731,7 +731,7 @@ class ArchivedFolder(HistoryFolder):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(None, ContentType.Any, self.workspace)
+            children = self.content_api.get_all(False, ContentType.Any, self.workspace)
 
         for content in children:
             if content.is_archived:

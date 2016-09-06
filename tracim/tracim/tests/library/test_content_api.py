@@ -244,9 +244,27 @@ class TestContentApi(BaseTest, TestStandard):
                                                         save_now=True)
 
         api = ContentApi(user)
-        item = api.create(ContentType.Folder, workspace, None, 'parent', True)
-        item2 = api.create(ContentType.File, workspace, item, 'file1', True)
-        item3 = api.create(ContentType.File, workspace, None, 'file2', True)
+        item = api.create(
+            ContentType.Folder,
+            workspace,
+            None,
+            'parent',
+            do_save=True,
+        )
+        item2 = api.create(
+            ContentType.File,
+            workspace,
+            item,
+            'file1',
+            do_save=True,
+        )
+        item3 = api.create(
+            ContentType.File,
+            workspace,
+            None,
+            'file2',
+            do_save=True,
+        )
         parent_id = item.content_id
         child_id = item2.content_id
         uid = user.user_id

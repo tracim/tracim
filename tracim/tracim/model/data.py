@@ -549,7 +549,7 @@ class ContentRevisionRO(DeclarativeBase):
     _cloned_columns = (
         'content_id', 'created', 'description', 'file_content', 'file_mimetype', 'file_name', 'is_archived',
         'is_deleted', 'label', 'node', 'owner', 'owner_id', 'parent', 'parent_id', 'properties', 'revision_type',
-        'status', 'type', 'updated', 'workspace', 'workspace_id',
+        'status', 'type', 'updated', 'workspace', 'workspace_id', 'is_temporary',
     )
 
     # Read by must be used like this:
