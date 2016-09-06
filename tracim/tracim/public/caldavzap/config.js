@@ -306,27 +306,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 //	}
 //];
 
-var globalAccountSettings=[
-	{
-		href: 'http://127.0.0.1:5232/user/3.ics/',
-		userAuth:
-		{
-			userName: 'bastien.sevajol@algoo.fr',
-			userPassword: 'bastien.sevajol@algoo.fr'
-			//userName: 'bastien',
-			//userPassword: 'bastien'
-		},
-		timeOut: 90000,
-		lockTimeOut: 10000,
-		checkContentType: true,
-		settingsAccount: true,
-		delegation: true,
-		hrefLabel: null,
-		forceReadOnly: null,
-		ignoreAlarms: false,
-		backgroundCalendars: []
-	}
-];
 
 // globalNetworkCheckSettings
 // Use this option if you want to use standard login screen without
@@ -352,22 +331,22 @@ var globalAccountSettings=[
 // Davical example which automatically detects the protocol, server name,
 // port, ... (client installed into Davical "htdocs" subdirectory;
 // works "out of the box", no additional setup required):
-// var globalNetworkCheckSettings={
-// 	href: location.protocol+'//'+location.hostname+
-// 		(location.port ? ':'+location.port: '')+
-// 		location.pathname.replace(RegExp('/+[^/]+/*(index\.html)?$'),'')+
-// 		'/caldav.php/',
-// 	timeOut: 90000,
-// 	lockTimeOut: 10000,
-//      checkContentType: true,
-// 	settingsAccount: true,
-//      delegation: true,
-// 	additionalResources: [],
-//      hrefLabel: null,
-// 	forceReadOnly: null,
-//      ignoreAlarms: false,
-// 	backgroundCalendars: []
-// }
+var globalNetworkCheckSettings={
+	href: location.protocol+'//'+location.hostname+
+		(location.port ? ':'+location.port: '')+
+		location.pathname.replace(RegExp('/+[^/]+/*(index\.html)?$'),'')+
+		'/caldav.php/',
+	timeOut: 90000,
+	lockTimeOut: 10000,
+	checkContentType: true,
+	settingsAccount: true,
+	delegation: true,
+	additionalResources: [],
+	hrefLabel: null,
+	forceReadOnly: null,
+	ignoreAlarms: false,
+	backgroundCalendars: []
+}
 
 
 // globalNetworkAccountSettings

@@ -15,7 +15,8 @@ var globalAccountSettings=[
         delegation: false,
         forceReadOnly: null,
         ignoreAlarms: false,
-        backgroundCalendars: ['1.ics']
+        backgroundCalendars: [],
+        basehref: '${base_href_url}'
     },
 % if workspace_clendar_urls:
     {
@@ -32,7 +33,8 @@ var globalAccountSettings=[
         delegation: false,
         forceReadOnly: null,
         ignoreAlarms: false,
-        backgroundCalendars: []
+        backgroundCalendars: [],
+        basehref: '${base_href_url}'
     },
 % endif
 ] ;

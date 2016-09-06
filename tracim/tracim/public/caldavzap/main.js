@@ -1936,3 +1936,23 @@ function setCalendarNumber(initSearch)
 			globalTodoCalendarNumber++;
 		}
 }
+
+function algoo_get_basehref_for_href(href, globalAccountSettings) {
+	for (config_key in globalAccountSettings) {
+		var config = globalAccountSettings[config_key];
+		if (config.href == href && config.basehref) {
+			return config.basehref;
+		}
+	}
+}
+
+function algoo_replace_regex(href, globalAccountSettings) {
+	var protocol_re = new RegExp('^(https?://)(.*)','i');
+
+	var base_href = algoo_get_basehref_for_href(href, globalAccountSettings);
+	var protocol_match = href.match(protocol_re);
+	var protocol = protocol_match[1];
+	var path = protocol_match[2].replace(base_href, '');
+
+	return [href, protocol, base_href, path]
+}

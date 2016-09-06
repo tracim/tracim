@@ -490,8 +490,7 @@ function netSaveProperty(inputCollection, hrefProperty, inputProperty, inputValu
 function DAVresourceDelegation(inputResource, index, lastIndex)
 {
 	globalCalDAVResourceSync=false;
-	var re=new RegExp('^(https?://)([^/]+)(.*)', 'i');
-	var tmp=inputResource.href.match(re);
+	var tmp=algoo_replace_regex(inputResource.href, globalAccountSettings);
 
 	var baseHref=tmp[1]+tmp[2];
 	var uidBase=tmp[1]+inputResource.userAuth.userName+'@'+tmp[2];
@@ -1039,8 +1038,7 @@ function netFindResource(inputResource, inputResourceIndex, forceLoad, indexR, l
 		return false;
 	}
 
-	var re=new RegExp('^(https?://)([^/]+)(.*)','i');
-	var tmp=inputResource.href.match(re);
+	var tmp = algoo_replace_regex(inputResource.href, globalAccountSettings);
 	var uidBase=tmp[1]+inputResource.userAuth.userName+'@'+tmp[2];
 	var uidFull=tmp[1]+inputResource.userAuth.userName+'@'+tmp[2]+tmp[3];	// for the error handler
 	var settingsXML='';
@@ -1221,7 +1219,6 @@ function netFindResource(inputResource, inputResourceIndex, forceLoad, indexR, l
 
 function netLoadResource(inputResource, inputHref, hrefMode, inputResourceIndex, forceLoad, indexR, loadArray)
 {
-	var re=new RegExp('^(https?://)([^/]+)(.*)','i');
 	if(!isAvaible('CardDavMATE') || !globalCardDAVInitLoad || (globalCardDAVInitLoad && typeof inputResource.addressbookNo == 'undefined'))
 		inputResource.addressbookNo=0;
 	if(!isAvaible('CalDavZAP') || !globalCalDAVInitLoad || (globalCalDAVInitLoad && typeof inputResource.calendarNo=='undefined' && typeof inputResource.todoNo=='undefined'))
@@ -1229,7 +1226,7 @@ function netLoadResource(inputResource, inputHref, hrefMode, inputResourceIndex,
 		inputResource.calendarNo=0;
 		inputResource.todoNo=0;
 	}
-	var tmp=inputResource.abhref.match(re);
+	var tmp = algoo_replace_regex(inputResource.abhref, globalAccountSettings);
 	var baseHref=tmp[1]+tmp[2];
 	var uidBase=tmp[1]+inputResource.userAuth.userName+'@'+tmp[2];
 	var uidFull=tmp[1]+inputResource.userAuth.userName+'@'+tmp[2]+tmp[3];	// for the error handler
@@ -1482,7 +1479,7 @@ function netLoadResource(inputResource, inputHref, hrefMode, inputResourceIndex,
 						var href=$(element).children().filterNsNode('href').text();
 						if(href.match(RegExp('^https?://','i'))!=null)
 						{
-							var tmpH = href.match(RegExp('^(https?://)([^/]+)(.*)','i'))
+							var tmpH = algoo_replace_regex(href, globalAccountSettings);
 							if(tmpH!=null)
 								href = tmpH[3];
 						}
@@ -1708,7 +1705,7 @@ function netLoadResource(inputResource, inputHref, hrefMode, inputResourceIndex,
 							var href=$(element).children().filterNsNode('href').text();
 							if(href.match(RegExp('^https?://','i'))!=null)
 							{
-								var tmpH = href.match(RegExp('^(https?://)([^/]+)(.*)','i'))
+								var tmpH = algoo_replace_regex(href, globalAccountSettings);
 								if(tmpH!=null)
 									href = tmpH[3];
 							}
@@ -1898,8 +1895,7 @@ function netLoadResource(inputResource, inputHref, hrefMode, inputResourceIndex,
 }// Save the client settings (stored as DAV property on server)
 function netSaveSettings(inputResource, inputSettings, isFormSave, collectionLoad)
 {
-	var re=new RegExp('^(https?://)([^/]+)(.*)', 'i');
-	var tmp=inputResource.href.match(re);
+	var tmp = algoo_replace_regex(inputResource.href, globalAccountSettings);
 	var baseHref=tmp[1]+tmp[2];
 	var uidBase=tmp[1]+inputResource.userAuth.userName+'@'+tmp[2];
 	var uidFull=tmp[1]+inputResource.userAuth.userName+'@'+tmp[2]+tmp[3]; //for the error handler

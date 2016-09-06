@@ -6,4 +6,4 @@ then
     rm -r tracim/tracim/public/caldavzap
 fi
 git clone https://github.com/algoo/caldavzap.git tracim/tracim/public/caldavzap
-rm -r tracim/tracim/public/caldavzap/.git
+rm -rf tracim/tracim/public/caldavzap/.git

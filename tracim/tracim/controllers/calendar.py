@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import re
 import tg
 from tg import tmpl_context
 
@@ -45,6 +45,8 @@ class CalendarConfigController(BaseController):
         workspace_base_url = CalendarManager.get_workspace_base_url()
         workspace_calendar_urls = CalendarManager\
             .get_workspace_readable_calendars_urls_for_user(user)
+        base_href_url = \
+            re.sub(r"^http[s]?://", '', CalendarManager.get_base_url())
 
         # Template will use User.auth_token, ensure it's validity
         user.ensure_auth_token()
@@ -55,4 +57,5 @@ class CalendarConfigController(BaseController):
             workspace_base_url=workspace_base_url,
             workspace_clendar_urls=workspace_calendar_urls,
             auth_token=user.auth_token,
+            base_href_url=base_href_url,
         )
