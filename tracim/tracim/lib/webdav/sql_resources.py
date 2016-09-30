@@ -850,8 +850,9 @@ class File(DAVNonCollection):
 
     def getPreferredPath(self):
         fix_txt = '.txt' if self.getContentType() == 'text/plain' else mimetypes.guess_extension(self.getContentType())
-
-        if self.content.label == '' or self.path.endswith(fix_txt):
+        if not fix_txt:
+            fix_txt = ''
+        if self.content and self.path and (self.content.label == '' or self.path.endswith(fix_txt)):
             return self.path
         else:
             return self.path + fix_txt
