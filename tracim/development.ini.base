@@ -202,6 +202,9 @@ email.notification.smtp.password = your_smtp_password
 ## in this case, you have to create your own proxy behind this url.
 # radicale.client.base_url = http://127.0.0.1:5232
 
+## WSGIDAV
+wsgidav.config_path = wsgidav.conf
+
 #####
 #
 # All configuration below is about logging.

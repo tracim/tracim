@@ -268,13 +268,15 @@ class WsgiDavDaemon(Daemon):
 
     def _initConfig(self):
         """Setup configuration dictionary from default, command line and configuration file."""
+        from tg import config as tg_config
 
         # Set config defaults
         config = DEFAULT_CONFIG.copy()
         temp_verbose = config["verbose"]
 
         # Configuration file overrides defaults
-        config_file = os.path.abspath(DEFAULT_CONFIG_FILE)
+        default_config_file = os.path.abspath(DEFAULT_CONFIG_FILE)
+        config_file = tg_config.get('wsgidav.config_path', default_config_file)
         fileConf = self._readConfigFile(config_file, temp_verbose)
         config.update(fileConf)
 
