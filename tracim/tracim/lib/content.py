@@ -196,6 +196,9 @@ class ContentApi(object):
     def _base_query(self, workspace: Workspace=None):
         result = self.__real_base_query(workspace)
 
+        # FIXME - 2016-10-17 - D.A. - Do not show temporary files
+        result = result.filter(Content.is_temporary == False)
+
         if not self._show_deleted:
             result = result.filter(Content.is_deleted==False)
 
