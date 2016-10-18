@@ -464,6 +464,24 @@ class ContentApi(object):
 
         return resultset.all()
 
+    def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> [Content]:
+        """
+        Return parent_id childs of given content_types
+        :param parent_id: parent id
+        :param content_types: list of types
+        :param workspace: workspace filter
+        :return: list of content
+        """
+        resultset = self._base_query(workspace)
+        resultset = resultset.filter(Content.type.in_(content_types))
+
+        if parent_id:
+            resultset = resultset.filter(Content.parent_id==parent_id)
+        if parent_id is False:
+            resultset = resultset.filter(Content.parent_id == None)
+
+        return resultset.all()
+
     # TODO find an other name to filter on is_deleted / is_archived
     def get_all_with_filter(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE

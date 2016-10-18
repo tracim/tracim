@@ -712,11 +712,17 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
 
         fake_api = Context(CTX.FOLDER).toDict(fake_api_content)
 
-        fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(
-            folder.get_valid_children([ContentType.Folder,
-                                       ContentType.File,
-                                       ContentType.Page,
-                                       ContentType.Thread]))
+        sub_items = content_api.get_children(
+            parent_id=folder.content_id,
+            content_types=[
+                ContentType.Folder,
+                ContentType.File,
+                ContentType.Page,
+                ContentType.Thread,
+            ],
+
+        )
+        fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(sub_items)
 
         fake_api.content_types = Context(CTX.DEFAULT).toDict(
             content_api.get_all_types())
