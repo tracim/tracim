@@ -114,7 +114,7 @@
                         % if fake_api.current_user.profile.id>2:
                             ${NAVBAR_MENU.ADMIN_ITEMS()}
                         % endif
-                        <li class=""><a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar fa-lg')} ${_('Calendar')}</a></li>
+                        <li class=""><a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar')} ${_('Calendar')}</a></li>
                     </ul>
                 % endif
 
