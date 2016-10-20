@@ -67,6 +67,9 @@ auth_type = internal
 # If True, LDAP own tracim group managment (not available for now!)
 # ldap_group_enabled = False
 
+# User auth token validity in seconds (used to interfaces like web calendars)
+user.auth_token.validity = 604800
+
 #By default session is store in cookies to avoid the overhead
 #of having to manage a session storage. On production you might
 #want to switch to a better session storage.
@@ -194,6 +197,7 @@ email.notification.smtp.password = your_smtp_password
 # radicale.server.ssl = false
 # radicale.server.filesystem.folder = ~/.config/radicale/collections
 # radicale.server.allow_origin = *
+# radicale.server.realm_message = Tracim Calendar - Password Required
 ## url can be extended like http://127.0.0.1:5232/calendar
 ## in this case, you have to create your own proxy behind this url.
 # radicale.client.base_url = http://127.0.0.1:5232

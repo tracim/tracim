@@ -19,23 +19,20 @@
         </div>
         <div class="checkbox form-group">
             <label for="workspaceCalendarEnabled">
-                <input id="workspaceCalendarEnabled" name="calendar_enabled" type="checkbox" checked >
+                <input id="workspaceCalendarEnabled" name="calendar_enabled" type="checkbox" ${'checked' if result.workspace.calendar_enabled else ''} >
                 <b>${_('Activate associated calendar')}</b>
             </label>
         </div>
         <script>
             $('#workspaceCalendarEnabled').click(function() {
-                console.log('Value is' + $(this).val());
                 if($(this).is(':checked')) {
-                    console.log('hide url');
                     $('.calendar-url').css('display', 'block');
                 } else {
-                    console.log('show url');
                     $('.calendar-url').css('display', 'none');
                 }
             });
         </script>
-        <div class="form-group calendar-url">
+        <div class="form-group calendar-url" style="display: ${'none' if not result.workspace.calendar_enabled else 'block'};">
             <label for="workspace-name1">${_('Calendar Url')}</label>
             <input id="workspaceCalendarUrl" type="text" class="form-control"  disabled="disabled" value="${result.workspace.calendar_url}" />
             <p>

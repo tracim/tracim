@@ -179,6 +179,7 @@ class RadicaleDaemon(Daemon):
         tracim_storage = 'tracim.lib.radicale.storage'
         fs_path = cfg.RADICALE_SERVER_FILE_SYSTEM_FOLDER
         allow_origin = cfg.RADICALE_SERVER_ALLOW_ORIGIN
+        realm_message = cfg.RADICALE_SERVER_REALM_MESSAGE
 
         radicale_config.set('auth', 'type', 'custom')
         radicale_config.set('auth', 'custom_handler', tracim_auth)
@@ -190,17 +191,35 @@ class RadicaleDaemon(Daemon):
         radicale_config.set('storage', 'custom_handler', tracim_storage)
         radicale_config.set('storage', 'filesystem_folder', fs_path)
 
-        if allow_origin:
-            try:
-                radicale_config.add_section('headers')
-            except DuplicateSectionError:
-                pass  # It is not a problem, we just want it exist
+        radicale_config.set('server', 'realm', realm_message)
 
+        try:
+            radicale_config.add_section('headers')
+        except DuplicateSectionError:
+            pass  # It is not a problem, we just want it exist
+
+        if allow_origin:
             radicale_config.set(
                 'headers',
                 'Access-Control-Allow-Origin',
                 allow_origin,
             )
+
+        # Radicale is not 100% CALDAV Compliant, we force some Allow-Methods
+        radicale_config.set(
+            'headers',
+            'Access-Control-Allow-Methods',
+            'DELETE, HEAD, GET, MKCALENDAR, MKCOL, MOVE, OPTIONS, PROPFIND, '
+            'PROPPATCH, PUT, REPORT',
+        )
+
+        # Radicale is not 100% CALDAV Compliant, we force some Allow-Headers
+        radicale_config.set(
+            'headers',
+            'Access-Control-Allow-Headers',
+            'X-Requested-With,X-Auth-Token,Content-Type,Content-Length,'
+            'X-Client,Authorization,depth,Prefer,If-None-Match,If-Match',
+        )
 
     def _get_server(self):
         from tracim.config.app_cfg import CFG
@@ -220,3 +239,143 @@ class RadicaleDaemon(Daemon):
         :param callback: callback to execute in daemon
         """
         self._server.append_thread_callback(callback)
+
+
+# TODO : webdav deamon, make it clean !
+
+import sys, os
+from wsgidav.wsgidav_app import DEFAULT_CONFIG
+from wsgidav.xml_tools import useLxml
+from wsgidav.wsgidav_app import WsgiDAVApp
+from wsgidav._version import __version__
+
+from tracim.lib.webdav.sql_dav_provider import Provider
+from tracim.lib.webdav.sql_domain_controller import TracimDomainController
+
+from inspect import isfunction
+import traceback
+
+DEFAULT_CONFIG_FILE = "wsgidav.conf"
+PYTHON_VERSION = "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
+
+
+class WsgiDavDaemon(Daemon):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.config = self._initConfig()
+        self._server = None
+
+    def _initConfig(self):
+        """Setup configuration dictionary from default, command line and configuration file."""
+
+        # Set config defaults
+        config = DEFAULT_CONFIG.copy()
+        temp_verbose = config["verbose"]
+
+        # Configuration file overrides defaults
+        config_file = os.path.abspath(DEFAULT_CONFIG_FILE)
+        fileConf = self._readConfigFile(config_file, temp_verbose)
+        config.update(fileConf)
+
+        if not useLxml and config["verbose"] >= 1:
+            print(
+                "WARNING: Could not import lxml: using xml instead (slower). Consider installing lxml from http://codespeak.net/lxml/.")
+        from wsgidav.dir_browser import WsgiDavDirBrowser
+        from wsgidav.debug_filter import WsgiDavDebugFilter
+        from tracim.lib.webdav.tracim_http_authenticator import TracimHTTPAuthenticator
+        from wsgidav.error_printer import ErrorPrinter
+
+        config['middleware_stack'] = [ WsgiDavDirBrowser, TracimHTTPAuthenticator, ErrorPrinter, WsgiDavDebugFilter ]
+
+        config['provider_mapping'] = {
+            config['root_path']: Provider(
+                show_archived=config['show_archived'],
+                show_deleted=config['show_deleted'],
+                show_history=config['show_history'],
+                manage_locks=config['manager_locks']
+            )
+        }
+
+        config['domaincontroller'] = TracimDomainController(presetdomain=None, presetserver=None)
+
+        return config
+
+    def _readConfigFile(self, config_file, verbose):
+        """Read configuration file options into a dictionary."""
+
+        if not os.path.exists(config_file):
+            raise RuntimeError("Couldn't open configuration file '%s'." % config_file)
+
+        try:
+            import imp
+            conf = {}
+            configmodule = imp.load_source("configuration_module", config_file)
+
+            for k, v in vars(configmodule).items():
+                if k.startswith("__"):
+                    continue
+                elif isfunction(v):
+                    continue
+                conf[k] = v
+        except Exception as e:
+            exceptioninfo = traceback.format_exception_only(sys.exc_type, sys.exc_value)  # @UndefinedVariable
+            exceptiontext = ""
+            for einfo in exceptioninfo:
+                exceptiontext += einfo + "\n"
+
+            print("Failed to read configuration file: " + config_file + "\nDue to " + exceptiontext, file=sys.stderr)
+            raise
+
+        return conf
+
+    def run(self):
+        app = WsgiDAVApp(self.config)
+
+        # Try running WsgiDAV inside the following external servers:
+        self._runCherryPy(app, self.config, "cherrypy-bundled")
+
+    def _runCherryPy(self, app, config, mode):
+        """Run WsgiDAV using cherrypy.wsgiserver, if CherryPy is installed."""
+        assert mode in ("cherrypy", "cherrypy-bundled")
+
+        try:
+            from wsgidav.server.cherrypy import wsgiserver
+
+            version = "WsgiDAV/%s %s Python/%s" % (
+                __version__,
+                wsgiserver.CherryPyWSGIServer.version,
+                PYTHON_VERSION)
+
+            wsgiserver.CherryPyWSGIServer.version = version
+
+            protocol = "http"
+
+            if config["verbose"] >= 1:
+                print("Running %s" % version)
+                print("Listening on %s://%s:%s ..." % (protocol, config["host"], config["port"]))
+            self._server = wsgiserver.CherryPyWSGIServer(
+                (config["host"], config["port"]),
+                app,
+                server_name=version,
+            )
+
+            self._server.start()
+        except ImportError as e:
+            if config["verbose"] >= 1:
+                print("Could not import wsgiserver.CherryPyWSGIServer.")
+            return False
+        return True
+
+    def stop(self):
+        self._server.stop()
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        """
+        Place here the logic who permit to execute a callback in your daemon.
+        To get an exemple of that, take a look at
+        socketserver.BaseServer#service_actions  and how we use it in
+        tracim.lib.daemons.TracimSocketServerMixin#service_actions .
+        :param callback: callback to execute in your thread.
+        """
+        raise NotImplementedError()

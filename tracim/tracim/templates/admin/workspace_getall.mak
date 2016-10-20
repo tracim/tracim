@@ -10,7 +10,6 @@
 <%def name="title()">${_('Workspaces')}</%def>
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
-    ${LEFT_MENU.ADMIN('')}
     ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
 </%def>
 

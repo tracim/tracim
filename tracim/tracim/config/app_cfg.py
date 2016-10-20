@@ -31,6 +31,7 @@ from tracim.lib.auth.wrapper import AuthConfigWrapper
 from tracim.lib.base import logger
 from tracim.lib.daemons import DaemonsManager
 from tracim.lib.daemons import RadicaleDaemon
+from tracim.lib.daemons import WsgiDavDaemon
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
@@ -94,7 +95,13 @@ def start_daemons(manager: DaemonsManager):
     """
     Sart Tracim daemons
     """
+    from tg import config
+    # Don't start daemons if they are disabled
+    if 'disable_daemons' in config and config['disable_daemons']:
+        return
+
     manager.run('radicale', RadicaleDaemon)
+    manager.run('webdav', WsgiDavDaemon)
 
 environment_loaded.register(lambda: start_daemons(daemons))
 
@@ -251,7 +258,20 @@ class CFG(object):
         )
         self.RADICALE_SERVER_ALLOW_ORIGIN = tg.config.get(
             'radicale.server.allow_origin',
-            '*',
+            None,
+        )
+        if not self.RADICALE_SERVER_ALLOW_ORIGIN:
+            self.RADICALE_SERVER_ALLOW_ORIGIN = self.WEBSITE_BASE_URL
+            logger.warning(
+                self,
+                'NOTE: Generated radicale.server.allow_origin parameter with '
+                'followings parameters: website.base_url ({0})'
+                .format(self.WEBSITE_BASE_URL)
+            )
+
+        self.RADICALE_SERVER_REALM_MESSAGE = tg.config.get(
+            'radicale.server.realm_message',
+            'Tracim Calendar - Password Required',
         )
 
         self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
@@ -270,6 +290,11 @@ class CFG(object):
                 'radicale.server.port -> {0}'
                 .format(self.RADICALE_CLIENT_BASE_URL_TEMPLATE)
             )
+
+        self.USER_AUTH_TOKEN_VALIDITY = int(tg.config.get(
+            'user.auth_token.validity',
+            '604800',
+        ))
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)

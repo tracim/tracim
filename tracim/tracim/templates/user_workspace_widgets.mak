@@ -14,7 +14,7 @@
     </ul>
 </%def>
 
-<%def name="EMPTY_CONTENT(empty_content_label)"><p class="pod-empty">${empty_content_label}</p></%def>
+<%def name="EMPTY_CONTENT(empty_content_label)"><p class="pod-empty">${empty_content_label|n}</p></%def>
 
 <%def name="DATA_TARGET_BUTTON(dom_id, label)"><a data-toggle="collapse" data-target="#${dom_id}"><b>${label}</b></a></%def>
 

@@ -20,7 +20,7 @@
     % endif
     
     <div class="btn-group btn-group-vertical">
-        <a href="download_url" role="button" class="btn btn-default" data-toggle="modal" title="${_('Download the file')}">${ICON.FA('fa fa-download t-less-visible')} ${_('Download')}</a>
+        <a href="${download_url}" role="button" class="btn btn-default" data-toggle="modal" title="${_('Download the file')}">${ICON.FA('fa fa-download t-less-visible')} ${_('Download')}</a>
         <a href="#file-versions" role="button" class="btn btn-default" data-toggle="modal" title="${_('View versions of the file')}">${ICON.FA('fa fa-history t-less-visible')} ${_('Revisions')}</a>
 ## RESTORE LINKS IF REQUIRED        <a href="#file-associated-links" role="button" class="btn btn-default" data-toggle="modal" title="${_('View all links')}">${TIM.ICO(32, 'apps/internet-web-browser')}</a>
     </div>
