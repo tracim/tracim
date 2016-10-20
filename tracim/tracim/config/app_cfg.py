@@ -296,6 +296,8 @@ class CFG(object):
             '604800',
         ))
 
+        self.WSGIDAV_CONFIG_PATH = tg.config.get('wsgidav.config_path')
+
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
         if js_tracker_file_path:
