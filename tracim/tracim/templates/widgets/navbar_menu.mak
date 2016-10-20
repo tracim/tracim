@@ -2,13 +2,13 @@
 
 <%def name="ADMIN_ITEMS()">
     <li class="">
-        <a href="${tg.url('/admin/users')}">
-            ${ICON.FA('fa-user fa-fw')} ${_('Users')}
+        <a href="${tg.url('/admin/workspaces')}">
+            ${ICON.FA('fa-bank fa-fw')} ${_('Workspaces')}
         </a>
     </li>
     <li class="">
-        <a href="${tg.url('/admin/workspaces')}">
-            ${ICON.FA('fa-bank fa-fw')} ${_('Workspaces')}
+        <a href="${tg.url('/admin/users')}">
+            ${ICON.FA('fa-user fa-fw')} ${_('Users')}
         </a>
     </li>
 </%def>
