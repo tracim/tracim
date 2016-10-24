@@ -21,7 +21,6 @@ class DaemonsManager(object):
     def __init__(self):
         self._running_daemons = {}
         add_signal_handler(signal.SIGTERM, self.stop_all)
-        add_signal_handler(signal.SIGINT, self.stop_all)
 
     def run(self, name: str, daemon_class: object, **kwargs) -> None:
         """

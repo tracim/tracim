@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 import time
 import signal
 
@@ -49,23 +49,15 @@ def NotImplemented():
     raise NotImplementedError()
 
 
-def add_signal_handler(signal_id, handler, execute_before=True) -> None:
+def add_signal_handler(signal_id, handler) -> None:
     """
     Add a callback attached to python signal.
     :param signal_id: signal identifier (eg. signal.SIGTERM)
     :param handler: callback to execute when signal trig
-    :param execute_before: If True, callback is executed before eventual
-    existing callback on given dignal id.
     """
-    previous_handler = signal.getsignal(signal_id)
+    def _handler(*args, **kwargs):
+        handler()
+        signal.signal(signal_id, signal.SIG_DFL)
+        os.kill(os.getpid(), signal_id)  # Rethrow signal
 
-    def call_callback(*args, **kwargs):
-        if not execute_before and callable(previous_handler):
-            previous_handler(*args, **kwargs)
-
-        handler(*args, **kwargs)
-
-        if execute_before and callable(previous_handler):
-            previous_handler(*args, **kwargs)
-
-    signal.signal(signal_id, call_callback)
+    signal.signal(signal_id, _handler)
