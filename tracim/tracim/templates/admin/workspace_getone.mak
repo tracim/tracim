@@ -56,7 +56,7 @@
                         ${TITLE.H3(_('Calendar'), 'fa-calendar', 'workspace-members')}
                         <p>${_('This workspace offers a calendar that you can configure in your software: Outlook, Thunderbird, etc.')}</p>
                         <p>${_('The url to configure is the following one:')}</p>
-                        <p class="form-control">${result.workspace.calendar_url}"</p>
+                        <p class="form-control">${result.workspace.calendar_url}</p>
 
                     </div>
                 % endif
