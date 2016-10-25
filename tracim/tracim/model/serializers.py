@@ -86,6 +86,9 @@ class CTX(object):
     USER = 'USER'
     USERS = 'USERS'
     WORKSPACE = 'WORKSPACE'
+    API_WORKSPACE = 'API_WORKSPACE'
+    API_CALENDAR_WORKSPACE = 'API_CALENDAR_WORKSPACE'
+    API_CALENDAR_USER = 'API_CALENDAR_USER'
 
 
 class DictLikeClass(dict):
@@ -1023,3 +1026,34 @@ def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Cont
             type='workspace',
             state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
         )
+
+
+@pod_serializer(Workspace, CTX.API_WORKSPACE)
+def serialize_api_workspace(item: Workspace, context: Context):
+    return DictLikeClass(
+        id=item.workspace_id,
+        label=item.label,
+        description=item.description,
+        has_calendar=item.calendar_enabled,
+    )
+
+
+@pod_serializer(Workspace, CTX.API_CALENDAR_WORKSPACE)
+def serialize_api_calendar_workspace(item: Workspace, context: Context):
+    return DictLikeClass(
+        id=item.workspace_id,
+        label=item.label,
+        description=item.description,
+        type='workspace',
+    )
+
+
+@pod_serializer(User, CTX.API_CALENDAR_USER)
+def serialize_api_calendar_workspace(item: User, context: Context):
+    from tracim.lib.calendar import CalendarManager  # Cyclic import
+    return DictLikeClass(
+        id=item.user_id,
+        label=item.display_name,
+        description=CalendarManager.get_personal_calendar_description(),
+        type='user',
+    )

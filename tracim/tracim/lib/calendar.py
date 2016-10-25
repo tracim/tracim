@@ -5,6 +5,7 @@ import transaction
 
 from icalendar import Event as iCalendarEvent
 from sqlalchemy.orm.exc import NoResultFound
+from tg.i18n import ugettext as _
 
 from tracim.lib.content import ContentApi
 from tracim.lib.exceptions import UnknownCalendarType
@@ -36,6 +37,10 @@ CALENDAR_WORKSPACE_BASE_URL = '/workspace/'
 
 
 class CalendarManager(object):
+    @classmethod
+    def get_personal_calendar_description(cls) -> str:
+        return _('My personal calendar')
+
     @classmethod
     def get_base_url(cls):
         from tracim.config.app_cfg import CFG
@@ -284,14 +289,24 @@ class CalendarManager(object):
     def get_workspace_readable_calendars_urls_for_user(cls, user: User)\
             -> [str]:
         calendar_urls = []
-        workspace_api = WorkspaceApi(user)
-        for workspace in workspace_api.get_all_for_user(user):
-            if workspace.calendar_enabled:
-                calendar_urls.append(cls.get_workspace_calendar_url(
-                    workspace_id=workspace.workspace_id,
-                ))
+        for workspace in cls.get_workspace_readable_calendars_for_user(user):
+            calendar_urls.append(cls.get_workspace_calendar_url(
+                workspace_id=workspace.workspace_id,
+            ))
 
         return calendar_urls
+
+    @classmethod
+    def get_workspace_readable_calendars_for_user(cls, user: User)\
+            -> ['Workspace']:
+        workspaces = []
+        workspace_api = WorkspaceApi(user)
+
+        for workspace in workspace_api.get_all():
+            if workspace.calendar_enabled:
+                workspaces.append(workspace)
+
+        return workspaces
 
     def is_discovery_path(self, path: str) -> bool:
         """

@@ -11,6 +11,7 @@ from tg import tmpl_context
 from tg import url
 
 from tg.i18n import ugettext as _
+from tracim.controllers.api import APIController
 
 from tracim.lib import CST
 from tracim.lib.base import logger
@@ -59,6 +60,9 @@ class RootController(StandardController):
     # Rest controllers
     workspaces = UserWorkspaceRestController()
     user = UserRestController()
+
+    # api
+    api = APIController()
 
     def _render_response(self, tgl, controller, response):
         replace_reset_password_templates(controller.decoration.engines)
