@@ -47,17 +47,20 @@ Return list of calendars accessible by current connected user.
           {
              "id":30,
              "label":"my calendar",
-             "description":"blablabla 230"
+             "description":"blablabla 230",
+             "type": "workspace"
           },
           {
              "id":230,
              "label":"my other calendar",
-             "description":"blablabla 230"
+             "description":"blablabla 230",
+             "type": "workspace"
           },
           {
              "id":20,
              "label":"Name of the user",
-             "description":"my personnal calendar"
+             "description":"my personnal calendar",
+             "type": "user"
           }
        ]
     }
