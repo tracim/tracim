@@ -20,7 +20,7 @@ from tracim.controllers import TIMWorkspaceContentRestController
 from tracim.lib import CST
 from tracim.lib.base import BaseController
 from tracim.lib.base import logger
-from tracim.lib.utils import SameValueError
+from tracim.lib.utils import SameValueError, get_valid_header_file_name
 from tracim.lib.content import ContentApi
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.predicates import current_user_is_reader
@@ -231,7 +231,9 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             tg.response.headers['Content-type'] = str(revision_to_send.file_mimetype)
 
         tg.response.headers['Content-Type'] = content_type
-        tg.response.headers['Content-Disposition'] = str('attachment; filename="{}"'.format(revision_to_send.file_name))
+        file_name = get_valid_header_file_name(revision_to_send.file_name)
+        tg.response.headers['Content-Disposition'] = \
+            str('attachment; filename="{}"'.format(file_name))
         return revision_to_send.file_content
 
 

@@ -123,3 +123,19 @@ class ErrorPageApplicationWrapper(BaseErrorPageApplicationWrapper):
             title=resp.title,
             comment=resp.comment,
         )
+
+
+def get_valid_header_file_name(file_name: str) -> str:
+    """
+    :param file_name: file name to test
+    :return: Return given string if compatible to header encoding, or
+    download.ext if not.
+    """
+    try:
+        file_name.encode('iso-8859-1')
+        return file_name
+    except UnicodeEncodeError:
+        split_file_name = file_name.split('.')
+        if len(split_file_name) > 1:  # If > 1 so file have extension
+            return 'download.{0}'.format(split_file_name[-1])
+        return 'download'
