@@ -235,7 +235,8 @@ class CFG(object):
             ActionDescription.COMMENT,
             ActionDescription.CREATION,
             ActionDescription.EDITION,
-            ActionDescription.REVISION
+            ActionDescription.REVISION,
+            ActionDescription.STATUS_UPDATE
         ]
 
         self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
