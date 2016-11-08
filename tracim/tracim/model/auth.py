@@ -125,6 +125,7 @@ class User(DeclarativeBase):
     created = Column(DateTime, default=datetime.now)
     is_active = Column(Boolean, default=True, nullable=False)
     imported_from = Column(Unicode(32), nullable=True)
+    timezone = Column(Unicode(255), nullable=False, server_default='')
     _webdav_left_digest_response_hash = Column('webdav_left_digest_response_hash', Unicode(128))
     auth_token = Column(Unicode(255))
     auth_token_created = Column(DateTime)

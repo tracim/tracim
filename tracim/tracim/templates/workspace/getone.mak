@@ -44,7 +44,8 @@
         </h1>
 
         <div style="margin: -1.5em auto -1.5em auto;" class="t-less-visible">
-          <p>${_('workspace created on {date} at {time}').format(date=h.date(result.workspace.created), time=h.time(result.workspace.created))|n}</p>
+            <% created_localized = h.get_with_timezone(result.workspace.created) %>
+          <p>${_('workspace created on {date} at {time}').format(date=h.date(created_localized), time=h.time(created_localized))|n}</p>
         </div>
     </div>
 </div>

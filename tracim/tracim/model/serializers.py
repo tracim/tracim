@@ -858,6 +858,7 @@ def serialize_user_list_default(user: User, context: Context):
     result['enabled'] = user.is_active
     result['profile'] = user.profile
     result['has_password'] = user.password!=None
+    result['timezone'] = user.timezone
     return result
 
 
@@ -880,6 +881,7 @@ def serialize_user_for_user(user: User, context: Context):
     result['enabled'] = user.is_active
     result['profile'] = user.profile
     result['calendar_url'] = user.calendar_url
+    result['timezone'] = user.timezone
 
     return result
 

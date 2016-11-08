@@ -30,12 +30,21 @@ class UserApi(object):
     def get_one_by_id(self, id: int) -> User:
         return self._base_query().filter(User.user_id==id).one()
 
-    def update(self, user: User, name: str=None, email: str=None, do_save=True):
+    def update(
+            self,
+            user: User,
+            name: str=None,
+            email: str=None,
+            do_save=True,
+            timezone: str='',
+    ):
         if name is not None:
             user.display_name = name
 
         if email is not None:
             user.email = email
+
+        user.timezone = timezone
 
         if do_save:
             self.save(user)
