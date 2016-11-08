@@ -63,3 +63,4 @@ track.js
 wsgidav.conf
 # Temporary files
 *~
+*.sqlite
