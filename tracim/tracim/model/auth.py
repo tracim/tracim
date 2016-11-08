@@ -69,7 +69,7 @@ class Group(DeclarativeBase):
     group_id = Column(Integer, Sequence('seq__groups__group_id'), autoincrement=True, primary_key=True)
     group_name = Column(Unicode(16), unique=True, nullable=False)
     display_name = Column(Unicode(255))
-    created = Column(DateTime, default=datetime.now)
+    created = Column(DateTime, default=datetime.utcnow)
 
     users = relationship('User', secondary=user_group_table, backref='groups')
 
@@ -122,7 +122,7 @@ class User(DeclarativeBase):
     email = Column(Unicode(255), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     _password = Column('password', Unicode(128))
-    created = Column(DateTime, default=datetime.now)
+    created = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)
     imported_from = Column(Unicode(32), nullable=True)
     _webdav_left_digest_response_hash = Column('webdav_left_digest_response_hash', Unicode(128))
