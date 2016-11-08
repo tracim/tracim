@@ -268,7 +268,7 @@ class User(DeclarativeBase):
         validity_seconds = CFG.get_instance().USER_AUTH_TOKEN_VALIDITY
 
         if not self.auth_token or not self.auth_token_created:
-            self.auth_token = uuid.uuid4()
+            self.auth_token = str(uuid.uuid4())
             self.auth_token_created = datetime.utcnow()
             DBSession.flush()
             return
