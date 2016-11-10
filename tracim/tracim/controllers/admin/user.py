@@ -312,7 +312,6 @@ class UserRestController(TIMRestController):
             is_tracim_manager = False
             is_tracim_admin = False
 
-
         api = UserApi(current_user)
 
         if api.user_with_email_exists(email):
@@ -347,9 +346,9 @@ class UserRestController(TIMRestController):
             email_manager = get_email_manager()
             email_manager.notify_created_account(user, password=password)
 
+        api.execute_created_user_actions(user)
         tg.flash(_('User {} created.').format(user.get_display_name()), CST.STATUS_OK)
         tg.redirect(self.url())
-
 
     @tg.expose('tracim.templates.admin.user_getone')
     def get_one(self, user_id):

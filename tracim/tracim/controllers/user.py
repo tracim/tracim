@@ -1,33 +1,16 @@
 # -*- coding: utf-8 -*-
 from webob.exc import HTTPForbidden
-
-from tracim import model  as pm
-
-from sprox.tablebase import TableBase
-from sprox.formbase import EditableForm, AddRecordForm
-from sprox.fillerbase import TableFiller, EditFormFiller
-from tw2 import forms as tw2f
 import tg
 from tg import tmpl_context
-from tg.i18n import ugettext as _, lazy_ugettext as l_
-
-from sprox.widgets import PropertyMultipleSelectField
-from sprox._compat import unicode_text
-
-from formencode import Schema
-from formencode.validators import FieldsMatch
+from tg.i18n import ugettext as _
 
 from tracim.controllers import TIMRestController
-from tracim.lib import helpers as h
 from tracim.lib.user import UserApi
-from tracim.lib.group import GroupApi
-from tracim.lib.user import UserStaticApi
-from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
-
-from tracim.model import DBSession
-from tracim.model.auth import Group, User
-from tracim.model.serializers import Context, CTX, DictLikeClass
+from tracim.model.serializers import Context
+from tracim.model.serializers import CTX
+from tracim.model.serializers import DictLikeClass
+from tracim import model as pm
 
 
 class UserWorkspaceRestController(TIMRestController):

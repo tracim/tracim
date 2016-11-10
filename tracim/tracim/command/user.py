@@ -3,13 +3,18 @@ import transaction
 from sqlalchemy.exc import IntegrityError
 from tg import config
 
-from tracim.command import AppContextCommand, Extender
+from tracim.command import AppContextCommand
+from tracim.command import Extender
 from tracim.lib.auth.ldap import LDAPAuth
+from tracim.lib.daemons import DaemonsManager
+from tracim.lib.daemons import RadicaleDaemon
 from tracim.lib.email import get_email_manager
-from tracim.lib.exception import AlreadyExistError, CommandAbortedError
+from tracim.lib.exception import AlreadyExistError
+from tracim.lib.exception import CommandAbortedError
 from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
-from tracim.model import DBSession, User
+from tracim.model import DBSession
+from tracim.model import User
 
 
 class UserCommand(AppContextCommand):
@@ -108,6 +113,13 @@ class UserCommand(AppContextCommand):
             user = User(email=login, password=password, **kwargs)
             self._session.add(user)
             self._session.flush()
+
+            # We need to enable radicale if it not already done
+            daemons = DaemonsManager()
+            daemons.run('radicale', RadicaleDaemon)
+
+            user_api = UserApi(user)
+            user_api.execute_created_user_actions(user)
         except IntegrityError:
             self._session.rollback()
             raise AlreadyExistError()
