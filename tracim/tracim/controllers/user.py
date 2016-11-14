@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-
+from webob.exc import HTTPForbidden
 import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
-from webob.exc import HTTPForbidden
 
 from tracim.controllers import TIMRestController
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import WorkspaceApi
-
-from tracim.model.serializers import Context, CTX, DictLikeClass
+from tracim.model.serializers import Context
+from tracim.model.serializers import CTX
+from tracim.model.serializers import DictLikeClass
 from tracim import model as pm
 
 

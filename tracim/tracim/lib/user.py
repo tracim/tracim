@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-__author__ = 'damien'
+import transaction
 
 import tg
 
@@ -8,7 +7,9 @@ from tracim.model.auth import User
 
 from tracim.model import auth as pbma
 from tracim.model import DBSession
-import tracim.model.data as pmd
+
+__author__ = 'damien'
+
 
 class UserApi(object):
 
@@ -69,6 +70,27 @@ class UserApi(object):
 
     def save(self, user: User):
         DBSession.flush()
+
+    def execute_created_user_actions(self, created_user: User) -> None:
+        """
+        Execute actions when user just been created
+        :return:
+        """
+        # NOTE: Cyclic import
+        from tracim.lib.calendar import CalendarManager
+        from tracim.model.organisational import UserCalendar
+
+        created_user.ensure_auth_token()
+
+        # Ensure database is up-to-date
+        DBSession.flush()
+        transaction.commit()
+
+        calendar_manager = CalendarManager(created_user)
+        calendar_manager.create_then_remove_fake_event(
+            calendar_class=UserCalendar,
+            related_object_id=created_user.user_id,
+        )
 
 
 class UserStaticApi(object):
