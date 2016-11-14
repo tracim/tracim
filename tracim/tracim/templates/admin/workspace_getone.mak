@@ -24,9 +24,8 @@
 <%def name="TITLE_ROW()">
     <div class="row-fluid">
         <div>
-            <%
-                subtitle = _('created on {}').format(h.formatLongDateAndTime(result.workspace.created))
-            %>
+            <% created_localized = h.get_with_timezone(result.workspace.created) %>
+            <% subtitle = _('workspace created on {date} at {time}').format(date=h.date(created_localized), time=h.time(created_localized)) %>
             ${ROW.TITLE_ROW(_('Workspace {}').format(result.workspace.label), 'fa-bank', 'col-md-offset-3 col-md-7', 't-user-color', subtitle)}
         </div>
     </div>

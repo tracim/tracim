@@ -46,7 +46,8 @@
         </h1>
 
         <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
-          <p>${_('folder created on {date} at {time} by <b>{author}</b>').format(date=h.date(result.folder.created), time=h.time(result.folder.created), author=result.folder.owner.name)|n}</p>
+            <% created_localized = h.get_with_timezone(result.folder.created) %>
+          <p>${_('folder created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.folder.owner.name)|n}</p>
         </div>
     </div>
 </div>
