@@ -34,7 +34,7 @@
         </script>
         <div class="form-group calendar-url" style="display: ${'none' if not result.workspace.calendar_enabled else 'block'};">
             <label for="workspace-name1">${_('Calendar Url')}</label>
-            <input id="workspaceCalendarUrl" type="text" class="form-control"  disabled="disabled" value="${result.workspace.calendar_url}" />
+            <input id="workspaceCalendarUrl" type="text" class="form-control" readonly value="${result.workspace.calendar_url}" />
             <p>
                 ${_('This url is the one to configure in your calendar software: Outlook, Thunderbird, etc.')}
             </p>

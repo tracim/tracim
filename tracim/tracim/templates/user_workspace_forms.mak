@@ -113,7 +113,7 @@
             <div class="form-group">
                 <label for="calendar">${_('Personal calendar')}</label>
                 <span class="info readonly">${_('This calendar URL will work with CalDav compatibles clients')}</span>
-                <input id="calendar" type="text" class="form-control"  disabled="disabled" value="${user.calendar_url}" />
+                <input id="calendar" type="text" class="form-control" readonly value="${user.calendar_url}" />
             </div>
         </div>
         <div class="modal-footer">
