@@ -25,7 +25,7 @@
     <div class="row-fluid">
         <div>
             <%
-                subtitle = _('created on {}'.format(h.formatLongDateAndTime(result.workspace.created)))
+                subtitle = _('created on {}').format(h.formatLongDateAndTime(result.workspace.created))
             %>
             ${ROW.TITLE_ROW(_('Workspace {}').format(result.workspace.label), 'fa-bank', 'col-md-offset-3 col-md-7', 't-user-color', subtitle)}
         </div>
