@@ -23,7 +23,6 @@ class Globals(object):
         pass
 
     VERSION_NUMBER = '1.0.3'
-    LONG_DATE_FORMAT = '%A, the %d of %B %Y at %H:%M'
     SHORT_DATE_FORMAT = l_('%B %d at %I:%M%p')
 
 

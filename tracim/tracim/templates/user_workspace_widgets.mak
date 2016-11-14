@@ -303,6 +303,7 @@
 </%def>
 
 <%def name="SECURED_TIMELINE_ITEM(user, item)">
+##     <% created_localized = h.get_with_timezone(item.created) %>
 ##     <div class="row t-odd-or-even t-hacky-thread-comment-border-top">
 ##         <div class="col-sm-7 col-sm-offset-3">
 ##             <div class="t-timeline-item">
@@ -312,7 +313,7 @@
 ##                 <h5 style="margin: 0;">
 ##                     <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(item.owner.name)|n}</span>
 ##
-##                     <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(item.created)|n}">
+##                     <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(created_localized)|n}">
 ##                         ${_('{delta} ago').format(delta=item.created_as_delta)}
 ##
 ##                         % if h.is_item_still_editable(item) and item.owner.id==user.id:
@@ -336,6 +337,7 @@
 </%def>
 
 <%def name="SECURED_HISTORY_VIRTUAL_EVENT(user, event)">
+    <% created_localized = h.get_with_timezone(event.created) %>
     <% is_new_css_class = 't-is-new-content' if event.is_new else '' %>
 
     <div class="row t-odd-or-even t-hacky-thread-comment-border-top ${is_new_css_class}">
@@ -353,7 +355,7 @@
                         <span class="tracim-less-visible">${_('{} by <strong>{}</strong>').format(event.label, event.owner.name)|n}</span>
                     % endif
 
-                    <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(event.created)|n}">
+                    <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(created_localized)|n}">
                         ${_('{delta} ago').format(delta=event.created_as_delta)}
 
                         % if h.is_item_still_editable(CFG, event) and event.owner.id==user.id:
@@ -374,6 +376,7 @@
 </%def>
 
 <%def name="SECURED_HISTORY_VIRTUAL_EVENT_AS_TABLE_ROW(user, event, current_revision_id)">
+    <% created_localized = h.get_with_timezone(event.created) %>
     <%
         warning_or_not = ('', 'warning')[current_revision_id==event.id]
         row_css = 't-is-new-content' if event.is_new else warning_or_not
@@ -382,7 +385,7 @@
         <td class="t-less-visible">
             <span class="label label-default">${ICON.FA_FW(event.type.icon)} ${event.type.label}</span>
         </td>
-        <td title="${h.date_time(event.created)|n}">${_('{delta} ago').format(delta=event.created_as_delta)}</td>
+        <td title="${h.date_time(created_localized)|n}">${_('{delta} ago').format(delta=event.created_as_delta)}</td>
         <td>${event.owner.name}</td>
 ## FIXME - REMOVE                            <td>${event}</td>
 
