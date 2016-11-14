@@ -51,7 +51,8 @@ class TestApp(BaseTestApp):
         try:
             super()._check_status(status, res)
         except AppError as exc:
-            dump_file_path = "/tmp/debug_%d_%s.html" % (time.time() * 1000, res.request.path_qs[1:])
+            escaped_page_name = res.request.path_qs[1:].replace('/', '')
+            dump_file_path = "/tmp/debug_%d_%s.html" % (time.time() * 1000, escaped_page_name)
             if os.path.exists("/tmp"):
                 with open(dump_file_path, 'w') as dump_file:
                     print(res.ubody, file=dump_file)
