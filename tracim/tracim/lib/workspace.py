@@ -1,28 +1,14 @@
 # -*- coding: utf-8 -*-
-
-__author__ = 'damien'
-
-import os
-from datetime import datetime
-from hashlib import sha256
-
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, Text
-from sqlalchemy.orm import relation, synonym, contains_eager
-from sqlalchemy.orm import joinedload_all
-import sqlalchemy.orm as sqlao
-import sqlalchemy as sqla
-
-import tg
+import transaction
 
 from tracim.lib.userworkspace import RoleApi
 from tracim.model.auth import Group
 from tracim.model.auth import User
 from tracim.model.data import Workspace
 from tracim.model.data import UserRoleInWorkspace
-
-from tracim.model import auth as pbma
 from tracim.model import DBSession
+
+__author__ = 'damien'
 
 
 class WorkspaceApi(object):
@@ -39,10 +25,17 @@ class WorkspaceApi(object):
             filter(UserRoleInWorkspace.user_id==self._user.user_id).\
             filter(Workspace.is_deleted==False)
 
-    def create_workspace(self, label: str, description: str='', save_now:bool=False) -> Workspace:
+    def create_workspace(
+            self,
+            label: str,
+            description: str='',
+            calendar_enabled: bool=False,
+            save_now: bool=False,
+    ) -> Workspace:
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
+        workspace.calendar_enabled = calendar_enabled
 
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
@@ -55,6 +48,9 @@ class WorkspaceApi(object):
 
         if save_now:
             DBSession.flush()
+
+        if calendar_enabled:
+            self.execute_created_workspace_actions(workspace)
 
         return workspace
 
@@ -124,6 +120,27 @@ class WorkspaceApi(object):
             DBSession.flush()
 
         return workspace
+
+    def execute_created_workspace_actions(self, workspace: Workspace) -> None:
+        self.ensure_calendar_exist(workspace)
+
+    def ensure_calendar_exist(self, workspace: Workspace) -> None:
+        # Note: Cyclic imports
+        from tracim.lib.calendar import CalendarManager
+        from tracim.model.organisational import WorkspaceCalendar
+
+        if workspace.calendar_enabled:
+            self._user.ensure_auth_token()
+
+            # Ensure database is up-to-date
+            DBSession.flush()
+            transaction.commit()
+
+            calendar_manager = CalendarManager(self._user)
+            calendar_manager.create_then_remove_fake_event(
+                calendar_class=WorkspaceCalendar,
+                related_object_id=workspace.workspace_id,
+            )
 
 
 class UnsafeWorkspaceApi(WorkspaceApi):

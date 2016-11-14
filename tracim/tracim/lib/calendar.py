@@ -1,3 +1,4 @@
+import caldav
 import os
 
 import re
@@ -5,6 +6,7 @@ import transaction
 
 from icalendar import Event as iCalendarEvent
 from sqlalchemy.orm.exc import NoResultFound
+from tg import tmpl_context
 from tg.i18n import ugettext as _
 
 from tracim.lib.content import ContentApi
@@ -316,3 +318,44 @@ class CalendarManager(object):
         :return: True if given collection path is an discover path
         """
         return path in ('user', 'workspace')
+
+    def create_then_remove_fake_event(
+            self,
+            calendar_class,
+            related_object_id,
+    ) -> None:
+        radicale_base_url = self.get_base_url()
+        client = caldav.DAVClient(
+            radicale_base_url,
+            username=self._user.email,
+            password=self._user.auth_token,
+        )
+        if calendar_class == WorkspaceCalendar:
+            calendar_url = self.get_workspace_calendar_url(related_object_id)
+        elif calendar_class == UserCalendar:
+            calendar_url = self.get_user_calendar_url(related_object_id)
+        else:
+            raise Exception('Unknown calendar type {0}'.format(calendar_class))
+
+        user_calendar = caldav.Calendar(
+            parent=client,
+            client=client,
+            url=calendar_url
+        )
+
+        event_ics = """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example Corp.//CalDAV Client//EN
+BEGIN:VEVENT
+UID:{uid}
+DTSTAMP:20100510T182145Z
+DTSTART:20100512T170000Z
+DTEND:20100512T180000Z
+SUMMARY:This is an event
+LOCATION:Here
+END:VEVENT
+END:VCALENDAR
+""".format(uid='{0}FAKEEVENT'.format(related_object_id))
+        event = user_calendar.add_event(event_ics)
+        event.delete()
+

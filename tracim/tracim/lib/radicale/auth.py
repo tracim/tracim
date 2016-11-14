@@ -1,6 +1,7 @@
 from tg import config
 
 from tracim.lib.user import UserApi
+from tracim.model import DBSession
 
 
 class Auth(object):
@@ -33,4 +34,5 @@ def is_authenticated(user: str, password: str) -> bool:
     """
     see tracim.lib.radicale.auth.Auth#is_authenticated
     """
+    DBSession.expire_all()
     return Auth.is_authenticated(user, password)

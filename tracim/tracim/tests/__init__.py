@@ -354,7 +354,7 @@ class BaseTestThread(BaseTest):
         return thread
 
 
-class TestCalendar(TestController):
+class TestCalendar(TracimTestController):
     fixtures = [BaseFixture, TestFixture]
     application_under_test = 'radicale'
 
