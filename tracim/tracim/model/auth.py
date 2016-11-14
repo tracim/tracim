@@ -14,7 +14,6 @@ import os
 from datetime import datetime
 import time
 from hashlib import sha256
-from slugify import slugify
 from sqlalchemy.ext.hybrid import hybrid_property
 from tg.i18n import lazy_ugettext as l_
 from hashlib import md5
@@ -217,6 +216,14 @@ class User(DeclarativeBase):
     webdav_left_digest_response_hash = synonym('_webdav_left_digest_response_hash',
                                                descriptor=property(_get_hash_digest,
                                                                     _set_hash_digest))
+
+    def update_webdav_digest_auth(self, password) -> None:
+        self.webdav_left_digest_response_hash \
+            = '{username}:/:{password}'.format(
+                username=self.email,
+                password=password,
+            )
+
 
     def validate_password(self, password):
         """
