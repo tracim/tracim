@@ -221,11 +221,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         workspace_api_controller.save(workspace)
 
         if calendar_enabled:
-            workspace_id = workspace.workspace_id
             workspace_api_controller.ensure_calendar_exist(workspace)
-            # We must reload user because user_api.created_user_actions
-            # commit transaction
-            workspace = workspace_api_controller.get_one_by_id(workspace_id)
 
         tg.flash(_('{} workspace updated.').format(workspace.label), CST.STATUS_OK)
         tg.redirect(self.url(workspace.workspace_id))
