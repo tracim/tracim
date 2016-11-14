@@ -10,7 +10,7 @@
 <%def name="HELP_MODAL_DIALOG(help_page)"><div id="help-modal-dialog-${help_page}" class="modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"></div></div></div></%def>
 
 <%def name="NO_CONTENT_INFO(message)"><div class="alert alert-warning" role="alert">${ICO(32, 'status/dialog-information')} ${message|n}</div></%def>
-                
+
 <%def name="ICO_ACTION(icon_size, icon_path, title, link_url, current_user, required_profile_id)">
     % if current_user.profile.id>=required_profile_id:
         <a href="${link_url}">${ICO_TOOLTIP(icon_size, icon_path, title)}</a>
@@ -79,7 +79,9 @@
                 $('.alert-error').removeClass('alert-error').addClass('alert-danger');
 
                 window.setTimeout(function() {
-                    $("#flash-message-to-fade-out").fadeTo(2000, 0.75).fadeTo(2000, 0.5).fadeTo(8000, 0);
+                    $("#flash-message-to-fade-out").fadeTo(8000, 0, 'linear', function () {
+                        $(this).hide()
+                    });
                 }, 2000);
             });
         </script>
