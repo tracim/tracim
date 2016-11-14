@@ -621,8 +621,10 @@ def serialize_content_for_general_list(content: Content, context: Context):
     last_activity_date = content.get_last_activity_date()
     last_activity_date_formatted = format_datetime(last_activity_date,
                                                    locale=tg.i18n.get_lang()[0])
-    last_activity_label = format_timedelta(datetime.now() - last_activity_date,
-                                           locale=tg.i18n.get_lang()[0])
+    last_activity_label = format_timedelta(
+        datetime.utcnow() - last_activity_date,
+        locale=tg.i18n.get_lang()[0],
+    )
     last_activity_label = last_activity_label.replace(' ', '\u00A0') # espace insécable
 
     return DictLikeClass(
@@ -645,7 +647,7 @@ def serialize_content_for_folder_content_list(content: Content, context: Context
     last_activity_date = content.get_last_activity_date()
     last_activity_date_formatted = format_datetime(last_activity_date,
                                                    locale=tg.i18n.get_lang()[0])
-    last_activity_label = format_timedelta(datetime.now() - last_activity_date,
+    last_activity_label = format_timedelta(datetime.utcnow() - last_activity_date,
                                            locale=tg.i18n.get_lang()[0])
     last_activity_label = last_activity_label.replace(' ', '\u00A0') # espace insécable
 
