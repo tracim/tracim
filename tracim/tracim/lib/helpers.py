@@ -98,17 +98,6 @@ def current_year():
   now = datetime.datetime.now()
   return now.strftime('%Y')
 
-def formatLongDateAndTime(datetime_object, format=''):
-    """ OBSOLETE
-    :param datetime_object:
-    :param format:
-    :return:
-    """
-    if not format:
-        format = plag.Globals.LONG_DATE_FORMAT
-    return datetime_object.strftime(format)
-
-
 
 def icon(icon_name, white=False):
     if (white):
