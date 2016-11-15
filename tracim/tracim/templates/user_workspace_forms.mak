@@ -115,6 +115,20 @@
                 <span class="info readonly">${_('This calendar URL will work with CalDav compatibles clients')}</span>
                 <input id="calendar" type="text" class="form-control"  disabled="disabled" value="${user.calendar_url}" />
             </div>
+            <div class="form-group">
+                <label for="timezone">${_('Timezone')}</label>
+                <span class="info readonly">${_('Dates will be displayed with this timezone')}</span>
+                <select id="timezone" name="timezone" class="form-control">
+                    <option value=""></option>
+                    % for timezone in timezones:
+                        % if timezone == user.timezone:
+                            <option value="${timezone}" selected>${timezone}</option>
+                        % else:
+                            <option value="${timezone}">${timezone}</option>
+                        % endif
+                    % endfor
+                </select>
+            </div>
         </div>
         <div class="modal-footer">
             <span class="pull-right t-modal-form-submit-button">

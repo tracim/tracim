@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-
+import pytz
+from webob.exc import HTTPForbidden
 import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
-from webob.exc import HTTPForbidden
 
 from tracim.controllers import TIMRestController
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import WorkspaceApi
-
-from tracim.model.serializers import Context, CTX, DictLikeClass
+from tracim.model.serializers import Context
+from tracim.model.serializers import CTX
+from tracim.model.serializers import DictLikeClass
 from tracim import model as pm
 
 
@@ -157,10 +158,14 @@ class UserRestController(TIMRestController):
 
         dictified_user = Context(CTX.USER).toDict(current_user, 'user')
         fake_api = DictLikeClass(next_url=next_url)
-        return DictLikeClass(result=dictified_user, fake_api=fake_api)
+        return DictLikeClass(
+            result=dictified_user,
+            fake_api=fake_api,
+            timezones=pytz.all_timezones,
+        )
 
     @tg.expose('tracim.templates.workspace.edit')
-    def put(self, user_id, name, email, next_url=None):
+    def put(self, user_id, name, email, timezone, next_url=None):
         user_id = tmpl_context.current_user.user_id
         current_user = tmpl_context.current_user
         assert user_id==current_user.user_id
@@ -168,7 +173,8 @@ class UserRestController(TIMRestController):
         # Only keep allowed field update
         updated_fields = self._clean_update_fields({
             'name': name,
-            'email': email
+            'email': email,
+            'timezone': timezone,
         })
 
         api = UserApi(tmpl_context.current_user)

@@ -580,7 +580,7 @@ class ContentRevisionRO(DeclarativeBase):
             column_value = getattr(revision, column_name)
             setattr(new_rev, column_name, column_value)
 
-        new_rev.updated = datetime.now()
+        new_rev.updated = datetime.utcnow()
 
         return new_rev
 
@@ -1009,7 +1009,7 @@ class Content(DeclarativeBase):
 
     def created_as_delta(self, delta_from_datetime:datetime=None):
         if not delta_from_datetime:
-            delta_from_datetime = datetime.now()
+            delta_from_datetime = datetime.utcnow()
 
         return format_timedelta(delta_from_datetime - self.created,
                                 locale=tg.i18n.get_lang()[0])
@@ -1017,7 +1017,7 @@ class Content(DeclarativeBase):
     def datetime_as_delta(self, datetime_object,
                           delta_from_datetime:datetime=None):
         if not delta_from_datetime:
-            delta_from_datetime = datetime.now()
+            delta_from_datetime = datetime.utcnow()
         return format_timedelta(delta_from_datetime - datetime_object,
                                 locale=tg.i18n.get_lang()[0])
 
@@ -1232,7 +1232,7 @@ class VirtualEvent(object):
 
     def created_as_delta(self, delta_from_datetime:datetime=None):
         if not delta_from_datetime:
-            delta_from_datetime = datetime.now()
+            delta_from_datetime = datetime.utcnow()
         return format_timedelta(delta_from_datetime - self.created,
                                 locale=tg.i18n.get_lang()[0])
 
@@ -1240,7 +1240,7 @@ class VirtualEvent(object):
         aff = ''
 
         if not delta_from_datetime:
-            delta_from_datetime = datetime.now()
+            delta_from_datetime = datetime.utcnow()
 
         delta = delta_from_datetime - self.created
         

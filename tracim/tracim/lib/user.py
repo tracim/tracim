@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-__author__ = 'damien'
+import transaction
 
 import tg
 
@@ -8,7 +7,9 @@ from tracim.model.auth import User
 
 from tracim.model import auth as pbma
 from tracim.model import DBSession
-import tracim.model.data as pmd
+
+__author__ = 'damien'
+
 
 class UserApi(object):
 
@@ -30,12 +31,21 @@ class UserApi(object):
     def get_one_by_id(self, id: int) -> User:
         return self._base_query().filter(User.user_id==id).one()
 
-    def update(self, user: User, name: str=None, email: str=None, do_save=True):
+    def update(
+            self,
+            user: User,
+            name: str=None,
+            email: str=None,
+            do_save=True,
+            timezone: str='',
+    ):
         if name is not None:
             user.display_name = name
 
         if email is not None:
             user.email = email
+
+        user.timezone = timezone
 
         if do_save:
             self.save(user)
@@ -69,6 +79,27 @@ class UserApi(object):
 
     def save(self, user: User):
         DBSession.flush()
+
+    def execute_created_user_actions(self, created_user: User) -> None:
+        """
+        Execute actions when user just been created
+        :return:
+        """
+        # NOTE: Cyclic import
+        from tracim.lib.calendar import CalendarManager
+        from tracim.model.organisational import UserCalendar
+
+        created_user.ensure_auth_token()
+
+        # Ensure database is up-to-date
+        DBSession.flush()
+        transaction.commit()
+
+        calendar_manager = CalendarManager(created_user)
+        calendar_manager.create_then_remove_fake_event(
+            calendar_class=UserCalendar,
+            related_object_id=created_user.user_id,
+        )
 
 
 class UserStaticApi(object):

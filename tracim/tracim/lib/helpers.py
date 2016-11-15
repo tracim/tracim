@@ -6,11 +6,14 @@
 
 import datetime
 
+import pytz
 import slugify
-from babel.dates import format_date, format_time
+from babel.dates import format_date
+from babel.dates import format_time
 from markupsafe import Markup
 
 import tg
+from tg import tmpl_context
 from tg.i18n import ugettext as _
 
 from tracim.lib import app_globals as plag
@@ -20,13 +23,45 @@ from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
-from tracim.model import User
 
 from tracim.model.data import ContentStatus
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
+
+
+def get_with_timezone(
+        datetime_object: datetime.datetime,
+        to_timezone: str='',
+        default_from_timezone: str='UTC',
+) -> datetime.datetime:
+    """
+    Change timezone of a date
+    :param datetime_object: datetime to update
+    :param to_timezone: timezone name, if equal to '',
+    try to grap current user timezone. If no given timezone name and no
+    current user timezone, return original date time
+    :param default_from_timezone: datetime original timezone if datetime
+    object is naive
+    :return: datetime updated
+    """
+    # If no to_timezone, try to grab from current user
+    if not to_timezone and tmpl_context.current_user:
+        to_timezone = tmpl_context.current_user.timezone
+
+    # If no to_timezone, return original datetime
+    if not to_timezone:
+        return datetime_object
+
+    # If datetime_object have not timezone, set new from default_from_timezone
+    if not datetime_object.tzinfo:
+        from_tzinfo = pytz.timezone(default_from_timezone)
+        datetime_object = from_tzinfo.localize(datetime_object)
+
+    new_tzinfo = pytz.timezone(to_timezone)
+    return datetime_object.astimezone(new_tzinfo)
+
 
 def date_time_in_long_format(datetime_object, format=''):
 
@@ -62,17 +97,6 @@ def user_friendly_file_size(file_size: int):
 def current_year():
   now = datetime.datetime.now()
   return now.strftime('%Y')
-
-def formatLongDateAndTime(datetime_object, format=''):
-    """ OBSOLETE
-    :param datetime_object:
-    :param format:
-    :return:
-    """
-    if not format:
-        format = plag.Globals.LONG_DATE_FORMAT
-    return datetime_object.strftime(format)
-
 
 
 def icon(icon_name, white=False):

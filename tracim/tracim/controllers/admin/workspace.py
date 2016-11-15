@@ -5,7 +5,6 @@ from tg import tmpl_context
 from tg.i18n import ugettext as _
 
 from tracim.controllers import TIMRestController
-from tracim.controllers import TIMRestPathContextSetup
 
 
 from tracim.lib import CST
@@ -13,22 +12,12 @@ from tracim.lib.base import BaseController
 from tracim.lib.helpers import on_off_to_boolean
 from tracim.lib.user import UserApi
 from tracim.lib.userworkspace import RoleApi
-from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
-from tracim.model import DBSession
 
 from tracim.model.auth import Group
-from tracim.model.data import NodeTreeItem
-from tracim.model.data import Content
-from tracim.model.data import ContentType
-from tracim.model.data import Workspace
 from tracim.model.data import UserRoleInWorkspace
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
-
-from tracim.controllers.content import UserWorkspaceFolderRestController
-
-
 
 
 class RoleInWorkspaceRestController(TIMRestController, BaseController):
@@ -198,9 +187,12 @@ class WorkspaceRestController(TIMRestController, BaseController):
         workspace_api_controller = WorkspaceApi(user)
         calendar_enabled = on_off_to_boolean(calendar_enabled)
 
-        workspace = workspace_api_controller.create_workspace(name, description)
-        workspace.calendar_enabled = calendar_enabled
-        DBSession.flush()
+        workspace = workspace_api_controller.create_workspace(
+            name,
+            description,
+            calendar_enabled=calendar_enabled,
+            save_now=True,
+        )
 
         tg.flash(_('{} workspace created.').format(workspace.label), CST.STATUS_OK)
         tg.redirect(self.url())
@@ -227,6 +219,9 @@ class WorkspaceRestController(TIMRestController, BaseController):
         workspace.description = description
         workspace.calendar_enabled = calendar_enabled
         workspace_api_controller.save(workspace)
+
+        if calendar_enabled:
+            workspace_api_controller.ensure_calendar_exist(workspace)
 
         tg.flash(_('{} workspace updated.').format(workspace.label), CST.STATUS_OK)
         tg.redirect(self.url(workspace.workspace_id))

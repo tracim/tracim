@@ -48,7 +48,8 @@
         </h1>
 
         <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
-          <p>${_('file created on {date} at {time} by <b>{author}</b>').format(date=h.date(result.file.created), time=h.time(result.file.created), author=result.file.owner.name)|n}</p>
+            <% created_localized = h.get_with_timezone(result.file.created) %>
+          <p>${_('file created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.file.owner.name)|n}</p>
         </div>
     </div>
 </div>
@@ -107,7 +108,8 @@
                 </tr>
                 <tr>
                     <td class="tracim-title">${_('Modified')}</td>
-                    <td>${h.format_short(result.file.created)|n} ${_('by {}').format(result.file.owner.name)}</td>
+                    <% created_localized = h.get_with_timezone(result.file.created) %>
+                    <td>${h.format_short(created_localized)|n} ${_('by {}').format(result.file.owner.name)}</td>
                 </tr>
             </table>
         </div>
