@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from operator import itemgetter
+
 __author__ = 'damien'
 
 import datetime
@@ -556,8 +558,13 @@ class ContentApi(object):
             .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
             .subquery()
 
-        not_read_content_ids = DBSession.query(
-            distinct(not_read_revisions.c.content_id)).all()
+        not_read_content_ids_query = DBSession.query(
+            distinct(not_read_revisions.c.content_id)
+        )
+        not_read_content_ids = list(map(
+            itemgetter(0),
+            not_read_content_ids_query,
+        ))
 
         not_read_contents = self._base_query(workspace) \
             .filter(Content.content_id.in_(not_read_content_ids)) \
