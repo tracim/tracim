@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Controllers for the tracim application."""
+from sqlalchemy.orm.exc import NoResultFound
+from tg import abort
 from tracim.lib.workspace import WorkspaceApi
 
 import tg
@@ -167,10 +169,12 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
     /dashboard/workspaces/{}/folders/{}/someitems/{}
     """
     def _before(self, *args, **kw):
-        TIMRestPathContextSetup.current_user()
-        TIMRestPathContextSetup.current_workspace()
-        TIMRestPathContextSetup.current_folder()
-
+        try:
+            TIMRestPathContextSetup.current_user()
+            TIMRestPathContextSetup.current_workspace()
+            TIMRestPathContextSetup.current_folder()
+        except NoResultFound:
+            abort(404)
 
     @property
     def _std_url(self):
