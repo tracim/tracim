@@ -29,8 +29,9 @@ abort(
 
 class APIBaseController(BaseController):
     def _before(self, *args, **kw):
-        if request.content_type != 'application/json':
-            abort(406, 'Only JSON requests are supported')
+        # For be user friendly, we disable hard check of content_type
+        # if request.content_type != 'application/json':
+        #     abort(406, 'Only JSON requests are supported')
 
         super()._before(*args, **kw)
 
