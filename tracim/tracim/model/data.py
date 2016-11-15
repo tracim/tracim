@@ -1007,6 +1007,16 @@ class Content(DeclarativeBase):
         self._properties = json.dumps(properties_struct)
         ContentChecker.check_properties(self)
 
+    @property
+    def clean_revisions(self):
+        """
+        This property return revisions with really only one of each revisions:
+        Actually, .revisions list give duplicated last revision,
+        see https://github.com/tracim/tracim/issues/126
+        :return: list of revisions
+        """
+        return list(set(self.revisions))
+
     def created_as_delta(self, delta_from_datetime:datetime=None):
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
@@ -1093,13 +1103,13 @@ class Content(DeclarativeBase):
         return last_comment
 
     def get_previous_revision(self) -> 'ContentRevisionRO':
-        rev_ids = [revision.revision_id for revision in self.revisions]
+        rev_ids = [revision.revision_id for revision in self.clean_revisions]
         rev_ids.sort()
 
         if len(rev_ids)>=2:
             revision_rev_id = rev_ids[-2]
 
-            for revision in self.revisions:
+            for revision in self.clean_revisions:
                 if revision.revision_id == revision_rev_id:
                     return revision
 
@@ -1128,7 +1138,7 @@ class Content(DeclarativeBase):
         events = []
         for comment in self.get_comments():
             events.append(VirtualEvent.create_from_content(comment))
-        for revision in self.revisions:
+        for revision in self.clean_revisions:
             events.append(VirtualEvent.create_from_content_revision(revision))
 
         sorted_events = sorted(events,
