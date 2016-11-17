@@ -53,6 +53,7 @@ class UserApi(object):
         if self._user and user.user_id==self._user.user_id:
             # this is required for the session to keep on being up-to-date
             tg.request.identity['repoze.who.userid'] = email
+            tg.auth_force_login(email)
 
     def user_with_email_exists(self, email: str):
         try:
