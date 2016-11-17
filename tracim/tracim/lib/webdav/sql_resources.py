@@ -232,7 +232,8 @@ class Workspace(DAVCollection):
         # TODO : remove commentary here raise DAVError(HTTP_FORBIDDEN)
         if '/.deleted/' in self.path or '/.archived/' in self.path:
             raise DAVError(HTTP_FORBIDDEN)
-
+        # TODO: Test ici que la ressource n'existe pas déjà
+        # Si oui on retourne le document déjà existant ?
         return FakeFileStream(
             file_name=file_name,
             content_api=self.content_api,
