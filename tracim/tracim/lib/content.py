@@ -186,12 +186,21 @@ class ContentApi(object):
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
+        # Security layer: if user provided, filter
+        # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
             user = DBSession.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = [r.workspace_id for r in user.roles \
                              if r.role>=UserRoleInWorkspace.READER]
-            result = result.filter(Content.workspace_id.in_(workspace_ids))
+            result = result.filter(or_(
+                Content.workspace_id.in_(workspace_ids),
+                # And allow access to non workspace document when he is owner
+                and_(
+                    Content.workspace_id == None,
+                    Content.owner_id == self._user_id,
+                )
+            ))
 
         return result
 

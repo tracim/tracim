@@ -2,7 +2,6 @@
 
 from nose.tools import eq_, ok_
 from nose.tools import raises
-from tracim.lib.group import GroupApi
 
 import transaction
 
@@ -20,8 +19,9 @@ from tracim.model.data import ActionDescription, ContentRevisionRO, Workspace
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
-
-from tracim.tests import TestStandard, BaseTest
+from tracim.fixtures.users_and_groups import Test as TestFixture
+from tracim.tests import TestStandard
+from tracim.tests import BaseTest
 
 
 class TestContentApi(BaseTest, TestStandard):
@@ -788,3 +788,46 @@ class TestContentApi(BaseTest, TestStandard):
         bar_result = api.search(['bar']).all()
         api.exclude_unavailable(bar_result)
         eq_(0, len(bar_result))
+
+
+class TestContentApiSecurity(TestStandard):
+    fixtures = [TestFixture, ]
+
+    def test_unit__cant_get_non_access_content__ok__nominal_case(self):
+        admin = DBSession.query(User)\
+            .filter(User.email == 'admin@admin.admin').one()
+        bob = DBSession.query(User)\
+            .filter(User.email == 'bob@fsf.local').one()
+
+        bob_workspace = WorkspaceApi(bob).create_workspace(
+            'bob_workspace',
+            save_now=True,
+        )
+        admin_workspace = WorkspaceApi(admin).create_workspace(
+            'admin_workspace',
+            save_now=True,
+        )
+
+        bob_page = ContentApi(bob).create(
+            content_type=ContentType.Page,
+            workspace=bob_workspace,
+            label='bob_page',
+            do_save=True,
+        )
+
+        admin_page = ContentApi(bob).create(
+            content_type=ContentType.Page,
+            workspace=admin_workspace,
+            label='admin_page',
+            do_save=True,
+        )
+
+        bob_viewable = ContentApi(bob).get_all()
+        eq_(1, len(bob_viewable), 'Bob should view only one content')
+        eq_(
+            'bob_page',
+            bob_viewable[0].label,
+            'Bob should not view "{0}" content'.format(
+                bob_viewable[0].label,
+            )
+        )
