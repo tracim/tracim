@@ -186,7 +186,7 @@ class ContentApi(object):
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
-        if self._user and workspace and not self._disable_user_workspaces_filter:
+        if self._user and not self._disable_user_workspaces_filter:
             user = DBSession.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = [r.workspace_id for r in user.roles \
