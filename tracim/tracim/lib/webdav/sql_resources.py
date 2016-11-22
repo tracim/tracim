@@ -959,10 +959,12 @@ class File(DAVNonCollection):
             workspace
         )
 
-
         with new_revision(self.content):
             if basename(destpath) != self.getDisplayName():
-                self.content_api.update_content(self.content, re.sub('\.[^\.]+$', '', self.provider.transform_to_bdd(basename(destpath))))
+                self.content_api.update_content(
+                    self.content,
+                    transform_to_bdd(basename(destpath)),
+                )
                 self.content_api.save(self.content)
             else:
                 self.content_api.move(
