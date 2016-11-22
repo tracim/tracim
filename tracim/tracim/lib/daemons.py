@@ -289,7 +289,7 @@ class HTTPRequest(BaseHTTPRequest):
             dump_file = '{0}/{1}_{2}.yml'.format(
                 dump_to_path,
                 '{0}_{1}'.format(
-                    datetime.utcnow().strftime('%Y-%m-%d_%H-%I-%S'),
+                    datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
                     int(round(time.time() * 1000)),
                 ),
                 self.method.decode('utf-8'),
