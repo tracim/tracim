@@ -2,6 +2,7 @@
 
 import re
 from os.path import basename, dirname, normpath
+from tracim.lib.webdav.utils import transform_to_bdd
 
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
@@ -242,11 +243,11 @@ class Provider(DAVProvider):
         parents = blbl.split('/')
 
         parents.remove('')
-        parents = [self.transform_to_bdd(x) for x in parents]
+        parents = [transform_to_bdd(x) for x in parents]
 
         try:
             return content_api.get_one_by_label_and_parent_label(
-                self.transform_to_bdd(basename(path)),
+                transform_to_bdd(basename(path)),
                 parents,
                 workspace
             )
@@ -264,50 +265,6 @@ class Provider(DAVProvider):
 
     def get_workspace_from_path(self, path: str, api: WorkspaceApi) -> Workspace:
         try:
-            return api.get_one_by_label(self.transform_to_bdd(path.split('/')[1]))
+            return api.get_one_by_label(transform_to_bdd(path.split('/')[1]))
         except:
             return None
-
-    def transform_to_display(self, string):
-        """
-        As characters that Windows does not support may have been inserted through Tracim in names, before displaying
-        information we update path so that all these forbidden characters are replaced with similar shape character
-        that are allowed so that the user isn't trouble and isn't limited in his naming choice
-        """
-        _TO_DISPLAY = {
-            '/':'⧸',
-            '\\': '⧹',
-            ':': '∶',
-            '*': '∗',
-            '?': 'ʔ',
-            '"': 'ʺ',
-            '<': '❮',
-            '>': '❯',
-            '|': '∣'
-        }
-
-        for key, value in _TO_DISPLAY.items():
-            string = string.replace(key, value)
-
-        return string
-
-    def transform_to_bdd(self, string):
-        """
-        Called before sending request to the database to recover the right names
-        """
-        _TO_BDD = {
-            '⧸': '/',
-            '⧹': '\\',
-            '∶': ':',
-            '∗': '*',
-            'ʔ': '?',
-            'ʺ': '"',
-            '❮': '<',
-            '❯': '>',
-            '∣': '|'
-        }
-
-        for key, value in _TO_BDD.items():
-            string = string.replace(key, value)
-
-        return string

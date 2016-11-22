@@ -10,6 +10,8 @@ from tracim.lib.content import ContentApi
 from tracim.lib.user import UserApi
 from tracim.lib.webdav import HistoryType
 from tracim.lib.webdav import FakeFileStream
+from tracim.lib.webdav.utils import transform_to_display
+from tracim.lib.webdav.utils import transform_to_bdd
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import data, new_revision
 from tracim.model.data import Content, ActionDescription
@@ -121,7 +123,7 @@ class Root(DAVCollection):
         """
         try:
             workspace = self.workspace_api.get_one_by_label(label)
-            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', self.provider.transform_to_display(workspace.label))
+            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', transform_to_display(workspace.label))
 
             return Workspace(workspace_path, self.environ, workspace)
         except AttributeError:
@@ -152,7 +154,7 @@ class Root(DAVCollection):
         self.workspace_api.save(new_workspace)
 
         workspace_path = '%s%s%s' % (
-        self.path, '' if self.path == '/' else '/', self.provider.transform_to_display(new_workspace.label))
+        self.path, '' if self.path == '/' else '/', transform_to_display(new_workspace.label))
 
         transaction.commit()
         return Workspace(workspace_path, self.environ, new_workspace)
@@ -222,7 +224,7 @@ class Workspace(DAVCollection):
     def getMember(self, content_label: str) -> _DAVResource:
 
         return self.provider.getResourceInst(
-            '%s/%s' % (self.path, self.provider.transform_to_display(content_label)),
+            '%s/%s' % (self.path, transform_to_display(content_label)),
             self.environ
         )
 
@@ -275,7 +277,7 @@ class Workspace(DAVCollection):
 
         transaction.commit()
 
-        return Folder('%s/%s' % (self.path, self.provider.transform_to_display(label)),
+        return Folder('%s/%s' % (self.path, transform_to_display(label)),
                       self.environ, folder,
                       self.workspace)
 
@@ -299,7 +301,7 @@ class Workspace(DAVCollection):
         children = self.content_api.get_all(False, ContentType.Any, self.workspace)
 
         for content in children:
-            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+            content_path = '%s/%s' % (self.path, transform_to_display(content.get_label()))
 
             if content.type == ContentType.Folder:
                 members.append(Folder(content_path, self.environ, self.workspace, content))
@@ -363,7 +365,7 @@ class Folder(Workspace):
         return mktime(self.content.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return self.provider.transform_to_display(self.content.get_label())
+        return transform_to_display(self.content.get_label())
 
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
@@ -441,7 +443,7 @@ class Folder(Workspace):
 
         with new_revision(self.content):
             if basename(destpath) != self.getDisplayName():
-                self.content_api.update_content(self.content, self.provider.transform_to_bdd(basename(destpath)))
+                self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
                 self.content_api.save(self.content)
             else:
                 if workspace.workspace_id == self.content.workspace.workspace_id:
@@ -461,7 +463,7 @@ class Folder(Workspace):
         )
 
         for content in visible_children:
-            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+            content_path = '%s/%s' % (self.path, transform_to_display(content.get_label()))
 
             if content.type == ContentType.Folder:
                 members.append(Folder(content_path, self.environ, self.workspace, content))
@@ -627,7 +629,7 @@ class DeletedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path='%s/%s' % (self.path, self.provider.transform_to_display(content.get_label())),
+            path='%s/%s' % (self.path, transform_to_display(content.get_label())),
             environ=self.environ
             )
 
@@ -658,7 +660,7 @@ class DeletedFolder(HistoryFolder):
 
         for content in children:
             if content.is_deleted:
-                content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+                content_path = '%s/%s' % (self.path, transform_to_display(content.get_label()))
 
                 if content.type == ContentType.Folder:
                     members.append(Folder(content_path, self.environ, self.workspace, content))
@@ -712,7 +714,7 @@ class ArchivedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path=self.path + '/' + self.provider.transform_to_display(content.get_label()),
+            path=self.path + '/' + transform_to_display(content.get_label()),
             environ=self.environ
         )
 
@@ -738,7 +740,7 @@ class ArchivedFolder(HistoryFolder):
 
         for content in children:
             if content.is_archived:
-                content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+                content_path = '%s/%s' % (self.path, transform_to_display(content.get_label()))
 
                 if content.type == ContentType.Folder:
                     members.append(Folder(content_path, self.environ, self.workspace, content))
@@ -800,13 +802,13 @@ class HistoryFileFolder(HistoryFolder):
 
         if self.content.type == ContentType.File:
             return HistoryFile(
-                path='%s%s' % (left_side, self.provider.transform_to_display(revision.file_name)),
+                path='%s%s' % (left_side, transform_to_display(revision.file_name)),
                 environ=self.environ,
                 content=self.content,
                 content_revision=revision)
         else:
             return HistoryOtherFile(
-                path='%s%s' % (left_side, self.provider.transform_to_display(revision.get_label())),
+                path='%s%s' % (left_side, transform_to_display(revision.get_label())),
                 environ=self.environ,
                 content=self.content,
                 content_revision=revision)
@@ -820,14 +822,14 @@ class HistoryFileFolder(HistoryFolder):
 
             if self.content.type == ContentType.File:
                 members.append(HistoryFile(
-                    path='%s%s' % (left_side, self.provider.transform_to_display(content.file_name)),
+                    path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
                     content=self.content,
                     content_revision=content)
                 )
             else:
                 members.append(HistoryOtherFile(
-                    path='%s%s' % (left_side, self.provider.transform_to_display(content.file_name)),
+                    path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
                     content=self.content,
                     content_revision=content)
@@ -992,7 +994,7 @@ class HistoryFile(File):
 
     def getDisplayName(self) -> str:
         left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
-        return '%s%s' % (left_side, self.provider.transform_to_display(self.content_revision.file_name))
+        return '%s%s' % (left_side, transform_to_display(self.content_revision.file_name))
 
     def getContent(self):
         filestream = compat.BytesIO()
@@ -1081,7 +1083,7 @@ class HistoryOtherFile(OtherFile):
 
     def getDisplayName(self) -> str:
         left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
-        return '%s%s' % (left_side, self.provider.transform_to_display(self.content_revision.get_label()))
+        return '%s%s' % (left_side, transform_to_display(self.content_revision.get_label()))
 
     def getContent(self):
         filestream = compat.BytesIO()
