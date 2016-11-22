@@ -72,7 +72,9 @@ class ManageActions(object):
         # thus we want to rename a file from 'file.txt' to 'file - deleted... .txt' and not 'file.txt - deleted...'
         is_file_name = self.content.label == ''
         if is_file_name:
-            extension = re.search(r'(\.[^.]+)$', new_name).group(0)
+            search = re.search(r'(\.[^.]+)$', new_name)
+            if search:
+                extension = search.group(0)
             new_name = re.sub(r'(\.[^.]+)$', '', new_name)
 
         if self._type in [ActionDescription.ARCHIVING, ActionDescription.DELETION]:
