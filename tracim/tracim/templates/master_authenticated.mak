@@ -14,6 +14,7 @@
         <link href="${tg.url('/assets/css/bootstrap.min.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/css/dashboard.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/font-awesome-4.2.0/css/font-awesome.css')}" rel="stylesheet">
+        <link href="${tg.url('/assets/select2-4.0.3/css/select2.min.css')}" rel="stylesheet">
 
         <script>
             var shiftWindow = function() { scrollBy(0, -50) };
@@ -32,7 +33,9 @@
         </div>
         ${self.footer()}
 
+        <script src="${tg.url('/assets/select2-4.0.3/js/select2.min.js')}"></script>
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
+        <script src="${tg.url('/assets/js/main.js')}"></script>
         ${CFG.TRACKER_JS_CONTENT|n}
     </body>
 
@@ -60,7 +63,7 @@
             copyright &copy; 2013 - ${h.current_year()} tracim project.
         </p>
     </div>
-    
+
     <script type="text/javascript">
         $(function () {
             $("[rel='tooltip']").tooltip();
