@@ -1,4 +1,6 @@
 # coding: utf8
+import os
+
 import transaction
 import re
 from datetime import datetime
@@ -236,13 +238,20 @@ class Workspace(DAVCollection):
         # TODO : remove commentary here raise DAVError(HTTP_FORBIDDEN)
         if '/.deleted/' in self.path or '/.archived/' in self.path:
             raise DAVError(HTTP_FORBIDDEN)
-        # TODO: Test ici que la ressource n'existe pas déjà
-        # Si oui on retourne le document déjà existant ?
+
+        content = None
+
+        # Note: To prevent bugs, check here again if resource already exist
+        path = os.path.join(self.path, file_name)
+        resource = self.provider.getResourceInst(path, self.environ)
+        if resource:
+            content = resource.content
+
         return FakeFileStream(
             file_name=file_name,
             content_api=self.content_api,
             workspace=self.workspace,
-            content=None,
+            content=content,
             parent=self.content,
             path=self.path + '/' + file_name
         )
