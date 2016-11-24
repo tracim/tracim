@@ -259,97 +259,10 @@ from inspect import isfunction
 import traceback
 
 from wsgidav.server.cherrypy import wsgiserver
-from wsgidav.server.cherrypy.wsgiserver.wsgiserver3 import \
-    HTTPConnection as BaseHTTPConnection
-from wsgidav.server.cherrypy.wsgiserver.wsgiserver3 import \
-    HTTPRequest as BaseHTTPRequest
+from wsgidav.server.cherrypy.wsgiserver.wsgiserver3 import CherryPyWSGIServer
 
 DEFAULT_CONFIG_FILE = "wsgidav.conf"
 PYTHON_VERSION = "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
-
-
-class HTTPRequest(BaseHTTPRequest):
-    """
-    Exeprimental override of HTTPRequest designed to permit
-    dump of HTTP requests
-    """
-    def parse_request(self, can_dump: bool=True):
-        super().parse_request()
-        dump = self.server.wsgi_app.config.get('dump_requests', False)
-        if self.ready and dump and can_dump:
-            dump_to_path = self.server.wsgi_app.config.get(
-                'dump_requests_path',
-                '/tmp/wsgidav_dumps',
-            )
-            self.dump(dump_to_path)
-
-    def dump(self, dump_to_path: str):
-        if self.ready:
-            os.makedirs(dump_to_path, exist_ok=True)
-            dump_file = '{0}/{1}_{2}.yml'.format(
-                dump_to_path,
-                '{0}_{1}'.format(
-                    datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
-                    int(round(time.time() * 1000)),
-                ),
-                self.method.decode('utf-8'),
-            )
-            with open(dump_file, 'w+') as f:
-                dump_content = dict()
-                dump_content['path'] = self.path.decode('ISO-8859-1')
-                str_headers = dict(
-                    (k.decode('utf8'), v.decode('ISO-8859-1')) for k, v in
-                    self.inheaders.items()
-                )
-                dump_content['headers'] = str_headers
-                dump_content['content'] = self.conn.read_content\
-                    .decode('ISO-8859-1')
-
-                f.write(yaml.dump(dump_content, default_flow_style=False))
-
-
-class HTTPConnection(BaseHTTPConnection):
-    """
-    Exeprimental override of HTTPConnection designed to permit
-    dump of HTTP requests
-    """
-    RequestHandlerClass = HTTPRequest
-
-    def __init__(self, server, sock, *args, **kwargs):
-        super().__init__(server, sock, *args, **kwargs)
-
-        if self.server.wsgi_app.config.get('dump_requests', False):
-            # We use HTTPRequest to parse headers, path, etc ...
-            req = self.RequestHandlerClass(self.server, self)
-            req.parse_request(can_dump=False)
-
-            # And we read request content
-            content_length = int(req.inheaders.get(b'Content-Length', b'0'))
-            content = req.rfile.read(content_length)
-
-            # We are now able to rebuild HTTP request
-            full_content = \
-                req.method + \
-                b' ' + \
-                req.uri + \
-                b' ' + \
-                req.request_protocol +\
-                b'\r\n'
-            for header_name, header_value in req.inheaders.items():
-                full_content += header_name + b': ' + header_value + b'\r\n'
-
-            full_content += b'\r\n' + content
-
-            # To give it again at HTTPConnection
-            bf = io.BufferedReader(io.BytesIO(full_content), self.rbufsize)
-
-            self.rfile = bf
-            # We will be able to dump request content with self.read_content
-            self.read_content = content
-
-
-class CherryPyWSGIServer(wsgiserver.CherryPyWSGIServer):
-    ConnectionClass = HTTPConnection
 
 
 class WsgiDavDaemon(Daemon):
@@ -377,11 +290,16 @@ class WsgiDavDaemon(Daemon):
             print(
                 "WARNING: Could not import lxml: using xml instead (slower). Consider installing lxml from http://codespeak.net/lxml/.")
         from wsgidav.dir_browser import WsgiDavDirBrowser
-        from wsgidav.debug_filter import WsgiDavDebugFilter
         from tracim.lib.webdav.tracim_http_authenticator import TracimHTTPAuthenticator
         from wsgidav.error_printer import ErrorPrinter
+        from tracim.lib.webdav.utils import TracimWsgiDavDebugFilter
 
-        config['middleware_stack'] = [ WsgiDavDirBrowser, TracimHTTPAuthenticator, ErrorPrinter, WsgiDavDebugFilter ]
+        config['middleware_stack'] = [
+            WsgiDavDirBrowser,
+            TracimHTTPAuthenticator,
+            ErrorPrinter,
+            TracimWsgiDavDebugFilter,
+        ]
 
         config['provider_mapping'] = {
             config['root_path']: Provider(
