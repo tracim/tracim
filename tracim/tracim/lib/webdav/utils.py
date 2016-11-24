@@ -81,19 +81,26 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
             #                                   "locks: 15",
         ]
 
-        if self._config.get('dump_requests'):
-            # Monkey patching
-            old_parseXmlBody = util.parseXmlBody
-            def new_parseXmlBody(environ, allowEmpty=False):
-                xml = old_parseXmlBody(environ, allowEmpty)
-                self._dump_request(environ, xml)
-                return xml
-            util.parseXmlBody = new_parseXmlBody
+        self.last_request_time = '__NOT_SET__'
+
+        # We disable request content dump for moment
+        # if self._config.get('dump_requests'):
+        #     # Monkey patching
+        #     old_parseXmlBody = util.parseXmlBody
+        #     def new_parseXmlBody(environ, allowEmpty=False):
+        #         xml = old_parseXmlBody(environ, allowEmpty)
+        #         self._dump_request(environ, xml)
+        #         return xml
+        #     util.parseXmlBody = new_parseXmlBody
 
     def __call__(self, environ, start_response):
         """"""
         #        srvcfg = environ["wsgidav.config"]
         verbose = self._config.get("verbose", 2)
+        self.last_request_time = '{0}_{1}'.format(
+            datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
+            int(round(time.time() * 1000)),
+        )
 
         method = environ["REQUEST_METHOD"]
 
@@ -155,6 +162,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
                 if k == k.upper():
                     print("%20s: '%s'" % (k, v), file=self.out)
             print("\n", file=self.out)
+            self._dump_request(environ, xml=None)
 
         # Intercept start_response
         #
@@ -233,14 +241,15 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
         os.makedirs(dump_to_path, exist_ok=True)
         dump_file = '{0}/{1}_RESPONSE_{2}.yml'.format(
             dump_to_path,
-            '{0}_{1}'.format(
-                datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
-                int(round(time.time() * 1000)),
-            ),
+            self.last_request_time,
             sub_app_start_response.status[0:3],
         )
         with open(dump_file, 'w+') as f:
             dump_content = dict()
+            headers = {}
+            for header_tuple in sub_app_start_response.response_headers:
+                headers[header_tuple[0]] = header_tuple[1]
+            dump_content['headers'] = headers
             if isinstance(drb, str):
                 dump_content['content'] = drb.replace('PROPFIND XML response body:\n', '')
 
@@ -254,16 +263,13 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
         os.makedirs(dump_to_path, exist_ok=True)
         dump_file = '{0}/{1}_REQUEST_{2}.yml'.format(
             dump_to_path,
-            '{0}_{1}'.format(
-                datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'),
-                int(round(time.time() * 1000)),
-            ),
+            self.last_request_time,
             environ['REQUEST_METHOD'],
         )
         with open(dump_file, 'w+') as f:
             dump_content = dict()
-            dump_content['path'] = environ['PATH_INFO']
-            dump_content['Authorization'] = environ['HTTP_AUTHORIZATION']
+            dump_content['path'] = environ.get('PATH_INFO', '')
+            dump_content['Authorization'] = environ.get('HTTP_AUTHORIZATION', '')
             if xml:
                 dump_content['content'] = ElementTree.tostring(xml, 'utf-8')
 
