@@ -948,23 +948,20 @@ class File(DAVNonCollection):
 
     def move_file(self, destpath):
 
-        workspace = self.provider.get_workspace_from_path(
-            normpath(destpath),
-            WorkspaceApi(self.user)
-        )
-
-        parent = self.provider.get_parent_from_path(
-            normpath(destpath),
-            self.content_api,
-            workspace
-        )
+        workspace = self.content.workspace
+        parent = self.content.parent
 
         with new_revision(self.content):
             if basename(destpath) != self.getDisplayName():
+                new_given_file_name = transform_to_bdd(basename(destpath))
+                new_file_name, new_file_extension = \
+                    os.path.splitext(new_given_file_name)
+
                 self.content_api.update_content(
                     self.content,
-                    transform_to_bdd(basename(destpath)),
+                    new_file_name,
                 )
+                self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
             else:
                 self.content_api.move(
