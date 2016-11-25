@@ -262,7 +262,7 @@ def serialize_breadcrumb_item(item: BreadcrumbItem, context: Context):
 def serialize_version_for_page_or_file(version: ContentRevisionRO, context: Context):
     return DictLikeClass(
         id = version.revision_id,
-        label = version.label if version.label else version.file_name,
+        label = version.label,
         owner = context.toDict(version.owner),
         created = version.created,
         action = context.toDict(version.get_last_action())
@@ -285,7 +285,7 @@ def serialize_item(content: Content, context: Context):
 
     result = DictLikeClass(
         id = content.content_id,
-        label = content.label if content.label else content.file_name,
+        label = content.label,
         icon = ContentType.get_icon(content.type),
         status = context.toDict(content.get_status()),
         folder = context.toDict(DictLikeClass(id = content.parent.content_id if content.parent else None)),
@@ -341,7 +341,7 @@ def serialize_node_for_page_list(content: Content, context: Context):
     if content.type==ContentType.File:
         result = DictLikeClass(
             id = content.content_id,
-            label = content.label if content.label else content.file_name,
+            label = content.label,
             status = context.toDict(content.get_status()),
             folder = Context(CTX.DEFAULT).toDict(content.parent)
         )
@@ -396,7 +396,7 @@ def serialize_node_for_page(content: Content, context: Context):
         )
 
         if content.type==ContentType.File:
-            result.label = content.label if content.label else content.file_name
+            result.label = content.label
             result['file'] = DictLikeClass(
                 name = data_container.file_name,
                 size = len(data_container.file_content),
@@ -763,7 +763,7 @@ def serialize_content_for_search_result(content: Content, context: Context):
         )
 
         if content.type==ContentType.File:
-            result.label = content.label.__str__() if content.label else content.file_name.__str__()
+            result.label = content.label.__str__()
 
         if not result.label or ''==result.label:
             result.label = 'No title'

@@ -31,7 +31,8 @@ class RevisionsIntegrity(object):
 
     @classmethod
     def remove_from_updatable(cls, revision: 'ContentRevisionRO') -> None:
-        cls._updatable_revisions.remove(revision)
+        if revision in cls._updatable_revisions:
+            cls._updatable_revisions.remove(revision)
 
     @classmethod
     def is_updatable(cls, revision: 'ContentRevisionRO') -> bool:

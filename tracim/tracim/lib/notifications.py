@@ -228,7 +228,7 @@ class EmailNotifier(object):
             subject = self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT
             subject = subject.replace(EST.WEBSITE_TITLE, self._global_config.WEBSITE_TITLE.__str__())
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
-            subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__() if main_content.label else main_content.file_name.__str__())
+            subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
 
             message = MIMEMultipart('alternative')
@@ -306,11 +306,8 @@ class EmailNotifier(object):
                 content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
                 if content.description:
                     content_text = content.description
-                elif content.label:
-                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
                 else:
-                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.file_name)
-
+                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
             elif ContentType.Page == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
