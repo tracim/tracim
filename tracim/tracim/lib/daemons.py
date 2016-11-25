@@ -303,9 +303,10 @@ class WsgiDavDaemon(Daemon):
 
         config['provider_mapping'] = {
             config['root_path']: Provider(
-                show_archived=config['show_archived'],
-                show_deleted=config['show_deleted'],
-                show_history=config['show_history'],
+                # TODO: Test to Re enabme archived and deleted
+                show_archived=False,  # config['show_archived'],
+                show_deleted=False,  # config['show_deleted'],
+                show_history=False,  # config['show_history'],
                 manage_locks=config['manager_locks']
             )
         }
