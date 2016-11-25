@@ -113,6 +113,17 @@
             </div>
         % endif
 
+            <p>
+                ${_('This workspace is {a_open}accessible with webdav{a_close}').format(a_open='<a data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
+            </p>
+            <div class="collapse" id="webdavConfig">
+                <p>${_('Adress to connect to webdav with:')}</p>
+                <p>Linux : </p>
+                <p class="form-control">dav://${webdav_url}</p>
+                <p>Windows : </p>
+                <p class="form-control">http://${webdav_url}</p>
+            </div>
+
     </div>
 </div>
 

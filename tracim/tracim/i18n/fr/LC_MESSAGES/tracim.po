@@ -2042,6 +2042,14 @@ msgstr "Cet espace de travail compte {a_open}un membre{a_close}"
 msgid "This workspace has {a_open}{member_nb} members{a_close}"
 msgstr "Cet espace de travail compte {a_open}{member_nb} membres{a_close}"
 
+#: tracim/templates/workspace/getone.mak:77
+msgid "This workspace is {a_open}accessible with webdav{a_close}"
+msgstr "Cet espace de travail est {a_open}accessible via webdav{a_close}"
+
+#: tracim/templates/workspace/getone.mak:78
+msgid "Adress to connect to webdav with:"
+msgstr "Adresses pour se connecter à webdav sous :"
+
 #: tracim/templates/workspace/getone.mak:76
 msgid "whose"
 msgstr "dont"

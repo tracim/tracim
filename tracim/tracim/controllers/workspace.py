@@ -65,7 +65,11 @@ class UserWorkspaceRestController(TIMRestController):
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
 
-        return DictLikeClass(result = dictified_workspace, fake_api=fake_api)
+        return DictLikeClass(
+            result=dictified_workspace,
+            fake_api=fake_api,
+            webdav_url='@TODO-BASTIEN'
+        )
 
 
     @tg.expose('json')
