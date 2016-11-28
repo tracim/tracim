@@ -30,7 +30,7 @@
 
 <%def name="TINYMCE_INIT_SCRIPT(selector)">
     <script>
-        function base64EncoreAndTinyMceInsert (files, editor) {
+        function base64EncodeAndTinyMceInsert (files) {
           for (var i = 0; i < files.length; i++) {
             if (files[i].size > 1000000)
               files[i].allowed = confirm(files[i].name + " fait plus de 1mo et peut prendre du temps à insérer, voulez-vous continuer ?")
@@ -92,7 +92,7 @@
                   $('body').append(fileTag)
 
                   $('#hidden_tinymce_fileinput').on('change', function () {
-                    base64EncoreAndTinyMceInsert($(this)[0].files)
+                    base64EncodeAndTinyMceInsert($(this)[0].files)
                   })
 
                   $('#hidden_tinymce_fileinput').click()
@@ -107,7 +107,7 @@
                 e.stopPropagation()
               })
               .on('drop', function(e) {
-                base64EncoreAndTinyMceInsert(e.dataTransfer.files)
+                base64EncodeAndTinyMceInsert(e.dataTransfer.files)
               })
             }
         });
