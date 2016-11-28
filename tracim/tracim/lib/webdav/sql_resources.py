@@ -964,6 +964,8 @@ class File(DAVNonCollection):
                 self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
             else:
+                # TODO: ???le new parent ne peut être le parent actuel ?
+
                 self.content_api.move(
                     item=self.content,
                     new_parent=parent,

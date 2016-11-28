@@ -241,11 +241,13 @@ class Provider(DAVProvider):
         path = self.reduce_path(path)
         parent_path = dirname(path)
 
-        blbl = parent_path.replace('/'+workspace.label, '')
+        relative_parents_path = parent_path[len(workspace.label)+1:]
+        parents = relative_parents_path.split('/')
 
-        parents = blbl.split('/')
-
-        parents.remove('')
+        try:
+            parents.remove('')
+        except ValueError:
+            pass
         parents = [transform_to_bdd(x) for x in parents]
 
         try:
