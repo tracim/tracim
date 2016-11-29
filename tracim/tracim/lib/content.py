@@ -416,7 +416,8 @@ class ContentApi(object):
         :param workspace: The workspace's content
         :return The corresponding Content
         """
-        query = self._base_query(content_parent.workspace)
+        workspace = content_parent.workspace if content_parent else None
+        query = self._base_query(workspace)
         parent_id = content_parent.content_id if content_parent else None
         query = query.filter(Content.parent_id == parent_id)
 
