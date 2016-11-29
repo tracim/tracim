@@ -85,6 +85,17 @@
 
 <div class="row">
     <div class="col-sm-7 col-sm-offset-3">
+        <div class="threads-history-reverse">
+        % if inverted:
+            <a href="${tg.url('/workspaces/{}/folders/{}/threads/{}'.format(result.thread.workspace.id, result.thread.parent.id, result.thread.id))}">
+                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+        % else:
+            <a href="${tg.url('/workspaces/{}/folders/{}/threads/{}?inverted=1'.format(result.thread.workspace.id, result.thread.parent.id, result.thread.id))}">
+                <i class="fa fa-chevron-up" aria-hidden="true"></i>
+        % endif
+                ${_('Invert order')}
+            </a>
+        </div>
         % if h.user_role(fake_api.current_user, result.thread.workspace)<=1:
             ## READONLY USER
             <% a = 'b' %>
@@ -101,6 +112,7 @@
     </div>
 </div>
 
+<!-- % for event in reversed(result.thread.history): -->
 % for event in result.thread.history:
     ## TODO - D.A. - 2015-08-20
     ## Allow to show full history (with status change and archive/unarchive)

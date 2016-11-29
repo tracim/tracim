@@ -1965,6 +1965,10 @@ msgstr ""
 msgid "Post a reply..."
 msgstr "Poster une réponse..."
 
+#: tracim/templates/thread/getone.mak:97
+msgid "Invert order"
+msgstr "Inverser l'ordre"
+
 #: tracim/templates/thread/toolbar.mak:16
 msgid "Edit current thread"
 msgstr "Modifier le sujet de discussion"
