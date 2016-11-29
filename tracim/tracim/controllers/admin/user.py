@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import uuid
 
+import pytz
 from tracim import model  as pm
 
 from sprox.tablebase import TableBase
@@ -380,15 +381,18 @@ class UserRestController(TIMRestController):
         user = api.get_one(id)
 
         dictified_user = Context(CTX.USER).toDict(user, 'user')
-        return DictLikeClass(result = dictified_user)
+        return DictLikeClass(
+            result=dictified_user,
+            timezones=pytz.all_timezones,
+        )
 
     @tg.require(predicates.in_group(Group.TIM_MANAGER_GROUPNAME))
     @tg.expose()
-    def put(self, user_id, name, email, next_url=''):
+    def put(self, user_id, name, email, timezone: str='', next_url=''):
         api = UserApi(tmpl_context.current_user)
 
         user = api.get_one(int(user_id))
-        api.update(user, name, email, True)
+        api.update(user, name, email, True, timezone=timezone)
 
         tg.flash(_('User {} updated.').format(user.get_display_name()), CST.STATUS_OK)
         if next_url:
