@@ -964,13 +964,25 @@ class File(DAVNonCollection):
                 self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
             else:
-                # TODO: ???le new parent ne peut être le parent actuel ?
+                workspace_api = WorkspaceApi(self.user)
+                content_api = ContentApi(self.user)
+
+                destination_workspace = self.provider.get_workspace_from_path(
+                    destpath,
+                    workspace_api,
+                )
+
+                destination_parent = self.provider.get_parent_from_path(
+                    destpath,
+                    content_api,
+                    workspace,
+                )
 
                 self.content_api.move(
                     item=self.content,
-                    new_parent=parent,
+                    new_parent=destination_parent,
                     must_stay_in_same_workspace=False,
-                    new_workspace=workspace
+                    new_workspace=destination_workspace
                 )
 
         transaction.commit()
