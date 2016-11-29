@@ -3,6 +3,7 @@ import os
 
 import re
 import transaction
+from caldav.lib.error import PutError
 
 from icalendar import Event as iCalendarEvent
 from sqlalchemy.orm.exc import NoResultFound
@@ -356,6 +357,9 @@ LOCATION:Here
 END:VEVENT
 END:VCALENDAR
 """.format(uid='{0}FAKEEVENT'.format(related_object_id))
-        event = user_calendar.add_event(event_ics)
-        event.delete()
+        try:
+            event = user_calendar.add_event(event_ics)
+            event.delete()
+        except PutError:
+            pass  # TODO BS 20161128: Radicale is down. Record this event ?
 
