@@ -382,3 +382,11 @@ span.info.readonly {
 .no-padding {
     padding: 0px;
 }
+.threads-history-reverse {
+  float: right;
+  padding: 10px 15px 0 0;
+  font-size: 16px;
+}
+.threads-history-reverse > i {
+  font-size: 12px;
+}

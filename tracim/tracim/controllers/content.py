@@ -527,7 +527,7 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
 
     @tg.require(current_user_is_reader())
     @tg.expose('tracim.templates.thread.getone')
-    def get_one(self, thread_id):
+    def get_one(self, thread_id, inverted: str=''):
         thread_id = int(thread_id)
         user = tmpl_context.current_user
         workspace = tmpl_context.workspace
@@ -543,7 +543,11 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
         fake_api = Context(CTX.FOLDER).toDict(fake_api_content)
 
         dictified_thread = Context(CTX.THREAD).toDict(thread, 'thread')
-        return DictLikeClass(result = dictified_thread, fake_api=fake_api)
+
+        if inverted:
+          dictified_thread.thread.history = reversed(dictified_thread.thread.history)
+
+        return DictLikeClass(result=dictified_thread, fake_api=fake_api, inverted=inverted)
 
 
 
