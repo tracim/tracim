@@ -537,7 +537,7 @@ class ContentApi(object):
 
             # Search into parent folder (if already deep)
             if folder:
-                folder_query\
+                folder_query = folder_query\
                     .filter(
                         Content.parent_id == folder.content_id,
                     )
