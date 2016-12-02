@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
-import sys
-
 __author__ = 'damien'
 
-from cgi import FieldStorage
+import sys
+import traceback
 
+from cgi import FieldStorage
 import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
 
-import traceback
-
 from tracim.controllers import TIMRestController
 from tracim.controllers import TIMRestPathContextSetup
 from tracim.controllers import TIMRestControllerWithBreadcrumb
 from tracim.controllers import TIMWorkspaceContentRestController
-
 from tracim.lib import CST
 from tracim.lib.base import BaseController
 from tracim.lib.base import logger
@@ -27,14 +24,16 @@ from tracim.lib.predicates import current_user_is_reader
 from tracim.lib.predicates import current_user_is_contributor
 from tracim.lib.predicates import current_user_is_content_manager
 from tracim.lib.predicates import require_current_user_is_owner
-
 from tracim.model.serializers import Context, CTX, DictLikeClass
 from tracim.model.data import ActionDescription
 from tracim.model import new_revision
+from tracim.model import DBSession
 from tracim.model.data import Content
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
+from tracim.lib.integrity import render_invalid_integrity_chosen_path
+
 
 class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
 
@@ -259,11 +258,18 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
     def post(self, label='', file_data=None):
         # TODO - SECURE THIS
         workspace = tmpl_context.workspace
+        folder = tmpl_context.folder
 
         api = ContentApi(tmpl_context.current_user)
+        with DBSession.no_autoflush:
+            file = api.create(ContentType.File, workspace, folder, label)
+            api.update_file_data(file, file_data.filename, file_data.type, file_data.file.read())
 
-        file = api.create(ContentType.File, workspace, tmpl_context.folder, label)
-        api.update_file_data(file, file_data.filename, file_data.type, file_data.file.read())
+            # Display error page to user if chosen label is in conflict
+            if not self._path_validation.validate_new_content(file):
+                return render_invalid_integrity_chosen_path(
+                    file.get_label_as_file(),
+                )
         api.save(file, ActionDescription.CREATION)
 
         tg.flash(_('File created'), CST.STATUS_OK)
@@ -291,6 +297,15 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                         item, label if label else item.label,
                         comment if comment else ''
                     )
+
+                    # Display error page to user if chosen label is in conflict
+                    if not self._path_validation.validate_new_content(
+                        updated_item,
+                    ):
+                        return render_invalid_integrity_chosen_path(
+                            updated_item.get_label_as_file(),
+                        )
+
                     api.save(updated_item, ActionDescription.EDITION)
 
                     # This case is the default "file title and description update"
@@ -317,6 +332,16 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
 
                     if isinstance(file_data, FieldStorage):
                         api.update_file_data(item, file_data.filename, file_data.type, file_data.file.read())
+
+                        # Display error page to user if chosen label is in
+                        # conflict
+                        if not self._path_validation.validate_new_content(
+                            item,
+                        ):
+                            return render_invalid_integrity_chosen_path(
+                                item.get_label_as_file(),
+                            )
+
                         api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)
@@ -415,8 +440,15 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
 
         api = ContentApi(tmpl_context.current_user)
 
-        page = api.create(ContentType.Page, workspace, tmpl_context.folder, label)
-        page.description = content
+        with DBSession.no_autoflush:
+            page = api.create(ContentType.Page, workspace, tmpl_context.folder, label)
+            page.description = content
+
+            if not self._path_validation.validate_new_content(page):
+                return render_invalid_integrity_chosen_path(
+                    page.get_label(),
+                )
+
         api.save(page, ActionDescription.CREATION, do_notify=True)
 
         tg.flash(_('Page created'), CST.STATUS_OK)
@@ -435,6 +467,12 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
             item = api.get_one(int(item_id), self._item_type, workspace)
             with new_revision(item):
                 api.update_content(item, label, content)
+
+                if not self._path_validation.validate_new_content(item):
+                    return render_invalid_integrity_chosen_path(
+                        item.get_label(),
+                    )
+
                 api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)
@@ -511,13 +549,20 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
 
         api = ContentApi(tmpl_context.current_user)
 
-        thread = api.create(ContentType.Thread, workspace, tmpl_context.folder, label)
-        # FIXME - DO NOT DUPLCIATE FIRST MESSAGE thread.description = content
-        api.save(thread, ActionDescription.CREATION, do_notify=False)
+        with DBSession.no_autoflush:
+            thread = api.create(ContentType.Thread, workspace, tmpl_context.folder, label)
+            # FIXME - DO NOT DUPLCIATE FIRST MESSAGE thread.description = content
+            api.save(thread, ActionDescription.CREATION, do_notify=False)
 
-        comment = api.create(ContentType.Comment, workspace, thread, label)
-        comment.label = ''
-        comment.description = content
+            comment = api.create(ContentType.Comment, workspace, thread, label)
+            comment.label = ''
+            comment.description = content
+
+            if not self._path_validation.validate_new_content(thread):
+                return render_invalid_integrity_chosen_path(
+                    thread.get_label(),
+                )
+
         api.save(comment, ActionDescription.COMMENT, do_notify=False)
         api.do_notify(thread)
 
@@ -771,15 +816,23 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             parent = None
             if parent_id:
                 parent = api.get_one(int(parent_id), ContentType.Folder, workspace)
-            folder = api.create(ContentType.Folder, workspace, parent, label)
 
-            subcontent = dict(
-                folder = True if can_contain_folders=='on' else False,
-                thread = True if can_contain_threads=='on' else False,
-                file = True if can_contain_files=='on' else False,
-                page = True if can_contain_pages=='on' else False
-            )
-            api.set_allowed_content(folder, subcontent)
+            with DBSession.no_autoflush:
+                folder = api.create(ContentType.Folder, workspace, parent, label)
+
+                subcontent = dict(
+                    folder = True if can_contain_folders=='on' else False,
+                    thread = True if can_contain_threads=='on' else False,
+                    file = True if can_contain_files=='on' else False,
+                    page = True if can_contain_pages=='on' else False
+                )
+                api.set_allowed_content(folder, subcontent)
+
+                if not self._path_validation.validate_new_content(folder):
+                    return render_invalid_integrity_chosen_path(
+                        folder.get_label(),
+                    )
+
             api.save(folder)
 
             tg.flash(_('Folder created'), CST.STATUS_OK)
@@ -825,6 +878,12 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
                     # TODO - D.A. - 2015-05-25 - Allow to set folder description
                     api.update_content(folder, label, folder.description)
                 api.set_allowed_content(folder, subcontent)
+
+                if not self._path_validation.validate_new_content(folder):
+                    return render_invalid_integrity_chosen_path(
+                        folder.get_label(),
+                    )
+
                 api.save(folder)
 
             tg.flash(_('Folder updated'), CST.STATUS_OK)

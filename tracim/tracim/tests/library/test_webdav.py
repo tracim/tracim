@@ -154,9 +154,9 @@ class TestWebDav(TestStandard):
 
         children = w1f1.getMemberList()
         eq_(
-            3,
+            5,
             len(children),
-            msg='w1f1 should list 3 folders instead {0}'.format(
+            msg='w1f1 should list 5 folders instead {0}'.format(
                 len(children),
             ),
         )
@@ -177,6 +177,18 @@ class TestWebDav(TestStandard):
         ok_(
             'w1f1d1.txt' in content_names,
             msg='w1f1d1.txt should be in names ({0})'.format(
+                content_names,
+            )
+        )
+        ok_(
+            'w1f1f1' in content_names,
+            msg='w1f1f1 should be in names ({0})'.format(
+                content_names,
+            )
+        )
+        ok_(
+            'w1f1d2.html' in content_names,
+            msg='w1f1d2.html should be in names ({0})'.format(
                 content_names,
             )
         )

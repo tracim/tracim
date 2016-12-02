@@ -10,6 +10,8 @@ from tracim.controllers import TIMRestController
 from tracim.lib import CST
 from tracim.lib.base import BaseController
 from tracim.lib.helpers import on_off_to_boolean
+from tracim.lib.integrity import PathValidationManager
+from tracim.lib.integrity import render_invalid_integrity_chosen_path
 from tracim.lib.user import UserApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
@@ -139,6 +141,12 @@ class WorkspaceRestController(TIMRestController, BaseController):
      responsible / advanced contributor. / contributor / reader
     """
 
+    def __init__(self):
+        super().__init__()
+        self._path_validation = PathValidationManager(
+            is_case_sensitive=False,
+        )
+
     @property
     def _base_url(self):
         return '/admin/workspaces'
@@ -187,6 +195,10 @@ class WorkspaceRestController(TIMRestController, BaseController):
         workspace_api_controller = WorkspaceApi(user)
         calendar_enabled = on_off_to_boolean(calendar_enabled)
 
+        # Display error page to user if chosen label is in conflict
+        if not self._path_validation.workspace_label_is_free(name):
+            return render_invalid_integrity_chosen_path(name)
+
         workspace = workspace_api_controller.create_workspace(
             name,
             description,
@@ -213,8 +225,13 @@ class WorkspaceRestController(TIMRestController, BaseController):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
         calendar_enabled = on_off_to_boolean(calendar_enabled)
-
         workspace = workspace_api_controller.get_one(id)
+
+        # Display error page to user if chosen label is in conflict
+        if name != workspace.label and \
+                not self._path_validation.workspace_label_is_free(name):
+            return render_invalid_integrity_chosen_path(name)
+
         workspace.label = name
         workspace.description = description
         workspace.calendar_enabled = calendar_enabled

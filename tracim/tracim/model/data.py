@@ -659,7 +659,7 @@ class ContentRevisionRO(DeclarativeBase):
         return False
 
     def get_label_as_file(self):
-        file_extension = self.file_extension
+        file_extension = self.file_extension or ''
 
         if self.type == ContentType.Thread:
             file_extension = '.html'
@@ -788,7 +788,8 @@ class Content(DeclarativeBase):
     @file_name.setter
     def file_name(self, value: str) -> None:
         file_name, file_extension = os.path.splitext(value)
-        self.revision.label = file_name
+        if not self.revision.label:
+            self.revision.label = file_name
         self.revision.file_extension = file_extension
 
     @file_name.expression

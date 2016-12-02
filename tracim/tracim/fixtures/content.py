@@ -42,6 +42,7 @@ class Content(Fixture):
             with_notif=False,
         )
 
+        # Folders
         w1f1 = content_api.create(
             content_type=ContentType.Folder,
             workspace=w1,
@@ -55,11 +56,10 @@ class Content(Fixture):
             do_save=True,
         )
 
-        # Folders
         w2f1 = content_api.create(
             content_type=ContentType.Folder,
             workspace=w2,
-            label='w1f1',
+            label='w2f1',
             do_save=True,
         )
         w2f2 = content_api.create(
@@ -93,16 +93,33 @@ class Content(Fixture):
         )
         w1f1t1.description = 'w1f1t1 description'
         self._session.add(w1f1t1)
-        w1f1d1 = content_api.create(
+        w1f1d1_txt = content_api.create(
             content_type=ContentType.File,
             workspace=w1,
             parent=w1f1,
             label='w1f1d1',
             do_save=False,
         )
-        w1f1d1.file_extension = '.txt'
-        w1f1d1.file_content = b'w1f1d1 content'
-        self._session.add(w1f1d1)
+        w1f1d1_txt.file_extension = '.txt'
+        w1f1d1_txt.file_content = b'w1f1d1 content'
+        self._session.add(w1f1d1_txt)
+        w1f1d2_html = content_api.create(
+            content_type=ContentType.File,
+            workspace=w1,
+            parent=w1f1,
+            label='w1f1d2',
+            do_save=False,
+        )
+        w1f1d2_html.file_extension = '.html'
+        w1f1d2_html.file_content = b'<p>w1f1d2 content</p>'
+        self._session.add(w1f1d2_html)
+        w1f1f1 = content_api.create(
+            content_type=ContentType.Folder,
+            workspace=w1,
+            label='w1f1f1',
+            parent=w1f1,
+            do_save=True,
+        )
 
         w2f1p1 = content_api.create(
             content_type=ContentType.Page,

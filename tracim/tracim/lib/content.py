@@ -2,6 +2,8 @@
 import os
 
 from operator import itemgetter
+from sqlalchemy import func
+from sqlalchemy.orm import Query
 
 __author__ = 'damien'
 
@@ -285,6 +287,9 @@ class ContentApi(object):
 
         return result
 
+    def get_base_query(self, workspace: Workspace) -> Query:
+        return self._base_query(workspace)
+
     def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> [Content]:
         """
         This method returns child items (folders or items) for left bar treeview.
@@ -339,6 +344,12 @@ class ContentApi(object):
         content.label = label
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
+
+        if content.type in (
+                ContentType.Page,
+                ContentType.Thread,
+        ):
+            content.file_extension = '.html'
 
         if do_save:
             DBSession.add(content)
@@ -452,9 +463,6 @@ class ContentApi(object):
             content_parent_labels: [str]=None,
     ):
         """
-        TODO: Assurer l'unicité des path dans Tracim
-        TODO: Ecrire tous les cas de tests par rapports aux
-         cas d'erreurs possible (duplications de labels, etc) et TROUVES
         Return content with it's label, workspace and parents labels (optional)
         :param content_label: label of content (label or file_name)
         :param workspace: workspace containing all of this
@@ -464,7 +472,6 @@ class ContentApi(object):
         :return: Found Content
         """
         query = self._base_query(workspace)
-        file_name, file_extension = os.path.splitext(content_label)
         parent_folder = None
 
         # Grab content parent folder if parent path given
@@ -475,32 +482,21 @@ class ContentApi(object):
             )
 
         # Build query for found content by label
-        content_query = query.filter(or_(
-            and_(
-                Content.type == ContentType.File,
-                Content.label == file_name,
-                Content.file_extension == file_extension,
-            ),
-            and_(
-                Content.type == ContentType.Thread,
-                Content.label == file_name,
-            ),
-            and_(
-                Content.type == ContentType.Page,
-                Content.label == file_name,
-            ),
-            and_(
-                Content.type == ContentType.Folder,
-                Content.label == content_label,
-            ),
-        ))
+        content_query = self.filter_query_for_content_label_as_path(
+            query=query,
+            content_label_as_file=content_label,
+        )
 
         # Modify query to apply parent folder filter if any
         if parent_folder:
             content_query = content_query.filter(
                 Content.parent_id == parent_folder.content_id,
-                Content.workspace_id == workspace.workspace_id,
             )
+
+        # Filter with workspace
+        content_query = content_query.filter(
+            Content.workspace_id == workspace.workspace_id,
+        )
 
         # Return the content
         return content_query\
@@ -548,6 +544,56 @@ class ContentApi(object):
                 .one()
 
         return folder
+
+    def filter_query_for_content_label_as_path(
+            self,
+            query: Query,
+            content_label_as_file: str,
+            is_case_sensitive: bool = False,
+    ) -> Query:
+        """
+        Apply normalised filters to found Content corresponding as given label.
+        :param query: query to modify
+        :param content_label_as_file: label in this
+        FILE version, use Content.get_label_as_file().
+        :param is_case_sensitive: Take care about case or not
+        :return: modified query
+        """
+        file_name, file_extension = os.path.splitext(content_label_as_file)
+
+        label_filter = Content.label == content_label_as_file
+        file_name_filter = Content.label == file_name
+        file_extension_filter = Content.file_extension == file_extension
+
+        if not is_case_sensitive:
+            label_filter = func.lower(Content.label) == \
+                           func.lower(content_label_as_file)
+            file_name_filter = func.lower(Content.label) == \
+                               func.lower(file_name)
+            file_extension_filter = func.lower(Content.file_extension) == \
+                                    func.lower(file_extension)
+
+        return query.filter(or_(
+            and_(
+                Content.type == ContentType.File,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Thread,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Page,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Folder,
+                label_filter,
+            ),
+        ))
 
     def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import transaction
+from sqlalchemy.orm import Query
 
 from tracim.lib.userworkspace import RoleApi
 from tracim.model.auth import Group
@@ -141,6 +142,9 @@ class WorkspaceApi(object):
                 calendar_class=WorkspaceCalendar,
                 related_object_id=workspace.workspace_id,
             )
+
+    def get_base_query(self) -> Query:
+        return self._base_query()
 
 
 class UnsafeWorkspaceApi(WorkspaceApi):
