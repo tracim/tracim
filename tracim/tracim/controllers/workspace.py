@@ -60,6 +60,7 @@ class UserWorkspaceRestController(TIMRestController):
         )
 
         fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(
+            # TODO BS 20161209: Is the correct way to grab folders? No use API?
             workspace.get_valid_children(ContentApi.DISPLAYABLE_CONTENTS)
         )
 

@@ -75,7 +75,7 @@
                                     <form role="form" method="POST" action="${tg.url('/admin/workspaces/{}/roles'.format(result.workspace.id))}">
                                         <div class="form-group">
                                             <label for="user_id">${_('User')}</label>
-                                            <select name="user_id" id="user_id" class="form-control">
+                                            <select name="user_id" id="user_id" class="form-control" style="width:100%">
                                                 % for user in fake_api.users:
                                                     % if user.id not in (user.id for user in result.workspace.members):
                                                         <option value="${user.id}">${user.name}</option>

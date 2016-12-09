@@ -2,6 +2,7 @@
 
 import re
 from os.path import basename, dirname, normpath
+from sqlalchemy.orm.exc import NoResultFound
 from tracim.lib.webdav.utils import transform_to_bdd
 
 from wsgidav.dav_provider import DAVProvider
@@ -75,8 +76,8 @@ class Provider(DAVProvider):
 
         content_api = ContentApi(
             user,
-            show_archived=self._show_archive,
-            show_deleted=self._show_delete
+            show_archived=False,  # self._show_archive,
+            show_deleted=False,  # self._show_delete
         )
 
         content = self.get_content_from_path(
@@ -160,7 +161,9 @@ class Provider(DAVProvider):
         if parent_path == root_path or workspace is None:
             return workspace is not None
 
-        content_api = ContentApi(user, show_archived=True, show_deleted=True)
+        # TODO bastien: Arnaud avait mis a True, verif le comportement
+        # lorsque l'on explore les dossiers archive et deleted
+        content_api = ContentApi(user, show_archived=False, show_deleted=False)
 
         revision_id = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) ([^/].+)$', path)
 
@@ -238,26 +241,28 @@ class Provider(DAVProvider):
         path = self.reduce_path(path)
         parent_path = dirname(path)
 
-        blbl = parent_path.replace('/'+workspace.label, '')
+        relative_parents_path = parent_path[len(workspace.label)+1:]
+        parents = relative_parents_path.split('/')
 
-        parents = blbl.split('/')
-
-        parents.remove('')
+        try:
+            parents.remove('')
+        except ValueError:
+            pass
         parents = [transform_to_bdd(x) for x in parents]
 
         try:
-            return content_api.get_one_by_label_and_parent_label(
-                transform_to_bdd(basename(path)),
-                parents,
-                workspace
+            return content_api.get_one_by_label_and_parent_labels(
+                content_label=transform_to_bdd(basename(path)),
+                content_parent_labels=parents,
+                workspace=workspace,
             )
-        except:
+        except NoResultFound:
             return None
 
     def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:
             return api.get_one(revision.content_id, ContentType.Any)
-        except:
+        except NoResultFound:
             return None
 
     def get_parent_from_path(self, path, api: ContentApi, workspace) -> Content:
@@ -266,5 +271,5 @@ class Provider(DAVProvider):
     def get_workspace_from_path(self, path: str, api: WorkspaceApi) -> Workspace:
         try:
             return api.get_one_by_label(transform_to_bdd(path.split('/')[1]))
-        except:
+        except NoResultFound:
             return None

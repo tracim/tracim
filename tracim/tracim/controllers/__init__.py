@@ -2,6 +2,8 @@
 """Controllers for the tracim application."""
 from sqlalchemy.orm.exc import NoResultFound
 from tg import abort
+from tracim.lib.integrity import PathValidationManager
+from tracim.lib.integrity import render_invalid_integrity_chosen_path
 from tracim.lib.workspace import WorkspaceApi
 
 import tg
@@ -121,6 +123,12 @@ class TIMRestController(RestController, BaseController):
 
     TEMPLATE_NEW = 'unknown "template new"'
     TEMPLATE_EDIT = 'unknown "template edit"'
+
+    def __init__(self):
+        super().__init__()
+        self._path_validation = PathValidationManager(
+            is_case_sensitive=False,
+        )
 
     def _before(self, *args, **kw):
         """
@@ -274,6 +282,12 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             item = api.get_one(int(item_id), self._item_type, workspace)
             with new_revision(item):
                 api.update_content(item, label, content)
+
+                if not self._path_validation.validate_new_content(item):
+                    return render_invalid_integrity_chosen_path(
+                        item.get_label(),
+                    )
+
                 api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)

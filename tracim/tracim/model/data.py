@@ -2,6 +2,7 @@
 
 import datetime as datetime_root
 import json
+import os
 from datetime import datetime
 
 import tg
@@ -63,9 +64,16 @@ class Workspace(DeclarativeBase):
     revisions = relationship("ContentRevisionRO")
 
     @hybrid_property
-    def contents(self):
+    def contents(self) -> ['Content']:
         # Return a list of unique revisions parent content
-        return list(set([revision.node for revision in self.revisions]))
+        contents = []
+        for revision in self.revisions:
+            # TODO BS 20161209: This ``revision.node.workspace`` make a lot
+            # of SQL queries !
+            if revision.node.workspace == self and revision.node not in contents:
+                contents.append(revision.node)
+
+        return contents
 
     @property
     def calendar_url(self) -> str:
@@ -522,7 +530,12 @@ class ContentRevisionRO(DeclarativeBase):
 
     label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default='')
-    file_name = Column(Unicode(255),  unique=False, nullable=False, default='')
+    file_extension = Column(
+        Unicode(255),
+        unique=False,
+        nullable=False,
+        server_default='',
+    )
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
     file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
     properties = Column('properties', Text(), unique=False, nullable=False, default='')
@@ -547,9 +560,28 @@ class ContentRevisionRO(DeclarativeBase):
 
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
-        'content_id', 'created', 'description', 'file_content', 'file_mimetype', 'file_name', 'is_archived',
-        'is_deleted', 'label', 'node', 'owner', 'owner_id', 'parent', 'parent_id', 'properties', 'revision_type',
-        'status', 'type', 'updated', 'workspace', 'workspace_id', 'is_temporary',
+        'content_id',
+        'created',
+        'description',
+        'file_content',
+        'file_mimetype',
+        'file_extension',
+        'is_archived',
+        'is_deleted',
+        'label',
+        'node',
+        'owner',
+        'owner_id',
+        'parent',
+        'parent_id',
+        'properties',
+        'revision_type',
+        'status',
+        'type',
+        'updated',
+        'workspace',
+        'workspace_id',
+        'is_temporary',
     )
 
     # Read by must be used like this:
@@ -561,6 +593,13 @@ class ContentRevisionRO(DeclarativeBase):
         creator=lambda k, v: \
             RevisionReadStatus(user=k, view_datetime=v)
     )
+
+    @property
+    def file_name(self):
+        return '{0}{1}'.format(
+            self.label,
+            self.file_extension,
+        )
 
     @classmethod
     def new_from(cls, revision: 'ContentRevisionRO') -> 'ContentRevisionRO':
@@ -607,7 +646,7 @@ class ContentRevisionRO(DeclarativeBase):
         return ContentStatus(self.status)
 
     def get_label(self) -> str:
-        return self.label if self.label else self.file_name if self.file_name else ''
+        return self.label or self.file_name or ''
 
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
@@ -625,6 +664,20 @@ class ContentRevisionRO(DeclarativeBase):
             return True
 
         return False
+
+    def get_label_as_file(self):
+        file_extension = self.file_extension or ''
+
+        if self.type == ContentType.Thread:
+            file_extension = '.html'
+        elif self.type == ContentType.Page:
+            file_extension = '.html'
+
+        return '{0}{1}'.format(
+            self.label,
+            file_extension,
+        )
+
 
 Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
 Index('idx__content_revisions__parent_id', ContentRevisionRO.parent_id)
@@ -734,15 +787,33 @@ class Content(DeclarativeBase):
 
     @hybrid_property
     def file_name(self) -> str:
-        return self.revision.file_name
+        return '{0}{1}'.format(
+            self.revision.label,
+            self.revision.file_extension,
+        )
 
     @file_name.setter
     def file_name(self, value: str) -> None:
-        self.revision.file_name = value
+        file_name, file_extension = os.path.splitext(value)
+        if not self.revision.label:
+            self.revision.label = file_name
+        self.revision.file_extension = file_extension
 
     @file_name.expression
     def file_name(cls) -> InstrumentedAttribute:
-        return ContentRevisionRO.file_name
+        return ContentRevisionRO.file_name + ContentRevisionRO.file_extension
+
+    @hybrid_property
+    def file_extension(self) -> str:
+        return self.revision.file_extension
+
+    @file_extension.setter
+    def file_extension(self, value: str) -> None:
+        self.revision.file_extension = value
+
+    @file_extension.expression
+    def file_extension(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.file_extension
 
     @hybrid_property
     def file_mimetype(self) -> str:
@@ -1042,7 +1113,13 @@ class Content(DeclarativeBase):
         return child_nb
 
     def get_label(self):
-        return self.label if self.label else self.file_name if self.file_name else ''
+        return self.label or self.file_name or ''
+
+    def get_label_as_file(self) -> str:
+        """
+        :return: Return content label in file representation context
+        """
+        return self.revision.get_label_as_file()
 
     def get_status(self) -> ContentStatus:
         return ContentStatus(self.status, self.type.__str__())

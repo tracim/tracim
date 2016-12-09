@@ -65,9 +65,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
                        label,
                        date,
                        event.owner.display_name,
-                       '<i class="fa fa-caret-left"></i> shown' if event.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/(%s - %s) %s.html">(View revision)</a></span>''' % (
-                       content.label, event.id, event.type.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
-
+                       # NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+                       '<i class="fa fa-caret-left"></i> shown'  if event.id == content_revision.revision_id else '' # '''<span><a class="revision-link" href="/.history/%s/(%s - %s) %s.html">(View revision)</a></span>''' % (
+                       # content.label, event.id, event.type.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
+                   )
     histHTML += '</table>'
 
     file = '''
@@ -93,9 +94,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
             </div>
             <div class="pull-right">
                 <div class="btn-group btn-group-vertical">
-                    <a class="btn btn-default">
-                        <i class="fa fa-external-link"></i> View in tracim</a>
-                    </a>
+                    <!-- NOTE: Not omplemented yet, don't display not working link
+                     <a class="btn btn-default">
+                         <i class="fa fa-external-link"></i> View in tracim</a>
+                     </a>-->
                 </div>
             </div>
         </div>
@@ -113,9 +115,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
             file_location = file_location.replace(/\/[^/]*$/, '')
             file_location = file_location.replace(/\/.history\/[^/]*$/, '')
 
-            $('.revision-link').each(function() {
-                $(this).attr('href', file_location + $(this).attr('href'))
-            });
+            // NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+            // $('.revision-link').each(function() {
+            //    $(this).attr('href', file_location + $(this).attr('href'))
+            // });
         }
     </script>
 </body>
@@ -197,10 +200,12 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                            t.owner.display_name,
                            t.create_readable_date(),
                            label,
-                            '<i class="fa fa-caret-left"></i> shown' if t.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
-                               content.label,
-                               t.id,
-                               t.ref_object.label) if t.type.id in ['revision', 'creation', 'edition'] else '')
+                            # NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+                            '<i class="fa fa-caret-left"></i> shown' if t.id == content_revision.revision_id else '' # else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
+                               # content.label,
+                               # t.id,
+                               # t.ref_object.label) if t.type.id in ['revision', 'creation', 'edition'] else '')
+                           )
 
         page = '''
 <html>
@@ -222,9 +227,10 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
             </div>
             <div class="pull-right">
                 <div class="btn-group btn-group-vertical">
+                    <!-- NOTE: Not omplemented yet, don't display not working link
                     <a class="btn btn-default" onclick="hide_elements()">
-                        <i id="hideshow" class="fa fa-eye-slash"></i> <span id="hideshowtxt" >Hide history</span></a>
-                    </a>
+                       <i id="hideshow" class="fa fa-eye-slash"></i> <span id="hideshowtxt" >Hide history</span></a>
+                    </a>-->
                     <a class="btn btn-default">
                         <i class="fa fa-external-link"></i> View in tracim</a>
                     </a>
@@ -244,9 +250,10 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
             file_location = file_location.replace(/\/[^/]*$/, '')
             file_location = file_location.replace(/\/.history\/[^/]*$/, '')
 
-            $('.revision-link').each(function() {
-                $(this).attr('href', file_location + $(this).attr('href'))
-            });
+            // NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+            // $('.revision-link').each(function() {
+            //     $(this).attr('href', file_location + $(this).attr('href'))
+            // });
         }
 
         function hide_elements() {

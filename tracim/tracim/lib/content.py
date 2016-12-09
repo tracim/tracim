@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
+
 from operator import itemgetter
+from sqlalchemy import func
+from sqlalchemy.orm import Query
 
 __author__ = 'damien'
 
@@ -283,6 +287,9 @@ class ContentApi(object):
 
         return result
 
+    def get_base_query(self, workspace: Workspace) -> Query:
+        return self._base_query(workspace)
+
     def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> [Content]:
         """
         This method returns child items (folders or items) for left bar treeview.
@@ -337,6 +344,12 @@ class ContentApi(object):
         content.label = label
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
+
+        if content.type in (
+                ContentType.Page,
+                ContentType.Thread,
+        ):
+            content.file_extension = '.html'
 
         if do_save:
             DBSession.add(content)
@@ -402,8 +415,11 @@ class ContentApi(object):
 
         return revision
 
-    def get_one_by_label_and_parent(self, content_label: str, content_parent: Content = None,
-                                    workspace: Workspace = None) -> Content:
+    def get_one_by_label_and_parent(
+            self,
+            content_label: str,
+            content_parent: Content=None,
+    ) -> Content:
         """
         This method let us request the database to obtain a Content with its name and parent
         :param content_label: Either the content's label or the content's filename if the label is None
@@ -411,52 +427,173 @@ class ContentApi(object):
         :param workspace: The workspace's content
         :return The corresponding Content
         """
-        assert content_label is not None# DYN_REMOVE
-
-        resultset = self._base_query(workspace)
-
+        workspace = content_parent.workspace if content_parent else None
+        query = self._base_query(workspace)
         parent_id = content_parent.content_id if content_parent else None
+        query = query.filter(Content.parent_id == parent_id)
 
-        resultset = resultset.filter(Content.parent_id == parent_id)
+        file_name, file_extension = os.path.splitext(content_label)
 
-        return resultset.filter(or_(
-            Content.label == content_label,
-            Content.file_name == content_label,
-            Content.label == re.sub(r'\.[^.]+$', '', content_label)
-        )).one()
+        return query.filter(
+            or_(
+                and_(
+                    Content.type == ContentType.File,
+                    Content.label == file_name,
+                    Content.file_extension == file_extension,
+                ),
+                and_(
+                    Content.type == ContentType.Thread,
+                    Content.label == file_name,
+                ),
+                and_(
+                    Content.type == ContentType.Page,
+                    Content.label == file_name,
+                ),
+                and_(
+                    Content.type == ContentType.Folder,
+                    Content.label == content_label,
+                ),
+            )
+        ).one()
 
-    def get_one_by_label_and_parent_label(self, content_label: str, content_parent_label: [str]=None, workspace: Workspace=None):
-        assert content_label is not None  # DYN_REMOVE
-        resultset = self._base_query(workspace)
+    def get_one_by_label_and_parent_labels(
+            self,
+            content_label: str,
+            workspace: Workspace,
+            content_parent_labels: [str]=None,
+    ):
+        """
+        Return content with it's label, workspace and parents labels (optional)
+        :param content_label: label of content (label or file_name)
+        :param workspace: workspace containing all of this
+        :param content_parent_labels: Ordered list of labels representing path
+            of folder (without workspace label).
+        E.g.: ['foo', 'bar'] for complete path /Workspace1/foo/bar folder
+        :return: Found Content
+        """
+        query = self._base_query(workspace)
+        parent_folder = None
 
-        res =  resultset.filter(or_(
-            Content.label == content_label,
-            Content.file_name == content_label,
-            Content.label == re.sub(r'\.[^.]+$', '', content_label)
-        )).all()
+        # Grab content parent folder if parent path given
+        if content_parent_labels:
+            parent_folder = self.get_folder_with_workspace_path_labels(
+                content_parent_labels,
+                workspace,
+            )
 
-        if content_parent_label:
-            tmp = dict()
-            for content in res:
-                tmp[content] = content.parent
+        # Build query for found content by label
+        content_query = self.filter_query_for_content_label_as_path(
+            query=query,
+            content_label_as_file=content_label,
+        )
 
-            for parent_label in reversed(content_parent_label):
-                a = []
-                tmp = {content: parent.parent for content, parent in tmp.items()
-                       if parent and parent.label == parent_label}
+        # Modify query to apply parent folder filter if any
+        if parent_folder:
+            content_query = content_query.filter(
+                Content.parent_id == parent_folder.content_id,
+            )
 
-                if len(tmp) == 1:
-                    content, last_parent = tmp.popitem()
-                    return content
-                elif len(tmp) == 0:
-                    return None
+        # Filter with workspace
+        content_query = content_query.filter(
+            Content.workspace_id == workspace.workspace_id,
+        )
 
-            for content, parent_content in tmp.items():
-                if not parent_content:
-                    return content
+        # Return the content
+        return content_query\
+            .order_by(
+                Content.revision_id.desc(),
+            )\
+            .one()
 
-            return None
-        return res[0]
+    def get_folder_with_workspace_path_labels(
+            self,
+            path_labels: [str],
+            workspace: Workspace,
+    ) -> Content:
+        """
+        Return a Content folder for given relative path.
+        TODO BS 20161124: Not safe if web interface allow folder duplicate names
+        :param path_labels: List of labels representing path of folder
+        (without workspace label).
+        E.g.: ['foo', 'bar'] for complete path /Workspace1/foo/bar folder
+        :param workspace: workspace of folders
+        :return: Content folder
+        """
+        query = self._base_query(workspace)
+        folder = None
+
+        for label in path_labels:
+            # Filter query on label
+            folder_query = query \
+                .filter(
+                    Content.type == ContentType.Folder,
+                    Content.label == label,
+                    Content.workspace_id == workspace.workspace_id,
+                )
+
+            # Search into parent folder (if already deep)
+            if folder:
+                folder_query = folder_query\
+                    .filter(
+                        Content.parent_id == folder.content_id,
+                    )
+
+            # Get thirst corresponding folder
+            folder = folder_query \
+                .order_by(Content.revision_id.desc()) \
+                .one()
+
+        return folder
+
+    def filter_query_for_content_label_as_path(
+            self,
+            query: Query,
+            content_label_as_file: str,
+            is_case_sensitive: bool = False,
+    ) -> Query:
+        """
+        Apply normalised filters to found Content corresponding as given label.
+        :param query: query to modify
+        :param content_label_as_file: label in this
+        FILE version, use Content.get_label_as_file().
+        :param is_case_sensitive: Take care about case or not
+        :return: modified query
+        """
+        file_name, file_extension = os.path.splitext(content_label_as_file)
+
+        label_filter = Content.label == content_label_as_file
+        file_name_filter = Content.label == file_name
+        file_extension_filter = Content.file_extension == file_extension
+
+        if not is_case_sensitive:
+            label_filter = func.lower(Content.label) == \
+                           func.lower(content_label_as_file)
+            file_name_filter = func.lower(Content.label) == \
+                               func.lower(file_name)
+            file_extension_filter = func.lower(Content.file_extension) == \
+                                    func.lower(file_extension)
+
+        return query.filter(or_(
+            and_(
+                Content.type == ContentType.File,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Thread,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Page,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Folder,
+                label_filter,
+            ),
+        ))
 
     def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE

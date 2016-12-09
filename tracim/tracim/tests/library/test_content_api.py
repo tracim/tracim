@@ -474,7 +474,7 @@ class TestContentApi(BaseTest, TestStandard):
         eq_(u2id, updated.owner_id,
             'the owner id should be {} (found {})'.format(u2id,
                                                           updated.owner_id))
-        eq_('index.html', updated.file_name)
+        eq_('this_is_a_page.html', updated.file_name)
         eq_('text/html', updated.file_mimetype)
         eq_(b'<html>hello world</html>', updated.file_content)
         eq_(ActionDescription.REVISION, updated.revision_type)

@@ -115,9 +115,7 @@
                     <ul class="nav navbar-nav navbar-left">
                         <li class="active"><a href="${tg.url('/home')}">${TIM.FA('fa-home fa-lg')} ${_('My Home')}</a></li>
                         <li class=""><a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar')} ${_('Calendar')}</a></li>
-                        % if fake_api.current_user.profile.id>2:
-                            ${NAVBAR_MENU.ADMIN_ITEMS()}
-                        % endif
+                        ${NAVBAR_MENU.ADMIN_ITEMS()}
                     </ul>
                 % endif
 
