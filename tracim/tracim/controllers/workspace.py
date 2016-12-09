@@ -65,13 +65,13 @@ class UserWorkspaceRestController(TIMRestController):
         )
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
+        webdav_url = CFG.get_instance().WSGIDAV_CLIENT_BASE_URL
 
         return DictLikeClass(
             result=dictified_workspace,
             fake_api=fake_api,
-            webdav_url='@TODO-BASTIEN'
+            webdav_url=webdav_url,
         )
-
 
     @tg.expose('json')
     def treeview_root(self, id='#',

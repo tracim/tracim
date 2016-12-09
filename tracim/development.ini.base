@@ -204,6 +204,10 @@ email.notification.smtp.password = your_smtp_password
 
 ## WSGIDAV
 wsgidav.config_path = wsgidav.conf
+## url can be extended like 127.0.0.1/webdav
+## in this case, you have to create your own proxy behind this url.
+## Do not set http:// prefix.
+# wsgidav.client.base_url = 127.0.0.1:<WSGIDAV_PORT>
 
 #####
 #

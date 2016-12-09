@@ -12,6 +12,8 @@ convert them into boolean, for example, you should use the
     setting = asbool(global_conf.get('the_setting'))
  
 """
+import imp
+import importlib
 from urllib.parse import urlparse
 
 import tg
@@ -297,7 +299,34 @@ class CFG(object):
             '604800',
         ))
 
-        self.WSGIDAV_CONFIG_PATH = tg.config.get('wsgidav.config_path')
+        self.WSGIDAV_CONFIG_PATH = tg.config.get(
+            'wsgidav.config_path',
+            'wsgidav.conf',
+        )
+        # TODO: Convert to importlib (cf http://stackoverflow.com/questions/41063938/use-importlib-instead-imp-for-non-py-file)
+        self.wsgidav_config = imp.load_source(
+            'wsgidav_config',
+            self.WSGIDAV_CONFIG_PATH,
+        )
+        self.WSGIDAV_PORT = self.wsgidav_config.port
+        self.WSGIDAV_CLIENT_BASE_URL = \
+            tg.config.get('wsgidav.client.base_url', None)
+
+        if not self.WSGIDAV_CLIENT_BASE_URL:
+            self.WSGIDAV_CLIENT_BASE_URL = \
+                '{0}:{1}'.format(
+                    self.WEBSITE_SERVER_NAME,
+                    self.WSGIDAV_PORT,
+                )
+            logger.warning(
+                self,
+                'NOTE: Generated wsgidav.client.base_url parameter with '
+                'followings parameters: website.server_name and '
+                'wsgidav.conf port'.format(
+                    self.WSGIDAV_CLIENT_BASE_URL,
+                )
+            )
+
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
