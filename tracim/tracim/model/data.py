@@ -64,9 +64,16 @@ class Workspace(DeclarativeBase):
     revisions = relationship("ContentRevisionRO")
 
     @hybrid_property
-    def contents(self):
+    def contents(self) -> ['Content']:
         # Return a list of unique revisions parent content
-        return list(set([revision.node for revision in self.revisions]))
+        contents = []
+        for revision in self.revisions:
+            # TODO BS 20161209: This ``revision.node.workspace`` make a lot
+            # of SQL queries !
+            if revision.node.workspace == self and revision.node not in contents:
+                contents.append(revision.node)
+
+        return contents
 
     @property
     def calendar_url(self) -> str:
