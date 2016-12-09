@@ -579,6 +579,7 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
                          NOTE: This parameter is in kwargs because prevent URL
                          changes.
         """
+        inverted = kwargs.get('inverted')
         thread_id = int(thread_id)
         user = tmpl_context.current_user
         workspace = tmpl_context.workspace
@@ -595,13 +596,13 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
 
         dictified_thread = Context(CTX.THREAD).toDict(thread, 'thread')
 
-        if kwargs.get('inverted'):
+        if inverted:
           dictified_thread.thread.history = reversed(dictified_thread.thread.history)
 
         return DictLikeClass(
             result=dictified_thread,
             fake_api=fake_api,
-            inverted=kwargs.get('inverted'),
+            inverted=inverted,
         )
 
 
