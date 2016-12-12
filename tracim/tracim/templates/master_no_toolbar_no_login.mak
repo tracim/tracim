@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="">
-        <link rel="icon" href="../../favicon.ico">
+        <link rel="icon" href="/favicon.ico">
 
         <!-- Bootstrap core CSS -->
         <link href="${tg.url('/assets/css/bootstrap.min.css')}" rel="stylesheet">
