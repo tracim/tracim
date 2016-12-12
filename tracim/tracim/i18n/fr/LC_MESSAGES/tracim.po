@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pod 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-11-08 15:20+0100\n"
+"POT-Creation-Date: 2016-11-14 14:06+0100\n"
 "PO-Revision-Date: 2016-06-09 15:35+0100\n"
 "Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
 "Language: fr\n"
@@ -167,7 +167,7 @@ msgstr "Commentaire"
 msgid "Comment added"
 msgstr "Commentaire créé"
 
-#: tracim/controllers/content.py:162 tracim/templates/file/getone.mak:94
+#: tracim/controllers/content.py:162 tracim/templates/file/getone.mak:93
 msgid "File"
 msgstr "Fichier"
 
@@ -248,31 +248,31 @@ msgstr "Bonjour %s. Ravis de vous revoir !"
 msgid "Successfully logged out. We hope to see you soon!"
 msgstr "Déconnexion réussie. Nous espérons vous revoir bientôt !"
 
-#: tracim/controllers/user.py:56
+#: tracim/controllers/user.py:38
 msgid "Notification enabled for workspace {}"
 msgstr "Notifications activées pour l'espace de travail {}"
 
-#: tracim/controllers/user.py:69
+#: tracim/controllers/user.py:51
 msgid "Notification disabled for workspace {}"
 msgstr "Notifications désactivées pour l'espace de travail {}"
 
-#: tracim/controllers/user.py:115 tracim/controllers/admin/user.py:205
+#: tracim/controllers/user.py:97 tracim/controllers/admin/user.py:205
 msgid "Empty password is not allowed."
 msgstr "Le mot de passe ne doit pas être vide"
 
-#: tracim/controllers/user.py:119
+#: tracim/controllers/user.py:101
 msgid "The current password you typed is wrong"
 msgstr "Le mot de passe saisi est erroné"
 
-#: tracim/controllers/user.py:123 tracim/controllers/admin/user.py:209
+#: tracim/controllers/user.py:105 tracim/controllers/admin/user.py:209
 msgid "New passwords do not match."
 msgstr "Les mots de passe ne concordent pas"
 
-#: tracim/controllers/user.py:130
+#: tracim/controllers/user.py:112
 msgid "Your password has been changed"
 msgstr "Votre mot de passe a été changé"
 
-#: tracim/controllers/user.py:199
+#: tracim/controllers/user.py:176
 msgid "profile updated."
 msgstr "Profil mis à jour"
 
@@ -300,39 +300,39 @@ msgstr "L'utilisateur {} peut désormais créer des espaces de travail"
 msgid "User {} is now an administrator"
 msgstr "L'utilisateur {} est désormais administrateur"
 
-#: tracim/controllers/admin/user.py:215
+#: tracim/controllers/admin/user.py:216
 msgid "The password has been changed"
 msgstr "Le mot de passe a été changé"
 
-#: tracim/controllers/admin/user.py:243
+#: tracim/controllers/admin/user.py:244
 msgid "User {}: notification enabled for workspace {}"
 msgstr "Utilisateur {} : notifications activées pour l'espace de travail {}"
 
-#: tracim/controllers/admin/user.py:257
+#: tracim/controllers/admin/user.py:258
 msgid "User {}: notification disabled for workspace {}"
 msgstr "User {}: notifications désactivées pour l'espace de travail {}"
 
-#: tracim/controllers/admin/user.py:319
+#: tracim/controllers/admin/user.py:320
 msgid "A user with email address \"{}\" already exists."
 msgstr "Un utilisateur avec l'adresse email \"{}\" existe déjà."
 
-#: tracim/controllers/admin/user.py:350
+#: tracim/controllers/admin/user.py:351
 msgid "User {} created."
 msgstr "Utilisateur {} créé."
 
-#: tracim/controllers/admin/user.py:393
+#: tracim/controllers/admin/user.py:394
 msgid "User {} updated."
 msgstr "Utilisateur {} mis à jour."
 
-#: tracim/controllers/admin/user.py:409
+#: tracim/controllers/admin/user.py:410
 msgid "User {} enabled."
 msgstr "Utilisateur {} activé."
 
-#: tracim/controllers/admin/user.py:422
+#: tracim/controllers/admin/user.py:423
 msgid "You can't de-activate your own account"
 msgstr "Vous ne pouvez pas désactiver votre propre compte"
 
-#: tracim/controllers/admin/user.py:427
+#: tracim/controllers/admin/user.py:428
 msgid "User {} disabled"
 msgstr "Utilisateur {} désactivé."
 
@@ -393,7 +393,6 @@ msgstr "le %d %B à %H:%M"
 
 #: tracim/lib/calendar.py:42
 #, fuzzy
-#| msgid "Personal calendar"
 msgid "My personal calendar"
 msgstr "Calendrier personnel"
 
@@ -416,7 +415,7 @@ msgstr "Espaces de travail"
 msgid "The content did not changed"
 msgstr "Le contenu est inchangé"
 
-#: tracim/lib/helpers.py:71
+#: tracim/lib/helpers.py:36
 msgid "{date} at {time}"
 msgstr "{date} à {time}"
 
@@ -489,11 +488,11 @@ msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 msgid "You're not allowed to access this resource"
 msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 
-#: tracim/model/auth.py:98
+#: tracim/model/auth.py:97
 msgid "Nobody"
 msgstr "Personne"
 
-#: tracim/model/auth.py:99 tracim/templates/master_authenticated.mak:137
+#: tracim/model/auth.py:98 tracim/templates/master_authenticated.mak:137
 #: tracim/templates/master_no_toolbar_no_login.mak:111
 #: tracim/templates/admin/user_getall.mak:11
 #: tracim/templates/admin/user_getall.mak:20
@@ -501,11 +500,11 @@ msgstr "Personne"
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: tracim/model/auth.py:100
+#: tracim/model/auth.py:99
 msgid "Global managers"
 msgstr "Managers globaux"
 
-#: tracim/model/auth.py:101
+#: tracim/model/auth.py:100
 msgid "Administrators"
 msgstr "Administrateurs"
 
@@ -790,8 +789,8 @@ msgid "Workspace"
 msgstr "Espace de travail"
 
 #: tracim/templates/home.mak:133 tracim/templates/admin/user_getone.mak:78
-#: tracim/templates/admin/workspace_getone.mak:88
-#: tracim/templates/admin/workspace_getone.mak:124
+#: tracim/templates/admin/workspace_getone.mak:89
+#: tracim/templates/admin/workspace_getone.mak:125
 msgid "Role"
 msgstr "Rôle"
 
@@ -833,7 +832,7 @@ msgstr "Accueil"
 
 #: tracim/templates/master_authenticated.mak:114
 #: tracim/templates/admin/workspace_getall.mak:85
-#: tracim/templates/admin/workspace_getone.mak:55
+#: tracim/templates/admin/workspace_getone.mak:56
 #: tracim/templates/calendar/iframe_container.mak:5
 msgid "Calendar"
 msgstr "Calendrier"
@@ -1065,10 +1064,10 @@ msgstr "des pages \"wiki\""
 #: tracim/templates/user_workspace_forms.mak:39
 #: tracim/templates/user_workspace_forms.mak:58
 #: tracim/templates/user_workspace_forms.mak:81
-#: tracim/templates/user_workspace_forms.mak:135
+#: tracim/templates/user_workspace_forms.mak:121
 #: tracim/templates/admin/user_getall.mak:70
 #: tracim/templates/admin/workspace_getall.mak:59
-#: tracim/templates/admin/workspace_getone.mak:107
+#: tracim/templates/admin/workspace_getone.mak:108
 #: tracim/templates/file/edit.mak:23 tracim/templates/file/forms.mak:25
 #: tracim/templates/file/forms.mak:49 tracim/templates/folder/forms.mak:34
 #: tracim/templates/folder/forms.mak:78 tracim/templates/page/edit.mak:23
@@ -1086,15 +1085,15 @@ msgstr "Titre de la page"
 #: tracim/templates/user_workspace_forms.mak:51
 #: tracim/templates/user_workspace_widgets.mak:81
 #: tracim/templates/file/edit.mak:13 tracim/templates/file/edit.mak:14
-#: tracim/templates/folder/getone.mak:125 tracim/templates/page/edit.mak:13
+#: tracim/templates/folder/getone.mak:124 tracim/templates/page/edit.mak:13
 #: tracim/templates/page/edit.mak:14 tracim/templates/page/forms.mak:16
-#: tracim/templates/workspace/getone.mak:194
+#: tracim/templates/workspace/getone.mak:193
 msgid "Title"
 msgstr "Titre"
 
 #: tracim/templates/user_workspace_forms.mak:54
 #: tracim/templates/file/edit.mak:17 tracim/templates/page/edit.mak:17
-#: tracim/templates/page/forms.mak:20 tracim/templates/workspace/getone.mak:131
+#: tracim/templates/page/forms.mak:20 tracim/templates/workspace/getone.mak:130
 msgid "Content"
 msgstr "Contenu"
 
@@ -1149,14 +1148,6 @@ msgstr "Calendrier personnel"
 msgid "This calendar URL will work with CalDav compatibles clients"
 msgstr "Cette url de calendrier fonctionne avec les logiciels compatibles CalDav"
 
-#: tracim/templates/user_workspace_forms.mak:119
-msgid "Timezone"
-msgstr "Fuseau horaire"
-
-#: tracim/templates/user_workspace_forms.mak:120
-msgid "Dates will be displayed with this timezone"
-msgstr "Les dates seront affichées avec ce fuseau horaire"
-
 #: tracim/templates/user_workspace_widgets.mak:37
 msgid "No folder found."
 msgstr "Aucun dossier."
@@ -1186,14 +1177,14 @@ msgid "No page found."
 msgstr "Aucune page."
 
 #: tracim/templates/user_workspace_widgets.mak:80
-#: tracim/templates/folder/getone.mak:124
-#: tracim/templates/workspace/getone.mak:193
+#: tracim/templates/folder/getone.mak:123
+#: tracim/templates/workspace/getone.mak:192
 msgid "Type"
 msgstr "Type"
 
 #: tracim/templates/user_workspace_widgets.mak:82
-#: tracim/templates/folder/getone.mak:126
-#: tracim/templates/workspace/getone.mak:195
+#: tracim/templates/folder/getone.mak:125
+#: tracim/templates/workspace/getone.mak:194
 msgid "Status"
 msgstr "Statut"
 
@@ -1225,32 +1216,32 @@ msgstr "Contactez un administrateur."
 msgid "This operation is locked"
 msgstr "Cette opération est verrouillée"
 
-#: tracim/templates/user_workspace_widgets.mak:353
+#: tracim/templates/user_workspace_widgets.mak:351
 msgid "<strong>{}</strong> wrote:"
 msgstr "<strong>{}</strong> a écrit :"
 
-#: tracim/templates/user_workspace_widgets.mak:355
+#: tracim/templates/user_workspace_widgets.mak:353
 msgid "{} by <strong>{}</strong>"
 msgstr "{} par <strong>{}</strong>"
 
-#: tracim/templates/user_workspace_widgets.mak:359
-#: tracim/templates/user_workspace_widgets.mak:388
+#: tracim/templates/user_workspace_widgets.mak:357
+#: tracim/templates/user_workspace_widgets.mak:385
 msgid "{delta} ago"
 msgstr "il y a {delta}"
 
-#: tracim/templates/user_workspace_widgets.mak:364
+#: tracim/templates/user_workspace_widgets.mak:362
 msgid "delete"
 msgstr "supprimer"
 
-#: tracim/templates/user_workspace_widgets.mak:400
+#: tracim/templates/user_workspace_widgets.mak:397
 msgid "View revision"
 msgstr "Voir cette version"
 
-#: tracim/templates/user_workspace_widgets.mak:403
+#: tracim/templates/user_workspace_widgets.mak:400
 msgid "Currently shown"
 msgstr "Actuellement affiché"
 
-#: tracim/templates/user_workspace_widgets.mak:405
+#: tracim/templates/user_workspace_widgets.mak:402
 msgid "shown"
 msgstr "affiché"
 
@@ -1290,8 +1281,8 @@ msgstr ""
 "form\">créant un espace de travail</a>."
 
 #: tracim/templates/admin/user_getall.mak:109
-#: tracim/templates/admin/workspace_getone.mak:77
-#: tracim/templates/admin/workspace_getone.mak:123
+#: tracim/templates/admin/workspace_getone.mak:78
+#: tracim/templates/admin/workspace_getone.mak:124
 msgid "User"
 msgstr "Utilisateur"
 
@@ -1304,7 +1295,7 @@ msgid "Administrator"
 msgstr "Administrateur"
 
 #: tracim/templates/admin/user_getall.mak:113
-#: tracim/templates/folder/getone.mak:127
+#: tracim/templates/folder/getone.mak:126
 msgid "Notes"
 msgstr "Remarques"
 
@@ -1384,7 +1375,7 @@ msgid "Roles"
 msgstr "Rôles"
 
 #: tracim/templates/admin/user_getone.mak:79
-#: tracim/templates/admin/workspace_getone.mak:125
+#: tracim/templates/admin/workspace_getone.mak:126
 msgid "Notifications"
 msgstr "Notifications"
 
@@ -1421,7 +1412,7 @@ msgid "User Nb"
 msgstr "Nombre d'utilisateurs"
 
 #: tracim/templates/admin/workspace_getone.mak:13
-#: tracim/templates/admin/workspace_getone.mak:29
+#: tracim/templates/admin/workspace_getone.mak:30
 msgid "Workspace {}"
 msgstr "Espace de travail {}"
 
@@ -1429,21 +1420,21 @@ msgstr "Espace de travail {}"
 msgid "created on {}"
 msgstr "créé le {}"
 
-#: tracim/templates/admin/workspace_getone.mak:39
-#: tracim/templates/workspace/getone.mak:57
+#: tracim/templates/admin/workspace_getone.mak:40
+#: tracim/templates/workspace/getone.mak:56
 msgid "Detail"
 msgstr "Détail"
 
-#: tracim/templates/admin/workspace_getone.mak:43
-#: tracim/templates/workspace/getone.mak:61
+#: tracim/templates/admin/workspace_getone.mak:44
+#: tracim/templates/workspace/getone.mak:60
 msgid "No description available"
 msgstr "Aucune description"
 
-#: tracim/templates/admin/workspace_getone.mak:51
+#: tracim/templates/admin/workspace_getone.mak:52
 msgid "The calendar is disabled."
 msgstr "Le calendrier est désactivé"
 
-#: tracim/templates/admin/workspace_getone.mak:56
+#: tracim/templates/admin/workspace_getone.mak:57
 msgid ""
 "This workspace offers a calendar that you can configure in your software:"
 " Outlook, Thunderbird, etc."
@@ -1451,24 +1442,24 @@ msgstr ""
 "Cet espace de travaille propose un calendrier que vous pouvez configurer "
 "dans votre logiciel : Outlook, Thunderbird, etc."
 
-#: tracim/templates/admin/workspace_getone.mak:57
+#: tracim/templates/admin/workspace_getone.mak:58
 msgid "The url to configure is the following one:"
 msgstr "L'url à configurer est la suivante :"
 
-#: tracim/templates/admin/workspace_getone.mak:69
-#: tracim/templates/admin/workspace_getone.mak:71
+#: tracim/templates/admin/workspace_getone.mak:70
+#: tracim/templates/admin/workspace_getone.mak:72
 msgid "Members"
 msgstr "Membres"
 
-#: tracim/templates/admin/workspace_getone.mak:71
+#: tracim/templates/admin/workspace_getone.mak:72
 msgid "add one..."
 msgstr "ajouter..."
 
-#: tracim/templates/admin/workspace_getone.mak:102
+#: tracim/templates/admin/workspace_getone.mak:103
 msgid "Subscribe to mail notifications"
 msgstr "Abonner l'utilisateur aux notifications par email"
 
-#: tracim/templates/admin/workspace_getone.mak:117
+#: tracim/templates/admin/workspace_getone.mak:118
 msgid ""
 "There are no user associated to the current workspace. <a class=\"alert-"
 "link\" data-toggle=\"collapse\" data-target=\"#add-role-from-existing-"
@@ -1516,11 +1507,11 @@ msgstr "Sélectionner la nouvelle version du fichier"
 msgid "Your comment..."
 msgstr "Votre commentaire..."
 
-#: tracim/templates/file/getone.mak:52
+#: tracim/templates/file/getone.mak:51
 msgid "file created on {date} at {time} by <b>{author}</b>"
 msgstr "Fichier créé le {date} à {time} par <b>{author}</b>"
 
-#: tracim/templates/file/getone.mak:62
+#: tracim/templates/file/getone.mak:61
 msgid ""
 "You are reading <b>an old revision</b> of the current file. (the shown "
 "revision is r{})."
@@ -1528,35 +1519,35 @@ msgstr ""
 "Vous consultez <b>une ancienne version</b> du fichier courant. (la "
 "version affichée est v{})."
 
-#: tracim/templates/file/getone.mak:64 tracim/templates/page/getone.mak:63
+#: tracim/templates/file/getone.mak:63 tracim/templates/page/getone.mak:62
 msgid "Show latest revision"
 msgstr "Voir la dernière version"
 
-#: tracim/templates/file/getone.mak:74
+#: tracim/templates/file/getone.mak:73
 msgid "<b>This file is deprecated</b>"
 msgstr "<b>Ce fichier est obsolète</b>"
 
-#: tracim/templates/file/getone.mak:84 tracim/templates/file/toolbar.mak:23
+#: tracim/templates/file/getone.mak:83 tracim/templates/file/toolbar.mak:23
 msgid "Download the file"
 msgstr "Télécharger le fichier"
 
-#: tracim/templates/file/getone.mak:96
+#: tracim/templates/file/getone.mak:95
 msgid "Download the file (last revision)"
 msgstr "Télécharger le fichier (dernière version)"
 
-#: tracim/templates/file/getone.mak:106
+#: tracim/templates/file/getone.mak:105
 msgid "Size"
 msgstr "Taille"
 
-#: tracim/templates/file/getone.mak:110
+#: tracim/templates/file/getone.mak:109
 msgid "Modified"
 msgstr "Modifié"
 
-#: tracim/templates/file/getone.mak:112
+#: tracim/templates/file/getone.mak:110
 msgid "by {}"
 msgstr "par {}"
 
-#: tracim/templates/file/getone.mak:139
+#: tracim/templates/file/getone.mak:137
 msgid ""
 "<b>Note</b>: You need to change status in case you want to upload a new "
 "version"
@@ -1564,19 +1555,19 @@ msgstr ""
 "<b>Note</b>: Vous devez changer le statut du fichier avant de pouvoir "
 "télécharger une nouvelle version"
 
-#: tracim/templates/file/getone.mak:142
+#: tracim/templates/file/getone.mak:140
 msgid "File revisions"
 msgstr "Versions du fichier"
 
-#: tracim/templates/file/getone.mak:143
+#: tracim/templates/file/getone.mak:141
 msgid "This file contains {} revision(s)"
 msgstr "ce fichier contient {} version(s)"
 
-#: tracim/templates/file/getone.mak:146
+#: tracim/templates/file/getone.mak:144
 msgid "upload a new revision and/or comment..."
 msgstr "téléverser une nouvelle version et/ou commenter..."
 
-#: tracim/templates/file/getone.mak:158
+#: tracim/templates/file/getone.mak:156
 msgid "File history"
 msgstr "Historique du fichier"
 
@@ -1645,27 +1636,27 @@ msgstr "dans l'espace de travail courant..."
 msgid "to another workspace"
 msgstr "vers un autre espace de travail"
 
-#: tracim/templates/folder/getone.mak:50
+#: tracim/templates/folder/getone.mak:49
 msgid "folder created on {date} at {time} by <b>{author}</b>"
 msgstr "Dossier créé le {date} à {time} par <b>{author}</b>"
 
-#: tracim/templates/folder/getone.mak:64
-#: tracim/templates/workspace/getone.mak:136
+#: tracim/templates/folder/getone.mak:63
+#: tracim/templates/workspace/getone.mak:135
 msgid "New ..."
 msgstr "Nouveau ..."
 
-#: tracim/templates/folder/getone.mak:88
-#: tracim/templates/workspace/getone.mak:173
+#: tracim/templates/folder/getone.mak:87
+#: tracim/templates/workspace/getone.mak:172
 msgid "hide..."
 msgstr "masquer ..."
 
-#: tracim/templates/folder/getone.mak:95
-#: tracim/templates/workspace/getone.mak:180
+#: tracim/templates/folder/getone.mak:94
+#: tracim/templates/workspace/getone.mak:179
 msgid "search..."
 msgstr "rechercher..."
 
-#: tracim/templates/folder/getone.mak:119
-#: tracim/templates/workspace/getone.mak:188
+#: tracim/templates/folder/getone.mak:118
+#: tracim/templates/workspace/getone.mak:187
 msgid "This folder has not yet content."
 msgstr "Ce dossier est vide."
 
@@ -1786,7 +1777,6 @@ msgstr ""
 
 #: tracim/templates/mail/created_account_body_html.mak:46
 #, fuzzy
-#| msgid "Create account"
 msgid "Created account"
 msgstr "Créer un compte"
 
@@ -1802,8 +1792,6 @@ msgstr ""
 
 #: tracim/templates/mail/created_account_body_html.mak:83
 #, fuzzy
-#| msgid "" "This email was automatically sent by <i>Tracim</i>, a
-#| collaborative " "software developped by Algoo."
 msgid ""
 "This email was sent by <i>Tracim</i>, a collaborative software developped"
 " by Algoo."
@@ -1819,11 +1807,11 @@ msgstr "Modifier la page"
 msgid "New Page"
 msgstr "Nouvelle page"
 
-#: tracim/templates/page/getone.mak:51 tracim/templates/thread/getone.mak:52
+#: tracim/templates/page/getone.mak:50 tracim/templates/thread/getone.mak:51
 msgid "page created on {date} at {time} by <b>{author}</b>"
 msgstr "Page créée le {date} à {time} par <b>{author}</b>"
 
-#: tracim/templates/page/getone.mak:61
+#: tracim/templates/page/getone.mak:60
 msgid ""
 "You are reading <b>an old revision</b> of the current page. (the shown "
 "revision is r{})."
@@ -1831,15 +1819,15 @@ msgstr ""
 "Vous consultez <b>une ancienne version</b> de la page courante. (la "
 "version affichée est la v{})."
 
-#: tracim/templates/page/getone.mak:73 tracim/templates/thread/getone.mak:62
+#: tracim/templates/page/getone.mak:72 tracim/templates/thread/getone.mak:61
 msgid "<b>This information is deprecated</b>"
 msgstr "<b>Cette information est obsolète</b>"
 
-#: tracim/templates/page/getone.mak:88
+#: tracim/templates/page/getone.mak:87
 msgid "This page is empty"
 msgstr "Cette page est vide"
 
-#: tracim/templates/page/getone.mak:102
+#: tracim/templates/page/getone.mak:101
 msgid "Page history"
 msgstr "Historique de la page"
 
@@ -1863,15 +1851,15 @@ msgstr "Résultats de recherche"
 msgid "for keywords: "
 msgstr "pour les mot-clés :"
 
-#: tracim/templates/search/display.mak:54
+#: tracim/templates/search/display.mak:53
 msgid "loading..."
 msgstr "chargement..."
 
-#: tracim/templates/search/display.mak:79
+#: tracim/templates/search/display.mak:78
 msgid "Last known activty"
 msgstr "Dernière activité connue"
 
-#: tracim/templates/search/display.mak:80
+#: tracim/templates/search/display.mak:79
 msgid "Last activity: {} ago"
 msgstr "Dernière activité : il y a {}"
 
@@ -1953,7 +1941,7 @@ msgstr "démarrer une discussion..."
 msgid "Your message"
 msgstr "votre message"
 
-#: tracim/templates/thread/getone.mak:93
+#: tracim/templates/thread/getone.mak:92
 msgid ""
 "<b>Note</b>: In case you'd like to post a reply, you must first open "
 "again the thread"
@@ -1961,13 +1949,9 @@ msgstr ""
 "<b>Note</b> : si vous souhaitez commenter cette discussion, vous devez "
 "tout d'abord en modifier le statut pour la ré-ouvrir"
 
-#: tracim/templates/thread/getone.mak:96
+#: tracim/templates/thread/getone.mak:95
 msgid "Post a reply..."
 msgstr "Poster une réponse..."
-
-#: tracim/templates/thread/getone.mak:97
-msgid "Invert order"
-msgstr "Inverser l'ordre"
 
 #: tracim/templates/thread/toolbar.mak:16
 msgid "Edit current thread"
@@ -2030,39 +2014,31 @@ msgstr ""
 "Cette url est l'url à configurer dans votre logiciel de calendrier : "
 "Outlook, Thunderbird, etc."
 
-#: tracim/templates/workspace/getone.mak:48
+#: tracim/templates/workspace/getone.mak:47
 msgid "workspace created on {date} at {time}"
 msgstr "espace de travail créé le {date} à {time}"
 
-#: tracim/templates/workspace/getone.mak:68
+#: tracim/templates/workspace/getone.mak:67
 msgid "There are no members in this workspace"
 msgstr "Cet espace de travail ne compte aucun membre"
 
-#: tracim/templates/workspace/getone.mak:72
+#: tracim/templates/workspace/getone.mak:71
 msgid "This workspace has {a_open}one member{a_close}"
 msgstr "Cet espace de travail compte {a_open}un membre{a_close}"
 
-#: tracim/templates/workspace/getone.mak:74
+#: tracim/templates/workspace/getone.mak:73
 msgid "This workspace has {a_open}{member_nb} members{a_close}"
 msgstr "Cet espace de travail compte {a_open}{member_nb} membres{a_close}"
 
-#: tracim/templates/workspace/getone.mak:77
-msgid "This workspace is {a_open}accessible with webdav{a_close}"
-msgstr "Cet espace de travail est {a_open}accessible via webdav{a_close}"
-
-#: tracim/templates/workspace/getone.mak:78
-msgid "Adress to connect to webdav with:"
-msgstr "Adresses pour se connecter à webdav sous :"
-
-#: tracim/templates/workspace/getone.mak:76
+#: tracim/templates/workspace/getone.mak:75
 msgid "whose"
 msgstr "dont"
 
-#: tracim/templates/workspace/getone.mak:107
+#: tracim/templates/workspace/getone.mak:106
 msgid "This workspace has {a_open}an associated calendar{a_close}"
 msgstr "Cet espace de travail propose {a_open}un calendrier associé{a_close}"
 
-#: tracim/templates/workspace/getone.mak:110
+#: tracim/templates/workspace/getone.mak:109
 msgid ""
 "You can access the calendar using your own software: Outlook, "
 "Thunderbird, etc."
@@ -2070,15 +2046,15 @@ msgstr ""
 "Vous pouvez accéder au calendrier à l'aide de votre propre logiciel : "
 "Outlook, Thunderbird, etc."
 
-#: tracim/templates/workspace/getone.mak:111
+#: tracim/templates/workspace/getone.mak:110
 msgid "The url to setup is the following one:"
 msgstr "L'url à configurer est la suivante :"
 
-#: tracim/templates/workspace/getone.mak:150
+#: tracim/templates/workspace/getone.mak:149
 msgid "You are not allowed to create content"
 msgstr "Vous n'êtes pas autorisé à créer des objets"
 
-#: tracim/templates/workspace/getone.mak:196
+#: tracim/templates/workspace/getone.mak:195
 msgid "Remarques"
 msgstr "Remarques"
 
@@ -2758,4 +2734,19 @@ msgstr "Supprimer l'espace de travail"
 
 #~ msgid "Archive thread"
 #~ msgstr "Archiver la discussion"
+
+#~ msgid "Timezone"
+#~ msgstr "Fuseau horaire"
+
+#~ msgid "Dates will be displayed with this timezone"
+#~ msgstr "Les dates seront affichées avec ce fuseau horaire"
+
+#~ msgid "Invert order"
+#~ msgstr "Inverser l'ordre"
+
+#~ msgid "This workspace is {a_open}accessible with webdav{a_close}"
+#~ msgstr "Cet espace de travail est {a_open}accessible via webdav{a_close}"
+
+#~ msgid "Adress to connect to webdav with:"
+#~ msgstr "Adresses pour se connecter à webdav sous :"
 
