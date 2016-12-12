@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytz
+from sqlalchemy.orm.exc import NoResultFound
 from tracim.lib import CST
 from webob.exc import HTTPForbidden
 import tg
@@ -176,10 +177,13 @@ class UserRestController(TIMRestController):
         else:
             next = self.url()
 
-        email_user = user_api.get_one_by_email(email)
-        if email_user != current_user:
-            tg.flash(_('Email already in use'), CST.STATUS_ERROR)
-            tg.redirect(next)
+        try:
+            email_user = user_api.get_one_by_email(email)
+            if email_user != current_user:
+                tg.flash(_('Email already in use'), CST.STATUS_ERROR)
+                tg.redirect(next)
+        except NoResultFound:
+            pass
 
         # Only keep allowed field update
         updated_fields = self._clean_update_fields({
