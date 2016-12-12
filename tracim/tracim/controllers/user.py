@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytz
+from tracim.lib import CST
 from webob.exc import HTTPForbidden
 import tg
 from tg import tmpl_context
@@ -168,7 +169,17 @@ class UserRestController(TIMRestController):
     def put(self, user_id, name, email, timezone, next_url=None):
         user_id = tmpl_context.current_user.user_id
         current_user = tmpl_context.current_user
+        user_api = UserApi(current_user)
         assert user_id==current_user.user_id
+        if next_url:
+            next = tg.url(next_url)
+        else:
+            next = self.url()
+
+        email_user = user_api.get_one_by_email(email)
+        if email_user != current_user:
+            tg.flash(_('Email already in use'), CST.STATUS_ERROR)
+            tg.redirect(next)
 
         # Only keep allowed field update
         updated_fields = self._clean_update_fields({
@@ -180,9 +191,7 @@ class UserRestController(TIMRestController):
         api = UserApi(tmpl_context.current_user)
         api.update(current_user, do_save=True, **updated_fields)
         tg.flash(_('profile updated.'))
-        if next_url:
-            tg.redirect(tg.url(next_url))
-        tg.redirect(self.url())
+        tg.redirect(next)
 
     def _clean_update_fields(self, fields: dict):
         """
