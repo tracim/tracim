@@ -113,7 +113,7 @@ _Note: the following information is for Debian. For other OS, adapt the package 
 
 You'll need to install the following packages on your Operating System:
 
-    apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml
+    apt-get install git realpath python3 python3-venv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml
 
 ## Database ##
 
@@ -146,7 +146,7 @@ _Reminder : Tracim is developed and tested using python3.4._
 
 We strongly recommend to use virtualenv as deployment environment. This ensure that there will be no conflict between system-wide python installation and Tracim required ones. To Create the virtual environment:
 
-    virtualenv -p /usr/bin/python3.4 tg2env
+    pyvenv tg2env
 
 And to activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**)):
 
