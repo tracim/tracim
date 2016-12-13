@@ -265,7 +265,7 @@ def serialize_version_for_page_or_file(version: ContentRevisionRO, context: Cont
         label = version.label,
         owner = context.toDict(version.owner),
         created = version.created,
-        action = context.toDict(version.get_last_action())
+        action = context.toDict(version.get_last_action()),
     )
 
 
@@ -389,6 +389,9 @@ def serialize_node_for_page(content: Content, context: Context):
             revisions=context.toDict(sorted(content.revisions, key=lambda v: v.created, reverse=True)),
             selected_revision='latest' if content.revision_to_serialize<=0 else content.revision_to_serialize,
             history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history()),
+            is_editable=content.is_editable,
+            is_deleted=content.is_deleted,
+            is_archived=content.is_archived,
             urls = context.toDict({
                 'mark_read': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_read', content)),
                 'mark_unread': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_unread', content))
@@ -458,6 +461,9 @@ def serialize_node_for_page(item: Content, context: Context):
             comments = reversed(context.toDict(item.get_comments())),
             is_new=item.has_new_information_for(context.get_user()),
             history = Context(CTX.CONTENT_HISTORY).toDict(item.get_history()),
+            is_editable=item.is_editable,
+            is_deleted=item.is_deleted,
+            is_archived=item.is_archived,
             urls = context.toDict({
                 'mark_read': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_read', item)),
                 'mark_unread': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_unread', item))
@@ -547,7 +553,8 @@ def serialize_content_for_workspace(content: Content, context: Context):
                 all = page_nb_all,
                 open = page_nb_open,
             ),
-            content_nb = DictLikeClass(all = content_nb_all)
+            content_nb = DictLikeClass(all = content_nb_all),
+            is_editable=content.is_editable,
         )
 
     return result
@@ -595,7 +602,10 @@ def serialize_content_for_workspace_and_folder(content: Content, context: Contex
                                     open=folder_nb_open),
             page_nb=DictLikeClass(all=page_nb_all,
                                   open=page_nb_open),
-            content_nb=DictLikeClass(all = content_nb_all)
+            content_nb=DictLikeClass(all = content_nb_all),
+            is_archived=content.is_archived,
+            is_deleted=content.is_deleted,
+            is_editable=content.is_editable,
         )
 
     elif content.type==ContentType.Page:
@@ -635,6 +645,9 @@ def serialize_content_for_general_list(content: Content, context: Context):
         url=ContentType.fill_url(content),
         type=DictLikeClass(content_type.toDict()),
         status=context.toDict(content.get_status()),
+        is_deleted=content.is_deleted,
+        is_archived=content.is_archived,
+        is_editable=content.is_editable,
         last_activity = DictLikeClass({'date': last_activity_date,
                                        'label': last_activity_date_formatted,
                                        'delta': last_activity_label})
@@ -705,6 +718,10 @@ def serialize_content_for_folder_content_list(content: Content, context: Context
     else:
         item = Context(CTX.CONTENT_LIST).toDict(content)
         item.notes = ''
+
+    item.is_deleted = content.is_deleted
+    item.is_archived = content.is_archived
+    item.is_editable = content.is_editable
 
     return item
 

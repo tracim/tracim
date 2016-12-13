@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
+
 import os
 
 from operator import itemgetter
@@ -99,6 +101,34 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
+
+    @contextmanager
+    def show(
+            self,
+            show_archived: bool=False,
+            show_deleted: bool=False,
+            show_temporary: bool=False,
+    ):
+        """
+        Use this method as context manager to update show_archived,
+        show_deleted and show_temporary properties during context.
+        :param show_archived: show archived contents
+        :param show_deleted:  show deleted contents
+        :param show_temporary:  show temporary contents
+        """
+        previous_show_archived = self._show_archived
+        previous_show_deleted = self._show_deleted
+        previous_show_temporary = self._show_temporary
+
+        try:
+            self._show_archived = show_archived
+            self._show_deleted = show_deleted
+            self._show_temporary = show_temporary
+            yield self
+        finally:
+            self._show_archived = previous_show_archived
+            self._show_deleted = previous_show_deleted
+            self._show_temporary = previous_show_temporary
 
     @classmethod
     def get_revision_join(cls):

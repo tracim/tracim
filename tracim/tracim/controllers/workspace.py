@@ -42,7 +42,16 @@ class UserWorkspaceRestController(TIMRestController):
         tg.redirect(tg.url('/home'))
 
     @tg.expose('tracim.templates.workspace.getone')
-    def get_one(self, workspace_id):
+    def get_one(self, workspace_id, **kwargs):
+        """
+        :param workspace_id: Displayed workspace id
+        :param kwargs:
+          * show_deleted: bool: Display deleted contents or hide them if False
+          * show_archived: bool: Display archived contents or hide them
+            if False
+        """
+        show_deleted = kwargs.get('show_deleted', False)
+        show_archived = kwargs.get('show_archived', False)
         user = tmpl_context.current_user
 
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
@@ -61,7 +70,11 @@ class UserWorkspaceRestController(TIMRestController):
 
         fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(
             # TODO BS 20161209: Is the correct way to grab folders? No use API?
-            workspace.get_valid_children(ContentApi.DISPLAYABLE_CONTENTS)
+            workspace.get_valid_children(
+                ContentApi.DISPLAYABLE_CONTENTS,
+                show_deleted=show_deleted,
+                show_archived=show_archived,
+            )
         )
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
@@ -71,6 +84,8 @@ class UserWorkspaceRestController(TIMRestController):
             result=dictified_workspace,
             fake_api=fake_api,
             webdav_url=webdav_url,
+            show_deleted=show_deleted,
+            show_archived=show_archived,
         )
 
     @tg.expose('json')

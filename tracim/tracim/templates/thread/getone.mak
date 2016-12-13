@@ -36,6 +36,9 @@
 ##
 ############################################################################
 
+<div class="content-container ${'not-editable' if not result.thread.is_editable else ''}">
+<!--# TODO BS 20161213: Indent content-->
+
 <div class="row t-page-header-row">
     <div class="col-sm-7 col-sm-offset-3 main">
         <h1 class="page-header t-thread-color-border">
@@ -125,3 +128,5 @@
 ##     ${WIDGETS.SECURED_TIMELINE_ITEM(fake_api.current_user, comment)}
 ## % endfor
 ##
+
+</div>

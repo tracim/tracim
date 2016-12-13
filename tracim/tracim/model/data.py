@@ -97,12 +97,17 @@ class Workspace(DeclarativeBase):
         # @see Content.get_allowed_content_types()
         return [ContentType('folder')]
 
-    def get_valid_children(self, content_types: list=None):
+    def get_valid_children(
+            self,
+            content_types: list=None,
+            show_deleted: bool=False,
+            show_archived: bool=False,
+    ):
         for child in self.contents:
             # we search only direct children
             if not child.parent \
-                    and not child.is_deleted \
-                    and not child.is_archived:
+                    and (show_deleted or not child.is_deleted) \
+                    and (show_archived or not child.is_archived):
                 if not content_types or child.type in content_types:
                     yield child
 
@@ -1031,6 +1036,10 @@ class Content(DeclarativeBase):
     @property
     def revision(self) -> ContentRevisionRO:
         return self.get_current_revision()
+
+    @property
+    def is_editable(self) -> bool:
+        return not self.is_archived and not self.is_deleted
 
     def get_current_revision(self) -> ContentRevisionRO:
         if not self.revisions:

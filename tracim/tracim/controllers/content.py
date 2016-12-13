@@ -174,13 +174,16 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         file_id = int(file_id)
         user = tmpl_context.current_user
         workspace = tmpl_context.workspace
-        workspace_id = tmpl_context.workspace_id
 
         current_user_content = Context(CTX.CURRENT_USER,
                                        current_user=user).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
-        content_api = ContentApi(user)
+        content_api = ContentApi(
+            user,
+            show_archived=True,
+            show_deleted=True,
+        )
         if revision_id:
             file = content_api.get_one_from_revision(file_id,  self._item_type, workspace, revision_id)
         else:
@@ -402,7 +405,11 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
-        content_api = ContentApi(user)
+        content_api = ContentApi(
+            user,
+            show_deleted=True,
+            show_archived=True,
+        )
         if revision_id:
             page = content_api.get_one_from_revision(page_id, ContentType.Page, workspace, revision_id)
         else:
@@ -587,7 +594,11 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
-        content_api = ContentApi(user)
+        content_api = ContentApi(
+            user,
+            show_deleted=True,
+            show_archived=True,
+        )
         thread = content_api.get_one(thread_id, ContentType.Thread, workspace)
 
         fake_api_breadcrumb = self.get_breadcrumb(thread_id)
@@ -744,18 +755,35 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
 
     @tg.require(current_user_is_reader())
     @tg.expose('tracim.templates.folder.getone')
-    def get_one(self, folder_id):
+    def get_one(self, folder_id, **kwargs):
+        """
+        :param folder_id: Displayed folder id
+        :param kwargs:
+          * show_deleted: bool: Display deleted contents or hide them if False
+          * show_archived: bool: Display archived contents or hide them
+            if False
+        """
+        show_deleted = kwargs.get('show_deleted', False)
+        show_archived = kwargs.get('show_archived', False)
         folder_id = int(folder_id)
         user = tmpl_context.current_user
         workspace = tmpl_context.workspace
-        workspace_id = tmpl_context.workspace_id
 
         current_user_content = Context(CTX.CURRENT_USER,
                                        current_user=user).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
-        content_api = ContentApi(user)
-        folder = content_api.get_one(folder_id, ContentType.Folder, workspace)
+        content_api = ContentApi(
+            user,
+            show_deleted=show_deleted,
+            show_archived=show_archived,
+        )
+        with content_api.show(show_deleted=True, show_archived=True):
+            folder = content_api.get_one(
+                folder_id,
+                ContentType.Folder,
+                workspace,
+            )
 
         fake_api_breadcrumb = self.get_breadcrumb(folder_id)
         fake_api_subfolders = self.get_all_fake(workspace, folder.content_id).result
@@ -787,10 +815,16 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(sub_items)
 
         fake_api.content_types = Context(CTX.DEFAULT).toDict(
-            content_api.get_all_types())
+            content_api.get_all_types()
+        )
 
         dictified_folder = Context(CTX.FOLDER).toDict(folder, 'folder')
-        return DictLikeClass(result = dictified_folder, fake_api=fake_api)
+        return DictLikeClass(
+            result=dictified_folder,
+            fake_api=fake_api,
+            show_deleted=show_deleted,
+            show_archived=show_archived,
+        )
 
 
     def get_all_fake(self, context_workspace: Workspace, parent_id=None):
@@ -804,7 +838,8 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
         """
         workspace = context_workspace
         content_api = ContentApi(tmpl_context.current_user)
-        parent_folder = content_api.get_one(parent_id, ContentType.Folder)
+        with content_api.show(show_deleted=True, show_archived=True):
+            parent_folder = content_api.get_one(parent_id, ContentType.Folder)
         folders = content_api.get_child_folders(parent_folder, workspace)
 
         folders = Context(CTX.FOLDERS).toDict(folders)

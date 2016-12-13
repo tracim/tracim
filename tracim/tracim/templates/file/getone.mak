@@ -36,6 +36,9 @@
 ##
 ############################################################################
 
+<div class="content-container ${'not-editable' if not result.file.is_editable else ''}">
+<!--# TODO BS 20161213: Indent content-->
+
 <div class="row t-page-header-row">
     <div class="col-sm-7 col-sm-offset-3 main">
         <h1 class="page-header t-file-color-border">
@@ -167,3 +170,4 @@
     </div>
 <div/>
 
+</div>

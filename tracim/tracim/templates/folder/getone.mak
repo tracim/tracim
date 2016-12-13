@@ -9,6 +9,7 @@
 <%namespace name="TABLE_ROW" file="tracim.templates.widgets.table_row"/>
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
 <%namespace name="P" file="tracim.templates.widgets.paragraph"/>
+<%namespace name="UI" file="tracim.templates.widgets.ui"/>
 
 <%def name="title()">${result.folder.label}</%def>
 
@@ -37,6 +38,9 @@
 ## PAGE CONTENT BELOW
 ##
 ############################################################################
+
+<div class="folder-container ${'not-editable' if not result.folder.is_editable else ''}">
+<!--# TODO BS 20161213: Indent content-->
 
 <div class="row t-page-header-row">
     <div class="col-sm-7 col-sm-offset-3 main">
@@ -115,6 +119,8 @@
                 % endif
             % endif
 
+            ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}/folders/{}'.format(result.folder.workspace.id, result.folder.id)))}
+
             % if len(fake_api.sub_items) <= 0:
                 ${P.EMPTY_CONTENT(_('This folder has not yet content.'))}
             % else:
@@ -176,3 +182,5 @@
         });
     });
 </script>
+
+</div>

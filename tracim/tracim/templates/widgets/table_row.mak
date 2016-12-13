@@ -55,7 +55,7 @@
 </%def>
 
 <%def name="CONTENT(content)">
-    <tr class="t-table-row-${content.type.type}">
+    <tr class="t-table-row-${content.type.type} ${'archived' if content.is_archived else ''} ${'deleted' if content.is_deleted else ''}">
         <td>
             <span class="${content.type.color}"><i class="fa-fw ${content.type.icon}"></i> ${content.type.label}</span>
 

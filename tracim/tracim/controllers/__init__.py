@@ -73,7 +73,11 @@ class TIMRestPathContextSetup(object):
 
     @classmethod
     def current_folder(cls) -> Content:
-        content_api = ContentApi(tg.tmpl_context.current_user)
+        content_api = ContentApi(
+            tg.tmpl_context.current_user,
+            show_archived=True,
+            show_deleted=True,
+        )
         folder_id = int(tg.request.controller_state.routing_args.get('folder_id'))
         folder = content_api.get_one(folder_id, ContentType.Folder, tg.tmpl_context.workspace)
 
@@ -149,7 +153,11 @@ class TIMRestControllerWithBreadcrumb(TIMRestController):
         :param item_id: an item id (item may be normal content or folder
         :return:
         """
-        return ContentApi(tmpl_context.current_user).build_breadcrumb(tmpl_context.workspace, item_id)
+        return ContentApi(
+            tmpl_context.current_user,
+            show_archived=True,
+            show_deleted=True,
+        ).build_breadcrumb(tmpl_context.workspace, item_id)
 
     def _struct_new_serialized(self, workspace_id, parent_id):
         print('values are: ', workspace_id, parent_id)

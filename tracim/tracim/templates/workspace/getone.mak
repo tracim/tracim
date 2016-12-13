@@ -10,6 +10,7 @@
 <%namespace name="P" file="tracim.templates.widgets.paragraph"/>
 <%namespace name="TITLE" file="tracim.templates.widgets.title"/>
 <%namespace name="TABLE_ROW" file="tracim.templates.widgets.table_row"/>
+<%namespace name="UI" file="tracim.templates.widgets.ui"/>
 
 <%def name="title()">${result.workspace.label}</%def>
 
@@ -191,6 +192,8 @@
                     <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('search...')}" aria-describedby="basic-addon1">
                 </div>
             % endif
+
+            ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}'.format(result.workspace.id)))}
 
         </div>
         <div class="t-spacer-above">
