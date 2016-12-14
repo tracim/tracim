@@ -503,8 +503,8 @@ function ResourceCalDAVList()
     }).done(function (data) {
       var currentICS = parseInt(inputResource.displayvalue.replace('.ics', ''))
 
-      var regExpUser = new RegExp('\/cal\/user\/')
-      var regExpWorkspace = new RegExp('\/cal\/workspace\/')
+      var regExpUser = new RegExp('\/user\/')
+      var regExpWorkspace = new RegExp('\/workspace\/')
 
       var user_or_workspace
 
