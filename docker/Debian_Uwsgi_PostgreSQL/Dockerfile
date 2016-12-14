@@ -25,7 +25,6 @@ RUN apt-get update -q \
 # Ensure UTF-8
 RUN locale-gen en_US.UTF-8 en_us \
     && dpkg-reconfigure locales \
-    && dpkg-reconfigure locales \
     && locale-gen C.UTF-8 \
     && /usr/sbin/update-locale LANG=C.UTF-8
 ENV LANG C.UTF-8
@@ -39,8 +38,13 @@ RUN git clone https://github.com/tracim/tracim.git \
      && cd /tracim \
      && pip3 install -r install/requirements.txt
 
+# Prepare volumes
+RUN mkdir /etc/tracim
+VOLUME ["/etc/tracim"]
+VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
+
 # Copy needed files
-COPY uwsgi.ini /etc/uwsgi/apps-available/tracim.ini
+COPY uwsgi.ini /tracim/tracim/uwsgi.ini
 COPY wsgi.py /tracim/tracim/wsgi.py
 COPY entrypoint.sh /tracim/entrypoint.sh
 
