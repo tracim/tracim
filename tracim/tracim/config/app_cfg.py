@@ -102,7 +102,6 @@ def start_daemons(manager: DaemonsManager):
     if 'disable_daemons' in config and config['disable_daemons']:
         return
 
-    return
     manager.run('radicale', RadicaleDaemon)
     manager.run('webdav', WsgiDavDaemon)
 
