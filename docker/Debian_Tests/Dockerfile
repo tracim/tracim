@@ -1,7 +1,7 @@
 FROM debian:jessie
 MAINTAINER contact@algoo.fr
 
-# TODO: See GOOD PRATICE (remove apt lists, etc)
+# TODO: See GOOD PRATICE (remove apt lists, cache, etc)
 
 # Install required packages
 RUN apt-get update -q \
@@ -20,7 +20,15 @@ RUN apt-get update -q \
       postgresql \
       postgresql-client \
       uwsgi \
-      uwsgi-plugin-python3
+      uwsgi-plugin-python3 \
+      postgresql-server-dev-all \
+      postgresql \
+      postgresql-client \
+      mysql-server \
+      mysql-client \
+      libmysqlclient-dev \
+      sqlite3 \
+      default-jdk
 
 # Ensure UTF-8
 RUN locale-gen en_US.UTF-8 en_us \
@@ -36,16 +44,10 @@ RUN git clone https://github.com/tracim/tracim.git \
      && cd /tracim/tracim \
      && python3 setup.py develop \
      && cd /tracim \
-     && pip3 install -r install/requirements.txt
-
-# Prepare volumes
-RUN mkdir /etc/tracim
-VOLUME ["/etc/tracim"]
-VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
+     && pip3 install -r install/requirements.txt \
+     && pip3 install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip
 
 # Copy needed files
-COPY uwsgi.ini /tracim/tracim/uwsgi.ini
-COPY wsgi.py /tracim/tracim/wsgi.py
 COPY entrypoint.sh /tracim/entrypoint.sh
 
 # Set the default entry point
