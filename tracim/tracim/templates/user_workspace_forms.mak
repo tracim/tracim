@@ -57,7 +57,7 @@
                 <span class="pull-right t-modal-form-submit-button">
                     <button id="${dom_id}-submit-button" type="submit" class="btn btn-small btn-success" title="${_('Create this page')}"><i class=" fa fa-check"></i> ${_('Validate')}</button>
                 </span>
-                
+
                 <div style="clear: both;"></div>
             </form>
         </div>
@@ -80,7 +80,7 @@
                 <span class="pull-right t-modal-form-submit-button">
                     <button id="${dom_id}-submit-button" type="submit" class="btn btn-small btn-success" title="${_('Create this page')}"><i class=" fa fa-check"></i> ${_('Validate')}</button>
                 </span>
-                
+
                 <div style="clear: both;"></div>
             </form>
         </div>
