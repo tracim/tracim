@@ -85,7 +85,8 @@ metadata = DeclarativeBase.metadata
 
 def init_model(engine):
     """Call me before using any of the tables or classes in the model."""
-    DBSession.configure(bind=engine)
+    if not DBSession.registry.has():  # Prevent a SQLAlchemy warning
+        DBSession.configure(bind=engine)
 
     # If you are using reflection to introspect your database and create
     # table objects for you, your tables must be defined and mapped inside
