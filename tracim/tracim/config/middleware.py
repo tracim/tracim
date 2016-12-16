@@ -3,8 +3,7 @@
 
 from tracim.config.app_cfg import base_config
 from tracim.config.environment import load_environment
-from tracim.lib.daemons import DaemonsManager
-from tracim.lib.daemons import RadicaleDaemon
+from sqlalchemy.pool import NullPool
 
 __all__ = ['make_app']
 
@@ -33,6 +32,11 @@ def make_app(global_conf, full_stack=True, **app_conf):
     
    
     """
+    # Configure NullPool for SQLAlchemy id we are in tests: unknown reason
+    # don't close it's connection during test and exceed postgresql limit.
+    if global_conf.get('test') == 'true':
+        global_conf['sqlalchemy.poolclass'] = NullPool
+
     app = make_base_app(global_conf, full_stack=True, **app_conf)
     
     # Wrap your base TurboGears 2 application with custom middleware here
