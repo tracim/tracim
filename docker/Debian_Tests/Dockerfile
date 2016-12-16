@@ -45,7 +45,8 @@ RUN git clone https://github.com/tracim/tracim.git \
      && python3 setup.py develop \
      && cd /tracim \
      && pip3 install -r install/requirements.txt \
-     && pip3 install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip
+     && pip3 install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip \
+     && echo 20161216001
 
 # Copy needed files
 COPY entrypoint.sh /tracim/entrypoint.sh

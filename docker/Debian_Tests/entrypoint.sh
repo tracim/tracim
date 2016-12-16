@@ -25,8 +25,6 @@ cp /tracim/tracim/wsgidav.conf.sample /tracim/tracim/wsgidav.conf
 
 # PostgreSQL case
 if [ "$DATABASE_TYPE" = postgresql ] ; then
-    # TODO: We need to increase max_connections, why ? Tracim tests don't closes connections ?
-    sed -i "s/\(max_connections *= *\).*/\max_connections = 300/" /etc/postgresql/9.4/main/postgresql.conf
     service postgresql start
     su - postgres -s /bin/bash -c "psql -c \"CREATE DATABASE tracim;\""
     su - postgres -s /bin/bash -c "psql -c \"ALTER USER postgres WITH PASSWORD 'dummy';\""
