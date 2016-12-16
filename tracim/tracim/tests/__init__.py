@@ -63,7 +63,15 @@ class TestApp(BaseTestApp):
 
 def load_app(name=application_name):
     """Load the test application."""
-    return TestApp(loadapp('config:test.ini#%s' % name, relative_to=getcwd()))
+    return TestApp(
+        loadapp(
+            'config:test.ini#%s' % name,
+            relative_to=getcwd(),
+            global_conf={
+                'test': 'true',
+            },
+        )
+    )
 
 
 def setup_app(section_name=None):
@@ -156,6 +164,7 @@ def teardown_db():
             logger.debug(teardown_db, 'Exception while trying to remove sequence {}'.format(sequence.name))
 
     transaction.commit()
+    connection.close()
     engine.dispose()
 
 
@@ -249,6 +258,9 @@ class TestController(object):
         DBSession.close()
         daemons.execute_in_thread('radicale', lambda: transaction.commit())
         teardown_db()
+        transaction.commit()
+        DBSession.close_all()
+        config['tg.app_globals'].sa_engine.dispose()
 
 
 class TracimTestController(TestController):
