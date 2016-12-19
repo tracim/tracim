@@ -21,6 +21,7 @@ RUN apt-get update -q \
       postgresql-client \
       uwsgi \
       uwsgi-plugin-python3 \
+      mysql-client \
       libmysqld-dev
 
 # Ensure UTF-8

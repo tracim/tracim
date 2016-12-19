@@ -7,6 +7,8 @@
 # TODO: README QQCH pour les ports ? 80, 3060 et 5333
 # TODO: generate cookie secrent (if not yet done)
 # TODO: run uwsgi as other user
+# TODO: Gestion des migrations
+# TODO: Verbosite des logs ?
 
 #
 # ENVIRONMENT VARIABLES ARE:
@@ -47,6 +49,12 @@ if [ "$DATABASE_TYPE" = mysql ] ; then
     fi
     # engine is mysql+oursql
     DATABASE_TYPE=mysql+oursql
+
+    # Check if database must be init
+    TEST_TABLE=$(mysql --host="$DATABASE_HOST" --user="$DATABASE_USER" --password="$DATABASE_USER" --database="$DATABASE_NAME" -s -N --execute="SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DATABASE_NAME' AND table_name = 'content';")
+    if [ ${TEST_TABLE} = 0 ] ; then
+        INIT_DATABASE=true
+    fi
 fi
 
 # PostgreSQL case
@@ -56,22 +64,21 @@ if [ "$DATABASE_TYPE" = postgresql ] ; then
         DATABASE_PORT=5432
     fi
     DATABASE_SUFFIX="?client_encoding=utf8"
-fi
 
-# Update sqlalchemy.url
-sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini
-
-# Initialize database if it is a fresh install
-if [ "$DATABASE_TYPE" = postgresql ] ; then
-    TEST_TABLE=$(PGPASSWORD="$DATABASE_PASSWORD" psql -U ${DATABASE_USER} -h ${DATABASE_HOST} -d ${DATABASE_NAME} -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'content' );")
+    # Check if database must be init
+    TEST_TABLE=$(PGPASSWORD="$DATABASE_PASSWORD" psql -U ${DATABASE_USER} -h ${TEST_TABLE} -d ${DATABASE_NAME} -t -c "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'content' );")
     if [ ${TEST_TABLE} = f ] ; then
         INIT_DATABASE=true
     fi
 fi
 
+# Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/tracim/ && gearbox setup-app -c config.ini
 fi
+
+# Update sqlalchemy.url
+sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini
 
 # Start with uwsgi
 uwsgi --http-socket 0.0.0.0:80 /etc/tracim/uwsgi.ini
