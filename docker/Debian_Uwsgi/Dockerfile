@@ -20,7 +20,8 @@ RUN apt-get update -q \
       postgresql \
       postgresql-client \
       uwsgi \
-      uwsgi-plugin-python3
+      uwsgi-plugin-python3 \
+      libmysqld-dev
 
 # Ensure UTF-8
 RUN locale-gen en_US.UTF-8 en_us \
@@ -36,7 +37,9 @@ RUN git clone https://github.com/tracim/tracim.git \
      && cd /tracim/tracim \
      && python3 setup.py develop \
      && cd /tracim \
-     && pip3 install -r install/requirements.txt
+     && pip3 install -r install/requirements.txt\
+     && pip3 install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip \
+     && echo 20161216001
 
 # Prepare volumes
 RUN mkdir /etc/tracim
@@ -45,6 +48,7 @@ VOLUME ["/etc/tracim"]
 # Copy needed files
 COPY uwsgi.ini /tracim/tracim/uwsgi.ini.template
 COPY wsgi.py /tracim/tracim/wsgi.py
+COPY check_env_vars.sh /tracim/check_env_vars.sh
 COPY entrypoint.sh /tracim/entrypoint.sh
 
 # Set the default entry point
