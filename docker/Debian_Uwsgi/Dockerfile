@@ -22,7 +22,8 @@ RUN apt-get update -q \
       uwsgi \
       uwsgi-plugin-python3 \
       mysql-client \
-      libmysqld-dev
+      libmysqld-dev \
+      sqlite3
 
 # Ensure UTF-8
 RUN locale-gen en_US.UTF-8 en_us \
@@ -43,8 +44,9 @@ RUN git clone https://github.com/tracim/tracim.git \
      && echo 20161216001
 
 # Prepare volumes
-RUN mkdir /etc/tracim
-VOLUME ["/etc/tracim"]
+RUN mkdir /etc/tracim \
+    && mkdir /var/lib/tracim
+VOLUME ["/etc/tracim", "/var/lib/tracim"]
 
 # Copy needed files
 COPY uwsgi.ini /tracim/tracim/uwsgi.ini.template

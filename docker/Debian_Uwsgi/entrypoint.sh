@@ -72,13 +72,24 @@ if [ "$DATABASE_TYPE" = postgresql ] ; then
     fi
 fi
 
+# SQLite case
+if [ "$DATABASE_TYPE" = sqlite ] ; then
+    if [ ! -f /var/lib/tracim/tracim.db ]; then
+        INIT_DATABASE=true
+    fi
+fi
+
+# Update sqlalchemy.url
+if ! [ "$DATABASE_TYPE" = sqlite ] ; then
+    sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini
+else
+    sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = sqlite:\/\/\/\/var\/lib\/tracim\/tracim.db/" /etc/tracim/config.ini
+fi
+
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/tracim/ && gearbox setup-app -c config.ini
 fi
-
-# Update sqlalchemy.url
-sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini
 
 # Start with uwsgi
 uwsgi --http-socket 0.0.0.0:80 /etc/tracim/uwsgi.ini
