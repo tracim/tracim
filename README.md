@@ -444,6 +444,69 @@ Example of Apache WSGI configuration. This configuration refers to productionapp
         LogLevel debug
     </VirtualHost>
 
+## Docker
+
+### Build images
+
+To build tests designed image
+
+    docker build -t tracim:tests docker/Debian_Tests
+
+To build Prod/dev designed image
+
+    docker build -t tracim:latest docker/Debian_Uwsgi
+
+### Run containers
+
+#### Run tests containers
+
+Run tests with PostgreSQL
+
+    docker run -e DATABASE_TYPE=postgresql tracim:tests
+
+Run tests with MySQL
+
+    docker run -e DATABASE_TYPE=mysql tracim:tests
+
+Run tests with SQLite
+
+    docker run -e DATABASE_TYPE=sqlite tracim:tests
+
+#### Run Prod/dev containers
+
+Environment variables are:
+
+* DATABASE_TYPE (values: postgresql, mysql, sqlite)
+* DATABASE_USER
+* DATABASE_PASSWORD
+* DATABASE_HOST
+* DATABASE_PORT
+* DATABASE_NAME
+
+Volumes are:
+
+* /etc/tracim
+* /var/lib/tracim (used for SQLite database)
+
+Ports are:
+
+* 80 (industracim web interface)
+* 3060 (webdav)
+* 5232 (caldav)
+
+To run tracim container with MySQL or PostgreSQL, you must set environment ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` variable.
+Example with PostgreSQL:
+
+    docker run -e DATABASE_TYPE=postgresql -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_HOST=192.168.1.2 -e DATABASE_NAME=tracim -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracim tracim:latest
+
+Example with MySQL
+
+    docker run -e DATABASE_TYPE=mysql -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_HOST=192.168.1.2 -e DATABASE_NAME=tracim -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracim tracim:latest
+
+Example with SQLite
+
+    docker run -e DATABASE_TYPE=sqlite -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracim -v /tmp/tracimdb:/var/lib/tracim tracim:latest
+
 # Support and Community #
 
 Building the community is a work in progress.

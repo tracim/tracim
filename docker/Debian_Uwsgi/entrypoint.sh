@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO: Données de postgreSQL dans un volume
-# TODO: Mettre des variable d'environn pour la config
-# TODO: Supporter le changement des variables d'environnement ? (actuellement utilisé pour générer le .ini)
-# TODO: Fichiers de config link ls -s dans un dossier pour VOLUME
-# TODO: README QQCH pour les ports ? 80, 3060 et 5333
 # TODO: generate cookie secrent (if not yet done)
 # TODO: run uwsgi as other user
 # TODO: Gestion des migrations
