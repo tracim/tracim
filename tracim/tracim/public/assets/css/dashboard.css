@@ -390,3 +390,11 @@ span.info.readonly {
 .threads-history-reverse > i {
   font-size: 12px;
 }
+
+.user-edit-form__calendar__url {
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #eee;
+  color: #555;
+}
