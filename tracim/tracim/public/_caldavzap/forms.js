@@ -1667,6 +1667,7 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
 	var calendarObj = $('#event_calendar');
 	var calSelected = $('.resourceCalDAV_item.resourceCalDAV_item_selected').attr('data-id');
 
+  var calendarsApiHasResponded = false
 	// begin custom code
   $.ajax({
     url: '/api/calendars/',
@@ -1703,6 +1704,7 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
         calendarObj.append(new Option(calName, cals[i].uid));
       }
     }
+    calendarsApiHasResponded = true
   })
 
 	if(mod=='new')
@@ -2394,9 +2396,15 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
 		}
 		/*************************** END OF BAD HACKS SECTION ***************************/
 		if(calEvent.etag!='') {
-      window.setTimeout(function () {
-        $('#event_calendar').val(calEvent.res_id);
-      }, 1)
+      var interval = window.setInterval(function () {
+        if (calendarsApiHasResponded === true) {
+          $('#event_calendar').val(calEvent.res_id);
+          stopInterval()
+        }
+      }, 500)
+      var stopInterval = function () {
+        window.clearInterval(interval)
+      }
     }
 	}
 
