@@ -1666,13 +1666,44 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
 	var cals=globalResourceCalDAVList.sortedCollections;
 	var calendarObj = $('#event_calendar');
 	var calSelected = $('.resourceCalDAV_item.resourceCalDAV_item_selected').attr('data-id');
-		for(var i=0;i<cals.length;i++)
-		{
-			if(cals[i].uid!=undefined && ((calEvent!=null && calEvent.res_id==cals[i].uid) || (cals[i].makeLoaded && !cals[i].permissions_read_only )))
-			{
-				calendarObj.append(new Option(cals[i].displayValue,cals[i].uid));
-			}
-		}
+
+	// begin custom code
+  $.ajax({
+    url: '/api/calendars/',
+    method: 'GET',
+    contentType: 'application/json'
+  }).done(function (data) {
+
+    var regExpUser = new RegExp('\/user\/')
+    var regExpWorkspace = new RegExp('\/workspace\/')
+
+    var user_or_workspace
+
+    for(var i=0;i<cals.length;i++)
+    {
+      if(cals[i].uid!=undefined && ((calEvent!=null && calEvent.res_id==cals[i].uid) || (cals[i].makeLoaded && !cals[i].permissions_read_only )))
+      {
+        var currentICS = parseInt(cals[i].displayValue.replace('.ics', ''))
+
+        if (regExpUser.test(cals[i].uid))
+          user_or_workspace = 'user'
+        else if (regExpWorkspace.test(cals[i].uid))
+          user_or_workspace = 'workspace'
+        else
+          user_or_workspace = 'fail'
+
+        var calName = ''
+        var calList_length = data.value_list.length
+        for (var j = 0; j < calList_length; j++) {
+          if (data.value_list[j].id === currentICS && data.value_list[j].type === user_or_workspace) {
+            calName = data.value_list[j].label
+          }
+        }
+
+        calendarObj.append(new Option(calName, cals[i].uid));
+      }
+    }
+  })
 
 	if(mod=='new')
 	{
