@@ -56,7 +56,7 @@ class CalendarManager(object):
         if not low_level:
             return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE
 
-        return '127.0.0.1:{0}'.format(cfg.RADICALE_SERVER_PORT)
+        return 'http://127.0.0.1:{0}'.format(cfg.RADICALE_SERVER_PORT)
 
     @classmethod
     def get_user_base_url(cls):
