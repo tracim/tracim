@@ -71,16 +71,30 @@ class CalendarManager(object):
         return os.path.join(cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE, 'workspace/')
 
     @classmethod
-    def get_user_calendar_url(cls, user_id: int):
+    def get_user_calendar_url(
+            cls,
+            user_id: int,
+            low_level: bool=False,
+    ):
         user_path = CALENDAR_USER_URL_TEMPLATE.format(id=str(user_id))
-        return os.path.join(cls.get_base_url(), user_path)
+        return os.path.join(
+            cls.get_base_url(low_level=low_level),
+            user_path,
+        )
 
     @classmethod
-    def get_workspace_calendar_url(cls, workspace_id: int):
+    def get_workspace_calendar_url(
+            cls,
+            workspace_id: int,
+            low_level: bool=False,
+    ):
         workspace_path = CALENDAR_WORKSPACE_URL_TEMPLATE.format(
             id=str(workspace_id)
         )
-        return os.path.join(cls.get_base_url(), workspace_path)
+        return os.path.join(
+            cls.get_base_url(low_level=low_level),
+            workspace_path,
+        )
 
     def __init__(self, user: User):
         self._user = user
@@ -340,9 +354,15 @@ class CalendarManager(object):
             password=self._user.auth_token,
         )
         if calendar_class == WorkspaceCalendar:
-            calendar_url = self.get_workspace_calendar_url(related_object_id)
+            calendar_url = self.get_workspace_calendar_url(
+                related_object_id,
+                low_level=True,
+            )
         elif calendar_class == UserCalendar:
-            calendar_url = self.get_user_calendar_url(related_object_id)
+            calendar_url = self.get_user_calendar_url(
+                related_object_id,
+                low_level=True,
+            )
         else:
             raise Exception('Unknown calendar type {0}'.format(calendar_class))
 
