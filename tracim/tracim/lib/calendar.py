@@ -45,10 +45,18 @@ class CalendarManager(object):
         return _('My personal calendar')
 
     @classmethod
-    def get_base_url(cls):
+    def get_base_url(cls, low_level: bool=False) -> str:
+        """
+        :param low_level: If True, use local ip address with radicale port.
+        :return: Radical address base url.
+        """
         from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
-        return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE
+
+        if not low_level:
+            return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE
+
+        return '127.0.0.1:{0}'.format(cfg.RADICALE_SERVER_PORT)
 
     @classmethod
     def get_user_base_url(cls):
@@ -325,7 +333,7 @@ class CalendarManager(object):
             calendar_class,
             related_object_id,
     ) -> None:
-        radicale_base_url = self.get_base_url()
+        radicale_base_url = self.get_base_url(low_level=True)
         client = caldav.DAVClient(
             radicale_base_url,
             username=self._user.email,
