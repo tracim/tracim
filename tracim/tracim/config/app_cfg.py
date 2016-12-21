@@ -327,6 +327,9 @@ class CFG(object):
                 )
             )
 
+        if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
+            self.WSGIDAV_CLIENT_BASE_URL += '/'
+
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)

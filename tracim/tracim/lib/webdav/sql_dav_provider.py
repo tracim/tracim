@@ -1,7 +1,7 @@
 # coding: utf8
 
 import re
-from os.path import basename, dirname, normpath
+from os.path import basename, dirname
 from sqlalchemy.orm.exc import NoResultFound
 from tracim.lib.webdav.utils import transform_to_bdd
 
@@ -18,6 +18,7 @@ from tracim.lib.user import UserApi
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model.data import Content, Workspace
 from tracim.model.data import ContentType
+from tracim.lib.webdav.utils import normpath
 
 
 class Provider(DAVProvider):
