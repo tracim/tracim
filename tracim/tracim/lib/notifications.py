@@ -182,6 +182,24 @@ class EmailNotifier(object):
         self._smtp_config = smtp_config
         self._global_config = global_config
 
+    def _get_sender(self, user: User=None) -> str:
+        """
+        Return sender string like "Bob Dylan
+            (via Tracim) <notification@mail.com>"
+        :param user: user to extract display name
+        :return: sender string
+        """
+        if user is None:
+            return '{0} <{1}>'.format(
+                self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
+                self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
+            )
+
+        return '{0} ({1}) <{2}>'.format(
+            user.display_name,
+            _('via Tracim'),
+            self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
+        )
 
     def notify_content_update(self, event_actor_id: int, event_content_id: int):
         """
@@ -233,10 +251,7 @@ class EmailNotifier(object):
 
             message = MIMEMultipart('alternative')
             message['Subject'] = subject
-            message['From'] = '{0} <{1}>'.format(
-                self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
-                self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
-            )
+            message['From'] = self._get_sender(user)
             message['To'] = to_addr
 
             body_text = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
