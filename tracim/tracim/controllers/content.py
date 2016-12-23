@@ -283,16 +283,16 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         workspace = tmpl_context.workspace
 
         try:
-            item_saved = False
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
+            label_changed = label != item.label
 
             # TODO - D.A. - 2015-03-19
             # refactor this method in order to make code easier to understand
 
             with new_revision(item):
 
-                if comment and label:
+                if (comment and label) or (not comment and label_changed):
                     updated_item = api.update_content(
                         item, label if label else item.label,
                         comment if comment else ''
