@@ -176,7 +176,8 @@ website.base_url = http://127.0.0.1:8080
 website.server_name = 127.0.0.1
     
 email.notification.activated = False
-email.notification.from = Tracim Notification <noreply@trac.im>
+email.notification.from.email = noreply@trac.im
+email.notification.from.default_label = Tracim Notifications
 email.notification.content_update.template.html = ./tracim/templates/mail/content_update_body_html.mak
 email.notification.content_update.template.text = ./tracim/templates/mail/content_update_body_text.mak
 email.notification.created_account.template.html = ./tracim/templates/mail/created_account_body_html.mak

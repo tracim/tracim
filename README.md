@@ -318,7 +318,8 @@ The reset password related parameters are the follwoing ones :
 The main parameters for notifications are the following ones:
 
     email.notification.activated = true
-    email.notification.from = Tracim Notification <tracim@tmycompany.com>
+    email.notification.from.email = noreply@trac.im
+    email.notification.from.default_label = Tracim Notification
     email.notification.smtp.server = smtp.mycompany.com
     email.notification.smtp.port = 25
     email.notification.smtp.user = username

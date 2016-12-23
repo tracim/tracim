@@ -103,7 +103,10 @@ class EmailManager(object):
             )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
-        message['From'] = self._global_config.EMAIL_NOTIFICATION_FROM
+        message['From'] = '{0} <{1}>'.format(
+            self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
+            self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
+        )
         message['To'] = user.email
 
         text_template_file_path = self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT  # nopep8

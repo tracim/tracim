@@ -233,7 +233,10 @@ class EmailNotifier(object):
 
             message = MIMEMultipart('alternative')
             message['Subject'] = subject
-            message['From'] = self._global_config.EMAIL_NOTIFICATION_FROM
+            message['From'] = '{0} <{1}>'.format(
+                self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
+                self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
+            )
             message['To'] = to_addr
 
             body_text = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
