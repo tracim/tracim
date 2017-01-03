@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import transaction
+
 from sqlalchemy.orm import Query
+from tg.i18n import ugettext as _
 
 from tracim.lib.userworkspace import RoleApi
 from tracim.model.auth import Group
@@ -17,9 +19,12 @@ class WorkspaceApi(object):
     def __init__(self, current_user: User):
         self._user = current_user
 
+    def _base_query_without_roles(self):
+        return DBSession.query(Workspace).filter(Workspace.is_deleted==False)
+
     def _base_query(self):
         if self._user.profile.id>=Group.TIM_ADMIN:
-            return DBSession.query(Workspace).filter(Workspace.is_deleted==False)
+            return self._base_query_without_roles()
 
         return DBSession.query(Workspace).\
             join(Workspace.roles).\
@@ -28,11 +33,14 @@ class WorkspaceApi(object):
 
     def create_workspace(
             self,
-            label: str,
+            label: str='',
             description: str='',
             calendar_enabled: bool=False,
             save_now: bool=False,
     ) -> Workspace:
+        if not label:
+            label = self.generate_label()
+
         workspace = Workspace()
         workspace.label = label
         workspace.description = description
@@ -145,6 +153,19 @@ class WorkspaceApi(object):
 
     def get_base_query(self) -> Query:
         return self._base_query()
+
+    def generate_label(self) -> str:
+        """
+        :return: Generated workspace label
+        """
+        query = self._base_query_without_roles() \
+            .filter(Workspace.label.ilike('{0}%'.format(
+                _('Workspace'),
+            )))
+
+        return _('Workspace {}').format(
+            query.count() + 1,
+        )
 
 
 class UnsafeWorkspaceApi(WorkspaceApi):
