@@ -29,7 +29,7 @@
     </div>
     <p></p>
 
-    % if user.profile.id>=3 or h.user_role(user, workspace)>=4 and file.is_editable:
+    % if (user.profile.id>=3 or h.user_role(user, workspace)>=4) and file.is_editable:
         ## if the user can see the toolbar, it means he is the workspace manager.
         ## So now, we need to know if he alsa has right to delete workspaces
         <div class="btn-group btn-group-vertical">

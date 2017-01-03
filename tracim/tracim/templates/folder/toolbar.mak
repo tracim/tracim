@@ -36,7 +36,7 @@
         <p></p>
     % endif
     
-    % if user.profile.id>=3 or h.user_role(user, workspace)>=4 and folder.is_editable:
+    % if (user.profile.id>=3 or h.user_role(user, workspace)>=4) and folder.is_editable:
         <div class="btn-group btn-group-vertical">
             ## This action is allowed for content managers only
             <a title="${_('Move current folder')}" class="btn btn-default ${move_disabled}" data-toggle="modal" data-target="#folder-move-modal-dialog" data-remote="${tg.url('/workspaces/{}/folders/{}/location/{}/edit'.format(folder.workspace.id, folder.id, folder.id))}" ><i class="fa fa-arrows fa-fw tracim-less-visible"></i> ${_('Move')}</a>
@@ -44,7 +44,7 @@
         <p></p>
     % endif
 
-    % if user.profile.id>=3 or h.user_role(user, workspace)>=4 and folder.is_editable:
+    % if (user.profile.id>=3 or h.user_role(user, workspace)>=4) and folder.is_editable:
         ## if the user can see the toolbar, it means he is the workspace manager.
         ## So now, we need to know if he alsa has right to delete workspaces
         <div class="btn-group btn-group-vertical">
