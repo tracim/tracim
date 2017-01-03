@@ -36,7 +36,7 @@
 ##
 ############################################################################
 
-<div class="content-container ${'not-editable' if not result.thread.is_editable else ''}">
+<div class="content-container ${'not-editable' if not result.thread.is_editable else ''} ${'archived' if result.thread.is_archived else ''} ${'deleted' if result.thread.is_deleted else ''}">
 <!--# TODO BS 20161213: Indent content-->
 
 <div class="row t-page-header-row">

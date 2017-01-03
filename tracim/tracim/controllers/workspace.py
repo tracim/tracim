@@ -12,6 +12,7 @@ from tracim.controllers.content import UserWorkspaceFolderRestController
 
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.content import ContentApi
+from tracim.lib.utils import str_as_bool
 from tracim.lib.workspace import WorkspaceApi
 
 from tracim.model.data import NodeTreeItem

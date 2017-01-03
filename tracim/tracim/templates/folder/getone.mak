@@ -39,7 +39,7 @@
 ##
 ############################################################################
 
-<div class="folder-container ${'not-editable' if not result.folder.is_editable else ''}">
+<div class="folder-container ${'not-editable' if not result.folder.is_editable else ''} ${'archived' if result.folder.is_archived else ''} ${'deleted' if result.folder.is_deleted else ''}">
 <!--# TODO BS 20161213: Indent content-->
 
 <div class="row t-page-header-row">
