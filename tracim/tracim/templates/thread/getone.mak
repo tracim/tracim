@@ -116,9 +116,7 @@
 % for event in result.thread.history:
     ## TODO - D.A. - 2015-08-20
     ## Allow to show full history (with status change and archive/unarchive)
-    % if event.type.id in ('comment', 'creation'):
-        ${WIDGETS.SECURED_HISTORY_VIRTUAL_EVENT(fake_api.current_user, event)}
-    % endif
+    ${WIDGETS.SECURED_HISTORY_VIRTUAL_EVENT(fake_api.current_user, event)}
 % endfor
 
 ## % for comment in result.thread.comments:
