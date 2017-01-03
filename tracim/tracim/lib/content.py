@@ -337,7 +337,7 @@ class ContentApi(object):
     def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False) -> Content:
         assert content_type in ContentType.allowed_types()
 
-        if not label:
+        if content_type == ContentType.Folder and not label:
             label = self.generate_folder_label(workspace, parent)
 
         content = Content()
