@@ -139,3 +139,9 @@ def get_valid_header_file_name(file_name: str) -> str:
         if len(split_file_name) > 1:  # If > 1 so file have extension
             return 'download.{0}'.format(split_file_name[-1])
         return 'download'
+
+
+def str_as_bool(string: str) -> bool:
+    if string == '0':
+        return False
+    return bool(string)

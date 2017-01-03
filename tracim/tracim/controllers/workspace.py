@@ -50,8 +50,8 @@ class UserWorkspaceRestController(TIMRestController):
           * show_archived: bool: Display archived contents or hide them
             if False
         """
-        show_deleted = kwargs.get('show_deleted', False)
-        show_archived = kwargs.get('show_archived', False)
+        show_deleted = str_as_bool(kwargs.get('show_deleted', False))
+        show_archived = str_as_bool(kwargs.get('show_archived', ''))
         user = tmpl_context.current_user
 
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)

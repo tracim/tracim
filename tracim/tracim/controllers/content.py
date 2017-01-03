@@ -17,7 +17,9 @@ from tracim.controllers import TIMWorkspaceContentRestController
 from tracim.lib import CST
 from tracim.lib.base import BaseController
 from tracim.lib.base import logger
-from tracim.lib.utils import SameValueError, get_valid_header_file_name
+from tracim.lib.utils import SameValueError
+from tracim.lib.utils import get_valid_header_file_name
+from tracim.lib.utils import str_as_bool
 from tracim.lib.content import ContentApi
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.predicates import current_user_is_reader
@@ -763,8 +765,8 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
           * show_archived: bool: Display archived contents or hide them
             if False
         """
-        show_deleted = kwargs.get('show_deleted', False)
-        show_archived = kwargs.get('show_archived', False)
+        show_deleted = str_as_bool(kwargs.get('show_deleted', ''))
+        show_archived = str_as_bool(kwargs.get('show_archived', ''))
         folder_id = int(folder_id)
         user = tmpl_context.current_user
         workspace = tmpl_context.workspace
