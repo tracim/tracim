@@ -496,6 +496,10 @@ class ContentApi(object):
             content_query = content_query.filter(
                 Content.parent_id == parent_folder.content_id,
             )
+        else:
+            content_query = content_query.filter(
+                Content.parent_id == None,
+            )
 
         # Filter with workspace
         content_query = content_query.filter(
@@ -541,6 +545,9 @@ class ContentApi(object):
                     .filter(
                         Content.parent_id == folder.content_id,
                     )
+            else:
+                folder_query = folder_query \
+                    .filter(Content.parent_id == None)
 
             # Get thirst corresponding folder
             folder = folder_query \
