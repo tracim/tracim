@@ -61,7 +61,7 @@
     <div class="col-sm-7 col-sm-offset-3">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            Vous consultez <b>une version archivée</b> de la page courante.
+            ${_('Vous consultez <b>une version archivée</b> de la page courante.')|n}
         </p>
     </div>
 </div>
@@ -70,7 +70,7 @@
     <div class="col-sm-7 col-sm-offset-3">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            Vous consultez <b>une version supprimée</b> de la page courante.
+            ${_('Vous consultez <b>une version supprimée</b> de la page courante.')|n}
         </p>
     </div>
 </div>
@@ -146,13 +146,13 @@
             % if len(fake_api.sub_items) <= 0:
                 ${P.EMPTY_CONTENT(_('This folder has not yet content.'))}
             % else:
-                <table class="table table-striped table-hover tablesorter" id="current-folder-content-list">
+                <table class="table table-striped table-hover tablesorter folder__content__list" id="current-folder-content-list">
                     <thead>
                         <tr>
-                            <th>${_('Type')}</th>
                             <th>${_('Title')}</th>
                             <th>${_('Status')}</th>
                             <th>${_('Notes')}</th>
+                            <th>${_('Type')}</th>
                         </tr>
                     </thead>
                     <tbody>

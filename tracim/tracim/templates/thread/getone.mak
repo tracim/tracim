@@ -62,7 +62,7 @@
     <div class="col-sm-7 col-sm-offset-3">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            Vous consultez <b>une version archivée</b> de la page courante.
+            ${_('Vous consultez <b>une version archivée</b> de la page courante.')|n}
         </p>
     </div>
 </div>
@@ -71,7 +71,7 @@
     <div class="col-sm-7 col-sm-offset-3">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            Vous consultez <b>une version supprimée</b> de la page courante.
+            ${_('Vous consultez <b>une version supprimée</b> de la page courante.')|n}
         </p>
     </div>
 </div>

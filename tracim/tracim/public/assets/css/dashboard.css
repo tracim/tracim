@@ -397,8 +397,28 @@ span.info.readonly {
 .folder__filter a.btn {
   font-size: 14px;
 }
-.folder__list__item__status {
+.folder__content__list {
+  cursor: pointer;
+}
+.folder__content__list__item__title {
+  color: #428BCA;
+}
+.folder__content__list__item.archived,
+.folder__content__list__item.archived .t-less-visible,
+.folder__content__list__item.archived .folder__content__list__item__title,
+.folder__content__list__item.archived .folder__content__list__item__title > i {
+  color: #999;
+}
+.folder__content__list__item.deleted,
+.folder__content__list__item.deleted .t-less-visible,
+.folder__content__list__item.deleted .folder__content__list__item__title,
+.folder__content__list__item.deleted .folder__content__list__item__title > i {
+  color: #ccc;
+}
+.folder__content__list__item__status {
   float: right;
   font-size: 13px;
-  color: #999;
+}
+.folder__content__list__item__status.deleted i {
+  font-size: 14px;
 }

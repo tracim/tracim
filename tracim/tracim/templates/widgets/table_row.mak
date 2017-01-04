@@ -55,10 +55,15 @@
 </%def>
 
 <%def name="CONTENT(content)">
-    <tr class="t-table-row-${content.type.type}">
-        <td>
+    <tr class="t-table-row-${content.type.type} folder__content__list__item ${'archived' if content.is_archived else ''} ${'deleted' if content.is_deleted else ''}"
+        onclick="document.location = '${content.url}'"> <!-- <a /> does not work on <tr /> -->
+
+        <td class="folder__content__list__item__title">
+            <i class="fa-fw ${content.type.icon} ${content.type.color}"></i> ${content.label}
+        </td>
+
+        <!--td class="folder__content__list__type">
             <span class="${content.type.color}">
-                <i class="fa-fw ${content.type.icon}"></i>
                 % if (content.is_archived) :
                     <i class="fa fa-archive fa-fw tracim-less-visible" title="Archivé"></i>
                 % elif (content.is_deleted) :
@@ -68,8 +73,8 @@
             </span>
 
             ## <span class="tracim-less-visible"><i class="fa fa-file-text-o fa-tw"></i> ${content}</span>
-        </td>
-        <td><a href="${content.url}">${content.label}</a></td>
+        </td-->
+
         % if 'folder' == content.type.id:
             <td class="text-center t-less-visible">-</td>
         % else:
@@ -86,16 +91,20 @@
                     <i class="fa fa-fw fa-close"></i>
                 % endif
 
-                <span class="t-less-visible">${content.status.label}</span>
+                <span class="t-less-visible">
+                  ${content.status.label}
+                  % if (content.is_archived) :
+                      - Archivé
+                  % elif (content.is_deleted) :
+                      - Supprimé
+                  % endif
+                </span>
 
-
-                % if (content.is_archived) :
-                    <div class="folder__list__item__status archived">Archivé</div>
-                % elif (content.is_deleted) :
-                    <div class="folder__list__item__status deleted">Supprimé</div>
-                % endif
             </td>
         % endif
+
         <td><span class="t-less-visible">${content.notes|n}</span></td>
+
+        <td>${content.type.label}</td>
     </tr>
 </%def>

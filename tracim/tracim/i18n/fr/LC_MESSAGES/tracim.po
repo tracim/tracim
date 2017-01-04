@@ -1819,6 +1819,20 @@ msgstr ""
 "Vous consultez <b>une ancienne version</b> de la page courante. (la "
 "version affichée est la v{})."
 
+#: tracim/templates/page/getone.mak:61
+#: tracim/templates/folder/getone.mak:61
+#: tracim/templates/thread/getone.mak:61
+#: tracim/templates/file/getone.mak:61
+msgid "You are viewing <b>an archived version</b> of the current page."
+msgstr "Vous consultez <b>une version archivée</b> de la page courante."
+
+#: tracim/templates/page/getone.mak:61
+#: tracim/templates/folder/getone.mak:61
+#: tracim/templates/thread/getone.mak:61
+#: tracim/templates/file/getone.mak:61
+msgid "You are viewing <b>a deleted version</b> of the current page."
+msgstr "Vous consultez <b>une version supprimée</b> de la page courante."
+
 #: tracim/templates/page/getone.mak:72 tracim/templates/thread/getone.mak:61
 msgid "<b>This information is deprecated</b>"
 msgstr "<b>Cette information est obsolète</b>"
