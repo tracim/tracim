@@ -390,3 +390,15 @@ span.info.readonly {
 .threads-history-reverse > i {
   font-size: 12px;
 }
+
+.folder__filter {
+  font-size: 14px;
+}
+.folder__filter a.btn {
+  font-size: 14px;
+}
+.folder__list__item__status {
+  float: right;
+  font-size: 13px;
+  color: #999;
+}

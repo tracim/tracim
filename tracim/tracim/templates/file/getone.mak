@@ -57,6 +57,26 @@
     </div>
 </div>
 
+% if (result.file.is_archived) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version archivée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% elif (result.file.is_deleted) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version supprimée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% endif
+
 % if result.file.selected_revision!='latest':
     <div class="row alert alert-warning" role="alert">
         <div class="col-sm-7 col-sm-offset-3">
@@ -145,7 +165,7 @@
                 ${WIDGETS.SECURED_SECTION_TITLE(fake_api.current_user, result.file.workspace, 'file-revisions', _('File revisions'))}
                 <p>${_('This file contains {} revision(s)').format(sum(1 for revision in result.file.revisions if revision.action.id=='revision'))}</p>
             % else:
-                % if h.user_role(fake_api.current_user, result.file.workspace)>1:
+                % if (h.user_role(fake_api.current_user, result.file.workspace)>1 and not result.file.is_archived and not result.file.is_deleted):
                     ${BUTTON.DATA_TARGET_AS_TEXT('new-file-revision', _('upload a new revision and/or comment...'), 'btn btn-success t-spacer-below')}
                     ${FORMS.NEW_FILE_REVISION_WITH_COMMENT_FORM('new-file-revision', result.file.workspace.id, result.file.parent.id, result.file.id)}
                 % endif

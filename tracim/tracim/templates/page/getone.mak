@@ -55,6 +55,26 @@
     </div>
 </div>
 
+% if (result.page.is_archived) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version archivée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% elif (result.page.is_deleted) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version supprimée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% endif
+
 % if result.page.selected_revision!='latest':
     <div class="row alert alert-warning" role="alert">
         <div class="col-sm-7 col-sm-offset-3">

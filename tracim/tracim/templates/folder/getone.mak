@@ -56,6 +56,26 @@
     </div>
 </div>
 
+% if (result.folder.is_archived) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version archivée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% elif (result.folder.is_deleted) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version supprimée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% endif
+
 <div class="row">
     <div class="col-sm-7 col-sm-offset-3">
 
@@ -64,10 +84,12 @@
         <div class="t-spacer-above">
             % if user_role > 1:
                 <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-plus"></i> ${_('New ...')}
-                        <span class="caret"></span>
-                    </button>
+                    % if (not result.folder.is_archived and not result.folder.is_deleted) :
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-plus"></i> ${_('New ...')}
+                            <span class="caret"></span>
+                        </button>
+                    % endif
                     <ul class="dropdown-menu" role="menu">
                         % for content_type in result.folder.allowed_content_types:
                             % if content_type.id != 'folder' or user_role > 2:

@@ -1,7 +1,7 @@
 <%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 
 <%def name="GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(base_url)">
-    <div class="btn-group" role="group" aria-label="...">
+    <div class="btn-group folder__filter" role="group" aria-label="...">
         ${BUTTON.TEXT('', 'btn btn-default disabled', _('display...'))}
 
         <% show_deleted_param = 1 %>

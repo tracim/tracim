@@ -57,6 +57,26 @@
     </div>
 </div>
 
+% if (result.thread.is_archived) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version archivée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% elif (result.thread.is_deleted) :
+<div class="row alert alert-info" role="alert">
+    <div class="col-sm-7 col-sm-offset-3">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            Vous consultez <b>une version supprimée</b> de la page courante.
+        </p>
+    </div>
+</div>
+% endif
+
 % if result.thread.status.id=='closed-deprecated':
     <div class="row alert alert-warning" role="alert">
         <div class="col-sm-7 col-sm-offset-3">
@@ -106,10 +126,12 @@
             % if result.thread.status.id!='open':
                 <p class="tracim-less-visible">${_('<b>Note</b>: In case you\'d like to post a reply, you must first open again the thread')|n}</p>
             % else:
-                <p class="t-half-spacer-below">
-                    ${BUTTON.DATA_TARGET_AS_TEXT('new-comment', _('Post a reply...'), 'btn btn-link')}
-                    ${FORMS.NEW_COMMENT_IN_THREAD('new-comment', result.thread.workspace.id, result.thread.parent.id, result.thread.id)}
-                </p>
+                % if (not result.thread.is_archived and not result.thread.is_deleted) :
+                    <p class="t-half-spacer-below">
+                        ${BUTTON.DATA_TARGET_AS_TEXT('new-comment', _('Post a reply...'), 'btn btn-link')}
+                        ${FORMS.NEW_COMMENT_IN_THREAD('new-comment', result.thread.workspace.id, result.thread.parent.id, result.thread.id)}
+                    </p>
+                % endif
             % endif
         % endif
     </div>

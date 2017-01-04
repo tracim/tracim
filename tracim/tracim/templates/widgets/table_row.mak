@@ -55,9 +55,17 @@
 </%def>
 
 <%def name="CONTENT(content)">
-    <tr class="t-table-row-${content.type.type} ${'archived' if content.is_archived else ''} ${'deleted' if content.is_deleted else ''}">
+    <tr class="t-table-row-${content.type.type}">
         <td>
-            <span class="${content.type.color}"><i class="fa-fw ${content.type.icon}"></i> ${content.type.label}</span>
+            <span class="${content.type.color}">
+                <i class="fa-fw ${content.type.icon}"></i>
+                % if (content.is_archived) :
+                    <i class="fa fa-archive fa-fw tracim-less-visible" title="Archivé"></i>
+                % elif (content.is_deleted) :
+                    <i class="fa fa-trash-o fa-fw tracim-less-visible" title="Supprimé"></i>
+                % endif
+                ${content.type.label}
+            </span>
 
             ## <span class="tracim-less-visible"><i class="fa fa-file-text-o fa-tw"></i> ${content}</span>
         </td>
@@ -77,7 +85,15 @@
                 % else:
                     <i class="fa fa-fw fa-close"></i>
                 % endif
+
                 <span class="t-less-visible">${content.status.label}</span>
+
+
+                % if (content.is_archived) :
+                    <div class="folder__list__item__status archived">Archivé</div>
+                % elif (content.is_deleted) :
+                    <div class="folder__list__item__status deleted">Supprimé</div>
+                % endif
             </td>
         % endif
         <td><span class="t-less-visible">${content.notes|n}</span></td>
