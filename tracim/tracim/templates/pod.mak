@@ -81,8 +81,7 @@
               //////////////////////////////////////////////
               // add custom btn to handle image by selecting them with system explorer
               $editor.addButton('customInsertImage', {
-                text: 'Image',
-                icon: false,
+                icon: 'mce-ico mce-i-image',
                 onclick: function () {
                   if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
 
