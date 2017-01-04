@@ -2,6 +2,7 @@
 import re
 import tg
 from tg import tmpl_context
+from tg.predicates import not_anonymous
 
 from tracim.lib.base import BaseController
 from tracim.lib.calendar import CalendarManager
@@ -16,6 +17,7 @@ class CalendarController(BaseController):
     """
 
     @tg.expose('tracim.templates.calendar.iframe_container')
+    @tg.require(not_anonymous())
     def index(self):
         user = tmpl_context.identity.get('user')
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)

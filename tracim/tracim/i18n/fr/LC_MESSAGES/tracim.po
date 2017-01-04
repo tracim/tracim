@@ -488,6 +488,18 @@ msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 msgid "You're not allowed to access this resource"
 msgstr "Vous n'êtes pas autorisé à accéder à cette ressource"
 
+#: tracim/lib/workspace.py:163 tracim/templates/home.mak:132
+#: tracim/templates/master_no_toolbar_no_login.mak:106
+#: tracim/templates/admin/user_getone.mak:77
+#: tracim/templates/admin/workspace_getall.mak:82
+msgid "Workspace"
+msgstr "Espace de travail"
+
+#: tracim/lib/workspace.py:166 tracim/templates/admin/workspace_getone.mak:13
+#: tracim/templates/admin/workspace_getone.mak:29
+msgid "Workspace {}"
+msgstr "Espace de travail {}"
+
 #: tracim/model/auth.py:97
 msgid "Nobody"
 msgstr "Personne"
@@ -1148,6 +1160,14 @@ msgstr "Calendrier personnel"
 msgid "This calendar URL will work with CalDav compatibles clients"
 msgstr "Cette url de calendrier fonctionne avec les logiciels compatibles CalDav"
 
+#: tracim/templates/user_workspace_forms.mak:119
+msgid "Timezone"
+msgstr "Fuseau horaire"
+
+#: tracim/templates/user_workspace_forms.mak:120
+msgid "Dates will be displayed with this timezone"
+msgstr "Les dates seront affichées avec ce fuseau horaire"
+
 #: tracim/templates/user_workspace_widgets.mak:37
 msgid "No folder found."
 msgstr "Aucun dossier."
@@ -1468,6 +1488,18 @@ msgstr ""
 "Cet espace de travail ne compte aucun membre. <a class=\"alert-link\" "
 "data-toggle=\"collapse\" data-target=\"#add-role-from-existing-user-"
 "form\">Ajouter un membre</a>."
+
+#: tracim/templates/errors/label_invalid_path.mak:6
+msgid ""
+"Chosen label \"{0}\" is invalid because is in conflict with other "
+"resource."
+msgstr ""
+"Le label \"{0}\" est invalide car il est en conflit avec une autre "
+"ressource."
+
+#: tracim/templates/errors/label_invalid_path.mak:9
+msgid "Go Back"
+msgstr "Retour en arrière"
 
 #: tracim/templates/file/edit.mak:9
 msgid "Edit file"
@@ -2763,4 +2795,7 @@ msgstr "Supprimer l'espace de travail"
 
 #~ msgid "Adress to connect to webdav with:"
 #~ msgstr "Adresses pour se connecter à webdav sous :"
+
+#~ msgid "created on {}"
+#~ msgstr "créé le {}"
 

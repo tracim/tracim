@@ -5,8 +5,7 @@ import transaction
 import re
 from datetime import datetime
 from time import mktime
-from os.path import normpath, dirname, basename
-import mimetypes
+from os.path import dirname, basename
 
 from tracim.lib.content import ContentApi
 from tracim.lib.user import UserApi
@@ -24,6 +23,7 @@ from wsgidav import compat
 from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
 from wsgidav.dav_provider import DAVCollection, DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
+from tracim.lib.webdav.utils import normpath
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 

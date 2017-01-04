@@ -5,6 +5,111 @@ from tracim.model.data import VirtualEvent
 from tracim.model.data import ContentType
 from tracim.model import data
 
+# FIXME: fix temporaire ...
+style = """
+.title {
+	background:#F5F5F5;
+	padding-right:15px;
+	padding-left:15px;
+	padding-top:10px;
+	border-bottom:1px solid #CCCCCC;
+	overflow:auto;
+} .title h1 { margin-top:0; }
+
+.content {
+	padding: 15px;
+}
+
+#left{ padding:0; }
+
+#right {
+	background:#F5F5F5;
+	border-left:1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	padding-top:15px;
+}
+@media (max-width: 1200px) {
+	#right {
+		border-top:1px solid #CCCCCC;
+		border-left: none;
+		border-bottom: none;
+	}
+}
+
+body { overflow:auto; }
+
+.btn {
+	text-align: left;
+}
+
+.table tbody tr .my-align {
+	vertical-align:middle;
+}
+
+.title-icon {
+	font-size:2.5em;
+	float:left;
+	margin-right:10px;
+}
+.title.page, .title-icon.page { color:#00CC00; }
+.title.thread, .title-icon.thread { color:#428BCA; }
+
+/* ****************************** */
+.description-icon {
+	color:#999;
+	font-size:3em;
+}
+
+.description {
+	border-left: 5px solid #999;
+	padding-left: 10px;
+	margin-left: 10px;
+	margin-bottom:10px;
+}
+
+.description-text {
+	display:block;
+	overflow:hidden;
+	color:#999;
+}
+
+.comment-row:nth-child(2n) {
+	background-color:#F5F5F5;
+}
+
+.comment-row:nth-child(2n+1) {
+	background-color:#FFF;
+}
+
+.comment-icon {
+	color:#CCC;
+	font-size:3em;
+	display:inline-block;
+	margin-right: 10px;
+	float:left;
+}
+
+.comment-content {
+	display:block;
+	overflow:hidden;
+}
+
+.comment, .comment-revision {
+	padding:10px;
+	border-top: 1px solid #999;
+}
+
+.comment-revision-icon {
+	color:#777;
+	margin-right: 10px;
+}
+
+.title-text {
+	display: inline-block;
+}
+"""
+
+
 def create_readable_date(created, delta_from_datetime: datetime = None):
     if not delta_from_datetime:
         delta_from_datetime = datetime.now()
@@ -29,10 +134,6 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
     return aff
 
 def designPage(content: data.Content, content_revision: data.ContentRevisionRO) -> str:
-    f = open('tracim/lib/webdav/style.css', 'r')
-    style = f.read()
-    f.close()
-
     hist = content.get_history()
     histHTML = '<table class="table table-striped table-hover">'
     for event in hist:
@@ -134,10 +235,6 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
     return file
 
 def designThread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
-        f = open('tracim/lib/webdav/style.css', 'r')
-        style = f.read()
-        f.close()
-
         hist = content.get_history()
 
         allT = []

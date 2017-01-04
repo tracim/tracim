@@ -366,6 +366,10 @@ class ContentApi(object):
 
     def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False) -> Content:
         assert content_type in ContentType.allowed_types()
+
+        if content_type == ContentType.Folder and not label:
+            label = self.generate_folder_label(workspace, parent)
+
         content = Content()
         content.owner = self._user
         content.parent = parent
@@ -522,6 +526,10 @@ class ContentApi(object):
             content_query = content_query.filter(
                 Content.parent_id == parent_folder.content_id,
             )
+        else:
+            content_query = content_query.filter(
+                Content.parent_id == None,
+            )
 
         # Filter with workspace
         content_query = content_query.filter(
@@ -567,6 +575,9 @@ class ContentApi(object):
                     .filter(
                         Content.parent_id == folder.content_id,
                     )
+            else:
+                folder_query = folder_query \
+                    .filter(Content.parent_id == None)
 
             # Get thirst corresponding folder
             folder = folder_query \
@@ -1066,3 +1077,25 @@ class ContentApi(object):
             )
         )
         return query.one()
+
+    def generate_folder_label(
+            self,
+            workspace: Workspace,
+            parent: Content=None,
+    ) -> str:
+        """
+        Generate a folder label
+        :param workspace: Future folder workspace
+        :param parent: Parent of foture folder (can be None)
+        :return: Generated folder name
+        """
+        query = self._base_query(workspace=workspace)\
+            .filter(Content.label.ilike('{0}%'.format(
+                _('New folder'),
+            )))
+        if parent:
+            query = query.filter(Content.parent == parent)
+
+        return _('New folder {0}').format(
+            query.count() + 1,
+        )

@@ -202,8 +202,17 @@ class CFG(object):
         self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle', '')
         self.WEBSITE_HOME_BELOW_LOGIN_FORM = tg.config.get('website.home.below_login_form', '')
 
+        if tg.config.get('email.notification.from'):
+            raise Exception(
+                'email.notification.from configuration is deprecated. '
+                'Use instead email.notification.from.email and '
+                'email.notification.from.default_label.'
+            )
 
-        self.EMAIL_NOTIFICATION_FROM = tg.config.get('email.notification.from')
+        self.EMAIL_NOTIFICATION_FROM_EMAIL = \
+            tg.config.get('email.notification.from.email')
+        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = \
+            tg.config.get('email.notification.from.default_label')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get('email.notification.content_update.template.html')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = tg.config.get('email.notification.content_update.template.text')
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = tg.config.get(
@@ -326,6 +335,9 @@ class CFG(object):
                     self.WSGIDAV_CLIENT_BASE_URL,
                 )
             )
+
+        if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
+            self.WSGIDAV_CLIENT_BASE_URL += '/'
 
 
     def get_tracker_js_content(self, js_tracker_file_path = None):

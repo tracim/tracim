@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 
 import yaml
+from os.path import normpath as base_normpath
 from wsgidav import util
 from wsgidav import compat
 from wsgidav.middleware import BaseMiddleware
@@ -274,3 +275,11 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
                 dump_content['content'] = ElementTree.tostring(xml, 'utf-8')
 
             f.write(yaml.dump(dump_content, default_flow_style=False))
+
+
+def normpath(path):
+    if path == b'':
+        path = b'/'
+    elif path == '':
+        path = '/'
+    return base_normpath(path)
