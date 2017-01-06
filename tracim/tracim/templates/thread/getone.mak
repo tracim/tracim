@@ -37,77 +37,72 @@
 ############################################################################
 
 <div class="content-container ${'not-editable' if not result.thread.is_editable else ''} ${'archived' if result.thread.is_archived else ''} ${'deleted' if result.thread.is_deleted else ''}">
-<!--# TODO BS 20161213: Indent content-->
 
-<div class="row t-page-header-row">
-    <div class="col-sm-7 col-sm-offset-3 main">
-        <h1 class="page-header t-thread-color-border">
-            <i class="fa fa-fw fa-lg fa-comments-o tracim-less-visible t-thread-color"></i>
-            ${result.thread.label}
+    <div class="t-page-header-row">
+        <div class="main">
+            <h1 class="page-header t-thread-color-border">
+                <i class="fa fa-fw fa-lg fa-comments-o tracim-less-visible t-thread-color"></i>
+                ${result.thread.label}
 
-            <span class="pull-right">
-                ${WIDGETS.SECURED_SHOW_CHANGE_STATUS_FOR_THREAD(fake_api.current_user, result.thread.workspace, result.thread)}
-            </span>
-        </h1>
+                <span class="pull-right">
+                    ${WIDGETS.SECURED_SHOW_CHANGE_STATUS_FOR_THREAD(fake_api.current_user, result.thread.workspace, result.thread)}
+                </span>
+            </h1>
 
-        <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
-            <% created_localized = h.get_with_timezone(result.thread.created) %>
-          <p>${_('page created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.thread.owner.name)|n}</p>
+            <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
+                <% created_localized = h.get_with_timezone(result.thread.created) %>
+              <p>${_('page created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.thread.owner.name)|n}</p>
+            </div>
         </div>
     </div>
-</div>
 
-% if (result.thread.is_archived) :
-<div class="row alert alert-info" role="alert">
-    <div class="col-sm-7 col-sm-offset-3">
-        <p>
-            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            ${_('Vous consultez <b>une version archivée</b> de la page courante.')|n}
-        </p>
+    % if (result.thread.is_archived) :
+    <div class="alert alert-info" role="alert">
+        <div class="">
+            <p>
+                <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+                ${_('Vous consultez <b>une version archivée</b> de la page courante.')|n}
+            </p>
+        </div>
     </div>
-</div>
-% elif (result.thread.is_deleted) :
-<div class="row alert alert-info" role="alert">
-    <div class="col-sm-7 col-sm-offset-3">
-        <p>
-            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            ${_('Vous consultez <b>une version supprimée</b> de la page courante.')|n}
-        </p>
+    % elif (result.thread.is_deleted) :
+    <div class="alert alert-info" role="alert">
+        <div class="">
+            <p>
+                <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+                ${_('Vous consultez <b>une version supprimée</b> de la page courante.')|n}
+            </p>
+        </div>
     </div>
-</div>
-% endif
+    % endif
 
-% if result.thread.status.id=='closed-deprecated':
-    <div class="row alert alert-warning" role="alert">
-        <div class="col-sm-7 col-sm-offset-3">
+    % if result.thread.status.id=='closed-deprecated':
+    <div class="alert alert-warning" role="alert">
+        <div class="">
             <p>
                 <span class="pull-left">${ICON.FA_FW_2X('fa-warning')}</span>
                 ${_('<b>This information is deprecated</b>')|n}
             </p>
         </div>
     </div>
-% endif
+    % endif
 
-% if result.thread.content:
-    <div class="row">
-        <div class="col-sm-7 col-sm-offset-3">
+    % if result.thread.content:
+    <div class="">
+        ## TODO - 2015-07-22 - D.A. - should we show a breadcrumb or not ?
+        ## <button id="current-page-breadcrumb-toggle-button" class="btn btn-link" title="${_('Show localisation')}"><i class="fa fa-map-marker"></i></button>
+        ## ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
 
-    ## TODO - 2015-07-22 - D.A. - should we show a breadcrumb or not ?
-    ## <button id="current-page-breadcrumb-toggle-button" class="btn btn-link" title="${_('Show localisation')}"><i class="fa fa-map-marker"></i></button>
-    ## ${WIDGETS.BREADCRUMB('current-page-breadcrumb', fake_api.breadcrumb)}
-
-            <div class="well t-half-spacer-above">
-                % if result.thread.status.id in ('closed-validated', 'closed-unvalidated'):
-                    <span style="font-size: 1.5em;"><i class="pull-right fa fa-4x ${result.thread.status.css} ${result.thread.status.icon}"></i></span>
-                % endif
-                ${result.thread.content|n}
-            </div>
+        <div class="well t-half-spacer-above">
+            % if result.thread.status.id in ('closed-validated', 'closed-unvalidated'):
+                <span style="font-size: 1.5em;"><i class="pull-right fa fa-4x ${result.thread.status.css} ${result.thread.status.icon}"></i></span>
+            % endif
+            ${result.thread.content|n}
         </div>
     </div>
-% endif
+    % endif
 
-<div class="row">
-    <div class="col-sm-7 col-sm-offset-3">
+    <div class="content__detail thread">
         <div class="threads-history-reverse">
         % if inverted:
             <a href="${tg.url('/workspaces/{}/folders/{}/threads/{}'.format(result.thread.workspace.id, result.thread.parent.id, result.thread.id))}">
@@ -134,19 +129,19 @@
                 % endif
             % endif
         % endif
+
+        <!-- % for event in reversed(result.thread.history): -->
+        % for event in result.thread.history:
+            ## TODO - D.A. - 2015-08-20
+            ## Allow to show full history (with status change and archive/unarchive)
+            ${WIDGETS.SECURED_HISTORY_VIRTUAL_EVENT(fake_api.current_user, event)}
+        % endfor
+
+        ## % for comment in result.thread.comments:
+        ##     ${WIDGETS.SECURED_TIMELINE_ITEM(fake_api.current_user, comment)}
+        ## % endfor
+        ##
+
     </div>
-</div>
-
-<!-- % for event in reversed(result.thread.history): -->
-% for event in result.thread.history:
-    ## TODO - D.A. - 2015-08-20
-    ## Allow to show full history (with status change and archive/unarchive)
-    ${WIDGETS.SECURED_HISTORY_VIRTUAL_EVENT(fake_api.current_user, event)}
-% endfor
-
-## % for comment in result.thread.comments:
-##     ${WIDGETS.SECURED_TIMELINE_ITEM(fake_api.current_user, comment)}
-## % endfor
-##
 
 </div>

@@ -116,8 +116,8 @@
 <%def name="FLASH_MSG(css_class='')">
     <% flash=tg.flash_obj.render('flash', use_js=False) %>
     % if flash:
-        <div class="row" id="flash-message-to-fade-out">
-            <div id="t-full-app-alert-message-id" class="${css_class}">
+        <div class="" id="flash-message-to-fade-out">
+            <div id="t-full-app-alert-message-id" class="flashmsg__data ${css_class}">
                 ${flash|n}
             </div>
         </div>

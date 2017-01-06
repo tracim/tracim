@@ -26,7 +26,7 @@
     <body class="${self.body_class()}">
         <script src="${tg.url('/assets/js/jquery.min.js')}"></script>
 
-        <div class="container-fluid ${container_classes()}">
+        <div class="${container_classes()}">
             ${self.main_menu()}
             ${self.content_wrapper()}
             <div id="tracim-footer-separator"></div>
@@ -74,7 +74,7 @@
 
 <%def name="main_menu()">
     <div class="navbar navbar-fixed-top" role="navigation">
-        ${TIM.FLASH_MSG('col-sm-7 col-sm-offset-3')}
+        ${TIM.FLASH_MSG('')}
 ##
 ##         <div class="row" id="flashgordon">
 ##             <div class="col-sm-7 col-sm-offset-3" style="z-index: 10001; padding: 0; position: absolute; top: 0;">
@@ -96,7 +96,7 @@
 
 
 
-        <div class="container-fluid">
+        <div class="">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -110,16 +110,20 @@
                 </a>
             </div>
 
-            <div class="navbar-collapse collapse">
+            <div class="header__navbar navbar-collapse collapse">
                 % if request.identity:
-                    <ul class="nav navbar-nav navbar-left">
-                        <li class="active"><a href="${tg.url('/home')}">${TIM.FA('fa-home fa-lg')} ${_('My Home')}</a></li>
-                        <li class=""><a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar')} ${_('Calendar')}</a></li>
+                    <ul class="header__navbar__list nav navbar-nav navbar-left">
+                        <li class="header__navbar__list__item active">
+                            <a href="${tg.url('/home')}">${TIM.FA('fa-home fa-lg')} ${_('My Home')}</a>
+                        </li>
+                        <li class="header__navbar__list__item">
+                            <a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar')} ${_('Calendar')}</a>
+                        </li>
                         ${NAVBAR_MENU.ADMIN_ITEMS()}
                     </ul>
                 % endif
 
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="header__navbar__right nav navbar-nav navbar-right">
 
                     % if request.identity:
 
@@ -186,6 +190,11 @@
 ##                        </ul>
 ##                    </li>
                 </ul>
+
+                <div class="header__navbar__switch-mode switch-read-mode">
+                    ${TIM.FA('fa-eye')} ${_('Read mode')}
+                </div>
+
             </div>
         </div>
     </div>

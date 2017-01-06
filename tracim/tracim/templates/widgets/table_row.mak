@@ -5,7 +5,7 @@
 <%def name="USER_ROLE_IN_WORKSPACE(current_user, role, show_id=True, enable_link=None, disable_link=None, role_types=None)">
     <tr>
         % if show_id:
-            <td class="text-right">${role.workspace.id}</td>
+            <td>${role.workspace.id}</td>
         % endif
         <td><a href="${tg.url('/admin/workspaces/{}').format(role.workspace.id)}">${role.workspace.name}</a></td>
 
@@ -33,8 +33,8 @@
 
 <%def name="SECURED_MEMBER_IN_WORKSPACE(current_user, workspace, member, role_types)">
     <tr>
-        <td class="text-right">${member.id}</td>
-        <td ><a href="${tg.url('/admin/users/{}'.format(member.id))}">${member.name}</a></td>
+        <td>${member.id}</td>
+        <td><a href="${tg.url('/admin/users/{}'.format(member.id))}">${member.name}</a></td>
         <td>${BUTTON.SECURED_ROLE_SELECTOR(fake_api.current_user, result.workspace, member, fake_api.role_types)}</td>
         <%
             user_is_himself = current_user.id == member.id

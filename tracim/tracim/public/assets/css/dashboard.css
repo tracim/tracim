@@ -60,6 +60,7 @@ body {
     top: 51px;
     bottom: 0;
     left: 0;
+    width: 260px;
     z-index: 1000;
     display: block;
     padding: 20px;
@@ -73,13 +74,30 @@ body {
 
   }
 }
+.fixed-width-sidebar {
+  width: auto;
+  min-width: 260px;
+  max-width: 50%;
+}
+
+.content__wrapper {
+  width: auto;
+  margin: 0 260px; /* When changing this value, also change the corresponding in main.js */
+}
+.content__data {
+  padding: 0 15px;
+}
 
 #sidebar-right {
+  left: auto;
+  right: 0;
   overflow-x: visible;
   overflow-y: auto;
     background-color: #F5F5F5;
     border-left: 1px solid #CCC;
-
+}
+.navbar-right {
+  margin-right: 0px;
 }
 
 /* Sidebar navigation */
@@ -99,6 +117,20 @@ body {
   background-color: #428bca;
 }
 
+.header__navbar__switch-mode {
+  float: right;
+  display: inline-block;
+  padding: 15px;
+  cursor: pointer;
+}
+.header__navbar__switch-mode > i {
+  margin-right: 5px;
+  font-size: 16px;
+}
+.header__navbar__switch-mode.switch-work-mode {
+    background-color: #eee;
+    color: #333;
+}
 
 /*
  * Main content
@@ -144,7 +176,6 @@ iframe { border: 5px solid #b3e7ff; }
 .pod-selected-item {background-color: #EEE;}
 .pod-empty {color: #999;}
 .pod-inline-form {
-    margin-left: 12px;
     border: 6px solid #428BCA;
     padding: 0.5em;
 }
@@ -295,6 +326,7 @@ div.t-page-metadata-row, div.t-metadata-row {
 
 #sidebar-left-menu {
     margin-bottom: 20px; /* add a margin between menu bottom and footer top */
+    overflow: hidden;
 }
 
 h1.page-header {
@@ -350,10 +382,15 @@ h1.page-header {
 #sidebar-right h4 { color: #555; margin: 1.5em 0 1em 0; }
 
 #t-full-app-alert-message-id {
-    z-index: 10001;
-    padding: 0;
-    position: absolute;
     top: 0;
+    position: absolute;
+    z-index: 10001;
+    width: 100%;
+    padding: 0;
+}
+#t-full-app-alert-message-id > div {
+  width: 75%;
+  margin: 1em auto 0 auto;
 }
 
 #t-full-app-alert-message-id > div.alert {
@@ -430,3 +467,46 @@ span.info.readonly {
 .folder__content__list__item__status.deleted i {
   font-size: 14px;
 }
+
+.content__home {
+  padding: 0 15px;
+}
+
+.workspace__wrapper {
+  padding: 0 15px;
+}
+.workspace__list table {
+  text-align: center;
+}
+
+.workspace__detail__wrapper {
+  padding: 0 15px;
+}
+.workspace__detail__wrapper table {
+  text-align: center;
+}
+
+.workspace__detail__user table {
+  text-align: center;
+}
+
+.content__detail {
+  padding: 0 15px;
+}
+.content__detail table {
+  text-align: center;
+}
+.anchored-title {
+  padding-left: 10px;
+}
+
+.adminuser__wrapper {
+  padding: 0 15px;
+}
+.adminuser__detail {
+  padding: 0 15px;
+}
+.adminuser__detail table {
+  text-align: center;
+}
+
