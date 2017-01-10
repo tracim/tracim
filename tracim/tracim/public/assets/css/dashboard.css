@@ -510,3 +510,6 @@ span.info.readonly {
   text-align: center;
 }
 
+div.mce-fullscreen {
+  z-index: 1030;
+}
