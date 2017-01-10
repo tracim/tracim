@@ -37,6 +37,7 @@
 
         <script src="${tg.url('/assets/select2-4.0.3/js/select2.min.js')}"></script>
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
+        <script src="${tg.url('/assets/js/trad.js')}"></script>
         <script src="${tg.url('/assets/js/main.js')}"></script>
         ${CFG.TRACKER_JS_CONTENT|n}
     </body>

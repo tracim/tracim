@@ -35,6 +35,8 @@
         ${self.footer()}
 
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
+        <script src="${tg.url('/assets/js/trad.js')}"></script>
+        <script src="${tg.url('/assets/js/main.js')}"></script>
         ## HACK - D.A. - 2014-10-21
         ##
         ## The following JS "hack" is intended to make TG2 flash messages compatible with bootstrap alert classes

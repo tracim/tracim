@@ -50,6 +50,8 @@
         <script src="${tg.url('/javascript/external/google-code-prettify/prettify.js')}"></script>
         <script src="${tg.url('/javascript/external/bootstrap-wysiwyg.js')}"></script>
         <script src="/javascript/external/bootstrap-datetimepicker.min.js"></script>
+        <script src="${tg.url('/assets/js/trad.js')}"></script>
+        <script src="${tg.url('/assets/js/main.js')}"></script>
         ${CFG.TRACKER_JS_CONTENT|n}
     </body>
 

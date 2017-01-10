@@ -20,12 +20,12 @@ $(document).ready(function () {
 
   // switch btn read/work btn
   $('.header__navbar').on('click', '.header__navbar__switch-mode.switch-read-mode', function () {
-    $(this).removeClass('switch-read-mode').addClass('switch-work-mode').html('<i class="fa fa-edit fa-fw"></i> Work mode')
+    $(this).removeClass('switch-read-mode').addClass('switch-work-mode').html('<i class="fa fa-edit fa-fw"></i> ' + __('btnWorkMode'))
     $('#sidebar-left, #sidebar-right').hide()
     $('.content__wrapper').css({margin: '0'})
   })
   $('.header__navbar').on('click', '.header__navbar__switch-mode.switch-work-mode', function () {
-    $(this).removeClass('switch-work-mode').addClass('switch-read-mode').html('<i class="fa fa-eye fa-fw"></i> Read mode')
+    $(this).removeClass('switch-work-mode').addClass('switch-read-mode').html('<i class="fa fa-eye fa-fw"></i> ' + __('btnReadMode'))
     $('#sidebar-left, #sidebar-right').show()
     $('.content__wrapper').css({margin: '0 260px'})
   })
@@ -35,7 +35,7 @@ $(document).ready(function () {
     $('#user_id').select2({
       "language": {
         "noResults": function () {
-          return "Aucun résultats"
+          return __('select2EmptyResult')
         }
       },
       escapeMarkup: function (markup) {
