@@ -56,7 +56,7 @@
             menubar:false,
             statusbar:true,
             plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker" ],
-
+            language: globalTracimLang === 'en_US' ? 'en' : globalTracimLang, // tinymce does't accept en_US as language, it is its default value named 'en'
             skin : 'tracim',
             selector:'${selector}',
             toolbar: [
@@ -82,6 +82,7 @@
               // add custom btn to handle image by selecting them with system explorer
               $editor.addButton('customInsertImage', {
                 icon: 'mce-ico mce-i-image',
+                title: 'Image',
                 onclick: function () {
                   if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
 
