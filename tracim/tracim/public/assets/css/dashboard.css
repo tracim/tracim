@@ -475,27 +475,31 @@ span.info.readonly {
 .workspace__wrapper {
   padding: 0 15px;
 }
-.workspace__list table {
-  text-align: center;
-}
 
 .workspace__detail__wrapper {
   padding: 0 15px;
-}
-.workspace__detail__wrapper table {
-  text-align: center;
-}
-
-.workspace__detail__user table {
-  text-align: center;
 }
 
 .content__detail {
   padding: 0 15px;
 }
-.content__detail table {
+
+/*.content__detail table {
   text-align: center;
 }
+.workspace__detail__wrapper table {
+  text-align: center;
+}
+.workspace__detail__user table {
+  text-align: center;
+}
+.workspace__list table {
+  text-align: center;
+}*/
+table th {
+  text-align: left;
+}
+
 .anchored-title {
   padding-left: 10px;
 }

@@ -9,18 +9,16 @@
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
     ## This is the default right sidebar implementation
-    <div class="sidebar">
-        <div class="btn-group btn-group-vertical">
-        </div>
-        <p></p>
-    </div> <!-- # End of side bar right -->
+    <div class="btn-group btn-group-vertical">
+    </div>
+    <p></p>
 </%def>
 <%def name="REQUIRED_DIALOGS()"></%def>
 <%def name="FOOTER_CONTENT_LIKE_SCRIPTS_AND_CSS()"></%def>
 
 <%def name="content_wrapper()">
     ## SIDEBAR LEFT
-    <div id="sidebar-left">
+    <div id="sidebar-left" class="sidebar">
         <div class="btn-group" style="position: absolute; right: 2px; top: 4px; ">
             <button id="toggle-left-sidebar-width" type="button" class="btn btn-link"><i class="fa fa-angle-double-right"></i></button>
         </div>
