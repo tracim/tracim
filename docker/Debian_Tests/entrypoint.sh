@@ -3,7 +3,7 @@
 #
 # ENVIRONMENT VARIABLES ARE:
 #
-# * DATABASE_TYPE (values: postgresql, mysql, sqlite)
+# * TEST_DATABASE_ENGINE (values: postgresql, mysql, sqlite)
 # * CHECKOUT (values: a commit or branch name)
 #
 
@@ -13,16 +13,16 @@ if [ -n "$CHECKOUT" ]; then
     echo "CHECKOUT set to $CHECKOUT"
 fi
 
-# Ensure DATABASE_TYPE is set
-if ! [ -n "$DATABASE_TYPE" ]; then
-    echo "You must set DATABASE_TYPE environment variable"
+# Ensure TEST_DATABASE_ENGINE is set
+if ! [ -n "$TEST_DATABASE_ENGINE" ]; then
+    echo "You must set TEST_DATABASE_ENGINE environment variable"
     exit 1
 fi
 
-# Ensure DATABASE_TYPE value
-case "$DATABASE_TYPE" in
+# Ensure TEST_DATABASE_ENGINE value
+case "$TEST_DATABASE_ENGINE" in
     postgresql|mysql|sqlite) ;;
-    *) echo "DATABASE_TYPE environment variable must be one of these: \
+    *) echo "TEST_DATABASE_ENGINE environment variable must be one of these: \
 postgresql, mysql, sqlite" ; exit 1 ;;
 esac
 
@@ -31,7 +31,7 @@ cp /tracim/tracim/development.ini.base /tracim/tracim/development.ini
 cp /tracim/tracim/wsgidav.conf.sample /tracim/tracim/wsgidav.conf
 
 # PostgreSQL case
-if [ "$DATABASE_TYPE" = postgresql ] ; then
+if [ "$TEST_DATABASE_ENGINE" = postgresql ] ; then
     service postgresql start
     su - postgres -s /bin/bash -c "psql -c \"CREATE DATABASE tracim;\""
     su - postgres -s /bin/bash -c "psql -c \"ALTER USER postgres WITH PASSWORD 'dummy';\""
@@ -40,7 +40,7 @@ if [ "$DATABASE_TYPE" = postgresql ] ; then
 fi
 
 # MySQL case
-if [ "$DATABASE_TYPE" = mysql ] ; then
+if [ "$TEST_DATABASE_ENGINE" = mysql ] ; then
     service mysql start
     mysql -e 'CREATE DATABASE tracim;'
     sed -i "s/\(sqlalchemy.url *= *\).*/\sqlalchemy.url = mysql+oursql:\/\/root@localhost\/tracim/" /tracim/tracim/test.ini
@@ -48,7 +48,7 @@ if [ "$DATABASE_TYPE" = mysql ] ; then
 fi
 
 # SQLite case
-if [ "$DATABASE_TYPE" = sqlite ] ; then
+if [ "$TEST_DATABASE_ENGINE" = sqlite ] ; then
     sed -i "s/\(sqlalchemy.url *= *\).*/\sqlalchemy.url = sqlite:\/\/\/tracim.sqlite/" /tracim/tracim/test.ini
     sed -i "s/\(sqlalchemy.url *= *\).*/\sqlalchemy.url = sqlite:\/\/\/tracim.sqlite/" /tracim/tracim/development.ini
 fi

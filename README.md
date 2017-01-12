@@ -462,21 +462,21 @@ To build Prod/dev designed image
 
 Run tests with PostgreSQL
 
-    docker run -e DATABASE_TYPE=postgresql tracim:tests
+    docker run -e TEST_DATABASE_ENGINE=postgresql tracim:tests
 
 Run tests with MySQL
 
-    docker run -e DATABASE_TYPE=mysql tracim:tests
+    docker run -e TEST_DATABASE_ENGINE=mysql tracim:tests
 
 Run tests with SQLite
 
-    docker run -e DATABASE_TYPE=sqlite tracim:tests
+    docker run -e TEST_DATABASE_ENGINE=sqlite tracim:tests
 
 ##### Run test on specific commit/branch
 
 To run tests on specific branch or commit, use ``CHECKOUT`` parameter, eg:
 
-    docker run -e DATABASE_TYPE=postgresql -e CHECKOUT=<branch_or_commit_name> tracim:tests
+    docker run -e TEST_DATABASE_ENGINE=postgresql -e CHECKOUT=<branch_or_commit_name> tracim:tests
 
 #### Run Prod/dev containers
 
