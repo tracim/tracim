@@ -478,6 +478,11 @@ To run tests on specific branch or commit, use ``CHECKOUT`` parameter, eg:
 
     docker run -e TEST_DATABASE_ENGINE=postgresql -e CHECKOUT=<branch_or_commit_name> tracim:tests
 
+##### Other parameters (environment variables)
+
+* FETCH: (0 or 1) Apply a ``git fetch origin`` on tracim repository
+* PULL: (0 or 1) Apply a ``git pull origin master`` on tracim repository to set tracim on latest master branch
+
 #### Run Prod/dev containers
 
 Environment variables are:

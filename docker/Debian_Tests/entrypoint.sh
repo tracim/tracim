@@ -5,7 +5,24 @@
 #
 # * TEST_DATABASE_ENGINE (values: postgresql, mysql, sqlite)
 # * CHECKOUT (values: a commit or branch name)
+# * PULL (values: 0 or 1)
+# * FETCH (values: 0 or 1)
 #
+
+# Default values
+FETCH=${FETCH:=1}
+PULL=${PULL:=1}
+
+# If PULL is set, change repository HEAD
+if [ "$FETCH" = 1 ]; then
+    cd /tracim && git fetch origin
+fi
+
+
+# If PULL is set, change repository HEAD
+if [ "$PULL" = 1 ]; then
+    cd /tracim && git pull origin master
+fi
 
 # If CHECKOUT is set, change repository HEAD
 if [ -n "$CHECKOUT" ]; then
