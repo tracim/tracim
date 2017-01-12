@@ -14,10 +14,21 @@
 # * DATABASE_HOST
 # * DATABASE_PORT
 # * DATABASE_NAME
+# * PULL
 #
+
+# Default values
+# TODO: Voir avec Damien si c'est le comportement souhaité
+PULL=${PULL:=1}
 
 # Check environment variables
 /tracim/check_env_vars.sh
+
+# If PULL is set, change repository HEAD
+if [ "$PULL" = 1 ]; then
+    echo "Upgrade Tracim code"
+    cd /tracim && git pull origin master
+fi
 
 # Create config.ini file if no exist
 if [ ! -f /etc/tracim/config.ini ]; then
@@ -87,6 +98,12 @@ fi
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/tracim/ && gearbox setup-app -c config.ini
+fi
+
+# Upgrade database
+if [ "$PULL" = 1 ]; then
+    echo "Upgrade Tracim database id required"
+    cd /tracim/tracim/ && gearbox migrate upgrade
 fi
 
 # Start with uwsgi

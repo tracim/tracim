@@ -493,6 +493,7 @@ Environment variables are:
 * DATABASE_HOST
 * DATABASE_PORT
 * DATABASE_NAME
+* PULL (0 or 1): If 1, upgrade tracim at startup
 
 Volumes are:
 
