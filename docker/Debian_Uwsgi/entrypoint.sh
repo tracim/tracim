@@ -69,16 +69,19 @@ fi
 
 # SQLite case
 if [ "$DATABASE_TYPE" = sqlite ] ; then
-    if [ ! -f /var/lib/tracim/tracim.db ]; then
+    if [ ! -f /var/tracim/tracim.db ]; then
         INIT_DATABASE=true
     fi
 fi
 
-# Update sqlalchemy.url
+# Update radicale file system folder config
+sed -i "s/\(# radicale.server.filesystem.folder *= *\).*/radicale.server.filesystem.folder = \/var\/tracim\/radicale/" /etc/tracim/config.ini
+
+# Update sqlalchemy.url config
 if ! [ "$DATABASE_TYPE" = sqlite ] ; then
     sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = $DATABASE_TYPE:\/\/$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT\/$DATABASE_NAME$DATABASE_SUFFIX/" /etc/tracim/config.ini
 else
-    sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = sqlite:\/\/\/\/var\/lib\/tracim\/tracim.db/" /etc/tracim/config.ini
+    sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = sqlite:\/\/\/\/var\/tracim\/tracim.db/" /etc/tracim/config.ini
 fi
 
 # Initialize database if needed

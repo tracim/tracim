@@ -516,7 +516,7 @@ Example with MySQL
 
 Example with SQLite
 
-    docker run -e DATABASE_TYPE=sqlite -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracim -v /tmp/tracimdb:/var/lib/tracim tracim:latest
+    docker run -e DATABASE_TYPE=sqlite -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracimetc -v /tmp/tracimvar:/var/tracim tracim:latest
 
 # Support and Community #
 

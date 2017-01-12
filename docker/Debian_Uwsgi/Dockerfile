@@ -45,8 +45,8 @@ RUN git clone https://github.com/tracim/tracim.git \
 
 # Prepare volumes
 RUN mkdir /etc/tracim \
-    && mkdir /var/lib/tracim
-VOLUME ["/etc/tracim", "/var/lib/tracim"]
+    && mkdir /var/tracim
+VOLUME ["/etc/tracim", "/var/tracim"]
 
 COPY uwsgi.ini /tracim/tracim/uwsgi.ini.template
 COPY wsgi.py /tracim/tracim/wsgi.py
