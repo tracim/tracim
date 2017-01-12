@@ -48,11 +48,9 @@ RUN mkdir /etc/tracim \
     && mkdir /var/lib/tracim
 VOLUME ["/etc/tracim", "/var/lib/tracim"]
 
-# Copy needed files
 COPY uwsgi.ini /tracim/tracim/uwsgi.ini.template
 COPY wsgi.py /tracim/tracim/wsgi.py
 COPY check_env_vars.sh /tracim/check_env_vars.sh
 COPY entrypoint.sh /tracim/entrypoint.sh
 
-# Set the default entry point
 CMD ["/tracim/entrypoint.sh"]
