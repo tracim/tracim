@@ -497,7 +497,7 @@ Environment variables are:
 Volumes are:
 
 * /etc/tracim
-* /var/lib/tracim (used for SQLite database)
+* /var/tracim (used for SQLite database and radicale)
 
 Ports are:
 
