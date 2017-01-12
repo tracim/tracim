@@ -4,7 +4,14 @@
 # ENVIRONMENT VARIABLES ARE:
 #
 # * DATABASE_TYPE (values: postgresql, mysql, sqlite)
+# * CHECKOUT (values: a commit or branch name)
 #
+
+# If CHECKOUT is set, change repository HEAD
+if [ -n "$CHECKOUT" ]; then
+    cd /tracim && git checkout ${CHECKOUT}
+    echo "CHECKOUT set to $CHECKOUT"
+fi
 
 # Ensure DATABASE_TYPE is set
 if ! [ -n "$DATABASE_TYPE" ]; then
