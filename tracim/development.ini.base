@@ -192,6 +192,9 @@ email.notification.smtp.port = 25
 email.notification.smtp.user = your_smtp_user
 email.notification.smtp.password = your_smtp_password
 
+# Asyncjob tracker, can be memory or redis default is memory
+asyncjob.tracker = memory
+
 ## Radical (CalDav server) configuration
 # radicale.server.host = 0.0.0.0
 # radicale.server.port = 5232

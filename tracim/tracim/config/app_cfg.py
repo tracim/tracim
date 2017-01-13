@@ -19,6 +19,8 @@ from urllib.parse import urlparse
 import tg
 from paste.deploy.converters import asbool
 from tg.configuration.milestones import environment_loaded
+from tgext.asyncjob.trackers.memory import MemoryProgressTracker
+from tgext.asyncjob.trackers.redisdb import RedisProgressTracker
 
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
@@ -339,6 +341,32 @@ class CFG(object):
         if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
             self.WSGIDAV_CLIENT_BASE_URL += '/'
 
+        self.ASYNC_JOB_TRACKER = tg.config.get(
+            'asyncjob.tracker',
+            'memory',
+        )
+
+        if self.ASYNC_JOB_TRACKER not in ('memory', 'redis'):
+            raise Exception(
+                'asyncjob.tracker configuration '
+                'can ''be "memory" or "redis", not "{0}"'.format(
+                    self.ASYNC_JOB_TRACKER,
+                )
+            )
+
+        if self.ASYNC_JOB_TRACKER == 'redis':
+            self.ASYNC_JOB_TRACKER_REDIS_HOST = tg.config.get(
+                'asyncjob.tracker.redis.host',
+                'localhost',
+            )
+            self.ASYNC_JOB_TRACKER_REDIS_PORT = int(tg.config.get(
+                'asyncjob.tracker.redis.port',
+                6379,
+            ))
+            self.ASYNC_JOB_TRACKER_REDIS_DB = int(tg.config.get(
+                'asyncjob.tracker.redis.db',
+                15,
+            ))
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
@@ -381,4 +409,29 @@ base_config.variable_provider = lambda: {
     'CFG': CFG.get_instance()
 }
 
-plug(base_config, 'tgext.asyncjob')
+
+def plug_asyncjob():
+    cfg = CFG.get_instance()
+
+    # # Manual creation of async job tracker to be able to log it
+    async_job_tracker = cfg.ASYNC_JOB_TRACKER
+    if async_job_tracker == 'redis':
+        async_job_progress_tracker = RedisProgressTracker(
+            host=cfg.ASYNC_JOB_TRACKER_REDIS_HOST,
+            port=cfg.ASYNC_JOB_TRACKER_REDIS_PORT,
+            db=cfg.ASYNC_JOB_TRACKER_REDIS_DB,
+        )
+    else:
+        async_job_progress_tracker = MemoryProgressTracker()
+
+    logger.info(
+        cfg,
+        'Async job track using {0}'.format(str(async_job_progress_tracker)),
+    )
+    plug(
+        base_config,
+        'tgext.asyncjob',
+        progress_tracker=async_job_progress_tracker,
+    )
+
+environment_loaded.register(lambda: plug_asyncjob())
