@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+  // toggle sidebar-left width to fixed or auto
   $('#toggle-left-sidebar-width').click( function() {
     sidebar = $('#sidebar-left')
     buttonIcon = $('> i', this)
@@ -11,6 +12,24 @@ $(document).ready(function () {
       sidebar.addClass('fixed-width-sidebar')
       buttonIcon.removeClass('fa-angle-double-right').addClass('fa-angle-double-left')
     }
+  })
+
+  var homeTabList = ['#unread-content-panel', '#recent-activity-panel', '#workspaces-panel']
+  // toggle the active tab in home page
+  $('.content__home__tab__item.unread, .content__home__tab__item.recent_activity, .content__home__tab__item.workspace').click(function () {
+    $('.content__home__tab__item.unread, .content__home__tab__item.recent_activity, .content__home__tab__item.workspace').removeClass('active')
+    homeTabList.forEach(function (item) { $(item).css('display', 'none') })
+  })
+  $('.content__home__tab__item.unread').click(function () {
+    $(this).addClass('active')
+    $('#unread-content-panel').css('display', 'block') })
+  $('.content__home__tab__item.recent_activity').click(function () {
+    $(this).addClass('active')
+    $('#recent-activity-panel').css('display', 'block')
+  })
+  $('.content__home__tab__item.workspace').click(function () {
+    $(this).addClass('active')
+    $('#workspaces-panel').css('display', 'block')
   })
 
   // Côme - 2017-01-06 - is the code bellow usefull ?

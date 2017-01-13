@@ -517,3 +517,93 @@ table th {
 div.mce-fullscreen {
   z-index: 1030;
 }
+
+#unread-content-panel, /*#recent-activity-panel,*/ #workspaces-panel {
+  display: none;
+}
+.panel-success > .panel-heading, .panel { /* bootstrap override */
+  border-top-left-radius: 0px;
+}
+.panel { /* bootstrap override */
+  border-width: 2px;
+  border-top-width: 10px;
+}
+.content__home__tab-wrapper {
+  margin: 15px 0 0 0;
+}
+.content__home__tab__item {
+  display: inline-block;
+  padding: 3px 25px;
+  border: 1px solid #333;
+  border-bottom-width: 0px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+  vertical-align: bottom;
+  cursor: pointer;
+}
+.content__home__tab__item > i {
+  margin-right: 4px;
+}
+.content__home__tab__item-news {
+  float: right;
+  position: relative;
+  top: -18px;
+  right: -28px;
+  height: auto;
+  color: #b35454;
+  font-size: 22px;
+}
+.content__home__tab__item-news__number {
+  top: -3px;
+  color: #dff0d8;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  letter-spacing: -1px;
+}
+.content__home__tab__item-lastactivity {
+  font-size: 12px;
+  font-weight: normal;
+  color: #b35454;
+}
+.content__home__tab__item:hover {
+  background-color: #eee;
+}
+.content__home__tab__item.active {
+  padding: 5px 25px;
+}
+.content__home__tab__item.unread {
+  border-color: #d6e9c6;
+  background-color: #dff0d8;
+  color: #3c763d;
+}
+.content__home__tab__item.unread:hover,
+.content__home__tab__item.unread.active {
+  border-color: #dff0d8;
+  background-color: #d6e9c6;
+  color: #3c763d;
+}
+.content__home__tab__item.recent_activity {
+  border-color: #faebcc;
+  background-color: #fcf8e3;
+  color: #8a6d3b;
+}
+.content__home__tab__item.recent_activity:hover,
+.content__home__tab__item.recent_activity.active {
+  border-color: #fcf8e3;
+  background-color: #faebcc;
+  color: #8a6d3b;
+}
+.content__home__tab__item.workspace {
+  border-color: #bce8f1;
+  background-color: #d9edf7;
+  color: #31708f;
+}
+.content__home__tab__item.workspace:hover,
+.content__home__tab__item.workspace.active {
+  border-color: #d9edf7;
+  background-color: #bce8f1;
+  color: #31708f;
+}

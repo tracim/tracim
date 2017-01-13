@@ -32,96 +32,108 @@
 </%def>
 
 <div class="content__home">
-    ## NOT READ
-    <div class="t-spacer-above" id="unread-content-panel">
-        <div class="t-half-spacer-above">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-fw fa-eye-slash"></i> ${_('Not Read')}</h3>
-                </div>
-                <div class="panel-body">
-                    % if fake_api.last_unread.nb <= 0:
-                        ${P.EMPTY_CONTENT(_('No new content.'))}
-                    % else:
-                        <table class="table table-hover">
-                            % for item in fake_api.last_unread.contents:
-                                <tr>
-                                    <td>
-                                        <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
-                                        <a href="${item.url}">${item.label}</a>
-                                        <br/>
-                                        <span class="t-less-visible">${item.workspace.label}</span>
-                                    </td>
-                                    <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
-                                        ${item.last_activity.delta}
-                                    </td>
-                                </tr>
-                            % endfor
-                        </table>
-                    % endif
-                 </div>
-             </div>
+    <div class="content__home__tab-wrapper">
+        <div class="content__home__tab__item recent_activity active">
+            <i class="fa fa-fw fa-line-chart"></i>${_('Recent Activity')}
+            % if fake_api.last_actives.contents[0]:
+              <span class="content__home__tab__item-lastactivity">[${fake_api.last_actives.contents[0].last_activity.delta}]</span>
+            % endif
+        </div>
+        <div class="content__home__tab__item unread">
+            <i class="fa fa-fw fa-eye-slash"></i>${_('Not Read')}
+            % if fake_api.last_unread.nb > 0:
+              <div class="content__home__tab__item-news fa-stack">
+                <i class="fa fa-bookmark fa-stack-1x"></i>
+                <i class="content__home__tab__item-news__number fa-stack-1x">
+                  % if fake_api.last_unread.nb == 10:
+                    ${fake_api.last_unread.nb}+
+                  % else:
+                    ${fake_api.last_unread.nb}
+                  % endif
+                </i>
+              </div>
+            % endif
+        </div>
+        <div class="content__home__tab__item workspace">
+            <i class="fa fa-bank"></i>${_('My workspaces')}
         </div>
     </div>
 
     ## RECENT ACTIVITY
-    <div class="t-spacer-above" id="recent-activity-panel">
-        <div class="t-half-spacer-above">
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-fw fa-line-chart"></i> ${_('Recent Activity')}</h3>
-                </div>
-                <div class="panel-body">
-                    % if fake_api.last_actives.nb <= 0:
-                        ${P.EMPTY_CONTENT(_('There\'s no activity yet.'))}
-                    % else:
-                        <table class="table table-hover">
-                            % for item in fake_api.last_actives.contents:
-                                <tr>
-                                    <td>
-                                        <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
-                                        <a href="${item.url}">${item.label}</a>
-                                        <br/>
-                                        <span class="t-less-visible">${item.workspace.label}</span>
-                                    </td>
-                                    <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
-                                        ${item.last_activity.delta}
-                                    </td>
-                                </tr>
-                            % endfor
-                        </table>
-                    % endif
-                </div>
+    <div class="" id="recent-activity-panel">
+        <div class="panel panel-warning">
+            <div class="panel-body">
+                % if fake_api.last_actives.nb <= 0:
+                    ${P.EMPTY_CONTENT(_('There\'s no activity yet.'))}
+                % else:
+                    <table class="table table-hover">
+                        % for item in fake_api.last_actives.contents:
+                            <tr>
+                                <td>
+                                    <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
+                                    <a href="${item.url}">${item.label}</a>
+                                    <br/>
+                                    <span class="t-less-visible">${item.workspace.label}</span>
+                                </td>
+                                <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
+                                    ${item.last_activity.delta}
+                                </td>
+                            </tr>
+                        % endfor
+                    </table>
+                % endif
             </div>
         </div>
     </div>
 
-    ## Workspace list and notifications
-    <div class="t-half-spacer-above" id="workspaces-panel">
-        <div class="t-spacer-above">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-bank"></i> ${_('Workspaces')}</h3>
-                </div>
-                <div class="panel-body">
+    ## NOT READ
+    <div class="" id="unread-content-panel">
+        <div class="panel panel-success">
+            <div class="panel-body">
+                % if fake_api.last_unread.nb <= 0:
+                    ${P.EMPTY_CONTENT(_('No new content.'))}
+                % else:
+                    <table class="table table-hover">
+                        % for item in fake_api.last_unread.contents:
+                            <tr>
+                                <td>
+                                    <i class="${item.type.icon} fa-fw ${item.type.color}"></i>
+                                    <a href="${item.url}">${item.label}</a>
+                                    <br/>
+                                    <span class="t-less-visible">${item.workspace.label}</span>
+                                </td>
+                                <td title="${_('Last activity: {datetime}').format(datetime=item.last_activity.label)}">
+                                    ${item.last_activity.delta}
+                                </td>
+                            </tr>
+                        % endfor
+                    </table>
+                % endif
+             </div>
+         </div>
+    </div>
 
-                    % if len(fake_api.current_user.roles)<=0:
-                        ${P.EMPTY_CONTENT(_('I\'m not member of any workspace.'))}
-                    % else:
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>${_('Workspace')}</th>
-                                    <th>${_('Role')}</th>
-                                    <th>${_('Email Notifications')}</th>
-                                </tr>
-                            </thead>
-                            % for role in fake_api.current_user.roles:
-                                ${TABLE_ROW.USER_ROLE_IN_WORKSPACE(fake_api.current_user, role, show_id=False, enable_link='/user/me/workspaces/{workspace}/enable_notifications?next_url=/home', disable_link='/user/me/workspaces/{workspace}/disable_notifications?next_url=/home')}
-                            % endfor
-                        </table>
-                    % endif
-                </div>
+    ## Workspace list and notifications
+    <div class="" id="workspaces-panel">
+        <div class="panel panel-info">
+            <div class="panel-body">
+
+                % if len(fake_api.current_user.roles)<=0:
+                    ${P.EMPTY_CONTENT(_('I\'m not member of any workspace.'))}
+                % else:
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>${_('Workspace')}</th>
+                                <th>${_('Role')}</th>
+                                <th>${_('Email Notifications')}</th>
+                            </tr>
+                        </thead>
+                        % for role in fake_api.current_user.roles:
+                            ${TABLE_ROW.USER_ROLE_IN_WORKSPACE(fake_api.current_user, role, show_id=False, enable_link='/user/me/workspaces/{workspace}/enable_notifications?next_url=/home', disable_link='/user/me/workspaces/{workspace}/disable_notifications?next_url=/home')}
+                        % endfor
+                    </table>
+                % endif
             </div>
         </div>
     </div>
