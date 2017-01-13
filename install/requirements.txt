@@ -63,3 +63,4 @@ who-ldap==3.1.0
 zope.interface==4.1.3
 zope.sqlalchemy==0.7.6
 PyYAML
+redis==2.10.5
