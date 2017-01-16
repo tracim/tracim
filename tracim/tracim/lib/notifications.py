@@ -195,10 +195,20 @@ class EmailNotifier(object):
                 self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
             )
 
-        return '{0} ({1}) <{2}>'.format(
+        # We add a suffix to email to prevent client like Thunderbird to
+        # display personal adressbook label.
+        email = self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL
+        email_name, domain = email.split('@')
+        arranged_email = '{0}+{1}@{2}'.format(
+            email_name,
+            str(user.user_id),
+            domain,
+        )
+
+        return '{0} {1} <{2}>'.format(
             user.display_name,
-            _('via Tracim'),
-            self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
+            'via Tracim',
+            arranged_email,
         )
 
     def notify_content_update(self, event_actor_id: int, event_content_id: int):
