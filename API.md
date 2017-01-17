@@ -5,28 +5,6 @@
 APi not actually implement authentication method. You must use cookies set by
 frontend login.
 
-## Timezone
-
-### List
-
-    GET /api/timezone/
-
-Return list of all timezone available when creating a user
-
-#### Response
-
-    {
-      "value_list": [
-        "Africa/Abidjan",
-        "Africa/Accra",
-        "Africa/Addis_Ababa",
-        "Africa/Algiers",
-        "Africa/Asmara",
-        ...
-      ]
-    }
-
-
 ## Workspaces
 
 ### List
@@ -139,7 +117,7 @@ Return list of all timezone available when creating a user
       ]
     }
 
-## Calendars
+## Calendars
 
 ### List
 
