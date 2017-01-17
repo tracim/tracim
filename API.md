@@ -5,6 +5,8 @@
 APi not actually implement authentication method. You must use cookies set by
 frontend login.
 
+## Timezone
+
 ### List
 
     GET /api/timezone/
