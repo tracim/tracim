@@ -60,7 +60,7 @@
 <%def name="title()">  </%def>
 
 <%def name="footer()">
-    <div class="pod-footer footer hidden-tablet hidden-phone text-center">
+    <div class="pod-footer footer hidden-tablet hidden-phone text-center hidden-xs">
         <p>
             <a href="http://trac.im">${_('Create your own collaborative workspace on trac.im')}</a> &mdash;
             copyright &copy; 2013 - ${h.current_year()} tracim project.
@@ -101,15 +101,11 @@
 
         <div class="">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <i class="fa fa-bars"></i>
                 </button>
                 <a class="navbar-brand" href="${tg.url('/')}">
-##                  <img src="${tg.url('/assets/img/tracim.png')}" class="pull-left" style="border: 1px solid #F5F5F5; height: 48px; margin: -13px 0.5em 0 0;"/>
-                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" style="height: 48px; margin: -13px 0.5em 0 -13px;"/>
+                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" />
                 </a>
             </div>
 
@@ -132,8 +128,8 @@
 
                         <form id="search-form" class="navbar-form navbar-left" role="search" action="${tg.url('/search?')}">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="${_('Search for...')}" name="keywords" value="${','.join(search.keywords) if search else ''}">
-                                <i class="fa fa-search t-less-visible" style="margin-left: -2em;" onclick="$('#search-form').submit()"></i>
+                                <input type="text" class="form-control" placeholder="${_('Search for...')}" name="keywords" value="${','.join(search.keywords) if search else ''}" />
+                                <i class="fa fa-search t-less-visible hidden-xs" style="margin-left: -2em;" onclick="$('#search-form').submit()"></i>
                             </div>
                             ## <button type="submit" class="btn btn-default">${_('Search')}</button>
                         </form>
@@ -194,7 +190,7 @@
 ##                    </li>
                 </ul>
 
-                <div class="header__navbar__switch-mode switch-read-mode">
+                <div class="header__navbar__switch-mode switch-read-mode hidden-xs">
                     ${TIM.FA('fa-eye')} ${_('Read mode')}
                 </div>
 

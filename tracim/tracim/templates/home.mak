@@ -40,7 +40,6 @@
             % endif
         </div>
         <div class="content__home__tab__item unread">
-            <i class="fa fa-fw fa-eye-slash"></i>${_('Not Read')}
             % if fake_api.last_unread.nb > 0:
               <div class="content__home__tab__item-news fa-stack">
                 <i class="fa fa-bookmark fa-stack-1x"></i>
@@ -53,6 +52,7 @@
                 </i>
               </div>
             % endif
+            <i class="fa fa-fw fa-eye-slash"></i>${_('Not Read')}
         </div>
         <div class="content__home__tab__item workspace">
             <i class="fa fa-bank"></i>${_('My workspaces')}

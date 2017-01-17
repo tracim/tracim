@@ -81,7 +81,7 @@
 <%def name="title()">  </%def>
 
 <%def name="footer()">
-    <div class="footer hidden-tablet hidden-phone text-center">
+    <div class="footer hidden-tablet hidden-phone text-center hidden-xs">
         <p class="pod-blue">
             <i>pod &mdash; ${_("collaborate today, capitalize for tomorrow")}</i>
 
@@ -97,13 +97,10 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                    <i class="fa fa-bars"></i>
                 </button>
                 <a class="navbar-brand" href="#">
-                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" style="border: 1px solid #F5F5F5; height: 48px; margin: -13px 0.5em 0 0;"/>
+                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" />
                 </a>
             </div>
             <div class="navbar-collapse collapse">
