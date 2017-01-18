@@ -35,8 +35,10 @@
     <div class="content__home__tab-wrapper recent_activity">
         <div class="content__home__tab__item recent_activity active">
             <i class="fa fa-fw fa-line-chart"></i>${_('Recent Activity')}
-            % if fake_api.last_actives.contents[0]:
-              <span class="content__home__tab__item-lastactivity">[${fake_api.last_actives.contents[0].last_activity.delta}]</span>
+            % if fake_api.last_actives.contents:
+                % if fake_api.last_actives.contents[0]:
+                  <span class="content__home__tab__item-lastactivity">[${fake_api.last_actives.contents[0].last_activity.delta}]</span>
+                % endif
             % endif
         </div>
         <div class="content__home__tab__item unread">
