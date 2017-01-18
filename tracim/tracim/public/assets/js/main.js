@@ -20,15 +20,16 @@ $(document).ready(function () {
     $('.content__home__tab__item.unread, .content__home__tab__item.recent_activity, .content__home__tab__item.workspace').removeClass('active')
     homeTabList.forEach(function (item) { $(item).css('display', 'none') })
   })
-  $('.content__home__tab__item.unread').click(function () {
-    $(this).addClass('active')
-    $('#unread-content-panel').css('display', 'block') })
   $('.content__home__tab__item.recent_activity').click(function () {
-    $(this).addClass('active')
+    $(this).addClass('active').parent().removeClass('unread recent_activity workspace').addClass('recent_activity')
     $('#recent-activity-panel').css('display', 'block')
   })
+  $('.content__home__tab__item.unread').click(function () {
+    $(this).addClass('active').parent().removeClass('unread recent_activity workspace').addClass('unread')
+    $('#unread-content-panel').css('display', 'block')
+  })
   $('.content__home__tab__item.workspace').click(function () {
-    $(this).addClass('active')
+    $(this).addClass('active').parent().removeClass('unread recent_activity workspace').addClass('workspace')
     $('#workspaces-panel').css('display', 'block')
   })
 
