@@ -80,9 +80,9 @@
     <div class="navbar navbar-fixed-top navbar-fixed-top-transparent" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <!--button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
                     <i class="fa fa-bars"></i>
-                </button>
+                </button-->
                 <a class="navbar-brand" href="${tg.url('/')}">
                   <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" />
                 </a>
