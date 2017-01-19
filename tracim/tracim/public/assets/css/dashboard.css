@@ -623,8 +623,6 @@ div.mce-fullscreen {
     padding: 5px;
   }
   .content__home__tab__item, .content__home__tab__item.active {
-    padding-left: 15px;
-    padding-right: 15px;
     max-width: 165px;
   }
   .content__home__tab__item-news {
@@ -670,10 +668,13 @@ div.mce-fullscreen {
     display: block;
     width: auto;
     max-width: 100%;
+    padding: 10px 25px;
     border-radius: 0px;
+    text-align: left;
   }
   .content__home__tab__item, .content__home__tab__item.active {
     max-width: 100%;
+    padding: 10px 25px;
     border: 0px;
   }
   .content__home__tab-wrapper {
