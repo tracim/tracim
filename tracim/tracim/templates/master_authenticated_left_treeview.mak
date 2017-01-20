@@ -32,7 +32,7 @@
     </div> <!-- # End of side bar right -->
     ## SIDEBAR RIGHT [END]
 
-    <div class="content__wrapper">
+    <div class="content__wrapper edit-mode-margin">
         ${self.TITLE_ROW()}
         ${self.body()}
     </div>

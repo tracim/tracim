@@ -20,15 +20,16 @@ $(document).ready(function () {
     $('.content__home__tab__item.unread, .content__home__tab__item.recent_activity, .content__home__tab__item.workspace').removeClass('active')
     homeTabList.forEach(function (item) { $(item).css('display', 'none') })
   })
-  $('.content__home__tab__item.unread').click(function () {
-    $(this).addClass('active')
-    $('#unread-content-panel').css('display', 'block') })
   $('.content__home__tab__item.recent_activity').click(function () {
-    $(this).addClass('active')
+    $(this).addClass('active').parent().removeClass('unread recent_activity workspace').addClass('recent_activity')
     $('#recent-activity-panel').css('display', 'block')
   })
+  $('.content__home__tab__item.unread').click(function () {
+    $(this).addClass('active').parent().removeClass('unread recent_activity workspace').addClass('unread')
+    $('#unread-content-panel').css('display', 'block')
+  })
   $('.content__home__tab__item.workspace').click(function () {
-    $(this).addClass('active')
+    $(this).addClass('active').parent().removeClass('unread recent_activity workspace').addClass('workspace')
     $('#workspaces-panel').css('display', 'block')
   })
 
@@ -41,12 +42,12 @@ $(document).ready(function () {
   $('.header__navbar').on('click', '.header__navbar__switch-mode.switch-read-mode', function () {
     $(this).removeClass('switch-read-mode').addClass('switch-work-mode').html('<i class="fa fa-edit fa-fw"></i> ' + __('btnWorkMode'))
     $('#sidebar-left, #sidebar-right').hide()
-    $('.content__wrapper').css({margin: '0'})
+    $('.content__wrapper').removeClass('edit-mode-margin')
   })
   $('.header__navbar').on('click', '.header__navbar__switch-mode.switch-work-mode', function () {
     $(this).removeClass('switch-work-mode').addClass('switch-read-mode').html('<i class="fa fa-eye fa-fw"></i> ' + __('btnReadMode'))
     $('#sidebar-left, #sidebar-right').show()
-    $('.content__wrapper').css({margin: '0 260px'})
+    $('.content__wrapper').addClass('edit-mode-margin')
   })
 
   // add select2 for admin/workspace/<id> for user selection

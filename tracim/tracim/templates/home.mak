@@ -12,7 +12,7 @@
 
 <%def name="TITLE_ROW()">
     <div class="content__title">
-        ${ROW.TITLE_ROW(_('My Dashboard'), 'fa-home', '', 't-user-color', _('Welcome to your home, {username}.').format(username=fake_api.current_user.name))}
+        ${ROW.TITLE_ROW(_('My Dashboard'), 'fa-home', 'content__title__subtitle-home-hidden-xs', 't-user-color', _('Welcome to your home, {username}.').format(username=fake_api.current_user.name))}
     </div>
 </%def>
 
@@ -32,15 +32,16 @@
 </%def>
 
 <div class="content__home">
-    <div class="content__home__tab-wrapper">
+    <div class="content__home__tab-wrapper recent_activity">
         <div class="content__home__tab__item recent_activity active">
             <i class="fa fa-fw fa-line-chart"></i>${_('Recent Activity')}
-            % if fake_api.last_actives.contents[0]:
-              <span class="content__home__tab__item-lastactivity">[${fake_api.last_actives.contents[0].last_activity.delta}]</span>
+            % if fake_api.last_actives.contents:
+                % if fake_api.last_actives.contents[0]:
+                  <span class="content__home__tab__item-lastactivity">[${fake_api.last_actives.contents[0].last_activity.delta}]</span>
+                % endif
             % endif
         </div>
         <div class="content__home__tab__item unread">
-            <i class="fa fa-fw fa-eye-slash"></i>${_('Not Read')}
             % if fake_api.last_unread.nb > 0:
               <div class="content__home__tab__item-news fa-stack">
                 <i class="fa fa-bookmark fa-stack-1x"></i>
@@ -53,6 +54,7 @@
                 </i>
               </div>
             % endif
+            <i class="fa fa-fw fa-eye-slash"></i>${_('Not Read')}
         </div>
         <div class="content__home__tab__item workspace">
             <i class="fa fa-bank"></i>${_('My workspaces')}
