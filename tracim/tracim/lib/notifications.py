@@ -279,12 +279,17 @@ class EmailNotifier(object):
             message.attach(part2)
 
             message_str = message.as_string()
-            asyncjob_perform(async_email_sender.send_mail, message)
+            # asyncjob_perform(async_email_sender.send_mail, message)
+            # FIXME: Temporary hack to enable email sending in
+            # uwsgi/prod environment
+            async_email_sender.send_mail(message)
             # s.send_message(message)
 
         # Note: The following action allow to close the SMTP connection.
         # This will work only if the async jobs are done in the right order
-        asyncjob_perform(async_email_sender.disconnect)
+        # FIXME: Temporary hack to enable email sending in
+        # uwsgi/prod environment
+        # asyncjob_perform(async_email_sender.disconnect)
 
 
     def _build_email_body(self, mako_template_filepath: str, role: UserRoleInWorkspace, content: Content, actor: User) -> str:
