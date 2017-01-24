@@ -4,17 +4,20 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import lxml
+import tg
 from lxml.html.diff import htmldiff
 
 from mako.template import Template
 
 from tg.i18n import lazy_ugettext as l_
 from tg.i18n import ugettext as _
+from tg.support.registry import StackedObjectProxy
 
 from tracim.lib.base import logger
 from tracim.lib.email import SmtpConfiguration
 from tracim.lib.email import EmailSender
 from tracim.lib.user import UserApi
+from tracim.lib.utils import initialize_app
 from tracim.lib.workspace import WorkspaceApi
 
 from tracim.model.serializers import Context
@@ -224,6 +227,13 @@ class EmailNotifier(object):
 
         user = UserApi(None).get_one(event_actor_id)
         logger.debug(self, 'Content: {}'.format(event_content_id))
+
+        # HACK, view https://github.com/tracim/tracim/issues/173
+        try:
+            context = StackedObjectProxy(name="context")
+            context.translator
+        except TypeError:
+            initialize_app(tg.config.get('__file__'))
 
         content = ContentApi(user, show_archived=True, show_deleted=True).get_one(event_content_id, ContentType.Any) # TODO - use a system user instead of the user that has triggered the event
         main_content = content.parent if content.type==ContentType.Comment else content
