@@ -287,14 +287,19 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
 
     @tg.require(current_user_is_contributor())
     @tg.expose()
-    def put(self, item_id, file_data=None, comment=None, label=''):
+    def put(self, item_id, file_data=None, comment=None, label=None):
         # TODO - SECURE THIS
         workspace = tmpl_context.workspace
 
         try:
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
-            label_changed = label != item.label
+            label_changed = False
+            if label is not None and label != item.label:
+                label_changed = True
+
+            if label is None:
+                label = ''
 
             # TODO - D.A. - 2015-03-19
             # refactor this method in order to make code easier to understand
