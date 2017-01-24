@@ -145,21 +145,3 @@ def str_as_bool(string: str) -> bool:
     if string == '0':
         return False
     return bool(string)
-
-
-def initialize_app(config_file_name: str='development.ini') -> None:
-    from webtest import TestApp
-    from paste.deploy import loadapp
-    import os
-
-    wsgi_app = loadapp(
-        'config:{}'.format(config_file_name),
-        relative_to=os.getcwd(),
-        global_conf={
-            'disable_daemons': 'true',
-        }
-    )
-    test_app = TestApp(wsgi_app)
-
-    # Make available the tg.request and other global variables
-    tresponse = test_app.get('/_test_vars')
