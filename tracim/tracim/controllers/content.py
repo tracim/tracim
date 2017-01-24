@@ -155,6 +155,10 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         return tg.url('/workspaces/{}/folders/{}')
 
     @property
+    def _err_url(self):
+        return tg.url('/dashboard/workspaces/{}/folders/{}/file/{}')
+
+    @property
     def _item_type(self):
         return ContentType.File
 
