@@ -109,6 +109,20 @@ body { overflow:auto; }
 }
 """
 
+_LABELS = {
+    'archiving': 'Item archived',
+    'content-comment': 'Item commented',
+    'creation': 'Item created',
+    'deletion': 'Item deleted',
+    'edition': 'item modified',
+    'revision': 'New revision',
+    'status-update': 'New status',
+    'unarchiving': 'Item unarchived',
+    'undeletion': 'Item undeleted',
+    'move': 'Item moved',
+    'comment': 'Comment'
+}
+
 
 def create_readable_date(created, delta_from_datetime: datetime = None):
     if not delta_from_datetime:
@@ -139,19 +153,6 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
     for event in hist:
         if isinstance(event, VirtualEvent):
             date = event.create_readable_date()
-            _LABELS = {
-                'archiving': 'Item archived',
-                'content-comment': 'Item commented',
-                'creation': 'Item created',
-                'deletion': 'Item deleted',
-                'edition': 'item modified',
-                'revision': 'New revision',
-                'status-update': 'New status',
-                'unarchiving': 'Item unarchived',
-                'undeletion': 'Item undeleted',
-                'move': 'Item moved'
-            }
-
             label = _LABELS[event.type.id]
 
             histHTML += '''
@@ -265,20 +266,6 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                     participants[t.owner.display_name][0] += 1
             else:
                 if isinstance(t, VirtualEvent) and t.type.id != 'comment':
-                    _LABELS = {
-                        'archiving': 'Item archived',
-                        'content-comment': 'Item commented',
-                        'creation': 'Item created',
-                        'deletion': 'Item deleted',
-                        'edition': 'item modified',
-                        'revision': 'New revision',
-                        'status-update': 'New status',
-                        'unarchiving': 'Item unarchived',
-                        'undeletion': 'Item undeleted',
-                        'move': 'Item moved',
-                        'comment' : 'hmmm'
-                    }
-
                     label = _LABELS[t.type.id]
 
                     disc += '''
