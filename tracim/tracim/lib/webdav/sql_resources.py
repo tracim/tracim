@@ -1,4 +1,6 @@
 # coding: utf8
+import logging
+
 import os
 
 import transaction
@@ -26,6 +28,9 @@ from wsgidav.dav_provider import _DAVResource
 from tracim.lib.webdav.utils import normpath
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
+logger = logging.getLogger()
+
 
 class ManageActions(object):
     """
@@ -474,14 +479,22 @@ class Folder(Workspace):
         for content in visible_children:
             content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
-            if content.type == ContentType.Folder:
-                members.append(Folder(content_path, self.environ, self.workspace, content))
-            elif content.type == ContentType.File:
-                self._file_count += 1
-                members.append(File(content_path, self.environ, content))
-            else:
-                self._file_count += 1
-                members.append(OtherFile(content_path, self.environ, content))
+            try:
+                if content.type == ContentType.Folder:
+                    members.append(Folder(content_path, self.environ, self.workspace, content))
+                elif content.type == ContentType.File:
+                    self._file_count += 1
+                    members.append(File(content_path, self.environ, content))
+                else:
+                    self._file_count += 1
+                    members.append(OtherFile(content_path, self.environ, content))
+            except Exception as exc:
+                logger.exception(
+                    'Unable to construct member {}'.format(
+                        content_path,
+                    ),
+                    exc_info=True,
+                )
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
