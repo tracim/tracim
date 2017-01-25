@@ -2,6 +2,7 @@
 import io
 from nose.tools import eq_
 from nose.tools import ok_
+from tracim.lib.notifications import DummyNotifier
 from tracim.lib.webdav.sql_dav_provider import Provider
 from tracim.lib.webdav.sql_resources import Root
 from tracim.model import Content
@@ -449,4 +450,56 @@ class TestWebDav(TestStandard):
             msg='file should be moved in w1f2 but is in {0}'.format(
                 content_w1f1d1.parent.label
             )
+        )
+
+    def test_unit__update_content__ok(self):
+        provider = self._get_provider()
+        environ = self._get_environ(
+            provider,
+            'bob@fsf.local',
+        )
+        result = provider.getResourceInst(
+            '/w1/w1f1/new_file.txt',
+            environ,
+        )
+
+        eq_(None, result, msg='Result should be None instead {0}'.format(
+            result
+        ))
+
+        result = self._put_new_text_file(
+            provider,
+            environ,
+            '/w1/w1f1/new_file.txt',
+            b'hello\n',
+        )
+
+        ok_(result, msg='Result should not be None instead {0}'.format(
+            result
+        ))
+        eq_(
+            b'hello\n',
+            result.content.file_content,
+            msg='fiel content should be "hello\n" but it is {0}'.format(
+                result.content.file_content
+            )
+        )
+
+        # ReInit DummyNotifier counter
+        DummyNotifier.send_count = 0
+
+        # Update file content
+        write_object = result.beginWrite(
+            contentType='application/octet-stream',
+        )
+        write_object.write(b'An other line')
+        write_object.close()
+        result.endWrite(withErrors=False)
+
+        eq_(
+            0,
+            DummyNotifier.send_count,
+            msg='DummyNotifier should send 1 mail, not {}'.format(
+                DummyNotifier.send_count
+            ),
         )

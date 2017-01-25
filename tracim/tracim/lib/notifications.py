@@ -51,10 +51,13 @@ class NotifierFactory(object):
 
 
 class DummyNotifier(INotifier):
+    send_count = 0
+
     def __init__(self, current_user: User=None):
         logger.info(self, 'Instantiating Dummy Notifier')
 
     def notify_content_update(self, content: Content):
+        type(self).send_count += 1
         logger.info(self, 'Fake notifier, do not send email-notification for update of content {}'.format(content.content_id))
 
 
