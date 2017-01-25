@@ -15,7 +15,7 @@ from datetime import datetime
 import time
 from hashlib import sha256
 from sqlalchemy.ext.hybrid import hybrid_property
-from tg.i18n import lazy_ugettext as l_
+from tracim.lib.utils import lazy_ugettext as l_
 from hashlib import md5
 
 __all__ = ['User', 'Group', 'Permission']

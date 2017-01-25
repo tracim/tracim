@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import cherrypy
+import os
+
 import types
 
 from bs4 import BeautifulSoup
@@ -10,8 +13,7 @@ import tg
 from tg.i18n import ugettext as _
 from tg.util import LazyString
 from tracim.lib.base import logger
-from tracim.lib.user import UserStaticApi
-from tracim.lib.utils import exec_time_monitor
+from tracim.lib.user import CurrentUserGetterApi
 from tracim.model.auth import Profile
 from tracim.model.auth import User
 from tracim.model.data import BreadcrumbItem, ActionDescription
@@ -154,12 +156,17 @@ class Context(object):
         self.context_string = context_string
         self._current_user = current_user  # Allow to define the current user if any
         if not current_user:
-            self._current_user = UserStaticApi.get_current_user()
+            self._current_user = CurrentUserGetterApi.get_current_user()
 
         self._base_url = base_url # real root url like http://mydomain.com:8080
 
     def url(self, base_url='/', params=None, qualified=False) -> str:
-        url = tg.url(base_url, params)
+        # HACK (REF WSGIDAV.CONTEXT.TG.URL) This is a temporary hack who
+        # permit to know we are in WSGIDAV context.
+        if not hasattr(cherrypy.request, 'current_user_email'):
+            url = tg.url(base_url, params)
+        else:
+            url = base_url
 
         if self._base_url:
             url = '{}{}'.format(self._base_url, url)

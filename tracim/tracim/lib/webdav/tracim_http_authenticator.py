@@ -1,6 +1,12 @@
+import os
+import re
+
 from wsgidav.http_authenticator import HTTPAuthenticator
 from wsgidav import util
-import re
+import cherrypy
+
+from tracim.lib.user import CurrentUserGetterApi
+from tracim.lib.user import CURRENT_USER_WSGIDAV
 
 _logger = util.getModuleLogger(__name__, True)
 HOTFIX_WINXP_AcceptRootShareLogin = True
@@ -131,6 +137,11 @@ class TracimHTTPAuthenticator(HTTPAuthenticator):
 
         environ["http_authenticator.realm"] = realmname
         environ["http_authenticator.username"] = req_username
+
+        # Set request current user email to be able to recognise him later
+        cherrypy.request.current_user_email = req_username
+        CurrentUserGetterApi.set_thread_local_getter(CURRENT_USER_WSGIDAV)
+
         return self._application(environ, start_response)
 
     def tracim_compute_digest_response(self, left_digest_response_hash, method, uri, nonce, cnonce, qop, nc):

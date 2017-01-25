@@ -8,7 +8,6 @@ from datetime import datetime
 import tg
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
-from slugify import slugify
 from sqlalchemy import Column, inspect, Index
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
@@ -25,8 +24,8 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import LargeBinary
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
-from tg.i18n import lazy_ugettext as l_, ugettext as _
 
+from tracim.lib.utils import lazy_ugettext as l_
 from tracim.lib.exception import ContentRevisionUpdateError
 from tracim.model import DeclarativeBase, RevisionsIntegrity
 from tracim.model.auth import User

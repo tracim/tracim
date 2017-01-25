@@ -3,7 +3,7 @@
 from tg import abort
 from tg import request
 from tg import tmpl_context
-from tg.i18n import lazy_ugettext as l_
+from tracim.lib.utils import lazy_ugettext as l_
 from tg.i18n import ugettext as _
 from tg.predicates import Predicate
 

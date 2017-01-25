@@ -9,6 +9,10 @@ from tg import response
 from tg.controllers.util import abort
 from tg.appwrappers.errorpage import ErrorPageApplicationWrapper \
     as BaseErrorPageApplicationWrapper
+from tg.i18n import ugettext
+from tg.support.registry import StackedObjectProxy
+from tg.util import LazyString as BaseLazyString
+from tg.util import lazify
 
 from tracim.lib.base import logger
 from webob import Response
@@ -145,3 +149,25 @@ def str_as_bool(string: str) -> bool:
     if string == '0':
         return False
     return bool(string)
+
+
+class LazyString(BaseLazyString):
+    pass
+
+
+def _lazy_ugettext(text: str):
+    """
+    This function test if application context is available
+    :param text: String to traduce
+    :return: lazyfied string or string
+    """
+    try:
+        # Test if context is available,
+        # cf. https://github.com/tracim/tracim/issues/173
+        context = StackedObjectProxy(name="context")
+        context.translator
+        return ugettext(text)
+    except TypeError:
+        return text
+
+lazy_ugettext = lazify(_lazy_ugettext)

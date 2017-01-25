@@ -25,7 +25,7 @@ from tgext.asyncjob.trackers.redisdb import RedisProgressTracker
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
 
-from tg.i18n import lazy_ugettext as l_
+from tracim.lib.utils import lazy_ugettext as l_
 
 import tracim
 from tracim import model

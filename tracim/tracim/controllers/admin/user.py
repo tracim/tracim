@@ -11,7 +11,7 @@ from tw2 import forms as tw2f
 import tg
 from tg import predicates
 from tg import tmpl_context
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tg.i18n import ugettext as _
 
 from sprox.widgets import PropertyMultipleSelectField
 from sprox._compat import unicode_text
@@ -28,7 +28,6 @@ from tracim.lib.base import logger
 from tracim.lib.email import get_email_manager
 from tracim.lib.user import UserApi
 from tracim.lib.group import GroupApi
-from tracim.lib.user import UserStaticApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
 

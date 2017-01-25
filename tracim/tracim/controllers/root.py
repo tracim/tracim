@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import tg
 from tg import expose
 from tg import flash
 from tg import lurl
@@ -15,7 +15,7 @@ from tracim.controllers.api import APIController
 
 from tracim.lib import CST
 from tracim.lib.base import logger
-from tracim.lib.user import UserStaticApi
+from tracim.lib.user import CurrentUserGetterApi
 from tracim.lib.content import ContentApi
 
 from tracim.controllers import StandardController
@@ -115,7 +115,7 @@ class RootController(StandardController):
             redirect(url('/login'),
                 params=dict(came_from=came_from, __logins=login_counter))
 
-        user = UserStaticApi.get_current_user()
+        user = CurrentUserGetterApi.get_current_user()
 
         flash(_('Welcome back, %s!') % user.get_display_name())
         redirect(came_from)

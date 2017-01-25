@@ -3,7 +3,7 @@
 from markupsafe import escape_silent as escape
 
 import tg
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tracim.lib.utils import lazy_ugettext as l_
 from tg.flash import TGFlash
 
 """The application's Globals object"""

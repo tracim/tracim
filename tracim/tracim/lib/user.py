@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-import transaction
+import threading
 
+import cherrypy
+import transaction
 import tg
+import typing as typing
 
 from tracim.model.auth import User
-
-from tracim.model import auth as pbma
 from tracim.model import DBSession
 
-__author__ = 'damien'
+CURRENT_USER_WEB = 'WEB'
+CURRENT_USER_WSGIDAV = 'WSGIDAV'
 
 
 class UserApi(object):
@@ -103,25 +105,61 @@ class UserApi(object):
         )
 
 
-class UserStaticApi(object):
+class CurrentUserGetterInterface(object):
+    def get_current_user(self) -> typing.Union[None, User]:
+        raise NotImplementedError()
 
-    @classmethod
-    def get_current_user(cls) -> User:
+
+class BaseCurrentUserGetter(CurrentUserGetterInterface):
+    def __init__(self) -> None:
+        self.api = UserApi(None)
+
+
+class WebCurrentUserGetter(BaseCurrentUserGetter):
+    def get_current_user(self) -> typing.Union[None, User]:
         # HACK - D.A. - 2015-09-02
         # In tests, the tg.request.identity may not be set
         # (this is a buggy case, but for now this is how the software is;)
-        if tg.request != None:
+        if tg.request is not None:
             if hasattr(tg.request, 'identity'):
-                if tg.request.identity != None:
-                    return cls._get_user(tg.request.identity['repoze.who.userid'])
+                if tg.request.identity is not None:
+                    return self.api.get_one_by_email(
+                        tg.request.identity['repoze.who.userid'],
+                    )
 
         return None
 
+
+class WsgidavCurrentUserGetter(BaseCurrentUserGetter):
+    def get_current_user(self) -> typing.Union[None, User]:
+        if hasattr(cherrypy.request, 'current_user_email'):
+            return self.api.get_one_by_email(
+                cherrypy.request.current_user_email,
+            )
+
+        return None
+
+
+class CurrentUserGetterApi(object):
+    thread_local = threading.local()
+    matches = {
+        CURRENT_USER_WEB: WebCurrentUserGetter,
+        CURRENT_USER_WSGIDAV: WsgidavCurrentUserGetter,
+    }
+    default = CURRENT_USER_WEB
+
     @classmethod
-    def _get_user(cls, email) -> User:
-        """
-        Do not use directly in your code.
-        :param email:
-        :return:
-        """
-        return pbma.User.by_email_address(email)
+    def get_current_user(cls) -> User:
+        try:
+            return cls.thread_local.getter.get_current_user()
+        except AttributeError:
+            return cls.factory(cls.default).get_current_user()
+
+    @classmethod
+    def set_thread_local_getter(cls, name) -> None:
+        if not hasattr(cls.thread_local, 'getter'):
+            cls.thread_local.getter = cls.factory(name)
+
+    @classmethod
+    def factory(cls, name: str) -> CurrentUserGetterInterface:
+        return cls.matches[name]()

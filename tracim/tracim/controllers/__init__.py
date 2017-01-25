@@ -4,6 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tg import abort
 from tracim.lib.integrity import PathValidationManager
 from tracim.lib.integrity import render_invalid_integrity_chosen_path
+from tracim.lib.user import CurrentUserGetterApi
 from tracim.lib.workspace import WorkspaceApi
 
 import tg
@@ -28,7 +29,6 @@ from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 
 from tracim.lib.content import ContentApi
-from tracim.lib.user import UserStaticApi
 from tracim.lib.utils import SameValueError
 
 from tracim.model.serializers import Context
@@ -38,7 +38,7 @@ class TIMRestPathContextSetup(object):
 
     @classmethod
     def current_user(cls) -> User:
-        user = UserStaticApi.get_current_user()
+        user = CurrentUserGetterApi.get_current_user()
         tmpl_context.current_user_id = user.user_id if user else None
         tmpl_context.current_user = user if user else None
         return user

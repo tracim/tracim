@@ -8,15 +8,12 @@ from lxml.html.diff import htmldiff
 
 from mako.template import Template
 
-from tg.i18n import lazy_ugettext as l_
-from tg.i18n import ugettext as _
-
 from tracim.lib.base import logger
 from tracim.lib.email import SmtpConfiguration
 from tracim.lib.email import EmailSender
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import WorkspaceApi
-
+from tracim.lib.utils import lazy_ugettext as l_
 from tracim.model.serializers import Context
 from tracim.model.serializers import CTX
 from tracim.model.serializers import DictLikeClass
@@ -319,72 +316,72 @@ class EmailNotifier(object):
 
         action = content.get_last_action().id
         if ActionDescription.COMMENT == action:
-            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
+            content_intro = l_('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
             content_text = content.description
-            call_to_action_text = _('Answer')
+            call_to_action_text = l_('Answer')
 
         elif ActionDescription.CREATION == action:
 
             # Default values (if not overriden)
             content_text = content.description
-            call_to_action_text = _('View online')
+            call_to_action_text = l_('View online')
 
             if ContentType.Thread == content.type:
-                call_to_action_text = _('Answer')
-                content_intro = _('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
+                call_to_action_text = l_('Answer')
+                content_intro = l_('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + \
                                content.get_last_comment_from(actor).description
 
             elif ContentType.File == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
                 if content.description:
                     content_text = content.description
                 else:
                     content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
             elif ContentType.Page == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
                 content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
         elif ActionDescription.REVISION == action:
             content_text = content.description
-            call_to_action_text = _('View online')
+            call_to_action_text = l_('View online')
 
             if ContentType.File == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
                 content_text = ''
 
             elif ContentType.Page == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                content_text = l_('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
                     title_diff + \
                     htmldiff(previous_revision.description, content.description)
 
             elif ContentType.Thread == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                content_text = l_('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
                     title_diff + \
                     htmldiff(previous_revision.description, content.description)
 
             # elif ContentType.Thread == content.type:
-            #     content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+            #     content_intro = l_('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
             #     previous_revision = content.get_previous_revision()
-            #     content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+            #     content_text = l_('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
             #         htmldiff(previous_revision.description, content.description)
 
         elif ActionDescription.EDITION == action:
-            call_to_action_text = _('View online')
+            call_to_action_text = l_('View online')
 
             if ContentType.File == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
                     content.description
 
@@ -404,7 +401,7 @@ class EmailNotifier(object):
         from tracim.config.app_cfg import CFG
         body_content = template.render(
             base_url=self._global_config.WEBSITE_BASE_URL,
-            _=_,
+            _=l_,
             h=helpers,
             user_display_name=role.user.display_name,
             user_role_label=role.role_as_label(),
