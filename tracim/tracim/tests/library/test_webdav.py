@@ -56,7 +56,7 @@ class TestWebDav(TestStandard):
         write_object = new_resource.beginWrite(
             contentType='application/octet-stream',
         )
-        write_object.write(b'hello\n')
+        write_object.write(file_content)
         write_object.close()
         new_resource.endWrite(withErrors=False)
 
