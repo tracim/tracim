@@ -294,6 +294,9 @@ class CFG(object):
         # Ensure finished by '/'
         if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[-1]:
             self.RADICALE_CLIENT_BASE_URL_PREFIX += '/'
+        if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[0]:
+            self.RADICALE_CLIENT_BASE_URL_PREFIX \
+                = '/' + self.RADICALE_CLIENT_BASE_URL_PREFIX
 
         if not self.RADICALE_CLIENT_BASE_URL_HOST:
             logger.warning(
