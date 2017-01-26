@@ -497,7 +497,7 @@ class TestWebDav(TestStandard):
         result.endWrite(withErrors=False)
 
         eq_(
-            0,
+            1,
             DummyNotifier.send_count,
             msg='DummyNotifier should send 1 mail, not {}'.format(
                 DummyNotifier.send_count
