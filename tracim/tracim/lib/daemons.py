@@ -1,20 +1,19 @@
+import logging
 import threading
 from configparser import DuplicateSectionError
-from datetime import datetime
 from wsgiref.simple_server import make_server
 import signal
 
 import collections
-import time
-
-import io
-import yaml
 
 from radicale import Application as RadicaleApplication
 from radicale import HTTPServer as BaseRadicaleHTTPServer
 from radicale import HTTPSServer as BaseRadicaleHTTPSServer
 from radicale import RequestHandler as RadicaleRequestHandler
 from radicale import config as radicale_config
+from rq import Connection as RQConnection
+from rq import Worker as BaseRQWorker
+from redis import Redis
 
 from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
@@ -146,6 +145,43 @@ class Daemon(threading.Thread):
         :param callback: callback to execute in your thread.
         """
         raise NotImplementedError()
+
+
+class MailSenderDaemon(Daemon):
+    # NOTE: use *args and **kwargs because parent __init__ use strange
+    # * parameter
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.worker = None  # type: RQWorker
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        logger.warning('MailSenderDaemon not implement append_thread_callback')
+        pass
+
+    def stop(self) -> None:
+        self.worker.request_stop('TRACIM STOP', None)
+
+    def run(self) -> None:
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        with RQConnection(Redis(
+            host=cfg.EMAIL_SENDER_REDIS_HOST,
+            port=cfg.EMAIL_SENDER_REDIS_PORT,
+            db=cfg.EMAIL_SENDER_REDIS_DB,
+        )):
+            self.worker = RQWorker(['mail_sender'])
+            self.worker.work()
+
+
+class RQWorker(BaseRQWorker):
+    def _install_signal_handlers(self):
+        # TODO BS 20170126: RQ WWorker is designed to work in main thread
+        # So we have to disable these signals (we implement server stop in
+        # MailSenderDaemon.stop method). When bug
+        # https://github.com/tracim/tracim/issues/166 will be fixed, ensure
+        # This worker terminate correctly.
+        pass
 
 
 class RadicaleHTTPSServer(TracimSocketServerMixin, BaseRadicaleHTTPSServer):

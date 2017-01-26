@@ -10,6 +10,7 @@ from mako.template import Template
 
 from tracim.lib.base import logger
 from tracim.lib.email import SmtpConfiguration
+from tracim.lib.email import send_email_through
 from tracim.lib.email import EmailSender
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import WorkspaceApi
@@ -22,8 +23,6 @@ from tracim.model.data import Content, UserRoleInWorkspace, ContentType, \
     ActionDescription
 from tracim.model.auth import User
 
-
-from tgext.asyncjob import asyncjob_perform
 
 class INotifier(object):
     """
@@ -142,7 +141,6 @@ class RealNotifier(object):
                 # TODO - D.A - 2014-11-06
                 # This feature must be implemented in order to be able to scale to large communities
                 raise NotImplementedError('Sending emails through ASYNC mode is not working yet')
-                asyncjob_perform(EmailNotifier(self._smtp_config, global_config).notify_content_update, self._user.user_id, content.content_id)
             else:
                 logger.info(self, 'Sending email in SYNC mode')
                 EmailNotifier(self._smtp_config, global_config).notify_content_update(self._user.user_id, content.content_id)
@@ -278,19 +276,7 @@ class EmailNotifier(object):
             message.attach(part1)
             message.attach(part2)
 
-            message_str = message.as_string()
-            # asyncjob_perform(async_email_sender.send_mail, message)
-            # FIXME: Temporary hack to enable email sending in
-            # uwsgi/prod environment
-            async_email_sender.send_mail(message)
-            # s.send_message(message)
-
-        # Note: The following action allow to close the SMTP connection.
-        # This will work only if the async jobs are done in the right order
-        # FIXME: Temporary hack to enable email sending in
-        # uwsgi/prod environment
-        # asyncjob_perform(async_email_sender.disconnect)
-
+            send_email_through(async_email_sender.send_mail, message)
 
     def _build_email_body(self, mako_template_filepath: str, role: UserRoleInWorkspace, content: Content, actor: User) -> str:
         """
@@ -360,7 +346,7 @@ class EmailNotifier(object):
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = l_('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                content_text = str(l_('<p id="content-body-intro">Here is an overview of the changes:</p>'))+ \
                     title_diff + \
                     htmldiff(previous_revision.description, content.description)
 
@@ -370,7 +356,7 @@ class EmailNotifier(object):
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = l_('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                content_text = str(l_('<p id="content-body-intro">Here is an overview of the changes:</p>'))+ \
                     title_diff + \
                     htmldiff(previous_revision.description, content.description)
 

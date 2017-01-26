@@ -1,15 +1,48 @@
 # -*- coding: utf-8 -*-
-
-from email.mime.multipart import MIMEMultipart
 import smtplib
+from email.message import Message
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import typing
 from mako.template import Template
-from tgext.asyncjob import asyncjob_perform
+from redis import Redis
+from rq import Queue
 from tg.i18n import ugettext as _
 
 from tracim.lib.base import logger
 from tracim.model import User
+
+
+def send_email_through(
+        send_callable: typing.Callable[[Message], None],
+        message: Message,
+) -> None:
+    """
+    Send mail encapsulation to send it in async or sync mode.
+    TODO BS 20170126: A global mail/sender management should be a good
+                      thing. Actually, this method is an fast solution.
+    :param send_callable: A callable who get message on first parameter
+    :param message: The message who have to be sent
+    """
+    from tracim.config.app_cfg import CFG
+    cfg = CFG.get_instance()
+
+    if cfg.EMAIL_PROCESSING_MODE == CFG.CST.SYNC:
+        send_callable(message)
+    elif cfg.EMAIL_PROCESSING_MODE == CFG.CST.ASYNC:
+        queue = Queue('mail_sender', connection=Redis(
+            host=cfg.EMAIL_SENDER_REDIS_HOST,
+            port=cfg.EMAIL_SENDER_REDIS_PORT,
+            db=cfg.EMAIL_SENDER_REDIS_DB,
+        ))
+        queue.enqueue(send_callable, message)
+    else:
+        raise NotImplementedError(
+            'Mail sender processing mode {} is not implemented'.format(
+                cfg.EMAIL_PROCESSING_MODE,
+            )
+        )
 
 
 class SmtpConfiguration(object):
@@ -139,11 +172,7 @@ class EmailManager(object):
         message.attach(part1)
         message.attach(part2)
 
-        asyncjob_perform(async_email_sender.send_mail, message)
-
-        # Note: The following action allow to close the SMTP connection.
-        # This will work only if the async jobs are done in the right order
-        asyncjob_perform(async_email_sender.disconnect)
+        send_email_through(async_email_sender.send_mail, message)
 
     def _render(self, mako_template_filepath: str, context: dict):
         """

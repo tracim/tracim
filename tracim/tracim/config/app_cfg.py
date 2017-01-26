@@ -19,8 +19,6 @@ from urllib.parse import urlparse
 import tg
 from paste.deploy.converters import asbool
 from tg.configuration.milestones import environment_loaded
-from tgext.asyncjob.trackers.memory import MemoryProgressTracker
-from tgext.asyncjob.trackers.redisdb import RedisProgressTracker
 
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
@@ -30,10 +28,9 @@ from tracim.lib.utils import lazy_ugettext as l_
 import tracim
 from tracim import model
 from tracim.config import TracimAppConfig
-from tracim.lib import app_globals, helpers
-from tracim.lib.auth.wrapper import AuthConfigWrapper
 from tracim.lib.base import logger
 from tracim.lib.daemons import DaemonsManager
+from tracim.lib.daemons import MailSenderDaemon
 from tracim.lib.daemons import RadicaleDaemon
 from tracim.lib.daemons import WsgiDavDaemon
 from tracim.model.data import ActionDescription
@@ -106,6 +103,7 @@ def start_daemons(manager: DaemonsManager):
 
     manager.run('radicale', RadicaleDaemon)
     manager.run('webdav', WsgiDavDaemon)
+    manager.run('mail_sender', MailSenderDaemon)
 
 environment_loaded.register(lambda: start_daemons(daemons))
 
@@ -341,32 +339,36 @@ class CFG(object):
         if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
             self.WSGIDAV_CLIENT_BASE_URL += '/'
 
-        self.ASYNC_JOB_TRACKER = tg.config.get(
-            'asyncjob.tracker',
-            'memory',
-        )
+        self.EMAIL_PROCESSING_MODE = tg.config.get(
+            'email.processing_mode',
+            'sync',
+        ).upper()
 
-        if self.ASYNC_JOB_TRACKER not in ('memory', 'redis'):
+        if self.EMAIL_PROCESSING_MODE not in (
+                self.CST.ASYNC,
+                self.CST.SYNC,
+        ):
             raise Exception(
-                'asyncjob.tracker configuration '
-                'can ''be "memory" or "redis", not "{0}"'.format(
-                    self.ASYNC_JOB_TRACKER,
+                'email.processing_mode '
+                'can ''be "{}" or "{}", not "{}"'.format(
+                    self.CST.ASYNC,
+                    self.CST.SYNC,
+                    self.EMAIL_PROCESSING_MODE,
                 )
             )
 
-        if self.ASYNC_JOB_TRACKER == 'redis':
-            self.ASYNC_JOB_TRACKER_REDIS_HOST = tg.config.get(
-                'asyncjob.tracker.redis.host',
-                'localhost',
-            )
-            self.ASYNC_JOB_TRACKER_REDIS_PORT = int(tg.config.get(
-                'asyncjob.tracker.redis.port',
-                6379,
-            ))
-            self.ASYNC_JOB_TRACKER_REDIS_DB = int(tg.config.get(
-                'asyncjob.tracker.redis.db',
-                15,
-            ))
+        self.EMAIL_SENDER_REDIS_HOST = tg.config.get(
+            'email.async.redis.host',
+            'localhost',
+        )
+        self.EMAIL_SENDER_REDIS_PORT = int(tg.config.get(
+            'email.async.redis.port',
+            6379,
+        ))
+        self.EMAIL_SENDER_REDIS_DB = int(tg.config.get(
+            'email.async.redis.db',
+            0,
+        ))
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
@@ -408,30 +410,3 @@ class CFG(object):
 base_config.variable_provider = lambda: {
     'CFG': CFG.get_instance()
 }
-
-
-def plug_asyncjob():
-    cfg = CFG.get_instance()
-
-    # # Manual creation of async job tracker to be able to log it
-    async_job_tracker = cfg.ASYNC_JOB_TRACKER
-    if async_job_tracker == 'redis':
-        async_job_progress_tracker = RedisProgressTracker(
-            host=cfg.ASYNC_JOB_TRACKER_REDIS_HOST,
-            port=cfg.ASYNC_JOB_TRACKER_REDIS_PORT,
-            db=cfg.ASYNC_JOB_TRACKER_REDIS_DB,
-        )
-    else:
-        async_job_progress_tracker = MemoryProgressTracker()
-
-    logger.info(
-        cfg,
-        'Async job track using {0}'.format(str(async_job_progress_tracker)),
-    )
-    plug(
-        base_config,
-        'tgext.asyncjob',
-        progress_tracker=async_job_progress_tracker,
-    )
-
-environment_loaded.register(lambda: plug_asyncjob())
