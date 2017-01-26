@@ -286,22 +286,28 @@ class CFG(object):
             'Tracim Calendar - Password Required',
         )
 
-        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
-            tg.config.get('radicale.client.base_url', None)
+        self.RADICALE_CLIENT_BASE_URL_HOST = \
+            tg.config.get('radicale.client.base_url.host', None)
 
-        if not self.RADICALE_CLIENT_BASE_URL_TEMPLATE:
-            self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
-                'http://{0}:{1}'.format(
-                    self.WEBSITE_SERVER_NAME,
-                    self.RADICALE_SERVER_PORT,
-                )
+        self.RADICALE_CLIENT_BASE_URL_PREFIX = \
+            tg.config.get('radicale.client.base_url.prefix', '/')
+        # Ensure finished by '/'
+        if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[-1]:
+            self.RADICALE_CLIENT_BASE_URL_PREFIX += '/'
+
+        if not self.RADICALE_CLIENT_BASE_URL_HOST:
             logger.warning(
                 self,
-                'NOTE: Generated radicale.client.base_url parameter with '
-                'followings parameters: website.server_name, '
-                'radicale.server.port -> {0}'
-                .format(self.RADICALE_CLIENT_BASE_URL_TEMPLATE)
+                'Generated radicale.client.base_url.host parameter with '
+                'followings parameters: website.server_name -> {}'
+                .format(self.RADICALE_CLIENT_BASE_URL_HOST)
             )
+            self.RADICALE_CLIENT_BASE_URL_HOST = self.RADICALE_SERVER_PORT
+
+        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = '{}{}'.format(
+            self.RADICALE_CLIENT_BASE_URL_HOST,
+            self.RADICALE_CLIENT_BASE_URL_PREFIX,
+        )
 
         self.USER_AUTH_TOKEN_VALIDITY = int(tg.config.get(
             'user.auth_token.validity',

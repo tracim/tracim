@@ -209,7 +209,9 @@ email.processing_mode = sync
 # radicale.server.realm_message = Tracim Calendar - Password Required
 ## url can be extended like http://127.0.0.1:5232/calendar
 ## in this case, you have to create your own proxy behind this url.
-# radicale.client.base_url = http://127.0.0.1:5232
+## and update following parameters
+# radicale.client.base_url.host = http://127.0.0.1:5232
+# radicale.client.base_url.prefix = /
 
 ## WSGIDAV
 wsgidav.config_path = wsgidav.conf

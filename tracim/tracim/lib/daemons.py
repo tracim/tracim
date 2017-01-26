@@ -1,4 +1,3 @@
-import logging
 import threading
 from configparser import DuplicateSectionError
 from wsgiref.simple_server import make_server
@@ -231,6 +230,11 @@ class RadicaleDaemon(Daemon):
         radicale_config.set('storage', 'filesystem_folder', fs_path)
 
         radicale_config.set('server', 'realm', realm_message)
+        radicale_config.set(
+            'server',
+            'base_prefix',
+            cfg.RADICALE_CLIENT_BASE_URL_PREFIX,
+        )
 
         try:
             radicale_config.add_section('headers')
