@@ -303,9 +303,9 @@ class CFG(object):
                 self,
                 'Generated radicale.client.base_url.host parameter with '
                 'followings parameters: website.server_name -> {}'
-                .format(self.RADICALE_CLIENT_BASE_URL_HOST)
+                .format(self.WEBSITE_SERVER_NAME)
             )
-            self.RADICALE_CLIENT_BASE_URL_HOST = self.RADICALE_SERVER_PORT
+            self.RADICALE_CLIENT_BASE_URL_HOST = self.WEBSITE_SERVER_NAME
 
         self.RADICALE_CLIENT_BASE_URL_TEMPLATE = '{}{}'.format(
             self.RADICALE_CLIENT_BASE_URL_HOST,
