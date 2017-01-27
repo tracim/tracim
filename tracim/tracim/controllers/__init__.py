@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 """Controllers for the tracim application."""
+from sqlalchemy.orm.exc import NoResultFound
+from tg import abort
+from tracim.lib.integrity import PathValidationManager
+from tracim.lib.integrity import render_invalid_integrity_chosen_path
+from tracim.lib.user import CurrentUserGetterApi
 from tracim.lib.workspace import WorkspaceApi
 
 import tg
@@ -24,7 +29,6 @@ from tracim.model.data import ContentType
 from tracim.model.data import Workspace
 
 from tracim.lib.content import ContentApi
-from tracim.lib.user import UserStaticApi
 from tracim.lib.utils import SameValueError
 
 from tracim.model.serializers import Context
@@ -34,7 +38,7 @@ class TIMRestPathContextSetup(object):
 
     @classmethod
     def current_user(cls) -> User:
-        user = UserStaticApi.get_current_user()
+        user = CurrentUserGetterApi.get_current_user()
         tmpl_context.current_user_id = user.user_id if user else None
         tmpl_context.current_user = user if user else None
         return user
@@ -69,7 +73,11 @@ class TIMRestPathContextSetup(object):
 
     @classmethod
     def current_folder(cls) -> Content:
-        content_api = ContentApi(tg.tmpl_context.current_user)
+        content_api = ContentApi(
+            tg.tmpl_context.current_user,
+            show_archived=True,
+            show_deleted=True,
+        )
         folder_id = int(tg.request.controller_state.routing_args.get('folder_id'))
         folder = content_api.get_one(folder_id, ContentType.Folder, tg.tmpl_context.workspace)
 
@@ -120,6 +128,12 @@ class TIMRestController(RestController, BaseController):
     TEMPLATE_NEW = 'unknown "template new"'
     TEMPLATE_EDIT = 'unknown "template edit"'
 
+    def __init__(self):
+        super().__init__()
+        self._path_validation = PathValidationManager(
+            is_case_sensitive=False,
+        )
+
     def _before(self, *args, **kw):
         """
         Instantiate the current workspace in tg.tmpl_context
@@ -139,7 +153,11 @@ class TIMRestControllerWithBreadcrumb(TIMRestController):
         :param item_id: an item id (item may be normal content or folder
         :return:
         """
-        return ContentApi(tmpl_context.current_user).build_breadcrumb(tmpl_context.workspace, item_id)
+        return ContentApi(
+            tmpl_context.current_user,
+            show_archived=True,
+            show_deleted=True,
+        ).build_breadcrumb(tmpl_context.workspace, item_id)
 
     def _struct_new_serialized(self, workspace_id, parent_id):
         print('values are: ', workspace_id, parent_id)
@@ -167,10 +185,12 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
     /dashboard/workspaces/{}/folders/{}/someitems/{}
     """
     def _before(self, *args, **kw):
-        TIMRestPathContextSetup.current_user()
-        TIMRestPathContextSetup.current_workspace()
-        TIMRestPathContextSetup.current_folder()
-
+        try:
+            TIMRestPathContextSetup.current_user()
+            TIMRestPathContextSetup.current_workspace()
+            TIMRestPathContextSetup.current_folder()
+        except NoResultFound:
+            abort(404)
 
     @property
     def _std_url(self):
@@ -270,6 +290,12 @@ class TIMWorkspaceContentRestController(TIMRestControllerWithBreadcrumb):
             item = api.get_one(int(item_id), self._item_type, workspace)
             with new_revision(item):
                 api.update_content(item, label, content)
+
+                if not self._path_validation.validate_new_content(item):
+                    return render_invalid_integrity_chosen_path(
+                        item.get_label(),
+                    )
+
                 api.save(item, ActionDescription.REVISION)
 
             msg = _('{} updated').format(self._item_type_label)

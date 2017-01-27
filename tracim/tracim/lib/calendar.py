@@ -1,10 +1,14 @@
+import caldav
 import os
 
 import re
 import transaction
+from caldav.lib.error import PutError
 
 from icalendar import Event as iCalendarEvent
 from sqlalchemy.orm.exc import NoResultFound
+from tg import tmpl_context
+from tg.i18n import ugettext as _
 
 from tracim.lib.content import ContentApi
 from tracim.lib.exceptions import UnknownCalendarType
@@ -37,10 +41,22 @@ CALENDAR_WORKSPACE_BASE_URL = '/workspace/'
 
 class CalendarManager(object):
     @classmethod
-    def get_base_url(cls):
+    def get_personal_calendar_description(cls) -> str:
+        return _('My personal calendar')
+
+    @classmethod
+    def get_base_url(cls, low_level: bool=False) -> str:
+        """
+        :param low_level: If True, use local ip address with radicale port.
+        :return: Radical address base url.
+        """
         from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
-        return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE
+
+        if not low_level:
+            return cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE
+
+        return 'http://127.0.0.1:{0}'.format(cfg.RADICALE_SERVER_PORT)
 
     @classmethod
     def get_user_base_url(cls):
@@ -55,16 +71,30 @@ class CalendarManager(object):
         return os.path.join(cfg.RADICALE_CLIENT_BASE_URL_TEMPLATE, 'workspace/')
 
     @classmethod
-    def get_user_calendar_url(cls, user_id: int):
+    def get_user_calendar_url(
+            cls,
+            user_id: int,
+            low_level: bool=False,
+    ):
         user_path = CALENDAR_USER_URL_TEMPLATE.format(id=str(user_id))
-        return os.path.join(cls.get_base_url(), user_path)
+        return os.path.join(
+            cls.get_base_url(low_level=low_level),
+            user_path,
+        )
 
     @classmethod
-    def get_workspace_calendar_url(cls, workspace_id: int):
+    def get_workspace_calendar_url(
+            cls,
+            workspace_id: int,
+            low_level: bool=False,
+    ):
         workspace_path = CALENDAR_WORKSPACE_URL_TEMPLATE.format(
             id=str(workspace_id)
         )
-        return os.path.join(cls.get_base_url(), workspace_path)
+        return os.path.join(
+            cls.get_base_url(low_level=low_level),
+            workspace_path,
+        )
 
     def __init__(self, user: User):
         self._user = user
@@ -284,14 +314,24 @@ class CalendarManager(object):
     def get_workspace_readable_calendars_urls_for_user(cls, user: User)\
             -> [str]:
         calendar_urls = []
-        workspace_api = WorkspaceApi(user)
-        for workspace in workspace_api.get_all_for_user(user):
-            if workspace.calendar_enabled:
-                calendar_urls.append(cls.get_workspace_calendar_url(
-                    workspace_id=workspace.workspace_id,
-                ))
+        for workspace in cls.get_workspace_readable_calendars_for_user(user):
+            calendar_urls.append(cls.get_workspace_calendar_url(
+                workspace_id=workspace.workspace_id,
+            ))
 
         return calendar_urls
+
+    @classmethod
+    def get_workspace_readable_calendars_for_user(cls, user: User)\
+            -> ['Workspace']:
+        workspaces = []
+        workspace_api = WorkspaceApi(user)
+
+        for workspace in workspace_api.get_all():
+            if workspace.calendar_enabled:
+                workspaces.append(workspace)
+
+        return workspaces
 
     def is_discovery_path(self, path: str) -> bool:
         """
@@ -301,3 +341,53 @@ class CalendarManager(object):
         :return: True if given collection path is an discover path
         """
         return path in ('user', 'workspace')
+
+    def create_then_remove_fake_event(
+            self,
+            calendar_class,
+            related_object_id,
+    ) -> None:
+        radicale_base_url = self.get_base_url(low_level=True)
+        client = caldav.DAVClient(
+            radicale_base_url,
+            username=self._user.email,
+            password=self._user.auth_token,
+        )
+        if calendar_class == WorkspaceCalendar:
+            calendar_url = self.get_workspace_calendar_url(
+                related_object_id,
+                low_level=True,
+            )
+        elif calendar_class == UserCalendar:
+            calendar_url = self.get_user_calendar_url(
+                related_object_id,
+                low_level=True,
+            )
+        else:
+            raise Exception('Unknown calendar type {0}'.format(calendar_class))
+
+        user_calendar = caldav.Calendar(
+            parent=client,
+            client=client,
+            url=calendar_url
+        )
+
+        event_ics = """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example Corp.//CalDAV Client//EN
+BEGIN:VEVENT
+UID:{uid}
+DTSTAMP:20100510T182145Z
+DTSTART:20100512T170000Z
+DTEND:20100512T180000Z
+SUMMARY:This is an event
+LOCATION:Here
+END:VEVENT
+END:VCALENDAR
+""".format(uid='{0}FAKEEVENT'.format(related_object_id))
+        try:
+            event = user_calendar.add_event(event_ics)
+            event.delete()
+        except PutError:
+            pass  # TODO BS 20161128: Radicale is down. Record this event ?
+

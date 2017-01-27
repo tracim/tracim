@@ -3,7 +3,7 @@
 from markupsafe import escape_silent as escape
 
 import tg
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tracim.lib.utils import lazy_ugettext as l_
 from tg.flash import TGFlash
 
 """The application's Globals object"""
@@ -23,7 +23,6 @@ class Globals(object):
         pass
 
     VERSION_NUMBER = '1.0.3'
-    LONG_DATE_FORMAT = '%A, the %d of %B %Y at %H:%M'
     SHORT_DATE_FORMAT = l_('%B %d at %I:%M%p')
 
 

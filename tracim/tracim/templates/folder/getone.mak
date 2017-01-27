@@ -9,6 +9,7 @@
 <%namespace name="TABLE_ROW" file="tracim.templates.widgets.table_row"/>
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
 <%namespace name="P" file="tracim.templates.widgets.paragraph"/>
+<%namespace name="UI" file="tracim.templates.widgets.ui"/>
 
 <%def name="title()">${result.folder.label}</%def>
 
@@ -38,31 +39,50 @@
 ##
 ############################################################################
 
-<div class="row t-page-header-row">
-    <div class="col-sm-7 col-sm-offset-3 main">
-        <h1 class="page-header t-folder-color-border">
-            <i class="fa fa-fw fa-lg fa-folder-open tracim-less-visible" style="color: #CCCC00"></i>
-            ${result.folder.label}
-        </h1>
+<div class="folder-container ${'not-editable' if not result.folder.is_editable else ''} ${'archived' if result.folder.is_archived else ''} ${'deleted' if result.folder.is_deleted else ''}">
 
-        <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
-          <p>${_('folder created on {date} at {time} by <b>{author}</b>').format(date=h.date(result.folder.created), time=h.time(result.folder.created), author=result.folder.owner.name)|n}</p>
+    <div class="t-page-header-row">
+        <div class=" main">
+            <h1 class="page-header t-folder-color-border">
+                <i class="fa fa-fw fa-lg fa-folder-open tracim-less-visible" style="color: #CCCC00"></i>
+                ${result.folder.label}
+            </h1>
+
+            <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
+                <% created_localized = h.get_with_timezone(result.folder.created) %>
+              <p>${_('folder created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.folder.owner.name)|n}</p>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-sm-7 col-sm-offset-3">
+    % if (result.folder.is_archived) :
+    <div class="alert alert-info" role="alert">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            ${_('Vous consultez <b>une version archivée</b> de la page courante.')|n}
+        </p>
+    </div>
+    % elif (result.folder.is_deleted) :
+    <div class="alert alert-info" role="alert">
+        <p>
+            <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
+            ${_('Vous consultez <b>une version supprimée</b> de la page courante.')|n}
+        </p>
+    </div>
+    % endif
 
+    <div class="content__detail folder">
         <% user_role = h.user_role(fake_api.current_user, result.folder.workspace) %>
 
         <div class="t-spacer-above">
             % if user_role > 1:
                 <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-plus"></i> ${_('New ...')}
-                        <span class="caret"></span>
-                    </button>
+                    % if (not result.folder.is_archived and not result.folder.is_deleted) :
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-plus"></i> ${_('New ...')}
+                            <span class="caret"></span>
+                        </button>
+                    % endif
                     <ul class="dropdown-menu" role="menu">
                         % for content_type in result.folder.allowed_content_types:
                             % if content_type.id != 'folder' or user_role > 2:
@@ -114,16 +134,18 @@
                 % endif
             % endif
 
+            ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}/folders/{}'.format(result.folder.workspace.id, result.folder.id)))}
+
             % if len(fake_api.sub_items) <= 0:
                 ${P.EMPTY_CONTENT(_('This folder has not yet content.'))}
             % else:
-                <table class="table table-striped table-hover tablesorter" id="current-folder-content-list">
+                <table class="table table-striped table-hover tablesorter folder__content__list" id="current-folder-content-list">
                     <thead>
                         <tr>
-                            <th>${_('Type')}</th>
                             <th>${_('Title')}</th>
                             <th>${_('Status')}</th>
                             <th>${_('Notes')}</th>
+                            <th>${_('Type')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -135,43 +157,44 @@
             % endif
         </div>
     </div>
-</div>
-<script>
-    $(document).ready(function() {
-        $("#current-folder-content-list").DataTable({
-            sDom: '',
-            pageLength: -1
+    <script>
+        $(document).ready(function() {
+            $("#current-folder-content-list").DataTable({
+                sDom: '',
+                pageLength: -1
+            });
         });
-    });
 
-    $(document).ready(function() {
-        $("#toggle-file-visibility").click(function() {
-            $('.t-table-row-file').toggle();
-            $('#toggle-file-visibility').toggleClass('t-active-color');
-            $('#toggle-file-visibility').toggleClass('t-inactive-color');
+        $(document).ready(function() {
+            $("#toggle-file-visibility").click(function() {
+                $('.t-table-row-file').toggle();
+                $('#toggle-file-visibility').toggleClass('t-active-color');
+                $('#toggle-file-visibility').toggleClass('t-inactive-color');
+            });
+            $("#toggle-thread-visibility").click(function() {
+                $('.t-table-row-thread').toggle();
+                $('#toggle-thread-visibility').toggleClass('t-active-color');
+                $('#toggle-thread-visibility').toggleClass('t-inactive-color');
+            });
+            $("#toggle-folder-visibility").click(function() {
+                $('.t-table-row-folder').toggle();
+                $('#toggle-folder-visibility').toggleClass('t-active-color');
+                $('#toggle-folder-visibility').toggleClass('t-inactive-color');
+            });
+            $("#toggle-page-visibility").click(function() {
+                $('.t-table-row-page').toggle();
+                $('#toggle-page-visibility').toggleClass('t-active-color');
+                $('#toggle-page-visibility').toggleClass('t-inactive-color');
+            });
         });
-        $("#toggle-thread-visibility").click(function() {
-            $('.t-table-row-thread').toggle();
-            $('#toggle-thread-visibility').toggleClass('t-active-color');
-            $('#toggle-thread-visibility').toggleClass('t-inactive-color');
-        });
-        $("#toggle-folder-visibility").click(function() {
-            $('.t-table-row-folder').toggle();
-            $('#toggle-folder-visibility').toggleClass('t-active-color');
-            $('#toggle-folder-visibility').toggleClass('t-inactive-color');
-        });
-        $("#toggle-page-visibility").click(function() {
-            $('.t-table-row-page').toggle();
-            $('#toggle-page-visibility').toggleClass('t-active-color');
-            $('#toggle-page-visibility').toggleClass('t-inactive-color');
-        });
-    });
 
-    $(document).ready(function() {
-        $("#filtering").on('keyup click', function() {
-            $("#current-folder-content-list").DataTable().search(
-                $("#filtering").val()
-            ).draw();
+        $(document).ready(function() {
+            $("#filtering").on('keyup click', function() {
+                $("#current-folder-content-list").DataTable().search(
+                    $("#filtering").val()
+                ).draw();
+            });
         });
-    });
-</script>
+    </script>
+
+</div> <!-- end .folder-container -->

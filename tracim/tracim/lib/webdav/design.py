@@ -5,6 +5,125 @@ from tracim.model.data import VirtualEvent
 from tracim.model.data import ContentType
 from tracim.model import data
 
+# FIXME: fix temporaire ...
+style = """
+.title {
+	background:#F5F5F5;
+	padding-right:15px;
+	padding-left:15px;
+	padding-top:10px;
+	border-bottom:1px solid #CCCCCC;
+	overflow:auto;
+} .title h1 { margin-top:0; }
+
+.content {
+	padding: 15px;
+}
+
+#left{ padding:0; }
+
+#right {
+	background:#F5F5F5;
+	border-left:1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	padding-top:15px;
+}
+@media (max-width: 1200px) {
+	#right {
+		border-top:1px solid #CCCCCC;
+		border-left: none;
+		border-bottom: none;
+	}
+}
+
+body { overflow:auto; }
+
+.btn {
+	text-align: left;
+}
+
+.table tbody tr .my-align {
+	vertical-align:middle;
+}
+
+.title-icon {
+	font-size:2.5em;
+	float:left;
+	margin-right:10px;
+}
+.title.page, .title-icon.page { color:#00CC00; }
+.title.thread, .title-icon.thread { color:#428BCA; }
+
+/* ****************************** */
+.description-icon {
+	color:#999;
+	font-size:3em;
+}
+
+.description {
+	border-left: 5px solid #999;
+	padding-left: 10px;
+	margin-left: 10px;
+	margin-bottom:10px;
+}
+
+.description-text {
+	display:block;
+	overflow:hidden;
+	color:#999;
+}
+
+.comment-row:nth-child(2n) {
+	background-color:#F5F5F5;
+}
+
+.comment-row:nth-child(2n+1) {
+	background-color:#FFF;
+}
+
+.comment-icon {
+	color:#CCC;
+	font-size:3em;
+	display:inline-block;
+	margin-right: 10px;
+	float:left;
+}
+
+.comment-content {
+	display:block;
+	overflow:hidden;
+}
+
+.comment, .comment-revision {
+	padding:10px;
+	border-top: 1px solid #999;
+}
+
+.comment-revision-icon {
+	color:#777;
+	margin-right: 10px;
+}
+
+.title-text {
+	display: inline-block;
+}
+"""
+
+_LABELS = {
+    'archiving': 'Item archived',
+    'content-comment': 'Item commented',
+    'creation': 'Item created',
+    'deletion': 'Item deleted',
+    'edition': 'item modified',
+    'revision': 'New revision',
+    'status-update': 'New status',
+    'unarchiving': 'Item unarchived',
+    'undeletion': 'Item undeleted',
+    'move': 'Item moved',
+    'comment': 'Comment'
+}
+
+
 def create_readable_date(created, delta_from_datetime: datetime = None):
     if not delta_from_datetime:
         delta_from_datetime = datetime.now()
@@ -29,28 +148,11 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
     return aff
 
 def designPage(content: data.Content, content_revision: data.ContentRevisionRO) -> str:
-    f = open('tracim/lib/webdav/style.css', 'r')
-    style = f.read()
-    f.close()
-
     hist = content.get_history()
     histHTML = '<table class="table table-striped table-hover">'
     for event in hist:
         if isinstance(event, VirtualEvent):
             date = event.create_readable_date()
-            _LABELS = {
-                'archiving': 'Item archived',
-                'content-comment': 'Item commented',
-                'creation': 'Item created',
-                'deletion': 'Item deleted',
-                'edition': 'item modified',
-                'revision': 'New revision',
-                'status-update': 'New status',
-                'unarchiving': 'Item unarchived',
-                'undeletion': 'Item undeleted',
-                'move': 'Item moved'
-            }
-
             label = _LABELS[event.type.id]
 
             histHTML += '''
@@ -65,9 +167,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
                        label,
                        date,
                        event.owner.display_name,
-                       '<i class="fa fa-caret-left"></i> shown' if event.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/(%s - %s) %s.html">(View revision)</a></span>''' % (
-                       content.label, event.id, event.type.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
-
+                       # NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+                       '<i class="fa fa-caret-left"></i> shown'  if event.id == content_revision.revision_id else '' # '''<span><a class="revision-link" href="/.history/%s/(%s - %s) %s.html">(View revision)</a></span>''' % (
+                       # content.label, event.id, event.type.id, event.ref_object.label) if event.type.id in ['revision', 'creation', 'edition'] else '')
+                   )
     histHTML += '</table>'
 
     file = '''
@@ -93,9 +196,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
             </div>
             <div class="pull-right">
                 <div class="btn-group btn-group-vertical">
-                    <a class="btn btn-default">
-                        <i class="fa fa-external-link"></i> View in tracim</a>
-                    </a>
+                    <!-- NOTE: Not omplemented yet, don't display not working link
+                     <a class="btn btn-default">
+                         <i class="fa fa-external-link"></i> View in tracim</a>
+                     </a>-->
                 </div>
             </div>
         </div>
@@ -113,9 +217,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
             file_location = file_location.replace(/\/[^/]*$/, '')
             file_location = file_location.replace(/\/.history\/[^/]*$/, '')
 
-            $('.revision-link').each(function() {
-                $(this).attr('href', file_location + $(this).attr('href'))
-            });
+            // NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+            // $('.revision-link').each(function() {
+            //    $(this).attr('href', file_location + $(this).attr('href'))
+            // });
         }
     </script>
 </body>
@@ -131,10 +236,6 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
     return file
 
 def designThread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
-        f = open('tracim/lib/webdav/style.css', 'r')
-        style = f.read()
-        f.close()
-
         hist = content.get_history()
 
         allT = []
@@ -165,20 +266,6 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                     participants[t.owner.display_name][0] += 1
             else:
                 if isinstance(t, VirtualEvent) and t.type.id != 'comment':
-                    _LABELS = {
-                        'archiving': 'Item archived',
-                        'content-comment': 'Item commented',
-                        'creation': 'Item created',
-                        'deletion': 'Item deleted',
-                        'edition': 'item modified',
-                        'revision': 'New revision',
-                        'status-update': 'New status',
-                        'unarchiving': 'Item unarchived',
-                        'undeletion': 'Item undeleted',
-                        'move': 'Item moved',
-                        'comment' : 'hmmm'
-                    }
-
                     label = _LABELS[t.type.id]
 
                     disc += '''
@@ -197,10 +284,12 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                            t.owner.display_name,
                            t.create_readable_date(),
                            label,
-                            '<i class="fa fa-caret-left"></i> shown' if t.id == content_revision.revision_id else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
-                               content.label,
-                               t.id,
-                               t.ref_object.label) if t.type.id in ['revision', 'creation', 'edition'] else '')
+                            # NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+                            '<i class="fa fa-caret-left"></i> shown' if t.id == content_revision.revision_id else '' # else '''<span><a class="revision-link" href="/.history/%s/%s-%s">(View revision)</a></span>''' % (
+                               # content.label,
+                               # t.id,
+                               # t.ref_object.label) if t.type.id in ['revision', 'creation', 'edition'] else '')
+                           )
 
         page = '''
 <html>
@@ -222,9 +311,10 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
             </div>
             <div class="pull-right">
                 <div class="btn-group btn-group-vertical">
+                    <!-- NOTE: Not omplemented yet, don't display not working link
                     <a class="btn btn-default" onclick="hide_elements()">
-                        <i id="hideshow" class="fa fa-eye-slash"></i> <span id="hideshowtxt" >Hide history</span></a>
-                    </a>
+                       <i id="hideshow" class="fa fa-eye-slash"></i> <span id="hideshowtxt" >Hide history</span></a>
+                    </a>-->
                     <a class="btn btn-default">
                         <i class="fa fa-external-link"></i> View in tracim</a>
                     </a>
@@ -244,9 +334,10 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
             file_location = file_location.replace(/\/[^/]*$/, '')
             file_location = file_location.replace(/\/.history\/[^/]*$/, '')
 
-            $('.revision-link').each(function() {
-                $(this).attr('href', file_location + $(this).attr('href'))
-            });
+            // NOTE: (WABDAV_HIST_DEL_DISABLED) Disabled for beta 1.0
+            // $('.revision-link').each(function() {
+            //     $(this).attr('href', file_location + $(this).attr('href'))
+            // });
         }
 
         function hide_elements() {

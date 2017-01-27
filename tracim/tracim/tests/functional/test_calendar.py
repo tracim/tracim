@@ -1,14 +1,17 @@
+import os
 import time
 
 import caldav
 import transaction
 from caldav.lib.error import AuthorizationError
+from collections import OrderedDict
 from nose.tools import eq_
 from nose.tools import ok_
 from nose.tools import raises
 import requests
 from requests.exceptions import ConnectionError
 from sqlalchemy.orm.exc import NoResultFound
+from tg import config
 
 from tracim.config.app_cfg import daemons
 from tracim.lib.calendar import CalendarManager
@@ -18,6 +21,7 @@ from tracim.tests import TestCalendar as BaseTestCalendar
 from tracim.tests import not_raises
 from tracim.model.auth import User
 from tracim.model.data import Content
+from tracim.model.data import Workspace
 
 
 class TestCalendar(BaseTestCalendar):
@@ -203,3 +207,108 @@ END:VCALENDAR
         eq_(event.properties['location'], 'Here')
         eq_(event.properties['start'], '2010-05-12 18:00:00+0000')
         eq_(event.properties['end'], '2010-05-12 17:00:00+0000')
+
+    def test_created_user_radicale_calendar(self):
+        self._connect_user(
+            'admin@admin.admin',
+            'admin@admin.admin',
+        )
+
+        user_count = DBSession.query(User)\
+            .filter(User.email == 'an-other-email@test.local').count()
+        eq_(0, user_count, 'User should not exist yet')
+
+        radicale_users_folder = '{0}/user'\
+            .format(config.get('radicale.server.filesystem.folder'))
+        eq_(
+            False,
+            os.path.isdir(radicale_users_folder),
+            'Radicale users folder should not exist yet',
+        )
+
+        # Create a new user, his calendar should be created to
+        try_post_user = self.app.post(
+            '/admin/users',
+            OrderedDict([
+                ('name', 'TEST'),
+                ('email', 'an-other-email@test.local'),
+                ('password', 'an-other-email@test.local'),
+                ('is_tracim_manager', 'off'),
+                ('is_tracim_admin', 'off'),
+                ('send_email', 'off'),
+            ])
+        )
+
+        eq_(try_post_user.status_code, 302,
+            "Code should be 302, but is %d" % try_post_user.status_code)
+
+        users_calendars = len([
+            name for name in os.listdir(radicale_users_folder)
+            if name.endswith('.ics')
+        ])
+
+        user = DBSession.query(User) \
+            .filter(User.email == 'an-other-email@test.local').one()
+
+        eq_(1, users_calendars, 'Radicale user path should list 1 calendar')
+        user_calendar = '{0}/{1}.ics'.format(
+            radicale_users_folder,
+            user.user_id,
+        )
+        user_calendar_exist = os.path.isfile(user_calendar)
+        eq_(True, user_calendar_exist, 'User calendar should be created')
+
+    def test_created_workspace_radicale_calendar(self):
+        self._connect_user(
+            'admin@admin.admin',
+            'admin@admin.admin',
+        )
+
+        workspaces_count = DBSession.query(Workspace)\
+            .filter(Workspace.label == 'WTESTCAL').count()
+        eq_(0, workspaces_count, 'Workspace should not exist yet !')
+
+        radicale_workspaces_folder = '{0}/workspace'\
+            .format(config.get('radicale.server.filesystem.folder'))
+        eq_(
+            False,
+            os.path.isdir(radicale_workspaces_folder),
+            'Radicale workskpaces folder should not exist yet',
+        )
+
+        # Create a new workspace, his calendar should be created to
+        try_post_workspace = self.app.post(
+            '/admin/workspaces',
+            OrderedDict([
+                ('name', 'WTESTCAL'),
+                ('description', 'WTESTCALDESCR'),
+                ('calendar_enabled', 'on'),
+            ])
+        )
+
+        eq_(try_post_workspace.status_code, 302,
+            "Code should be 302, but is %d" % try_post_workspace.status_code)
+
+        workspaces_calendars = len([
+            name for name in os.listdir(radicale_workspaces_folder)
+            if name.endswith('.ics')
+        ])
+
+        workspace = DBSession.query(Workspace) \
+            .filter(Workspace.label == 'WTESTCAL').one()
+
+        eq_(
+            1,
+            workspaces_calendars,
+            'Radicale workspace path should list 1 calendar',
+        )
+        workspace_calendar = '{0}/{1}.ics'.format(
+            radicale_workspaces_folder,
+            workspace.workspace_id,
+        )
+        workspace_calendar_exist = os.path.isfile(workspace_calendar)
+        eq_(
+            True,
+            workspace_calendar_exist,
+            'Workspace calendar should be created',
+        )

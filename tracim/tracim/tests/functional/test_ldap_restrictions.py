@@ -68,6 +68,7 @@ class TestAuthentication(LDAPTest, TracimTestController):
             OrderedDict([
                 ('name', 'Lawrence Lessig YEAH'),
                 ('email', 'An-other-email@fsf.org'),
+                ('timezone', ''),
             ])
         )
 

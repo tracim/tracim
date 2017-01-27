@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import cherrypy
+import os
+
 import types
 
 from bs4 import BeautifulSoup
@@ -10,8 +13,7 @@ import tg
 from tg.i18n import ugettext as _
 from tg.util import LazyString
 from tracim.lib.base import logger
-from tracim.lib.user import UserStaticApi
-from tracim.lib.utils import exec_time_monitor
+from tracim.lib.user import CurrentUserGetterApi
 from tracim.model.auth import Profile
 from tracim.model.auth import User
 from tracim.model.data import BreadcrumbItem, ActionDescription
@@ -86,6 +88,9 @@ class CTX(object):
     USER = 'USER'
     USERS = 'USERS'
     WORKSPACE = 'WORKSPACE'
+    API_WORKSPACE = 'API_WORKSPACE'
+    API_CALENDAR_WORKSPACE = 'API_CALENDAR_WORKSPACE'
+    API_CALENDAR_USER = 'API_CALENDAR_USER'
 
 
 class DictLikeClass(dict):
@@ -151,12 +156,17 @@ class Context(object):
         self.context_string = context_string
         self._current_user = current_user  # Allow to define the current user if any
         if not current_user:
-            self._current_user = UserStaticApi.get_current_user()
+            self._current_user = CurrentUserGetterApi.get_current_user()
 
         self._base_url = base_url # real root url like http://mydomain.com:8080
 
     def url(self, base_url='/', params=None, qualified=False) -> str:
-        url = tg.url(base_url, params)
+        # HACK (REF WSGIDAV.CONTEXT.TG.URL) This is a temporary hack who
+        # permit to know we are in WSGIDAV context.
+        if not hasattr(cherrypy.request, 'current_user_email'):
+            url = tg.url(base_url, params)
+        else:
+            url = base_url
 
         if self._base_url:
             url = '{}{}'.format(self._base_url, url)
@@ -259,10 +269,10 @@ def serialize_breadcrumb_item(item: BreadcrumbItem, context: Context):
 def serialize_version_for_page_or_file(version: ContentRevisionRO, context: Context):
     return DictLikeClass(
         id = version.revision_id,
-        label = version.label if version.label else version.file_name,
+        label = version.label,
         owner = context.toDict(version.owner),
         created = version.created,
-        action = context.toDict(version.get_last_action())
+        action = context.toDict(version.get_last_action()),
     )
 
 
@@ -282,7 +292,7 @@ def serialize_item(content: Content, context: Context):
 
     result = DictLikeClass(
         id = content.content_id,
-        label = content.label if content.label else content.file_name,
+        label = content.label,
         icon = ContentType.get_icon(content.type),
         status = context.toDict(content.get_status()),
         folder = context.toDict(DictLikeClass(id = content.parent.content_id if content.parent else None)),
@@ -338,7 +348,7 @@ def serialize_node_for_page_list(content: Content, context: Context):
     if content.type==ContentType.File:
         result = DictLikeClass(
             id = content.content_id,
-            label = content.label if content.label else content.file_name,
+            label = content.label,
             status = context.toDict(content.get_status()),
             folder = Context(CTX.DEFAULT).toDict(content.parent)
         )
@@ -386,6 +396,9 @@ def serialize_node_for_page(content: Content, context: Context):
             revisions=context.toDict(sorted(content.revisions, key=lambda v: v.created, reverse=True)),
             selected_revision='latest' if content.revision_to_serialize<=0 else content.revision_to_serialize,
             history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history()),
+            is_editable=content.is_editable,
+            is_deleted=content.is_deleted,
+            is_archived=content.is_archived,
             urls = context.toDict({
                 'mark_read': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_read', content)),
                 'mark_unread': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_unread', content))
@@ -393,7 +406,7 @@ def serialize_node_for_page(content: Content, context: Context):
         )
 
         if content.type==ContentType.File:
-            result.label = content.label if content.label else content.file_name
+            result.label = content.label
             result['file'] = DictLikeClass(
                 name = data_container.file_name,
                 size = len(data_container.file_content),
@@ -455,6 +468,9 @@ def serialize_node_for_page(item: Content, context: Context):
             comments = reversed(context.toDict(item.get_comments())),
             is_new=item.has_new_information_for(context.get_user()),
             history = Context(CTX.CONTENT_HISTORY).toDict(item.get_history()),
+            is_editable=item.is_editable,
+            is_deleted=item.is_deleted,
+            is_archived=item.is_archived,
             urls = context.toDict({
                 'mark_read': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_read', item)),
                 'mark_unread': context.url(Content.format_path('/workspaces/{wid}/folders/{fid}/{ctype}s/{cid}/put_unread', item))
@@ -544,7 +560,8 @@ def serialize_content_for_workspace(content: Content, context: Context):
                 all = page_nb_all,
                 open = page_nb_open,
             ),
-            content_nb = DictLikeClass(all = content_nb_all)
+            content_nb = DictLikeClass(all = content_nb_all),
+            is_editable=content.is_editable,
         )
 
     return result
@@ -592,7 +609,10 @@ def serialize_content_for_workspace_and_folder(content: Content, context: Contex
                                     open=folder_nb_open),
             page_nb=DictLikeClass(all=page_nb_all,
                                   open=page_nb_open),
-            content_nb=DictLikeClass(all = content_nb_all)
+            content_nb=DictLikeClass(all = content_nb_all),
+            is_archived=content.is_archived,
+            is_deleted=content.is_deleted,
+            is_editable=content.is_editable,
         )
 
     elif content.type==ContentType.Page:
@@ -618,8 +638,10 @@ def serialize_content_for_general_list(content: Content, context: Context):
     last_activity_date = content.get_last_activity_date()
     last_activity_date_formatted = format_datetime(last_activity_date,
                                                    locale=tg.i18n.get_lang()[0])
-    last_activity_label = format_timedelta(datetime.now() - last_activity_date,
-                                           locale=tg.i18n.get_lang()[0])
+    last_activity_label = format_timedelta(
+        datetime.utcnow() - last_activity_date,
+        locale=tg.i18n.get_lang()[0],
+    )
     last_activity_label = last_activity_label.replace(' ', '\u00A0') # espace insécable
 
     return DictLikeClass(
@@ -630,6 +652,9 @@ def serialize_content_for_general_list(content: Content, context: Context):
         url=ContentType.fill_url(content),
         type=DictLikeClass(content_type.toDict()),
         status=context.toDict(content.get_status()),
+        is_deleted=content.is_deleted,
+        is_archived=content.is_archived,
+        is_editable=content.is_editable,
         last_activity = DictLikeClass({'date': last_activity_date,
                                        'label': last_activity_date_formatted,
                                        'delta': last_activity_label})
@@ -642,7 +667,7 @@ def serialize_content_for_folder_content_list(content: Content, context: Context
     last_activity_date = content.get_last_activity_date()
     last_activity_date_formatted = format_datetime(last_activity_date,
                                                    locale=tg.i18n.get_lang()[0])
-    last_activity_label = format_timedelta(datetime.now() - last_activity_date,
+    last_activity_label = format_timedelta(datetime.utcnow() - last_activity_date,
                                            locale=tg.i18n.get_lang()[0])
     last_activity_label = last_activity_label.replace(' ', '\u00A0') # espace insécable
 
@@ -701,6 +726,10 @@ def serialize_content_for_folder_content_list(content: Content, context: Context
         item = Context(CTX.CONTENT_LIST).toDict(content)
         item.notes = ''
 
+    item.is_deleted = content.is_deleted
+    item.is_archived = content.is_archived
+    item.is_editable = content.is_editable
+
     return item
 
 
@@ -758,7 +787,7 @@ def serialize_content_for_search_result(content: Content, context: Context):
         )
 
         if content.type==ContentType.File:
-            result.label = content.label.__str__() if content.label else content.file_name.__str__()
+            result.label = content.label.__str__()
 
         if not result.label or ''==result.label:
             result.label = 'No title'
@@ -855,6 +884,7 @@ def serialize_user_list_default(user: User, context: Context):
     result['enabled'] = user.is_active
     result['profile'] = user.profile
     result['has_password'] = user.password!=None
+    result['timezone'] = user.timezone
     return result
 
 
@@ -877,6 +907,7 @@ def serialize_user_for_user(user: User, context: Context):
     result['enabled'] = user.is_active
     result['profile'] = user.profile
     result['calendar_url'] = user.calendar_url
+    result['timezone'] = user.timezone
 
     return result
 
@@ -1023,3 +1054,34 @@ def serialize_node_tree_item_for_menu_api_tree(item: NodeTreeItem, context: Cont
             type='workspace',
             state={'opened': True if len(item.children)>0 else False, 'selected': item.is_selected}
         )
+
+
+@pod_serializer(Workspace, CTX.API_WORKSPACE)
+def serialize_api_workspace(item: Workspace, context: Context):
+    return DictLikeClass(
+        id=item.workspace_id,
+        label=item.label,
+        description=item.description,
+        has_calendar=item.calendar_enabled,
+    )
+
+
+@pod_serializer(Workspace, CTX.API_CALENDAR_WORKSPACE)
+def serialize_api_calendar_workspace(item: Workspace, context: Context):
+    return DictLikeClass(
+        id=item.workspace_id,
+        label=item.label,
+        description=item.description,
+        type='workspace',
+    )
+
+
+@pod_serializer(User, CTX.API_CALENDAR_USER)
+def serialize_api_calendar_workspace(item: User, context: Context):
+    from tracim.lib.calendar import CalendarManager  # Cyclic import
+    return DictLikeClass(
+        id=item.user_id,
+        label=item.display_name,
+        description=CalendarManager.get_personal_calendar_description(),
+        type='user',
+    )

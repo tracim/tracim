@@ -5,7 +5,7 @@
 <%def name="USER_ROLE_IN_WORKSPACE(current_user, role, show_id=True, enable_link=None, disable_link=None, role_types=None)">
     <tr>
         % if show_id:
-            <td class="text-right">${role.workspace.id}</td>
+            <td>${role.workspace.id}</td>
         % endif
         <td><a href="${tg.url('/admin/workspaces/{}').format(role.workspace.id)}">${role.workspace.name}</a></td>
 
@@ -33,8 +33,8 @@
 
 <%def name="SECURED_MEMBER_IN_WORKSPACE(current_user, workspace, member, role_types)">
     <tr>
-        <td class="text-right">${member.id}</td>
-        <td ><a href="${tg.url('/admin/users/{}'.format(member.id))}">${member.name}</a></td>
+        <td>${member.id}</td>
+        <td><a href="${tg.url('/admin/users/{}'.format(member.id))}">${member.name}</a></td>
         <td>${BUTTON.SECURED_ROLE_SELECTOR(fake_api.current_user, result.workspace, member, fake_api.role_types)}</td>
         <%
             user_is_himself = current_user.id == member.id
@@ -55,13 +55,26 @@
 </%def>
 
 <%def name="CONTENT(content)">
-    <tr class="t-table-row-${content.type.type}">
-        <td>
-            <span class="${content.type.color}"><i class="fa-fw ${content.type.icon}"></i> ${content.type.label}</span>
+    <tr class="t-table-row-${content.type.type} folder__content__list__item ${'archived' if content.is_archived else ''} ${'deleted' if content.is_deleted else ''}"
+        onclick="document.location = '${content.url}'"> <!-- <a /> does not work on <tr /> -->
+
+        <td class="folder__content__list__item__title">
+            <i class="fa-fw ${content.type.icon} ${content.type.color}"></i> ${content.label}
+        </td>
+
+        <!--td class="folder__content__list__type">
+            <span class="${content.type.color}">
+                % if (content.is_archived) :
+                    <i class="fa fa-archive fa-fw tracim-less-visible" title="Archivé"></i>
+                % elif (content.is_deleted) :
+                    <i class="fa fa-trash-o fa-fw tracim-less-visible" title="Supprimé"></i>
+                % endif
+                ${content.type.label}
+            </span>
 
             ## <span class="tracim-less-visible"><i class="fa fa-file-text-o fa-tw"></i> ${content}</span>
-        </td>
-        <td><a href="${content.url}">${content.label}</a></td>
+        </td-->
+
         % if 'folder' == content.type.id:
             <td class="text-center t-less-visible">-</td>
         % else:
@@ -77,9 +90,21 @@
                 % else:
                     <i class="fa fa-fw fa-close"></i>
                 % endif
-                <span class="t-less-visible">${content.status.label}</span>
+
+                <span class="t-less-visible">
+                  ${content.status.label}
+                  % if (content.is_archived) :
+                      - Archivé
+                  % elif (content.is_deleted) :
+                      - Supprimé
+                  % endif
+                </span>
+
             </td>
         % endif
+
         <td><span class="t-less-visible">${content.notes|n}</span></td>
+
+        <td>${content.type.label}</td>
     </tr>
 </%def>

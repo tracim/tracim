@@ -31,7 +31,8 @@ class RevisionsIntegrity(object):
 
     @classmethod
     def remove_from_updatable(cls, revision: 'ContentRevisionRO') -> None:
-        cls._updatable_revisions.remove(revision)
+        if revision in cls._updatable_revisions:
+            cls._updatable_revisions.remove(revision)
 
     @classmethod
     def is_updatable(cls, revision: 'ContentRevisionRO') -> bool:
@@ -39,8 +40,12 @@ class RevisionsIntegrity(object):
 
 # Global session manager: DBSession() returns the Thread-local
 # session object appropriate for the current web request.
-maker = sessionmaker(autoflush=True, autocommit=False,
-                     extension=ZopeTransactionExtension())
+maker = sessionmaker(
+    autoflush=True,
+    autocommit=False,
+    extension=ZopeTransactionExtension(),
+    expire_on_commit=False,
+)
 DBSession = scoped_session(maker)
 
 # Base class for all of our model classes: By default, the data model is
@@ -80,7 +85,8 @@ metadata = DeclarativeBase.metadata
 
 def init_model(engine):
     """Call me before using any of the tables or classes in the model."""
-    DBSession.configure(bind=engine)
+    if not DBSession.registry.has():  # Prevent a SQLAlchemy warning
+        DBSession.configure(bind=engine)
 
     # If you are using reflection to introspect your database and create
     # table objects for you, your tables must be defined and mapped inside

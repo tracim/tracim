@@ -22,11 +22,11 @@
     <h4 id="${dom_id}">
         ${TIM.ICO(icon_size, icon_path) if icon_path else ''}
         ${label}
-        
+
         ## Button is shown for contributors (or more), not for readers
-        % if h.user_role(user, workspace)>1: 
+        % if h.user_role(user, workspace)>1:
             % if action_dom_id and action_label:
-                <small style="margin-left: 1em;"> ${DATA_TARGET_BUTTON(action_dom_id, action_label)}</small>    
+                <small style="margin-left: 1em;"> ${DATA_TARGET_BUTTON(action_dom_id, action_label)}</small>
             % endif
         % endif
     </h4>
@@ -47,7 +47,7 @@
                             % if folder.folder_nb.all>=1:
                                 ${_('{nb_total} subfolder(s)').format(nb_total=folder.folder_nb.all)|n}
                             % endif
-                            
+
                             % if folder.thread_nb.all>=1:
                                 ${_('{nb_total} thread(s) &mdash; {nb_open} open').format(nb_total=folder.thread_nb.all, nb_open=folder.thread_nb.open)|n}
                                 <br/>
@@ -214,7 +214,7 @@
 
                 ##
                 ## INFO - D.A. - 2014-10-17
-                ## Look comment at top of this function in order to get information about the next if/then/else 
+                ## Look comment at top of this function in order to get information about the next if/then/else
                 ##
                 % if mode=='link_to_document':
                     $('#${dom_id}-treeview').on("select_node.jstree", function (e, data) {
@@ -223,7 +223,7 @@
                         url = $('#'+data.selected[0]+' > a').attr('href');
                         location.href = url;
                     });
-                % else:              
+                % else:
                     $('#${dom_id}-treeview').on("select_node.jstree", function (e, data) {
                         // on click, the form hidden field is updated
                         ## FIXME - REMOVE alert('about to update value of field '+'#${dom_id}-treeview-hidden-field');
@@ -236,7 +236,7 @@
                         % endif
                     });
                 % endif
-                
+
                 $('#${dom_id}-treeview').on("loaded.jstree", function () {
                     nodes = $('#${dom_id}-treeview .jstree-node');
                     console.log("nodes = "+nodes.length);
@@ -303,6 +303,7 @@
 </%def>
 
 <%def name="SECURED_TIMELINE_ITEM(user, item)">
+##     <% created_localized = h.get_with_timezone(item.created) %>
 ##     <div class="row t-odd-or-even t-hacky-thread-comment-border-top">
 ##         <div class="col-sm-7 col-sm-offset-3">
 ##             <div class="t-timeline-item">
@@ -312,7 +313,7 @@
 ##                 <h5 style="margin: 0;">
 ##                     <span class="tracim-less-visible">${_('<strong>{}</strong> wrote:').format(item.owner.name)|n}</span>
 ##
-##                     <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(item.created)|n}">
+##                     <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(created_localized)|n}">
 ##                         ${_('{delta} ago').format(delta=item.created_as_delta)}
 ##
 ##                         % if h.is_item_still_editable(item) and item.owner.id==user.id:
@@ -336,10 +337,11 @@
 </%def>
 
 <%def name="SECURED_HISTORY_VIRTUAL_EVENT(user, event)">
+    <% created_localized = h.get_with_timezone(event.created) %>
     <% is_new_css_class = 't-is-new-content' if event.is_new else '' %>
 
-    <div class="row t-odd-or-even t-hacky-thread-comment-border-top ${is_new_css_class}">
-        <div class="col-sm-7 col-sm-offset-3">
+    <div class="t-odd-or-even t-hacky-thread-comment-border-top ${is_new_css_class}">
+        <div class="">
             <div class="t-timeline-item">
 ##                <i class="fa fa-fw fa-3x fa-comment-o t-less-visible" style="margin-left: -1.5em; float:left;"></i>
 
@@ -353,7 +355,7 @@
                         <span class="tracim-less-visible">${_('{} by <strong>{}</strong>').format(event.label, event.owner.name)|n}</span>
                     % endif
 
-                    <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(event.created)|n}">
+                    <div class="pull-right text-right t-timeline-item-moment" title="${h.date_time(created_localized)|n}">
                         ${_('{delta} ago').format(delta=event.created_as_delta)}
 
                         % if h.is_item_still_editable(CFG, event) and event.owner.id==user.id:
@@ -374,6 +376,7 @@
 </%def>
 
 <%def name="SECURED_HISTORY_VIRTUAL_EVENT_AS_TABLE_ROW(user, event, current_revision_id)">
+    <% created_localized = h.get_with_timezone(event.created) %>
     <%
         warning_or_not = ('', 'warning')[current_revision_id==event.id]
         row_css = 't-is-new-content' if event.is_new else warning_or_not
@@ -382,7 +385,7 @@
         <td class="t-less-visible">
             <span class="label label-default">${ICON.FA_FW(event.type.icon)} ${event.type.label}</span>
         </td>
-        <td title="${h.date_time(event.created)|n}">${_('{delta} ago').format(delta=event.created_as_delta)}</td>
+        <td title="${h.date_time(created_localized)|n}">${_('{delta} ago').format(delta=event.created_as_delta)}</td>
         <td>${event.owner.name}</td>
 ## FIXME - REMOVE                            <td>${event}</td>
 

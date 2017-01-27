@@ -43,6 +43,7 @@ install_requires=[
     "python-ldap-test==0.2.1",
     "unicode-slugify==0.1.3",
     "pytz==2014.7",
+    'rq==0.7.1',
     ]
 
 setup(
@@ -76,6 +77,7 @@ setup(
             'ldap_server = tracim.command.ldap_test_server:LDAPTestServerCommand',
             'user_create = tracim.command.user:CreateUserCommand',
             'user_update = tracim.command.user:UpdateUserCommand',
+            'mail sender = tracim.command.mail:MailSenderCommend',
         ]
     },
     dependency_links=[

@@ -10,29 +10,35 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="">
-        <link rel="icon" href="../../favicon.ico">
+        <link rel="icon" href="/favicon.ico">
         <link href="${tg.url('/assets/css/bootstrap.min.css')}" rel="stylesheet">
-        <link href="${tg.url('/assets/css/dashboard.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/font-awesome-4.2.0/css/font-awesome.css')}" rel="stylesheet">
+        <link href="${tg.url('/assets/select2-4.0.3/css/select2.min.css')}" rel="stylesheet">
+        <link href="${tg.url('/assets/css/dashboard.css')}" rel="stylesheet">
 
         <script>
             var shiftWindow = function() { scrollBy(0, -50) };
             window.addEventListener("hashchange", shiftWindow);
             function load() { if (window.location.hash) shiftWindow(); }
+
+            globalTracimLang = 'fr_FR'
         </script>
     </head>
 
     <body class="${self.body_class()}">
         <script src="${tg.url('/assets/js/jquery.min.js')}"></script>
 
-        <div class="container-fluid ${container_classes()}">
+        <div class="${container_classes()}">
             ${self.main_menu()}
             ${self.content_wrapper()}
             <div id="tracim-footer-separator"></div>
         </div>
         ${self.footer()}
 
+        <script src="${tg.url('/assets/select2-4.0.3/js/select2.min.js')}"></script>
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
+        <script src="${tg.url('/assets/js/trad.js')}"></script>
+        <script src="${tg.url('/assets/js/main.js')}"></script>
         ${CFG.TRACKER_JS_CONTENT|n}
     </body>
 
@@ -54,13 +60,13 @@
 <%def name="title()">  </%def>
 
 <%def name="footer()">
-    <div class="pod-footer footer hidden-tablet hidden-phone text-center">
+    <div class="pod-footer footer hidden-tablet hidden-phone text-center hidden-xs">
         <p>
             <a href="http://trac.im">${_('Create your own collaborative workspace on trac.im')}</a> &mdash;
             copyright &copy; 2013 - ${h.current_year()} tracim project.
         </p>
     </div>
-    
+
     <script type="text/javascript">
         $(function () {
             $("[rel='tooltip']").tooltip();
@@ -71,7 +77,7 @@
 
 <%def name="main_menu()">
     <div class="navbar navbar-fixed-top" role="navigation">
-        ${TIM.FLASH_MSG('col-sm-7 col-sm-offset-3')}
+        ${TIM.FLASH_MSG('')}
 ##
 ##         <div class="row" id="flashgordon">
 ##             <div class="col-sm-7 col-sm-offset-3" style="z-index: 10001; padding: 0; position: absolute; top: 0;">
@@ -93,49 +99,47 @@
 
 
 
-        <div class="container-fluid">
+        <div class="">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <i class="fa fa-bars"></i>
                 </button>
                 <a class="navbar-brand" href="${tg.url('/')}">
-##                  <img src="${tg.url('/assets/img/tracim.png')}" class="pull-left" style="border: 1px solid #F5F5F5; height: 48px; margin: -13px 0.5em 0 0;"/>
-                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" style="height: 48px; margin: -13px 0.5em 0 -13px;"/>
+                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" />
                 </a>
             </div>
 
-            <div class="navbar-collapse collapse">
+            <div class="header__navbar navbar-collapse collapse">
                 % if request.identity:
-                    <ul class="nav navbar-nav navbar-left">
-                        <li class="active"><a href="${tg.url('/home')}">${TIM.FA('fa-home fa-lg')} ${_('My Home')}</a></li>
-                        % if fake_api.current_user.profile.id>2:
-                            ${NAVBAR_MENU.ADMIN_ITEMS()}
-                        % endif
-                        <li class=""><a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar fa-lg')} ${_('Calendar')}</a></li>
+                    <ul class="header__navbar__list nav navbar-nav navbar-left">
+                        <li class="header__navbar__list__item active">
+                            <a href="${tg.url('/home')}">${TIM.FA('fa-home fa-lg')} ${_('My Home')}</a>
+                        </li>
+                        <li class="header__navbar__list__item">
+                            <a href="${tg.url('/calendar')}">${TIM.FA('fa-calendar fa-fw')} ${_('Calendar')}</a>
+                        </li>
+                        ${NAVBAR_MENU.ADMIN_ITEMS()}
                     </ul>
                 % endif
 
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="header__navbar__right nav navbar-nav navbar-right">
 
                     % if request.identity:
 
                         <form id="search-form" class="navbar-form navbar-left" role="search" action="${tg.url('/search?')}">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="${_('Search for...')}" name="keywords" value="${','.join(search.keywords) if search else ''}">
-                                <i class="fa fa-search t-less-visible" style="margin-left: -2em;" onclick="$('#search-form').submit()"></i>
+                                <input type="text" class="form-control" placeholder="${_('Search for...')}" name="keywords" value="${','.join(search.keywords) if search else ''}" />
+                                <i class="fa fa-search t-less-visible hidden-xs" style="margin-left: -2em;" onclick="$('#search-form').submit()"></i>
                             </div>
                             ## <button type="submit" class="btn btn-default">${_('Search')}</button>
                         </form>
 
                         % if fake_api.current_user.profile.id>=8: #2:
                             <li class="dropdown">
-                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.FA('fa-lg fa-cogs')} ${_('Admin')} <b class="caret"></b></a>
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.FA('fa-lg fa-cogs fa-fw')} ${_('Admin')} <b class="caret"></b></a>
                               <ul class="dropdown-menu">
-                                <li><a href="${tg.url('/admin/users')}">${TIM.FA('fa-users tracim-less-visible')} ${_('Users')}</a></li>
-                                <li><a href="${tg.url('/admin/workspaces')}">${TIM.FA('fa-bank tracim-less-visible')} ${_('Workspaces')}</a></li>
+                                <li><a href="${tg.url('/admin/users')}">${TIM.FA('fa-users fa-fw tracim-less-visible')} ${_('Users')}</a></li>
+                                <li><a href="${tg.url('/admin/workspaces')}">${TIM.FA('fa-bank fa-fw tracim-less-visible')} ${_('Workspaces')}</a></li>
 ## TODO - D.A. - 2014-10-20 - Restore global configuration screen
 ##                                <li class="divider" role="presentation"></li>
 ##                                <li><a href="${tg.url('/admin/configuration')}">${TIM.ICO(16, 'categories/preferences-system')} ${_('Global configuration')}</a></li>
@@ -145,21 +149,21 @@
 
                         % if False and h.is_debug_mode():
                             <li class="dropdown text-danger" >
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.FA('fa-warning t-orange')} Debug <b class="caret"></b></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${TIM.FA('fa-warning t-orange fa-fw')} Debug <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     <li><a class="text-danger" href=""><strong>${_('you MUST desactivate debug in production')}</strong></a></li>
                                     <li class="divider" role="presentation"></li>
                                     <li><a href="${tg.url('/debug/environ')}">${TIM.FA('fa-globe fa-fw t-less-visible')} request.environ</a></li>
                                     <li><a href="${tg.url('/debug/identity')}">${TIM.FA('fa-user fa-fw t-less-visible')} request.identity</a></li>
                                     <li class="divider" role="presentation"></li>
-                                    <li><a href="${tg.url('/debug/iconset-fa')}">${TIM.FA('fa-file-image-o t-less-visible')} Icon set - Font Awesome</a></li>
-                                    <li><a href="${tg.url('/debug/iconset-tango')}">${TIM.FA('fa-file-image-o t-less-visible')} Icon set - Tango Icons</a></li>
+                                    <li><a href="${tg.url('/debug/iconset-fa')}">${TIM.FA('fa-file-image-o fa-fw t-less-visible')} Icon set - Font Awesome</a></li>
+                                    <li><a href="${tg.url('/debug/iconset-tango')}">${TIM.FA('fa-file-image-o fa-fw t-less-visible')} Icon set - Tango Icons</a></li>
                                 </ul>
                             </li>
                         % endif
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                ${TIM.FA('fa-lg fa-user')} ${fake_api.current_user.name}
+                                ${TIM.FA('fa-lg fa-fw fa-user')} ${fake_api.current_user.name}
 
                             </a>
                             <ul class="dropdown-menu pull-right">
@@ -185,6 +189,11 @@
 ##                        </ul>
 ##                    </li>
                 </ul>
+
+                <div class="header__navbar__switch-mode switch-read-mode hidden-xs">
+                    ${TIM.FA('fa-eye fa-fw')} ${_('Read mode')}
+                </div>
+
             </div>
         </div>
     </div>

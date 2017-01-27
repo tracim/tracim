@@ -3,7 +3,7 @@
 
 <%def name="TREEVIEW(dom_id, selected_id='', uniq_workspace='0', css_classes='t-spacer-above')">
     <div class="${css_classes}">
-        <h4 class="t-less-visible t-spacer-above">${_('Workspaces')}</h4>
+        <h4 class="t-less-visible t-spacer-above textMenuColor">${_('Workspaces')}</h4>
         ${OLD_WIDGETS.TREEVIEW(dom_id, selected_id, uniq_workspace)}
     </div>
 </%def>

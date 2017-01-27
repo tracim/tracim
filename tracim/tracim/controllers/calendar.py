@@ -2,6 +2,7 @@
 import re
 import tg
 from tg import tmpl_context
+from tg.predicates import not_anonymous
 
 from tracim.lib.base import BaseController
 from tracim.lib.calendar import CalendarManager
@@ -16,6 +17,7 @@ class CalendarController(BaseController):
     """
 
     @tg.expose('tracim.templates.calendar.iframe_container')
+    @tg.require(not_anonymous())
     def index(self):
         user = tmpl_context.identity.get('user')
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)
@@ -34,6 +36,9 @@ class CalendarConfigController(BaseController):
 
     @tg.expose('tracim.templates.calendar.config')
     def index(self):
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
         # TODO BS 20160720: S'assurer d'être identifié !
         user = tmpl_context.identity.get('user')
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)
@@ -46,7 +51,7 @@ class CalendarConfigController(BaseController):
         workspace_calendar_urls = CalendarManager\
             .get_workspace_readable_calendars_urls_for_user(user)
         base_href_url = \
-            re.sub(r"^http[s]?://", '', CalendarManager.get_base_url())
+            re.sub(r"^http[s]?://", '', cfg.RADICALE_CLIENT_BASE_URL_HOST)
 
         # Template will use User.auth_token, ensure it's validity
         user.ensure_auth_token()

@@ -14,9 +14,8 @@ import os
 from datetime import datetime
 import time
 from hashlib import sha256
-from slugify import slugify
 from sqlalchemy.ext.hybrid import hybrid_property
-from tg.i18n import lazy_ugettext as l_
+from tracim.lib.utils import lazy_ugettext as l_
 from hashlib import md5
 
 __all__ = ['User', 'Group', 'Permission']
@@ -69,7 +68,7 @@ class Group(DeclarativeBase):
     group_id = Column(Integer, Sequence('seq__groups__group_id'), autoincrement=True, primary_key=True)
     group_name = Column(Unicode(16), unique=True, nullable=False)
     display_name = Column(Unicode(255))
-    created = Column(DateTime, default=datetime.now)
+    created = Column(DateTime, default=datetime.utcnow)
 
     users = relationship('User', secondary=user_group_table, backref='groups')
 
@@ -122,9 +121,10 @@ class User(DeclarativeBase):
     email = Column(Unicode(255), unique=True, nullable=False)
     display_name = Column(Unicode(255))
     _password = Column('password', Unicode(128))
-    created = Column(DateTime, default=datetime.now)
+    created = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)
     imported_from = Column(Unicode(32), nullable=True)
+    timezone = Column(Unicode(255), nullable=False, server_default='')
     _webdav_left_digest_response_hash = Column('webdav_left_digest_response_hash', Unicode(128))
     auth_token = Column(Unicode(255))
     auth_token_created = Column(DateTime)
@@ -218,6 +218,14 @@ class User(DeclarativeBase):
                                                descriptor=property(_get_hash_digest,
                                                                     _set_hash_digest))
 
+    def update_webdav_digest_auth(self, password) -> None:
+        self.webdav_left_digest_response_hash \
+            = '{username}:/:{password}'.format(
+                username=self.email,
+                password=password,
+            )
+
+
     def validate_password(self, password):
         """
         Check the password against existing credentials.
@@ -268,7 +276,7 @@ class User(DeclarativeBase):
         validity_seconds = CFG.get_instance().USER_AUTH_TOKEN_VALIDITY
 
         if not self.auth_token or not self.auth_token_created:
-            self.auth_token = uuid.uuid4()
+            self.auth_token = str(uuid.uuid4())
             self.auth_token_created = datetime.utcnow()
             DBSession.flush()
             return

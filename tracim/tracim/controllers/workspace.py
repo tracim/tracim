@@ -12,6 +12,7 @@ from tracim.controllers.content import UserWorkspaceFolderRestController
 
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.content import ContentApi
+from tracim.lib.utils import str_as_bool
 from tracim.lib.workspace import WorkspaceApi
 
 from tracim.model.data import NodeTreeItem
@@ -42,7 +43,16 @@ class UserWorkspaceRestController(TIMRestController):
         tg.redirect(tg.url('/home'))
 
     @tg.expose('tracim.templates.workspace.getone')
-    def get_one(self, workspace_id):
+    def get_one(self, workspace_id, **kwargs):
+        """
+        :param workspace_id: Displayed workspace id
+        :param kwargs:
+          * show_deleted: bool: Display deleted contents or hide them if False
+          * show_archived: bool: Display archived contents or hide them
+            if False
+        """
+        show_deleted = str_as_bool(kwargs.get('show_deleted', False))
+        show_archived = str_as_bool(kwargs.get('show_archived', ''))
         user = tmpl_context.current_user
 
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
@@ -60,13 +70,24 @@ class UserWorkspaceRestController(TIMRestController):
         )
 
         fake_api.sub_items = Context(CTX.FOLDER_CONTENT_LIST).toDict(
-            workspace.get_valid_children(ContentApi.DISPLAYABLE_CONTENTS)
+            # TODO BS 20161209: Is the correct way to grab folders? No use API?
+            workspace.get_valid_children(
+                ContentApi.DISPLAYABLE_CONTENTS,
+                show_deleted=show_deleted,
+                show_archived=show_archived,
+            )
         )
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
+        webdav_url = CFG.get_instance().WSGIDAV_CLIENT_BASE_URL
 
-        return DictLikeClass(result = dictified_workspace, fake_api=fake_api)
-
+        return DictLikeClass(
+            result=dictified_workspace,
+            fake_api=fake_api,
+            webdav_url=webdav_url,
+            show_deleted=show_deleted,
+            show_archived=show_archived,
+        )
 
     @tg.expose('json')
     def treeview_root(self, id='#',

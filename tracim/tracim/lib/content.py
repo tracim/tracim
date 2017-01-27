@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
+
+import os
+
+from operator import itemgetter
+from sqlalchemy import func
+from sqlalchemy.orm import Query
+
 __author__ = 'damien'
 
 import datetime
@@ -94,6 +102,34 @@ class ContentApi(object):
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
 
+    @contextmanager
+    def show(
+            self,
+            show_archived: bool=False,
+            show_deleted: bool=False,
+            show_temporary: bool=False,
+    ):
+        """
+        Use this method as context manager to update show_archived,
+        show_deleted and show_temporary properties during context.
+        :param show_archived: show archived contents
+        :param show_deleted:  show deleted contents
+        :param show_temporary:  show temporary contents
+        """
+        previous_show_archived = self._show_archived
+        previous_show_deleted = self._show_deleted
+        previous_show_temporary = self._show_temporary
+
+        try:
+            self._show_archived = show_archived
+            self._show_deleted = show_deleted
+            self._show_temporary = show_temporary
+            yield self
+        finally:
+            self._show_archived = previous_show_archived
+            self._show_deleted = previous_show_deleted
+            self._show_temporary = previous_show_temporary
+
     @classmethod
     def get_revision_join(cls):
         """
@@ -184,12 +220,21 @@ class ContentApi(object):
         if workspace:
             result = result.filter(Content.workspace_id==workspace.workspace_id)
 
+        # Security layer: if user provided, filter
+        # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
             user = DBSession.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = [r.workspace_id for r in user.roles \
                              if r.role>=UserRoleInWorkspace.READER]
-            result = result.filter(Content.workspace_id.in_(workspace_ids))
+            result = result.filter(or_(
+                Content.workspace_id.in_(workspace_ids),
+                # And allow access to non workspace document when he is owner
+                and_(
+                    Content.workspace_id == None,
+                    Content.owner_id == self._user_id,
+                )
+            ))
 
         return result
 
@@ -275,6 +320,9 @@ class ContentApi(object):
 
         return result
 
+    def get_base_query(self, workspace: Workspace) -> Query:
+        return self._base_query(workspace)
+
     def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> [Content]:
         """
         This method returns child items (folders or items) for left bar treeview.
@@ -321,6 +369,10 @@ class ContentApi(object):
 
     def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False) -> Content:
         assert content_type in ContentType.allowed_types()
+
+        if content_type == ContentType.Folder and not label:
+            label = self.generate_folder_label(workspace, parent)
+
         content = Content()
         content.owner = self._user
         content.parent = parent
@@ -329,6 +381,12 @@ class ContentApi(object):
         content.label = label
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
+
+        if content.type in (
+                ContentType.Page,
+                ContentType.Thread,
+        ):
+            content.file_extension = '.html'
 
         if do_save:
             DBSession.add(content)
@@ -394,8 +452,11 @@ class ContentApi(object):
 
         return revision
 
-    def get_one_by_label_and_parent(self, content_label: str, content_parent: Content = None,
-                                    workspace: Workspace = None) -> Content:
+    def get_one_by_label_and_parent(
+            self,
+            content_label: str,
+            content_parent: Content=None,
+    ) -> Content:
         """
         This method let us request the database to obtain a Content with its name and parent
         :param content_label: Either the content's label or the content's filename if the label is None
@@ -403,52 +464,180 @@ class ContentApi(object):
         :param workspace: The workspace's content
         :return The corresponding Content
         """
-        assert content_label is not None# DYN_REMOVE
-
-        resultset = self._base_query(workspace)
-
+        workspace = content_parent.workspace if content_parent else None
+        query = self._base_query(workspace)
         parent_id = content_parent.content_id if content_parent else None
+        query = query.filter(Content.parent_id == parent_id)
 
-        resultset = resultset.filter(Content.parent_id == parent_id)
+        file_name, file_extension = os.path.splitext(content_label)
 
-        return resultset.filter(or_(
-            Content.label == content_label,
-            Content.file_name == content_label,
-            Content.label == re.sub(r'\.[^.]+$', '', content_label)
-        )).one()
+        return query.filter(
+            or_(
+                and_(
+                    Content.type == ContentType.File,
+                    Content.label == file_name,
+                    Content.file_extension == file_extension,
+                ),
+                and_(
+                    Content.type == ContentType.Thread,
+                    Content.label == file_name,
+                ),
+                and_(
+                    Content.type == ContentType.Page,
+                    Content.label == file_name,
+                ),
+                and_(
+                    Content.type == ContentType.Folder,
+                    Content.label == content_label,
+                ),
+            )
+        ).one()
 
-    def get_one_by_label_and_parent_label(self, content_label: str, content_parent_label: [str]=None, workspace: Workspace=None):
-        assert content_label is not None  # DYN_REMOVE
-        resultset = self._base_query(workspace)
+    def get_one_by_label_and_parent_labels(
+            self,
+            content_label: str,
+            workspace: Workspace,
+            content_parent_labels: [str]=None,
+    ):
+        """
+        Return content with it's label, workspace and parents labels (optional)
+        :param content_label: label of content (label or file_name)
+        :param workspace: workspace containing all of this
+        :param content_parent_labels: Ordered list of labels representing path
+            of folder (without workspace label).
+        E.g.: ['foo', 'bar'] for complete path /Workspace1/foo/bar folder
+        :return: Found Content
+        """
+        query = self._base_query(workspace)
+        parent_folder = None
 
-        res =  resultset.filter(or_(
-            Content.label == content_label,
-            Content.file_name == content_label,
-            Content.label == re.sub(r'\.[^.]+$', '', content_label)
-        )).all()
+        # Grab content parent folder if parent path given
+        if content_parent_labels:
+            parent_folder = self.get_folder_with_workspace_path_labels(
+                content_parent_labels,
+                workspace,
+            )
 
-        if content_parent_label:
-            tmp = dict()
-            for content in res:
-                tmp[content] = content.parent
+        # Build query for found content by label
+        content_query = self.filter_query_for_content_label_as_path(
+            query=query,
+            content_label_as_file=content_label,
+        )
 
-            for parent_label in reversed(content_parent_label):
-                a = []
-                tmp = {content: parent.parent for content, parent in tmp.items()
-                       if parent and parent.label == parent_label}
+        # Modify query to apply parent folder filter if any
+        if parent_folder:
+            content_query = content_query.filter(
+                Content.parent_id == parent_folder.content_id,
+            )
+        else:
+            content_query = content_query.filter(
+                Content.parent_id == None,
+            )
 
-                if len(tmp) == 1:
-                    content, last_parent = tmp.popitem()
-                    return content
-                elif len(tmp) == 0:
-                    return None
+        # Filter with workspace
+        content_query = content_query.filter(
+            Content.workspace_id == workspace.workspace_id,
+        )
 
-            for content, parent_content in tmp.items():
-                if not parent_content:
-                    return content
+        # Return the content
+        return content_query\
+            .order_by(
+                Content.revision_id.desc(),
+            )\
+            .one()
 
-            return None
-        return res[0]
+    def get_folder_with_workspace_path_labels(
+            self,
+            path_labels: [str],
+            workspace: Workspace,
+    ) -> Content:
+        """
+        Return a Content folder for given relative path.
+        TODO BS 20161124: Not safe if web interface allow folder duplicate names
+        :param path_labels: List of labels representing path of folder
+        (without workspace label).
+        E.g.: ['foo', 'bar'] for complete path /Workspace1/foo/bar folder
+        :param workspace: workspace of folders
+        :return: Content folder
+        """
+        query = self._base_query(workspace)
+        folder = None
+
+        for label in path_labels:
+            # Filter query on label
+            folder_query = query \
+                .filter(
+                    Content.type == ContentType.Folder,
+                    Content.label == label,
+                    Content.workspace_id == workspace.workspace_id,
+                )
+
+            # Search into parent folder (if already deep)
+            if folder:
+                folder_query = folder_query\
+                    .filter(
+                        Content.parent_id == folder.content_id,
+                    )
+            else:
+                folder_query = folder_query \
+                    .filter(Content.parent_id == None)
+
+            # Get thirst corresponding folder
+            folder = folder_query \
+                .order_by(Content.revision_id.desc()) \
+                .one()
+
+        return folder
+
+    def filter_query_for_content_label_as_path(
+            self,
+            query: Query,
+            content_label_as_file: str,
+            is_case_sensitive: bool = False,
+    ) -> Query:
+        """
+        Apply normalised filters to found Content corresponding as given label.
+        :param query: query to modify
+        :param content_label_as_file: label in this
+        FILE version, use Content.get_label_as_file().
+        :param is_case_sensitive: Take care about case or not
+        :return: modified query
+        """
+        file_name, file_extension = os.path.splitext(content_label_as_file)
+
+        label_filter = Content.label == content_label_as_file
+        file_name_filter = Content.label == file_name
+        file_extension_filter = Content.file_extension == file_extension
+
+        if not is_case_sensitive:
+            label_filter = func.lower(Content.label) == \
+                           func.lower(content_label_as_file)
+            file_name_filter = func.lower(Content.label) == \
+                               func.lower(file_name)
+            file_extension_filter = func.lower(Content.file_extension) == \
+                                    func.lower(file_extension)
+
+        return query.filter(or_(
+            and_(
+                Content.type == ContentType.File,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Thread,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Page,
+                file_name_filter,
+                file_extension_filter,
+            ),
+            and_(
+                Content.type == ContentType.Folder,
+                label_filter,
+            ),
+        ))
 
     def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
@@ -459,6 +648,24 @@ class ContentApi(object):
 
         if content_type!=ContentType.Any:
             resultset = resultset.filter(Content.type==content_type)
+
+        if parent_id:
+            resultset = resultset.filter(Content.parent_id==parent_id)
+        if parent_id is False:
+            resultset = resultset.filter(Content.parent_id == None)
+
+        return resultset.all()
+
+    def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> [Content]:
+        """
+        Return parent_id childs of given content_types
+        :param parent_id: parent id
+        :param content_types: list of types
+        :param workspace: workspace filter
+        :return: list of content
+        """
+        resultset = self._base_query(workspace)
+        resultset = resultset.filter(Content.type.in_(content_types))
 
         if parent_id:
             resultset = resultset.filter(Content.parent_id==parent_id)
@@ -541,8 +748,13 @@ class ContentApi(object):
             .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
             .subquery()
 
-        not_read_content_ids = DBSession.query(
-            distinct(not_read_revisions.c.content_id)).all()
+        not_read_content_ids_query = DBSession.query(
+            distinct(not_read_revisions.c.content_id)
+        )
+        not_read_content_ids = list(map(
+            itemgetter(0),
+            not_read_content_ids_query,
+        ))
 
         not_read_contents = self._base_query(workspace) \
             .filter(Content.content_id.in_(not_read_content_ids)) \
@@ -868,3 +1080,25 @@ class ContentApi(object):
             )
         )
         return query.one()
+
+    def generate_folder_label(
+            self,
+            workspace: Workspace,
+            parent: Content=None,
+    ) -> str:
+        """
+        Generate a folder label
+        :param workspace: Future folder workspace
+        :param parent: Parent of foture folder (can be None)
+        :return: Generated folder name
+        """
+        query = self._base_query(workspace=workspace)\
+            .filter(Content.label.ilike('{0}%'.format(
+                _('New folder'),
+            )))
+        if parent:
+            query = query.filter(Content.parent == parent)
+
+        return _('New folder {0}').format(
+            query.count() + 1,
+        )

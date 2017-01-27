@@ -12,6 +12,8 @@ convert them into boolean, for example, you should use the
     setting = asbool(global_conf.get('the_setting'))
  
 """
+import imp
+import importlib
 from urllib.parse import urlparse
 
 import tg
@@ -21,15 +23,14 @@ from tg.configuration.milestones import environment_loaded
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
 
-from tg.i18n import lazy_ugettext as l_
+from tracim.lib.utils import lazy_ugettext as l_
 
 import tracim
 from tracim import model
 from tracim.config import TracimAppConfig
-from tracim.lib import app_globals, helpers
-from tracim.lib.auth.wrapper import AuthConfigWrapper
 from tracim.lib.base import logger
 from tracim.lib.daemons import DaemonsManager
+from tracim.lib.daemons import MailSenderDaemon
 from tracim.lib.daemons import RadicaleDaemon
 from tracim.lib.daemons import WsgiDavDaemon
 from tracim.model.data import ActionDescription
@@ -102,6 +103,7 @@ def start_daemons(manager: DaemonsManager):
 
     manager.run('radicale', RadicaleDaemon)
     manager.run('webdav', WsgiDavDaemon)
+    manager.run('mail_sender', MailSenderDaemon)
 
 environment_loaded.register(lambda: start_daemons(daemons))
 
@@ -200,8 +202,17 @@ class CFG(object):
         self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle', '')
         self.WEBSITE_HOME_BELOW_LOGIN_FORM = tg.config.get('website.home.below_login_form', '')
 
+        if tg.config.get('email.notification.from'):
+            raise Exception(
+                'email.notification.from configuration is deprecated. '
+                'Use instead email.notification.from.email and '
+                'email.notification.from.default_label.'
+            )
 
-        self.EMAIL_NOTIFICATION_FROM = tg.config.get('email.notification.from')
+        self.EMAIL_NOTIFICATION_FROM_EMAIL = \
+            tg.config.get('email.notification.from.email')
+        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = \
+            tg.config.get('email.notification.from.default_label')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get('email.notification.content_update.template.html')
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = tg.config.get('email.notification.content_update.template.text')
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = tg.config.get(
@@ -235,7 +246,8 @@ class CFG(object):
             ActionDescription.COMMENT,
             ActionDescription.CREATION,
             ActionDescription.EDITION,
-            ActionDescription.REVISION
+            ActionDescription.REVISION,
+            ActionDescription.STATUS_UPDATE
         ]
 
         self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
@@ -274,29 +286,98 @@ class CFG(object):
             'Tracim Calendar - Password Required',
         )
 
-        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
-            tg.config.get('radicale.client.base_url', None)
+        self.RADICALE_CLIENT_BASE_URL_HOST = \
+            tg.config.get('radicale.client.base_url.host', None)
 
-        if not self.RADICALE_CLIENT_BASE_URL_TEMPLATE:
-            self.RADICALE_CLIENT_BASE_URL_TEMPLATE = \
-                'http://{0}:{1}'.format(
-                    self.WEBSITE_SERVER_NAME,
-                    self.RADICALE_SERVER_PORT,
-                )
+        self.RADICALE_CLIENT_BASE_URL_PREFIX = \
+            tg.config.get('radicale.client.base_url.prefix', '/')
+        # Ensure finished by '/'
+        if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[-1]:
+            self.RADICALE_CLIENT_BASE_URL_PREFIX += '/'
+        if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[0]:
+            self.RADICALE_CLIENT_BASE_URL_PREFIX \
+                = '/' + self.RADICALE_CLIENT_BASE_URL_PREFIX
+
+        if not self.RADICALE_CLIENT_BASE_URL_HOST:
             logger.warning(
                 self,
-                'NOTE: Generated radicale.client.base_url parameter with '
-                'followings parameters: website.server_name, '
-                'radicale.server.port -> {0}'
-                .format(self.RADICALE_CLIENT_BASE_URL_TEMPLATE)
+                'Generated radicale.client.base_url.host parameter with '
+                'followings parameters: website.server_name -> {}'
+                .format(self.WEBSITE_SERVER_NAME)
             )
+            self.RADICALE_CLIENT_BASE_URL_HOST = self.WEBSITE_SERVER_NAME
+
+        self.RADICALE_CLIENT_BASE_URL_TEMPLATE = '{}{}'.format(
+            self.RADICALE_CLIENT_BASE_URL_HOST,
+            self.RADICALE_CLIENT_BASE_URL_PREFIX,
+        )
 
         self.USER_AUTH_TOKEN_VALIDITY = int(tg.config.get(
             'user.auth_token.validity',
             '604800',
         ))
 
-        self.WSGIDAV_CONFIG_PATH = tg.config.get('wsgidav.config_path')
+        self.WSGIDAV_CONFIG_PATH = tg.config.get(
+            'wsgidav.config_path',
+            'wsgidav.conf',
+        )
+        # TODO: Convert to importlib (cf http://stackoverflow.com/questions/41063938/use-importlib-instead-imp-for-non-py-file)
+        self.wsgidav_config = imp.load_source(
+            'wsgidav_config',
+            self.WSGIDAV_CONFIG_PATH,
+        )
+        self.WSGIDAV_PORT = self.wsgidav_config.port
+        self.WSGIDAV_CLIENT_BASE_URL = \
+            tg.config.get('wsgidav.client.base_url', None)
+
+        if not self.WSGIDAV_CLIENT_BASE_URL:
+            self.WSGIDAV_CLIENT_BASE_URL = \
+                '{0}:{1}'.format(
+                    self.WEBSITE_SERVER_NAME,
+                    self.WSGIDAV_PORT,
+                )
+            logger.warning(
+                self,
+                'NOTE: Generated wsgidav.client.base_url parameter with '
+                'followings parameters: website.server_name and '
+                'wsgidav.conf port'.format(
+                    self.WSGIDAV_CLIENT_BASE_URL,
+                )
+            )
+
+        if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
+            self.WSGIDAV_CLIENT_BASE_URL += '/'
+
+        self.EMAIL_PROCESSING_MODE = tg.config.get(
+            'email.processing_mode',
+            'sync',
+        ).upper()
+
+        if self.EMAIL_PROCESSING_MODE not in (
+                self.CST.ASYNC,
+                self.CST.SYNC,
+        ):
+            raise Exception(
+                'email.processing_mode '
+                'can ''be "{}" or "{}", not "{}"'.format(
+                    self.CST.ASYNC,
+                    self.CST.SYNC,
+                    self.EMAIL_PROCESSING_MODE,
+                )
+            )
+
+        self.EMAIL_SENDER_REDIS_HOST = tg.config.get(
+            'email.async.redis.host',
+            'localhost',
+        )
+        self.EMAIL_SENDER_REDIS_PORT = int(tg.config.get(
+            'email.async.redis.port',
+            6379,
+        ))
+        self.EMAIL_SENDER_REDIS_DB = int(tg.config.get(
+            'email.async.redis.db',
+            0,
+        ))
 
     def get_tracker_js_content(self, js_tracker_file_path = None):
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
@@ -338,5 +419,3 @@ class CFG(object):
 base_config.variable_provider = lambda: {
     'CFG': CFG.get_instance()
 }
-
-plug(base_config, 'tgext.asyncjob')

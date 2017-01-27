@@ -17,12 +17,12 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-offset-3 col-sm-2">
+                <div class="col-sm-offset-3 col-sm-2 hidden-xs">
                     <a class="thumbnail">
                         <img src="${CFG.WEBSITE_HOME_IMAGE_URL}" alt="">
                     </a>
                     <p>${CFG.WEBSITE_HOME_TAG_LINE|n}</p>
-                    
+
 
                 </div>
                 <div class="col-sm-4">

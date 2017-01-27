@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import uuid
 
+import pytz
 from tracim import model  as pm
 
 from sprox.tablebase import TableBase
@@ -10,7 +11,7 @@ from tw2 import forms as tw2f
 import tg
 from tg import predicates
 from tg import tmpl_context
-from tg.i18n import ugettext as _, lazy_ugettext as l_
+from tg.i18n import ugettext as _
 
 from sprox.widgets import PropertyMultipleSelectField
 from sprox._compat import unicode_text
@@ -27,7 +28,6 @@ from tracim.lib.base import logger
 from tracim.lib.email import get_email_manager
 from tracim.lib.user import UserApi
 from tracim.lib.group import GroupApi
-from tracim.lib.user import UserStaticApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
 
@@ -210,6 +210,7 @@ class UserPasswordAdminRestController(TIMRestController):
             tg.redirect(next_url)
 
         user.password = new_password1
+        user.update_webdav_digest_auth(new_password1)
         pm.DBSession.flush()
 
         tg.flash(_('The password has been changed'), CST.STATUS_OK)
@@ -312,7 +313,6 @@ class UserRestController(TIMRestController):
             is_tracim_manager = False
             is_tracim_admin = False
 
-
         api = UserApi(current_user)
 
         if api.user_with_email_exists(email):
@@ -347,9 +347,9 @@ class UserRestController(TIMRestController):
             email_manager = get_email_manager()
             email_manager.notify_created_account(user, password=password)
 
+        api.execute_created_user_actions(user)
         tg.flash(_('User {} created.').format(user.get_display_name()), CST.STATUS_OK)
         tg.redirect(self.url())
-
 
     @tg.expose('tracim.templates.admin.user_getone')
     def get_one(self, user_id):
@@ -380,15 +380,18 @@ class UserRestController(TIMRestController):
         user = api.get_one(id)
 
         dictified_user = Context(CTX.USER).toDict(user, 'user')
-        return DictLikeClass(result = dictified_user)
+        return DictLikeClass(
+            result=dictified_user,
+            timezones=pytz.all_timezones,
+        )
 
     @tg.require(predicates.in_group(Group.TIM_MANAGER_GROUPNAME))
     @tg.expose()
-    def put(self, user_id, name, email, next_url=''):
+    def put(self, user_id, name, email, timezone: str='', next_url=''):
         api = UserApi(tmpl_context.current_user)
 
         user = api.get_one(int(user_id))
-        api.update(user, name, email, True)
+        api.update(user, name, email, True, timezone=timezone)
 
         tg.flash(_('User {} updated.').format(user.get_display_name()), CST.STATUS_OK)
         if next_url:

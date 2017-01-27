@@ -18,7 +18,7 @@ class Collection(BaseCollection):
     def __init__(self, path: str, principal: bool=False):
         super().__init__(path, principal)
         self._replacing = False  # See ``replacing`` context manager
-        self._manager = CalendarManager(None)
+        self._manager = CalendarManager(Auth.current_user)
 
     @contextmanager
     def replacing(self):

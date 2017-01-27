@@ -28,7 +28,7 @@
     %>
     
     <% delete_or_archive_disabled = ('', 'disabled')[folder.selected_revision!='latest'] %> 
-    % if h.user_role(user, workspace)>2:
+    % if h.user_role(user, workspace)>2 and folder.is_editable:
         <div class="btn-group btn-group-vertical">
             ## This action is allowed for content managers only
             <a title="${_('Edit current folder')}" class="btn btn-default ${edit_disabled}" data-toggle="modal" data-target="#folder-edit-modal-dialog" data-remote="${tg.url('/workspaces/{}/folders/{}/edit'.format(folder.workspace.id, folder.id))}" ><i class="fa fa-edit fa-fw tracim-less-visible"></i> ${_('Edit')}</a>
@@ -36,7 +36,7 @@
         <p></p>
     % endif
     
-    % if user.profile.id>=3 or h.user_role(user, workspace)>=4:
+    % if (user.profile.id>=3 or h.user_role(user, workspace)>=4) and folder.is_editable:
         <div class="btn-group btn-group-vertical">
             ## This action is allowed for content managers only
             <a title="${_('Move current folder')}" class="btn btn-default ${move_disabled}" data-toggle="modal" data-target="#folder-move-modal-dialog" data-remote="${tg.url('/workspaces/{}/folders/{}/location/{}/edit'.format(folder.workspace.id, folder.id, folder.id))}" ><i class="fa fa-arrows fa-fw tracim-less-visible"></i> ${_('Move')}</a>
@@ -44,15 +44,36 @@
         <p></p>
     % endif
 
-    % if user.profile.id>=3 or h.user_role(user, workspace)>=4:
+    % if (user.profile.id>=3 or h.user_role(user, workspace)>=4) and folder.is_editable:
         ## if the user can see the toolbar, it means he is the workspace manager.
         ## So now, we need to know if he alsa has right to delete workspaces
         <div class="btn-group btn-group-vertical">
-## SHOW_ARCHIVE_BUTTON__BUG_#81            <a title="${_('Archive thread')}" class="btn btn-default ${delete_or_archive_disabled}" href="${tg.url('/workspaces/{}/folders/{}/put_archive'.format(folder.workspace.id, folder.id))}"><i class="fa fa-archive fa-fw tracim-less-visible"></i> ${_('Archive')}</a>
+            <a title="${_('Archive thread')}" class="btn btn-default ${delete_or_archive_disabled}" href="${tg.url('/workspaces/{}/folders/{}/put_archive'.format(folder.workspace.id, folder.id))}"><i class="fa fa-archive fa-fw tracim-less-visible"></i> ${_('Archive')}</a>
             <a title="${_('Delete thread')}" class="btn btn-default ${delete_or_archive_disabled}" href="${tg.url('/workspaces/{}/folders/{}/put_delete'.format(folder.workspace.id, folder.id))}"><i class="fa fa-trash-o fa-fw tracim-less-visible"></i> ${_('Delete')}</a>
         </div>
         <p></p>
     % endif
 
-</%def>
+    % if folder.is_deleted or folder.is_archived:
+        <div class="btn-group btn-group-vertical">
+            % if folder.is_archived:
+                <a title="${_('Restore')}"
+                   class="btn btn-default"
+                   href="${tg.url('/workspaces/{}/folders/{}/put_archive_undo'.format(folder.workspace.id, folder.id))}">
+                    <i class="fa fa-archive fa-fw tracim-less-visible"></i>
+                    ${_('Restore')}
+                </a>
+            % endif
+            % if folder.is_deleted:
+                <a title="${_('Restore')}"
+                   class="btn btn-default"
+                   href="${tg.url('/workspaces/{}/folders/{}/put_delete_undo'.format(folder.workspace.id, folder.id))}">
+                    <i class="fa fa-archive fa-fw tracim-less-visible"></i>
+                    ${_('Restore')}
+                </a>
+            % endif
+        </div>
+        <p></p>
+    % endif
 
+</%def>

@@ -11,16 +11,34 @@ class TestUserCommand(TestCommand):
 
     def test_create(self):
         self._create_user('new-user@algoo.fr', 'toor')
+        # Check webdav digest exist for this user
+        user = DBSession.query(User)\
+            .filter(User.email == 'new-user@algoo.fr').one()
+        ok_(user.webdav_left_digest_response_hash)
 
     def test_update_password(self):
         self._create_user('new-user@algoo.fr', 'toor')
+
+        # Grab webdav digest
+        user = DBSession.query(User) \
+            .filter(User.email == 'new-user@algoo.fr').one()
+        webdav_digest = user.webdav_left_digest_response_hash
+
         self._execute_command(
-            CreateUserCommand,
+            UpdateUserCommand,
             'gearbox user update',
             ['-l', 'new-user@algoo.fr', '-p', 'new_password']
         )
         user = DBSession.query(User).filter(User.email == 'new-user@algoo.fr').one()
-        user.validate_password('new_password')
+        ok_(user.validate_password('new_password'))
+
+        # Grab new webdav digest to compare it
+        user = DBSession.query(User) \
+            .filter(User.email == 'new-user@algoo.fr').one()
+        ok_(
+            webdav_digest != user.webdav_left_digest_response_hash,
+            msg='Webdav digest should be different',
+        )
 
     def test_create_with_group(self):
         more_args = ['--add-to-group', 'managers', '--add-to-group', 'administrators']

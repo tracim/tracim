@@ -4,13 +4,15 @@ from wsgiref.simple_server import make_server
 import signal
 
 import collections
-import transaction
 
 from radicale import Application as RadicaleApplication
 from radicale import HTTPServer as BaseRadicaleHTTPServer
 from radicale import HTTPSServer as BaseRadicaleHTTPSServer
 from radicale import RequestHandler as RadicaleRequestHandler
 from radicale import config as radicale_config
+from rq import Connection as RQConnection
+from rq import Worker as BaseRQWorker
+from redis import Redis
 
 from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
@@ -21,7 +23,6 @@ class DaemonsManager(object):
     def __init__(self):
         self._running_daemons = {}
         add_signal_handler(signal.SIGTERM, self.stop_all)
-        add_signal_handler(signal.SIGINT, self.stop_all)
 
     def run(self, name: str, daemon_class: object, **kwargs) -> None:
         """
@@ -145,6 +146,43 @@ class Daemon(threading.Thread):
         raise NotImplementedError()
 
 
+class MailSenderDaemon(Daemon):
+    # NOTE: use *args and **kwargs because parent __init__ use strange
+    # * parameter
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.worker = None  # type: RQWorker
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        logger.warning('MailSenderDaemon not implement append_thread_callback')
+        pass
+
+    def stop(self) -> None:
+        self.worker.request_stop('TRACIM STOP', None)
+
+    def run(self) -> None:
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        with RQConnection(Redis(
+            host=cfg.EMAIL_SENDER_REDIS_HOST,
+            port=cfg.EMAIL_SENDER_REDIS_PORT,
+            db=cfg.EMAIL_SENDER_REDIS_DB,
+        )):
+            self.worker = RQWorker(['mail_sender'])
+            self.worker.work()
+
+
+class RQWorker(BaseRQWorker):
+    def _install_signal_handlers(self):
+        # TODO BS 20170126: RQ WWorker is designed to work in main thread
+        # So we have to disable these signals (we implement server stop in
+        # MailSenderDaemon.stop method). When bug
+        # https://github.com/tracim/tracim/issues/166 will be fixed, ensure
+        # This worker terminate correctly.
+        pass
+
+
 class RadicaleHTTPSServer(TracimSocketServerMixin, BaseRadicaleHTTPSServer):
     pass
 
@@ -192,6 +230,11 @@ class RadicaleDaemon(Daemon):
         radicale_config.set('storage', 'filesystem_folder', fs_path)
 
         radicale_config.set('server', 'realm', realm_message)
+        radicale_config.set(
+            'server',
+            'base_prefix',
+            cfg.RADICALE_CLIENT_BASE_URL_PREFIX,
+        )
 
         try:
             radicale_config.add_section('headers')
@@ -255,6 +298,9 @@ from tracim.lib.webdav.sql_domain_controller import TracimDomainController
 from inspect import isfunction
 import traceback
 
+from wsgidav.server.cherrypy import wsgiserver
+from wsgidav.server.cherrypy.wsgiserver.wsgiserver3 import CherryPyWSGIServer
+
 DEFAULT_CONFIG_FILE = "wsgidav.conf"
 PYTHON_VERSION = "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
@@ -284,17 +330,23 @@ class WsgiDavDaemon(Daemon):
             print(
                 "WARNING: Could not import lxml: using xml instead (slower). Consider installing lxml from http://codespeak.net/lxml/.")
         from wsgidav.dir_browser import WsgiDavDirBrowser
-        from wsgidav.debug_filter import WsgiDavDebugFilter
         from tracim.lib.webdav.tracim_http_authenticator import TracimHTTPAuthenticator
         from wsgidav.error_printer import ErrorPrinter
+        from tracim.lib.webdav.utils import TracimWsgiDavDebugFilter
 
-        config['middleware_stack'] = [ WsgiDavDirBrowser, TracimHTTPAuthenticator, ErrorPrinter, WsgiDavDebugFilter ]
+        config['middleware_stack'] = [
+            WsgiDavDirBrowser,
+            TracimHTTPAuthenticator,
+            ErrorPrinter,
+            TracimWsgiDavDebugFilter,
+        ]
 
         config['provider_mapping'] = {
             config['root_path']: Provider(
-                show_archived=config['show_archived'],
-                show_deleted=config['show_deleted'],
-                show_history=config['show_history'],
+                # TODO: Test to Re enabme archived and deleted
+                show_archived=False,  # config['show_archived'],
+                show_deleted=False,  # config['show_deleted'],
+                show_history=False,  # config['show_history'],
                 manage_locks=config['manager_locks']
             )
         }
@@ -335,39 +387,29 @@ class WsgiDavDaemon(Daemon):
         app = WsgiDAVApp(self.config)
 
         # Try running WsgiDAV inside the following external servers:
-        self._runCherryPy(app, self.config, "cherrypy-bundled")
+        self._runCherryPy(app, self.config)
 
-    def _runCherryPy(self, app, config, mode):
-        """Run WsgiDAV using cherrypy.wsgiserver, if CherryPy is installed."""
-        assert mode in ("cherrypy", "cherrypy-bundled")
+    def _runCherryPy(self, app, config):
+        version = "WsgiDAV/%s %s Python/%s" % (
+            __version__,
+            wsgiserver.CherryPyWSGIServer.version,
+            PYTHON_VERSION
+        )
 
-        try:
-            from wsgidav.server.cherrypy import wsgiserver
+        wsgiserver.CherryPyWSGIServer.version = version
 
-            version = "WsgiDAV/%s %s Python/%s" % (
-                __version__,
-                wsgiserver.CherryPyWSGIServer.version,
-                PYTHON_VERSION)
+        protocol = "http"
 
-            wsgiserver.CherryPyWSGIServer.version = version
+        if config["verbose"] >= 1:
+            print("Running %s" % version)
+            print("Listening on %s://%s:%s ..." % (protocol, config["host"], config["port"]))
+        self._server = CherryPyWSGIServer(
+            (config["host"], config["port"]),
+            app,
+            server_name=version,
+        )
 
-            protocol = "http"
-
-            if config["verbose"] >= 1:
-                print("Running %s" % version)
-                print("Listening on %s://%s:%s ..." % (protocol, config["host"], config["port"]))
-            self._server = wsgiserver.CherryPyWSGIServer(
-                (config["host"], config["port"]),
-                app,
-                server_name=version,
-            )
-
-            self._server.start()
-        except ImportError as e:
-            if config["verbose"] >= 1:
-                print("Could not import wsgiserver.CherryPyWSGIServer.")
-            return False
-        return True
+        self._server.start()
 
     def stop(self):
         self._server.stop()

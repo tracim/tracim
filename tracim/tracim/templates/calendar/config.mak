@@ -43,8 +43,8 @@ var globalBackgroundSync=true;
 var globalSyncResourcesInterval=120000;
 var globalEnableRefresh=false;
 var globalEnableKbNavigation=true;
-var globalInterfaceLanguage='en_US';
-var globalInterfaceCustomLanguages=[];
+var globalInterfaceLanguage=window.parent.globalTracimLang; // globalTracimLang is declared in tracim header (caldavzap in in an iframe)
+var globalInterfaceCustomLanguages=['en_US', 'fr_FR'];
 var globalSortAlphabet=' 0123456789'+
     'AÀÁÂÄÆÃÅĀBCÇĆČDĎEÈÉÊËĒĖĘĚFGĞHIÌÍÎİÏĪĮJKLŁĹĽMNŃÑŇOÒÓÔÖŐŒØÕŌ'+
     'PQRŔŘSŚŠȘșŞşẞTŤȚțŢţUÙÚÛÜŰŮŪVWXYÝŸZŹŻŽ'+

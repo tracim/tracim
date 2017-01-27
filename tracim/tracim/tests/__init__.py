@@ -51,7 +51,8 @@ class TestApp(BaseTestApp):
         try:
             super()._check_status(status, res)
         except AppError as exc:
-            dump_file_path = "/tmp/debug_%d_%s.html" % (time.time() * 1000, res.request.path_qs[1:])
+            escaped_page_name = res.request.path_qs[1:].replace('/', '')
+            dump_file_path = "/tmp/debug_%d_%s.html" % (time.time() * 1000, escaped_page_name)
             if os.path.exists("/tmp"):
                 with open(dump_file_path, 'w') as dump_file:
                     print(res.ubody, file=dump_file)
@@ -62,7 +63,15 @@ class TestApp(BaseTestApp):
 
 def load_app(name=application_name):
     """Load the test application."""
-    return TestApp(loadapp('config:test.ini#%s' % name, relative_to=getcwd()))
+    return TestApp(
+        loadapp(
+            'config:test.ini#%s' % name,
+            relative_to=getcwd(),
+            global_conf={
+                'test': 'true',
+            },
+        )
+    )
 
 
 def setup_app(section_name=None):
@@ -155,6 +164,7 @@ def teardown_db():
             logger.debug(teardown_db, 'Exception while trying to remove sequence {}'.format(sequence.name))
 
     transaction.commit()
+    connection.close()
     engine.dispose()
 
 
@@ -248,6 +258,9 @@ class TestController(object):
         DBSession.close()
         daemons.execute_in_thread('radicale', lambda: transaction.commit())
         teardown_db()
+        transaction.commit()
+        DBSession.close_all()
+        config['tg.app_globals'].sa_engine.dispose()
 
 
 class TracimTestController(TestController):
@@ -354,7 +367,7 @@ class BaseTestThread(BaseTest):
         return thread
 
 
-class TestCalendar(TestController):
+class TestCalendar(TracimTestController):
     fixtures = [BaseFixture, TestFixture]
     application_under_test = 'radicale'
 

@@ -8,15 +8,13 @@ from lxml.html.diff import htmldiff
 
 from mako.template import Template
 
-from tg.i18n import lazy_ugettext as l_
-from tg.i18n import ugettext as _
-
 from tracim.lib.base import logger
 from tracim.lib.email import SmtpConfiguration
+from tracim.lib.email import send_email_through
 from tracim.lib.email import EmailSender
 from tracim.lib.user import UserApi
 from tracim.lib.workspace import WorkspaceApi
-
+from tracim.lib.utils import lazy_ugettext as l_
 from tracim.model.serializers import Context
 from tracim.model.serializers import CTX
 from tracim.model.serializers import DictLikeClass
@@ -25,8 +23,6 @@ from tracim.model.data import Content, UserRoleInWorkspace, ContentType, \
     ActionDescription
 from tracim.model.auth import User
 
-
-from tgext.asyncjob import asyncjob_perform
 
 class INotifier(object):
     """
@@ -54,10 +50,13 @@ class NotifierFactory(object):
 
 
 class DummyNotifier(INotifier):
+    send_count = 0
+
     def __init__(self, current_user: User=None):
         logger.info(self, 'Instantiating Dummy Notifier')
 
     def notify_content_update(self, content: Content):
+        type(self).send_count += 1
         logger.info(self, 'Fake notifier, do not send email-notification for update of content {}'.format(content.content_id))
 
 
@@ -142,7 +141,6 @@ class RealNotifier(object):
                 # TODO - D.A - 2014-11-06
                 # This feature must be implemented in order to be able to scale to large communities
                 raise NotImplementedError('Sending emails through ASYNC mode is not working yet')
-                asyncjob_perform(EmailNotifier(self._smtp_config, global_config).notify_content_update, self._user.user_id, content.content_id)
             else:
                 logger.info(self, 'Sending email in SYNC mode')
                 EmailNotifier(self._smtp_config, global_config).notify_content_update(self._user.user_id, content.content_id)
@@ -182,6 +180,34 @@ class EmailNotifier(object):
         self._smtp_config = smtp_config
         self._global_config = global_config
 
+    def _get_sender(self, user: User=None) -> str:
+        """
+        Return sender string like "Bob Dylan
+            (via Tracim) <notification@mail.com>"
+        :param user: user to extract display name
+        :return: sender string
+        """
+        if user is None:
+            return '{0} <{1}>'.format(
+                self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
+                self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
+            )
+
+        # We add a suffix to email to prevent client like Thunderbird to
+        # display personal adressbook label.
+        email = self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL
+        email_name, domain = email.split('@')
+        arranged_email = '{0}+{1}@{2}'.format(
+            email_name,
+            str(user.user_id),
+            domain,
+        )
+
+        return '{0} {1} <{2}>'.format(
+            user.display_name,
+            'via Tracim',
+            arranged_email,
+        )
 
     def notify_content_update(self, event_actor_id: int, event_content_id: int):
         """
@@ -228,12 +254,12 @@ class EmailNotifier(object):
             subject = self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT
             subject = subject.replace(EST.WEBSITE_TITLE, self._global_config.WEBSITE_TITLE.__str__())
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
-            subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__() if main_content.label else main_content.file_name.__str__())
+            subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
 
             message = MIMEMultipart('alternative')
             message['Subject'] = subject
-            message['From'] = self._global_config.EMAIL_NOTIFICATION_FROM
+            message['From'] = self._get_sender(user)
             message['To'] = to_addr
 
             body_text = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
@@ -250,14 +276,7 @@ class EmailNotifier(object):
             message.attach(part1)
             message.attach(part2)
 
-            message_str = message.as_string()
-            asyncjob_perform(async_email_sender.send_mail, message)
-            # s.send_message(message)
-
-        # Note: The following action allow to close the SMTP connection.
-        # This will work only if the async jobs are done in the right order
-        asyncjob_perform(async_email_sender.disconnect)
-
+            send_email_through(async_email_sender.send_mail, message)
 
     def _build_email_body(self, mako_template_filepath: str, role: UserRoleInWorkspace, content: Content, actor: User) -> str:
         """
@@ -286,75 +305,72 @@ class EmailNotifier(object):
 
         action = content.get_last_action().id
         if ActionDescription.COMMENT == action:
-            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
+            content_intro = l_('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
             content_text = content.description
-            call_to_action_text = _('Answer')
+            call_to_action_text = l_('Answer')
 
         elif ActionDescription.CREATION == action:
 
             # Default values (if not overriden)
             content_text = content.description
-            call_to_action_text = _('View online')
+            call_to_action_text = l_('View online')
 
             if ContentType.Thread == content.type:
-                call_to_action_text = _('Answer')
-                content_intro = _('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
+                call_to_action_text = l_('Answer')
+                content_intro = l_('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + \
                                content.get_last_comment_from(actor).description
 
             elif ContentType.File == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
                 if content.description:
                     content_text = content.description
-                elif content.label:
-                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
                 else:
-                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.file_name)
-
+                    content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
             elif ContentType.Page == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
                 content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
         elif ActionDescription.REVISION == action:
             content_text = content.description
-            call_to_action_text = _('View online')
+            call_to_action_text = l_('View online')
 
             if ContentType.File == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
                 content_text = ''
 
             elif ContentType.Page == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                content_text = str(l_('<p id="content-body-intro">Here is an overview of the changes:</p>'))+ \
                     title_diff + \
                     htmldiff(previous_revision.description, content.description)
 
             elif ContentType.Thread == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+                content_text = str(l_('<p id="content-body-intro">Here is an overview of the changes:</p>'))+ \
                     title_diff + \
                     htmldiff(previous_revision.description, content.description)
 
             # elif ContentType.Thread == content.type:
-            #     content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+            #     content_intro = l_('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
             #     previous_revision = content.get_previous_revision()
-            #     content_text = _('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
+            #     content_text = l_('<p id="content-body-intro">Here is an overview of the changes:</p>')+ \
             #         htmldiff(previous_revision.description, content.description)
 
         elif ActionDescription.EDITION == action:
-            call_to_action_text = _('View online')
+            call_to_action_text = l_('View online')
 
             if ContentType.File == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
+                content_intro = l_('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
                     content.description
 
@@ -374,7 +390,7 @@ class EmailNotifier(object):
         from tracim.config.app_cfg import CFG
         body_content = template.render(
             base_url=self._global_config.WEBSITE_BASE_URL,
-            _=_,
+            _=l_,
             h=helpers,
             user_display_name=role.user.display_name,
             user_role_label=role.role_as_label(),

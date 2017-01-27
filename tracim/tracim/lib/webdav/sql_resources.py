@@ -1,15 +1,20 @@
 # coding: utf8
+import logging
+
+import os
+
 import transaction
 import re
 from datetime import datetime
 from time import mktime
-from os.path import normpath, dirname, basename
-import mimetypes
+from os.path import dirname, basename
 
 from tracim.lib.content import ContentApi
 from tracim.lib.user import UserApi
 from tracim.lib.webdav import HistoryType
 from tracim.lib.webdav import FakeFileStream
+from tracim.lib.webdav.utils import transform_to_display
+from tracim.lib.webdav.utils import transform_to_bdd
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import data, new_revision
 from tracim.model.data import Content, ActionDescription
@@ -20,8 +25,12 @@ from wsgidav import compat
 from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
 from wsgidav.dav_provider import DAVCollection, DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
+from tracim.lib.webdav.utils import normpath
 
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
+logger = logging.getLogger()
+
 
 class ManageActions(object):
     """
@@ -50,7 +59,7 @@ class ManageActions(object):
         try:
             # When undeleting/unarchiving we except a content with the new name to not exist, thus if we
             # don't get an error and the database request send back a result, we stop the action
-            self.content_api.get_one_by_label_and_parent(self._new_name, self.content.parent, self.content.workspace)
+            self.content_api.get_one_by_label_and_parent(self._new_name, self.content.parent)
             raise DAVError(HTTP_FORBIDDEN)
         except NoResultFound:
             with new_revision(self.content):
@@ -65,14 +74,16 @@ class ManageActions(object):
         Will create the new name, either by adding '- deleted the [date]' after the name when archiving/deleting or
         removing this string when undeleting/unarchiving
         """
-        new_name = self.content.get_label()
+        new_name = self.content.get_label_as_file()
         extension = ''
 
         # if the content has no label, the last .ext is important
         # thus we want to rename a file from 'file.txt' to 'file - deleted... .txt' and not 'file.txt - deleted...'
         is_file_name = self.content.label == ''
         if is_file_name:
-            extension = re.search(r'(\.[^.]+)$', new_name).group(0)
+            search = re.search(r'(\.[^.]+)$', new_name)
+            if search:
+                extension = search.group(0)
             new_name = re.sub(r'(\.[^.]+)$', '', new_name)
 
         if self._type in [ActionDescription.ARCHIVING, ActionDescription.DELETION]:
@@ -119,7 +130,7 @@ class Root(DAVCollection):
         """
         try:
             workspace = self.workspace_api.get_one_by_label(label)
-            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', self.provider.transform_to_display(workspace.label))
+            workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', transform_to_display(workspace.label))
 
             return Workspace(workspace_path, self.environ, workspace)
         except AttributeError:
@@ -150,7 +161,7 @@ class Root(DAVCollection):
         self.workspace_api.save(new_workspace)
 
         workspace_path = '%s%s%s' % (
-        self.path, '' if self.path == '/' else '/', self.provider.transform_to_display(new_workspace.label))
+        self.path, '' if self.path == '/' else '/', transform_to_display(new_workspace.label))
 
         transaction.commit()
         return Workspace(workspace_path, self.environ, new_workspace)
@@ -213,14 +224,14 @@ class Workspace(DAVCollection):
             # the purpose is to display .history only if there's at least one content's type that has a history
             if content.type != ContentType.Folder:
                 self._file_count += 1
-            retlist.append(content.get_label())
+            retlist.append(content.get_label_as_file())
 
         return retlist
 
     def getMember(self, content_label: str) -> _DAVResource:
 
         return self.provider.getResourceInst(
-            '%s/%s' % (self.path, self.provider.transform_to_display(content_label)),
+            '%s/%s' % (self.path, transform_to_display(content_label)),
             self.environ
         )
 
@@ -233,11 +244,19 @@ class Workspace(DAVCollection):
         if '/.deleted/' in self.path or '/.archived/' in self.path:
             raise DAVError(HTTP_FORBIDDEN)
 
+        content = None
+
+        # Note: To prevent bugs, check here again if resource already exist
+        path = os.path.join(self.path, file_name)
+        resource = self.provider.getResourceInst(path, self.environ)
+        if resource:
+            content = resource.content
+
         return FakeFileStream(
             file_name=file_name,
             content_api=self.content_api,
             workspace=self.workspace,
-            content=None,
+            content=content,
             parent=self.content,
             path=self.path + '/' + file_name
         )
@@ -272,7 +291,7 @@ class Workspace(DAVCollection):
 
         transaction.commit()
 
-        return Folder('%s/%s' % (self.path, self.provider.transform_to_display(label)),
+        return Folder('%s/%s' % (self.path, transform_to_display(label)),
                       self.environ, folder,
                       self.workspace)
 
@@ -296,7 +315,7 @@ class Workspace(DAVCollection):
         children = self.content_api.get_all(False, ContentType.Any, self.workspace)
 
         for content in children:
-            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+            content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
             if content.type == ContentType.Folder:
                 members.append(Folder(content_path, self.environ, self.workspace, content))
@@ -360,7 +379,7 @@ class Folder(Workspace):
         return mktime(self.content.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return self.provider.transform_to_display(self.content.get_label())
+        return transform_to_display(self.content.get_label_as_file())
 
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
@@ -438,7 +457,7 @@ class Folder(Workspace):
 
         with new_revision(self.content):
             if basename(destpath) != self.getDisplayName():
-                self.content_api.update_content(self.content, self.provider.transform_to_bdd(basename(destpath)))
+                self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
                 self.content_api.save(self.content)
             else:
                 if workspace.workspace_id == self.content.workspace.workspace_id:
@@ -458,16 +477,24 @@ class Folder(Workspace):
         )
 
         for content in visible_children:
-            content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+            content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
-            if content.type == ContentType.Folder:
-                members.append(Folder(content_path, self.environ, self.workspace, content))
-            elif content.type == ContentType.File:
-                self._file_count += 1
-                members.append(File(content_path, self.environ, content))
-            else:
-                self._file_count += 1
-                members.append(OtherFile(content_path, self.environ, content))
+            try:
+                if content.type == ContentType.Folder:
+                    members.append(Folder(content_path, self.environ, self.workspace, content))
+                elif content.type == ContentType.File:
+                    self._file_count += 1
+                    members.append(File(content_path, self.environ, content))
+                else:
+                    self._file_count += 1
+                    members.append(OtherFile(content_path, self.environ, content))
+            except Exception as exc:
+                logger.exception(
+                    'Unable to construct member {}'.format(
+                        content_path,
+                    ),
+                    exc_info=True,
+                )
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
@@ -541,7 +568,7 @@ class HistoryFolder(Folder):
         )
 
         return HistoryFileFolder(
-            path='%s/%s' % (self.path, content.get_label()),
+            path='%s/%s' % (self.path, content.get_label_as_file()),
             environ=self.environ,
             content=content)
 
@@ -554,7 +581,7 @@ class HistoryFolder(Folder):
                 self._is_deleted and content.is_deleted or
                 not (content.is_archived or self._is_archived or content.is_deleted or self._is_deleted))\
                     and content.type != ContentType.Folder:
-                ret.append(content.get_label())
+                ret.append(content.get_label_as_file())
 
         return ret
 
@@ -587,7 +614,7 @@ class HistoryFolder(Folder):
         for content in children:
             if content.is_archived == self._is_archived and content.is_deleted == self._is_deleted:
                 members.append(HistoryFileFolder(
-                    path='%s/%s' % (self.path, content.get_label()),
+                    path='%s/%s' % (self.path, content.get_label_as_file()),
                     environ=self.environ,
                     content=content))
 
@@ -624,7 +651,7 @@ class DeletedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path='%s/%s' % (self.path, self.provider.transform_to_display(content.get_label())),
+            path='%s/%s' % (self.path, transform_to_display(content.get_label_as_file())),
             environ=self.environ
             )
 
@@ -638,7 +665,7 @@ class DeletedFolder(HistoryFolder):
 
         for content in children:
             if content.is_deleted:
-                retlist.append(content.get_label())
+                retlist.append(content.get_label_as_file())
 
                 if content.type != ContentType.Folder:
                     self._file_count += 1
@@ -655,7 +682,7 @@ class DeletedFolder(HistoryFolder):
 
         for content in children:
             if content.is_deleted:
-                content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+                content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
                 if content.type == ContentType.Folder:
                     members.append(Folder(content_path, self.environ, self.workspace, content))
@@ -709,7 +736,7 @@ class ArchivedFolder(HistoryFolder):
         )
 
         return self.provider.getResourceInst(
-            path=self.path + '/' + self.provider.transform_to_display(content.get_label()),
+            path=self.path + '/' + transform_to_display(content.get_label_as_file()),
             environ=self.environ
         )
 
@@ -718,7 +745,7 @@ class ArchivedFolder(HistoryFolder):
 
         for content in self.content_api.get_all_with_filter(
                 self.content if self.content is None else self.content.id, ContentType.Any):
-            retlist.append(content.get_label())
+            retlist.append(content.get_label_as_file())
 
             if content.type != ContentType.Folder:
                 self._file_count += 1
@@ -735,7 +762,7 @@ class ArchivedFolder(HistoryFolder):
 
         for content in children:
             if content.is_archived:
-                content_path = '%s/%s' % (self.path, self.provider.transform_to_display(content.get_label()))
+                content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
                 if content.type == ContentType.Folder:
                     members.append(Folder(content_path, self.environ, self.workspace, content))
@@ -772,7 +799,7 @@ class HistoryFileFolder(HistoryFolder):
         return "<DAVCollection: HistoryFileFolder (%s)" % self.content.file_name
 
     def getDisplayName(self) -> str:
-        return self.content.get_label()
+        return self.content.get_label_as_file()
 
     def createCollection(self, name):
         raise DAVError(HTTP_FORBIDDEN)
@@ -797,13 +824,13 @@ class HistoryFileFolder(HistoryFolder):
 
         if self.content.type == ContentType.File:
             return HistoryFile(
-                path='%s%s' % (left_side, self.provider.transform_to_display(revision.file_name)),
+                path='%s%s' % (left_side, transform_to_display(revision.file_name)),
                 environ=self.environ,
                 content=self.content,
                 content_revision=revision)
         else:
             return HistoryOtherFile(
-                path='%s%s' % (left_side, self.provider.transform_to_display(revision.get_label())),
+                path='%s%s' % (left_side, transform_to_display(revision.get_label_as_file())),
                 environ=self.environ,
                 content=self.content,
                 content_revision=revision)
@@ -817,14 +844,14 @@ class HistoryFileFolder(HistoryFolder):
 
             if self.content.type == ContentType.File:
                 members.append(HistoryFile(
-                    path='%s%s' % (left_side, self.provider.transform_to_display(content.file_name)),
+                    path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
                     content=self.content,
                     content_revision=content)
                 )
             else:
                 members.append(HistoryOtherFile(
-                    path='%s%s' % (left_side, self.provider.transform_to_display(content.file_name)),
+                    path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
                     content=self.content,
                     content_revision=content)
@@ -848,14 +875,6 @@ class File(DAVNonCollection):
         # but i wasn't able to set this property so you'll have to look into it >.>
         # self.setPropertyValue('Win32FileAttributes', '00000021')
 
-    def getPreferredPath(self):
-        fix_txt = '.txt' if self.getContentType() == 'text/plain' else mimetypes.guess_extension(self.getContentType())
-
-        if self.content.label == '' or self.path.endswith(fix_txt):
-            return self.path
-        else:
-            return self.path + fix_txt
-
     def __repr__(self) -> str:
         return "<DAVNonCollection: File (%d)>" % self.content.revision_id
 
@@ -869,7 +888,7 @@ class File(DAVNonCollection):
         return mktime(self.content.created.timetuple())
 
     def getDisplayName(self) -> str:
-        return self.content.get_label()
+        return self.content.file_name
 
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
@@ -885,7 +904,7 @@ class File(DAVNonCollection):
         return FakeFileStream(
             content=self.content,
             content_api=self.content_api,
-            file_name=self.content.get_label(),
+            file_name=self.content.get_label_as_file(),
             workspace=self.content.workspace,
             path=self.path
         )
@@ -942,28 +961,41 @@ class File(DAVNonCollection):
 
     def move_file(self, destpath):
 
-        workspace = self.provider.get_workspace_from_path(
-            normpath(destpath),
-            WorkspaceApi(self.user)
-        )
-
-        parent = self.provider.get_parent_from_path(
-            normpath(destpath),
-            self.content_api,
-            workspace
-        )
-
+        workspace = self.content.workspace
+        parent = self.content.parent
 
         with new_revision(self.content):
             if basename(destpath) != self.getDisplayName():
-                self.content_api.update_content(self.content, re.sub('\.[^\.]+$', '', self.provider.transform_to_bdd(basename(destpath))))
+                new_given_file_name = transform_to_bdd(basename(destpath))
+                new_file_name, new_file_extension = \
+                    os.path.splitext(new_given_file_name)
+
+                self.content_api.update_content(
+                    self.content,
+                    new_file_name,
+                )
+                self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
             else:
+                workspace_api = WorkspaceApi(self.user)
+                content_api = ContentApi(self.user)
+
+                destination_workspace = self.provider.get_workspace_from_path(
+                    destpath,
+                    workspace_api,
+                )
+
+                destination_parent = self.provider.get_parent_from_path(
+                    destpath,
+                    content_api,
+                    workspace,
+                )
+
                 self.content_api.move(
                     item=self.content,
-                    new_parent=parent,
+                    new_parent=destination_parent,
                     must_stay_in_same_workspace=False,
-                    new_workspace=workspace
+                    new_workspace=destination_workspace
                 )
 
         transaction.commit()
@@ -988,7 +1020,7 @@ class HistoryFile(File):
 
     def getDisplayName(self) -> str:
         left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
-        return '%s%s' % (left_side, self.provider.transform_to_display(self.content_revision.file_name))
+        return '%s%s' % (left_side, transform_to_display(self.content_revision.file_name))
 
     def getContent(self):
         filestream = compat.BytesIO()
@@ -1031,7 +1063,7 @@ class OtherFile(File):
             self.path += '.html'
 
     def getDisplayName(self) -> str:
-        return self.content.get_label()
+        return self.content.get_label_as_file()
 
     def getPreferredPath(self):
         return self.path
@@ -1077,7 +1109,7 @@ class HistoryOtherFile(OtherFile):
 
     def getDisplayName(self) -> str:
         left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
-        return '%s%s' % (left_side, self.provider.transform_to_display(self.content_revision.get_label()))
+        return '%s%s' % (left_side, transform_to_display(self.content_revision.get_label_as_file()))
 
     def getContent(self):
         filestream = compat.BytesIO()

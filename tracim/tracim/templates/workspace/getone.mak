@@ -10,6 +10,7 @@
 <%namespace name="P" file="tracim.templates.widgets.paragraph"/>
 <%namespace name="TITLE" file="tracim.templates.widgets.title"/>
 <%namespace name="TABLE_ROW" file="tracim.templates.widgets.table_row"/>
+<%namespace name="UI" file="tracim.templates.widgets.ui"/>
 
 <%def name="title()">${result.workspace.label}</%def>
 
@@ -36,94 +37,96 @@
 ##
 ############################################################################
 
-<div class="row t-page-header-row">
-    <div class="col-sm-7 col-sm-offset-3 main">
+<div class="t-page-header-row">
+    <div class="main">
         <h1 class="page-header t-less-visible-border">
             <i class="fa fa-fw fa-lg fa-bank t-less-visible"></i>
             ${result.workspace.label}
         </h1>
 
         <div style="margin: -1.5em auto -1.5em auto;" class="t-less-visible">
-          <p>${_('workspace created on {date} at {time}').format(date=h.date(result.workspace.created), time=h.time(result.workspace.created))|n}</p>
+            <% created_localized = h.get_with_timezone(result.workspace.created) %>
+          <p>${_('workspace created on {date} at {time}').format(date=h.date(created_localized), time=h.time(created_localized))|n}</p>
         </div>
     </div>
 </div>
 
 
 
-<div class="row">
-    <div class="col-sm-7 col-md-offset-3">
-        ${TITLE.H3(_('Detail'), 'fa-align-justify', 'workspace-members')}
-        % if result.workspace.description:
-            <p>${result.workspace.description}</p>
-        % else:
-            <p class="t-less-visible">${_('No description available')}</p>
-        % endif
+<div class="workspace__detail__wrapper">
+    ${TITLE.H3(_('Detail'), 'fa-align-justify', 'workspace-members')}
+    % if result.workspace.description:
+        <p>${result.workspace.description}</p>
+    % else:
+        <p class="t-less-visible">${_('No description available')}</p>
+    % endif
 
-        <% member_nb = len(result.workspace.members) %>
-        <% viewable_members = h.get_viewable_members_for_role(fake_api.current_user_workspace_role, result.workspace.members) %>
-        <% viewable_member_nb = len(viewable_members) %>
-        % if member_nb<=0:
-            ${P.EMPTY_CONTENT(_('There are no members in this workspace'))}
-        % else:
-            <p>
-                % if member_nb == 1:
-                    ${_('This workspace has {a_open}one member{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', a_close='</a>')|n}
-                % else:
-                    ${_('This workspace has {a_open}{member_nb} members{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', member_nb=member_nb, a_close='</a>')|n}
-                    % if viewable_member_nb != member_nb:
-                        <span id="members-whose" style="display: none;">${ _('whose') }:</span>
-                    % endif
+    <% member_nb = len(result.workspace.members) %>
+    <% viewable_members = h.get_viewable_members_for_role(fake_api.current_user_workspace_role, result.workspace.members) %>
+    <% viewable_member_nb = len(viewable_members) %>
+    % if member_nb<=0:
+        ${P.EMPTY_CONTENT(_('There are no members in this workspace'))}
+    % else:
+        <p>
+            % if member_nb == 1:
+                ${_('This workspace has {a_open}one member{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', a_close='</a>')|n}
+            % else:
+                ${_('This workspace has {a_open}{member_nb} members{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', member_nb=member_nb, a_close='</a>')|n}
+                % if viewable_member_nb != member_nb:
+                    <span id="members-whose" style="display: none;">${ _('whose') }:</span>
                 % endif
-            </p>
-            <div class="collapse" id="memberList">
-                <table class="table">
-                    % for member in viewable_members:
-                        <tr>
-                            <td><strong>${member.name}</strong></td>
-                            <td>
-                                ${TIM.ICO_FA_BADGED('fa fa-fw fa-flag', member.role_description, member.style)}
-                                ${member.role_description}
-                            </td>
-                        </tr>
-                    % endfor
-                </table>
-            </div>
-            <script>
-                $(document).ready(function(){
-                    $('#memberList').on('show.bs.collapse', function() {
-                        $('#members-whose').show();
-                    });
-                    $('#memberList').on('hide.bs.collapse', function() {
-                        $('#members-whose').hide();
-                    });
-                });
-            </script>
-        % endif
-
-        % if result.workspace.calendar_enabled:
-            <p>
-                ${_('This workspace has {a_open}an associated calendar{a_close}').format(a_open='<a data-toggle="collapse" href="#calendarConfig" aria-expanded="false" aria-controls="calendarConfig">', a_close='</a>')|n}
-            </p>
-            <div class="collapse" id="calendarConfig">
-                <p>${_('You can access the calendar using your own software: Outlook, Thunderbird, etc.')}</p>
-                <p>${_('The url to setup is the following one:')}</p>
-                <p class="form-control">${result.workspace.calendar_url}</p>
-            </div>
-        % endif
-
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-sm-7 col-sm-offset-3">
-        <div class="t-half-spacer-above t-less-visible">
+            % endif
+        </p>
+        <div class="collapse" id="memberList">
+            <table class="table">
+                % for member in viewable_members:
+                    <tr>
+                        <td><strong>${member.name}</strong></td>
+                        <td>
+                            ${TIM.ICO_FA_BADGED('fa fa-fw fa-flag', member.role_description, member.style)}
+                            ${member.role_description}
+                        </td>
+                    </tr>
+                % endfor
+            </table>
         </div>
-    </div>
-</div>
+        <script>
+            $(document).ready(function(){
+                $('#memberList').on('show.bs.collapse', function() {
+                    $('#members-whose').show();
+                });
+                $('#memberList').on('hide.bs.collapse', function() {
+                    $('#members-whose').hide();
+                });
+            });
+        </script>
+    % endif
 
-<div class="row">
-    <div class="col-sm-7 col-sm-offset-3">
+    % if result.workspace.calendar_enabled:
+        <p>
+            ${_('This workspace has {a_open}an associated calendar{a_close}').format(a_open='<a data-toggle="collapse" href="#calendarConfig" aria-expanded="false" aria-controls="calendarConfig">', a_close='</a>')|n}
+        </p>
+        <div class="collapse" id="calendarConfig">
+            <p>${_('You can access the calendar using your own software: Outlook, Thunderbird, etc.')}</p>
+            <p>${_('The url to setup is the following one:')}</p>
+            <p class="form-control">${result.workspace.calendar_url}</p>
+        </div>
+    % endif
+
+        <p>
+            ${_('This workspace is {a_open}accessible with webdav{a_close}').format(a_open='<a data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
+        </p>
+        <div class="collapse" id="webdavConfig">
+            <p>${_('Adress to connect to webdav with:')}</p>
+            <p>Linux : </p>
+            <p class="form-control">dav://${webdav_url}</p>
+            <p>Windows : </p>
+            <p class="form-control">http://${webdav_url}</p>
+        </div>
+
+    <div class="t-half-spacer-above t-less-visible"></div>
+
+    <div class="">
         <div class="t-half-spacer-above">
             <% user_role = h.user_role(fake_api.current_user, result.workspace) %>
 
@@ -147,17 +150,17 @@
                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
                             % else:
                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT('', _('You are not allowed to create content'), '', 't-less-visible fa fa-ban')}</li>
-## Show new content entries in the menu is currently not available at root of a workspace
-## TODO - D.A. - 2015-08-20 - Allow to put content at root (and show related entry in the menu
-##                             % if user_role == 2:
-##                                 ## Only show 'new folder' to content managers
-##                                 <%
-##                                     new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
-##                                     modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
-##                                     icon_classes = content_type.icon+' '+content_type.color
-##                                 %>
-##                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
-##                             % endif
+    ## Show new content entries in the menu is currently not available at root of a workspace
+    ## TODO - D.A. - 2015-08-20 - Allow to put content at root (and show related entry in the menu
+    ##                             % if user_role == 2:
+    ##                                 ## Only show 'new folder' to content managers
+    ##                                 <%
+    ##                                     new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
+    ##                                     modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
+    ##                                     icon_classes = content_type.icon+' '+content_type.color
+    ##                                 %>
+    ##                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
+    ##                             % endif
                             % endif
                         % endfor
                     </ul>
@@ -179,6 +182,8 @@
                     <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('search...')}" aria-describedby="basic-addon1">
                 </div>
             % endif
+
+            ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}'.format(result.workspace.id)))}
 
         </div>
         <div class="t-spacer-above">
@@ -203,24 +208,24 @@
                 </table>
             % endif
 
-##             % if h.user_role(fake_api.current_user, result.workspace)<=2: # User must be a content manager to be allowed to create folders
-##                 ${WIDGETS.SECURED_SECTION_TITLE(fake_api.current_user, result.workspace, 'sub-folders', _('Folders'))}
-##             % else:
-##                 ${WIDGETS.SECURED_SECTION_TITLE(fake_api.current_user, result.workspace, 'sub-folders', _('Folders'), 'folder-new', _('Add a folder...'))}
-##                 {FORMS.NEW_FOLDER_FORM('folder-new', result.workspace.id)}
-##             % endif
-##
-##             <p>
-##                 ${WIDGETS.FOLDER_LIST('subfolder-list', result.workspace.id, fake_api.current_workspace_folders)}
-##             </p>
-##             % if len(fake_api.current_workspace_folders)<=0 and fake_api.current_user:
-##                 % if h.user_role(fake_api.current_user, result.workspace)>2: # User must be a content manager to be allowed to create folders
-##                     <p>
-##                         ${_('You need folders to organize your content.')}
-##                         <a class="btn btn-small btn-primary" data-toggle="collapse" data-target="#folder-new"><i class="fa fa-check"></i> <b>${_('Create a folder now')}</b></a>
-##                     </p>
-##                 % endif
-##             % endif
+    ##             % if h.user_role(fake_api.current_user, result.workspace)<=2: # User must be a content manager to be allowed to create folders
+    ##                 ${WIDGETS.SECURED_SECTION_TITLE(fake_api.current_user, result.workspace, 'sub-folders', _('Folders'))}
+    ##             % else:
+    ##                 ${WIDGETS.SECURED_SECTION_TITLE(fake_api.current_user, result.workspace, 'sub-folders', _('Folders'), 'folder-new', _('Add a folder...'))}
+    ##                 {FORMS.NEW_FOLDER_FORM('folder-new', result.workspace.id)}
+    ##             % endif
+    ##
+    ##             <p>
+    ##                 ${WIDGETS.FOLDER_LIST('subfolder-list', result.workspace.id, fake_api.current_workspace_folders)}
+    ##             </p>
+    ##             % if len(fake_api.current_workspace_folders)<=0 and fake_api.current_user:
+    ##                 % if h.user_role(fake_api.current_user, result.workspace)>2: # User must be a content manager to be allowed to create folders
+    ##                     <p>
+    ##                         ${_('You need folders to organize your content.')}
+    ##                         <a class="btn btn-small btn-primary" data-toggle="collapse" data-target="#folder-new"><i class="fa fa-check"></i> <b>${_('Create a folder now')}</b></a>
+    ##                     </p>
+    ##                 % endif
+    ##             % endif
         </div>
     </div>
 </div>

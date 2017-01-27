@@ -1,33 +1,19 @@
 # -*- coding: utf-8 -*-
+import pytz
+from sqlalchemy.orm.exc import NoResultFound
+from tracim.lib import CST
 from webob.exc import HTTPForbidden
-
-from tracim import model  as pm
-
-from sprox.tablebase import TableBase
-from sprox.formbase import EditableForm, AddRecordForm
-from sprox.fillerbase import TableFiller, EditFormFiller
-from tw2 import forms as tw2f
 import tg
 from tg import tmpl_context
-from tg.i18n import ugettext as _, lazy_ugettext as l_
-
-from sprox.widgets import PropertyMultipleSelectField
-from sprox._compat import unicode_text
-
-from formencode import Schema
-from formencode.validators import FieldsMatch
+from tg.i18n import ugettext as _
 
 from tracim.controllers import TIMRestController
-from tracim.lib import helpers as h
 from tracim.lib.user import UserApi
-from tracim.lib.group import GroupApi
-from tracim.lib.user import UserStaticApi
-from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
-
-from tracim.model import DBSession
-from tracim.model.auth import Group, User
-from tracim.model.serializers import Context, CTX, DictLikeClass
+from tracim.model.serializers import Context
+from tracim.model.serializers import CTX
+from tracim.model.serializers import DictLikeClass
+from tracim import model as pm
 
 
 class UserWorkspaceRestController(TIMRestController):
@@ -123,7 +109,7 @@ class UserPasswordRestController(TIMRestController):
             tg.redirect(redirect_url)
 
         current_user.password = new_password1
-        current_user.webdav_left_digest_response_hash = '%s:/:%s' % (current_user.email, new_password1)
+        current_user.update_webdav_digest_auth(new_password1)
         pm.DBSession.flush()
 
         tg.flash(_('Your password has been changed'))
@@ -174,26 +160,42 @@ class UserRestController(TIMRestController):
 
         dictified_user = Context(CTX.USER).toDict(current_user, 'user')
         fake_api = DictLikeClass(next_url=next_url)
-        return DictLikeClass(result=dictified_user, fake_api=fake_api)
+        return DictLikeClass(
+            result=dictified_user,
+            fake_api=fake_api,
+            timezones=pytz.all_timezones,
+        )
 
     @tg.expose('tracim.templates.workspace.edit')
-    def put(self, user_id, name, email, next_url=None):
+    def put(self, user_id, name, email, timezone, next_url=None):
         user_id = tmpl_context.current_user.user_id
         current_user = tmpl_context.current_user
+        user_api = UserApi(current_user)
         assert user_id==current_user.user_id
+        if next_url:
+            next = tg.url(next_url)
+        else:
+            next = self.url()
+
+        try:
+            email_user = user_api.get_one_by_email(email)
+            if email_user != current_user:
+                tg.flash(_('Email already in use'), CST.STATUS_ERROR)
+                tg.redirect(next)
+        except NoResultFound:
+            pass
 
         # Only keep allowed field update
         updated_fields = self._clean_update_fields({
             'name': name,
-            'email': email
+            'email': email,
+            'timezone': timezone,
         })
 
         api = UserApi(tmpl_context.current_user)
         api.update(current_user, do_save=True, **updated_fields)
         tg.flash(_('profile updated.'))
-        if next_url:
-            tg.redirect(tg.url(next_url))
-        tg.redirect(self.url())
+        tg.redirect(next)
 
     def _clean_update_fields(self, fields: dict):
         """

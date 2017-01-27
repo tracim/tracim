@@ -7,7 +7,7 @@
 
 <%def name="content_wrapper()">
     <iframe width="100%"
-            src="/caldavzap/index.tracim.html"
+            src="/_caldavzap/index.tracim.html"
             style="position: absolute; height: 100%; border: none; margin-bottom: 20px;"
     ></iframe>
 </%def>

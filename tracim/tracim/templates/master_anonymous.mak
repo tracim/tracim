@@ -9,10 +9,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="">
-        <link rel="icon" href="../../favicon.ico">
+        <link rel="icon" href="/favicon.ico">
         <link href="${tg.url('/assets/css/bootstrap.min.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/css/dashboard.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/font-awesome-4.2.0/css/font-awesome.css')}" rel="stylesheet">
+        <script>
+          globalTracimLang = 'fr_FR'
+        </script>
     </head>
 
     <body class="${self.body_class()}" style="
@@ -27,11 +30,13 @@
         <div class="container-fluid">
             ${self.main_menu()}
             ${self.content_wrapper()}
-            <div id="tracim-footer-separator"></div>
+            <div id="tracim-footer-separator hidden-xs"></div>
         </div>
         ${self.footer()}
 
         <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
+        <script src="${tg.url('/assets/js/trad.js')}"></script>
+        <script src="${tg.url('/assets/js/main.js')}"></script>
         ## HACK - D.A. - 2014-10-21
         ##
         ## The following JS "hack" is intended to make TG2 flash messages compatible with bootstrap alert classes
@@ -48,7 +53,7 @@
     </body>
 
 <%def name="content_wrapper()">
-    ${TIM.FLASH_MSG('col-sm-6 col-sm-offset-3')}
+    ${TIM.FLASH_MSG('')}
     ${self.body()}
 </%def>
 
@@ -62,7 +67,7 @@
 <%def name="title()"></%def>
 
 <%def name="footer()">
-    <div class="pod-footer footer hidden-tablet hidden-phone text-center">
+    <div class="pod-footer footer hidden-tablet hidden-phone text-center hidden-xs">
         <p>
             <a href="http://trac.im">${_('Create your own collaborative workspace on trac.im')}</a> &mdash;
             copyright &copy; 2013 - ${h.current_year()} tracim project.
@@ -75,14 +80,11 @@
     <div class="navbar navbar-fixed-top navbar-fixed-top-transparent" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
+                <!--button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <i class="fa fa-bars"></i>
+                </button-->
                 <a class="navbar-brand" href="${tg.url('/')}">
-                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" style="margin: -13px 0.5em 0 -13px;"/>
+                  <img src="${tg.url('/assets/img/logo.png')}" class="pull-left" />
                 </a>
             </div>
         </div>
