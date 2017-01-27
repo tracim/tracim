@@ -75,45 +75,53 @@
         <% user_role = h.user_role(fake_api.current_user, result.folder.workspace) %>
 
         <div class="t-spacer-above">
-            % if user_role > 1:
-                <div class="btn-group" role="group">
-                    % if (not result.folder.is_archived and not result.folder.is_deleted) :
-                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            <i class="fa fa-plus"></i> ${_('New ...')}
-                            <span class="caret"></span>
-                        </button>
-                    % endif
-                    <ul class="dropdown-menu" role="menu">
-                        % for content_type in result.folder.allowed_content_types:
-                            % if content_type.id != 'folder' or user_role > 2:
-                                ## Only show 'new folder' to content managers
-                                <%
-                                    new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
-                                    modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
-                                    icon_classes = content_type.icon+' '+content_type.color
-                                %>
-                                <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
+            <div class="row">
+                <div class="col-md-4 col-sx-12">
+                    % if user_role > 1:
+                        <div class="btn-group" role="group">
+                            % if (not result.folder.is_archived and not result.folder.is_deleted) :
+                                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-plus"></i> ${_('New ...')}
+                                    <span class="caret"></span>
+                                </button>
                             % endif
-                        % endfor
-                    </ul>
+                            <ul class="dropdown-menu" role="menu">
+                                % for content_type in result.folder.allowed_content_types:
+                                    % if content_type.id != 'folder' or user_role > 2:
+                                        ## Only show 'new folder' to content managers
+                                        <%
+                                            new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
+                                            modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
+                                            icon_classes = content_type.icon+' '+content_type.color
+                                        %>
+                                        <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
+                                    % endif
+                                % endfor
+                            </ul>
+                        </div>
+                    % endif
                 </div>
-            % endif
+                <div class="col-md-8 text-right">
+                    % if len(fake_api.sub_items) > 0:
+                        ## INFO - D.A. - 2015-05-25
+                        ## We hide filtering/search buttons if no content yet.
+                        ## This make the interface more easy to use
+                        <div class="btn-group" role="group" aria-label="...">
+                            ${BUTTON.TEXT('', 'btn btn-default disabled', _('hide...'))}
 
-            % if len(fake_api.sub_items) > 0:
-                ## INFO - D.A. - 2015-05-25
-                ## We hide filtering/search buttons if no content yet.
-                ## This make the interface more easy to use
-                <div class="btn-group" role="group" aria-label="...">
-                    ${BUTTON.TEXT('', 'btn btn-default disabled', _('hide...'))}
-                    % for content_type in result.folder.allowed_content_types:
-                        ${BUTTON.TEXT('toggle-{type}-visibility'.format(type=content_type.id), 'btn btn-default t-active-color disabled-has-priority', content_type.label)}
-                    % endfor
+                            % for content_type in result.folder.allowed_content_types:
+                                ${BUTTON.TEXT('toggle-{type}-visibility'.format(type=content_type.id), 'btn btn-default t-active-color disabled-has-priority', content_type.label)}
+                            % endfor
+                        </div>
+                        <p></p>
+                        ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}/folders/{}'.format(result.folder.workspace.id, result.folder.id)))}
+                        <p></p>
+                        <div class="btn-group" role="group" aria-label="...">
+                            <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('filter...')}" aria-describedby="basic-addon1">
+                        </div>
+                    % endif
                 </div>
-
-                <div class="btn-group pull-right" role="group" aria-label="...">
-                    <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('search...')}" aria-describedby="basic-addon1">
-                </div>
-            % endif
+            </div>
         </div>
 
         <div class="t-spacer-above">
@@ -133,8 +141,6 @@
                     ## FIXME${FORMS.NEW_FOLDER_FORM('folder-new', result.folder.workspace.id, result.folder.id)}
                 % endif
             % endif
-
-            ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}/folders/{}'.format(result.folder.workspace.id, result.folder.id)))}
 
             % if len(fake_api.sub_items) <= 0:
                 ${P.EMPTY_CONTENT(_('This folder has not yet content.'))}

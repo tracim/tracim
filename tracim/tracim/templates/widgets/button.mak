@@ -9,6 +9,7 @@
 
 
 <%def name="TEXT(dom_id, css_class, label='')"><button type="button" class="${css_class}" id="${dom_id}">${label}</button></%def>
+<%def name="TEXT_AND_ICON(dom_id, css_class, label='', icon_css='')"><button type="button" class="${css_class}" id="${dom_id}"><i class="${icon_css}"></i> ${label}</button></%def>
 <%def name="DATA_TARGET_AS_TEXT(dom_id, label='', classes='')"><a data-toggle="collapse" data-target="#${dom_id}" class="${classes}">${label}</a></%def>
 <%def name="DATA_TARGET_AS_TEXT_MODAL_WITH_REMOTE_CONTENT(dom_id, label, remote_url)"><a data-toggle="modal" data-target="#${dom_id}" data-remote="${remote_url}">${label}</a></%def>
 <%def name="DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(dom_id, label, remote_url, icon_classes)"><a data-toggle="modal" data-target="#${dom_id}" data-remote="${remote_url}">${ICON.FA_FW(icon_classes)} ${label}</a></%def>
