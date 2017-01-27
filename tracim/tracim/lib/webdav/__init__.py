@@ -139,4 +139,4 @@ class FakeFileStream(object):
                 self._file_stream.read()
             )
 
-            self._api.save(self._content, ActionDescription.EDITION)
+            self._api.save(self._content, ActionDescription.REVISION)
