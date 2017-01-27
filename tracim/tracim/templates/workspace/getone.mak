@@ -114,17 +114,30 @@
     % endif
 
     <p>
-        ${_('This workspace is {a_open}accessible with webdav{a_close}').format(a_open='<a data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
+        ${_('You can browse the content of this workspace {a_open}in your file explorer (webdav){a_close}').format(a_open='<a data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
     </p>
     <div class="collapse" id="webdavConfig">
-        <div class="input-group">
-            <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-windows"></i> Windows</span>
-            <p class="form-control">http://${webdav_url}</p>
-        </div>
-        <p></p>
-        <div class="input-group">
-            <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-linux"></i> Linux</span>
-            <p class="form-control">dav://${webdav_url}</p>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-windows"></i> Windows</span>
+                    <p class="form-control">http://${webdav_url}</p>
+                </div>
+                <p></p>
+                <div class="input-group">
+                    <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-linux"></i> Linux</span>
+                    <p class="form-control">dav://${webdav_url}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-warning">
+                    <p>
+                        <i class="fa fa-fw fa-info"></i>
+                        ${_('Tracim implements a <a href="https://fr.wikipedia.org/wiki/WebDAV">webdav interface</a>.')|n}
+                    </p>
+                    <p>${_('You can configure your file explorer to use this interface and browse tracim content through it.')}</p>
+                </div>
+            </div>
         </div>
     </div>
 
