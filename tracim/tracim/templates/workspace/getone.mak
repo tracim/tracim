@@ -113,16 +113,33 @@
         </div>
     % endif
 
-        <p>
-            ${_('This workspace is {a_open}accessible with webdav{a_close}').format(a_open='<a data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
-        </p>
-        <div class="collapse" id="webdavConfig">
-            <p>${_('Adress to connect to webdav with:')}</p>
-            <p>Linux : </p>
-            <p class="form-control">dav://${webdav_url}</p>
-            <p>Windows : </p>
-            <p class="form-control">http://${webdav_url}</p>
+    <p>
+        ${_('You can browse the content of this workspace {a_open}in your file explorer (webdav){a_close}').format(a_open='<a data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
+    </p>
+    <div class="collapse" id="webdavConfig">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-windows"></i> Windows</span>
+                    <p class="form-control">http://${webdav_url}</p>
+                </div>
+                <p></p>
+                <div class="input-group">
+                    <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-linux"></i> Linux</span>
+                    <p class="form-control">dav://${webdav_url}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-warning">
+                    <p>
+                        <i class="fa fa-fw fa-info"></i>
+                        ${_('Tracim implements a <a href="https://fr.wikipedia.org/wiki/WebDAV">webdav interface</a>.')|n}
+                    </p>
+                    <p>${_('You can configure your file explorer to use this interface and browse tracim content through it.')}</p>
+                </div>
+            </div>
         </div>
+    </div>
 
     <div class="t-half-spacer-above t-less-visible"></div>
 
@@ -131,59 +148,63 @@
             <% user_role = h.user_role(fake_api.current_user, result.workspace) %>
 
             ${TITLE.H3(_('Content'), 'fa-copy', 'workspace-content')}
-
-            % if user_role > 1:
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-plus"></i> ${_('New ...')}
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        % for content_type in result.workspace.allowed_content_types:
-                            % if content_type.id == 'folder' and user_role > 2:
-                                ## Only show 'new folder' to content managers
-                                <%
-                                    new_form_content_url = tg.url('/workspaces/{}/folders/new'.format(result.workspace.id), params={'workspace_id': result.workspace.id, 'parent_id': None})
-                                    modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
-                                    icon_classes = content_type.icon+' '+content_type.color
-                                %>
-                                <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
-                            % else:
-                                <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT('', _('You are not allowed to create content'), '', 't-less-visible fa fa-ban')}</li>
-    ## Show new content entries in the menu is currently not available at root of a workspace
-    ## TODO - D.A. - 2015-08-20 - Allow to put content at root (and show related entry in the menu
-    ##                             % if user_role == 2:
-    ##                                 ## Only show 'new folder' to content managers
-    ##                                 <%
-    ##                                     new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
-    ##                                     modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
-    ##                                     icon_classes = content_type.icon+' '+content_type.color
-    ##                                 %>
-    ##                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
-    ##                             % endif
-                            % endif
-                        % endfor
-                    </ul>
+                <div class="col-md-4 col-sx-12">
+                    % if user_role > 1:
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-plus"></i> ${_('New ...')}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                % for content_type in result.workspace.allowed_content_types:
+                                    % if content_type.id == 'folder' and user_role > 2:
+                                        ## Only show 'new folder' to content managers
+                                        <%
+                                            new_form_content_url = tg.url('/workspaces/{}/folders/new'.format(result.workspace.id), params={'workspace_id': result.workspace.id, 'parent_id': None})
+                                            modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
+                                            icon_classes = content_type.icon+' '+content_type.color
+                                        %>
+                                        <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
+                                    % else:
+                                        <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT('', _('You are not allowed to create content'), '', 't-less-visible fa fa-ban')}</li>
+            ## Show new content entries in the menu is currently not available at root of a workspace
+            ## TODO - D.A. - 2015-08-20 - Allow to put content at root (and show related entry in the menu
+            ##                             % if user_role == 2:
+            ##                                 ## Only show 'new folder' to content managers
+            ##                                 <%
+            ##                                     new_form_content_url = tg.url('/workspaces/{}/folders/{}/{}s/new'.format(result.folder.workspace.id, result.folder.id, content_type.id), params={'workspace_id': result.folder.workspace.id, 'parent_id': result.folder.id})
+            ##                                     modal_dialog_id = '{content_type}-new-modal-dialog'.format(content_type=content_type.id)
+            ##                                     icon_classes = content_type.icon+' '+content_type.color
+            ##                                 %>
+            ##                                 <li>${BUTTON.DATA_TARGET_AS_TEXT_AND_ICON_MODAL_WITH_REMOTE_CONTENT(modal_dialog_id, content_type.label, new_form_content_url, icon_classes)}</li>
+            ##                             % endif
+                                    % endif
+                                % endfor
+                            </ul>
+                        </div>
+                    % endif
                 </div>
-            % endif
-
-            % if len(fake_api.sub_items) > 0:
-                ## INFO - D.A. - 2015-05-25
-                ## We hide filtering/search buttons if no content yet.
-                ## This make the interface more easy to use
-                <div class="btn-group" role="group" aria-label="...">
-                    ${BUTTON.TEXT('', 'btn btn-default disabled', _('hide...'))}
-                    % for content_type in result.workspace.allowed_content_types:
-                        ${BUTTON.TEXT('toggle-{type}-visibility'.format(type=content_type.id), 'btn btn-default t-active-color disabled-has-priority', content_type.label)}
-                    % endfor
+                <div class="col-md-8 text-right">
+                    % if len(fake_api.sub_items) > 0:
+                        ## INFO - D.A. - 2015-05-25
+                        ## We hide filtering/search buttons if no content yet.
+                        ## This make the interface more easy to use
+                        <div class="btn-group" role="group" aria-label="...">
+                            ${BUTTON.TEXT('', 'btn btn-default disabled', _('hide...'))}
+                            % for content_type in result.workspace.allowed_content_types:
+                                ${BUTTON.TEXT('toggle-{type}-visibility'.format(type=content_type.id), 'btn btn-default t-active-color disabled-has-priority', content_type.label)}
+                            % endfor
+                        </div>
+                        <p></p>
+                        ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}'.format(result.workspace.id)))}
+                        <p></p>
+                        <div class="btn-group pull-right" role="group" aria-label="...">
+                            <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('filter...')}" aria-describedby="basic-addon1">
+                        </div>
+                    % endif
                 </div>
 
-                <div class="btn-group pull-right" role="group" aria-label="...">
-                    <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('search...')}" aria-describedby="basic-addon1">
-                </div>
-            % endif
 
-            ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}'.format(result.workspace.id)))}
 
         </div>
         <div class="t-spacer-above">

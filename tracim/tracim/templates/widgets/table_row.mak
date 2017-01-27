@@ -2,12 +2,12 @@
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
 <%namespace name="SPAN" file="tracim.templates.widgets.span"/>
 
-<%def name="USER_ROLE_IN_WORKSPACE(current_user, role, show_id=True, enable_link=None, disable_link=None, role_types=None)">
+<%def name="USER_ROLE_IN_WORKSPACE(current_user, role, show_id=True, enable_link=None, disable_link=None, role_types=None, base_link='/admin/workspaces/{workspace}')">
     <tr>
         % if show_id:
             <td>${role.workspace.id}</td>
         % endif
-        <td><a href="${tg.url('/admin/workspaces/{}').format(role.workspace.id)}">${role.workspace.name}</a></td>
+        <td><a href="${tg.url(base_link).format(workspace=role.workspace.id)}">${role.workspace.name}</a></td>
 
         % if role_types:
             ## <td>${BUTTON.SECURED_ROLE_SELECTOR(fake_api.current_user, result.workspace, member, fake_api.role_types)}</td>

@@ -2,28 +2,18 @@
 
 <%def name="GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(base_url)">
     <div class="btn-group folder__filter" role="group" aria-label="...">
-        ${BUTTON.TEXT('', 'btn btn-default disabled', _('display...'))}
 
-        <% show_deleted_param = 1 %>
-        <% show_archived_param = 1 %>
+        <% show_deleted_param = int(not show_deleted) %>
+        <% show_archived_param = int(not show_archived) %>
+        <% show_deleted_url = '{}?show_deleted={}&show_archived={}'.format(base_url, show_deleted_param, int(show_archived)) %>
+        <% show_archive_url = '{}?show_deleted={}&show_archived={}'.format(base_url, int(show_deleted), show_archived_param) %>
 
-        % if show_deleted:
-            <% show_deleted_param = 0 %>
-        % endif
-        % if show_archived:
-            <% show_archived_param = 0 %>
-        % endif
-
-        <a href="${base_url}?show_deleted=${show_deleted_param}&show_archived=${show_archived if show_archived else 0}"
-           class="btn btn-default disabled-has-priority ${'t-inactive-color' if not show_deleted else ''}"
-        >
-            ${_('deleted')}
+        <a href="${show_deleted_url}" class="btn btn-default disabled-has-priority ${('t-inactive-color', '')[show_deleted ]}">
+            ${(_('Show trashed items'), _('Hide trashed items'))[show_deleted]} <i class="fa fa-fw fa-trash ${('t-inactive-color', 'tracim-less-visible')[show_deleted]}"></i>
         </a>
 
-        <a href="${base_url}?show_deleted=${show_deleted if show_deleted else 0}&show_archived=${show_archived_param}"
-           class="btn btn-default disabled-has-priority ${'t-inactive-color' if not show_archived else ''}"
-        >
-            ${_('archived')}
+        <a href="${show_archive_url}" class="btn btn-default disabled-has-priority ${('t-inactive-color', '')[show_archived]}">
+            ${(_('Show archives'),_('Hide archives'))[show_archived]} <i class="fa fa-fw fa-archive ${('t-inactive-color', 'tracim-less-visible')[show_archived]}"></i>
         </a>
     </div>
 </%def>
