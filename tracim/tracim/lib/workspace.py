@@ -107,7 +107,9 @@ class WorkspaceApi(object):
     def get_notifiable_roles(self, workspace: Workspace) -> [UserRoleInWorkspace]:
         roles = []
         for role in workspace.roles:
-            if role.do_notify==True and role.user!=self._user:
+            if role.do_notify==True \
+                    and role.user!=self._user \
+                    and role.user.is_active:
                 roles.append(role)
         return roles
 
