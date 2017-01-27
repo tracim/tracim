@@ -241,7 +241,7 @@ class ContentApi(object):
     def _base_query(self, workspace: Workspace=None):
         result = self.__real_base_query(workspace)
 
-       if not self._show_deleted:
+        if not self._show_deleted:
             result = result.filter(Content.is_deleted==False)
 
         if not self._show_archived:
