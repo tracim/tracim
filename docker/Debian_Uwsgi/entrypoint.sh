@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO: generate cookie secret (if not yet done)
-# TODO: run uwsgi as other user
-# TODO: Gestion des migrations
-# TODO: Verbosite des logs ?
-
 #
 # ENVIRONMENT VARIABLES ARE:
 #
@@ -20,6 +15,7 @@
 # Default values
 # TODO: Voir avec Damien si c'est le comportement souhaité
 PULL=${PULL:=1}
+CONFIG_FILE_IS_NEW=0
 
 # Check environment variables
 /tracim/check_env_vars.sh
@@ -35,6 +31,7 @@ fi
 
 # Create config.ini file if no exist
 if [ ! -f /etc/tracim/config.ini ]; then
+    CONFIG_FILE_IS_NEW=1
     cp /tracim/tracim/development.ini.base /etc/tracim/config.ini
 fi
 ln -sf /etc/tracim/config.ini /tracim/tracim/config.ini
@@ -83,8 +80,17 @@ if [ "$DATABASE_TYPE" = sqlite ] ; then
     fi
 fi
 
-# Update radicale file system folder config
-sed -i "s/\(# radicale.server.filesystem.folder *= *\).*/radicale.server.filesystem.folder = \/var\/tracim\/radicale/" /etc/tracim/config.ini
+# Some configs are require if it's a fresh config file
+if [ "$CONFIG_FILE_IS_NEW" = 1 ] ; then
+    # Update radicale file system folder config
+    sed -i "s/\(# radicale.server.filesystem.folder *= *\).*/radicale.server.filesystem.folder = \/var\/tracim\/radicale/" /etc/tracim/config.ini
+    # Update secret
+    # TODO: test it
+    SECRET=$(python -c "import uuid; print(str(uuid.uuid4()))")
+    sed -i "s/\(cookie_secret *= *\).*/cookie_secret = $SECRET/" /etc/tracim/config.ini
+    sed -i "s/\(beaker.session.secret *= *\).*/beaker.session.secret = $SECRET/" /etc/tracim/config.ini
+    sed -i "s/\(beaker.session.validate_key *= *\).*/beaker.session.validate_key = $SECRET/" /etc/tracim/config.ini
+fi
 
 # Update sqlalchemy.url config
 if ! [ "$DATABASE_TYPE" = sqlite ] ; then
