@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# TODO: generate cookie secrent (if not yet done)
+# TODO: generate cookie secret (if not yet done)
 # TODO: run uwsgi as other user
 # TODO: Gestion des migrations
 # TODO: Verbosite des logs ?
@@ -23,6 +23,9 @@ PULL=${PULL:=1}
 
 # Check environment variables
 /tracim/check_env_vars.sh
+if [ ! "$?" = 0 ]; then
+    exit 1
+fi
 
 # If PULL is set, change repository HEAD
 if [ "$PULL" = 1 ]; then
@@ -34,18 +37,13 @@ fi
 if [ ! -f /etc/tracim/config.ini ]; then
     cp /tracim/tracim/development.ini.base /etc/tracim/config.ini
 fi
-ln -s /etc/tracim/config.ini /tracim/tracim/config.ini
+ln -sf /etc/tracim/config.ini /tracim/tracim/config.ini
 
 # Create wsgidav.conf file if no exist
 if [ ! -f /etc/tracim/wsgidav.conf ]; then
     cp /tracim/tracim/wsgidav.conf.sample /etc/tracim/wsgidav.conf
 fi
-ln -s /etc/tracim/wsgidav.conf /tracim/tracim/wsgidav.conf
-
-# Create uwsgi file if no exist
-if [ ! -f /etc/tracim/uwsgi.ini ]; then
-    cp /tracim/tracim/uwsgi.ini.template /etc/tracim/uwsgi.ini
-fi
+ln -sf /etc/tracim/wsgidav.conf /tracim/tracim/wsgidav.conf
 
 # MySQL case
 if [ "$DATABASE_TYPE" = mysql ] ; then
@@ -95,6 +93,9 @@ else
     sed -i "s/\(sqlalchemy.url *= *\).*/\\sqlalchemy.url = sqlite:\/\/\/\/var\/tracim\/tracim.db/" /etc/tracim/config.ini
 fi
 
+# Start redis server (for async email sending if configured)
+service redis-server start
+
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     cd /tracim/tracim/ && gearbox setup-app -c config.ini
@@ -102,9 +103,17 @@ fi
 
 # Upgrade database
 if [ "$PULL" = 1 ]; then
-    echo "Upgrade Tracim database id required"
+    echo "Upgrade Tracim database if required"
     cd /tracim/tracim/ && gearbox migrate upgrade
 fi
 
-# Start with uwsgi
-uwsgi --http-socket 0.0.0.0:80 /etc/tracim/uwsgi.ini
+service nginx start
+
+ln -sf /var/log/uwsgi/app/tracim.log /var/tracim/logs/uwsgi.log
+ln -sf /var/log/nginx/access.log /var/tracim/logs/nginx-access.log
+ln -sf /var/log/nginx/error.log /var/tracim/logs/nginx-error.log
+mkdir -p /var/run/uwsgi/app/tracim/
+chown www-data:www-data -R /var/run/uwsgi
+chown www-data:www-data -R /var/tracim
+
+uwsgi -i /etc/uwsgi/apps-available/tracim.ini --uid www-data --gid www-data

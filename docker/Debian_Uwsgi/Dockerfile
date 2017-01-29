@@ -23,7 +23,9 @@ RUN apt-get update -q \
       uwsgi-plugin-python3 \
       mysql-client \
       libmysqld-dev \
-      sqlite3
+      sqlite3 \
+      nginx \
+      redis-server
 
 # Ensure UTF-8
 RUN locale-gen en_US.UTF-8 en_us \
@@ -45,12 +47,23 @@ RUN git clone https://github.com/tracim/tracim.git \
 
 # Prepare volumes
 RUN mkdir /etc/tracim \
-    && mkdir /var/tracim
+    && mkdir /var/tracim \
+    && mkdir /var/tracim/logs \
+    && mkdir /var/tracim/assets
 VOLUME ["/etc/tracim", "/var/tracim"]
 
-COPY uwsgi.ini /tracim/tracim/uwsgi.ini.template
+COPY uwsgi.ini /etc/tracim/uwsgi.ini
+COPY nginx.conf /etc/tracim/nginx.conf
 COPY wsgi.py /tracim/tracim/wsgi.py
 COPY check_env_vars.sh /tracim/check_env_vars.sh
 COPY entrypoint.sh /tracim/entrypoint.sh
+
+RUN ln -s /etc/tracim/uwsgi.ini /etc/uwsgi/apps-available/tracim.ini && \
+    ln -s /etc/uwsgi/apps-available/tracim.ini /etc/uwsgi/apps-enabled/tracim.ini && \
+    ln -s /etc/tracim/nginx.conf /etc/nginx/sites-available/tracim.conf && \
+    ln -s /etc/nginx/sites-available/tracim.conf /etc/nginx/sites-enabled/tracim.conf && \
+    chown root:www-data -R /var/tracim/logs && \
+    chmod 775 -R /var/tracim/logs && \
+    rm /etc/nginx/sites-enabled/default
 
 CMD ["/tracim/entrypoint.sh"]

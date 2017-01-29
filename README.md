@@ -115,6 +115,8 @@ You'll need to install the following packages on your Operating System:
 
     apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml
 
+You also need `redis-server` package if you want to send email in async mode.
+
 ## Database ##
 
 If you want use PostgreSQL as database engine:
@@ -487,13 +489,16 @@ To run tests on specific branch or commit, use ``CHECKOUT`` parameter, eg:
 
 Environment variables are:
 
+* PULL (0 or 1): If 1, upgrade tracim at startup
 * DATABASE_TYPE (values: postgresql, mysql, sqlite)
+
+If DATABASE_TYPE is `postgresql` or `mysql`, please set these variables:
+
 * DATABASE_USER
 * DATABASE_PASSWORD
 * DATABASE_HOST
 * DATABASE_PORT
 * DATABASE_NAME
-* PULL (0 or 1): If 1, upgrade tracim at startup
 
 Volumes are:
 
@@ -503,21 +508,21 @@ Volumes are:
 Ports are:
 
 * 80 (industracim web interface)
-* 3060 (webdav)
-* 5232 (caldav)
 
 To run tracim container with MySQL or PostgreSQL, you must set environment ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` variable.
 Example with PostgreSQL:
 
-    docker run -e DATABASE_TYPE=postgresql -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_HOST=192.168.1.2 -e DATABASE_NAME=tracim -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracim tracim:latest
+    docker run -e DATABASE_TYPE=postgresql -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_HOST=192.168.1.2 -e DATABASE_NAME=tracim -p 80:80 -v /tmp/tracim:/etc/tracim tracim:latest
 
 Example with MySQL
 
-    docker run -e DATABASE_TYPE=mysql -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_HOST=192.168.1.2 -e DATABASE_NAME=tracim -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracim tracim:latest
+    docker run -e DATABASE_TYPE=mysql -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_HOST=192.168.1.2 -e DATABASE_NAME=tracim -p 80:80 -v /tmp/tracim:/etc/tracim tracim:latest
 
 Example with SQLite
 
-    docker run -e DATABASE_TYPE=sqlite -p 127.0.0.1:80:80 -p 127.0.0.1:3060:3060 -p 127.0.0.1:5232:5232 -v /tmp/tracim:/etc/tracimetc -v /tmp/tracimvar:/var/tracim tracim:latest
+    docker run -e DATABASE_TYPE=sqlite -p 80:80 -v /tmp/tracim:/etc/tracimetc -v /tmp/tracimvar:/var/tracim tracim:latest
+
+After execute one of these command, tracim will be available on your system on port 80.
 
 # Support and Community #
 
