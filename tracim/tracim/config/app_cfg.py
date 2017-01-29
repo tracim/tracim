@@ -98,7 +98,7 @@ def start_daemons(manager: DaemonsManager):
     """
     from tg import config
     # Don't start daemons if they are disabled
-    if 'disable_daemons' in config and config['disable_daemons']:
+    if config.get('disable_daemons', False):
         return
 
     manager.run('radicale', RadicaleDaemon)
