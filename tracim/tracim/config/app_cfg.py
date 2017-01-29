@@ -97,13 +97,16 @@ def start_daemons(manager: DaemonsManager):
     Sart Tracim daemons
     """
     from tg import config
+    cfg = CFG.get_instance()
     # Don't start daemons if they are disabled
     if config.get('disable_daemons', False):
         return
 
     manager.run('radicale', RadicaleDaemon)
     manager.run('webdav', WsgiDavDaemon)
-    manager.run('mail_sender', MailSenderDaemon)
+
+    if cfg.EMAIL_PROCESSING_MODE == CFG.CST.ASYNC:
+        manager.run('mail_sender', MailSenderDaemon)
 
 environment_loaded.register(lambda: start_daemons(daemons))
 
