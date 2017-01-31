@@ -476,6 +476,9 @@ span.info.readonly {
 }
 .workspace__list table {
   text-align: center;
+}
+.adminuser__detail table {
+  text-align: center;
 }*/
 table th {
   text-align: left;
@@ -490,9 +493,6 @@ table th {
 }
 .adminuser__detail {
   padding: 0 15px;
-}
-.adminuser__detail table {
-  text-align: center;
 }
 
 div.mce-fullscreen {
