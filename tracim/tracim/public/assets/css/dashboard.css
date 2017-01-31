@@ -430,9 +430,6 @@ span.info.readonly {
 .folder__filter a.btn {
   font-size: 14px;
 }
-.folder__content__list {
-  cursor: pointer;
-}
 .folder__content__list__item__title {
   color: #428BCA;
 }

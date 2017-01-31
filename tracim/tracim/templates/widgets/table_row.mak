@@ -55,11 +55,11 @@
 </%def>
 
 <%def name="CONTENT(content)">
-    <tr class="t-table-row-${content.type.type} folder__content__list__item ${'archived' if content.is_archived else ''} ${'deleted' if content.is_deleted else ''}"
-        onclick="document.location = '${content.url}'"> <!-- <a /> does not work on <tr /> -->
-
+    <tr class="t-table-row-${content.type.type} folder__content__list__item ${'archived' if content.is_archived else ''} ${'deleted' if content.is_deleted else ''}">
         <td class="folder__content__list__item__title">
-            <i class="fa-fw ${content.type.icon} ${content.type.color}"></i> ${content.label}
+            <a href="${content.url}">
+                <i class="fa-fw ${content.type.icon} ${content.type.color}"></i> ${content.label}
+            </a>
         </td>
 
         <!--td class="folder__content__list__type">
@@ -79,32 +79,33 @@
             <td class="text-center t-less-visible">-</td>
         % else:
             <td>
-                % if 'open' == content.status.id:
-                    <i class="fa fa-fw fa-square-o"></i>
-                % elif 'closed-validated' == content.status.id:
-                    <i class="fa fa-fw fa-check-square-o"></i>
-                % elif 'closed-unvalidated' == content.status.id:
-                    <i class="fa fa-fw fa-check-square-o"></i>
-                % elif 'closed-deprecated' == content.status.id:
-                    <i class="fa fa-fw fa-bell-slash-o"></i>
-                % else:
-                    <i class="fa fa-fw fa-close"></i>
-                % endif
+                <a href="${content.url}">
+                    % if 'open' == content.status.id:
+                        <i class="fa fa-fw fa-square-o"></i>
+                    % elif 'closed-validated' == content.status.id:
+                        <i class="fa fa-fw fa-check-square-o"></i>
+                    % elif 'closed-unvalidated' == content.status.id:
+                        <i class="fa fa-fw fa-check-square-o"></i>
+                    % elif 'closed-deprecated' == content.status.id:
+                        <i class="fa fa-fw fa-bell-slash-o"></i>
+                    % else:
+                        <i class="fa fa-fw fa-close"></i>
+                    % endif
 
-                <span class="t-less-visible">
-                  ${content.status.label}
-                  % if (content.is_archived) :
-                      - Archivé
-                  % elif (content.is_deleted) :
-                      - Supprimé
-                  % endif
-                </span>
-
+                    <span class="t-less-visible">
+                      ${content.status.label}
+                      % if (content.is_archived) :
+                          - Archivé
+                      % elif (content.is_deleted) :
+                          - Supprimé
+                      % endif
+                    </span>
+                </a>
             </td>
         % endif
 
-        <td><span class="t-less-visible">${content.notes|n}</span></td>
+        <td><a href="${content.url}"><span class="t-less-visible">${content.notes|n}</span></a></td>
 
-        <td>${content.type.label}</td>
+        <td><a href="${content.url}">${content.type.label}</a></td>
     </tr>
 </%def>
