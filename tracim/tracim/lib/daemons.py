@@ -1,9 +1,8 @@
 import threading
-from configparser import DuplicateSectionError
-from wsgiref.simple_server import make_server
-import signal
-
 import collections
+from configparser import DuplicateSectionError
+
+from wsgiref.simple_server import make_server
 
 from radicale import Application as RadicaleApplication
 from radicale import HTTPServer as BaseRadicaleHTTPServer
@@ -13,16 +12,18 @@ from radicale import config as radicale_config
 from rq import Connection as RQConnection
 from rq import Worker as BaseRQWorker
 from redis import Redis
+from rq.dummy import do_nothing
+from rq.worker import StopRequested
 
 from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
-from tracim.lib.utils import add_signal_handler
+
+from tracim.tracim.lib.utils import get_rq_queue
 
 
 class DaemonsManager(object):
     def __init__(self):
         self._running_daemons = {}
-        add_signal_handler(signal.SIGTERM, self.stop_all)
 
     def run(self, name: str, daemon_class: object, **kwargs) -> None:
         """
@@ -61,7 +62,7 @@ class DaemonsManager(object):
             logger.info(self, 'Stopping daemon with name "{0}": OK'
                               .format(name))
 
-    def stop_all(self, *args, **kwargs) -> None:
+    def stop_all(self) -> None:
         """
         Stop all started daemons and wait for them.
         """
@@ -71,6 +72,10 @@ class DaemonsManager(object):
             daemon.stop()
 
         for name, daemon in self._running_daemons.items():
+            logger.info(
+                self,
+                'Stopping daemon "{0}" waiting confirmation'.format(name),
+            )
             daemon.join()
             logger.info(self, 'Stopping daemon "{0}" OK'.format(name))
 
@@ -158,7 +163,12 @@ class MailSenderDaemon(Daemon):
         pass
 
     def stop(self) -> None:
-        self.worker.request_stop('TRACIM STOP', None)
+        # When _stop_requested at False, tracim.tracim.lib.daemons.RQWorker
+        # will raise StopRequested exception in worker thread after receive a
+        # job.
+        self.worker._stop_requested = True
+        queue = get_rq_queue('mail_sender')
+        queue.enqueue(do_nothing)
 
     def run(self) -> None:
         from tracim.config.app_cfg import CFG
@@ -175,12 +185,18 @@ class MailSenderDaemon(Daemon):
 
 class RQWorker(BaseRQWorker):
     def _install_signal_handlers(self):
-        # TODO BS 20170126: RQ WWorker is designed to work in main thread
+        # RQ Worker is designed to work in main thread
         # So we have to disable these signals (we implement server stop in
-        # MailSenderDaemon.stop method). When bug
-        # https://github.com/tracim/tracim/issues/166 will be fixed, ensure
-        # This worker terminate correctly.
+        # MailSenderDaemon.stop method).
         pass
+
+    def dequeue_job_and_maintain_ttl(self, timeout):
+        # RQ Worker is designed to work in main thread, so we add behaviour
+        # here: if _stop_requested has been set to True, raise the standard way
+        # StopRequested exception to stop worker.
+        if self._stop_requested:
+            raise StopRequested()
+        return super().dequeue_job_and_maintain_ttl(timeout)
 
 
 class RadicaleHTTPSServer(TracimSocketServerMixin, BaseRadicaleHTTPSServer):

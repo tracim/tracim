@@ -13,6 +13,8 @@ from tg.i18n import ugettext
 from tg.support.registry import StackedObjectProxy
 from tg.util import LazyString as BaseLazyString
 from tg.util import lazify
+from redis import Redis
+from rq import Queue
 
 from tracim.lib.base import logger
 from webob import Response
@@ -61,20 +63,6 @@ def replace_reset_password_templates(engines):
 @property
 def NotImplemented():
     raise NotImplementedError()
-
-
-def add_signal_handler(signal_id, handler) -> None:
-    """
-    Add a callback attached to python signal.
-    :param signal_id: signal identifier (eg. signal.SIGTERM)
-    :param handler: callback to execute when signal trig
-    """
-    def _handler(*args, **kwargs):
-        handler()
-        signal.signal(signal_id, signal.SIG_DFL)
-        os.kill(os.getpid(), signal_id)  # Rethrow signal
-
-    signal.signal(signal_id, _handler)
 
 
 class APIWSGIHTTPException(WSGIHTTPException):
@@ -171,3 +159,18 @@ def _lazy_ugettext(text: str):
         return text
 
 lazy_ugettext = lazify(_lazy_ugettext)
+
+
+def get_rq_queue(queue_name: str= 'default') -> Queue:
+    """
+    :param queue_name: name of queue
+    :return: wanted queue
+    """
+    from tracim.config.app_cfg import CFG
+    cfg = CFG.get_instance()
+
+    return Queue(queue_name, connection=Redis(
+        host=cfg.EMAIL_SENDER_REDIS_HOST,
+        port=cfg.EMAIL_SENDER_REDIS_PORT,
+        db=cfg.EMAIL_SENDER_REDIS_DB,
+    ))

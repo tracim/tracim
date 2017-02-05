@@ -6,12 +6,12 @@ from email.mime.text import MIMEText
 
 import typing
 from mako.template import Template
-from redis import Redis
-from rq import Queue
 from tg.i18n import ugettext as _
 
 from tracim.lib.base import logger
 from tracim.model import User
+
+from tracim.tracim.lib.utils import get_rq_queue
 
 
 def send_email_through(
@@ -31,11 +31,7 @@ def send_email_through(
     if cfg.EMAIL_PROCESSING_MODE == CFG.CST.SYNC:
         send_callable(message)
     elif cfg.EMAIL_PROCESSING_MODE == CFG.CST.ASYNC:
-        queue = Queue('mail_sender', connection=Redis(
-            host=cfg.EMAIL_SENDER_REDIS_HOST,
-            port=cfg.EMAIL_SENDER_REDIS_PORT,
-            db=cfg.EMAIL_SENDER_REDIS_DB,
-        ))
+        queue = get_rq_queue('mail_sender')
         queue.enqueue(send_callable, message)
     else:
         raise NotImplementedError(
