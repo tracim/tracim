@@ -6,9 +6,17 @@ from tracim.lib.daemons import DaemonsManager
 
 
 class InterruptManager(object):
-    def __init__(self, daemons_manager: DaemonsManager):
+    def __init__(
+            self,
+            tracim_process_pid: int,
+            daemons_manager: DaemonsManager,
+    ) -> None:
+        """
+        :param tracim_process_pid: pid of tracim.
+        :param daemons_manager: Tracim daemons manager
+        """
         self.daemons_manager = daemons_manager
-        self.process_pid = os.getpid()
+        self.tracim_process_pid = tracim_process_pid
         self._install_sgnal_handlers()
 
     def _install_sgnal_handlers(self) -> None:
@@ -35,4 +43,4 @@ class InterruptManager(object):
         self.daemons_manager.stop_all()
         # Web server is managed by end of stack like uwsgi, apache2.
         # So to ask it's termination, we have to use standard kills signals
-        os.kill(self.process_pid, signum)
+        os.kill(self.tracim_process_pid, signum)
