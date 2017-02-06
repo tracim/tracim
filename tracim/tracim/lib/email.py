@@ -11,7 +11,7 @@ from tg.i18n import ugettext as _
 from tracim.lib.base import logger
 from tracim.model import User
 
-from tracim.tracim.lib.utils import get_rq_queue
+from tracim.lib.utils import get_rq_queue
 
 
 def send_email_through(

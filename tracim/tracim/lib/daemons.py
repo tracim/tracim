@@ -18,7 +18,7 @@ from rq.worker import StopRequested
 from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
 
-from tracim.tracim.lib.utils import get_rq_queue
+from tracim.lib.utils import get_rq_queue
 
 
 class DaemonsManager(object):
@@ -163,7 +163,7 @@ class MailSenderDaemon(Daemon):
         pass
 
     def stop(self) -> None:
-        # When _stop_requested at False, tracim.tracim.lib.daemons.RQWorker
+        # When _stop_requested at False, tracim.lib.daemons.RQWorker
         # will raise StopRequested exception in worker thread after receive a
         # job.
         self.worker._stop_requested = True
