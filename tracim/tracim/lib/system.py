@@ -6,6 +6,16 @@ from tracim.lib.daemons import DaemonsManager
 
 
 class InterruptManager(object):
+    """
+    Manager interruption of tracim components.
+
+    Stop all tracim daemons, then:
+
+    With a specific production server like uWSGI, we should use master
+    FIFO system to exit properly the program:
+    https://github.com/unbit/uwsgi/issues/849. But to be generic, we resend the
+    signal after intercept it.
+    """
     def __init__(
             self,
             tracim_process_pid: int,
@@ -41,6 +51,4 @@ class InterruptManager(object):
         """
         self._remove_signal_handlers()
         self.daemons_manager.stop_all()
-        # Web server is managed by end of stack like uwsgi, apache2.
-        # So to ask it's termination, we have to use standard kills signals
         os.kill(self.tracim_process_pid, signum)
