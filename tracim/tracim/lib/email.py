@@ -15,24 +15,24 @@ from tracim.lib.utils import get_rq_queue
 
 
 def send_email_through(
-        send_callable: typing.Callable[[Message], None],
+        sendmail_callable: typing.Callable[[Message], None],
         message: Message,
 ) -> None:
     """
     Send mail encapsulation to send it in async or sync mode.
     TODO BS 20170126: A global mail/sender management should be a good
                       thing. Actually, this method is an fast solution.
-    :param send_callable: A callable who get message on first parameter
+    :param sendmail_callable: A callable who get message on first parameter
     :param message: The message who have to be sent
     """
     from tracim.config.app_cfg import CFG
     cfg = CFG.get_instance()
 
     if cfg.EMAIL_PROCESSING_MODE == CFG.CST.SYNC:
-        send_callable(message)
+        sendmail_callable(message)
     elif cfg.EMAIL_PROCESSING_MODE == CFG.CST.ASYNC:
         queue = get_rq_queue('mail_sender')
-        queue.enqueue(send_callable, message)
+        queue.enqueue(sendmail_callable, message)
     else:
         raise NotImplementedError(
             'Mail sender processing mode {} is not implemented'.format(
