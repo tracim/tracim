@@ -4,7 +4,7 @@
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
     ## This is the default left sidebar implementation
-    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__'))}
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
@@ -49,12 +49,6 @@
     <!-- TinyMCE ================================================== -->
     <script src="${tg.url('/assets/tinymce/js/tinymce/tinymce.min.js')}"></script>
     ${TIM.TINYMCE_INIT_SCRIPT('.pod-rich-textarea')}
-
-    <!-- JSTree ================================================== -->
-    <link rel="stylesheet" href="${tg.url('/assets/jstree/themes/default/style.min.css')}" />
-    <link rel="stylesheet" href="${tg.url('/assets/jstree/themes/tracim/style.css')}" />
-    <script src="${tg.url('/assets/jstree/jstree.min.js')}"></script>
-
 
 ##    <link rel="stylesheet" href="${tg.url('/assets/tablesorter/themes/blue/style.css')}" />
     <script src="${tg.url('/assets/tablesorter/jquery.tablesorter.min.js')}"></script>

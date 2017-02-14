@@ -41,11 +41,6 @@
     <script src="${tg.url('/assets/tinymce/js/tinymce/tinymce.min.js')}"></script>
     ${TIM.TINYMCE_INIT_SCRIPT('.pod-rich-textarea')}
 
-    <!-- JSTree ================================================== -->
-    <link rel="stylesheet" href="${tg.url('/assets/jstree/themes/default/style.min.css')}" />
-    <link rel="stylesheet" href="${tg.url('/assets/jstree/themes/tracim/style.css')}" />
-    <script src="${tg.url('/assets/jstree/jstree.min.js')}"></script>
-
 ##     <link rel="stylesheet" href="${tg.url('/assets/tablesorter/themes/tracim/style.css')}"/>
 ##    <script src="${tg.url('/assets/tablesorter/jquery.tablesorter.min.js')}"></script>
 
