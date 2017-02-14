@@ -776,6 +776,23 @@ div.mce-fullscreen {
 }
 /* end rules that will be overriden by theme builder */
 
+
+.sidebarleft__menu__item__link > .fa-bank {
+  color: #DDD;
+}
+.sidebarleft__menu__item__link > .fa-folder-open-o {
+  color: #CCCC00;
+}
+.sidebarleft__menu__item__link > .fa-file-text-o {
+  color: #00CC00;
+}
+.sidebarleft__menu__item__link > .fa-comments-o {
+  color: #428BCA;
+}
+.sidebarleft__menu__item__link > .fa-paperclip {
+  color: orange;
+}
+
 .sidebarleft {
   margin: 20px 0 0 0;
   font-size:
