@@ -14,6 +14,7 @@ convert them into boolean, for example, you should use the
 """
 import imp
 import importlib
+import os
 from urllib.parse import urlparse
 
 import tg
@@ -22,6 +23,7 @@ from tg.configuration.milestones import environment_loaded
 
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
+from tracim.lib.system import InterruptManager
 
 from tracim.lib.utils import lazy_ugettext as l_
 
@@ -109,6 +111,7 @@ def start_daemons(manager: DaemonsManager):
         manager.run('mail_sender', MailSenderDaemon)
 
 environment_loaded.register(lambda: start_daemons(daemons))
+interrupt_manager = InterruptManager(os.getpid(), daemons_manager=daemons)
 
 # Note: here are fake translatable strings that allow to translate messages for reset password email content
 duplicated_email_subject = l_('Password reset request')
