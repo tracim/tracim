@@ -761,22 +761,6 @@ div.mce-fullscreen {
   }
 }
 
-/* start rules that will be overriden by theme builder */
-.textMenuClickedBgColor {
-  background: #beebff;
-}
-.textMenuClickedColor {
-  color: #333;
-}
-.textMenuBgColor-hover {
-  background-color: #e7f4f9;
-}
-.textMenuColor-hover {
-  color: #333;
-}
-/* end rules that will be overriden by theme builder */
-
-
 .sidebarleft__menu__item__link > .fa-bank {
   color: #DDD;
 }
