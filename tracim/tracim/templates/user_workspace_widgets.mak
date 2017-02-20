@@ -148,7 +148,13 @@
 
 <%def name="TREEVIEW(dom_id, selected_id='', uniq_workspace='0')">
     <% get_root_url = tg.url("/workspaces/treeview_root", dict(current_id=selected_id)) %>
-    <div id='sidebarleft_menu' apiPath='/' apiParameters='?current_id=${selected_id}'></div>
+    <div id='sidebarleft_menu'></div>
+    <script src="${tg.url('/assets/js/sidebarleft.js')}"></script>
+    <script>
+      (function () {
+        sidebarLeft(document.getElementById('sidebarleft_menu'), '/', '?current_id=${selected_id}')
+      })()
+    </script>
 </%def>
 
 <%def name="SECURED_SHOW_CHANGE_STATUS_FOR_FILE(user, workspace, item)">

@@ -41,7 +41,6 @@
         <script src="${tg.url('/assets/js/trad.js')}"></script>
         <script src="${tg.url('/assets/js/main.js')}"></script>
         ${CFG.TRACKER_JS_CONTENT|n}
-        <script src="${tg.url('/assets/js/sidebarleft.js')}"></script>
     </body>
 
 

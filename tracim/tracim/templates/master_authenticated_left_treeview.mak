@@ -4,7 +4,7 @@
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
     ## This is the default left sidebar implementation
-    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__'))}
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
