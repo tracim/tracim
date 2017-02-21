@@ -16,14 +16,19 @@ __author__ = 'damien'
 
 class WorkspaceApi(object):
 
-    def __init__(self, current_user: User):
+    def __init__(self, current_user: User, force_role: bool=False):
+        """
+        :param current_user: Current user of context
+        :param force_role: If True, app role in queries even if admin
+        """
         self._user = current_user
+        self._force_role = force_role
 
     def _base_query_without_roles(self):
         return DBSession.query(Workspace).filter(Workspace.is_deleted==False)
 
     def _base_query(self):
-        if self._user.profile.id>=Group.TIM_ADMIN:
+        if not self._force_role and self._user.profile.id>=Group.TIM_ADMIN:
             return self._base_query_without_roles()
 
         return DBSession.query(Workspace).\

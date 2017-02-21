@@ -19,25 +19,20 @@ class Content(Fixture):
         bob = self._session.query(model.User) \
             .filter(model.User.email == 'bob@fsf.local') \
             .one()
-        workspace_api = WorkspaceApi(admin)
+        admin_workspace_api = WorkspaceApi(admin)
+        bob_workspace_api = WorkspaceApi(bob)
         content_api = ContentApi(admin)
         role_api = RoleApi(admin)
 
         # Workspaces
-        w1 = workspace_api.create_workspace('w1', save_now=True)
-        w2 = workspace_api.create_workspace('w2', save_now=True)
-        w3 = workspace_api.create_workspace('w3', save_now=True)
+        w1 = admin_workspace_api.create_workspace('w1', save_now=True)
+        w2 = bob_workspace_api.create_workspace('w2', save_now=True)
+        w3 = admin_workspace_api.create_workspace('w3', save_now=True)
 
         # Workspaces roles
         role_api.create_one(
             user=bob,
             workspace=w1,
-            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
-            with_notif=False,
-        )
-        role_api.create_one(
-            user=bob,
-            workspace=w2,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
             with_notif=False,
         )

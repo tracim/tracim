@@ -79,7 +79,7 @@ class TestWebDav(TestStandard):
         ok_(root, msg='Path / should return a Root instance')
         ok_(isinstance(root, Root))
 
-    def test_unit__list_workspaces_with_admin__ok(self):
+    def test_unit__list_workspaces_with_user__ok(self):
         provider = self._get_provider()
         root = provider.getResourceInst(
             '/',
@@ -105,6 +105,35 @@ class TestWebDav(TestStandard):
             workspaces_names,
         ))
         ok_('w2' in workspaces_names, msg='w2 should be in names ({0})'.format(
+            workspaces_names,
+        ))
+
+    def test_unit__list_workspaces_with_admin__ok(self):
+        provider = self._get_provider()
+        root = provider.getResourceInst(
+            '/',
+            self._get_environ(
+                provider,
+                'admin@admin.admin',
+            )
+        )
+        ok_(root, msg='Path / should return a Root instance')
+        ok_(isinstance(root, Root), msg='Path / should return a Root instance')
+
+        children = root.getMemberList()
+        eq_(
+            2,
+            len(children),
+            msg='Root should return 2 workspaces instead {0}'.format(
+                len(children),
+            )
+        )
+
+        workspaces_names = [w.name for w in children]
+        ok_('w1' in workspaces_names, msg='w1 should be in names ({0})'.format(
+            workspaces_names,
+        ))
+        ok_('w3' in workspaces_names, msg='w3 should be in names ({0})'.format(
             workspaces_names,
         ))
 

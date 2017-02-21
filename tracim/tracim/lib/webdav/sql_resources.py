@@ -109,7 +109,10 @@ class Root(DAVCollection):
         super(Root, self).__init__(path, environ)
 
         self.user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
-        self.workspace_api = WorkspaceApi(self.user)
+        # TODO BS 20170221: Web interface should list all workspace to. We
+        # disable it here for moment. When web interface will be updated to
+        # list all workspace, change this here to.
+        self.workspace_api = WorkspaceApi(self.user, force_role=True)
 
     def __repr__(self) -> str:
         return '<DAVCollection: Root>'
