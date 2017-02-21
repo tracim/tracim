@@ -239,6 +239,8 @@ class WorkspaceRestController(TIMRestController, BaseController):
 
         if calendar_enabled:
             workspace_api_controller.ensure_calendar_exist(workspace)
+        else:
+            workspace_api_controller.disable_calendar(workspace)
 
         tg.flash(_('{} workspace updated.').format(workspace.label), CST.STATUS_OK)
         tg.redirect(self.url(workspace.workspace_id))

@@ -64,7 +64,9 @@ class WorkspaceApi(object):
             DBSession.flush()
 
         if calendar_enabled:
-            self.execute_created_workspace_actions(workspace)
+            self.ensure_calendar_exist(workspace)
+        else:
+            self.disable_calendar(workspace)
 
         return workspace
 
@@ -145,18 +147,38 @@ class WorkspaceApi(object):
         from tracim.lib.calendar import CalendarManager
         from tracim.model.organisational import WorkspaceCalendar
 
-        if workspace.calendar_enabled:
+        calendar_manager = CalendarManager(self._user)
+
+        try:
+            calendar_manager.enable_calendar_file(
+                calendar_class=WorkspaceCalendar,
+                related_object_id=workspace.workspace_id,
+                raise_=True,
+            )
+        # If previous calendar file no exist, calendar must be created
+        except FileNotFoundError:
             self._user.ensure_auth_token()
 
             # Ensure database is up-to-date
             DBSession.flush()
             transaction.commit()
 
-            calendar_manager = CalendarManager(self._user)
             calendar_manager.create_then_remove_fake_event(
                 calendar_class=WorkspaceCalendar,
                 related_object_id=workspace.workspace_id,
             )
+
+    def disable_calendar(self, workspace: Workspace) -> None:
+        # Note: Cyclic imports
+        from tracim.lib.calendar import CalendarManager
+        from tracim.model.organisational import WorkspaceCalendar
+
+        calendar_manager = CalendarManager(self._user)
+        calendar_manager.disable_calendar_file(
+            calendar_class=WorkspaceCalendar,
+            related_object_id=workspace.workspace_id,
+            raise_=False,
+        )
 
     def get_base_query(self) -> Query:
         return self._base_query()

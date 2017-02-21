@@ -9,6 +9,8 @@ import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
+from sqlalchemy.orm.exc import NoResultFound
+from tg import abort
 
 from tracim.controllers import TIMRestController
 from tracim.controllers import TIMRestPathContextSetup
@@ -740,8 +742,10 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
 
     def _before(self, *args, **kw):
         TIMRestPathContextSetup.current_user()
-        TIMRestPathContextSetup.current_workspace()
-
+        try:
+            TIMRestPathContextSetup.current_workspace()
+        except NoResultFound:
+            abort(404)
 
     @tg.require(current_user_is_content_manager())
     @tg.expose('tracim.templates.folder.edit')

@@ -391,3 +391,99 @@ END:VCALENDAR
         except PutError:
             pass  # TODO BS 20161128: Radicale is down. Record this event ?
 
+    def get_enabled_calendar_file_path(
+            self,
+            calendar_class,
+            related_object_id,
+    ) -> str:
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        calendar_file_name = '{}.ics'.format(related_object_id)
+
+        if calendar_class == WorkspaceCalendar:
+            calendar_type_folder = 'workspace'
+        elif calendar_class == UserCalendar:
+            calendar_type_folder = 'user'
+        else:
+            raise NotImplementedError()
+
+        current_calendar_file_path = os.path.join(
+            cfg.RADICALE_SERVER_FILE_SYSTEM_FOLDER,
+            calendar_type_folder,
+            calendar_file_name,
+        )
+
+        return current_calendar_file_path
+
+    def get_deleted_calendar_file_path(
+            self,
+            calendar_class,
+            related_object_id,
+    ) -> str:
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        calendar_file_name = '{}.ics'.format(related_object_id)
+
+        if calendar_class == WorkspaceCalendar:
+            calendar_type_folder = 'workspace'
+        elif calendar_class == UserCalendar:
+            calendar_type_folder = 'user'
+        else:
+            raise NotImplementedError()
+
+        deleted_calendar_file_path = os.path.join(
+            cfg.RADICALE_SERVER_FILE_SYSTEM_FOLDER,
+            calendar_type_folder,
+            'deleted',
+            calendar_file_name,
+        )
+
+        return deleted_calendar_file_path
+
+    def disable_calendar_file(
+            self,
+            calendar_class,
+            related_object_id: int,
+            raise_: bool=False,
+    ) -> None:
+        enabled_calendar_file_path = self.get_enabled_calendar_file_path(
+            calendar_class,
+            related_object_id,
+        )
+        deleted_calendar_file_path = self.get_deleted_calendar_file_path(
+            calendar_class,
+            related_object_id,
+        )
+
+        deleted_folder = os.path.dirname(deleted_calendar_file_path)
+        if not os.path.exists(deleted_folder):
+            os.makedirs(deleted_folder)
+
+        try:
+            os.rename(enabled_calendar_file_path, deleted_calendar_file_path)
+        except FileNotFoundError:
+            if raise_:
+                raise
+
+    def enable_calendar_file(
+            self,
+            calendar_class,
+            related_object_id: int,
+            raise_: bool=False,
+    ) -> None:
+        enabled_calendar_file_path = self.get_enabled_calendar_file_path(
+            calendar_class,
+            related_object_id,
+        )
+        deleted_calendar_file_path = self.get_deleted_calendar_file_path(
+            calendar_class,
+            related_object_id,
+        )
+
+        try:
+            os.rename(deleted_calendar_file_path, enabled_calendar_file_path)
+        except FileNotFoundError:
+            if raise_:
+                raise

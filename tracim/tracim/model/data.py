@@ -30,6 +30,15 @@ from tracim.lib.exception import ContentRevisionUpdateError
 from tracim.model import DeclarativeBase, RevisionsIntegrity
 from tracim.model.auth import User
 
+DEFAULT_PROPERTIES = dict(
+    allowed_content=dict(
+        folder=True,
+        file=True,
+        page=True,
+        thread=True,
+    ),
+)
+
 
 class BreadcrumbItem(object):
 
@@ -507,14 +516,7 @@ class ContentChecker(object):
     @classmethod
     def reset_properties(cls, item):
         if item.type==ContentType.Folder:
-            item.properties = dict(
-                allowed_content = dict (
-                    folder = True,
-                    file = True,
-                    page = True,
-                    thread = True
-                )
-            )
+            item.properties = DEFAULT_PROPERTIES
             return
 
         raise NotImplementedError
@@ -1077,7 +1079,7 @@ class Content(DeclarativeBase):
     def properties(self) -> dict:
         """ return a structure decoded from json content of _properties """
         if not self._properties:
-            ContentChecker.reset_properties(self)
+            return DEFAULT_PROPERTIES
         return json.loads(self._properties)
 
     @properties.setter
