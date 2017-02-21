@@ -312,3 +312,158 @@ END:VCALENDAR
             workspace_calendar_exist,
             'Workspace calendar should be created',
         )
+
+    def unit_test__disable_workspace_disable_file__ok__nominal_case(self):
+        self._connect_user(
+            'admin@admin.admin',
+            'admin@admin.admin',
+        )
+        radicale_workspaces_folder = '{0}/workspace'.format(
+            config.get('radicale.server.filesystem.folder'),
+        )
+        delete_radicale_workspaces_folder = '{0}/workspace/deleted'.format(
+            config.get('radicale.server.filesystem.folder'),
+        )
+
+        # Core after assume "test_created_workspace_radicale_calendar" is ok
+        self.app.post(
+            '/admin/workspaces',
+            OrderedDict([
+                ('name', 'WTESTCAL2'),
+                ('description', 'WTESTCAL2DESCR'),
+                ('calendar_enabled', 'on'),
+            ])
+        )
+        created_workspace = DBSession.query(Workspace)\
+            .filter(Workspace.label == 'WTESTCAL2')\
+            .one()
+        disable_response = self.app.put(
+            '/admin/workspaces/{}?_method=PUT'.format(
+                created_workspace.workspace_id,
+            ),
+            OrderedDict([
+                ('name', 'WTESTCAL2'),
+                ('description', 'WTESTCAL2DESCR'),
+                ('calendar_enabled', 'off'),
+            ])
+        )
+        eq_(disable_response.status_code, 302,
+            "Code should be 302, but is %d" % disable_response.status_code)
+        workspaces_calendars = [
+            name for name in
+            os.listdir(radicale_workspaces_folder)
+            if name.endswith('.ics')
+        ]
+        deleted_workspaces_calendars = [
+            name for name in
+            os.listdir(delete_radicale_workspaces_folder)
+            if name.endswith('.ics')
+        ]
+
+        eq_(
+            0,
+            len(workspaces_calendars),
+            msg='No workspace ics file should exist, but {} found'.format(
+                len(workspaces_calendars),
+            ),
+        )
+        eq_(
+            1,
+            len(deleted_workspaces_calendars),
+            msg='1 deleted workspace ics file should exist, but {} found'
+                .format(
+                    len(deleted_workspaces_calendars),
+                ),
+        )
+        workspace_ics_file_name = '{}.ics'.format(
+                created_workspace.workspace_id
+        )
+        ok_(
+            workspace_ics_file_name in deleted_workspaces_calendars,
+            '{} should be in deleted workspace calendar folder'.format(
+                workspace_ics_file_name
+            ),
+        )
+
+    def unit_test__re_enable_workspace_re_enable_file__ok__nominal_case(self):
+        self._connect_user(
+            'admin@admin.admin',
+            'admin@admin.admin',
+        )
+        radicale_workspaces_folder = '{0}/workspace'.format(
+            config.get('radicale.server.filesystem.folder'),
+        )
+        delete_radicale_workspaces_folder = '{0}/workspace/deleted'.format(
+            config.get('radicale.server.filesystem.folder'),
+        )
+
+        # Core after assume
+        # "unit_test__disable_workspace_disable_file__ok__nominal_case" is ok
+        self.app.post(
+            '/admin/workspaces',
+            OrderedDict([
+                ('name', 'WTESTCAL2'),
+                ('description', 'WTESTCAL2DESCR'),
+                ('calendar_enabled', 'on'),
+            ])
+        )
+        created_workspace = DBSession.query(Workspace) \
+            .filter(Workspace.label == 'WTESTCAL2') \
+            .one()
+        self.app.put(
+            '/admin/workspaces/{}?_method=PUT'.format(
+                created_workspace.workspace_id,
+            ),
+            OrderedDict([
+                ('name', 'WTESTCAL2'),
+                ('description', 'WTESTCAL2DESCR'),
+                ('calendar_enabled', 'off'),
+            ])
+        )
+        re_enable_response = self.app.put(
+            '/admin/workspaces/{}?_method=PUT'.format(
+                created_workspace.workspace_id,
+            ),
+            OrderedDict([
+                ('name', 'WTESTCAL2'),
+                ('description', 'WTESTCAL2DESCR'),
+                ('calendar_enabled', 'on'),
+            ])
+        )
+        eq_(re_enable_response.status_code, 302,
+            "Code should be 302, but is %d" % re_enable_response.status_code)
+        workspaces_calendars = [
+            name for name in
+            os.listdir(radicale_workspaces_folder)
+            if name.endswith('.ics')
+            ]
+        deleted_workspaces_calendars = [
+            name for name in
+            os.listdir(delete_radicale_workspaces_folder)
+            if name.endswith('.ics')
+            ]
+
+        eq_(
+            1,
+            len(workspaces_calendars),
+            msg='1 workspace ics file should exist, but {} found'.format(
+                len(workspaces_calendars),
+            ),
+        )
+        eq_(
+            0,
+            len(deleted_workspaces_calendars),
+            msg='0 deleted workspace ics file should exist, but {} found'
+                .format(
+                len(deleted_workspaces_calendars),
+            ),
+        )
+        workspace_ics_file_name = '{}.ics'.format(
+            created_workspace.workspace_id
+        )
+        ok_(
+            workspace_ics_file_name in workspaces_calendars,
+            '{} should be in workspace calendar folder'.format(
+                workspace_ics_file_name
+            ),
+        )

@@ -272,7 +272,7 @@ class CFG(object):
         self.RADICALE_SERVER_SSL = asbool(tg.config.get('radicale.server.ssl', False))
         self.RADICALE_SERVER_FILE_SYSTEM_FOLDER = tg.config.get(
             'radicale.server.filesystem.folder',
-            '~/.config/radicale/collections'
+            './radicale/collections',
         )
         self.RADICALE_SERVER_ALLOW_ORIGIN = tg.config.get(
             'radicale.server.allow_origin',
