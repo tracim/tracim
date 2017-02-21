@@ -988,7 +988,7 @@ class File(DAVNonCollection):
                 destination_parent = self.provider.get_parent_from_path(
                     destpath,
                     content_api,
-                    workspace,
+                    destination_workspace,
                 )
 
                 self.content_api.move(

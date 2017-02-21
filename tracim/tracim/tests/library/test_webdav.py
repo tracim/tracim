@@ -452,6 +452,48 @@ class TestWebDav(TestStandard):
             )
         )
 
+    def test_unit__move_content__ok__another_workspace(self):
+        provider = self._get_provider()
+        environ = self._get_environ(
+            provider,
+            'bob@fsf.local',
+        )
+        content_to_move_res = provider.getResourceInst(
+            '/w1/w1f1/w1f1d1.txt',
+            environ,
+        )
+
+        content_to_move = DBSession.query(ContentRevisionRO) \
+            .filter(Content.label == 'w1f1d1') \
+            .one()  # It must exist only one revision, cf fixtures
+        ok_(content_to_move, msg='w1f1d1 should be exist')
+        content_to_move_id = content_to_move.content_id
+        content_to_move_parent = content_to_move.parent
+        eq_(
+            content_to_move_parent.label,
+            'w1f1',
+            msg='field parent should be w1f1',
+        )
+
+        content_to_move_res.moveRecursive('/w2/w2f1/w1f1d1.txt')  # move in w2, f1
+
+        # Database content is moved
+        content_to_move = DBSession.query(ContentRevisionRO) \
+            .filter(ContentRevisionRO.content_id == content_to_move_id) \
+            .order_by(ContentRevisionRO.revision_id.desc()) \
+            .first()
+
+        ok_(
+            content_to_move.parent,
+            msg='Content should have a parent'
+        )
+        ok_(
+            content_to_move.parent.label == 'w2f1',
+            msg='file should be moved in w2f1 but is in {0}'.format(
+                content_to_move.parent.label
+            )
+        )
+
     def test_unit__update_content__ok(self):
         provider = self._get_provider()
         environ = self._get_environ(
