@@ -49,6 +49,9 @@ body {
 .navbar-brand {
   padding: 0 0 0 5px;
 }
+.navbar-brand > img {
+  max-height: 100%;
+}
 
 /*
  * Sidebar
