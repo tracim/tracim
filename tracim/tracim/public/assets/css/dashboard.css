@@ -763,3 +763,8 @@ div.mce-fullscreen {
     padding: 0 15px;
   }
 }
+
+.form-control[readonly].webdavconfig__input {
+  background-color: #fff;
+  cursor: text;
+}

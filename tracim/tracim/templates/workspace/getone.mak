@@ -121,12 +121,12 @@
             <div class="col-md-6">
                 <div class="input-group">
                     <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-windows"></i> Windows</span>
-                    <p class="form-control">http://${webdav_url}</p>
+                    <input class="form-control webdavconfig__input" value="http://${webdav_url}" readonly />
                 </div>
                 <p></p>
                 <div class="input-group">
                     <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-linux"></i> Linux</span>
-                    <p class="form-control">dav://${webdav_url}</p>
+                    <input class="form-control webdavconfig__input" value="dav://${webdav_url}" readonly />
                 </div>
             </div>
             <div class="col-md-6">
