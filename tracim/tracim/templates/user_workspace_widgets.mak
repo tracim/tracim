@@ -147,10 +147,11 @@
 </%def>
 
 <%def name="TREEVIEW(dom_id, selected_id='', uniq_workspace='0')">
-    <% get_root_url = tg.url("/workspaces/treeview_root", dict(current_id=selected_id)) %>
+    ## <% get_root_url = tg.url("/workspaces/treeview_root", dict(current_id=selected_id)) %>
     <div id='sidebarleft_menu'></div>
     <script src="${tg.url('/assets/js/sidebarleft.js')}"></script>
     <script>
+      // (function () { })() is equivalent to window.onload (http://stackoverflow.com/questions/9899372/pure-javascript-equivalent-to-jquerys-ready-how-to-call-a-function-when-the)
       (function () {
         sidebarLeft(document.getElementById('sidebarleft_menu'), '/', '?current_id=${selected_id}')
       })()
