@@ -7,10 +7,10 @@ This file complements development/deployment.ini.
 Please note that **all the argument values are strings**. If you want to
 convert them into boolean, for example, you should use the
 :func:`paste.deploy.converters.asbool` function, as in::
-    
+
     from paste.deploy.converters import asbool
     setting = asbool(global_conf.get('the_setting'))
- 
+
 """
 import imp
 import importlib
@@ -81,7 +81,7 @@ base_config['templating.genshi.name_constant_patch'] = True
 
 # Configure the authentication backend
 
-# YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP 
+# YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP
 base_config.sa_auth.cookie_secret = "3283411b-1904-4554-b0e1-883863b53080"
 
 # INFO - This is the way to specialize the resetpassword email properties

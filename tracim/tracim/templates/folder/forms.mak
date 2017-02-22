@@ -1,7 +1,7 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
-<%namespace name="WIDGETS" file="tracim.templates.user_workspace_widgets"/>
+<%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
 
 <%def name="NEW(dom_id, workspace_id, parent_id=None)">
     <div id="{dom_id}">
@@ -53,21 +53,12 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="move-to-same-workspace">
                         <div class="t-half-spacer-above">
-                            <%
-                                selected_id = 'workspace_{}__folder_{}'.format(item.workspace.id, item.folder.id if item.folder else '')
-                                get_root_url = tg.url('/workspaces/treeview_root', dict(current_id=selected_id, all_workspaces=0, folder_allowed_content_types='folder', ignore_id=item.id))
-                                get_children_url = tg.url('/workspaces/treeview_children', dict(ignore_id=item.id, allowed_content_types='folder'))
-                            %>
-                            ${WIDGETS.TREEVIEW_DYNAMIC('move-item-treeview', selected_id, get_root_url, get_children_url, 'move_mode')}
+                            ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
                         </div>
                     </div>
                     <div role="tabpanel" class="tab-pane" id="move-to-another-workspace">
                         <div class="t-half-spacer-above">
-                            <%
-                                get_root_url = tg.url('/workspaces/treeview_root', dict(current_id=None, all_workspaces=1, folder_allowed_content_types='folder', ignore_id=item.id, ignore_workspace_id=item.workspace.id))
-                                get_children_url = tg.url('/workspaces/treeview_children', dict(ignore_id=item.id, allowed_content_types='folder'))
-                            %>
-                            ${WIDGETS.TREEVIEW_DYNAMIC('move-item-to-other-ws-treeview', None, get_root_url, get_children_url, 'move_mode', 'move-item-treeview-treeview-hidden-field')}
+                            ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
                         </div>
                     </div>
                 </div>

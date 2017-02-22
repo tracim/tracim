@@ -768,3 +768,47 @@ div.mce-fullscreen {
   background-color: #fff;
   cursor: text;
 }
+
+.sidebarleft__menu__item__link > .fa-bank {
+  color: #DDD;
+}
+.sidebarleft__menu__item__link > .fa-folder-open-o {
+  color: #CCCC00;
+}
+.sidebarleft__menu__item__link > .fa-file-text-o {
+  color: #00CC00;
+}
+.sidebarleft__menu__item__link > .fa-comments-o {
+  color: #428BCA;
+}
+.sidebarleft__menu__item__link > .fa-paperclip {
+  color: orange;
+}
+
+.sidebarleft {
+  margin: 20px 0 0 0;
+  font-size:
+}
+.sidebarleft__menu {
+  overflow: hidden;
+}
+.sidebarleft__menu__item {
+  cursor: pointer;
+}
+.sidebarleft__menu__item__name {
+  padding: 3px 0;
+}
+.sidebarleft__menu__item__expandpicto > i {
+  margin-right: 5px;
+}
+.sidebarleft__menu__item__link > i {
+  margin-right: 8px;
+  font-size: 15px;
+}
+.sidebarleft__menu__item__link, a:hover {
+  color: inherit;
+}
+.sidebarleft__menu__item__link:hover {
+  text-decoration: none;
+}
+
