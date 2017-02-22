@@ -43,7 +43,6 @@
     ## GENERIC STUFF LIKE SCRIPTS
     ##
     ###########################################
-    <script src="${tg.url('/assets/js/jquery.min.js')}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="${tg.url('/assets/js/ie10-viewport-bug-workaround.js')}"></script>
     <!-- TinyMCE ================================================== -->

@@ -1,0 +1,13 @@
+{
+    "esversion" :   6,
+    "unused":       true,
+    "undef":        true,
+    "browser":      true,
+    "asi":          true,
+    "globals": {
+        "$":        true,
+        "__":       true,
+        "console":  true,
+        "moment":   true
+    }
+}

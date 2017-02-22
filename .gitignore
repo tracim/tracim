@@ -64,3 +64,10 @@ wsgidav.conf
 # Temporary files
 *~
 *.sqlite
+
+# npm packages
+/node_modules/
+
+# builded files from gulp scripts
+/tracim/tracim/public/assets/dist/
+/tracim/tracim/public/assets/js/main_es5.js
