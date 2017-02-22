@@ -2,8 +2,8 @@ $(document).ready(function () {
 
   // toggle sidebar-left width to fixed or auto
   $('#toggle-left-sidebar-width').click( function() {
-    sidebar = $('#sidebar-left')
-    buttonIcon = $('> i', this)
+    const sidebar = $('#sidebar-left')
+    const buttonIcon = $('> i', this)
 
     if (sidebar.hasClass('fixed-width-sidebar')) {
       sidebar.removeClass('fixed-width-sidebar')
@@ -63,5 +63,4 @@ $(document).ready(function () {
       }
     })
   }
-
 })
