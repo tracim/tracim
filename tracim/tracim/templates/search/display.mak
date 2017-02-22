@@ -63,7 +63,7 @@
                 ${ICON.FA_FW('{} fa-3x t-less-visible pull-left'.format(item.type.icon))}
                 <div style="margin-left: 5em;">
                     <h4>
-                        <a href="${item.breadcrumb[-1].url}">${TIM.ICO(16, item.icon)} ${item.label}</a>
+                        <a href="${item.breadcrumb[-1].url}">${TIM.FA(item.icon)} ${item.label}</a>
                          <small class="pull-right ${item.status.css}">
                              ${item.status.label}
                              ${ICON.FA_FW('{} {}'.format(item.status.icon, item.status.css))}
