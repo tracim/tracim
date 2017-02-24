@@ -9,7 +9,7 @@
 
 <%def name="content_wrapper()">
     ## SIDEBAR LEFT
-    <div id="sidebar-left" class="sidebar">
+    <div id="sidebar-left" class="sidebar bg-primary">
         <div class="btn-group" style="position: absolute; right: 2px; top: 4px; ">
             <button id="toggle-left-sidebar-width" type="button" class="btn btn-link"><i class="fa fa-angle-double-right"></i></button>
         </div>
@@ -18,7 +18,7 @@
     ## SIDEBAR LEFT [END]
 
     ## SIDEBAR RIGHT
-    <div id="sidebar-right" class="sidebar">
+    <div id="sidebar-right" class="sidebar bg-secondary">
         ${self.SIDEBAR_RIGHT_CONTENT()}
     </div> <!-- # End of side bar right -->
     ## SIDEBAR RIGHT [END]

@@ -2,6 +2,7 @@
 
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="FORMS" file="tracim.templates.user_workspace_forms"/>
+<%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
 <%namespace name="WIDGETS" file="tracim.templates.user_workspace_widgets"/>
 
 <%namespace name="TOOLBAR" file="tracim.templates.page.toolbar"/>
@@ -14,9 +15,7 @@
 <%def name="title()">${result.page.label}</%def>
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
-    <h4>${_('Workspaces')}</h4>
-    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.page.workspace.id, result.page.id))}
-    <hr/>
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.page.workspace.id, result.page.id))}
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">

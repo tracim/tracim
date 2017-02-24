@@ -3,6 +3,7 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="TOOLBAR" file="tracim.templates.workspace.toolbar"/>
 <%namespace name="FORMS" file="tracim.templates.user_workspace_forms"/>
+<%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
 <%namespace name="WIDGETS" file="tracim.templates.user_workspace_widgets"/>
 <%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 
@@ -15,8 +16,7 @@
 <%def name="title()">${result.workspace.label}</%def>
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
-    <h4>${_('Workspaces')}</h4>
-    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__'.format(result.workspace.id))}
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', 'workspace_{}__'.format(result.workspace.id))}
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
@@ -37,7 +37,7 @@
 ##
 ############################################################################
 
-<div class="t-page-header-row">
+<div class="t-page-header-row bg-secondary">
     <div class="main">
         <h1 class="page-header t-less-visible-border">
             <i class="fa fa-fw fa-lg fa-bank t-less-visible"></i>

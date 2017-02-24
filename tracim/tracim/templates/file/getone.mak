@@ -3,6 +3,7 @@
 <%namespace name="TOOLBAR" file="tracim.templates.file.toolbar"/>
 <%namespace name="FORMS" file="tracim.templates.file.forms"/>
 
+<%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
 <%namespace name="WIDGETS" file="tracim.templates.user_workspace_widgets"/>
 
 <%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
@@ -16,9 +17,7 @@
 <%def name="title()">${result.file.label}</%def>
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
-    <h4>${_('Workspaces')}</h4>
-    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.file.workspace.id, result.file.id))}
-    <hr/>
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.file.workspace.id, result.file.id))}
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
@@ -38,7 +37,7 @@
 
 <div class="content-container ${'not-editable' if not result.file.is_editable else ''} ${'archived' if result.file.is_archived else ''} ${'deleted' if result.file.is_deleted else ''}">
 
-    <div class="t-page-header-row">
+    <div class="t-page-header-row bg-secondary">
         <div class="main">
             <h1 class="page-header t-file-color-border">
                 <i class="fa fa-fw fa-lg fa-paperclip tracim-less-visible t-file-color"></i>

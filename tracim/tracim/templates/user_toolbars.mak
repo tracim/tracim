@@ -53,7 +53,7 @@
 
 <%def name="USERS(current_user)">
     ## SIDEBAR RIGHT
-    <div id="sidebar-right" class="col-sm-1 col-md-1 col-sm-offset-11 sidebar">
+    <div id="sidebar-right" class="col-sm-1 col-md-1 col-sm-offset-11 sidebar bg-secondary">
         <div class="btn-group btn-group-vertical">
         </div>
         <p></p>

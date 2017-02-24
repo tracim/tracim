@@ -27,7 +27,7 @@
     ## SIDEBAR LEFT [END]
 
     ## SIDEBAR RIGHT
-    <div id="sidebar-right" class="sidebar">
+    <div id="sidebar-right" class="sidebar bg-secondary">
         ${self.SIDEBAR_RIGHT_CONTENT()}
     </div> <!-- # End of side bar right -->
     ## SIDEBAR RIGHT [END]

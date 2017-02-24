@@ -146,15 +146,22 @@
     % endif
 </%def>
 
-<%def name="TREEVIEW(dom_id, selected_id='', uniq_workspace='0')">
-    ## <% get_root_url = tg.url("/workspaces/treeview_root", dict(current_id=selected_id)) %>
-    <div id='sidebarleft_menu'></div>
-    <script src="${tg.url('/assets/js/sidebarleft.js')}"></script>
+<%def name="TREEVIEW(dom_id, apiPath='/', apiParameters='', apiChildPath='', apiChildParameters='', loadScript='True')">
+## this function should only be called by the popup 'move folder'. For the sidebar left, use templates.widgets.left_menu.TREEVIEW
+## loadScript is used to call the js file only once AND (more importantly) create only one instance of the input hidden. Otherwise, an array of folder_id would be send through POST
+    <div id='${dom_id}'></div>
+    % if loadScript == 'True':
+      <script src="${tg.url('/assets/js/sidebarleft.js')}"></script>
+      <input type='hidden' id='move-folder-treeview-hidden-field' name='folder_id' value=''/>
+    % endif
     <script>
       // (function () { })() is equivalent to window.onload (http://stackoverflow.com/questions/9899372/pure-javascript-equivalent-to-jquerys-ready-how-to-call-a-function-when-the)
-      (function () {
-        sidebarLeft(document.getElementById('sidebarleft_menu'), '/', '?current_id=${selected_id}')
+      ;(function () {
+        sidebarLeft(document.getElementById('${dom_id}'), false, '${apiPath|n}', '${apiParameters|n}', '${apiChildPath|n}', '${apiChildParameters|n}')
       })()
+      $('#${dom_id}').on('click', '.sidebarleft__menu__item__link', function () {
+        $('#move-folder-treeview-hidden-field').val($(this).attr('id'))
+      })
     </script>
 </%def>
 

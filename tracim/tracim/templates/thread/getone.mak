@@ -2,6 +2,7 @@
 
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="TOOLBAR" file="tracim.templates.thread.toolbar"/>
+<%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
 <%namespace name="WIDGETS" file="tracim.templates.user_workspace_widgets"/>
 
 
@@ -16,9 +17,7 @@
 <%def name="title()">${result.thread.label}</%def>
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
-    <h4>${_('Workspaces')}</h4>
-    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.thread.workspace.id, result.thread.id))}
-    <hr/>
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.thread.workspace.id, result.thread.id))}
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
@@ -38,7 +37,7 @@
 
 <div class="content-container ${'not-editable' if not result.thread.is_editable else ''} ${'archived' if result.thread.is_archived else ''} ${'deleted' if result.thread.is_deleted else ''}">
 
-    <div class="t-page-header-row">
+    <div class="t-page-header-row bg-secondary">
         <div class="main">
             <h1 class="page-header t-thread-color-border">
                 <i class="fa fa-fw fa-lg fa-comments-o tracim-less-visible t-thread-color"></i>

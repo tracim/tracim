@@ -1,7 +1,7 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 <%namespace name="ICON" file="tracim.templates.widgets.icon"/>
-<%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
+<%namespace name="LEFT_MENU" file="tracim.templates.user_workspace_widgets"/>
 
 <%def name="NEW(dom_id, workspace_id, parent_id=None)">
     <div id="{dom_id}">
@@ -39,7 +39,7 @@
 </%def>
 
 <%def name="MOVE(dom_id, item, do_move_url, modal_title)">
-    <form role="form" method="POST" action="${do_move_url}">
+    <form id="move_folder_popup" role="form" method="POST" action="${do_move_url}">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">${_('Close')}</span></button>
             <h4 class="modal-title">${TIM.FA('fa-arrows t-less-visible')} ${modal_title}</h4>
@@ -51,16 +51,23 @@
                     <li role="presentation"><a href="#move-to-another-workspace" aria-controls="move-to-another-workspace" role="tab" data-toggle="tab">${_('to another workspace')}</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="move-to-same-workspace">
-                        <div class="t-half-spacer-above">
-                            ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
-                        </div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="move-to-another-workspace">
-                        <div class="t-half-spacer-above">
-                            ${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
-                        </div>
-                    </div>
+                    <div role="tabpanel" class="tab-pane active bg-primary" id="move-to-same-workspace"></div>
+                    <%
+                      selected_id = 'workspace_{}__folder_{}'.format(item.workspace.id, item.folder.id if item.folder else '')
+                      apiPath = tg.url('/workspaces/treeview_root')
+                      apiParameters = tg.url('', dict(current_id=selected_id, all_workspaces=0, folder_allowed_content_types='folder', ignore_id=item.id))
+                      apiChildPath = tg.url('/workspaces/treeview_children')
+                      apiChildParameters = tg.url('', dict(ignore_id=item.id, allowed_content_types='folder'))
+                    %>
+                    ${LEFT_MENU.TREEVIEW('move-to-same-workspace', apiPath, apiParameters, apiChildPath, apiChildParameters, 'True')}
+                    <div role="tabpanel" class="tab-pane bg-primary" id="move-to-another-workspace"></div>
+                    <%
+                      apiPath = tg.url('/workspaces/treeview_root')
+                      apiParameters = tg.url('', dict(current_id=None, all_workspaces=1, folder_allowed_content_types='folder', ignore_id=item.id, ignore_workspace_id=item.workspace.id))
+                      apiChildPath = tg.url('/workspaces/treeview_children')
+                      apiChildParameters = tg.url('', dict(ignore_id=item.id, allowed_content_types='folder'))
+                    %>
+                    ${LEFT_MENU.TREEVIEW('move-to-another-workspace', apiPath, apiParameters, apiChildPath, apiChildParameters, 'False')}
                 </div>
             </div>
         </div>

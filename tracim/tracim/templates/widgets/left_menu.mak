@@ -7,8 +7,8 @@
     <script src="${tg.url('/assets/js/sidebarleft.js')}"></script>
     <script>
       // (function () { })() is equivalent to window.onload (http://stackoverflow.com/questions/9899372/pure-javascript-equivalent-to-jquerys-ready-how-to-call-a-function-when-the)
-      (function () {
-        sidebarLeft(document.getElementById('sidebarleft_menu'), '/')
+      ;(function () {
+        sidebarLeft(document.getElementById('sidebarleft_menu'), true, '/workspaces/treeview_root/', '?current_id=${selected_id}', '/workspaces/treeview_children', '')
       })()
     </script>
 </%def>

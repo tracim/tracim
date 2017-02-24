@@ -104,7 +104,7 @@
                 </a>
             </div>
 
-            <div class="header__navbar navbar-collapse collapse">
+            <div class="header__navbar bg-primary navbar-collapse collapse">
                 % if request.identity:
                     <ul class="header__navbar__list nav navbar-nav navbar-left">
                         <li class="header__navbar__list__item active">

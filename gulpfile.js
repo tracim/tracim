@@ -22,7 +22,7 @@ const _tpldir = 'tracim/tracim/templates/'
 
 const listCssFiles = [
   _srcdir + 'css/default_skin.css',
-  _srcdir + 'css/bootstrap.min.css',
+  _srcdir + 'css/bootstrap.css',
   _srcdir + 'font-awesome-4.2.0/css/font-awesome.css',
   _srcdir + 'select2-4.0.3/css/select2.min.css',
   _srcdir + 'css/dashboard.css'

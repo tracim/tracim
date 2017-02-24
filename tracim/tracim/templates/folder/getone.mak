@@ -3,7 +3,7 @@
 <%namespace name="TIM" file="tracim.templates.pod"/>
 <%namespace name="TOOLBAR" file="tracim.templates.folder.toolbar"/>
 <%namespace name="FORMS" file="tracim.templates.user_workspace_forms"/>
-<%namespace name="WIDGETS" file="tracim.templates.user_workspace_widgets"/>
+<%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
 
 <%namespace name="BUTTON" file="tracim.templates.widgets.button"/>
 <%namespace name="TABLE_ROW" file="tracim.templates.widgets.table_row"/>
@@ -14,8 +14,7 @@
 <%def name="title()">${result.folder.label}</%def>
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
-    <h4>${_('Workspaces')}</h4>
-    ${WIDGETS.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.folder.workspace.id, result.folder.id))}
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', 'workspace_{}__item_{}'.format(result.folder.workspace.id, result.folder.id))}
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
@@ -41,7 +40,7 @@
 
 <div class="folder-container ${'not-editable' if not result.folder.is_editable else ''} ${'archived' if result.folder.is_archived else ''} ${'deleted' if result.folder.is_deleted else ''}">
 
-    <div class="t-page-header-row">
+    <div class="t-page-header-row bg-secondary">
         <div class=" main">
             <h1 class="page-header t-folder-color-border">
                 <i class="fa fa-fw fa-lg fa-folder-open tracim-less-visible" style="color: #CCCC00"></i>

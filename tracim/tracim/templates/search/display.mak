@@ -28,7 +28,7 @@
 ##
 ############################################################################
 
-<div class="row t-page-header-row">
+<div class="row t-page-header-row bg-secondary">
     <div class="col-sm-7 col-sm-offset-3 main">
         <h1 class="page-header t-search-color-border">
             <i class="fa fa-fw fa-lg fa-search t-search-color"></i>
