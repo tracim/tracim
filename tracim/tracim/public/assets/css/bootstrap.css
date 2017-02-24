@@ -6769,7 +6769,10 @@ button.close {
 .textMenuColor-hover {
   color: #333;
 }
+.bg-primary {
+  background-color: #555;
+}
 .bg-secondary {
-  background-color: #2f4433;
+  background-color: #f5f5f5;
 }
 /*# sourceMappingURL=bootstrap.css.map */
