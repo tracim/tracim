@@ -10,9 +10,9 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link rel="icon" href="/favicon.ico">
-        <link href="${tg.url('/assets/css/bootstrap.min.css')}" rel="stylesheet">
-        <link href="${tg.url('/assets/css/dashboard.css')}" rel="stylesheet">
-        <link href="${tg.url('/assets/font-awesome-4.2.0/css/font-awesome.css')}" rel="stylesheet">
+
+        <link href="${tg.url('/assets/dist/all.css')}" rel="stylesheet">
+
         <script>
           globalTracimLang = 'fr_FR'
         </script>
@@ -34,9 +34,7 @@
         </div>
         ${self.footer()}
 
-        <script src="${tg.url('/assets/js/bootstrap.min.js')}"></script>
-        <script src="${tg.url('/assets/js/trad.js')}"></script>
-        <script src="${tg.url('/assets/js/main.js')}"></script>
+        <script src="${tg.url('/assets/dist/all.js')}"></script>
         ## HACK - D.A. - 2014-10-21
         ##
         ## The following JS "hack" is intended to make TG2 flash messages compatible with bootstrap alert classes
