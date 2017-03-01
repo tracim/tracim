@@ -173,7 +173,9 @@ class CFG(object):
         :param value:
         :return:
         """
-        if 'PASSWORD' not in key and 'URL' not in key and 'CONTENT' not in key:
+        if 'PASSWORD' not in key and \
+                ('URL' not in key or type(value) == str) and \
+                'CONTENT' not in key:
             # We do not show PASSWORD for security reason
             # we do not show URL because the associated config uses tg.lurl() which is evaluated when at display time.
             # At the time of configuration setup, it can't be evaluated
