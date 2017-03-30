@@ -362,7 +362,7 @@ class UserRestController(TIMRestController):
     def generate_password(
             cls,
             password_length = PASSWORD_LENGTH,
-            password_char = PASSWORD_CHARACTERS
+            password_chars = PASSWORD_CHARACTERS
             ):
 
         # character list that will be contained into the password
@@ -371,7 +371,7 @@ class UserRestController(TIMRestController):
         for j in range(0, password_length):
             # This puts a random char from the list above inside
             # the list of chars and then merges them into a String
-            char_list.append(random.choice(password_char))
+            char_list.append(random.choice(password_chars))
             password = ''.join(char_list)
         return password
 
