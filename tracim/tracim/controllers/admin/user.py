@@ -328,7 +328,7 @@ class UserRestController(TIMRestController):
             user.password = password
         elif send_email:
             # Setup a random password to send email at user
-            password = UserRestController.generate_password()
+            password = self.generate_password()
             user.password = password
 
         user.webdav_left_digest_response_hash = '%s:/:%s' % (email, password)
@@ -353,18 +353,12 @@ class UserRestController(TIMRestController):
         tg.flash(_('User {} created.').format(user.get_display_name()), CST.STATUS_OK)
         tg.redirect(self.url())
 
-    @staticmethod
-    def generate_password():
+    @classmethod
+    def generate_password(cls):
         # Characters available to generate a password
-        characters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-
-                      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-                      'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-                      'u', 'v', 'w', 'x', 'y', 'z',
-
-                      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                      'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                      'U', 'V', 'W', 'X', 'Y', 'Z']
+        characters = '0123456789' \
+                     'abcdefghijklmonpqrstuvwxyz' \
+                     'ABCDEFGHIJKLMONPQRSTUVWXYZ'
 
         # character list that will be contained into the password
         list_char = []

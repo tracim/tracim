@@ -218,7 +218,8 @@ class CFG(object):
             )
 
         self.AUTO_GENERATED_PASSWORD_LENGTH = tg.config.get(
-            'tracim.password.length')
+            'tracim.password.length'
+        )
 
         self.EMAIL_NOTIFICATION_FROM_EMAIL = \
             tg.config.get('email.notification.from.email')
