@@ -217,10 +217,6 @@ class CFG(object):
                 'email.notification.from.default_label.'
             )
 
-        self.AUTO_GENERATED_PASSWORD_LENGTH = tg.config.get(
-            'tracim.password.length'
-        )
-
         self.EMAIL_NOTIFICATION_FROM_EMAIL = \
             tg.config.get('email.notification.from.email')
         self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = \

@@ -275,6 +275,11 @@ class UserRestController(TIMRestController):
     profile = UserProfileAdminRestController()
     workspaces = UserWorkspaceRestController()
 
+    PASSWORD_LENGTH = 12
+    PASSWORD_CHARACTERS = '0123456789' \
+                          'abcdefghijklmonpqrstuvwxyz' \
+                          'ABCDEFGHIJKLMONPQRSTUVWXYZ'
+
     @classmethod
     def current_item_id_key_in_context(cls):
         return 'user_id'
@@ -354,21 +359,20 @@ class UserRestController(TIMRestController):
         tg.redirect(self.url())
 
     @classmethod
-    def generate_password(cls):
-        # Characters available to generate a password
-        characters = '0123456789' \
-                     'abcdefghijklmonpqrstuvwxyz' \
-                     'ABCDEFGHIJKLMONPQRSTUVWXYZ'
+    def generate_password(
+            cls,
+            password_length = PASSWORD_LENGTH,
+            password_char = PASSWORD_CHARACTERS
+            ):
 
         # character list that will be contained into the password
-        list_char = []
+        char_list = []
 
-        pass_length = int(CFG.get_instance().AUTO_GENERATED_PASSWORD_LENGTH)
-        for j in range(0, pass_length):
+        for j in range(0, password_length):
             # This puts a random char from the list above inside
             # the list of chars and then merges them into a String
-            list_char.append(random.choice(characters))
-            password = ''.join(list_char)
+            char_list.append(random.choice(password_char))
+            password = ''.join(char_list)
         return password
 
     @tg.expose('tracim.templates.admin.user_getone')
