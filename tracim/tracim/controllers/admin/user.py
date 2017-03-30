@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import uuid
+import random
 
 import pytz
 from tracim import model  as pm
@@ -7,6 +8,7 @@ from tracim import model  as pm
 from sprox.tablebase import TableBase
 from sprox.formbase import EditableForm, AddRecordForm
 from sprox.fillerbase import TableFiller, EditFormFiller
+from tracim.config.app_cfg import CFG
 from tw2 import forms as tw2f
 import tg
 from tg import predicates
@@ -326,7 +328,7 @@ class UserRestController(TIMRestController):
             user.password = password
         elif send_email:
             # Setup a random password to send email at user
-            password = str(uuid.uuid4())
+            password = UserRestController.generate_password()
             user.password = password
 
         user.webdav_left_digest_response_hash = '%s:/:%s' % (email, password)
@@ -350,6 +352,30 @@ class UserRestController(TIMRestController):
         api.execute_created_user_actions(user)
         tg.flash(_('User {} created.').format(user.get_display_name()), CST.STATUS_OK)
         tg.redirect(self.url())
+
+    @staticmethod
+    def generate_password():
+        # Characters available to generate a password
+        characters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+
+                      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                      'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+                      'u', 'v', 'w', 'x', 'y', 'z',
+
+                      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                      'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                      'U', 'V', 'W', 'X', 'Y', 'Z']
+
+        # character list that will be contained into the password
+        list_char = []
+
+        pass_length = int(CFG.get_instance().AUTO_GENERATED_PASSWORD_LENGTH)
+        for j in range(0, pass_length):
+            # This puts a random char from the list above inside
+            # the list of chars and then merges them into a String
+            list_char.append(random.choice(characters))
+            password = ''.join(list_char)
+        return password
 
     @tg.expose('tracim.templates.admin.user_getone')
     def get_one(self, user_id):
