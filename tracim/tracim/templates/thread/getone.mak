@@ -51,8 +51,11 @@
 
             <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
                 <% created_localized = h.get_with_timezone(result.thread.created) %>
-              <p>${_('page created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.thread.owner.name)|n}</p>
-            </div>
+                <% updated_localized = h.get_with_timezone(result.thread.updated) %>
+                <p>${_('page created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.thread.owner.name)|n}</p>
+                % if result.thread.revision_nb > 1:
+                  <p>${_(' (last modification on {update_date} at {update_time})').format(update_date=h.update_date(updated_localized), update_time=h.update_time(updated_localized))|n}</p>
+              % endif
         </div>
     </div>
 
