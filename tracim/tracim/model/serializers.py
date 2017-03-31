@@ -388,7 +388,7 @@ def serialize_node_for_page(content: Content, context: Context):
             is_new=content.has_new_information_for(context.get_user()),
             content=data_container.description,
             created=data_container.created,
-            updated=data_container.updated,
+            updated=content.last_revision.updated,
             label=data_container.label,
             icon=ContentType.get_icon(content.type),
             owner=context.toDict(content.first_revision.owner),
@@ -457,7 +457,7 @@ def serialize_node_for_thread(item: Content, context: Context):
         return DictLikeClass(
             content = item.description,
             created = item.created,
-            updated = item.updated,
+            updated = item.last_revision.updated,
             revision_nb = len(item.revisions),
             icon = ContentType.get_icon(item.type),
             id = item.content_id,
