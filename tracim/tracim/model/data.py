@@ -1043,6 +1043,10 @@ class Content(DeclarativeBase):
         return self.revisions[0]  # FIXME
 
     @property
+    def last_revision(self) -> ContentRevisionRO:
+        return self.revisions[-1]
+
+    @property
     def is_editable(self) -> bool:
         return not self.is_archived and not self.is_deleted
 
