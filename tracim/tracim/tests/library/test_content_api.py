@@ -347,6 +347,35 @@ class TestContentApi(BaseTest, TestStandard):
         eq_(ActionDescription.COMMENT, c.revision_type)
 
 
+    def test_mark_as_read(self):
+        uapi = UserApi(None)
+        groups = [GroupApi(None).get_one(Group.TIM_USER),
+                  GroupApi(None).get_one(Group.TIM_MANAGER),
+                  GroupApi(None).get_one(Group.TIM_ADMIN)]
+
+        userA = uapi.create_user(email='this.is@user',
+                                groups=groups, save_now=True)
+
+        userB = uapi.create_user(email='this.is@nother_user',
+                                 groups=groups, save_now=True)
+
+        workspace = WorkspaceApi(userA, userB).create_workspace('test workspace',
+                                                        save_now=True)
+        contapiA = ContentApi(userA)
+        contapiB = ContentApi(userB)
+
+        page = contapiA.create(ContentType.page, workspace, "this is a page")
+
+        eq_(page.revisions[-1].read_by[userB], False)
+
+        contapiB.mark_read(page)
+
+        eq_(page.revisions[-1].read_by[userB], True)
+
+        print("test_mark_as_read")
+
+
+
     def test_update(self):
         uapi = UserApi(None)
         groups = [GroupApi(None).get_one(Group.TIM_USER),
