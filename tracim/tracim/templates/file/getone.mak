@@ -51,7 +51,14 @@
 
             <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
                 <% created_localized = h.get_with_timezone(result.file.created) %>
-              <p>${_('file created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.file.owner.name)|n}</p>
+                <% updated_localized = h.get_with_timezone(result.file.updated) %>
+                <% last_modification_author = result.file.last_modification_author.name %>
+              <p>${_('file created on {date} at {time} by <b>{author}</b>').format(date=h.date(created_localized), time=h.time(created_localized), author=result.file.owner.name)|n}
+                  % if result.file.revision_nb > 1:
+                      ${_(' (last modification on {update_date} at {update_time} by {last_modification_author})').format(update_date=h.update_date(updated_localized), update_time=h.update_time(updated_localized), last_modification_author = last_modification_author)|n}
+                  % endif
+              </p>
+
             </div>
         </div>
     </div>

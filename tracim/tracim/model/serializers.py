@@ -388,12 +388,14 @@ def serialize_node_for_page(content: Content, context: Context):
             is_new=content.has_new_information_for(context.get_user()),
             content=data_container.description,
             created=data_container.created,
+            updated=content.last_revision.updated,
             label=data_container.label,
             icon=ContentType.get_icon(content.type),
-            owner=context.toDict(data_container.owner),
+            owner=context.toDict(content.first_revision.owner),
+            last_modification_author=context.toDict(content.last_revision.owner),
             status=context.toDict(data_container.get_status()),
             links=[],
-            revisions=context.toDict(sorted(content.revisions, key=lambda v: v.created, reverse=True)),
+            revision_nb = len(content.revisions),
             selected_revision='latest' if content.revision_to_serialize<=0 else content.revision_to_serialize,
             history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history()),
             is_editable=content.is_editable,
@@ -450,16 +452,19 @@ def serialize_content_for_history(event: VirtualEvent, context: Context):
     )
 
 @pod_serializer(Content, CTX.THREAD)
-def serialize_node_for_page(item: Content, context: Context):
+def serialize_node_for_thread(item: Content, context: Context):
     if item.type==ContentType.Thread:
         return DictLikeClass(
             content = item.description,
             created = item.created,
+            updated = item.last_revision.updated,
+            revision_nb = len(item.revisions),
             icon = ContentType.get_icon(item.type),
             id = item.content_id,
             label = item.label,
             links=[],
             owner = context.toDict(item.owner),
+            last_modification_author=context.toDict(item.last_revision.owner),
             parent = context.toDict(item.parent),
             selected_revision = 'latest',
             status = context.toDict(item.get_status()),
@@ -595,6 +600,9 @@ def serialize_content_for_workspace_and_folder(content: Content, context: Contex
             id=content.content_id,
             label=content.label,
             created=content.created,
+            updated=content.last_revision.updated,
+            last_modification_author=context.toDict(content.last_revision.owner),
+            revision_nb=len(content.revisions),
             workspace=context.toDict(content.workspace),
             allowed_content=DictLikeClass(content.properties['allowed_content']),
             allowed_content_types=context.toDict(content.get_allowed_content_types()),
