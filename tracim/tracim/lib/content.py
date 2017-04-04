@@ -872,6 +872,17 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
+    def mark_read__all(self,
+                  read_datetime: datetime=None,
+                  do_flush: bool=True, recursive: bool=True):
+
+        if not read_datetime:
+            read_datetime = datetime.datetime.now()
+
+        itemset = self.get_last_unread(None, ContentType.Any, None)
+        for item in itemset:
+            self.mark_read(item, read_datetime, do_flush, recursive)
+
     def mark_read(self, content: Content,
                   read_datetime: datetime=None,
                   do_flush: bool=True, recursive: bool=True) -> Content:

@@ -6,7 +6,7 @@ from tracim.lib.content import ContentApi
 from tracim.model.data import ContentType
 
 
-class ReadController(StandardController):
+class ContentController(StandardController):
 
     @classmethod
     def current_item_id_key_in_context(cls) -> str:
@@ -18,13 +18,10 @@ class ReadController(StandardController):
 
     @require(predicates.not_anonymous())
     @tg.expose()
-    def all(self):
-        print("read all")
+    def mark_all_read(self):
         user = tg.tmpl_context.current_user
         content_api = ContentApi(user)
-        itemset = content_api.get_last_unread(None, ContentType.Any, None)
-        for item in itemset:
-            content_api.mark_read(item)
+        content_api.mark_read__all()
 
         tg.redirect("/home")
 
