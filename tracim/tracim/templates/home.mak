@@ -90,12 +90,13 @@
 
     ## NOT READ
     <div class="" id="unread-content-panel">
-        <br/><a href="/tools/read/all" class="btn btn-default"> Mark everything as read </a><hr/>
+
         <div class="panel panel-success">
             <div class="panel-body">
                 % if fake_api.last_unread.nb <= 0:
                     ${P.EMPTY_CONTENT(_('No new content.'))}
                 % else:
+                    <a href="/tools/read/all" class="btn btn-default"> Mark everything as read </a>
                     <table class="table table-hover">
                         % for item in fake_api.last_unread.contents:
                             <tr>
