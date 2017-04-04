@@ -364,15 +364,18 @@ class TestContentApi(BaseTest, TestStandard):
         contapiA = ContentApi(userA)
         contapiB = ContentApi(userB)
 
-        page = contapiA.create(ContentType.page, workspace, "this is a page")
+        page1 = contapiA.create(ContentType.page, workspace, "this is a page")
+        page2 = contapiA.create(ContentType.page, workspace, "this is another page")
 
-        eq_(page.revisions[-1].read_by[userB], False)
+        eq_(page1.revisions[-1].read_by[userB], False)
+        eq_(page2.revisions[-1].read_by[userB], False)
 
-        contapiB.mark_read(page)
+        itemset = contapiB.get_last_unread(None, ContentType.Any, None)
+        for item in itemset:
+            contapiB.mark_read(item)
 
-        eq_(page.revisions[-1].read_by[userB], True)
-
-        print("test_mark_as_read")
+        eq_(page1.revisions[-1].read_by[userB], True)
+        eq_(page2.revisions[-1].read_by[userB], True)
 
 
 
