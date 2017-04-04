@@ -50,11 +50,11 @@
             <div style="margin: -1.5em auto -1.5em auto;" class="tracim-less-visible">
                 <% created_localized = h.get_with_timezone(result.page.created) %>
                 <% updated_localized = h.get_with_timezone(result.page.updated) %>
-                <% last_author = result.page.last_author.name %>
+                <% last_modification_author = result.page.last_modification_author.name %>
                 <p>
                     ${_('page created on {date} at {time} by <b>{author}</b> ').format(date=h.date(created_localized), time=h.time(created_localized), author=result.page.owner.name)|n}
                     % if result.page.revision_nb > 1:
-                      ${_('(last modification on {update_date} at {update_time} by {last_author})').format(update_date=h.update_date(updated_localized), update_time=h.update_time(updated_localized), last_author = last_author)|n}
+                      ${_('(last modification on {update_date} at {update_time} by {last_modification_author})').format(update_date=h.update_date(updated_localized), update_time=h.update_time(updated_localized), last_modification_author = last_modification_author)|n}
                     % endif
                 </p>
             </div>
