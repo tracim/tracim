@@ -873,11 +873,10 @@ class ContentApi(object):
         content.revision_type = ActionDescription.UNDELETION
 
     def mark_read__all(self,
-                  read_datetime: datetime=None,
-                  do_flush: bool=True, recursive: bool=True):
-
-        if not read_datetime:
-            read_datetime = datetime.datetime.now()
+                       read_datetime: datetime=None,
+                       do_flush: bool=True,
+                       recursive: bool=True
+                       ):
 
         itemset = self.get_last_unread(None, ContentType.Any, None)
         for item in itemset:
