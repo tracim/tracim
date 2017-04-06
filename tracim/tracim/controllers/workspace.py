@@ -69,10 +69,6 @@ class UserWorkspaceRestController(TIMRestController):
         show_archived = str_as_bool(kwargs.get('show_archived', ''))
         user = tmpl_context.current_user
 
-        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
-        fake_api = Context(CTX.CURRENT_USER).toDict({
-            'current_user': current_user_content})
-
         unread_contents = ContentApi(user).get_last_unread(None,
                                                            ContentType.Any,
                                                            None)
