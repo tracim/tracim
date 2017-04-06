@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 
 from nose.tools import eq_, ok_
 from nose.tools import raises

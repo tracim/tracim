@@ -9,6 +9,7 @@ from tracim.config.app_cfg import CFG
 
 from tracim.controllers import TIMRestController
 from tracim.controllers.content import UserWorkspaceFolderRestController
+from tracim.controllers.read import ContentController
 
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.content import ContentApi
@@ -42,6 +43,19 @@ class UserWorkspaceRestController(TIMRestController):
     def get_all(self, *args, **kw):
         tg.redirect(tg.url('/home'))
 
+    @tg.expose()
+    def mark_read(self, workspace_id, **kwargs):
+
+        user = tmpl_context.current_user
+        workspace_api = WorkspaceApi(user)
+        workspace = workspace_api.get_one(workspace_id)
+
+        content_api = ContentApi(user)
+        content_api.mark_read__workspace(workspace)
+
+        tg.redirect('/workspaces/{}'.format(workspace_id))
+        return DictLikeClass(fake_api=fake_api)
+
     @tg.expose('tracim.templates.workspace.getone')
     def get_one(self, workspace_id, **kwargs):
         """
@@ -56,6 +70,13 @@ class UserWorkspaceRestController(TIMRestController):
         user = tmpl_context.current_user
 
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
+        fake_api = Context(CTX.CURRENT_USER).toDict({
+            'current_user': current_user_content})
+
+        unread_contents = ContentApi(user).get_last_unread(None,
+                                                           ContentType.Any,
+                                                           None)
+        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
         workspace_api = WorkspaceApi(user)
@@ -64,6 +85,9 @@ class UserWorkspaceRestController(TIMRestController):
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)
         dictified_folders = self.folders.get_all_fake(workspace).result
         fake_api = DictLikeClass(
+            last_unread=Context(CTX.CONTENT_LIST).toDict(unread_contents,
+                                                         'contents',
+                                                         'nb'),
             current_user=dictified_current_user,
             current_workspace_folders=dictified_folders,
             current_user_workspace_role=workspace.get_user_role(user)

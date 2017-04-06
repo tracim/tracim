@@ -878,7 +878,20 @@ class ContentApi(object):
                        recursive: bool=True
                        ):
 
-        itemset = self.get_last_unread(None, ContentType.Any, None)
+        itemset = self.get_last_unread(None, ContentType.Any)
+
+        for item in itemset:
+            self.mark_read(item, read_datetime, do_flush, recursive)
+
+    def mark_read__workspace(self,
+                       workspace : Workspace,
+                       read_datetime: datetime=None,
+                       do_flush: bool=True,
+                       recursive: bool=True
+                       ):
+
+        itemset = self.get_last_unread(None, ContentType.Any, workspace)
+
         for item in itemset:
             self.mark_read(item, read_datetime, do_flush, recursive)
 

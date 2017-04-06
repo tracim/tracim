@@ -10,7 +10,7 @@ class ContentController(StandardController):
 
     @classmethod
     def current_item_id_key_in_context(cls) -> str:
-        pass
+        return''
 
     @tg.expose()
     def index(self):
