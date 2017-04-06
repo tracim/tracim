@@ -69,14 +69,16 @@ class UserWorkspaceRestController(TIMRestController):
         show_archived = str_as_bool(kwargs.get('show_archived', ''))
         user = tmpl_context.current_user
 
+        workspace_api = WorkspaceApi(user)
+        workspace = workspace_api.get_one(workspace_id)
+
         unread_contents = ContentApi(user).get_last_unread(None,
                                                            ContentType.Any,
-                                                           None)
+                                                           workspace=workspace)
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         current_user_content.roles.sort(key=lambda role: role.workspace.name)
 
-        workspace_api = WorkspaceApi(user)
-        workspace = workspace_api.get_one(workspace_id)
+
 
         dictified_current_user = Context(CTX.CURRENT_USER).toDict(user)
         dictified_folders = self.folders.get_all_fake(workspace).result
