@@ -9,7 +9,6 @@ from tracim.config.app_cfg import CFG
 
 from tracim.controllers import TIMRestController
 from tracim.controllers.content import UserWorkspaceFolderRestController
-from tracim.controllers.read import ContentController
 
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.content import ContentApi

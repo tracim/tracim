@@ -12,7 +12,7 @@ from tg import url
 
 from tg.i18n import ugettext as _
 from tracim.controllers.api import APIController
-from tracim.controllers.read import ContentController
+from tracim.controllers.content import ContentController
 
 from tracim.lib import CST
 from tracim.lib.base import logger
