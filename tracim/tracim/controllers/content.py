@@ -6,13 +6,16 @@ import traceback
 
 from cgi import FieldStorage
 import tg
-from tg import tmpl_context, require, predicates
+from tg import tmpl_context
+from tg import require
+from tg import predicates
 from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
 from sqlalchemy.orm.exc import NoResultFound
 from tg import abort
 
-from tracim.controllers import TIMRestController, StandardController
+from tracim.controllers import TIMRestController
+from tracim.controllers import StandardController
 from tracim.controllers import TIMRestPathContextSetup
 from tracim.controllers import TIMRestControllerWithBreadcrumb
 from tracim.controllers import TIMWorkspaceContentRestController
@@ -28,7 +31,9 @@ from tracim.lib.predicates import current_user_is_reader
 from tracim.lib.predicates import current_user_is_contributor
 from tracim.lib.predicates import current_user_is_content_manager
 from tracim.lib.predicates import require_current_user_is_owner
-from tracim.model.serializers import Context, CTX, DictLikeClass
+from tracim.model.serializers import Context
+from tracim.model.serializers import CTX
+from tracim.model.serializers import DictLikeClass
 from tracim.model.data import ActionDescription
 from tracim.model import new_revision
 from tracim.model import DBSession

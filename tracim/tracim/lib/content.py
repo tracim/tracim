@@ -26,7 +26,8 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib import cmp_to_key
 from tracim.lib.notifications import NotifierFactory
 from tracim.lib.utils import SameValueError
-from tracim.model import DBSession, new_revision
+from tracim.model import DBSession
+from tracim.model import new_revision
 from tracim.model.auth import User
 from tracim.model.data import ActionDescription
 from tracim.model.data import BreadcrumbItem
