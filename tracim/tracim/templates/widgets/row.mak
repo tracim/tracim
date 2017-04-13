@@ -1,5 +1,5 @@
 <%def name="TITLE_ROW(label, icon, width_classes, color_classes, subtitle)">
-    <div class="" style="background-color: #F5F5F5; border-bottom: 1px solid #CCC;">
+    <div class="bg-secondary" style="border-bottom: 1px solid #CCC;">
         <div class="${width_classes} main">
             <h1 class="page-header ${color_classes}">
                 <i class="fa fa-fw fa-lg ${icon} ${color_classes}"></i>

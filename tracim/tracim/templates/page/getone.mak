@@ -35,7 +35,7 @@
 
 <div class="content-container ${'not-editable' if not result.page.is_editable else ''} ${'archived' if result.page.is_archived else ''} ${'deleted' if result.page.is_deleted else ''}">
 
-    <div class="t-page-header-row">
+    <div class="t-page-header-row bg-secondary">
         <div class="main">
             <h1 class="page-header t-page-color-border">
                 <i class="fa fa-fw fa-lg fa-file-text-o tracim-less-visible t-page-color"></i>
