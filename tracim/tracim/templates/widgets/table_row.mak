@@ -57,7 +57,7 @@
 <%def name="CONTENT(content)">
     <tr class="t-table-row-${content.type.type} folder__content__list__item ${'archived' if content.is_archived else ''} ${'deleted' if content.is_deleted else ''}">
         <td class="folder__content__list__item__title">
-            <a href="${content.url}">
+            <a href="${content.url}" id="folder__content__list__item__link_${content.id}">
                 <i class="fa-fw ${content.type.icon} ${content.type.color}"></i> ${content.label}
             </a>
         </td>

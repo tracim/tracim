@@ -12,16 +12,16 @@
     % endif
 
     <% edit_disabled = ('', 'disabled')[page.selected_revision!='latest' or page.status.id[:6]=='closed'] %>
-    <% delete_or_archive_disabled = ('', 'disabled')[page.selected_revision!='latest'] %> 
+    <% delete_or_archive_disabled = ('', 'disabled')[page.selected_revision!='latest'] %>
     % if h.user_role(user, workspace)>1 and page.is_editable:
         <div class="btn-group btn-group-vertical">
-            <a title="${_('Edit')}" class="btn btn-default ${edit_disabled}" data-toggle="modal" data-target="#page-edit-modal-dialog" data-remote="${tg.url('/workspaces/{}/folders/{}/pages/{}/edit'.format(page.workspace.id, page.parent.id, page.id))}" >
+            <a title="${_('Edit')}" id="edit_page_button" class="btn btn-default ${edit_disabled}" data-toggle="modal" data-target="#page-edit-modal-dialog" data-remote="${tg.url('/workspaces/{}/folders/{}/pages/{}/edit'.format(page.workspace.id, page.parent.id, page.id))}" >
                 <i class="fa fa-edit fa-fw t-less-visible"></i> ${_('Edit')}
             </a>
         </div>
         <p></p>
     % endif
-    
+
     <div class="btn-group btn-group-vertical">
         <a href="#associated-revisions" role="button" class="btn btn-default" title="${_('View versions of the page')}">
             <i class="fa fa-history fa-fw t-less-visible"></i>
