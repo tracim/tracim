@@ -54,6 +54,12 @@
 
 
 <div class="workspace__detail__wrapper">
+     %if fake_api.last_unread.nb > 0:
+         <% workspace_id = result.workspace.id %>
+         <a href="${tg.url('/workspaces/{ws_id}/mark_read'.format(ws_id = workspace_id))}" class="btn btn-default"> ${_('Mark this workspace as read')} </a>
+
+     %endif
+
     ${TITLE.H3(_('Detail'), 'fa-align-justify', 'workspace-members')}
     % if result.workspace.description:
         <p>${result.workspace.description}</p>

@@ -7,12 +7,15 @@ import traceback
 from cgi import FieldStorage
 import tg
 from tg import tmpl_context
+from tg import require
+from tg import predicates
 from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
 from sqlalchemy.orm.exc import NoResultFound
 from tg import abort
 
 from tracim.controllers import TIMRestController
+from tracim.controllers import StandardController
 from tracim.controllers import TIMRestPathContextSetup
 from tracim.controllers import TIMRestControllerWithBreadcrumb
 from tracim.controllers import TIMWorkspaceContentRestController
@@ -28,7 +31,9 @@ from tracim.lib.predicates import current_user_is_reader
 from tracim.lib.predicates import current_user_is_contributor
 from tracim.lib.predicates import current_user_is_content_manager
 from tracim.lib.predicates import require_current_user_is_owner
-from tracim.model.serializers import Context, CTX, DictLikeClass
+from tracim.model.serializers import Context
+from tracim.model.serializers import CTX
+from tracim.model.serializers import DictLikeClass
 from tracim.model.data import ActionDescription
 from tracim.model import new_revision
 from tracim.model import DBSession
@@ -1074,3 +1079,32 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
             msg = _('{} not un-deleted: {}').format(self._item_type_label, str(e))
             tg.flash(msg, CST.STATUS_ERROR)
             tg.redirect(back_url)
+
+
+class ContentController(StandardController):
+
+    '''
+    Class of controllers used for example in home to mark read the unread 
+    contents via mark_all_read()
+    '''
+
+    @classmethod
+    def current_item_id_key_in_context(cls) -> str:
+        return''
+
+    @tg.expose()
+    def index(self):
+        return dict()
+
+    @require(predicates.not_anonymous())
+    @tg.expose()
+    def mark_all_read(self):
+        '''
+        Mark as read all the content that hasn't been read
+        redirects the user to "/home"
+        '''
+        user = tg.tmpl_context.current_user
+        content_api = ContentApi(user)
+        content_api.mark_read__all()
+
+        tg.redirect("/home")

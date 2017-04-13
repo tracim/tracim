@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 
 from nose.tools import eq_, ok_
 from nose.tools import raises
@@ -345,6 +346,160 @@ class TestContentApi(BaseTest, TestStandard):
         eq_('this is the comment', c.description)
         eq_('', c.label)
         eq_(ActionDescription.COMMENT, c.revision_type)
+
+
+    def test_mark_read__workspace(self):
+        uapi = UserApi(None)
+        groups = [GroupApi(None).get_one(Group.TIM_USER),
+                  GroupApi(None).get_one(Group.TIM_MANAGER),
+                  GroupApi(None).get_one(Group.TIM_ADMIN)]
+        user_a = uapi.create_user(email='this.is@user',
+                                  groups=groups, save_now=True)
+        user_b = uapi.create_user(email='this.is@another.user',
+                                  groups=groups, save_now=True)
+
+        wapi = WorkspaceApi(user_a)
+        workspace1 = wapi.create_workspace(
+            'test workspace n°1',
+            save_now=True)
+        workspace2 = wapi.create_workspace(
+            'test workspace n°2',
+            save_now=True)
+
+        role_api1 = RoleApi(user_a)
+        role_api1.create_one(user_b, workspace1, UserRoleInWorkspace.READER,
+                            False)
+
+        role_api2 = RoleApi(user_a)
+        role_api2.create_one(user_b, workspace2, UserRoleInWorkspace.READER,
+                             False)
+
+        cont_api_a = ContentApi(user_a)
+        cont_api_b = ContentApi(user_b)
+
+
+        # Creates page_1 & page_2 in workspace 1
+        #     and page_3 & page_4 in workspace 2
+        page_1 = cont_api_a.create(ContentType.Page, workspace1, None,
+                                   'this is a page', do_save=True)
+        page_2 = cont_api_a.create(ContentType.Page, workspace1, None,
+                                   'this is page1', do_save=True)
+        page_3 = cont_api_a.create(ContentType.Thread, workspace2, None,
+                                   'this is page2', do_save=True)
+        page_4 = cont_api_a.create(ContentType.File, workspace2, None,
+                                   'this is page3', do_save=True)
+
+        for rev in page_1.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+        for rev in page_2.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+        for rev in page_3.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+        for rev in page_4.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+
+        # Set as read the workspace n°1
+        cont_api_b.mark_read__workspace(workspace=workspace1)
+
+        for rev in page_1.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+        for rev in page_2.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+        for rev in page_3.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+        for rev in page_4.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+
+        # Set as read the workspace n°2
+        cont_api_b.mark_read__workspace(workspace=workspace2)
+
+        for rev in page_1.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+        for rev in page_2.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+        for rev in page_3.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+        for rev in page_4.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+
+    def test_mark_read(self):
+        uapi = UserApi(None)
+        groups = [GroupApi(None).get_one(Group.TIM_USER),
+                  GroupApi(None).get_one(Group.TIM_MANAGER),
+                  GroupApi(None).get_one(Group.TIM_ADMIN)]
+        user_a = uapi.create_user(email='this.is@user',
+                                 groups=groups, save_now=True)
+        user_b = uapi.create_user(email='this.is@another.user',
+                                 groups=groups, save_now=True)
+
+        wapi = WorkspaceApi(user_a)
+        workspace = wapi.create_workspace(
+            'test workspace',
+            save_now=True)
+
+        role_api = RoleApi(user_a)
+        role_api.create_one(user_b, workspace, UserRoleInWorkspace.READER, False)
+        cont_api_a = ContentApi(user_a)
+        cont_api_b = ContentApi(user_b)
+
+        page_1 = cont_api_a.create(ContentType.Page, workspace, None,
+                                   'this is a page', do_save=True)
+
+        for rev in page_1.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+
+        cont_api_b.mark_read(page_1)
+
+        for rev in page_1.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+
+
+    def test_mark_read__all(self):
+        uapi = UserApi(None)
+        groups = [GroupApi(None).get_one(Group.TIM_USER),
+                  GroupApi(None).get_one(Group.TIM_MANAGER),
+                  GroupApi(None).get_one(Group.TIM_ADMIN)]
+        user_a = uapi.create_user(email='this.is@user',
+                                 groups=groups, save_now=True)
+        user_b = uapi.create_user(email='this.is@another.user',
+                                 groups=groups, save_now=True)
+
+        wapi = WorkspaceApi(user_a)
+        workspace = wapi.create_workspace(
+            'test workspace',
+            save_now=True)
+
+        role_api = RoleApi(user_a)
+        role_api.create_one(user_b, workspace, UserRoleInWorkspace.READER, False)
+        cont_api_a = ContentApi(user_a)
+        cont_api_b = ContentApi(user_b)
+
+        page_2 = cont_api_a.create(ContentType.Page, workspace, None, 'this is page1', do_save=True)
+        page_3 = cont_api_a.create(ContentType.Thread, workspace, None, 'this is page2', do_save=True)
+        page_4 = cont_api_a.create(ContentType.File, workspace, None, 'this is page3', do_save=True)
+
+        for rev in page_2.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+        for rev in page_3.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+        for rev in page_4.revisions:
+            eq_(user_b not in rev.read_by.keys(), True)
+
+        DBSession.refresh(page_2)
+        DBSession.refresh(page_3)
+        DBSession.refresh(page_4)
+
+        cont_api_b.mark_read__all()
+
+        for rev in page_2.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+        for rev in page_3.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+        for rev in page_4.revisions:
+            eq_(user_b in rev.read_by.keys(), True)
+
+
+
 
 
     def test_update(self):

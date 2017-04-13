@@ -26,7 +26,8 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib import cmp_to_key
 from tracim.lib.notifications import NotifierFactory
 from tracim.lib.utils import SameValueError
-from tracim.model import DBSession, new_revision
+from tracim.model import DBSession
+from tracim.model import new_revision
 from tracim.model.auth import User
 from tracim.model.data import ActionDescription
 from tracim.model.data import BreadcrumbItem
@@ -871,6 +872,29 @@ class ContentApi(object):
         content.owner = self._user
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
+
+    def mark_read__all(self,
+                       read_datetime: datetime=None,
+                       do_flush: bool=True,
+                       recursive: bool=True
+                       ):
+
+        itemset = self.get_last_unread(None, ContentType.Any)
+
+        for item in itemset:
+            self.mark_read(item, read_datetime, do_flush, recursive)
+
+    def mark_read__workspace(self,
+                       workspace : Workspace,
+                       read_datetime: datetime=None,
+                       do_flush: bool=True,
+                       recursive: bool=True
+                       ):
+
+        itemset = self.get_last_unread(None, ContentType.Any, workspace)
+
+        for item in itemset:
+            self.mark_read(item, read_datetime, do_flush, recursive)
 
     def mark_read(self, content: Content,
                   read_datetime: datetime=None,
