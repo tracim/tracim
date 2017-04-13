@@ -82,6 +82,14 @@ def time(datetime_object):
     current_locale = tg.i18n.get_lang()[0]
     return format_time(datetime_object, locale=current_locale)
 
+def update_date(datetime_object):
+    current_locale = tg.i18n.get_lang()[0]
+    return format_date(datetime_object, locale=current_locale)
+
+def update_time(datetime_object):
+    current_locale = tg.i18n.get_lang()[0]
+    return format_time(datetime_object, locale=current_locale)
+
 def format_short(datetime_object):
     return datetime_object.strftime(format = plag.Globals.SHORT_DATE_FORMAT.__str__())
 
