@@ -452,3 +452,6 @@ Example of Apache WSGI configuration. This configuration refers to productionapp
 Building the community is a work in progress.
 
 Need help ? Do not hesitate to contact me : damien.accorsi@free.fr
+
+![BrowserStack](https://github.com/tracim/tracim/tree/master/tracim/tracim/public/assets/img/logo_browserstack.svg)
+BrowserStack support open source project and graciously helps us testing Tracim on every devices.
