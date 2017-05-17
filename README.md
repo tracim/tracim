@@ -117,7 +117,7 @@ You'll need to install the following packages on your Operating System:
 
 You also need `redis-server` package if you want to send email in async mode.
 
-### Frontend dependencies ###
+## Frontend ##
 
 [//]: # ( from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
 
@@ -129,10 +129,6 @@ Install nodejs by typing:
 Check that this went well by getting npm version:
 
     npm -v
-
-Then install frontend dependancies:
-
-    npm install
 
 ## Database ##
 
@@ -158,6 +154,12 @@ Get the sources from github with git:
     cd tracim/
 
 *Note: Now everything is documented to be executed from the tracim directory newly created.*
+
+### Frontend dependencies ###
+
+To install frontend dependencies listed in the file package.json, proceed as follow:
+
+    npm install
 
 ### Setting-up python virtualenv ###
 
