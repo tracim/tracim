@@ -399,6 +399,12 @@ There are other parameters which may be of some interest for you. For example, y
 * personalize home page (background image, title color...)
 * ...
 
+### WebDAV ###
+
+Create WsgiDAV configuration from the sample file:
+
+    cp tracim/wsgidav.conf.sample tracim/wsgidav.conf
+
 ### frontend files compilation ###
 
 Considering your environment, run:
