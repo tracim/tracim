@@ -113,7 +113,7 @@ _Note: the following information is for Debian. For other OS, adapt the package 
 
 You'll need to install the following packages on your Operating System:
 
-    apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml
+    apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml zlib1g-dev
 
 You also need `redis-server` package if you want to send email in async mode.
 
