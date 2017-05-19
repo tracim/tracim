@@ -1,9 +1,6 @@
 sudo: false
 language: python
-python:
-  - "3.4"
-  - "3.5"
-  - "3.6"
+python: "3.4"
 
 env:
   - DB=postgres
@@ -17,6 +14,7 @@ addons:
 install:
   - cd tracim && python setup.py develop; cd -
   - pip install -r install/requirements.txt; echo
+  - pip install coveralls
 
 before_script:
   - cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini
@@ -38,3 +36,6 @@ before_script:
 
 # command to run tests
 script: "cd ${TRAVIS_BUILD_DIR}/tracim && nosetests -c ${TRAVIS_BUILD_DIR}/tracim/test.ini -v --with-coverage --cover-package=tracim --cover-erase"
+
+after_success:
+  - coveralls
