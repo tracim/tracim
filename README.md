@@ -138,7 +138,7 @@ If you want use PostgreSQL as database engine:
 
 Or if you want to use MySQL as database engine
 
-    apt-get install mysql-server mysql-client libmysqlclient-dev
+    apt-get install mysql-server
 
 Or if you want to use SQLite as database engine
 
@@ -177,8 +177,6 @@ To install tracim and it's dependencies:
 
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
-
-**Note**: If you want to use MySQL database, please refer to Configuration/database schema note to install required package.
 
 ## Database Setup ##
 
@@ -257,7 +255,14 @@ In this case, delete the user and database you previously created (using pgtool)
 
 ### Minimalist introduction to MySQL ###
 
-## Create database ##
+#### Driver ####
+
+Tracim uses the PyMySQL driver between the SQLAlchemy ORM and the MySQL RDBMS.
+The only requirement is a pip installable package:
+
+    pip install PyMySQL
+
+#### Create database ####
 
 Connect to mysql with root user (password has been set at "Installation" -> "Dependencies" chapter, when installing package)
 
@@ -304,9 +309,9 @@ Configure database in the development.ini file. This is defined as sqlalchemy.ur
 
     sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
 
-There is an example value for MySQL below (please refer to Configuration/database schema note to install required package):
+There is an example value for MySQL below:
 
-    sqlalchemy.url = mysql+oursql://tracimuser:tracimpassword@127.0.0.1/tracimdb
+    sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb
 
 There is an example value for SQLite below :
 
@@ -420,8 +425,6 @@ or
 ### database schema ###
 
 The last step before to run the application is to initialize the database schema. This is done through the following command:
-
-**Note**: If you want to use MySQL database, please install this pip package: ```pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip```
 
     cd tracim && gearbox setup-app && cd -
 
