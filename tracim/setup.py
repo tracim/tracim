@@ -39,7 +39,7 @@ install_requires=[
     "sqlalchemy",
     "alembic",
     "repoze.who",
-    "who-ldap==3.1.0",
+    "who_ldap>=3.2.1",
     "python-ldap-test==0.2.1",
     "unicode-slugify==0.1.3",
     "pytz==2014.7",
