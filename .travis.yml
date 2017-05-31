@@ -18,7 +18,6 @@ install:
   - cd tracim && python setup.py develop; cd -
   - echo coveralls >> install/requirements.txt; echo
   - pip install -r install/requirements.txt; echo
-  - pip install coveralls
 
 before_script:
   - cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini
