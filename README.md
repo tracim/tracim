@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=master)](https://travis-ci.org/tracim/tracim) [![Coverage Status](https://img.shields.io/coveralls/tracim/tracim.svg)](https://coveralls.io/r/tracim/tracim) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=master)
+[![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=master)](https://travis-ci.org/tracim/tracim) [![Coverage Status](https://img.shields.io/coveralls/tracim/tracim.svg)](https://coveralls.io/r/tracim/tracim) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=master) [![PyPI](https://img.shields.io/pypi/pyversions/tracim.svg)](https://pypi.python.org/pypi/tracim)
 
 # Tracim - Introduction #
 
@@ -67,7 +67,7 @@ Tracim is licensed under the terms of the
 
 Tracim is a web application:
 
-* developed with python >=3.4.
+* developed with python 3.4, 3.5, 3.6
 * based on the [TurboGears](http://www.turbogears.org/) web framework.
 * relying on [PostgreSQL](http://www.postgresql.org/) or [MySQL](https://www.mysql.fr/) or [sqlite](https://www.sqlite.org/) as the storage engine.
 
@@ -163,7 +163,7 @@ To install frontend dependencies listed in the file package.json, proceed as fol
 
 ### Setting-up python virtualenv ###
 
-_Reminder : Tracim is developed and tested using python3.4._
+_Reminder : Tracim is developed and tested using python3.4, python3.5, python3.6._
 
 We strongly recommend to use virtualenv as deployment environment. This ensure that there will be no conflict between system-wide python installation and Tracim required ones. To Create the virtual environment:
 

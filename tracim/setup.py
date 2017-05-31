@@ -25,6 +25,14 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
+classifiers = [
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+]
+
 testpkgs=['WebTest >= 1.2.3',
                'nose',
                'coverage',
