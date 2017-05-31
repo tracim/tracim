@@ -16,6 +16,7 @@ addons:
 
 install:
   - cd tracim && python setup.py develop; cd -
+  - echo coveralls >> install/requirements.txt; echo
   - pip install -r install/requirements.txt; echo
 
 before_script:
@@ -37,3 +38,6 @@ before_script:
 
 # command to run tests
 script: "cd ${TRAVIS_BUILD_DIR}/tracim && nosetests -c ${TRAVIS_BUILD_DIR}/tracim/test.ini -v --with-coverage --cover-package=tracim --cover-erase"
+
+after_success:
+- coveralls
