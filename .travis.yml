@@ -13,6 +13,7 @@ addons:
 
 install:
   - cd tracim && python setup.py develop; cd -
+  - echo coveralls >> install/requirements.txt; echo
   - pip install -r install/requirements.txt; echo
   - pip install coveralls
 
