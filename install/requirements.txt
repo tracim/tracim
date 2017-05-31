@@ -17,7 +17,7 @@ WebTest==1.4.2
 alembic==0.8.4
 argparse==1.2.1
 backlash==0.0.7
-beautifulsoup4==4.3.2
+beautifulsoup4==4.4.0
 caldav==0.4.0
 cliff==1.8.0
 cmd2==0.6.9
