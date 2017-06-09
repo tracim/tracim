@@ -52,6 +52,7 @@ install_requires=[
     "unicode-slugify==0.1.3",
     "pytz==2014.7",
     'rq==0.7.1',
+    'filedepot>=0.5.0',
     ]
 
 setup(

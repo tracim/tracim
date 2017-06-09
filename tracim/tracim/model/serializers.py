@@ -12,6 +12,9 @@ from datetime import datetime
 import tg
 from tg.i18n import ugettext as _
 from tg.util import LazyString
+
+from depot.manager import DepotManager
+
 from tracim.lib.base import logger
 from tracim.lib.user import CurrentUserGetterApi
 from tracim.model.auth import Profile
@@ -411,7 +414,7 @@ def serialize_node_for_page(content: Content, context: Context):
             result.label = content.label
             result['file'] = DictLikeClass(
                 name = data_container.file_name,
-                size = len(data_container.file_content),
+                size = DepotManager.get().get(data_container.revision.depot_file_uid).content_length,
                 mimetype = data_container.file_mimetype)
         return result
 

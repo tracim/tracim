@@ -850,6 +850,7 @@ class ContentApi(object):
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.file_content = new_file_content
+        item.revision.depot_file_uid = new_file_content
         item.revision_type = ActionDescription.REVISION
         return item
 

@@ -14,6 +14,8 @@ from tg.predicates import not_anonymous
 from sqlalchemy.orm.exc import NoResultFound
 from tg import abort
 
+from depot.manager import DepotManager
+
 from tracim.controllers import TIMRestController
 from tracim.controllers import StandardController
 from tracim.controllers import TIMRestPathContextSetup
@@ -249,7 +251,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         file_name = get_valid_header_file_name(revision_to_send.file_name)
         tg.response.headers['Content-Disposition'] = \
             str('attachment; filename="{}"'.format(file_name))
-        return revision_to_send.file_content
+        return DepotManager.get().get(revision_to_send.depot_file_uid)
 
 
     def get_all_fake(self, context_workspace: Workspace, context_folder: Content):

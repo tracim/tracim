@@ -38,6 +38,12 @@ from tracim.lib.daemons import WsgiDavDaemon
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
+from depot.manager import DepotManager
+DepotManager.configure(
+    'default',
+    {'depot.storage_path': '/tmp/depot_storage_path/'}
+)
+
 base_config = TracimAppConfig()
 base_config.renderers = []
 base_config.use_toscawidgets = False
