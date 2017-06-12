@@ -113,9 +113,26 @@ _Note: the following information is for Debian. For other OS, adapt the package 
 
 You'll need to install the following packages on your Operating System:
 
-    apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml
+    apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml zlib1g-dev
 
 You also need `redis-server` package if you want to send email in async mode.
+
+### Frontend dependencies ###
+
+[//]: # ( from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
+
+Install nodejs by typing:
+
+    curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+Check that this went well by getting npm version:
+
+    npm -v
+
+Then install frontend dependancies:
+
+    npm install
 
 ## Database ##
 
@@ -381,6 +398,22 @@ There are other parameters which may be of some interest for you. For example, y
 * personalize notification email
 * personalize home page (background image, title color...)
 * ...
+
+### WebDAV ###
+
+Create WsgiDAV configuration from the sample file:
+
+    cp tracim/wsgidav.conf.sample tracim/wsgidav.conf
+
+### frontend files compilation ###
+
+Considering your environment, run:
+
+    npm run gulp-dev
+
+or
+
+    npm run gulp-prod
 
 ### database schema ###
 
