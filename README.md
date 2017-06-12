@@ -117,6 +117,19 @@ You'll need to install the following packages on your Operating System:
 
 You also need `redis-server` package if you want to send email in async mode.
 
+## Frontend ##
+
+[//]: # ( from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
+
+Install nodejs by typing:
+
+    curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+Check that this went well by getting npm version:
+
+    npm -v
+
 ## Database ##
 
 If you want use PostgreSQL as database engine:
@@ -141,6 +154,12 @@ Get the sources from github with git:
     cd tracim/
 
 *Note: Now everything is documented to be executed from the tracim directory newly created.*
+
+### Frontend dependencies ###
+
+To install frontend dependencies listed in the file package.json, proceed as follow:
+
+    npm install
 
 ### Setting-up python virtualenv ###
 
@@ -381,6 +400,16 @@ There are other parameters which may be of some interest for you. For example, y
 * personalize notification email
 * personalize home page (background image, title color...)
 * ...
+
+### frontend files compilation ###
+
+Considering your environment, run:
+
+    npm run gulp-dev
+
+or
+
+    npm run gulp-prod
 
 ### database schema ###
 
