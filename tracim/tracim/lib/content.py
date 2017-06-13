@@ -474,14 +474,10 @@ class ContentApi(object):
         dpt = DepotManager.get()
         # python 3.6 PEP 526 -- Syntax for Variable Annotations
         # https://www.python.org/dev/peps/pep-0526/
-        # dpt_path: str = dpt.storage_path
-        # dpt_file_dir: str = item.revision.depot_file_uid.file_id
-        # dpt_file_path: str = dpt_path + dpt_file_dir + dpt_file_name
-        dpt_path = dpt.storage_path
-        dpt_file_dir = revision.depot_file_uid.file_id
-        dpt_file_path = '{0}{1}/file'.format(dpt_path, dpt_file_dir)
+        # dpt_file_path: str = dpt.get(dpt_stored_file)._file_path
+        dpt_file_path = dpt.get(dpt_stored_file)._file_path
 
-        return file_from_depot.name
+        return dpt_file_path
 
     def get_one_by_label_and_parent(
             self,
