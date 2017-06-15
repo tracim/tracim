@@ -96,7 +96,7 @@ beaker.session.validate_key = 3283411b-1904-4554-b0e1-883863b53080
 # sqlalchemy.url=mysql://username:password@hostname:port/databasename
 # sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
 # sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb
-sqlalchemy.url = <replace_database_uri_here>
+sqlalchemy.url = sqlite:///tracimdb.sqlite
 
 #echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
