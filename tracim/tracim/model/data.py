@@ -24,9 +24,8 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import LargeBinary
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
-
-from depot.manager import DepotManager
 from depot.fields.sqlalchemy import UploadedFileField
+from depot.fields.upload import UploadedFile
 
 from tracim.lib.utils import lazy_ugettext as l_
 from tracim.lib.exception import ContentRevisionUpdateError
@@ -1057,6 +1056,14 @@ class Content(DeclarativeBase):
     @property
     def is_editable(self) -> bool:
         return not self.is_archived and not self.is_deleted
+
+    @property
+    def depot_file_uid(self) -> UploadedFile:
+        return self.revision.depot_file_uid
+
+    @depot_file_uid.setter
+    def depot_file_uid(self, value):
+        self.revision.depot_file_uid = value
 
     def get_current_revision(self) -> ContentRevisionRO:
         if not self.revisions:
