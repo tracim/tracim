@@ -48,7 +48,7 @@ With Tracim, you centralize information, you can stay in touch by configuring yo
 
 ### Manage documents and files ###
 
-Traceability and versioning are very important for high-quality processes. Unfortunately, specialized software are hard to setup and to use.
+Traceability and versioning are very important for high-quality processes. Unfortunately, specialized software are hard to setup and use.
 
 Let's try Tracim ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versioned and never deleted.
 

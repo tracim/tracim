@@ -83,7 +83,7 @@ Keep in mind `admin-email@domain.com` must match with LDAP user.
 
 ## Other parameters  ##
 
-There are other parameters which may be of some interest for you. For example, you can:
+There are other parameters which may be of interest to you. For example, you can:
 
 * include a JS tracker like Piwik or Google Analytics,
 * define your own notification email subject
