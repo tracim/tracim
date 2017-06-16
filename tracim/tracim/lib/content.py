@@ -475,6 +475,7 @@ class ContentApi(object):
         # python 3.6 PEP 526 -- Syntax for Variable Annotations
         # https://www.python.org/dev/peps/pep-0526/
         # dpt_file_path: str = dpt.get(dpt_stored_file)._file_path
+        dpt_stored_file = dpt.get(revision.depot_file_uid)
         dpt_file_path = dpt.get(dpt_stored_file)._file_path
 
         return dpt_file_path

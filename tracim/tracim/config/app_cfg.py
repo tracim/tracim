@@ -194,6 +194,8 @@ class CFG(object):
 
     def __init__(self):
 
+        self.PREVIEW_CACHE = str(tg.config.get('preview_cache_dir'))
+
         self.DATA_UPDATE_ALLOWED_DURATION = int(tg.config.get('content.update.allowed.duration', 0))
 
         self.WEBSITE_TITLE = tg.config.get('website.title', 'TRACIM')

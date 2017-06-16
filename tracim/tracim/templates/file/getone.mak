@@ -100,6 +100,71 @@
     % endif
 
     <div class="content__detail file">
+        <div style="width: 15%;height: 100%;border:5px solid #606060;">
+            <a id="preview_link"><img id='preview' alt="Preview" style="width:100%;height:100%"></a>
+            <table style="width:100%;height:20%;">
+                <tr>
+                    <td rowspan="2">
+                        <button type="button" id="prev" onclick="previous_page()" style="width:100%;height:100%;"> - </button>
+                    </td>
+                    <td>
+                        <a id="dl_one_pdf" style=""> Download the page </a>
+                    </td>
+                    <td rowspan="2">
+                        <button type="button" id="next" onclick="next_page()" style="width:100%;height:100%;"> + </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td >
+                        <a id="dl_full_pdf" style=""> Download all </a>
+                    </td>
+                </tr>
+            </table>
+
+            <script type="text/javascript">
+                var nb_page = parseInt(${nb_page});
+                console.log(nb_page);
+                var page = 0;
+                var urls = [];
+                % for one_url in url:
+                urls.push('${one_url}');
+                % endfor
+                console.log(urls);
+                document.getElementById('preview').src = urls[page];
+                refresh_button();
+
+                function next_page(){
+                    page = page+1;
+                    console.log('page next');
+                    console.log(urls[page]);
+                    document.getElementById('preview').src = urls[page];
+                    refresh_button();
+                }
+
+                function previous_page(){
+                    page = page-1;
+                    console.log('page previous');
+                    console.log(urls[page]);
+                    document.getElementById('preview').src = urls[page];
+                    refresh_button();
+                }
+
+                function refresh_button(){
+                    console.log(page);
+                    document.getElementById('prev').disabled = false;
+                    document.getElementById('next').disabled = false;
+                    document.getElementById('dl_one_pdf').href = "/previews/${result.file.id}/pages/" + page + "/download_pdf_one";
+                    document.getElementById('dl_full_pdf').href = "/previews/${result.file.id}/pages/" + page + "/download_pdf_full";
+                    document.getElementById('preview_link').href = "/previews/${result.file.id}/pages/" + page + "/high_quality";
+                    if(page >= nb_page-1){
+                        document.getElementById('next').disabled = true;
+                    }
+                    if(page <= 0){
+                        document.getElementById('prev').disabled = true;
+                    }
+                }
+            </script>
+        </div>
         <% download_url = tg.url('/workspaces/{}/folders/{}/files/{}/download?revision_id={}'.format(result.file.workspace.id, result.file.parent.id,result.file.id,result.file.selected_revision)) %>
         <div class="t-half-spacer-above download-file-button">
             <a style="" class="btn btn-default" tittle="${_('Download the file')}"
