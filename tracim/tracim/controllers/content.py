@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from tracim.config.app_cfg import CFG
+
 __author__ = 'damien'
 
 import sys
@@ -13,6 +15,8 @@ from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
 from sqlalchemy.orm.exc import NoResultFound
 from tg import abort
+
+from depot.manager import DepotManager
 
 from tracim.controllers import TIMRestController
 from tracim.controllers import StandardController
@@ -42,6 +46,8 @@ from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
 from tracim.lib.integrity import render_invalid_integrity_chosen_path
+
+from preview_generator.manager import PreviewManager
 
 
 class UserWorkspaceFolderThreadCommentRestController(TIMRestController):
@@ -197,19 +203,56 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             show_archived=True,
             show_deleted=True,
         )
+        cfg = CFG.get_instance()
+        cache_path = cfg.PREVIEW_CACHE
+        preview_manager = PreviewManager(cache_path, create_folder=True)
         if revision_id:
-            file = content_api.get_one_from_revision(file_id,  self._item_type, workspace, revision_id)
+            file_path = content_api.get_one_revision_filepath(revision_id)
+        else:
+            file = content_api.get_one(file_id, self._item_type)
+            file_path = content_api.get_one_revision_filepath(file.revision_id)
+        nb_page = preview_manager.get_nb_page(
+            file_path=file_path,
+        )
+        if revision_id:
+            file = content_api.get_one_from_revision(
+                file_id,
+                self._item_type,
+                workspace,
+                revision_id
+            )
         else:
             file = content_api.get_one(file_id, self._item_type, workspace)
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
-        fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb, current_user=current_user_content)
+        fake_api_content = DictLikeClass(
+            breadcrumb=fake_api_breadcrumb,
+            current_user=current_user_content
+        )
         fake_api = Context(CTX.FOLDER,
                            current_user=user).toDict(fake_api_content)
 
         dictified_file = Context(self._get_one_context,
                                  current_user=user).toDict(file, 'file')
-        return DictLikeClass(result = dictified_file, fake_api=fake_api)
+
+        url = []
+        if revision_id:
+            for i in range(int(nb_page)):
+                url.append('/previews/{}/pages/{}?revision_id={}'.format(
+                    file_id,
+                    i,
+                    revision_id)
+                )
+        else:
+            for i in range(int(nb_page)):
+                url.append('/previews/{}/pages/{}'.format(file_id, i))
+
+        return DictLikeClass(
+            result=dictified_file,
+            fake_api=fake_api,
+            nb_page=nb_page,
+            url=url,
+        )
 
     @tg.require(current_user_is_reader())
     @tg.expose()
@@ -249,7 +292,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         file_name = get_valid_header_file_name(revision_to_send.file_name)
         tg.response.headers['Content-Disposition'] = \
             str('attachment; filename="{}"'.format(file_name))
-        return revision_to_send.file_content
+        return DepotManager.get().get(revision_to_send.depot_file_uid)
 
 
     def get_all_fake(self, context_workspace: Workspace, context_folder: Content):
