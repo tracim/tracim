@@ -111,15 +111,7 @@ Following the installation documentation below, you'll be able to run your own i
 
 You'll need to install the following packages :
 
-    sudo apt install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml zlib1g-dev
-
-To keep things simple for now, we'll use `SQLite3` as database engine:
-
-    sudo apt install sqlite3
-
-If you want to send email asynchronously:
-
-    sudo apt install redis-server
+    sudo apt install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml zlib1g-dev redis-server
 
 ## Get the source ##
 

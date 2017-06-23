@@ -17,6 +17,8 @@ addons:
 install:
   - cd tracim && python setup.py develop; cd -
   - echo coveralls >> install/requirements.txt; echo
+  - cat install/requirements.postgresql.txt >> install/requirements.txt; echo
+  - cat install/requirements.mysql.txt >> install/requirements.txt; echo
   - pip install -r install/requirements.txt; echo
 
 before_script:
