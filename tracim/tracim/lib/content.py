@@ -452,15 +452,15 @@ class ContentApi(object):
 
         return revision
 
-    # def get_one_revision_file(self, revision_id: int = None):
-    #     """
-    #     This function allows us to directly get a Python file object from its
-    #     revision identifier.
-    #     :param revision_id: The revision id of the file we want to return
-    #     :return: The corresponding Python file object
-    #     """
-    #     revision = self.get_one_revision(revision_id)
-    #     return DepotManager.get().get(revision.depot_file_uid)
+    # def get_one_revision_file(self, revision_id: int = None):
+    #     """
+    #     This function allows us to directly get a Python file object from its
+    #     revision identifier.
+    #     :param revision_id: The revision id of the file we want to return
+    #     :return: The corresponding Python file object
+    #     """
+    #     revision = self.get_one_revision(revision_id)
+    #     return DepotManager.get().get(revision.depot_file_uid)
 
     def get_one_revision_filepath(self, revision_id: int = None) -> str:
         """
@@ -472,9 +472,9 @@ class ContentApi(object):
         revision = self.get_one_revision(revision_id)
 
         dpt = DepotManager.get()
-        # python 3.6 PEP 526 -- Syntax for Variable Annotations
-        # https://www.python.org/dev/peps/pep-0526/
-        # dpt_file_path: str = dpt.get(dpt_stored_file)._file_path
+        # python 3.6 PEP 526 -- Syntax for Variable Annotations
+        # https://www.python.org/dev/peps/pep-0526/
+        # dpt_file_path: str = dpt.get(dpt_stored_file)._file_path
         dpt_stored_file = dpt.get(revision.depot_file_uid)
         dpt_file_path = dpt.get(dpt_stored_file)._file_path
 
