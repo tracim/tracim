@@ -1,6 +1,9 @@
 sudo: false
 language: python
-python: "3.4"
+python:
+  - "3.4"
+  - "3.5"
+  - "3.6"
 
 env:
   - DB=postgres
@@ -13,8 +16,10 @@ addons:
 
 install:
   - cd tracim && python setup.py develop; cd -
+  - echo coveralls >> install/requirements.txt; echo
+  - cat install/requirements.postgresql.txt >> install/requirements.txt; echo
+  - cat install/requirements.mysql.txt >> install/requirements.txt; echo
   - pip install -r install/requirements.txt; echo
-  - pip install coveralls
 
 before_script:
   - cp ${TRAVIS_BUILD_DIR}/tracim/development.ini.base ${TRAVIS_BUILD_DIR}/tracim/development.ini
@@ -25,9 +30,8 @@ before_script:
   - sh -c "if [ '$DB' = 'postgres' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/\(sqlalchemy.url *= *\).*/\1postgresql:\/\/postgres:dummy@127.0.0.1:5432\/tracim_test?client_encoding=utf8/\" development.ini; fi"
 
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE tracim_test;'; fi"
-  - sh -c "if [ '$DB' = 'mysql' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/\(sqlalchemy.url *= *\).*/\mysql+oursql:\/\/root@localhost\/tracim_test/\" test.ini; fi"
-  - sh -c "if [ '$DB' = 'mysql' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/<replace_database_uri_here>/mysql+oursql:\/\/root@localhost\/tracim_test/\" development.ini; fi"
-  - sh -c "if [ '$DB' = 'mysql' ]; then pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/\(sqlalchemy.url *= *\).*/\mysql+pymysql:\/\/root@localhost\/tracim_test/\" test.ini; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/<replace_database_uri_here>/mysql+pymysql:\/\/root@localhost\/tracim_test/\" development.ini; fi"
 
   - sh -c "if [ '$DB' = 'sqlite' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/\(sqlalchemy.url *= *\).*/\sqlite:\/\/\/tracim_test.sqlite/\" test.ini; fi"
   - sh -c "if [ '$DB' = 'sqlite' ]; then cd ${TRAVIS_BUILD_DIR}/tracim && sed -i \"s/<replace_database_uri_here>/sqlite:\/\/\/tracim.sqlite/\" development.ini; fi"
@@ -38,4 +42,4 @@ before_script:
 script: "cd ${TRAVIS_BUILD_DIR}/tracim && nosetests -c ${TRAVIS_BUILD_DIR}/tracim/test.ini -v --with-coverage --cover-package=tracim --cover-erase"
 
 after_success:
-- coveralls
+  - coveralls

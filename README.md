@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=master)](https://travis-ci.org/tracim/tracim) [![Coverage Status](https://img.shields.io/coveralls/tracim/tracim.svg)](https://coveralls.io/r/tracim/tracim) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=master)
+[![Build Status](https://travis-ci.org/tracim/tracim.svg?branch=master)](https://travis-ci.org/tracim/tracim) [![Coverage Status](https://img.shields.io/coveralls/tracim/tracim.svg)](https://coveralls.io/r/tracim/tracim) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=master) [![PyPI](https://img.shields.io/pypi/pyversions/tracim.svg)](https://pypi.python.org/pypi/tracim)
 
 # Tracim - Introduction #
 
@@ -9,14 +9,14 @@ If you hesitate to install a wiki, a forum or a file management software, stop h
 With Tracim, you manage in the same place:
 
 - forum-like threads,
-- files and automatic versionning,
+- files and automatic versioning,
 - wiki-like pages for online information,
 
 All data offers:
 
 - information status: open / resolved / cancelled / deprecated
-- native versionning
-- comment threads making tracim knowledge-growth ready.
+- native versioning
+- comment threads making Tracim knowledge-growth ready.
 
 Join Tracim community : http://tracim.org
 
@@ -48,9 +48,9 @@ With Tracim, you centralize information, you can stay in touch by configuring yo
 
 ### Manage documents and files ###
 
-Traceability and versionning are very important for high-quality processes. Unfortunately, specialized software are hard to setup and to use.
+Traceability and versioning are very important for high-quality processes. Unfortunately, specialized software are hard to setup and use.
 
-Let's try Tracim ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versionned and never deleted.
+Let's try Tracim ! You define access-control for each workspace and store documents and file there. Users can't delete information: everything is versioned and never deleted.
 
 The user interface is easy to use: it's based on the well-known folders and files explorer paradigm.
 
@@ -67,9 +67,9 @@ Tracim is licensed under the terms of the
 
 Tracim is a web application:
 
-* developed with python >=3.4.
+* developed with python 3.4, 3.5, 3.6
 * based on the [TurboGears](http://www.turbogears.org/) web framework.
-* relying on [PostgreSQL](http://www.postgresql.org/) or [MySQL](https://www.mysql.fr/) or [sqlite](https://www.sqlite.org/) as the storage engine.
+* relying on [PostgreSQL](http://www.postgresql.org/) or [MySQL](https://www.mysql.fr/) or [SQLite](https://www.sqlite.org/) as the storage engine.
 
 The user interface is based on the following resources and technologies:
 
@@ -107,292 +107,83 @@ Following the installation documentation below, you'll be able to run your own i
 
 # Installation #
 
-## Dependencies ##
+## Distribution dependencies ##
 
-_Note: the following information is for Debian. For other OS, adapt the package names._
+You'll need to install the following packages :
 
-You'll need to install the following packages on your Operating System:
+    sudo apt install git realpath redis-server \
+                     python3 python-virtualenv python3-dev python-pip  python-lxml \
+                     build-essential libxml2-dev libxslt1-dev zlib1g-dev
 
-    apt-get install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml
+## Get the source ##
 
-You also need `redis-server` package if you want to send email in async mode.
-
-## Database ##
-
-If you want use PostgreSQL as database engine:
-
-    apt-get install postgresql-server-dev-all postgresql postgresql-client
-
-Or if you want to use MySQL as database engine
-
-    apt-get install mysql-server mysql-client libmysqlclient-dev
-
-Or if you want to use SQLite as database engine
-
-    apt-get install sqlite3
-
-## Installation ##
-
-### Get the source ###
-
-Get the sources from github with git:
+Get the sources from GitHub:
 
     git clone https://github.com/tracim/tracim.git
     cd tracim/
 
 *Note: Now everything is documented to be executed from the tracim directory newly created.*
 
-### Setting-up python virtualenv ###
+## Frontend dependencies ##
 
-_Reminder : Tracim is developed and tested using python3.4._
+[//]: # ( from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
 
-We strongly recommend to use virtualenv as deployment environment. This ensure that there will be no conflict between system-wide python installation and Tracim required ones. To Create the virtual environment:
+Install `nodejs` by typing:
+
+    curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+    sudo apt install -y nodejs
+
+Check that this went well by getting `npm` version:
+
+    npm -v
+
+Then install frontend dependencies listed in the file `package.json`:
+
+    npm install
+
+At last, compile frontend files:
+
+    npm run gulp-dev # for a development environment
+    # npm run gulp-prod # for a production environment
+
+## Tracim virtual environment ##
+
+Create a python virtual environment:
 
     virtualenv -p /usr/bin/python3.4 tg2env
 
-And to activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**)):
+Activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**):
 
     source tg2env/bin/activate
 
-To install tracim and it's dependencies:
+Install Tracim and its dependencies:
 
     cd tracim && python setup.py develop && cd -
     pip install -r install/requirements.txt
 
-**Note**: If you want to use MySQL database, please refer to Configuration/database schema note to install required package.
+## Configuration files ##
 
-## Database Setup ##
-
-### Minimalist introduction to PostgreSQL ###
-
-If you already use/know PostgreSQL, you can directly go to *Test the database access*.
-
-#### Allowing local connections on PostgreSQL ####
-
-PostgreSQL stores connections ahtorization in *pg\_hba.conf*
-
-Edit the pg_hba.conf file and check that connectionx from 127.0.0.1 are allowed using user/password. You should find the following line in the file:
-
-    # IPv4 local connections:
-    host    all             all             127.0.0.1/32            md5
-
-Note: on Debian, the *pg\_hba.conf* file is found at */etc/postgresql/9.1/main/pg\_hba.conf*
-
-If you changed the file, reload PostgreSQL:
-
-    service postgresql reload
-
-#### Creating a user and associated database ####
-
-You need a database and associated user/password.
-
-Tracim comes with a tool that will make this step easy : pgtool.
-
-    ~/tracim$ ./bin/pgtool help
-
-login as *postgres* user and run the follwoing commands (which are self explanatory)
-
-    ./bin/pgtool create_user tracimuser tracimpassword
-    ./bin/pgtool create_database tracimdb
-    ./bin/pgtool grant_all_privileges tracimdb tracimuser
-
-Notes :
-
-* in order to login as postgres user, su as root (with your password) then su postgres.
-* pgtool also offers options to delete users / databases. Run *./bin/pgtool help* for more information
-
-#### Test the database access ####
-
-So, now you have a database and an associated user/password.
-
-A good habit is to test things before to use them, that's why we want to test the database access now. This is easily done with tracim pgtool :
-
-    ./bin/pgtool test_connection tracimdb tracimuser tracimpassword 127.0.0.1
-
-The result is similar to the following :
-
-    PG # CONNECT TO DATABASE
-    ------------------------
-    server:     127.0.0.1
-    database:   tracimdb
-    username:   bibi
-
-                  now
-    -------------------------------
-     2014-11-10 09:40:23.306199+01
-    (1 row)
-
-In case of failure, you would get something like this:
-
-    PG # CONNECT TO DATABASE
-    ------------------------
-    server:     127.0.0.1
-    database:   tracimdb
-    username:   bibi
-
-    psql: FATAL:  password authentication failed for user "bibi"
-    FATAL:  password authentication failed for user "bibi"
-    ERRROR
-
-In this case, delete the user and database you previously created (using pgtool) and do it again. Do not forget to run the grant_all_rights command!
-
-### Minimalist introduction to MySQL ###
-
-## Create database ##
-
-Connect to mysql with root user (password has been set at "Installation" -> "Dependencies" chapter, when installing package)
-
-    mysql -u root -p
-
-Create a database with following command:
-
-    CREATE DATABASE tracimdb;
-
-Create a user with following command:
-
-    CREATE USER 'tracimuser'@'localhost' IDENTIFIED BY 'tracimpassword';
-
-And allow him to manipulate created database with following command:
-
-    GRANT ALL PRIVILEGES ON tracimdb . * TO 'tracimuser'@'localhost';
-
-Then flush privileges:
-
-    FLUSH PRIVILEGES;
-
-You can now quit mysql prompt:
-
-    \q
-
-## Configuration ##
-
-At this point, you have :
-
-* an installation of Tracim with its dedicated python3-ready virtualenv
-* a PostgreSQL/MySQL server and dedicated database (if you don't use sqlite)
-
-What you have to do now is to configure the application and to initialize the database content.
-
-### Create configuration ###
+Create configuration files for a development environment and for `WsgiDAV`:
 
     cp tracim/development.ini.base tracim/development.ini
+    cp tracim/wsgidav.conf.sample tracim/wsgidav.conf
 
-You can now edit the file and setup required files. Here are the main ones:
+## Database schema ##
 
-#### Database access ####
-
-Configure database in the development.ini file. This is defined as sqlalchemy.url. There is an example value for PostgreSQL below:
-
-    sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
-
-There is an example value for MySQL below (please refer to Configuration/database schema note to install required package):
-
-    sqlalchemy.url = mysql+oursql://tracimuser:tracimpassword@127.0.0.1/tracimdb
-
-There is an example value for SQLite below :
-
-    sqlalchemy.url = sqlite:///tracimdb.sqlite
-
-#### Listening port
-
-Default configuration is to listen on port 8080. If you want to adapt this to your environment, edit the .ini file and setup the port you want:
-
-    port = 8080
-
-#### Interface language
-
-The default language is English. You can change it to French by uncommenting the following line in the .ini file:
-
-    lang = fr
-
-#### SMTP parameters for resetpassword and notifications
-
-for technical reason, you have to configure SMTP parameters for rest password process and SMTP parameters for notifications in separate places.
-
-The reset password related parameters are the follwoing ones :
-
-    resetpassword.email_sender = tracim@mycompany.com
-    resetpassword.smtp_host = smtp.mycompany.com
-    resetpassword.smtp_port = 25
-    resetpassword.smtp_login = username
-    resetpassword.smtp_passwd = password
-
-The main parameters for notifications are the following ones:
-
-    email.notification.activated = true
-    email.notification.from.email = noreply@trac.im
-    email.notification.from.default_label = Tracim Notification
-    email.notification.smtp.server = smtp.mycompany.com
-    email.notification.smtp.port = 25
-    email.notification.smtp.user = username
-    email.notification.smtp.password = password
-
-#### Website ####
-
-You must define general parameters like the base_url and the website title which are required for home page and email notification links
-
-    website.title = My Company Intranet
-    website.base_url = http://intranet.mycompany.com:8080
-
-#### LDAP ####
-
-To use LDAP authentication, set ``auth_type`` parameter to "ldap":
-
-    auth_type = ldap
-
-Then add LDAP parameters
-
-    # LDAP server address
-    ldap_url = ldap://localhost:389
-
-    # Base dn to make queries
-    ldap_base_dn = dc=directory,dc=fsf,dc=org
-
-    # Bind dn to identify the search
-    ldap_bind_dn = cn=admin,dc=directory,dc=fsf,dc=org
-
-    # The bind password
-    ldap_bind_pass = toor
-
-    # Attribute name of user record who contain user login (email)
-    ldap_ldap_naming_attribute = uid
-
-    # Matching between ldap attribute and ldap user field (ldap_attr1=user_field1,ldap_attr2=user_field2,...)
-    ldap_user_attributes = mail=email
-
-    # TLS usage to communicate with your LDAP server
-    ldap_tls = False
-
-    # If True, LDAP own tracim group managment (not available for now!)
-    ldap_group_enabled = False
-
-You may need an administrator account to manage Tracim. Use the following command (from ``/install/dir/of/tracim/tracim``):
-
-    gearbox user create -l admin@admin.admin -p admin@admin.admin -g managers -g administrators
-
-Keep in mind ``admin-email@domain.com`` must match with LDAP user.
-
-#### Other parameters  ####
-
-There are other parameters which may be of some interest for you. For example, you can:
-
-* include a JS tracker like Piwik or Google Analytics,
-* define your own notification email subject
-* personalize notification email
-* personalize home page (background image, title color...)
-* ...
-
-### database schema ###
-
-The last step before to run the application is to initialize the database schema. This is done through the following command:
-
-**Note**: If you want to use MySQL database, please install this pip package: ```pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip```
+The last step before running the application is to initialize the database
+schema. This is done through the following command:
 
     cd tracim && gearbox setup-app && cd -
 
-## Running the server ##
+## Running the paste http server ##
 
-### Running Tracim in standalone mode ###
+    gearbox serve
+
+While developing, the following command may be more convenient:
+
+    gearbox serve --reload --debug
+
+## Running the standalone server ##
 
 Now you can run the standalone server:
 
@@ -407,7 +198,8 @@ Which should result in something like this:
     13:53:50,862 INFO  [gearbox] Starting server in PID 11174.
     Starting HTTP server on http://0.0.0.0:8080
 
-You can now enter the application at [http://localhost:8080](http://localhost:8080) and login with admin user.
+You can now enter the application at
+[http://localhost:8080](http://localhost:8080) and login with admin user.
 
  * user : admin@admin.admin
  * password : admin@admin.admin
@@ -418,34 +210,13 @@ If admin user not created yet, execute following command:
 
 Enjoy :)
 
-### Running Tracim through Apache WSGI ###
+# Going further #
 
-#### Dependencies ####
+Here is additional documentation about configuring:
 
-Install dependencies:
-
-    apt-get install apache2 libapache2-mod-wsgi-py3
-
-#### WSGI configuration ####
-
-Example of Apache WSGI configuration. This configuration refers to productionapp.wsgi which is a copy of the file *app.wsgi* available in the repo. (this file has to be updated to match with your environment and installation)
-
-    <VirtualHost *:80>
-        ServerAdmin webmaster@tracim.mycompany.com
-        ServerName tracim.mycompany.com
-
-        WSGIProcessGroup tracim
-        WSGIDaemonProcess tracim user=www-data group=adm threads=4 python-path=/opt/traciminstall/tg2env/lib/python3.2/site-packages
-        WSGIScriptAlias / /opt/traciminstall/tracim/productionapp.wsgi
-
-        #Serve static files directly without TurboGears
-        Alias /assets     /opt/traciminstall/tracim/tracim/public/assets
-        Alias /favicon.ico /opt/traciminstall/tracim/tracim/public/favicon.ico
-
-        CustomLog /var/log/apache2/demotracim-access.log combined
-        ErrorLog /var/log/apache2/demotracim-error.log
-        LogLevel debug
-    </VirtualHost>
+ * [Apache](doc/apache.md)
+ * [PostgreSQL, MySQL and SQLAlchemy](doc/database.md)
+ * [Tracim](doc/setting.md)
 
 # Support and Community #
 

@@ -25,6 +25,14 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
+classifiers = [
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+]
+
 testpkgs=['WebTest >= 1.2.3',
                'nose',
                'coverage',
@@ -39,7 +47,7 @@ install_requires=[
     "sqlalchemy",
     "alembic",
     "repoze.who",
-    "who-ldap==3.1.0",
+    "who_ldap>=3.2.1",
     "python-ldap-test==0.2.1",
     "unicode-slugify==0.1.3",
     "pytz==2014.7",
