@@ -3,7 +3,7 @@
 
 ## PostgreSQL ##
 
-If you want use `PostgreSQL` as database engine:
+If you want to use `PostgreSQL` as database engine:
 
     sudo apt install postgresql-server-dev-all postgresql postgresql-client
 
@@ -13,7 +13,7 @@ If you already use/know `PostgreSQL`, you can directly go to *Test the database 
 
 #### Driver ####
 
-Tracim uses the `psycopg` driver between the `SQLAlchemy` ORM and the `PostgreSQL` RDBMS. Run the following command to install the right version:
+Tracim uses the `psycopg2` driver between the `SQLAlchemy` ORM and the `PostgreSQL` RDBMS. Run the following command to install the right version:
 
     pip install -r install/requirements.postgresql.txt
 

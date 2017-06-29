@@ -107,11 +107,13 @@ Following the installation documentation below, you'll be able to run your own i
 
 # Installation #
 
-## Debian dependencies ##
+## Distribution dependencies ##
 
 You'll need to install the following packages :
 
-    sudo apt install git realpath python3 python-virtualenv python3-dev python-pip build-essential libxml2-dev libxslt1-dev python-lxml zlib1g-dev redis-server
+    sudo apt install git realpath redis-server \
+                     python3 python-virtualenv python3-dev python-pip  python-lxml \
+                     build-essential libxml2-dev libxslt1-dev zlib1g-dev
 
 ## Get the source ##
 
@@ -166,12 +168,20 @@ Create configuration files for a development environment and for `WsgiDAV`:
     cp tracim/development.ini.base tracim/development.ini
     cp tracim/wsgidav.conf.sample tracim/wsgidav.conf
 
-## database schema ##
+## Database schema ##
 
 The last step before running the application is to initialize the database
 schema. This is done through the following command:
 
     cd tracim && gearbox setup-app && cd -
+
+## Running the paste http server ##
+
+    gearbox serve
+
+While developing, the following command may be more convenient:
+
+    gearbox serve --reload --debug
 
 ## Running the standalone server ##
 
@@ -199,6 +209,14 @@ If admin user not created yet, execute following command:
     gearbox user create -l admin@admin.admin -p admin@admin.admin -g managers -g administrators
 
 Enjoy :)
+
+# Going further #
+
+Here is additional documentation about configuring:
+
+ * [Apache](doc/apache.md)
+ * [PostgreSQL, MySQL and SQLAlchemy](doc/database.md)
+ * [Tracim](doc/setting.md)
 
 # Support and Community #
 
