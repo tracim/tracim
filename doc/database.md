@@ -1,6 +1,8 @@
 
 # Database #
 
+*Note: This page helps you setting up a **development** environment for `Tracim` and its ORM `SQLAlchemy` with `PostgreSQL` and `MySQL`. To set up a **production** environment, changing default database name, database user name and moreover its password is mandatory.*
+
 ## PostgreSQL ##
 
 If you want to use `PostgreSQL` as database engine:
