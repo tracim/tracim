@@ -198,16 +198,16 @@ class TestContent(TestStandard):
         )
         return content
 
-    def test_unit__content_depot_file_uid(self):
+    def test_unit__content_depot_file(self):
         """ Depot file access thought content property methods. """
         content = self._create_content_from_nothing()
         # tests uninitialized depot file
-        eq_(content.depot_file_uid, None)
+        eq_(content.depot_file, None)
         # initializes depot file
-        content.depot_file_uid = b'test'
+        content.depot_file = b'test'
         # tests initialized depot file
-        ok_(content.depot_file_uid)
+        ok_(content.depot_file)
         # tests type of initialized depot file
-        eq_(type(content.depot_file_uid), UploadedFile)
+        eq_(type(content.depot_file), UploadedFile)
         # tests content of initialized depot file
-        eq_(content.depot_file_uid.file.read(), b'test')
+        eq_(content.depot_file.file.read(), b'test')

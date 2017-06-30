@@ -460,7 +460,7 @@ class ContentApi(object):
     #     :return: The corresponding Python file object
     #     """
     #     revision = self.get_one_revision(revision_id)
-    #     return DepotManager.get().get(revision.depot_file_uid)
+    #     return DepotManager.get().get(revision.depot_file)
 
     def get_one_revision_filepath(self, revision_id: int = None) -> str:
         """
@@ -475,10 +475,10 @@ class ContentApi(object):
         # python 3.6 PEP 526 -- Syntax for Variable Annotations
         # https://www.python.org/dev/peps/pep-0526/
         # dpt_path: str = dpt.storage_path
-        # dpt_file_dir: str = item.revision.depot_file_uid.file_id
+        # dpt_file_dir: str = item.revision.depot_file.file_id
         # dpt_file_path: str = dpt_path + dpt_file_dir + dpt_file_name
         dpt_path = dpt.storage_path
-        dpt_file_dir = revision.depot_file_uid.file_id
+        dpt_file_dir = revision.depot_file.file_id
         dpt_file_path = '{0}{1}/file'.format(dpt_path, dpt_file_dir)
 
         return file_from_depot.name
@@ -883,7 +883,7 @@ class ContentApi(object):
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.file_content = new_file_content
-        item.revision.depot_file_uid = new_file_content
+        item.depot_file = new_file_content
         item.revision_type = ActionDescription.REVISION
         return item
 

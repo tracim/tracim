@@ -546,7 +546,7 @@ class ContentRevisionRO(DeclarativeBase):
     )
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
     file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
-    depot_file_uid = Column(UploadedFileField, unique=False, nullable=True)
+    depot_file = Column(UploadedFileField, unique=False, nullable=True)
     properties = Column('properties', Text(), unique=False, nullable=False, default='')
 
     type = Column(Unicode(32), unique=False, nullable=False)
@@ -629,10 +629,10 @@ class ContentRevisionRO(DeclarativeBase):
             setattr(new_rev, column_name, column_value)
 
         new_rev.updated = datetime.utcnow()
-        # TODO APY tweaks here depot_file_uid
+        # TODO APY tweaks here depot_file
         # import pudb; pu.db
-        # new_rev.depot_file_uid = DepotManager.get().get(revision.depot_file_uid)
-        new_rev.depot_file_uid = revision.file_content
+        # new_rev.depot_file = DepotManager.get().get(revision.depot_file)
+        new_rev.depot_file = revision.file_content
 
         return new_rev
 
@@ -1058,12 +1058,12 @@ class Content(DeclarativeBase):
         return not self.is_archived and not self.is_deleted
 
     @property
-    def depot_file_uid(self) -> UploadedFile:
-        return self.revision.depot_file_uid
+    def depot_file(self) -> UploadedFile:
+        return self.revision.depot_file
 
-    @depot_file_uid.setter
-    def depot_file_uid(self, value):
-        self.revision.depot_file_uid = value
+    @depot_file.setter
+    def depot_file(self, value):
+        self.revision.depot_file = value
 
     def get_current_revision(self) -> ContentRevisionRO:
         if not self.revisions:
