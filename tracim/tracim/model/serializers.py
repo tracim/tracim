@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 import cherrypy
-import os
 
 import types
 
-from bs4 import BeautifulSoup
 from babel.dates import format_timedelta
 from babel.dates import format_datetime
 
@@ -12,6 +10,9 @@ from datetime import datetime
 import tg
 from tg.i18n import ugettext as _
 from tg.util import LazyString
+
+from depot.manager import DepotManager
+
 from tracim.lib.base import logger
 from tracim.lib.user import CurrentUserGetterApi
 from tracim.model.auth import Profile
@@ -407,12 +408,14 @@ def serialize_node_for_page(content: Content, context: Context):
             })
         )
 
-        if content.type==ContentType.File:
+        if content.type == ContentType.File:
+            dpt = DepotManager.get()
+            dpt_file = dpt.get(data_container.depot_file)
             result.label = content.label
             result['file'] = DictLikeClass(
-                name = data_container.file_name,
-                size = len(data_container.file_content),
-                mimetype = data_container.file_mimetype)
+                name=data_container.file_name,
+                size=dpt_file.content_length,
+                mimetype=data_container.file_mimetype)
         return result
 
     if content.type==ContentType.Folder:

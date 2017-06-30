@@ -38,6 +38,12 @@ from tracim.lib.daemons import WsgiDavDaemon
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
+from depot.manager import DepotManager
+DepotManager.configure(
+    'default',
+    {'depot.storage_path': '/tmp/depot_storage_path/'}
+)
+
 base_config = TracimAppConfig()
 base_config.renderers = []
 base_config.use_toscawidgets = False
@@ -187,6 +193,8 @@ class CFG(object):
         self.__dict__[key] = value
 
     def __init__(self):
+
+        self.PREVIEW_CACHE = str(tg.config.get('preview_cache_dir'))
 
         self.DATA_UPDATE_ALLOWED_DURATION = int(tg.config.get('content.update.allowed.duration', 0))
 

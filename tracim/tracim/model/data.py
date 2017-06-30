@@ -24,6 +24,8 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import LargeBinary
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
+from depot.fields.sqlalchemy import UploadedFileField
+from depot.fields.upload import UploadedFile
 
 from tracim.lib.utils import lazy_ugettext as l_
 from tracim.lib.exception import ContentRevisionUpdateError
@@ -544,6 +546,7 @@ class ContentRevisionRO(DeclarativeBase):
     )
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
     file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
+    depot_file = Column(UploadedFileField, unique=False, nullable=True)
     properties = Column('properties', Text(), unique=False, nullable=False, default='')
 
     type = Column(Unicode(32), unique=False, nullable=False)
@@ -626,6 +629,10 @@ class ContentRevisionRO(DeclarativeBase):
             setattr(new_rev, column_name, column_value)
 
         new_rev.updated = datetime.utcnow()
+        # TODO APY tweaks here depot_file
+        # import pudb; pu.db
+        # new_rev.depot_file = DepotManager.get().get(revision.depot_file)
+        new_rev.depot_file = revision.file_content
 
         return new_rev
 
@@ -1049,6 +1056,14 @@ class Content(DeclarativeBase):
     @property
     def is_editable(self) -> bool:
         return not self.is_archived and not self.is_deleted
+
+    @property
+    def depot_file(self) -> UploadedFile:
+        return self.revision.depot_file
+
+    @depot_file.setter
+    def depot_file(self, value):
+        self.revision.depot_file = value
 
     def get_current_revision(self) -> ContentRevisionRO:
         if not self.revisions:
