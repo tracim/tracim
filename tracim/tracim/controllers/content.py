@@ -282,7 +282,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         file_name = get_valid_header_file_name(revision_to_send.file_name)
         tg.response.headers['Content-Disposition'] = \
             str('attachment; filename="{}"'.format(file_name))
-        return DepotManager.get().get(revision_to_send.depot_file_uid)
+        return DepotManager.get().get(revision_to_send.depot_file)
 
     def get_all_fake(self,
                      context_workspace: Workspace,

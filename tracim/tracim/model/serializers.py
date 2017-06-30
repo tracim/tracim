@@ -410,7 +410,7 @@ def serialize_node_for_page(content: Content, context: Context):
 
         if content.type == ContentType.File:
             dpt = DepotManager.get()
-            dpt_file = dpt.get(data_container.depot_file_uid)
+            dpt_file = dpt.get(data_container.depot_file)
             result.label = content.label
             result['file'] = DictLikeClass(
                 name=data_container.file_name,
