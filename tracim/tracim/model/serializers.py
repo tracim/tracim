@@ -409,12 +409,12 @@ def serialize_node_for_page(content: Content, context: Context):
         )
 
         if content.type == ContentType.File:
-            dpt = DepotManager.get()
-            dpt_file = dpt.get(data_container.depot_file)
+            depot = DepotManager.get()
+            depot_stored_file = depot.get(data_container.depot_file)
             result.label = content.label
             result['file'] = DictLikeClass(
                 name=data_container.file_name,
-                size=dpt_file.content_length,
+                size=depot_stored_file.content_length,
                 mimetype=data_container.file_mimetype)
         return result
 

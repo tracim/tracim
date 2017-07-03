@@ -7,6 +7,8 @@ from tracim.controllers.page import PagesController
 __all__ = ['PreviewsController']
 
 
+# FIXME https://github.com/tracim/tracim/issues/272
+# unused, future removal planned
 class PreviewsController(TIMRestController):
 
     pages = PagesController()

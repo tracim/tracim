@@ -545,7 +545,27 @@ class ContentRevisionRO(DeclarativeBase):
         server_default='',
     )
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
+    # TODO - A.P - 2017-07-03 - future removal planned
+    # file_content is to be replaced by depot_file, for now both coexist as
+    # this:
+    # - file_content data is still setted
+    # - newly created revision also gets depot_file data setted
+    # - access to the file of a revision from depot_file exclusively
+    # Here is the tasks workflow of the DB to OnDisk Switch :
+    # - Add depot_file "prototype style"
+    #   https://github.com/tracim/tracim/issues/233 - DONE
+    # - Integrate preview generator feature "prototype style"
+    #   https://github.com/tracim/tracim/issues/232 - DONE
+    # - Write migrations
+    #   https://github.com/tracim/tracim/issues/245
+    #   https://github.com/tracim/tracim/issues/246
+    # - Stabilize preview generator integration
+    #   includes dropping DB file content
+    #   https://github.com/tracim/tracim/issues/249
     file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
+    # INFO - A.P - 2017-07-03 - Depot Doc
+    # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
+    # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
     depot_file = Column(UploadedFileField, unique=False, nullable=True)
     properties = Column('properties', Text(), unique=False, nullable=False, default='')
 

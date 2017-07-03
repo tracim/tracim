@@ -452,6 +452,9 @@ class ContentApi(object):
 
         return revision
 
+    # INFO - A.P - 2017-07-03 - python file object getter
+    # in case of we cook a version of preview manager that allows a pythonic
+    # access to files
     # def get_one_revision_file(self, revision_id: int = None):
     #     """
     #     This function allows us to directly get a Python file object from its
@@ -470,15 +473,10 @@ class ContentApi(object):
         :return: The corresponding filepath
         """
         revision = self.get_one_revision(revision_id)
-
-        dpt = DepotManager.get()
-        # python 3.6 PEP 526 -- Syntax for Variable Annotations
-        # https://www.python.org/dev/peps/pep-0526/
-        # dpt_file_path: str = dpt.get(dpt_stored_file)._file_path
-        dpt_stored_file = dpt.get(revision.depot_file)
-        dpt_file_path = dpt.get(dpt_stored_file)._file_path
-
-        return dpt_file_path
+        depot = DepotManager.get()
+        depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
+        depot_file_path = depot_stored_file._file_path  # type: str
+        return depot_file_path
 
     def get_one_by_label_and_parent(
             self,

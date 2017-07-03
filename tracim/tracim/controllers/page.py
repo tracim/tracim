@@ -22,6 +22,7 @@ class PagesController(TIMRestController):
         file_id = int(tg.request.controller_state.routing_args.get('file_id'))
         return 'all the pages of document {}'.format(file_id)
 
+    # FIXME https://github.com/tracim/tracim/issues/271
     @expose(content_type='image/jpeg')
     def get_one(self,
                 page_id: str='-1',
@@ -71,6 +72,7 @@ class PagesController(TIMRestController):
                                      revision_id=revision_id,
                                      args=args, kwargs=kwargs)
 
+    # FIXME https://github.com/tracim/tracim/issues/271
     @expose(content_type='application/pdf')
     def download_pdf_one(self,
                          page_id: str,
