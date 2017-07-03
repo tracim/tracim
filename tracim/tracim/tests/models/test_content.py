@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import time
 
+from depot.fields.upload import UploadedFile
 from nose.tools import ok_
 from nose.tools import raises
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.testing import eq_
-from depot.fields.upload import UploadedFile
 
 from tracim.lib.content import ContentApi
 from tracim.lib.exception import ContentRevisionUpdateError
@@ -204,10 +204,12 @@ class TestContent(TestStandard):
         # tests uninitialized depot file
         eq_(content.depot_file, None)
         # initializes depot file
+        # which is able to behave like a python file object
         content.depot_file = b'test'
         # tests initialized depot file
         ok_(content.depot_file)
         # tests type of initialized depot file
         eq_(type(content.depot_file), UploadedFile)
         # tests content of initialized depot file
+        # using depot_file.file of type StoredFile to fetch content back
         eq_(content.depot_file.file.read(), b'test')
