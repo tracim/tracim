@@ -34,8 +34,8 @@ use = egg:tracim
 full_stack = true
 # You can set french as default language by uncommenting next line
 # lang = fr
-cache_dir = %(here)s/data
-preview_cache_dir = /tmp/tracim/cache/previews/
+cache_dir = %(here)s/data/cache
+preview_cache_dir = %(here)s/data/cache/preview/
 beaker.session.key = tracim
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
 
@@ -221,6 +221,9 @@ wsgidav.config_path = wsgidav.conf
 ## in this case, you have to create your own proxy behind this url.
 ## Do not set http:// prefix.
 # wsgidav.client.base_url = 127.0.0.1:<WSGIDAV_PORT>
+
+## DEPOT
+depot_storage_path = %(here)s/data/depot/
 
 #####
 #
