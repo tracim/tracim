@@ -1,13 +1,22 @@
 # -*- coding: utf-8 -*-
 import time
-from nose.tools import raises, ok_
+
+from depot.fields.upload import UploadedFile
+from nose.tools import ok_
+from nose.tools import raises
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.testing import eq_
 
 from tracim.lib.content import ContentApi
 from tracim.lib.exception import ContentRevisionUpdateError
-from tracim.model import DBSession, User, Content, new_revision
-from tracim.model.data import ContentRevisionRO, Workspace, ActionDescription, ContentType
+from tracim.model import Content
+from tracim.model import DBSession
+from tracim.model import new_revision
+from tracim.model import User
+from tracim.model.data import ActionDescription
+from tracim.model.data import ContentRevisionRO
+from tracim.model.data import ContentType
+from tracim.model.data import Workspace
 from tracim.tests import TestStandard
 
 
@@ -111,7 +120,7 @@ class TestContent(TestStandard):
             revision_type=ActionDescription.CREATION,
             is_deleted=False,  # TODO: pk ?
             is_archived=False,  # TODO: pk ?
-            #file_content=None,  # TODO: pk ? (J'ai du mettre nullable=True)
+            # file_content=None,  # TODO: pk ? (J'ai du mettre nullable=True)
         )
 
         eq_(1, DBSession.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
@@ -163,9 +172,44 @@ class TestContent(TestStandard):
 
         return created_content
 
+    def _get_user(self):
+        email = 'admin@admin.admin'
+        user_query = DBSession.query(User)
+        user_filter = user_query.filter(User.email == email)
+        user = user_filter.one()
+        return user
+
     def _create_content(self, *args, **kwargs):
         content = Content(*args, **kwargs)
         DBSession.add(content)
         DBSession.flush()
-
         return content
+
+    def _create_content_from_nothing(self):
+        user_admin = self._get_user()
+        workspace = Workspace(label="TEST_WORKSPACE_1")
+        content = self._create_content(
+            owner=user_admin,
+            workspace=workspace,
+            type=ContentType.File,
+            label='TEST_CONTENT_1',
+            description='TEST_CONTENT_DESCRIPTION_1',
+            revision_type=ActionDescription.CREATION,
+        )
+        return content
+
+    def test_unit__content_depot_file(self):
+        """ Depot file access thought content property methods. """
+        content = self._create_content_from_nothing()
+        # tests uninitialized depot file
+        eq_(content.depot_file, None)
+        # initializes depot file
+        # which is able to behave like a python file object
+        content.depot_file = b'test'
+        # tests initialized depot file
+        ok_(content.depot_file)
+        # tests type of initialized depot file
+        eq_(type(content.depot_file), UploadedFile)
+        # tests content of initialized depot file
+        # using depot_file.file of type StoredFile to fetch content back
+        eq_(content.depot_file.file.read(), b'test')

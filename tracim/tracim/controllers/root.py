@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import tg
 from tg import expose
 from tg import flash
 from tg import lurl
@@ -9,31 +8,29 @@ from tg import request
 from tg import require
 from tg import tmpl_context
 from tg import url
-
 from tg.i18n import ugettext as _
-from tracim.controllers.api import APIController
-from tracim.controllers.content import ContentController
-
-from tracim.lib import CST
-from tracim.lib.base import logger
-from tracim.lib.user import CurrentUserGetterApi
-from tracim.lib.content import ContentApi
 
 from tracim.controllers import StandardController
 from tracim.controllers.admin import AdminController
+from tracim.controllers.api import APIController
+from tracim.controllers.calendar import CalendarConfigController
+from tracim.controllers.calendar import CalendarController
+from tracim.controllers.content import ContentController
 from tracim.controllers.debug import DebugController
 from tracim.controllers.error import ErrorController
 from tracim.controllers.help import HelpController
-from tracim.controllers.calendar import CalendarController
-from tracim.controllers.calendar import CalendarConfigController
+from tracim.controllers.previews import PreviewsController
 from tracim.controllers.user import UserRestController
 from tracim.controllers.workspace import UserWorkspaceRestController
+from tracim.lib import CST
+from tracim.lib.base import logger
+from tracim.lib.content import ContentApi
+from tracim.lib.user import CurrentUserGetterApi
 from tracim.lib.utils import replace_reset_password_templates
-
 from tracim.model.data import ContentType
-from tracim.model.serializers import DictLikeClass
-from tracim.model.serializers import CTX
 from tracim.model.serializers import Context
+from tracim.model.serializers import CTX
+from tracim.model.serializers import DictLikeClass
 
 
 class RootController(StandardController):
@@ -58,10 +55,10 @@ class RootController(StandardController):
     debug = DebugController()
     error = ErrorController()
 
-
     # Rest controllers
     workspaces = UserWorkspaceRestController()
     user = UserRestController()
+    previews = PreviewsController()
 
     content = ContentController()
 
@@ -75,7 +72,6 @@ class RootController(StandardController):
     def _before(self, *args, **kw):
         super(RootController, self)._before(args, kw)
         tmpl_context.project_name = "tracim"
-
 
     @expose('tracim.templates.index')
     def index(self, came_from='', *args, **kwargs):
@@ -107,7 +103,6 @@ class RootController(StandardController):
         logger.info(self, 'came_from: {}'.format(kwargs))
         return self.index(came_from, args, *kwargs)
 
-
     @expose()
     def post_login(self, came_from=lurl('/home')):
         """
@@ -117,7 +112,7 @@ class RootController(StandardController):
         if not request.identity:
             login_counter = request.environ.get('repoze.who.logins', 0) + 1
             redirect(url('/login'),
-                params=dict(came_from=came_from, __logins=login_counter))
+                     params=dict(came_from=came_from, __logins=login_counter))
 
         user = CurrentUserGetterApi.get_current_user()
 
@@ -127,11 +122,11 @@ class RootController(StandardController):
     @expose()
     def post_logout(self, came_from=lurl('/')):
         """
-        Redirect the user to the initially requested page on logout and say  goodbye as well.
+        Redirect the user to the initially requested page on logout and say
+        goodbye as well.
         """
         flash(_('Successfully logged out. We hope to see you soon!'))
         redirect(came_from)
-        
 
     @require(predicates.not_anonymous())
     @expose('tracim.templates.home')
@@ -141,7 +136,6 @@ class RootController(StandardController):
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         fake_api = Context(CTX.CURRENT_USER).toDict({
             'current_user': current_user_content})
-
 
         last_active_contents = ContentApi(user).get_last_active(None, ContentType.Any, None)
         fake_api.last_actives = Context(CTX.CONTENT_LIST).toDict(last_active_contents, 'contents', 'nb')
@@ -173,10 +167,9 @@ class RootController(StandardController):
         #
         # return DictLikeClass(result = dictified_user, fake_api=fake_api)
 
-
     @require(predicates.not_anonymous())
     @expose('tracim.templates.search.display')
-    def search(self, keywords = ''):
+    def search(self, keywords=''):
         from tracim.lib.content import ContentApi
 
         user = tmpl_context.current_user
@@ -197,5 +190,3 @@ class RootController(StandardController):
         search_results.keywords = keyword_list
 
         return DictLikeClass(fake_api=fake_api, search=search_results)
-
-

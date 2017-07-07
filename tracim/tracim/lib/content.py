@@ -15,6 +15,8 @@ import re
 import tg
 from tg.i18n import ugettext as _
 
+from depot.manager import DepotManager
+
 import sqlalchemy
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
@@ -450,6 +452,32 @@ class ContentApi(object):
 
         return revision
 
+    # INFO - A.P - 2017-07-03 - python file object getter
+    # in case of we cook a version of preview manager that allows a pythonic
+    # access to files
+    # def get_one_revision_file(self, revision_id: int = None):
+    #     """
+    #     This function allows us to directly get a Python file object from its
+    #     revision identifier.
+    #     :param revision_id: The revision id of the file we want to return
+    #     :return: The corresponding Python file object
+    #     """
+    #     revision = self.get_one_revision(revision_id)
+    #     return DepotManager.get().get(revision.depot_file)
+
+    def get_one_revision_filepath(self, revision_id: int = None) -> str:
+        """
+        This method allows us to directly get a file path from its revision
+        identifier.
+        :param revision_id: The revision id of the filepath we want to return
+        :return: The corresponding filepath
+        """
+        revision = self.get_one_revision(revision_id)
+        depot = DepotManager.get()
+        depot_stored_file = depot.get(revision.depot_file)  # type: StoredFile
+        depot_file_path = depot_stored_file._file_path  # type: str
+        return depot_file_path
+
     def get_one_by_label_and_parent(
             self,
             content_label: str,
@@ -850,6 +878,7 @@ class ContentApi(object):
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.file_content = new_file_content
+        item.depot_file = new_file_content
         item.revision_type = ActionDescription.REVISION
         return item
 

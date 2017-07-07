@@ -24,6 +24,8 @@ from sqlalchemy.types import Integer
 from sqlalchemy.types import LargeBinary
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
+from depot.fields.sqlalchemy import UploadedFileField
+from depot.fields.upload import UploadedFile
 
 from tracim.lib.utils import lazy_ugettext as l_
 from tracim.lib.exception import ContentRevisionUpdateError
@@ -543,7 +545,28 @@ class ContentRevisionRO(DeclarativeBase):
         server_default='',
     )
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
+    # TODO - A.P - 2017-07-03 - future removal planned
+    # file_content is to be replaced by depot_file, for now both coexist as
+    # this:
+    # - file_content data is still setted
+    # - newly created revision also gets depot_file data setted
+    # - access to the file of a revision from depot_file exclusively
+    # Here is the tasks workflow of the DB to OnDisk Switch :
+    # - Add depot_file "prototype style"
+    #   https://github.com/tracim/tracim/issues/233 - DONE
+    # - Integrate preview generator feature "prototype style"
+    #   https://github.com/tracim/tracim/issues/232 - DONE
+    # - Write migrations
+    #   https://github.com/tracim/tracim/issues/245
+    #   https://github.com/tracim/tracim/issues/246
+    # - Stabilize preview generator integration
+    #   includes dropping DB file content
+    #   https://github.com/tracim/tracim/issues/249
     file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
+    # INFO - A.P - 2017-07-03 - Depot Doc
+    # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
+    # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
+    depot_file = Column(UploadedFileField, unique=False, nullable=True)
     properties = Column('properties', Text(), unique=False, nullable=False, default='')
 
     type = Column(Unicode(32), unique=False, nullable=False)
@@ -626,6 +649,10 @@ class ContentRevisionRO(DeclarativeBase):
             setattr(new_rev, column_name, column_value)
 
         new_rev.updated = datetime.utcnow()
+        # TODO APY tweaks here depot_file
+        # import pudb; pu.db
+        # new_rev.depot_file = DepotManager.get().get(revision.depot_file)
+        new_rev.depot_file = revision.file_content
 
         return new_rev
 
@@ -1049,6 +1076,14 @@ class Content(DeclarativeBase):
     @property
     def is_editable(self) -> bool:
         return not self.is_archived and not self.is_deleted
+
+    @property
+    def depot_file(self) -> UploadedFile:
+        return self.revision.depot_file
+
+    @depot_file.setter
+    def depot_file(self, value):
+        self.revision.depot_file = value
 
     def get_current_revision(self) -> ContentRevisionRO:
         if not self.revisions:
