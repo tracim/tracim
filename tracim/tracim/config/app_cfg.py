@@ -17,15 +17,11 @@ import os
 from urllib.parse import urlparse
 
 from depot.manager import DepotManager
-import tg
 from paste.deploy.converters import asbool
+import tg
 from tg.configuration.milestones import environment_loaded
-
 from tgext.pluggable import plug
 from tgext.pluggable import replace_template
-from tracim.lib.system import InterruptManager
-
-from tracim.lib.utils import lazy_ugettext as l_
 
 import tracim
 from tracim.config import TracimAppConfig
@@ -34,6 +30,8 @@ from tracim.lib.daemons import DaemonsManager
 from tracim.lib.daemons import MailSenderDaemon
 from tracim.lib.daemons import RadicaleDaemon
 from tracim.lib.daemons import WsgiDavDaemon
+from tracim.lib.system import InterruptManager
+from tracim.lib.utils import lazy_ugettext as l_
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
@@ -116,9 +114,7 @@ daemons = DaemonsManager()
 
 
 def start_daemons(manager: DaemonsManager):
-    """
-    Sart Tracim daemons
-    """
+    """Start Tracim daemons."""
     from tg import config
     cfg = CFG.get_instance()
     # Don't start daemons if they are disabled
@@ -133,9 +129,7 @@ def start_daemons(manager: DaemonsManager):
 
 
 def configure_depot():
-    """
-    Configure Depot
-    """
+    """Configure Depot."""
     depot_storage_name = 'default'
     depot_storage_path = CFG.get_instance().DEPOT_STORAGE_PATH
     depot_storage_settings = {'depot.storage_path': depot_storage_path}
@@ -200,22 +194,23 @@ If you no longer wish to make the above change, or if you did not initiate this 
 
 
 class CFG(object):
-    """
-    Singleton used for easy access to config file parameters
-    """
+    """Singleton used for easy access to config file parameters."""
 
     _instance = None
 
     @classmethod
     def get_instance(cls) -> 'CFG':
+        """Get configuration singleton."""
         if not CFG._instance:
             CFG._instance = CFG()
         return CFG._instance
 
     def __setattr__(self, key, value):
         """
-        Log-ready setter. this is used for logging configuration (every
-        parameter except password)
+        Log-ready setter.
+
+        This is used for logging configuration (every parameter except
+        password)
         :param key:
         :param value:
         :return:
@@ -235,7 +230,7 @@ class CFG(object):
         self.__dict__[key] = value
 
     def __init__(self):
-
+        """Parse configuration file."""
         self.DEPOT_STORAGE_PATH = tg.config.get('depot_storage_path')
         self.PREVIEW_CACHE = tg.config.get('preview_cache_dir')
 
@@ -457,6 +452,7 @@ class CFG(object):
         ))
 
     def get_tracker_js_content(self, js_tracker_file_path=None):
+        """Get frontend analytics file."""
         result = ''
         js_tracker_file_path = tg.config.get('js_tracker_path', None)
         if js_tracker_file_path:
