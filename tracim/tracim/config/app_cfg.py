@@ -131,7 +131,7 @@ def start_daemons(manager: DaemonsManager):
 def configure_depot():
     """Configure Depot."""
     depot_storage_name = 'default'
-    depot_storage_path = CFG.get_instance().DEPOT_STORAGE_PATH
+    depot_storage_path = CFG.get_instance().DEPOT_STORAGE_DIR
     depot_storage_settings = {'depot.storage_path': depot_storage_path}
     DepotManager.configure(depot_storage_name,
                            depot_storage_settings)
@@ -222,8 +222,8 @@ class CFG(object):
 
     def __init__(self):
         """Parse configuration file."""
-        self.DEPOT_STORAGE_PATH = tg.config.get('depot_storage_path')
-        self.PREVIEW_CACHE = tg.config.get('preview_cache_dir')
+        self.DEPOT_STORAGE_DIR = tg.config.get('depot_storage_dir')
+        self.PREVIEW_CACHE_DIR = tg.config.get('preview_cache_dir')
 
         self.DATA_UPDATE_ALLOWED_DURATION = \
             int(tg.config.get('content.update.allowed.duration', 0))

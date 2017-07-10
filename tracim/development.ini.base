@@ -34,8 +34,13 @@ use = egg:tracim
 full_stack = true
 # You can set french as default language by uncommenting next line
 # lang = fr
+
 cache_dir = %(here)s/data/cache
+# preview generator cache directory
 preview_cache_dir = %(here)s/data/cache/preview/
+# file depot storage directory
+depot_storage_dir = %(here)s/data/depot/
+
 beaker.session.key = tracim
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
 
@@ -176,7 +181,7 @@ website.treeview.content = all
 website.base_url = http://127.0.0.1:8080
 # If config not provided, it will be extracted from website.base_url
 website.server_name = 127.0.0.1
-    
+
 email.notification.activated = False
 email.notification.from.email = noreply@trac.im
 email.notification.from.default_label = Tracim Notifications
@@ -221,9 +226,6 @@ wsgidav.config_path = wsgidav.conf
 ## in this case, you have to create your own proxy behind this url.
 ## Do not set http:// prefix.
 # wsgidav.client.base_url = 127.0.0.1:<WSGIDAV_PORT>
-
-## DEPOT
-depot_storage_path = %(here)s/data/depot/
 
 #####
 #

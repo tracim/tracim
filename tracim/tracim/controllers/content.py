@@ -194,7 +194,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
     @tg.expose('tracim.templates.file.getone')
     def get_one(self, file_id, revision_id=None):
         file_id = int(file_id)
-        cache_path = CFG.get_instance().PREVIEW_CACHE
+        cache_path = CFG.get_instance().PREVIEW_CACHE_DIR
         preview_manager = PreviewManager(cache_path, create_folder=True)
         user = tmpl_context.current_user
         workspace = tmpl_context.workspace
