@@ -153,15 +153,6 @@ Please click this link to reset your password:
 
 If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.
 ''')
-duplicated_email_body = l_('''
-We've received a request to reset the password for this account.
-Please click this link to reset your password:
-
-%(password_reset_link)s
-
-If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.
-''')
-import pudb; pu.db
 
 #######
 #
