@@ -35,11 +35,11 @@ full_stack = true
 # You can set french as default language by uncommenting next line
 # lang = fr
 
-cache_dir = %(here)s/data/cache
+cache_dir = %(here)s/data
 # preview generator cache directory
-preview_cache_dir = %(here)s/data/cache/preview/
+preview_cache_dir = /tmp/tracim/preview/
 # file depot storage directory
-depot_storage_dir = %(here)s/data/depot/
+depot_storage_dir = %(here)s/depot/
 
 beaker.session.key = tracim
 beaker.session.secret = 3283411b-1904-4554-b0e1-883863b53080
