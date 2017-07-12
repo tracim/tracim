@@ -35,7 +35,6 @@ from tracim.lib.utils import lazy_ugettext as l_
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 
-
 base_config = TracimAppConfig()
 base_config.renderers = []
 base_config.use_toscawidgets = False
@@ -142,23 +141,10 @@ environment_loaded.register(lambda: configure_depot())
 
 interrupt_manager = InterruptManager(os.getpid(), daemons_manager=daemons)
 
-# Note: here are fake translatable strings that allow to translate messages for
-# reset password email content
-duplicated_email_subject = l_('Password reset request')
-duplicated_email_body = l_('''
-We've received a request to reset the password for this account.
-Please click this link to reset your password:
-
-%(password_reset_link)s
-
-If you no longer wish to make the above change, or if you did not initiate this request, please disregard and/or delete this e-mail.
-''')
-
 #######
 #
 # INFO - D.A. - 2014-10-31
-# The following code is a dirty way to integrate translation for resetpassword
-# tgapp in tracim
+# fake strings allowing to translate resetpassword tgapp.
 # TODO - Integrate these translations into tgapp-resetpassword
 #
 
@@ -167,6 +153,8 @@ l_('Confirm new password')
 l_('Save new password')
 l_('Email address')
 l_('Send Request')
+
+l_('Password reset request')
 
 l_('Password reset request sent')
 l_('Invalid password reset request')
@@ -200,8 +188,7 @@ class CFG(object):
         """
         Log-ready setter.
 
-        This is used for logging configuration (every parameter except
-        password)
+        Logs all configuration parameters except password.
         :param key:
         :param value:
         :return:
@@ -222,21 +209,40 @@ class CFG(object):
 
     def __init__(self):
         """Parse configuration file."""
-        self.DEPOT_STORAGE_DIR = tg.config.get('depot_storage_dir')
-        self.PREVIEW_CACHE_DIR = tg.config.get('preview_cache_dir')
+        self.DEPOT_STORAGE_DIR = tg.config.get(
+            'depot_storage_dir',
+        )
+        self.PREVIEW_CACHE_DIR = tg.config.get(
+            'preview_cache_dir',
+        )
 
-        self.DATA_UPDATE_ALLOWED_DURATION = \
-            int(tg.config.get('content.update.allowed.duration', 0))
+        self.DATA_UPDATE_ALLOWED_DURATION = int(tg.config.get(
+            'content.update.allowed.duration',
+            0,
+        ))
 
-        self.WEBSITE_TITLE = tg.config.get('website.title', 'TRACIM')
-        self.WEBSITE_HOME_TITLE_COLOR = \
-            tg.config.get('website.title.color', '#555')
-        self.WEBSITE_HOME_IMAGE_URL = \
-            tg.lurl('/assets/img/home_illustration.jpg')
-        self.WEBSITE_HOME_BACKGROUND_IMAGE_URL = \
-            tg.lurl('/assets/img/bg.jpg')
-        self.WEBSITE_BASE_URL = tg.config.get('website.base_url', '')
-        self.WEBSITE_SERVER_NAME = tg.config.get('website.server_name', None)
+        self.WEBSITE_TITLE = tg.config.get(
+            'website.title',
+            'TRACIM',
+        )
+        self.WEBSITE_HOME_TITLE_COLOR = tg.config.get(
+            'website.title.color',
+            '#555',
+        )
+        self.WEBSITE_HOME_IMAGE_URL = tg.lurl(
+            '/assets/img/home_illustration.jpg',
+        )
+        self.WEBSITE_HOME_BACKGROUND_IMAGE_URL = tg.lurl(
+            '/assets/img/bg.jpg',
+        )
+        self.WEBSITE_BASE_URL = tg.config.get(
+            'website.base_url',
+            '',
+        )
+        self.WEBSITE_SERVER_NAME = tg.config.get(
+            'website.server_name',
+            None,
+        )
 
         if not self.WEBSITE_SERVER_NAME:
             self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
@@ -247,10 +253,18 @@ class CFG(object):
                 .format(self.WEBSITE_SERVER_NAME)
             )
 
-        self.WEBSITE_HOME_TAG_LINE = tg.config.get('website.home.tag_line', '')
-        self.WEBSITE_SUBTITLE = tg.config.get('website.home.subtitle', '')
-        self.WEBSITE_HOME_BELOW_LOGIN_FORM = \
-            tg.config.get('website.home.below_login_form', '')
+        self.WEBSITE_HOME_TAG_LINE = tg.config.get(
+            'website.home.tag_line',
+            '',
+        )
+        self.WEBSITE_SUBTITLE = tg.config.get(
+            'website.home.subtitle',
+            '',
+        )
+        self.WEBSITE_HOME_BELOW_LOGIN_FORM = tg.config.get(
+            'website.home.below_login_form',
+            '',
+        )
 
         if tg.config.get('email.notification.from'):
             raise Exception(
@@ -259,14 +273,18 @@ class CFG(object):
                 'email.notification.from.default_label.'
             )
 
-        self.EMAIL_NOTIFICATION_FROM_EMAIL = \
-            tg.config.get('email.notification.from.email')
-        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = \
-            tg.config.get('email.notification.from.default_label')
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = \
-            tg.config.get('email.notification.content_update.template.html')
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = \
-            tg.config.get('email.notification.content_update.template.text')
+        self.EMAIL_NOTIFICATION_FROM_EMAIL = tg.config.get(
+            'email.notification.from.email',
+        )
+        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = tg.config.get(
+            'email.notification.from.default_label'
+        )
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get(
+            'email.notification.content_update.template.html',
+        )
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = tg.config.get(
+            'email.notification.content_update.template.text',
+        )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = tg.config.get(
             'email.notification.created_account.template.html',
             './tracim/templates/mail/created_account_body_html.mak',
@@ -275,32 +293,43 @@ class CFG(object):
             'email.notification.created_account.template.text',
             './tracim/templates/mail/created_account_body_text.mak',
         )
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = \
-            tg.config.get('email.notification.content_update.subject')
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = tg.config.get(
+            'email.notification.content_update.subject',
+        )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = tg.config.get(
             'email.notification.created_account.subject',
             '[{website_title}] Created account',
         )
-        self.EMAIL_NOTIFICATION_PROCESSING_MODE = \
-            tg.config.get('email.notification.processing_mode')
+        self.EMAIL_NOTIFICATION_PROCESSING_MODE = tg.config.get(
+            'email.notification.processing_mode',
+        )
 
-        self.EMAIL_NOTIFICATION_ACTIVATED = \
-            asbool(tg.config.get('email.notification.activated'))
-        self.EMAIL_NOTIFICATION_SMTP_SERVER = \
-            tg.config.get('email.notification.smtp.server')
-        self.EMAIL_NOTIFICATION_SMTP_PORT = \
-            tg.config.get('email.notification.smtp.port')
-        self.EMAIL_NOTIFICATION_SMTP_USER = \
-            tg.config.get('email.notification.smtp.user')
-        self.EMAIL_NOTIFICATION_SMTP_PASSWORD = \
-            tg.config.get('email.notification.smtp.password')
+        self.EMAIL_NOTIFICATION_ACTIVATED = asbool(tg.config.get(
+            'email.notification.activated',
+        ))
+        self.EMAIL_NOTIFICATION_SMTP_SERVER = tg.config.get(
+            'email.notification.smtp.server',
+        )
+        self.EMAIL_NOTIFICATION_SMTP_PORT = tg.config.get(
+            'email.notification.smtp.port',
+        )
+        self.EMAIL_NOTIFICATION_SMTP_USER = tg.config.get(
+            'email.notification.smtp.user',
+        )
+        self.EMAIL_NOTIFICATION_SMTP_PASSWORD = tg.config.get(
+            'email.notification.smtp.password',
+        )
 
-        self.TRACKER_JS_PATH = tg.config.get('js_tracker_path')
-        self.TRACKER_JS_CONTENT = \
-            self.get_tracker_js_content(self.TRACKER_JS_PATH)
+        self.TRACKER_JS_PATH = tg.config.get(
+            'js_tracker_path',
+        )
+        self.TRACKER_JS_CONTENT = self.get_tracker_js_content(
+            self.TRACKER_JS_PATH,
+        )
 
-        self.WEBSITE_TREEVIEW_CONTENT = \
-            tg.config.get('website.treeview.content')
+        self.WEBSITE_TREEVIEW_CONTENT = tg.config.get(
+            'website.treeview.content',
+        )
 
         self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
             ActionDescription.COMMENT,
@@ -318,13 +347,19 @@ class CFG(object):
             # ContentType.Folder -- Folder is skipped
         ]
 
-        self.RADICALE_SERVER_HOST = \
-            tg.config.get('radicale.server.host', '0.0.0.0')
-        self.RADICALE_SERVER_PORT = \
-            int(tg.config.get('radicale.server.port', 5232))
+        self.RADICALE_SERVER_HOST = tg.config.get(
+            'radicale.server.host',
+            '0.0.0.0',
+        )
+        self.RADICALE_SERVER_PORT = int(tg.config.get(
+            'radicale.server.port',
+            5232,
+        ))
         # Note: Other parameters needed to work in SSL (cert file, etc)
-        self.RADICALE_SERVER_SSL = \
-            asbool(tg.config.get('radicale.server.ssl', False))
+        self.RADICALE_SERVER_SSL = asbool(tg.config.get(
+            'radicale.server.ssl',
+            False,
+        ))
         self.RADICALE_SERVER_FILE_SYSTEM_FOLDER = tg.config.get(
             'radicale.server.filesystem.folder',
             './radicale/collections',
@@ -347,11 +382,15 @@ class CFG(object):
             'Tracim Calendar - Password Required',
         )
 
-        self.RADICALE_CLIENT_BASE_URL_HOST = \
-            tg.config.get('radicale.client.base_url.host', None)
+        self.RADICALE_CLIENT_BASE_URL_HOST = tg.config.get(
+            'radicale.client.base_url.host',
+            None,
+        )
 
-        self.RADICALE_CLIENT_BASE_URL_PREFIX = \
-            tg.config.get('radicale.client.base_url.prefix', '/')
+        self.RADICALE_CLIENT_BASE_URL_PREFIX = tg.config.get(
+            'radicale.client.base_url.prefix',
+            '/',
+        )
         # Ensure finished by '/'
         if '/' != self.RADICALE_CLIENT_BASE_URL_PREFIX[-1]:
             self.RADICALE_CLIENT_BASE_URL_PREFIX += '/'
@@ -390,8 +429,10 @@ class CFG(object):
             self.WSGIDAV_CONFIG_PATH,
         )
         self.WSGIDAV_PORT = self.wsgidav_config.port
-        self.WSGIDAV_CLIENT_BASE_URL = \
-            tg.config.get('wsgidav.client.base_url', None)
+        self.WSGIDAV_CLIENT_BASE_URL = tg.config.get(
+            'wsgidav.client.base_url',
+            None,
+        )
 
         if not self.WSGIDAV_CLIENT_BASE_URL:
             self.WSGIDAV_CLIENT_BASE_URL = \
