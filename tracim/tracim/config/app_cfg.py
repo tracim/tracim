@@ -132,8 +132,10 @@ def configure_depot():
     depot_storage_name = 'default'
     depot_storage_path = CFG.get_instance().DEPOT_STORAGE_DIR
     depot_storage_settings = {'depot.storage_path': depot_storage_path}
-    DepotManager.configure(depot_storage_name,
-                           depot_storage_settings)
+    DepotManager.configure(
+        depot_storage_name,
+        depot_storage_settings,
+    )
 
 
 environment_loaded.register(lambda: start_daemons(daemons))
