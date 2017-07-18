@@ -32,7 +32,7 @@ class PagesController(TIMRestController):
         file_id = int(tg.request.controller_state.routing_args.get('file_id'))
         page = int(page_id)
         revision_id = int(revision_id) if revision_id != 'latest' else None
-        cache_path = CFG.get_instance().PREVIEW_CACHE
+        cache_path = CFG.get_instance().PREVIEW_CACHE_DIR
         preview_manager = PreviewManager(cache_path, create_folder=True)
         user = tmpl_context.current_user
         content_api = ContentApi(user,
@@ -81,7 +81,7 @@ class PagesController(TIMRestController):
         file_id = int(tg.request.controller_state.routing_args.get('file_id'))
         revision_id = int(revision_id) if revision_id != 'latest' else None
         page = int(page_id)
-        cache_path = CFG.get_instance().PREVIEW_CACHE
+        cache_path = CFG.get_instance().PREVIEW_CACHE_DIR
         preview_manager = PreviewManager(cache_path, create_folder=True)
         user = tmpl_context.current_user
         content_api = ContentApi(user,

@@ -57,6 +57,9 @@ tg2env/
 # cache
 tracim/data/
 
+# file depot
+tracim/depot/
+
 # Site-local config file
 development.ini
 track.js
