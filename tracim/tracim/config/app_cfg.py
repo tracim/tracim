@@ -351,7 +351,7 @@ class CFG(object):
 
         self.RADICALE_SERVER_HOST = tg.config.get(
             'radicale.server.host',
-            '0.0.0.0',
+            '127.0.0.1',
         )
         self.RADICALE_SERVER_PORT = int(tg.config.get(
             'radicale.server.port',
