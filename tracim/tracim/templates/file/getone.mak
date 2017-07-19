@@ -116,17 +116,17 @@
                         <table>
                             <tr>
                                 <td>
-                                    <button type="button" id="prev" onclick="previous_page()">
+                                    <button type="button" id="pg_previous_page" onclick="previous_page()">
                                         <span class="pull-left">
                                             ${ICON.FA_FW('fa fa-chevron-left')}
                                         </span>
                                     </button>
                                 </td>
                                 <td>
-                                    <a id="preview_link"><img id='preview' alt="Preview"></a>
+                                    <div id="pg_link"><img id='preview_generator' alt="Preview"></div>
                                 </td>
                                 <td>
-                                    <button type="button" id="next" onclick="next_page()">
+                                    <button type="button" id="pg_next_page" onclick="next_page()">
                                         <span>
                                             ${ICON.FA_FW('fa fa-chevron-right')}
                                         </span>
@@ -150,45 +150,41 @@
                         </table>
 
                         <script type="text/javascript">
-                            var nb_page = parseInt(${nb_page});
-                            console.log(nb_page);
-                            var page = 0;
-                            var urls = [];
-                            % for one_url in url:
-                            urls.push('${one_url}');
-                            % endfor
-                            console.log(urls);
-                            document.getElementById('preview').src = urls[page];
-                            refresh_button();
+                            var nb_page = parseInt(${nb_page})
+                            var page = 0
+                            var urls = [
+                                % for one_url in url:
+                                    '${one_url}',
+                                % endfor
+                            ]
 
-                            function next_page(){
-                                page = page+1;
-                                console.log('page next');
-                                console.log(urls[page]);
-                                document.getElementById('preview').src = urls[page];
-                                refresh_button();
+                            document.getElementById('preview_generator').src = urls[page]
+                            refresh_button()
+
+                            function next_page () {
+                                page = page + 1
+                                document.getElementById('preview_generator').src = urls[page]
+                                refresh_button()
                             }
 
-                            function previous_page(){
-                                page = page-1;
-                                console.log('page previous');
-                                console.log(urls[page]);
-                                document.getElementById('preview').src = urls[page];
-                                refresh_button();
+                            function previous_page () {
+                                page = page - 1
+                                document.getElementById('preview_generator').src = urls[page]
+                                refresh_button()
                             }
 
-                            function refresh_button(){
-                                console.log(page);
-                                document.getElementById('prev').disabled = false;
-                                document.getElementById('next').disabled = false;
-                                document.getElementById('dl_one_pdf').href = "/previews/${result.file.id}/pages/" + page + "/download_pdf_one?revision_id=${result.file.selected_revision}";
-                                document.getElementById('dl_full_pdf').href = "/previews/${result.file.id}/pages/" + page + "/download_pdf_full?revision_id=${result.file.selected_revision}";
-                                document.getElementById('preview_link').href = "/previews/${result.file.id}/pages/" + page + "/high_quality?revision_id=${result.file.selected_revision}";
-                                if(page >= nb_page-1){
-                                    document.getElementById('next').disabled = true;
+                            function refresh_button () {
+                                document.getElementById('pg_previous_page').disabled = false
+                                document.getElementById('pg_next_page').disabled = false
+                                document.getElementById('dl_one_pdf').href = '/previews/${result.file.id}/pages/' + page + '/download_pdf_one?revision_id=${result.file.selected_revision}'
+                                document.getElementById('dl_full_pdf').href = '/previews/${result.file.id}/pages/' + page + '/download_pdf_full?revision_id=${result.file.selected_revision}'
+                                document.getElementById('pg_link').href = '/previews/${result.file.id}/pages/' + page + '/high_quality?revision_id=${result.file.selected_revision}'
+
+                                if (page >= nb_page - 1) {
+                                    document.getElementById('pg_next_page').disabled = true
                                 }
-                                if(page <= 0){
-                                    document.getElementById('prev').disabled = true;
+                                if (page <= 0) {
+                                    document.getElementById('pg_previous_page').disabled = true
                                 }
                             }
                         </script>
