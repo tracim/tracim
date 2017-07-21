@@ -25,12 +25,6 @@ down_revision = '69fb10c3d6f0'
 # Session = sessionmaker()
 # DeclarativeBase = declarative_base()
 
-DepotManager.configure(
-    'default', {
-    'depot.storage_path': 'depot/',
-})
-# DepotManager.set_default('default')
-
 revision_helper = sa.Table(
     'content_revisions',
     sa.MetaData(),
@@ -105,8 +99,14 @@ def upgrade():
 
     # fill_depot_file_fields()
 
+    # Creates files depot used in this migration:
+    # - 'default': depot used until now,
+    DepotManager.configure(
+        'default', {'depot.storage_path': 'depot/'},
+    )
+    depot = DepotManager.get('default')
+
     connection = op.get_bind()
-    depot = DepotManager.get()
 
     file_revision_query = revision_helper.select() \
         .where(revision_helper.c.type == 'file')
