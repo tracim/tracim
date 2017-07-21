@@ -97,46 +97,62 @@ def upgrade():
     """Sets depot file for file typed revisions."""
     import pudb; pu.db
 
-    # fill_depot_file_fields()
-
-    # Creates files depot used in this migration:
-    # - 'default': depot used until now,
-    DepotManager.configure(
-        'default', {'depot.storage_path': 'depot/'},
-    )
-    depot = DepotManager.get('default')
+    # INFO - A.P - 2017-07-21 - put all files also on disk
+    # Until now, files are both in database and, for the newly created
+    # ones, on disk. In order to simplify the migration, this procedure
+    # will:
+    # - delete the few files on disk,
+    # - create all files on disk from database.
 
     connection = op.get_bind()
+    delete_query = revision_helper.update() \
+        .where(revision_helper.c.type == 'file') \
+        .where(revision_helper.c.depot_file.isnot(None)) \
+        .values(depot_file=None)
+    delete_result = connection.execute(delete_query)
+    shutil.rmtree('depot/', ignore_errors=True)
 
-    file_revision_query = revision_helper.select() \
-        .where(revision_helper.c.type == 'file')
-    all_file_revisions = connection.execute(file_revision_query)
-    for one_revision in all_file_revisions:
-        one_revision_filename = '{0}{1}'.format(
-            one_revision.label,
-            one_revision.file_extension,
+    # Creates files depot used in this migration:
+    # - 'default': depot used until now,
+    DepotManager.configure(
+        'tracim', {'depot.storage_path': 'depot/'},
+    )
+    # depot = DepotManager.get('default')
+
+    # create_query = revision_helper.update() \
+    #     .where(revision_helper.c.type == 'file') \
+    #     .values(depot_file=
+    #         UploadedFile(
+    #             FileIntent(
+    #                 file_content,
+    #                 '{0}{1}'.format(label, file_extension),
+    #                 file_mimetype,
+    #             )
+    #         )
+    #     )
+    # create_result = connection.execute(create_query)
+
+    select_query = revision_helper.select() \
+        .where(revision_helper.c.type == 'file') \
+        .where(revision_helper.c.depot_file.is_(None))
+    all_files = connection.execute(select_query).fetchall()
+    for one_file in all_files:
+        one_file_filename = '{0}{1}'.format(
+            one_file.label,
+            one_file.file_extension,
         )
-        if not one_revision.depot_file:
-            depot_file_intent = FileIntent(
-                one_revision.file_content,
-                one_revision_filename,
-                one_revision.file_mimetype,
-            )
-            depot_file_field = UploadedFile(depot_file_intent)
-            one_revision_update = revision_helper.update() \
-                .where(revision_helper.c.type == 'file') \
-                .where(revision_helper.c.revision_id == one_revision.revision_id) \
-                .values(depot_file=depot_file_field) \
-                .return_defaults()
-            result = connection.execute(one_revision_update)
-        else:
-            # TODO - A.P - makes the field in DB to be updated as well
-            depot_file_uid = depot.replace(
-                one_revision.depot_file.file_id,
-                one_revision.file_content,
-                one_revision_filename,
-                one_revision.file_mimetype,
-            )
+        depot_file_intent = FileIntent(
+            one_file.file_content,
+            one_file_filename,
+            one_file.file_mimetype,
+        )
+        depot_file_field = UploadedFile(depot_file_intent, 'default')
+        one_file_update = revision_helper.update() \
+            .where(revision_helper.c.type == 'file') \
+            .where(revision_helper.c.revision_id == one_file.revision_id) \
+            .values(depot_file=depot_file_field) \
+            .return_defaults()
+        create_result = connection.execute(one_file_update)
 
 
 def downgrade():
@@ -145,7 +161,6 @@ def downgrade():
     file_revision_query = revision_helper.update() \
         .where(revision_helper.c.type == 'file') \
         .where(revision_helper.c.depot_file.isnot(None)) \
-        .values(depot_file=None) \
-        .return_defaults()
+        .values(depot_file=None)
     result = connection.execute(file_revision_query)
     shutil.rmtree('depot/', ignore_errors=True)

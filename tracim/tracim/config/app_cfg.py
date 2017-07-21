@@ -129,7 +129,7 @@ def start_daemons(manager: DaemonsManager):
 
 def configure_depot():
     """Configure Depot."""
-    depot_storage_name = 'default'
+    depot_storage_name = 'tracim'
     depot_storage_path = CFG.get_instance().DEPOT_STORAGE_DIR
     depot_storage_settings = {'depot.storage_path': depot_storage_path}
     DepotManager.configure(
