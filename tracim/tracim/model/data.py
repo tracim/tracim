@@ -546,7 +546,6 @@ class ContentRevisionRO(DeclarativeBase):
         server_default='',
     )
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
-    file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
     # INFO - A.P - 2017-07-03 - Depot Doc
     # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
