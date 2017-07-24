@@ -307,9 +307,9 @@ class TestWebDav(TestStandard):
         ))
         eq_(
             b'hello\n',
-            result.content.file_content,
+            result.content.depot_file.file.read(),
             msg='fiel content should be "hello\n" but it is {0}'.format(
-                result.content.file_content
+                result.content.depot_file.file.read()
             )
         )
 
@@ -550,9 +550,9 @@ class TestWebDav(TestStandard):
         ))
         eq_(
             b'hello\n',
-            result.content.file_content,
+            result.content.depot_file.file.read(),
             msg='fiel content should be "hello\n" but it is {0}'.format(
-                result.content.file_content
+                result.content.depot_file.file.read()
             )
         )
 

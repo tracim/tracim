@@ -16,6 +16,7 @@ import tg
 from tg.i18n import ugettext as _
 
 from depot.manager import DepotManager
+from depot.io.utils import FileIntent
 
 import sqlalchemy
 from sqlalchemy.orm import aliased
@@ -873,12 +874,15 @@ class ContentApi(object):
         item.revision_type = ActionDescription.EDITION
         return item
 
-    def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_file_content) -> Content:
+    def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content) -> Content:
         item.owner = self._user
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
-        item.file_content = new_file_content
-        item.depot_file = new_file_content
+        item.depot_file = FileIntent(
+            new_content,
+            new_filename,
+            new_mimetype,
+        )
         item.revision_type = ActionDescription.REVISION
         return item
 

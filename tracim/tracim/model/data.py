@@ -26,6 +26,7 @@ from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
+from depot.io.utils import FileIntent
 
 from tracim.lib.utils import lazy_ugettext as l_
 from tracim.lib.exception import ContentRevisionUpdateError
@@ -545,23 +546,6 @@ class ContentRevisionRO(DeclarativeBase):
         server_default='',
     )
     file_mimetype = Column(Unicode(255),  unique=False, nullable=False, default='')
-    # TODO - A.P - 2017-07-03 - future removal planned
-    # file_content is to be replaced by depot_file, for now both coexist as
-    # this:
-    # - file_content data is still setted
-    # - newly created revision also gets depot_file data setted
-    # - access to the file of a revision from depot_file exclusively
-    # Here is the tasks workflow of the DB to OnDisk Switch :
-    # - Add depot_file "prototype style"
-    #   https://github.com/tracim/tracim/issues/233 - DONE
-    # - Integrate preview generator feature "prototype style"
-    #   https://github.com/tracim/tracim/issues/232 - DONE
-    # - Write migrations
-    #   https://github.com/tracim/tracim/issues/245
-    #   https://github.com/tracim/tracim/issues/246
-    # - Stabilize preview generator integration
-    #   includes dropping DB file content
-    #   https://github.com/tracim/tracim/issues/249
     file_content = deferred(Column(LargeBinary(), unique=False, nullable=True))
     # INFO - A.P - 2017-07-03 - Depot Doc
     # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
@@ -592,7 +576,6 @@ class ContentRevisionRO(DeclarativeBase):
         'content_id',
         'created',
         'description',
-        'file_content',
         'file_mimetype',
         'file_extension',
         'is_archived',
@@ -649,10 +632,12 @@ class ContentRevisionRO(DeclarativeBase):
             setattr(new_rev, column_name, column_value)
 
         new_rev.updated = datetime.utcnow()
-        # TODO APY tweaks here depot_file
-        # import pudb; pu.db
-        # new_rev.depot_file = DepotManager.get().get(revision.depot_file)
-        new_rev.depot_file = revision.file_content
+        if revision.depot_file:
+            new_rev.depot_file = FileIntent(
+                revision.depot_file.file.read(),
+                revision.file_name,
+                revision.file_mimetype,
+            )
 
         return new_rev
 
@@ -859,18 +844,6 @@ class Content(DeclarativeBase):
     @file_mimetype.expression
     def file_mimetype(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.file_mimetype
-
-    @hybrid_property
-    def file_content(self):
-        return self.revision.file_content
-
-    @file_content.setter
-    def file_content(self, value):
-        self.revision.file_content = value
-
-    @file_content.expression
-    def file_content(cls) -> InstrumentedAttribute:
-        return ContentRevisionRO.file_content
 
     @hybrid_property
     def _properties(self) -> str:
