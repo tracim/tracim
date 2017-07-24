@@ -13,7 +13,7 @@ from tracim.tests import TestStandard, BaseTest
 class TestContentRevision(BaseTest, TestStandard):
 
     def _new_from(self, revision):
-        excluded_columns = ('revision_id', '_sa_instance_state')
+        excluded_columns = ('revision_id', '_sa_instance_state', 'depot_file')
         revision_columns = [attr.key for attr in inspect(revision).attrs if not attr.key in excluded_columns]
         new_revision = ContentRevisionRO()
 
