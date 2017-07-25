@@ -1,7 +1,7 @@
 $(document).ready(function () {
 
   // toggle sidebar-left width to fixed or auto
-  $('#toggle-left-sidebar-width').click( function() {
+  $('#toggle-left-sidebar-width').click(function() {
     const sidebar = $('#sidebar-left')
     const buttonIcon = $('> i', this)
 
