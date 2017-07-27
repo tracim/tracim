@@ -2,30 +2,27 @@
 
 """WebHelpers used in tracim."""
 
-#from webhelpers import date, feedgenerator, html, number, misc, text
+# from webhelpers import date, feedgenerator, html, number, misc, text
 
 import datetime
 
-import pytz
-import slugify
 from babel.dates import format_date
 from babel.dates import format_time
 from markupsafe import Markup
-
+import pytz
+import slugify
 import tg
 from tg import tmpl_context
 from tg.i18n import ugettext as _
 
 from tracim.lib import app_globals as plag
-
 from tracim.lib import CST
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
-
-from tracim.model.data import ContentStatus
 from tracim.model.data import Content
+from tracim.model.data import ContentStatus
 from tracim.model.data import ContentType
 from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
