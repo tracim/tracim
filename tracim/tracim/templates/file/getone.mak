@@ -127,7 +127,7 @@
                     modifiedAt: '${h.format_short(created_localized)|n}',
                     owner: '${result.file.owner.name}',
                     sourceLink: '${download_url}',
-                    pdfAvailable: false // Côme - 2017/07/24 - backend should return this information
+                    pdfAvailable: false // FIXME - Côme - 2017/07/24 - backend should return this information
                   }
                 )
               })()
