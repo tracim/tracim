@@ -113,7 +113,7 @@ You'll need to install the following packages :
 
     sudo apt install git realpath redis-server \
                      python3 python-virtualenv python3-dev python-pip  python-lxml \
-                     build-essential libxml2-dev libxslt1-dev zlib1g-dev
+                     build-essential libxml2-dev libxslt1-dev zlib1g-dev libjpeg-dev
 
 ## Get the source ##
 
