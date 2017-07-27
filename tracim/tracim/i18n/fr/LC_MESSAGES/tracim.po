@@ -1563,14 +1563,6 @@ msgstr "<b>Ce fichier est obsolète</b>"
 msgid "Preview"
 msgstr "Prévisualisation"
 
-#: tracim/templates/file/getone.mak:136
-msgid "this page"
-msgstr "cette page"
-
-#: tracim/templates/file/getone.mak:143
-msgid "all pages"
-msgstr "toutes les pages"
-
 #: tracim/templates/file/getone.mak:83 tracim/templates/file/toolbar.mak:23
 msgid "Download the file"
 msgstr "Télécharger le fichier"
