@@ -1,0 +1,20 @@
+{
+  "name": "Tracim - Algoo",
+  "short_name": "Tracim",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0094bc",
+  "icons": [{
+    "src": "/assets/img/logo_192.png?v=0.0.1",
+    "sizes": "192x192",
+    "type": "image/png"
+  }, {
+    "src": "/assets/img/logo_384.png?v=0.0.1",
+    "sizes": "384x384",
+    "type": "image/png"
+  }],
+  "lang": "fr-FR",
+  "orientation": "portrait",
+  "prefer_related_applications": false
+}

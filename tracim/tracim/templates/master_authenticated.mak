@@ -21,6 +21,7 @@
 
             globalTracimLang = 'fr_FR'
         </script>
+        <link rel="manifest" href="manifest.json?v=0.0.1" />
     </head>
 
     <body class="${self.body_class()}">
