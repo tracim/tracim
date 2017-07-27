@@ -31,6 +31,17 @@ from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
 
 
+def get_lang() -> str:
+    """
+    Gets language code.
+
+    Provides the first language:
+    - asked by the request to the server,
+    - supported by Tracim.
+    """
+    return tg.i18n.get_lang(all=False)[0]
+
+
 def get_with_timezone(
         datetime_object: datetime.datetime,
         to_timezone: str='',
