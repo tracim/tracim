@@ -73,9 +73,6 @@ body {
   width: auto;
   margin: 0;
 }
-.content__wrapper.edit-mode-margin {
-  overflow: hidden;
-}
 
 .fixed-width-sidebar {
   width: auto !important;
