@@ -43,12 +43,15 @@ class PagesController(TIMRestController):
         else:
             file = content_api.get_one(file_id, self._item_type)
             file_path = content_api.get_one_revision_filepath(file.revision_id)
-        path = preview_manager.get_jpeg_preview(file_path=file_path,
-                                                page=page,
-                                                height=size,
-                                                width=size)
-        with open(path, 'rb') as large:
-            return large.read()
+        try:
+            path = preview_manager.get_jpeg_preview(file_path=file_path,
+                                                    page=page,
+                                                    height=size,
+                                                    width=size)
+            with open(path, 'rb') as large:
+                return large.read()
+        except:
+            pass
 
     @expose(content_type='image/jpeg')
     def high_quality(self,

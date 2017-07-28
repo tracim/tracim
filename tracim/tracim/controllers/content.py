@@ -216,7 +216,11 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             revision_id = file.revision_id
 
         file_path = content_api.get_one_revision_filepath(revision_id)
-        nb_page = preview_manager.get_nb_page(file_path=file_path)
+        nb_page = 0
+        try:
+            nb_page = preview_manager.get_nb_page(file_path=file_path)
+        except:
+            pass
         preview_urls = []
         for page in range(int(nb_page)):
             url_str = '/previews/{}/pages/{}?revision_id={}'
