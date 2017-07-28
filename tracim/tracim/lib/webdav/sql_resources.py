@@ -897,7 +897,7 @@ class File(DAVNonCollection):
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
-    def getContent(self):
+    def getContent(self) -> typing.BinaryIO:
         filestream = compat.BytesIO()
         filestream.write(self.content.depot_file.file.read())
         filestream.seek(0)
