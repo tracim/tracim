@@ -62,20 +62,20 @@ def upgrade():
     select_query = revision_helper.select() \
         .where(revision_helper.c.type == 'file') \
         .where(revision_helper.c.depot_file.is_(None))
-    all_files = connection.execute(select_query).fetchall()
-    for one_file in all_files:
-        one_file_filename = '{0}{1}'.format(
-            one_file.label,
-            one_file.file_extension,
+    files = connection.execute(select_query).fetchall()
+    for file in files:
+        file_filename = '{0}{1}'.format(
+            file.label,
+            file.file_extension,
         )
         depot_file_intent = FileIntent(
-            one_file.file_content,
-            one_file_filename,
-            one_file.file_mimetype,
+            file.file_content,
+            file_filename,
+            file.file_mimetype,
         )
         depot_file_field = UploadedFile(depot_file_intent, 'tracim')
         update_query = revision_helper.update() \
-            .where(revision_helper.c.revision_id == one_file.revision_id) \
+            .where(revision_helper.c.revision_id == file.revision_id) \
             .values(depot_file=depot_file_field) \
             .return_defaults()
         connection.execute(update_query)
