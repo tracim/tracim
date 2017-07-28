@@ -874,7 +874,7 @@ class ContentApi(object):
         item.revision_type = ActionDescription.EDITION
         return item
 
-    def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content) -> Content:
+    def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
         item.owner = self._user
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
