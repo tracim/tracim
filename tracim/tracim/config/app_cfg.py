@@ -214,6 +214,11 @@ class CFG(object):
         self.DEPOT_STORAGE_DIR = tg.config.get(
             'depot_storage_dir',
         )
+        if not self.DEPOT_STORAGE_DIR:
+            raise Exception(
+                'ERROR: depot_storage_dir configuration is mandatory. '
+                'Set it before continuing.'
+            )
         self.PREVIEW_CACHE_DIR = tg.config.get(
             'preview_cache_dir',
         )
