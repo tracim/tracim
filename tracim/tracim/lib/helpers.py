@@ -36,7 +36,15 @@ def get_lang() -> str:
     - asked by the request to the server,
     - supported by Tracim.
     """
-    return tg.i18n.get_lang(all=False)[0]
+    # TODO - A.P - language code access from test environment
+    # try based workaround instead of raw get language call for test
+    # environment only, this should be set with tg.i18n.set_lang in
+    # be I was unable to achieve that.
+    try:
+        result = tg.i18n.get_lang(all=False)[0]
+    except:
+        result = 'en'
+    return result
 
 
 def get_with_timezone(
