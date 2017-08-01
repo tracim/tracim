@@ -101,121 +101,37 @@
 
     <div class="content__detail file">
         <% download_url = tg.url('/workspaces/{}/folders/{}/files/{}/download?revision_id={}'.format(result.file.workspace.id, result.file.parent.id,result.file.id,result.file.selected_revision)) %>
-        <div class="t-half-spacer-above download-file-button">
-            <a style="" class="btn btn-default" tittle="${_('Download the file')}"
-                href="${download_url}" >
-                ${ICON.FA_FW('fa fa-download fa-2x')}
-            </a>
-        </div>
-
         <div class="t-half-spacer-above">
-            <table class="table table-hover table-condensed table-striped table-bordered">
-                <tr>
-                    <td class="tracim-title">${_('Preview')}</td>
-                    <td>
-                        <table>
-                            <tr>
-                                <td>
-                                    <button type="button" id="prev" onclick="previous_page()">
-                                        <span class="pull-left">
-                                            ${ICON.FA_FW('fa fa-chevron-left')}
-                                        </span>
-                                    </button>
-                                </td>
-                                <td>
-                                    <a id="preview_link"><img id='preview' alt="Preview"></a>
-                                </td>
-                                <td>
-                                    <button type="button" id="next" onclick="next_page()">
-                                        <span>
-                                            ${ICON.FA_FW('fa fa-chevron-right')}
-                                        </span>
-                                    </button>
-                                </td>
-                                <td>
-                                    <a type="button" id="dl_one_pdf">${_('this page')}
-                                        <span class="pull-left">
-                                            ${ICON.FA_FW('fa fa-download')}
-                                        </span>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a type="button" id="dl_full_pdf">${_('all pages')}
-                                        <span class="pull-left">
-                                            ${ICON.FA_FW('fa fa-download')}
-                                        </span>
-                                    </a>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <script type="text/javascript">
-                            var nb_page = parseInt(${nb_page});
-                            console.log(nb_page);
-                            var page = 0;
-                            var urls = [];
-                            % for one_url in url:
-                            urls.push('${one_url}');
-                            % endfor
-                            console.log(urls);
-                            document.getElementById('preview').src = urls[page];
-                            refresh_button();
-
-                            function next_page(){
-                                page = page+1;
-                                console.log('page next');
-                                console.log(urls[page]);
-                                document.getElementById('preview').src = urls[page];
-                                refresh_button();
-                            }
-
-                            function previous_page(){
-                                page = page-1;
-                                console.log('page previous');
-                                console.log(urls[page]);
-                                document.getElementById('preview').src = urls[page];
-                                refresh_button();
-                            }
-
-                            function refresh_button(){
-                                console.log(page);
-                                document.getElementById('prev').disabled = false;
-                                document.getElementById('next').disabled = false;
-                                document.getElementById('dl_one_pdf').href = "/previews/${result.file.id}/pages/" + page + "/download_pdf_one?revision_id=${result.file.selected_revision}";
-                                document.getElementById('dl_full_pdf').href = "/previews/${result.file.id}/pages/" + page + "/download_pdf_full?revision_id=${result.file.selected_revision}";
-                                document.getElementById('preview_link').href = "/previews/${result.file.id}/pages/" + page + "/high_quality?revision_id=${result.file.selected_revision}";
-                                if(page >= nb_page-1){
-                                    document.getElementById('next').disabled = true;
-                                }
-                                if(page <= 0){
-                                    document.getElementById('prev').disabled = true;
-                                }
-                            }
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="tracim-title">${_('File')}</td>
-                    <td>
-                        <a href="${download_url}" tittle="${_('Download the file (last revision)')}">
-                            ${result.file.file.name}
-                            <span class="pull-right">
-                                ${ICON.FA_FW('fa fa-download')}
-                            </span>
-
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="tracim-title">${_('Size')}</td>
-                    <td>${h.user_friendly_file_size(result.file.file.size)}</td>
-                </tr>
-                <tr>
-                    <td class="tracim-title">${_('Modified')}</td>
-                    <% created_localized = h.get_with_timezone(result.file.created) %>
-                    <td>${h.format_short(created_localized)|n} ${_('by {}').format(result.file.owner.name)}</td>
-                </tr>
-            </table>
+            <div id='previewGenerator'></div>
+            <script src="${tg.url('/assets/js/previewGenerator.vendor.bundle.js')}" type="text/javascript"></script>
+            <script src="${tg.url('/assets/js/previewGenerator.app.entry.js')}" type="text/javascript"></script>
+            <script type="text/javascript">
+              <% created_localized = h.get_with_timezone(result.file.created) %>
+              (function initialisePreviewGenerator() {
+                previewGenerator(
+                  document.getElementById('previewGenerator'),
+                  'fr_FR',
+                  [
+                    % for one_url in url:
+                      '${one_url}',
+                    % endfor
+                  ],
+                  '${nb_page}',
+                  '/previews/__FILE_ID__/pages/__CURRENT_PAGE__/__DOWNLOAD_TYPE__?revision_id=__REVISION_ID__',
+                  {
+                    id: '${result.file.id}',
+                    name: '${result.file.file.name}',
+                    selectedRevision: '${result.file.selected_revision}',
+                    weight: '${h.user_friendly_file_size(result.file.file.size)}',
+                    height: '300',
+                    modifiedAt: '${h.format_short(created_localized)|n}',
+                    owner: '${result.file.owner.name}',
+                    sourceLink: '${download_url}',
+                    pdfAvailable: false // FIXME - Côme - 2017/07/24 - backend should return this information
+                  }
+                )
+              })()
+            </script>
         </div>
 
         <div class="t-half-spacer-above">

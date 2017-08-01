@@ -1,4 +1,11 @@
 /*
+ * Bootstrap overrides
+ */
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: 4px
+}
+
+/*
  * Base structure
  */
 

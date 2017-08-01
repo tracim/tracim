@@ -1559,6 +1559,10 @@ msgstr "Voir la dernière version"
 msgid "<b>This file is deprecated</b>"
 msgstr "<b>Ce fichier est obsolète</b>"
 
+#: tracim/templates/file/getone.mak:114
+msgid "Preview"
+msgstr "Prévisualisation"
+
 #: tracim/templates/file/getone.mak:83 tracim/templates/file/toolbar.mak:23
 msgid "Download the file"
 msgstr "Télécharger le fichier"
