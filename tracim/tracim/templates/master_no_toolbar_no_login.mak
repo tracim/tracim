@@ -29,7 +29,7 @@
         <![endif]-->
 
         <script>
-          globalTracimLang = ${h.get_lang()}
+          globalTracimLang = '${h.get_lang()}'
         </script>
     </head>
 
