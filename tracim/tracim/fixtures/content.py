@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from depot.io.utils import FileIntent
+
 from tracim import model
 from tracim.fixtures import Fixture
 from tracim.fixtures.users_and_groups import Test
@@ -96,7 +98,11 @@ class Content(Fixture):
             do_save=False,
         )
         w1f1d1_txt.file_extension = '.txt'
-        w1f1d1_txt.file_content = b'w1f1d1 content'
+        w1f1d1_txt.depot_file = FileIntent(
+            b'w1f1d1 content',
+            'w1f1d1.txt',
+            'text/plain',
+        )
         self._session.add(w1f1d1_txt)
         w1f1d2_html = content_api.create(
             content_type=ContentType.File,
@@ -106,7 +112,11 @@ class Content(Fixture):
             do_save=False,
         )
         w1f1d2_html.file_extension = '.html'
-        w1f1d2_html.file_content = b'<p>w1f1d2 content</p>'
+        w1f1d2_html.depot_file = FileIntent(
+            b'<p>w1f1d2 content</p>',
+            'w1f1d2.html',
+            'text/html',
+        )
         self._session.add(w1f1d2_html)
         w1f1f1 = content_api.create(
             content_type=ContentType.Folder,

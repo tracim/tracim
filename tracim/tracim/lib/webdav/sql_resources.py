@@ -5,6 +5,7 @@ import os
 
 import tg
 import transaction
+import typing
 import re
 from datetime import datetime
 from time import mktime
@@ -883,7 +884,7 @@ class File(DAVNonCollection):
         return "<DAVNonCollection: File (%d)>" % self.content.revision_id
 
     def getContentLength(self) -> int:
-        return len(self.content.file_content)
+        return self.content.depot_file.file.content_length
 
     def getContentType(self) -> str:
         return self.content.file_mimetype
@@ -897,9 +898,9 @@ class File(DAVNonCollection):
     def getLastModified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
-    def getContent(self):
+    def getContent(self) -> typing.BinaryIO:
         filestream = compat.BytesIO()
-        filestream.write(self.content.file_content)
+        filestream.write(self.content.depot_file.file.read())
         filestream.seek(0)
 
         return filestream
@@ -1028,13 +1029,13 @@ class HistoryFile(File):
 
     def getContent(self):
         filestream = compat.BytesIO()
-        filestream.write(self.content_revision.file_content)
+        filestream.write(self.content_revision.depot_file.file.read())
         filestream.seek(0)
 
         return filestream
 
     def getContentLength(self):
-        return len(self.content_revision.file_content)
+        return self.content_revision.depot_file.file.content_length
 
     def getContentType(self) -> str:
         return self.content_revision.file_mimetype

@@ -631,7 +631,7 @@ class TestContentApi(BaseTest, TestStandard):
                                                           updated.owner_id))
         eq_('this_is_a_page.html', updated.file_name)
         eq_('text/html', updated.file_mimetype)
-        eq_(b'<html>hello world</html>', updated.file_content)
+        eq_(b'<html>hello world</html>', updated.depot_file.file.read())
         eq_(ActionDescription.REVISION, updated.revision_type)
 
     def test_archive_unarchive(self):
