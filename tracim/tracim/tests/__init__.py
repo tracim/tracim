@@ -197,7 +197,7 @@ class TestStandard(object):
         logger.debug(self, 'Load extra fixtures... -> done')
 
         self.app.get('/_test_vars')  # Allow to create fake context
-        tg.i18n.set_lang('en')  # Set a default lang
+        tg.i18n.set_lang(['en', ])  # Set a default lang
 
     def tearDown(self):
         transaction.commit()

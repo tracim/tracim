@@ -19,7 +19,7 @@
             window.addEventListener("hashchange", shiftWindow);
             function load() { if (window.location.hash) shiftWindow(); }
 
-            globalTracimLang = 'fr_FR'
+            globalTracimLang = ${h.get_lang()}
         </script>
         <link rel="manifest" href="manifest.json?v=0.0.1" />
     </head>
