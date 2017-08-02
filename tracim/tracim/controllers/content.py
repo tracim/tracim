@@ -10,9 +10,6 @@ from cgi import FieldStorage
 from depot.manager import DepotManager
 from preview_generator.exception import PreviewGeneratorException
 from preview_generator.manager import PreviewManager
-from preview_generator.preview.builder.office__libreoffice import OfficePreviewBuilderLibreoffice
-from preview_generator.preview.builder.pdf__pypdf2 import PdfPreviewBuilderPyPDF2
-from preview_generator.preview.builder.plain_text import PlainTextPreviewBuilder
 from sqlalchemy.orm.exc import NoResultFound
 import tg
 from tg import abort
@@ -221,11 +218,15 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             revision_id = file.revision_id
 
         file_path = content_api.get_one_revision_filepath(revision_id)
+
         nb_page = 0
         try:
             nb_page = preview_manager.get_page_nb(file_path=file_path)
-        except PreviewGeneratorException:
-            pass
+        except PreviewGeneratorException as e:
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            msg_str = _('Sorry... No preview for {}: {}')  # type: str
+            msg = msg_str.format(file.file_name, str(e))  # type: str
+            tg.flash(msg, CST.STATUS_ERROR)
         preview_urls = []
         for page in range(int(nb_page)):
             url_str = '/previews/{}/pages/{}?revision_id={}'
@@ -234,14 +235,18 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                                  revision_id)
             preview_urls.append(url)
 
-        pdf_ready_mimetypes = []  # type: List[str]
-        pdf_ready_mimetypes = \
-            OfficePreviewBuilderLibreoffice.get_supported_mimetypes() + \
-            PdfPreviewBuilderPyPDF2.get_supported_mimetypes() + \
-            PlainTextPreviewBuilder.get_supported_mimetypes()
-        enable_pdf_buttons = \
-            file.file_mimetype in pdf_ready_mimetypes  # type: bool
-        pdf_available = str(enable_pdf_buttons).lower()  # type: str
+        pdf_available = 'false'  # type: str
+        try:
+            enable_pdf_buttons = \
+                preview_manager.has_pdf_preview(
+                    file_path=file_path,
+                )  # type: bool
+            pdf_available = str(enable_pdf_buttons).lower()
+        except PreviewGeneratorException as e:
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            msg_str = _('Sorry... No PDF downloads for {}: {}')  # type: str
+            msg = msg_str.format(file.file_name, str(e))  # type: str
+            tg.flash(msg, CST.STATUS_ERROR)
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb,
