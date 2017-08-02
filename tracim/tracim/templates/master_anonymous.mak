@@ -14,7 +14,7 @@
         <link href="${tg.url('/assets/dist/all.css')}" rel="stylesheet">
 
         <script>
-          globalTracimLang = ${h.get_lang()}
+          globalTracimLang = '${h.get_lang()}'
         </script>
     </head>
 
