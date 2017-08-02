@@ -223,10 +223,9 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         try:
             nb_page = preview_manager.get_page_nb(file_path=file_path)
         except PreviewGeneratorException as e:
+            # INFO - A.P - Silently intercepts preview exception
+            # As preview generation isn't mandatory, just register it
             logger.debug(self, 'Exception: {}'.format(e.__str__))
-            msg_str = _('Sorry... No preview for {}: {}')  # type: str
-            msg = msg_str.format(file.file_name, str(e))  # type: str
-            tg.flash(msg, CST.STATUS_ERROR)
         preview_urls = []
         for page in range(int(nb_page)):
             url_str = '/previews/{}/pages/{}?revision_id={}'
@@ -235,18 +234,15 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                                  revision_id)
             preview_urls.append(url)
 
-        pdf_available = 'false'  # type: str
+        enable_pdf_buttons = False  # type: bool
         try:
             enable_pdf_buttons = \
-                preview_manager.has_pdf_preview(
-                    file_path=file_path,
-                )  # type: bool
-            pdf_available = str(enable_pdf_buttons).lower()
+                preview_manager.has_pdf_preview(file_path=file_path)
         except PreviewGeneratorException as e:
+            # INFO - A.P - Silently intercepts preview exception
+            # As preview generation isn't mandatory, just register it
             logger.debug(self, 'Exception: {}'.format(e.__str__))
-            msg_str = _('Sorry... No PDF downloads for {}: {}')  # type: str
-            msg = msg_str.format(file.file_name, str(e))  # type: str
-            tg.flash(msg, CST.STATUS_ERROR)
+        pdf_available = str(enable_pdf_buttons).lower()
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb,
