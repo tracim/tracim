@@ -242,7 +242,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             # INFO - A.P - Silently intercepts preview exception
             # As preview generation isn't mandatory, just register it
             logger.debug(self, 'Exception: {}'.format(e.__str__))
-        pdf_available = str(enable_pdf_buttons).lower()  # type: str
+        pdf_available = 'true' if enable_pdf_buttons else 'false'  # type: str
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb,
