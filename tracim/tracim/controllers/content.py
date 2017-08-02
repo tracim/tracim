@@ -10,6 +10,9 @@ from cgi import FieldStorage
 from depot.manager import DepotManager
 from preview_generator.exception import PreviewGeneratorException
 from preview_generator.manager import PreviewManager
+from preview_generator.preview.builder.office__libreoffice import OfficePreviewBuilderLibreoffice
+from preview_generator.preview.builder.pdf__pypdf2 import PdfPreviewBuilderPyPDF2
+from preview_generator.preview.builder.plain_text import PlainTextPreviewBuilder
 from sqlalchemy.orm.exc import NoResultFound
 import tg
 from tg import abort
@@ -18,6 +21,7 @@ from tg import require
 from tg import predicates
 from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
+from typing import List
 
 from tracim.controllers import TIMRestController
 from tracim.controllers import StandardController
@@ -230,6 +234,15 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                                  revision_id)
             preview_urls.append(url)
 
+        pdf_ready_mimetypes = []  # type: List[str]
+        pdf_ready_mimetypes = \
+            OfficePreviewBuilderLibreoffice.get_supported_mimetypes() + \
+            PdfPreviewBuilderPyPDF2.get_supported_mimetypes() + \
+            PlainTextPreviewBuilder.get_supported_mimetypes()
+        enable_pdf_buttons = \
+            file.file_mimetype in pdf_ready_mimetypes  # type: bool
+        pdf_available = str(enable_pdf_buttons).lower()  # type: str
+
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb,
                                          current_user=current_user_content)
@@ -240,7 +253,8 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         result = DictLikeClass(result=dictified_file,
                                fake_api=fake_api,
                                nb_page=nb_page,
-                               url=preview_urls)
+                               url=preview_urls,
+                               pdf_available=pdf_available)
         return result
 
     @tg.require(current_user_is_reader())
