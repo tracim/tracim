@@ -218,7 +218,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         file_path = content_api.get_one_revision_filepath(revision_id)
         nb_page = 0
         try:
-            nb_page = preview_manager.get_nb_page(file_path=file_path)
+            nb_page = preview_manager.get_page_nb(file_path=file_path)
         except:
             pass
         preview_urls = []

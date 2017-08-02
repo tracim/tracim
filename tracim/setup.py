@@ -91,7 +91,7 @@ setup(
         ]
     },
     dependency_links=[
-        "http://tg.gy/230",
+        'http://github.com/algoo/preview-generator/tarball/master#egg=preview_generator-1.0',
         ],
     zip_safe=False
 )
