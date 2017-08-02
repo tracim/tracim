@@ -107,24 +107,19 @@
                     % endif
                 </div>
                 <div class="col-md-8 text-right">
-                    % if len(fake_api.sub_items) > 0:
-                        ## INFO - D.A. - 2015-05-25
-                        ## We hide filtering/search buttons if no content yet.
-                        ## This make the interface more easy to use
-                        <div class="btn-group" role="group" aria-label="...">
-                            ${BUTTON.TEXT('', 'btn btn-default disabled', _('hide...'))}
+                    <div class="btn-group" role="group" aria-label="...">
+                        ${BUTTON.TEXT('', 'btn btn-default disabled', _('hide...'))}
 
-                            % for content_type in result.folder.allowed_content_types:
-                                ${BUTTON.TEXT('toggle-{type}-visibility'.format(type=content_type.id), 'btn btn-default t-active-color disabled-has-priority', content_type.label)}
-                            % endfor
-                        </div>
-                        <p></p>
-                        ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}/folders/{}'.format(result.folder.workspace.id, result.folder.id)))}
-                        <p></p>
-                        <div class="btn-group" role="group" aria-label="...">
-                            <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('filter...')}" aria-describedby="basic-addon1">
-                        </div>
-                    % endif
+                        % for content_type in result.folder.allowed_content_types:
+                            ${BUTTON.TEXT('toggle-{type}-visibility'.format(type=content_type.id), 'btn btn-default t-active-color disabled-has-priority', content_type.label)}
+                        % endfor
+                    </div>
+                    <p></p>
+                    ${UI.GENERIC_DISPLAY_VIEW_BUTTONS_CONTAINER(tg.url('/workspaces/{}/folders/{}'.format(result.folder.workspace.id, result.folder.id)))}
+                    <p></p>
+                    <div class="btn-group" role="group" aria-label="...">
+                        <input id="filtering"  type="text" class="form-control t-bg-grey" placeholder="${_('filter...')}" aria-describedby="basic-addon1">
+                    </div>
                 </div>
             </div>
         </div>
