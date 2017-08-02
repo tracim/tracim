@@ -1,6 +1,7 @@
 import tg
 from tg import expose
 from tg import tmpl_context
+from preview_generator.exception import PreviewGeneratorException
 from preview_generator.manager import PreviewManager
 
 from tracim.config.app_cfg import CFG
@@ -49,9 +50,10 @@ class PagesController(TIMRestController):
                                                     height=size,
                                                     width=size)
             with open(path, 'rb') as large:
-                return large.read()
-        except:
-            pass
+                result = large.read()
+        except PreviewGeneratorException:
+            result = None
+        return result
 
     @expose(content_type='image/jpeg')
     def high_quality(self,

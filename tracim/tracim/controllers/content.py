@@ -8,6 +8,7 @@ import traceback
 
 from cgi import FieldStorage
 from depot.manager import DepotManager
+from preview_generator.exception import PreviewGeneratorException
 from preview_generator.manager import PreviewManager
 from sqlalchemy.orm.exc import NoResultFound
 import tg
@@ -219,7 +220,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         nb_page = 0
         try:
             nb_page = preview_manager.get_page_nb(file_path=file_path)
-        except:
+        except PreviewGeneratorException:
             pass
         preview_urls = []
         for page in range(int(nb_page)):
