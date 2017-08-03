@@ -8,6 +8,7 @@ import traceback
 
 from cgi import FieldStorage
 from depot.manager import DepotManager
+from preview_generator.exception import PreviewGeneratorException
 from preview_generator.manager import PreviewManager
 from sqlalchemy.orm.exc import NoResultFound
 import tg
@@ -17,6 +18,7 @@ from tg import require
 from tg import predicates
 from tg.i18n import ugettext as _
 from tg.predicates import not_anonymous
+from typing import List
 
 from tracim.controllers import TIMRestController
 from tracim.controllers import StandardController
@@ -216,7 +218,14 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             revision_id = file.revision_id
 
         file_path = content_api.get_one_revision_filepath(revision_id)
-        nb_page = preview_manager.get_nb_page(file_path=file_path)
+
+        nb_page = 0
+        try:
+            nb_page = preview_manager.get_page_nb(file_path=file_path)
+        except PreviewGeneratorException as e:
+            # INFO - A.P - Silently intercepts preview exception
+            # As preview generation isn't mandatory, just register it
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
         preview_urls = []
         for page in range(int(nb_page)):
             url_str = '/previews/{}/pages/{}?revision_id={}'
@@ -224,6 +233,16 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                                  page,
                                  revision_id)
             preview_urls.append(url)
+
+        enable_pdf_buttons = False  # type: bool
+        try:
+            enable_pdf_buttons = \
+                preview_manager.has_pdf_preview(file_path=file_path)
+        except PreviewGeneratorException as e:
+            # INFO - A.P - Silently intercepts preview exception
+            # As preview generation isn't mandatory, just register it
+            logger.debug(self, 'Exception: {}'.format(e.__str__))
+        pdf_available = 'true' if enable_pdf_buttons else 'false'  # type: str
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
         fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb,
@@ -235,7 +254,8 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         result = DictLikeClass(result=dictified_file,
                                fake_api=fake_api,
                                nb_page=nb_page,
-                               url=preview_urls)
+                               url=preview_urls,
+                               pdf_available=pdf_available)
         return result
 
     @tg.require(current_user_is_reader())
