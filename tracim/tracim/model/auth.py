@@ -250,7 +250,7 @@ class User(DeclarativeBase):
          remove @xxx.xxx part of email in returned value
         :return: display name based on user name or email.
         """
-        if self.display_name!=None and self.display_name!='':
+        if self.display_name != None and self.display_name != '':
             return self.display_name
         else:
             if remove_email_part:
