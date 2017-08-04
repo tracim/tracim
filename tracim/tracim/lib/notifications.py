@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -204,7 +205,7 @@ class EmailNotifier(object):
         )
 
         return '{0} {1} <{2}>'.format(
-            user.display_name,
+            Header(user.display_name).encode(),
             'via Tracim',
             arranged_email,
         )
