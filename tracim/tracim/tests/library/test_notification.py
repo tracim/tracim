@@ -10,6 +10,7 @@ import transaction
 
 from tracim.config.app_cfg import CFG
 from tracim.lib.notifications import DummyNotifier
+from tracim.lib.notifications import EmailNotifier
 from tracim.lib.notifications import EST
 from tracim.lib.notifications import NotifierFactory
 from tracim.lib.notifications import RealNotifier
@@ -47,3 +48,51 @@ class TestDummyNotifier(TestStandard):
         ok_('{workspace_label}' in tags)
         ok_('{content_label}' in tags)
         ok_('{content_status_label}' in tags)
+
+
+class TestEmailNotifier(TestStandard):
+    def test_email_notifier__build_name_with_user_id(self):
+        u = User()
+        u.user_id = 3
+        u.display_name = 'François Michâlié'
+
+        config = CFG.get_instance()
+        config.EMAIL_NOTIFICATION_FROM_EMAIL = 'noreply+{user_id}@tracim.io'
+
+        notifier = EmailNotifier(smtp_config=None, global_config=config)
+        email = notifier._get_sender(user=u)
+        eq_('=?utf-8?q?Fran=C3=A7ois_Mich=C3=A2li=C3=A9_via_Tracim?= <noreply+3@tracim.io>', email)  # nopep8
+
+    def test_email_notifier__build_name_without_user_id(self):
+        u = User()
+        u.user_id = 3
+        u.display_name = 'François Michâlié'
+
+        config = CFG.get_instance()
+        config.EMAIL_NOTIFICATION_FROM_EMAIL = 'noreply@tracim.io'
+
+        notifier = EmailNotifier(smtp_config=None, global_config=config)
+        email = notifier._get_sender(user=u)
+        eq_('=?utf-8?q?Fran=C3=A7ois_Mich=C3=A2li=C3=A9_via_Tracim?= <noreply@tracim.io>', email)  # nopep8
+
+    def test_email_notifier__build_name_with_user_id_wrong_syntax(self):
+        u = User()
+        u.user_id = 3
+        u.display_name = 'François Michâlié'
+
+        config = CFG.get_instance()
+        config.EMAIL_NOTIFICATION_FROM_EMAIL = 'noreply+{userid}@tracim.io'
+
+        notifier = EmailNotifier(smtp_config=None, global_config=config)
+        email = notifier._get_sender(user=u)
+        eq_('=?utf-8?q?Fran=C3=A7ois_Mich=C3=A2li=C3=A9_via_Tracim?= <noreply+{userid}@tracim.io>', email)  # nopep8
+
+    def test_email_notifier__build_name_with_no_user(self):
+        config = CFG.get_instance()
+        config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = 'Robot'
+        config.EMAIL_NOTIFICATION_FROM_EMAIL = 'noreply@tracim.io'
+
+        notifier = EmailNotifier(smtp_config=None, global_config=config)
+        email = notifier._get_sender()
+        eq_('Robot <noreply@tracim.io>', email)
+

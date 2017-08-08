@@ -168,6 +168,7 @@ class EST(object):
             cls.WORKSPACE_LABEL
         ]
 
+
 class EmailNotifier(object):
 
     """
@@ -188,26 +189,25 @@ class EmailNotifier(object):
         :param user: user to extract display name
         :return: sender string
         """
-        if user is None:
-            return '{0} <{1}>'.format(
-                self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
-                self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
-            )
 
-        # We add a suffix to email to prevent client like Thunderbird to
-        # display personal adressbook label.
-        email = self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL
-        email_name, domain = email.split('@')
-        arranged_email = '{0}+{1}@{2}'.format(
-            email_name,
-            str(user.user_id),
-            domain,
-        )
+        email_template = self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL
+        mail_sender_name = self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL  # nopep8
+        if user:
+            mail_sender_name = '{name} via Tracim'.format(name=user.display_name)
+            email_address = email_template.replace('{user_id}', str(user.user_id))
+            # INFO - D.A. - 2017-08-04
+            # We use email_template.replace() instead of .format() because this
+            # method is more robust to errors in config file.
+            #
+            # For example, if the email is info+{userid}@tracim.fr
+            # email.format(user_id='bob') will raise an exception
+            # email.replace('{user_id}', 'bob') will just ignore {userid}
+        else:
+            email_address = email_template.replace('{user_id}', '0')
 
-        return '{0} {1} <{2}>'.format(
-            Header(user.display_name).encode(),
-            'via Tracim',
-            arranged_email,
+        return '{label} <{email_address}>'.format(
+            label = Header(mail_sender_name).encode(),
+            email_address = email_address
         )
 
     def notify_content_update(self, event_actor_id: int, event_content_id: int):
