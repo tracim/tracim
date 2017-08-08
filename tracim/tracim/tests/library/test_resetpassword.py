@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
+
+import sys
+
 from nose.tools import assert_raises
 from resetpassword.lib import _plain_send_mail
 
 from tracim.tests import TestStandard
 
+
 class TestSerializers(TestStandard):
     application_under_test = 'nosmtp'
 
     def test_unit__plain_send_mail__ok(self):
-        import sys
         if sys.version_info >= (3, 5):
             from smtplib import SMTPNotSupportedError
 
