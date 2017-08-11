@@ -220,35 +220,47 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         file_path = content_api.get_one_revision_filepath(revision_id)
 
         nb_page = 0
+        enable_pdf_buttons = False  # type: bool
+        preview_urls = []
+
         try:
             nb_page = preview_manager.get_page_nb(file_path=file_path)
-        except PreviewGeneratorException as e:
-            # INFO - A.P - Silently intercepts preview exception
-            # As preview generation isn't mandatory, just register it
-            logger.debug(self, 'Exception: {}'.format(e.__str__))
-        preview_urls = []
-        for page in range(int(nb_page)):
-            url_str = '/previews/{}/pages/{}?revision_id={}'
-            url = url_str.format(file_id,
-                                 page,
-                                 revision_id)
-            preview_urls.append(url)
+            for page in range(int(nb_page)):
+                url_str = '/previews/{}/pages/{}?revision_id={}'
+                url = url_str.format(file_id,
+                                     page,
+                                     revision_id)
+                preview_urls.append(url)
 
-        enable_pdf_buttons = False  # type: bool
-        try:
             enable_pdf_buttons = \
                 preview_manager.has_pdf_preview(file_path=file_path)
+
         except PreviewGeneratorException as e:
             # INFO - A.P - Silently intercepts preview exception
             # As preview generation isn't mandatory, just register it
-            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            logger.debug(
+                self,
+                'Preview Generator Exception: {}'.format(e.__str__)
+            )
+        except Exception as e:
+            # INFO - D.A - 2017-08-11 - Make Tracim robust to pg exceptions
+            # Preview generator may potentially raise any type of exception
+            # so we prevent user interface crashes by catching all exceptions
+            logger.error(
+                self,
+                'Preview Generator Generic Exception: {}'.format(e.__str__)
+            )
+
         pdf_available = 'true' if enable_pdf_buttons else 'false'  # type: str
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
-        fake_api_content = DictLikeClass(breadcrumb=fake_api_breadcrumb,
-                                         current_user=current_user_content)
-        fake_api = Context(CTX.FOLDER,
-                           current_user=user).toDict(fake_api_content)
+        fake_api_content = DictLikeClass(
+            breadcrumb=fake_api_breadcrumb,
+            current_user=current_user_content
+        )
+        fake_api = Context(CTX.FOLDER, current_user=user)\
+            .toDict(fake_api_content)
+
         dictified_file = Context(self._get_one_context,
                                  current_user=user).toDict(file, 'file')
         result = DictLikeClass(result=dictified_file,
