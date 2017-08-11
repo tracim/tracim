@@ -151,7 +151,7 @@
     % else:
         % if h.user_role(fake_api.current_user, result.file.workspace)<=1: # User must be a contributor to be allowed to upload files
             ${WIDGETS.SECURED_SECTION_TITLE(fake_api.current_user, result.file.workspace, 'file-revisions', _('File revisions'))}
-            <p>${_('This file contains {} revision(s)').format(sum(1 for revision in result.file.revisions if revision.action.id=='revision'))}</p>
+            <p>${_('This file contains {} revision(s)').format(result.file.revision_nb)}</p>
         % else:
             % if (h.user_role(fake_api.current_user, result.file.workspace)>1 and not result.file.is_archived and not result.file.is_deleted):
                 ${BUTTON.DATA_TARGET_AS_TEXT('new-file-revision', _('upload a new revision and/or comment...'), 'btn btn-success t-spacer-below')}
