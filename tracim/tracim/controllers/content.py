@@ -241,7 +241,19 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         except PreviewGeneratorException as e:
             # INFO - A.P - Silently intercepts preview exception
             # As preview generation isn't mandatory, just register it
-            logger.debug(self, 'Exception: {}'.format(e.__str__))
+            logger.debug(
+                self,
+                'Preview Generator Exception: {}'.format(e.__str__)
+            )
+        except Exception as e:
+            # INFO - D.A - 2017-08-11 - Make Tracim robust to pg exceptions
+            # Preview generator may potentially raise any type of exception
+            # so we prevent user interface crashes by catching all exceptions
+            logger.error(
+                self,
+                'Preview Generator Generic Exception: {}'.format(e.__str__)
+            )
+
         pdf_available = 'true' if enable_pdf_buttons else 'false'  # type: str
 
         fake_api_breadcrumb = self.get_breadcrumb(file_id)
