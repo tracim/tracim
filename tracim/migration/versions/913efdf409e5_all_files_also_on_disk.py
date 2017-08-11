@@ -14,6 +14,7 @@ from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 import sqlalchemy as sa
+from sqlalchemy.sql.expression import func
 
 # revision identifiers, used by Alembic.
 revision = '913efdf409e5'
@@ -61,7 +62,8 @@ def upgrade():
     delete_files_on_disk(connection=connection)
     select_query = revision_helper.select() \
         .where(revision_helper.c.type == 'file') \
-        .where(revision_helper.c.depot_file.is_(None))
+        .where(revision_helper.c.depot_file.is_(None)) \
+        .where(func.length(revision_helper.c.file_content) > 0)
     files = connection.execute(select_query).fetchall()
     for file in files:
         file_filename = '{0}{1}'.format(
