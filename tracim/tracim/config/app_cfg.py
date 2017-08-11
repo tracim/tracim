@@ -129,7 +129,7 @@ def start_daemons(manager: DaemonsManager):
 
 def configure_depot():
     """Configure Depot."""
-    depot_storage_name = 'tracim'
+    depot_storage_name = CFG.get_instance().DEPOT_STORAGE_NAME
     depot_storage_path = CFG.get_instance().DEPOT_STORAGE_DIR
     depot_storage_settings = {'depot.storage_path': depot_storage_path}
     DepotManager.configure(
@@ -217,6 +217,14 @@ class CFG(object):
         if not self.DEPOT_STORAGE_DIR:
             raise Exception(
                 'ERROR: depot_storage_dir configuration is mandatory. '
+                'Set it before continuing.'
+            )
+        self.DEPOT_STORAGE_NAME = tg.config.get(
+            'depot_storage_name',
+        )
+        if not self.DEPOT_STORAGE_NAME:
+            raise Exception(
+                'ERROR: depot_storage_name configuration is mandatory. '
                 'Set it before continuing.'
             )
         self.PREVIEW_CACHE_DIR = tg.config.get(
