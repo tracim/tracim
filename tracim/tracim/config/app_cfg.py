@@ -230,6 +230,11 @@ class CFG(object):
         self.PREVIEW_CACHE_DIR = tg.config.get(
             'preview_cache_dir',
         )
+        if not self.PREVIEW_CACHE_DIR:
+            raise Exception(
+                'ERROR: preview_cache_dir configuration is mandatory. '
+                'Set it before continuing.'
+            )
 
         self.DATA_UPDATE_ALLOWED_DURATION = int(tg.config.get(
             'content.update.allowed.duration',
