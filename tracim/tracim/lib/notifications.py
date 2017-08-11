@@ -375,6 +375,18 @@ class EmailNotifier(object):
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
                     content.description
 
+        elif ActionDescription.STATUS_UPDATE == action:
+            call_to_action_text = l_('View online')
+            intro_user_msg = l_(
+                '<span id="content-intro-username">{}</span> '
+                'updated the following status:'
+            )
+            content_intro = intro_user_msg.format(actor.display_name)
+            intro_body_msg = '<p id="content-body-intro">{}: {}</p>'
+            content_text = intro_body_msg.format(
+                content.get_label(),
+                content.get_status().label,
+            )
 
         if '' == content_intro and content_text == '':
             # Skip notification, but it's not normal

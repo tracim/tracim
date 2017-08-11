@@ -355,6 +355,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                                  file_data.file.read())
             # Display error page to user if chosen label is in conflict
             if not self._path_validation.validate_new_content(file):
+                DBSession.rollback()
                 return render_invalid_integrity_chosen_path(
                     file.get_label_as_file(),
                 )
@@ -567,6 +568,7 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
             page.description = content
 
             if not self._path_validation.validate_new_content(page):
+                DBSession.rollback()
                 return render_invalid_integrity_chosen_path(
                     page.get_label(),
                 )
@@ -683,19 +685,19 @@ class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController)
                                 workspace,
                                 tmpl_context.folder,
                                 label)
-            # FIXME - DO NOT DUPLCIATE FIRST MESSAGE
-            # thread.description = content
-            api.save(thread, ActionDescription.CREATION, do_notify=False)
-
-            comment = api.create(ContentType.Comment, workspace, thread, label)
-            comment.label = ''
-            comment.description = content
 
             if not self._path_validation.validate_new_content(thread):
+                DBSession.rollback()
                 return render_invalid_integrity_chosen_path(
                     thread.get_label(),
                 )
 
+        # FIXME - DO NOT DUPLICATE FIRST MESSAGE
+        # thread.description = content
+        api.save(thread, ActionDescription.CREATION, do_notify=False)
+        comment = api.create(ContentType.Comment, workspace, thread, label)
+        comment.label = ''
+        comment.description = content
         api.save(comment, ActionDescription.COMMENT, do_notify=False)
         api.do_notify(thread)
 
@@ -1020,6 +1022,7 @@ class UserWorkspaceFolderRestController(TIMRestControllerWithBreadcrumb):
                 api.set_allowed_content(folder, subcontent)
 
                 if not self._path_validation.validate_new_content(folder):
+                    DBSession.rollback()
                     return render_invalid_integrity_chosen_path(
                         folder.get_label(),
                     )

@@ -456,14 +456,3 @@ class UserRestController(TIMRestController):
         if next_url=='user':
             tg.redirect(self.url(id=user.user_id))
         tg.redirect(self.url())
-
-
-    @tg.require(predicates.in_group(Group.TIM_USER_GROUPNAME))
-    @tg.expose('tracim.templates.user_profile')
-    def me(self):
-        current_user = tmpl_context.current_user
-
-        current_user_content = Context(CTX.CURRENT_USER).toDict(current_user)
-        fake_api = Context(CTX.ADMIN_WORKSPACE).toDict({'current_user': current_user_content})
-
-        return DictLikeClass(fake_api=fake_api)

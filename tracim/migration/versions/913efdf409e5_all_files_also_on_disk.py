@@ -8,12 +8,14 @@ Create Date: 2017-07-12 15:44:20.568447
 
 import shutil
 
+from alembic import context
 from alembic import op
 from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 import sqlalchemy as sa
+from sqlalchemy.sql.expression import func
 
 # revision identifiers, used by Alembic.
 revision = '913efdf409e5'
@@ -33,6 +35,17 @@ revision_helper = sa.Table(
 )
 
 
+def configure_depot():
+    """Configure Depot."""
+    depot_storage_name = context.config.get_main_option('depot_storage_name')
+    depot_storage_path = context.config.get_main_option('depot_storage_dir')
+    depot_storage_settings = {'depot.storage_path': depot_storage_path}
+    DepotManager.configure(
+        depot_storage_name,
+        depot_storage_settings,
+    )
+
+
 def delete_files_on_disk(connection: sa.engine.Connection):
     """Deletes files from disk and their references in database."""
     delete_query = revision_helper.update() \
@@ -40,7 +53,8 @@ def delete_files_on_disk(connection: sa.engine.Connection):
         .where(revision_helper.c.depot_file.isnot(None)) \
         .values(depot_file=None)
     connection.execute(delete_query)
-    shutil.rmtree('depot/', ignore_errors=True)
+    depot_storage_path = context.config.get_main_option('depot_storage_dir')
+    shutil.rmtree(depot_storage_path, ignore_errors=True)
 
 
 def upgrade():
@@ -54,14 +68,13 @@ def upgrade():
     - create all files on disk from database.
     """
     # Creates files depot used in this migration
-    DepotManager.configure(
-        'tracim', {'depot.storage_path': 'depot/'},
-    )
+    configure_depot()
     connection = op.get_bind()
     delete_files_on_disk(connection=connection)
     select_query = revision_helper.select() \
         .where(revision_helper.c.type == 'file') \
-        .where(revision_helper.c.depot_file.is_(None))
+        .where(revision_helper.c.depot_file.is_(None)) \
+        .where(func.length(revision_helper.c.file_content) > 0)
     files = connection.execute(select_query).fetchall()
     for file in files:
         file_filename = '{0}{1}'.format(
@@ -76,8 +89,7 @@ def upgrade():
         depot_file_field = UploadedFile(depot_file_intent, 'tracim')
         update_query = revision_helper.update() \
             .where(revision_helper.c.revision_id == file.revision_id) \
-            .values(depot_file=depot_file_field) \
-            .return_defaults()
+            .values(depot_file=depot_file_field)
         connection.execute(update_query)
 
 
