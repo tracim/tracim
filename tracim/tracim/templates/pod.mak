@@ -56,7 +56,7 @@
             menubar:false,
             statusbar:true,
             plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker" ],
-            language: globalTracimLang === 'en_US' ? 'en' : globalTracimLang, // tinymce does't accept en_US as language, it is its default value named 'en'
+            language: globalTracimLang === 'fr' ? 'fr_FR' : globalTracimLang, // tinymce does't accept en_US as language, it is its default value named 'en'
             skin : 'tracim',
             selector:'${selector}',
             toolbar: [
