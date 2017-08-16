@@ -32,7 +32,20 @@ If you changed the file, reload `PostgreSQL`:
 
 #### Creating a user and associated database ####
 
-You need a database and associated user/password. Tracim comes with `pgtool`, tool that will make this step easy:
+##### With `psql`, the `PostgreSQL` interactive terminal
+
+    sudo --user=postgres psql \
+         --command='CREATE USER tracimuser WITH PASSWORD tracimpassword;' \
+         --command='CREATE DATABASE tracimdb OWNER TO tracimuser;'
+[//]: # (The following lines should only be necessary to fix permissions on an existing database:)
+[//]: # (    sudo --user=postgres psql \)
+[//]: # (         --dbname=tracimdb \)
+[//]: # (         --command='GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;' \)
+[//]: # (         --command='GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;')
+
+##### With `pgtool`
+
+Tracim comes with `pgtool` to ease this step:
 
     ./bin/pgtool help
 
@@ -44,13 +57,11 @@ Run the following self explanatory commands:
     ./bin/pgtool grant_all_privileges tracimdb tracimuser
     exit
 
-#### Test the database access ####
-
-So, now you have a database and an associated user/password. A good habit is to test things before to use them, that's why we want to test the database access. This is easily done with Tracim `pgtool`:
+Test the database access:
 
     ./bin/pgtool test_connection tracimdb tracimuser tracimpassword 127.0.0.1
 
-The result is similar to the following :
+Success output:
 
     PG # CONNECT TO DATABASE
     ------------------------
@@ -63,7 +74,7 @@ The result is similar to the following :
      2014-11-10 09:40:23.306199+01
     (1 row)
 
-In case of failure, you would get something like this:
+Failure output:
 
     PG # CONNECT TO DATABASE
     ------------------------
@@ -75,7 +86,7 @@ In case of failure, you would get something like this:
     FATAL:  password authentication failed for user "bibi"
     ERRROR
 
-In this case, delete the user and database you previously created, using `pgtool`, and do it again. Do not forget to run the `grant_all_rights` command!
+In this case, delete the user and database you previously created using `pgtool`, and do it again.
 
 ## MySQL ##
 
