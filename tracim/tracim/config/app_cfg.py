@@ -211,21 +211,21 @@ class CFG(object):
 
     def __init__(self):
         """Parse configuration file."""
+        mandatory_msg = \
+            'ERROR: {} configuration is mandatory. Set it before continuing.'
         self.DEPOT_STORAGE_DIR = tg.config.get(
             'depot_storage_dir',
         )
         if not self.DEPOT_STORAGE_DIR:
             raise Exception(
-                'ERROR: depot_storage_dir configuration is mandatory. '
-                'Set it before continuing.'
+                mandatory_msg.format('depot_storage_dir')
             )
         self.DEPOT_STORAGE_NAME = tg.config.get(
             'depot_storage_name',
         )
         if not self.DEPOT_STORAGE_NAME:
             raise Exception(
-                'ERROR: depot_storage_name configuration is mandatory. '
-                'Set it before continuing.'
+                mandatory_msg.format('depot_storage_name')
             )
         self.PREVIEW_CACHE_DIR = tg.config.get(
             'preview_cache_dir',
@@ -382,8 +382,11 @@ class CFG(object):
         ))
         self.RADICALE_SERVER_FILE_SYSTEM_FOLDER = tg.config.get(
             'radicale.server.filesystem.folder',
-            './radicale/collections',
         )
+        if not self.RADICALE_SERVER_FILE_SYSTEM_FOLDER:
+            raise Exception(
+                mandatory_msg.format('radicale.server.filesystem.folder')
+            )
         self.RADICALE_SERVER_ALLOW_ORIGIN = tg.config.get(
             'radicale.server.allow_origin',
             None,
@@ -404,7 +407,10 @@ class CFG(object):
 
         self.RADICALE_CLIENT_BASE_URL_HOST = tg.config.get(
             'radicale.client.base_url.host',
-            None,
+            'http://{}:{}'.format(
+                self.RADICALE_SERVER_HOST,
+                self.RADICALE_SERVER_PORT,
+            ),
         )
 
         self.RADICALE_CLIENT_BASE_URL_PREFIX = tg.config.get(
