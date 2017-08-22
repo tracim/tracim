@@ -8,7 +8,7 @@ from resetpassword.lib import _plain_send_mail
 from tracim.tests import TestStandard
 
 
-class TestSerializers(TestStandard):
+class TestResetPassword(TestStandard):
     application_under_test = 'nosmtp'
 
     def test_unit__plain_send_mail__ok(self):
