@@ -60,6 +60,9 @@ tracim/data/
 # file depot
 tracim/depot/
 
+# radicale
+tracim/radicale/
+
 # Site-local config file
 development.ini
 track.js
