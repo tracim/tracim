@@ -100,8 +100,14 @@ class PagesController(TIMRestController):
             file_path = content_api.get_one_revision_filepath(file.revision_id)
         path = preview_manager.get_pdf_preview(file_path=file_path,
                                                page=page)
+        file_suffix = ''
+        if page > -1:
+            file_suffix = '.page-{}'.format(page + 1)
         tg.response.headers['Content-Disposition'] = \
-            'attachment; filename="{}"'.format(file.file_name)
+            'attachment; filename="{}{}.pdf"'.format(
+                file.label,
+                file_suffix,
+            )
         with open(path, 'rb') as pdf:
             return pdf.read()
 
