@@ -53,7 +53,8 @@ class TestContent(TestStandard):
             .join(ContentRevisionRO, and_(Content.id == ContentRevisionRO.content_id,
                                           ContentRevisionRO.revision_id == join_sub_query))
 
-        eq_(2, base_query.count())
+        pattern = 'TEST_CONTENT_DESCRIPTION_%_UPDATED'
+        eq_(2, base_query.filter(Content.description.like(pattern)).count())
 
         eq_(1, base_query.filter(Content.workspace == workspace1).count())
         eq_(1, base_query.filter(Content.workspace == workspace2).count())
