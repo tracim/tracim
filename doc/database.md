@@ -35,13 +35,13 @@ If you changed the file, reload `PostgreSQL`:
 ##### With `psql`, the `PostgreSQL` interactive terminal
 
     sudo --user=postgres psql \
-         --command='CREATE USER tracimuser WITH PASSWORD tracimpassword;' \
-         --command='CREATE DATABASE tracimdb OWNER TO tracimuser;'
-[//]: # (The following lines should only be necessary to fix permissions on an existing database:)
+         --command="CREATE USER tracimuser WITH PASSWORD 'tracimpassword';" \
+         --command="CREATE DATABASE tracimdb OWNER tracimuser;"
+[//]: # (The following lines are only necessary to fix permissions on an existing database:)
 [//]: # (    sudo --user=postgres psql \)
 [//]: # (         --dbname=tracimdb \)
-[//]: # (         --command='GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;' \)
-[//]: # (         --command='GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;')
+[//]: # (         --command="GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;" \)
+[//]: # (         --command="GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;")
 
 ##### With `pgtool`
 
