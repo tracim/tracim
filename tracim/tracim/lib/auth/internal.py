@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import Dict
 
-from sqlalchemy import and_
 from tg.configuration.auth import TGAuthMetadata
 
 from tracim.lib.auth.base import Auth
@@ -13,19 +12,18 @@ class InternalAuth(Auth):
     name = 'internal'
     _internal = True
 
-    def feed_config(self):
-        """
-        Fill config with internal (database) auth information.
-        :return:
-        """
+    def feed_config(self) -> None:
+        """Fill config with internal (database) auth information."""
         super().feed_config()
         self._config['sa_auth'].user_class = User
         self._config['auth_backend'] = 'sqlalchemy'
         self._config['sa_auth'].dbsession = DBSession
-        self._config['sa_auth'].authmetadata = InternalApplicationAuthMetadata(self._config.get('sa_auth'))
+        self._config['sa_auth'].authmetadata = \
+            InternalApplicationAuthMetadata(self._config.get('sa_auth'))
 
 
 class InternalApplicationAuthMetadata(TGAuthMetadata):
+
     def __init__(self, sa_auth):
         self.sa_auth = sa_auth
 
@@ -36,7 +34,7 @@ class InternalApplicationAuthMetadata(TGAuthMetadata):
             allow_auth_token: bool = False,
     ) -> str:
         """
-        Authenticates using given credentials.
+        Authenticate using given credentials.
 
         Checks password first then auth token if allowed.
         :param environ:
@@ -60,8 +58,11 @@ class InternalApplicationAuthMetadata(TGAuthMetadata):
         return result
 
     def get_user(self, identity, userid):
-        return self.sa_auth.dbsession.query(self.sa_auth.user_class).filter(
-            and_(self.sa_auth.user_class.is_active == True, self.sa_auth.user_class.email == userid)).first()
+        return self.sa_auth.dbsession \
+            .query(self.sa_auth.user_class) \
+            .filter(self.sa_auth.user_class.is_active.is_(True)) \
+            .filter(self.sa_auth.user_class.email == userid) \
+            .first()
 
     def get_groups(self, identity, userid):
         return [g.group_name for g in identity['user'].groups]
