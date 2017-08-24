@@ -336,8 +336,6 @@ class UserRestController(TIMRestController):
             password = self.generate_password()
             user.password = password
 
-        user.webdav_left_digest_response_hash = '%s:/:%s' % (email, password)
-
         api.save(user)
 
         # Now add the user to related groups
