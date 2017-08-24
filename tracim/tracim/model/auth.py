@@ -238,11 +238,14 @@ class User(DeclarativeBase):
         :rtype: bool
 
         """
-        if not self.password:
-            return False
-        hash = sha256()
-        hash.update((password + self.password[:64]).encode('utf-8'))
-        return self.password[64:] == hash.hexdigest()
+        result = False
+        if self.password:
+            hash = sha256()
+            hash.update((password + self.password[:64]).encode('utf-8'))
+            result = self.password[64:] == hash.hexdigest()
+            if result and not self.webdav_left_digest_response_hash:
+                self.update_webdav_digest_auth(password)
+        return result
 
     def get_display_name(self, remove_email_part=False):
         """
