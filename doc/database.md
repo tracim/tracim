@@ -1,4 +1,5 @@
 
+
 # Database #
 
 *Note: This page helps you setting up a **development** environment for `Tracim` and its ORM `SQLAlchemy` with `PostgreSQL` and `MySQL`. To set up a **production** environment, changing default database name, database user name and moreover its password is mandatory.*
@@ -34,9 +35,29 @@ If you changed the file, reload `PostgreSQL`:
 
 ##### With `psql`, the `PostgreSQL` interactive terminal
 
+Create user and database:
+
     sudo --user=postgres psql \
          --command="CREATE USER tracimuser WITH PASSWORD 'tracimpassword';" \
          --command="CREATE DATABASE tracimdb OWNER tracimuser;"
+
+Test the database access:
+
+    psql --username=tracimuser --password --host=localhost --dbname=tracimdb \
+         --command="SELECT NOW();"
+
+Success output:
+
+                  now
+    -------------------------------
+    2017-08-25 15:46:41.105865+02
+    (1 ligne)
+
+Failure output:
+
+    psql: FATAL:  password authentication failed for user "tracimuser"
+    FATAL:  password authentication failed for user "tracimuser"
+
 [//]: # (The following lines are only necessary to fix permissions on an existing database:)
 [//]: # (    sudo --user=postgres psql \)
 [//]: # (         --dbname=tracimdb \)
