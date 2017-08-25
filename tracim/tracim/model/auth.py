@@ -6,32 +6,34 @@ This is where the models used by the authentication stack are defined.
 
 It's perfectly fine to re-use this definition in the tracim application,
 though.
-
 """
+import os
+import time
 import uuid
 
-import os
 from datetime import datetime
-import time
-from hashlib import sha256
-from sqlalchemy.ext.hybrid import hybrid_property
-from tracim.lib.utils import lazy_ugettext as l_
 from hashlib import md5
-
-__all__ = ['User', 'Group', 'Permission']
+from hashlib import sha256
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy import Table
-
-from sqlalchemy.types import Unicode
-from sqlalchemy.types import Integer
-from sqlalchemy.types import DateTime
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
-from sqlalchemy.orm import relation, relationship, synonym
-from tg import request
-from tracim.model import DeclarativeBase, metadata, DBSession
+from sqlalchemy.types import DateTime
+from sqlalchemy.types import Integer
+from sqlalchemy.types import Unicode
+
+from tracim.lib.utils import lazy_ugettext as l_
+from tracim.model import DBSession
+from tracim.model import DeclarativeBase
+from tracim.model import metadata
+
+__all__ = ['User', 'Group', 'Permission']
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions.
@@ -50,6 +52,7 @@ user_group_table = Table('user_group', metadata,
     Column('group_id', Integer, ForeignKey('groups.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
+
 
 class Group(DeclarativeBase):
 
@@ -84,10 +87,8 @@ class Group(DeclarativeBase):
         return DBSession.query(cls).filter_by(group_name=group_name).first()
 
 
-
 class Profile(object):
-    """ This model is the "max" group associated to a given user
-    """
+    """This model is the "max" group associated to a given user."""
 
     _NAME = [Group.TIM_NOBODY_GROUPNAME,
              Group.TIM_USER_GROUPNAME,
@@ -106,15 +107,14 @@ class Profile(object):
         self.label = Profile._LABEL[profile_id]
 
 
-
 class User(DeclarativeBase):
     """
     User definition.
 
     This is the user definition used by :mod:`repoze.who`, which requires at
     least the ``email`` column.
-
     """
+
     __tablename__ = 'users'
 
     user_id = Column(Integer, Sequence('seq__users__user_id'), autoincrement=True, primary_key=True)
@@ -151,7 +151,7 @@ class User(DeclarativeBase):
     @property
     def profile(self) -> Profile:
         profile_id = 0
-        if len(self.groups)>0:
+        if len(self.groups) > 0:
             profile_id = max(group.group_id for group in self.groups)
         return Profile(profile_id)
 
@@ -223,7 +223,7 @@ class User(DeclarativeBase):
 
     webdav_left_digest_response_hash = synonym('_webdav_left_digest_response_hash',
                                                descriptor=property(_get_hash_digest,
-                                                                    _set_hash_digest))
+                                                                   _set_hash_digest))
 
     def update_webdav_digest_auth(self, cleartext_password) -> None:
         self.webdav_left_digest_response_hash \
@@ -231,7 +231,6 @@ class User(DeclarativeBase):
                 username=self.email,
                 cleartext_password=cleartext_password,
             )
-
 
     def validate_password(self, cleartext_password):
         """
@@ -256,11 +255,13 @@ class User(DeclarativeBase):
 
     def get_display_name(self, remove_email_part=False):
         """
+        Get a name to display from corresponding member or email.
+
         :param remove_email_part: If True and display name based on email,
-         remove @xxx.xxx part of email in returned value
+            remove @xxx.xxx part of email in returned value
         :return: display name based on user name or email.
         """
-        if self.display_name != None and self.display_name != '':
+        if self.display_name:
             return self.display_name
         else:
             if remove_email_part:
@@ -279,6 +280,7 @@ class User(DeclarativeBase):
     def ensure_auth_token(self) -> None:
         """
         Create auth_token if None, regenerate auth_token if too much old.
+
         auth_token validity is set in
         :return:
         """
@@ -311,7 +313,6 @@ class Permission(DeclarativeBase):
 
     __tablename__ = 'permissions'
 
-
     permission_id = Column(Integer, Sequence('seq__permissions__permission_id'), autoincrement=True, primary_key=True)
     permission_name = Column(Unicode(63), unique=True, nullable=False)
     description = Column(Unicode(255))
@@ -324,4 +325,3 @@ class Permission(DeclarativeBase):
 
     def __unicode__(self):
         return self.permission_name
-
