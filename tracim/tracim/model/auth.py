@@ -174,29 +174,35 @@ class User(DeclarativeBase):
         return DBSession.query(cls).filter_by(email=username).first()
 
     @classmethod
-    def _hash_password(cls, password):
+    def _hash_password(cls, cleartext_password):
         salt = sha256()
         salt.update(os.urandom(60))
         salt = salt.hexdigest()
 
         hash = sha256()
         # Make sure password is a str because we cannot hash unicode objects
-        hash.update((password + salt).encode('utf-8'))
+        hash.update((cleartext_password + salt).encode('utf-8'))
         hash = hash.hexdigest()
 
-        password = salt + hash
+        ciphertext_password = salt + hash
 
         # Make sure the hashed password is a unicode object at the end of the
         # process because SQLAlchemy _wants_ unicode objects for Unicode cols
         # FIXME - D.A. - 2013-11-20 - The following line has been removed since using python3. Is this normal ?!
         # password = password.decode('utf-8')
 
-        return password
+        return ciphertext_password
 
-    def _set_password(self, password):
-        """Hash ``password`` on the fly and store its hashed version."""
-        self._password = self._hash_password(password)
-        self.update_webdav_digest_auth(password)
+    def _set_password(self, cleartext_password: str) -> None:
+        """
+        Set ciphertext password from cleartext password.
+
+        Hash cleartext password on the fly,
+        Store its ciphertext version,
+        Update the WebDAV hash as well.
+        """
+        self._password = self._hash_password(cleartext_password)
+        self.update_webdav_digest_auth(cleartext_password)
 
     def _get_password(self):
         """Return the hashed version of the password."""
@@ -219,22 +225,22 @@ class User(DeclarativeBase):
                                                descriptor=property(_get_hash_digest,
                                                                     _set_hash_digest))
 
-    def update_webdav_digest_auth(self, password) -> None:
+    def update_webdav_digest_auth(self, cleartext_password) -> None:
         self.webdav_left_digest_response_hash \
-            = '{username}:/:{password}'.format(
+            = '{username}:/:{cleartext_password}'.format(
                 username=self.email,
-                password=password,
+                cleartext_password=cleartext_password,
             )
 
 
-    def validate_password(self, password):
+    def validate_password(self, cleartext_password):
         """
         Check the password against existing credentials.
 
-        :param password: the password that was provided by the user to
-            try and authenticate. This is the clear text version that we will
-            need to match against the hashed one in the database.
-        :type password: unicode object.
+        :param cleartext_password: the password that was provided by the user
+            to try and authenticate. This is the clear text version that we
+            will need to match against the hashed one in the database.
+        :type cleartext_password: unicode object.
         :return: Whether the password is valid.
         :rtype: bool
 
@@ -242,10 +248,10 @@ class User(DeclarativeBase):
         result = False
         if self.password:
             hash = sha256()
-            hash.update((password + self.password[:64]).encode('utf-8'))
+            hash.update((cleartext_password + self.password[:64]).encode('utf-8'))
             result = self.password[64:] == hash.hexdigest()
             if result and not self.webdav_left_digest_response_hash:
-                self.update_webdav_digest_auth(password)
+                self.update_webdav_digest_auth(cleartext_password)
         return result
 
     def get_display_name(self, remove_email_part=False):
