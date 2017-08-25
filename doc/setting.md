@@ -45,11 +45,11 @@ You must define general parameters like the `base_url` and the website title whi
 
 ## LDAP ##
 
-To use LDAP authentication, set `auth_type` parameter to `ldap`:
+`Tracim` is able to authenticate users via `LDAP`. To enable this feature, start by setting the authentication type as follow:
 
     auth_type = ldap
 
-Then add LDAP parameters
+Then add these `LDAP` parameters:
 
     # LDAP server address
     ldap_url = ldap://localhost:389
