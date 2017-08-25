@@ -14,6 +14,7 @@ import uuid
 from datetime import datetime
 from hashlib import md5
 from hashlib import sha256
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -32,6 +33,8 @@ from tracim.lib.utils import lazy_ugettext as l_
 from tracim.model import DBSession
 from tracim.model import DeclarativeBase
 from tracim.model import metadata
+if TYPE_CHECKING:
+    from tracim.model.data import Workspace
 
 __all__ = ['User', 'Group', 'Permission']
 
@@ -174,7 +177,7 @@ class User(DeclarativeBase):
         return DBSession.query(cls).filter_by(email=username).first()
 
     @classmethod
-    def _hash_password(cls, cleartext_password):
+    def _hash_password(cls, cleartext_password: str) -> str:
         salt = sha256()
         salt.update(os.urandom(60))
         salt = salt.hexdigest()
@@ -204,7 +207,7 @@ class User(DeclarativeBase):
         self._password = self._hash_password(cleartext_password)
         self.update_webdav_digest_auth(cleartext_password)
 
-    def _get_password(self):
+    def _get_password(self) -> str:
         """Return the hashed version of the password."""
         return self._password
 
@@ -225,14 +228,14 @@ class User(DeclarativeBase):
                                                descriptor=property(_get_hash_digest,
                                                                    _set_hash_digest))
 
-    def update_webdav_digest_auth(self, cleartext_password) -> None:
+    def update_webdav_digest_auth(self, cleartext_password: str) -> None:
         self.webdav_left_digest_response_hash \
             = '{username}:/:{cleartext_password}'.format(
                 username=self.email,
                 cleartext_password=cleartext_password,
             )
 
-    def validate_password(self, cleartext_password):
+    def validate_password(self, cleartext_password: str) -> bool:
         """
         Check the password against existing credentials.
 
@@ -253,7 +256,7 @@ class User(DeclarativeBase):
                 self.update_webdav_digest_auth(cleartext_password)
         return result
 
-    def get_display_name(self, remove_email_part=False):
+    def get_display_name(self, remove_email_part: bool=False) -> str:
         """
         Get a name to display from corresponding member or email.
 
