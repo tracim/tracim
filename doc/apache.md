@@ -1,24 +1,33 @@
-# Running Tracim through Apache WSGI #
+# Running Tracim through Apache #
 
-## Installation ##
+## Tracim WSGI application script ##
 
-Install `Apache` `HTTP` server and its `WSGI` module:
+Copy a `WSGI` application script:
+
+    cp tracim/app.wsgi tracim/productionapp.wsgi
+
+Edit this last's `APP_CONFIG` variable to match your environment:
+
+    APP_CONFIG = "/var/www/tracim/tracim/production.ini"
+
+## Apache WSGI ##
+
+### Installation ###
+
+Install `Apache` server and its [`WSGI` module](https://github.com/GrahamDumpleton/mod_wsgi):
 
     sudo apt install apache2 libapache2-mod-wsgi-py3
 
-## Configuration ##
+### Configuration ###
 
-Example of `Apache` `WSGI` configuration. This configuration refers to
-`productionapp.wsgi` which is a copy of the file `app.wsgi` available in the
-repo. (this file has to be updated to match with your environment and
-installation)
+Create a file named `/etc/apache2/sites-available/tracim.conf` with the following content:
 
     <VirtualHost *:80>
         ServerAdmin webmaster@tracim.mycompany.com
         ServerName tracim.mycompany.com
 
         WSGIProcessGroup tracim
-        WSGIDaemonProcess tracim user=www-data group=adm threads=4 python-path=/opt/traciminstall/tg2env/lib/python3.2/site-packages
+        WSGIDaemonProcess tracim user=www-data group=adm threads=4 python-path=/opt/traciminstall/tg2env/lib/python3.5/site-packages
         WSGIScriptAlias / /opt/traciminstall/tracim/productionapp.wsgi
 
         #Serve static files directly without TurboGears
@@ -29,3 +38,8 @@ installation)
         ErrorLog /var/log/apache2/demotracim-error.log
         LogLevel debug
     </VirtualHost>
+
+## Documentation Links ##
+
+[TurboGears](http://turbogears.readthedocs.io/en/tg2.3.7/cookbook/deploy/mod_wsgi.html)
+[mod_wsgi](http://modwsgi.readthedocs.io/en/develop/index.html)
