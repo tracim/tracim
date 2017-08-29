@@ -2,7 +2,9 @@
 
 ## Intro ##
 
-Tests on `Tracim` lays on [`nose` test tool](http://nose.readthedocs.io/en/latest/).
+Tests on `Tracim` lays on:
+- [`TurboGears` tests](http://turbogears.readthedocs.io/en/tg2.3.7/turbogears/testing.html)
+- [`nose` test tool](http://nose.readthedocs.io/en/latest/).
 
 In order to use the `nosetests [...]` commands, change your current directory to be `tracim/` from the root of the project, also usually named `tracim/` :
 
