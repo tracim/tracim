@@ -161,7 +161,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
 
-        workspaces = workspace_api_controller.get_all()
+        workspaces = workspace_api_controller.get_all_manageable_for_user(user)
 
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         fake_api = Context(CTX.ADMIN_WORKSPACE).toDict({'current_user': current_user_content})

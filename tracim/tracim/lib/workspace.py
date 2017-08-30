@@ -3,6 +3,7 @@ import transaction
 
 from sqlalchemy.orm import Query
 from tg.i18n import ugettext as _
+from typing import List
 
 from tracim.lib.userworkspace import RoleApi
 from tracim.model.auth import Group
@@ -99,6 +100,21 @@ class WorkspaceApi(object):
                     pass  # do not return workspace
 
         workspaces.sort(key=lambda workspace: workspace.label.lower())
+        return workspaces
+
+    def get_all_manageable_for_user(self, user: User) -> List[Workspace]:
+        """Get all workspaces the given user has manager rights on."""
+        workspaces = []
+        if user.profile.id == Group.TIM_ADMIN:
+            workspaces = self._base_query().order_by(Workspace.label).all()
+        elif user.profile.id == Group.TIM_MANAGER:
+            workspaces = self._base_query() \
+                .filter(
+                    UserRoleInWorkspace.role ==
+                    UserRoleInWorkspace.WORKSPACE_MANAGER
+                ) \
+                .order_by(Workspace.label) \
+                .all()
         return workspaces
 
     def disable_notifications(self, user: User, workspace: Workspace):
