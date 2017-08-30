@@ -215,7 +215,7 @@ email.processing_mode = sync
 # radicale.server.host = 0.0.0.0
 # radicale.server.port = 5232
 # radicale.server.ssl = false
-# radicale.server.filesystem.folder = ./radicale/collections
+radicale.server.filesystem.folder = %(here)s/radicale/collections/
 # radicale.server.allow_origin = *
 # radicale.server.realm_message = Tracim Calendar - Password Required
 ## url can be extended like http://127.0.0.1:5232/calendar
