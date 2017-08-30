@@ -21,6 +21,7 @@ from tracim.tests import TestCalendar as BaseTestCalendar
 from tracim.tests import not_raises
 from tracim.model.auth import User
 from tracim.model.data import Content
+from tracim.model.data import ContentRevisionRO
 from tracim.model.data import Workspace
 
 
@@ -197,9 +198,11 @@ END:VCALENDAR
         time.sleep(3)  # Wait for be sure transaction commited in daemon
         transaction.commit()
         try:
-            event = DBSession.query(Content).filter(
-                Content.label == 'This is an event'
-            ).one()
+            event = DBSession.query(Content) \
+                .filter(Content.label == 'This is an event') \
+                .filter(Content.owner_id == lawrence.user_id) \
+                .filter(Content.id == ContentRevisionRO.content_id) \
+                .one()
         except NoResultFound:
             ok_(False, 'Content record should exist for '
                        '"This is an event" label')
