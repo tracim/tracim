@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
@@ -210,6 +211,24 @@ class EmailNotifier(object):
             email_address = email_address
         )
 
+    @staticmethod
+    def _log_notification(
+            recipient: str,
+            subject: str
+    ) -> None:
+        """Log notification metadata."""
+        from tracim.config.app_cfg import CFG
+        log_path = CFG.get_instance().EMAIL_NOTIFICATION_LOG_FILE_PATH
+        if log_path:
+            with open(log_path, 'a') as log_file:
+                print(
+                    datetime.datetime.now(),
+                    recipient,
+                    subject,
+                    sep='|',
+                    file=log_file,
+                )
+
     def notify_content_update(self, event_actor_id: int, event_content_id: int):
         """
         Look for all users to be notified about the new content and send them an individual email
@@ -277,6 +296,10 @@ class EmailNotifier(object):
             message.attach(part1)
             message.attach(part2)
 
+            self._log_notification(
+                recipient=message['for'],
+                subject=message['Subject'],
+            )
             send_email_through(async_email_sender.send_mail, message)
 
     def _build_email_body(self, mako_template_filepath: str, role: UserRoleInWorkspace, content: Content, actor: User) -> str:
