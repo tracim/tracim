@@ -159,7 +159,7 @@ class WorkspaceRestController(TIMRestController, BaseController):
     def get_all(self, *args, **kw):
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
-        workspaces = workspace_api_controller.get_all_manageable_for_user(user)
+        workspaces = workspace_api_controller.get_all_manageable()
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         fake_api = Context(CTX.ADMIN_WORKSPACE) \
             .toDict(

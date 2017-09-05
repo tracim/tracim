@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-import transaction
+import typing
 
 from sqlalchemy.orm import Query
 from tg.i18n import ugettext as _
-from typing import List
+import transaction
 
 from tracim.lib.userworkspace import RoleApi
+from tracim.model import DBSession
 from tracim.model.auth import Group
 from tracim.model.auth import User
-from tracim.model.data import Workspace
 from tracim.model.data import UserRoleInWorkspace
-from tracim.model import DBSession
+from tracim.model.data import Workspace
 
 __author__ = 'damien'
 
@@ -102,12 +102,12 @@ class WorkspaceApi(object):
         workspaces.sort(key=lambda workspace: workspace.label.lower())
         return workspaces
 
-    def get_all_manageable_for_user(self, user: User) -> List[Workspace]:
-        """Get all workspaces the given user has manager rights on."""
-        workspaces = []
-        if user.profile.id == Group.TIM_ADMIN:
+    def get_all_manageable(self) -> typing.List[Workspace]:
+        """Get all workspaces the current user has manager rights on."""
+        workspaces = []  # type: typing.List[Workspace]
+        if self._user.profile.id == Group.TIM_ADMIN:
             workspaces = self._base_query().order_by(Workspace.label).all()
-        elif user.profile.id == Group.TIM_MANAGER:
+        elif self._user.profile.id == Group.TIM_MANAGER:
             workspaces = self._base_query() \
                 .filter(
                     UserRoleInWorkspace.role ==
