@@ -2,12 +2,14 @@
 from nose.tools import eq_
 
 from tracim.lib.content import ContentApi
+from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
 from tracim.lib.userworkspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import Content
 from tracim.model import DBSession
 from tracim.model import User
+from tracim.model.auth import Group
 from tracim.model.data import UserRoleInWorkspace
 from tracim.model.data import Workspace
 from tracim.tests import BaseTestThread
@@ -41,3 +43,33 @@ class TestThread(BaseTestThread, TestStandard):
         eq_([r, ], wapi.get_notifiable_roles(workspace=w))
         u.is_active = False
         eq_([], wapi.get_notifiable_roles(workspace=w))
+
+    def test_unit__get_all_manageable(self):
+        admin = DBSession.query(User) \
+            .filter(User.email == 'admin@admin.admin').one()
+        uapi = UserApi(admin)
+        # Checks a case without workspaces.
+        wapi = WorkspaceApi(current_user=admin)
+        eq_([], wapi.get_all_manageable())
+        # Checks an admin gets all workspaces.
+        w4 = wapi.create_workspace(label='w4')
+        w3 = wapi.create_workspace(label='w3')
+        w2 = wapi.create_workspace(label='w2')
+        w1 = wapi.create_workspace(label='w1')
+        eq_([w1, w2, w3, w4], wapi.get_all_manageable())
+        # Checks a regular user gets none workspace.
+        gapi = GroupApi(None)
+        u = uapi.create_user('u.s@e.r', [gapi.get_one(Group.TIM_USER)], True)
+        wapi = WorkspaceApi(current_user=u)
+        rapi = RoleApi(current_user=u)
+        off = 'off'
+        rapi.create_one(u, w4, UserRoleInWorkspace.READER, off)
+        rapi.create_one(u, w3, UserRoleInWorkspace.CONTRIBUTOR, off)
+        rapi.create_one(u, w2, UserRoleInWorkspace.CONTENT_MANAGER, off)
+        rapi.create_one(u, w1, UserRoleInWorkspace.WORKSPACE_MANAGER, off)
+        eq_([], wapi.get_all_manageable())
+        # Checks a manager gets only its own workspaces.
+        u.groups.append(gapi.get_one(Group.TIM_MANAGER))
+        rapi.delete_one(u.user_id, w2.workspace_id)
+        rapi.create_one(u, w2, UserRoleInWorkspace.WORKSPACE_MANAGER, off)
+        eq_([w1, w2], wapi.get_all_manageable())

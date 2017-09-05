@@ -157,17 +157,21 @@ class WorkspaceRestController(TIMRestController, BaseController):
 
     @tg.expose('tracim.templates.admin.workspace_getall')
     def get_all(self, *args, **kw):
-
         user = tmpl_context.current_user
         workspace_api_controller = WorkspaceApi(user)
-
-        workspaces = workspace_api_controller.get_all()
-
+        workspaces = workspace_api_controller.get_all_manageable()
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
-        fake_api = Context(CTX.ADMIN_WORKSPACE).toDict({'current_user': current_user_content})
-
-        dictified_workspaces = Context(CTX.ADMIN_WORKSPACES).toDict(workspaces, 'workspaces', 'workspace_nb')
-        return DictLikeClass(result = dictified_workspaces, fake_api=fake_api)
+        fake_api = Context(CTX.ADMIN_WORKSPACE) \
+            .toDict(
+                {'current_user': current_user_content}
+            )
+        dictified_workspaces = Context(CTX.ADMIN_WORKSPACES) \
+            .toDict(
+                workspaces,
+                'workspaces',
+                'workspace_nb',
+            )
+        return DictLikeClass(result=dictified_workspaces, fake_api=fake_api)
 
     @tg.expose('tracim.templates.admin.workspace_getone')
     def get_one(self, workspace_id):
