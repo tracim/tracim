@@ -3,17 +3,7 @@
 #  sqlalchemy: True
 #  auth:       sqlalchemy
 #  mako:       True
-
-import sys
-
 from setuptools.command.develop import develop
-# This is just a work-around for a Python2.7 issue causing
-# interpreter crash at exit when trying to log an info message.
-try:
-    import logging
-    import multiprocessing
-except:
-    pass
 
 try:
     from setuptools import setup, find_packages
@@ -21,11 +11,6 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup, find_packages
-
-py_version = sys.version_info[:2]
-
-DESCRIPTION = ('Tracim is a plateform software designed to improve '
-               'traceability and productivity in collaborative work.')
 
 
 class DevelopWithCompileCatalog(develop):
@@ -81,7 +66,10 @@ setup_requires = [
 setup(
     name='tracim',
     version='1.0.0',
-    description=DESCRIPTION,
+    description=(
+        'Tracim is a plateform software designed to improve '
+        'traceability and productivity in collaborative work.'
+    ),
     author='Damien ACCORSI',
     author_email='damien.accorsi@free.fr',
     url='https://github.com/tracim/tracim',
