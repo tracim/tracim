@@ -7,6 +7,7 @@
 #
 #
 
+from setuptools.command.develop import develop
 #This is just a work-around for a Python2.7 issue causing
 #interpreter crash at exit when trying to log an info message.
 try:
@@ -24,6 +25,17 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup, find_packages
+
+
+class DevelopWithCompileCatalog(develop):
+    def run(self):
+        from babel.messages.frontend import compile_catalog
+        compiler = compile_catalog(self.distribution)
+        option_dict = self.distribution.get_option_dict('compile_catalog')
+        compiler.domain = option_dict['domain'][1]
+        compiler.directory = option_dict['directory'][1]
+        compiler.run()
+        super().run()
 
 classifiers = [
     "License :: OSI Approved :: GNU Affero General Public License v3",
@@ -55,6 +67,10 @@ install_requires=[
     'filedepot>=0.5.0',
     'preview-generator'
     ]
+
+setup_requires = [
+    'babel',
+],
 
 setup(
     name='tracim',
@@ -93,5 +109,8 @@ setup(
     dependency_links=[
         'http://github.com/algoo/preview-generator/tarball/master#egg=preview_generator-1.0',
         ],
-    zip_safe=False
+    zip_safe=False,
+    cmdclass={
+        'develop': DevelopWithCompileCatalog,
+    },
 )
