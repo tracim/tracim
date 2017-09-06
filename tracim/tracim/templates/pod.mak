@@ -63,6 +63,7 @@
         tinymce.init({
             menubar:false,
             statusbar:true,
+            branding: false,
             plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker", "link", "code", "contextmenu"],
             language: globalTracimLang === 'fr' ? 'fr_FR' : globalTracimLang, // tinymce does't accept en_US as language, it is its default value named 'en'
             selector:'${selector}',
