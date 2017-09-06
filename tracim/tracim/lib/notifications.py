@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 import datetime
+import typing
 
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import lxml
 from lxml.html.diff import htmldiff
 
 from mako.template import Template
 
 from tracim.lib.base import logger
+from tracim.lib.email import EmailSender
 from tracim.lib.email import SmtpConfiguration
 from tracim.lib.email import send_email_through
-from tracim.lib.email import EmailSender
 from tracim.lib.user import UserApi
-from tracim.lib.workspace import WorkspaceApi
 from tracim.lib.utils import lazy_ugettext as l_
-from tracim.model.serializers import Context
-from tracim.model.serializers import CTX
-from tracim.model.serializers import DictLikeClass
-
-from tracim.model.data import Content, UserRoleInWorkspace, ContentType, \
-    ActionDescription
+from tracim.lib.workspace import WorkspaceApi
 from tracim.model.auth import User
+from tracim.model.data import ActionDescription
+from tracim.model.data import Content
+from tracim.model.data import ContentType
+from tracim.model.data import UserRoleInWorkspace
+from tracim.model.serializers import CTX
+from tracim.model.serializers import Context
+from tracim.model.serializers import DictLikeClass
 
 
 class INotifier(object):
@@ -212,17 +213,22 @@ class EmailNotifier(object):
         )
 
     @staticmethod
-    def _log_notification(
-            recipient: str,
-            subject: str
+    def log_notification(
+            action: str,
+            recipient: typing.Optional[str],
+            subject: typing.Optional[str],
     ) -> None:
         """Log notification metadata."""
         from tracim.config.app_cfg import CFG
         log_path = CFG.get_instance().EMAIL_NOTIFICATION_LOG_FILE_PATH
         if log_path:
+            # TODO - A.P - 2017-09-06 - file logging inefficiency
+            # Updating a document with 100 users to notify will leads to open
+            # and close the file 100 times.
             with open(log_path, 'a') as log_file:
                 print(
                     datetime.datetime.now(),
+                    action,
                     recipient,
                     subject,
                     sep='|',
@@ -296,8 +302,9 @@ class EmailNotifier(object):
             message.attach(part1)
             message.attach(part2)
 
-            self._log_notification(
-                recipient=message['for'],
+            self.log_notification(
+                action='CREATED',
+                recipient=message['To'],
                 subject=message['Subject'],
             )
             send_email_through(async_email_sender.send_mail, message)

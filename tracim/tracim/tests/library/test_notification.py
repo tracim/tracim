@@ -49,19 +49,32 @@ class TestDummyNotifier(TestStandard):
 class TestEmailNotifier(TestStandard):
 
     def test_unit__log_notification(self):
+        """Check file and format of notification log."""
         log_path = CFG.get_instance().EMAIL_NOTIFICATION_LOG_FILE_PATH
-        pattern = '\|{rec}\|{subj}$\\n'
+        pattern = '\|{act}\|{rec}\|{subj}$\\n'
+        line_1_act = 'CREATED'
         line_1_rec = 'user 1 <us.er@o.ne>'
         line_1_subj = 'notification 1'
-        line_1_pattern = pattern.format(rec=line_1_rec, subj=line_1_subj)
+        line_1_pattern = pattern.format(
+            act=line_1_act,
+            rec=line_1_rec,
+            subj=line_1_subj,
+        )
+        line_2_act = '   SENT'
         line_2_rec = 'user 2 <us.er@t.wo>'
         line_2_subj = 'notification 2'
-        line_2_pattern = pattern.format(rec=line_2_rec, subj=line_2_subj)
-        EmailNotifier._log_notification(
+        line_2_pattern = pattern.format(
+            act=line_2_act,
+            rec=line_2_rec,
+            subj=line_2_subj,
+        )
+        EmailNotifier.log_notification(
+            action=line_1_act,
             recipient=line_1_rec,
             subject=line_1_subj,
         )
-        EmailNotifier._log_notification(
+        EmailNotifier.log_notification(
+            action=line_2_act,
             recipient=line_2_rec,
             subject=line_2_subj,
         )
