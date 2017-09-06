@@ -18,13 +18,8 @@ class DevelopWithCompileCatalog(develop):
 
     def run(self):
         """Compiles binary translation files from catalog."""
-        from babel.messages.frontend import compile_catalog
-        compiler = compile_catalog(self.distribution)
-        option_dict = self.distribution.get_option_dict('compile_catalog')
-        compiler.domain = option_dict['domain'][1]
-        compiler.directory = option_dict['directory'][1]
-        compiler.run()
         super().run()
+        self.run_command('compile_catalog')
 
 
 classifiers = [
@@ -56,12 +51,13 @@ install_requires = [
     'pytz==2014.7',
     'rq==0.7.1',
     'filedepot>=0.5.0',
-    'preview-generator'
+    'preview-generator',
+    'babel',
 ]
 
 setup_requires = [
     'babel',
-],
+]
 
 setup(
     name='tracim',
@@ -75,6 +71,7 @@ setup(
     url='https://github.com/tracim/tracim',
     packages=find_packages(exclude=['ez_setup']),
     install_requires=install_requires,
+    setup_requires=setup_requires,
     include_package_data=True,
     test_suite='nose.collector',
     tests_require=testpkgs,
