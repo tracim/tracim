@@ -63,13 +63,13 @@
         tinymce.init({
             menubar:false,
             statusbar:true,
-            plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker", "link", "code"],
+            plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker", "link", "code", "contextmenu"],
             language: globalTracimLang === 'fr' ? 'fr_FR' : globalTracimLang, // tinymce does't accept en_US as language, it is its default value named 'en'
-            skin : 'tracim',
             selector:'${selector}',
             toolbar: [
               "undo redo | bold italic underline strikethrough | link | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code",
             ],
+            contextmenu: "link",
             paste_data_images: true,
             table_default_attributes: {
                 'class': 'user_content'
