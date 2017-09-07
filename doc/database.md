@@ -12,8 +12,6 @@ If you want to use `PostgreSQL` as database engine:
 
 ### Minimalist introduction to PostgreSQL ###
 
-If you already use/know `PostgreSQL`, you can directly go to *Test the database access*.
-
 #### Driver ####
 
 Tracim uses the `psycopg2` driver between the `SQLAlchemy` ORM and the `PostgreSQL` RDBMS. Run the following command to install the right version:
@@ -32,8 +30,6 @@ If you changed the file, reload `PostgreSQL`:
     service postgresql reload
 
 #### Creating a user and associated database ####
-
-##### With `psql`, the `PostgreSQL` interactive terminal
 
 Create user and database:
 
@@ -58,56 +54,17 @@ Failure output:
     psql: FATAL:  password authentication failed for user "tracimuser"
     FATAL:  password authentication failed for user "tracimuser"
 
+In this case, delete the user and database and start over:
+
+    sudo --user=postgres psql \
+         --command="DROP USER tracimuser;" \
+         --command="DROP DATABASE tracimdb;"
+
 [//]: # (The following lines are only necessary to fix permissions on an existing database:)
 [//]: # (    sudo --user=postgres psql \)
 [//]: # (         --dbname=tracimdb \)
 [//]: # (         --command="GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;" \)
 [//]: # (         --command="GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;")
-
-##### With `pgtool`
-
-Tracim comes with `pgtool` to ease this step:
-
-    ./bin/pgtool help
-
-Run the following self explanatory commands:
-
-    sudo su postgres
-    ./bin/pgtool create_user tracimuser tracimpassword
-    ./bin/pgtool create_database tracimdb
-    ./bin/pgtool grant_all_privileges tracimdb tracimuser
-    exit
-
-Test the database access:
-
-    ./bin/pgtool test_connection tracimdb tracimuser tracimpassword 127.0.0.1
-
-Success output:
-
-    PG # CONNECT TO DATABASE
-    ------------------------
-    server:     127.0.0.1
-    database:   tracimdb
-    username:   bibi
-
-                  now
-    -------------------------------
-     2014-11-10 09:40:23.306199+01
-    (1 row)
-
-Failure output:
-
-    PG # CONNECT TO DATABASE
-    ------------------------
-    server:     127.0.0.1
-    database:   tracimdb
-    username:   bibi
-
-    psql: FATAL:  password authentication failed for user "bibi"
-    FATAL:  password authentication failed for user "bibi"
-    ERRROR
-
-In this case, delete the user and database you previously created using `pgtool`, and do it again.
 
 ## MySQL ##
 
