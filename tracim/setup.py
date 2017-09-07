@@ -3,8 +3,6 @@
 #  sqlalchemy: True
 #  auth:       sqlalchemy
 #  mako:       True
-import sys
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
