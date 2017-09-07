@@ -71,6 +71,7 @@
               "undo redo | bold italic underline strikethrough | link | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code",
             ],
             contextmenu: "link",
+            link_context_toolbar: true,
             paste_data_images: true,
             table_default_attributes: {
                 'class': 'user_content'
