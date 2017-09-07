@@ -3,23 +3,12 @@
 #  sqlalchemy: True
 #  auth:       sqlalchemy
 #  mako:       True
-from setuptools.command.develop import develop
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup, find_packages
-
-
-class DevelopWithCompileCatalog(develop):
-    """Extend base develop setup.py command."""
-
-    def run(self):
-        """Compiles binary translation files from catalog."""
-        super().run()
-        self.run_command('compile_catalog')
 
 
 classifiers = [
@@ -34,7 +23,7 @@ testpkgs = [
     'WebTest >= 1.2.3',
     'nose',
     'coverage',
-    'gearbox'
+    'gearbox',
 ]
 
 install_requires = [
@@ -52,11 +41,6 @@ install_requires = [
     'rq==0.7.1',
     'filedepot>=0.5.0',
     'preview-generator',
-    'babel',
-]
-
-setup_requires = [
-    'babel',
 ]
 
 setup(
@@ -71,7 +55,6 @@ setup(
     url='https://github.com/tracim/tracim',
     packages=find_packages(exclude=['ez_setup']),
     install_requires=install_requires,
-    setup_requires=setup_requires,
     include_package_data=True,
     test_suite='nose.collector',
     tests_require=testpkgs,
@@ -107,7 +90,4 @@ setup(
         'http://github.com/algoo/preview-generator/tarball/master#egg=preview_generator-1.0',
     ],
     zip_safe=False,
-    cmdclass={
-        'develop': DevelopWithCompileCatalog,
-    },
 )
