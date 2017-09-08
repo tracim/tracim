@@ -32,6 +32,7 @@ cookie_secret = 3283411b-1904-4554-b0e1-883863b53080
 [app:main]
 use = egg:tracim
 full_stack = true
+i18n.lang = en
 
 cache_dir = %(here)s/data
 # preview generator cache directory
