@@ -26,7 +26,7 @@ except ImportError:
     from setuptools import setup, find_packages
 
 classifiers = [
-    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: 3.5",
