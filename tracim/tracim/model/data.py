@@ -739,13 +739,13 @@ class Content(DeclarativeBase):
     # The only sorting that makes sens is ordering by "updated" field. But:
     # - its content will soon replace the one of "created",
     # - this "updated" field will then be dropped.
-    # So for now, we order by "updated" explicitly, but remember to switch to
-    # "created" once "updated" removed.
+    # So for now, we order by "revision_id" explicitly, but remember to switch
+    # to "created" once "updated" removed.
     # https://github.com/tracim/tracim/issues/336
     revisions = relationship("ContentRevisionRO",
                              foreign_keys=[ContentRevisionRO.content_id],
                              back_populates="node",
-                             order_by="ContentRevisionRO.updated")
+                             order_by="ContentRevisionRO.revision_id")
     children_revisions = relationship("ContentRevisionRO",
                                       foreign_keys=[ContentRevisionRO.parent_id],
                                       back_populates="parent")
