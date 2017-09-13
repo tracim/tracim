@@ -109,7 +109,6 @@ class UserPasswordRestController(TIMRestController):
             tg.redirect(redirect_url)
 
         current_user.password = new_password1
-        current_user.update_webdav_digest_auth(new_password1)
         pm.DBSession.flush()
 
         tg.flash(_('Your password has been changed'))

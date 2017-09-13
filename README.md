@@ -60,8 +60,7 @@ The user interface is easy to use: it's based on the well-known folders and file
 
 ## Licence ##
 
-Tracim is licensed under the terms of the
-[GNU Affero General Public License](http://www.gnu.org/licenses/agpl.txt) as published by the [Free Software Foundation](http://www.fsf.org/).
+Tracim is licensed under the terms of the [MIT License](https://opensource.org/licenses/mit-license.php)
 
 ## Technical information ##
 

@@ -111,7 +111,6 @@ class UserCommand(AppContextCommand):
 
         try:
             user = User(email=login, password=password, **kwargs)
-            user.update_webdav_digest_auth(password)
             self._session.add(user)
             self._session.flush()
 
@@ -130,7 +129,6 @@ class UserCommand(AppContextCommand):
     def _update_password_for_login(self, login, password):
         user = self._user_api.get_one_by_email(login)
         user.password = password
-        user.update_webdav_digest_auth(password)
         self._session.flush()
         transaction.commit()
 

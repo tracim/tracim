@@ -39,7 +39,7 @@ class TestThread(BaseTestThread, TestStandard):
         u = uapi.create_user(email='u.u@u.u', save_now=True)
         eq_([], wapi.get_notifiable_roles(workspace=w))
         rapi = RoleApi(u)
-        r = rapi.create_one(u, w, UserRoleInWorkspace.READER, with_notif='on')
+        r = rapi.create_one(u, w, UserRoleInWorkspace.READER, with_notif=True)
         eq_([r, ], wapi.get_notifiable_roles(workspace=w))
         u.is_active = False
         eq_([], wapi.get_notifiable_roles(workspace=w))
@@ -62,14 +62,13 @@ class TestThread(BaseTestThread, TestStandard):
         u = uapi.create_user('u.s@e.r', [gapi.get_one(Group.TIM_USER)], True)
         wapi = WorkspaceApi(current_user=u)
         rapi = RoleApi(current_user=u)
-        off = 'off'
-        rapi.create_one(u, w4, UserRoleInWorkspace.READER, off)
-        rapi.create_one(u, w3, UserRoleInWorkspace.CONTRIBUTOR, off)
-        rapi.create_one(u, w2, UserRoleInWorkspace.CONTENT_MANAGER, off)
-        rapi.create_one(u, w1, UserRoleInWorkspace.WORKSPACE_MANAGER, off)
+        rapi.create_one(u, w4, UserRoleInWorkspace.READER, False)
+        rapi.create_one(u, w3, UserRoleInWorkspace.CONTRIBUTOR, False)
+        rapi.create_one(u, w2, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        rapi.create_one(u, w1, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         eq_([], wapi.get_all_manageable())
         # Checks a manager gets only its own workspaces.
         u.groups.append(gapi.get_one(Group.TIM_MANAGER))
         rapi.delete_one(u.user_id, w2.workspace_id)
-        rapi.create_one(u, w2, UserRoleInWorkspace.WORKSPACE_MANAGER, off)
+        rapi.create_one(u, w2, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
         eq_([w1, w2], wapi.get_all_manageable())

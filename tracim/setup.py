@@ -12,11 +12,11 @@ except ImportError:
 
 
 classifiers = [
-    'License :: OSI Approved :: GNU Affero General Public License v3',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
 ]
 
 testpkgs = [

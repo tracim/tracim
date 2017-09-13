@@ -52,16 +52,26 @@
           }
         }
 
+        // HACK: The tiny mce source code modal contain a textarea, but we
+        // can't edit it (like it's readonly). The following solution
+        // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
+        $(document).on('focusin', function(e) {
+        if ($(event.target).closest(".mce-window").length) {
+            e.stopImmediatePropagation();
+        }});
+
         tinymce.init({
             menubar:false,
             statusbar:true,
-            plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker" ],
+            branding: false,
+            plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker", "link", "code", "contextmenu"],
             language: globalTracimLang === 'fr' ? 'fr_FR' : globalTracimLang, // tinymce does't accept en_US as language, it is its default value named 'en'
-            skin : 'tracim',
             selector:'${selector}',
             toolbar: [
-              "undo redo | bold italic underline strikethrough | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage",
+              "undo redo | bold italic underline strikethrough | link | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code",
             ],
+            contextmenu: "link",
+            link_context_toolbar: true,
             paste_data_images: true,
             table_default_attributes: {
                 'class': 'user_content'

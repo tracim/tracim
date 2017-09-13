@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
+import datetime
+import typing
 
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import lxml
 from lxml.html.diff import htmldiff
 
 from mako.template import Template
 
 from tracim.lib.base import logger
+from tracim.lib.email import EmailSender
 from tracim.lib.email import SmtpConfiguration
 from tracim.lib.email import send_email_through
-from tracim.lib.email import EmailSender
 from tracim.lib.user import UserApi
-from tracim.lib.workspace import WorkspaceApi
 from tracim.lib.utils import lazy_ugettext as l_
-from tracim.model.serializers import Context
-from tracim.model.serializers import CTX
-from tracim.model.serializers import DictLikeClass
-
-from tracim.model.data import Content, UserRoleInWorkspace, ContentType, \
-    ActionDescription
+from tracim.lib.workspace import WorkspaceApi
 from tracim.model.auth import User
+from tracim.model.data import ActionDescription
+from tracim.model.data import Content
+from tracim.model.data import ContentType
+from tracim.model.data import UserRoleInWorkspace
+from tracim.model.serializers import CTX
+from tracim.model.serializers import Context
+from tracim.model.serializers import DictLikeClass
 
 
 class INotifier(object):
@@ -210,6 +212,29 @@ class EmailNotifier(object):
             email_address = email_address
         )
 
+    @staticmethod
+    def log_notification(
+            action: str,
+            recipient: typing.Optional[str],
+            subject: typing.Optional[str],
+    ) -> None:
+        """Log notification metadata."""
+        from tracim.config.app_cfg import CFG
+        log_path = CFG.get_instance().EMAIL_NOTIFICATION_LOG_FILE_PATH
+        if log_path:
+            # TODO - A.P - 2017-09-06 - file logging inefficiency
+            # Updating a document with 100 users to notify will leads to open
+            # and close the file 100 times.
+            with open(log_path, 'a') as log_file:
+                print(
+                    datetime.datetime.now(),
+                    action,
+                    recipient,
+                    subject,
+                    sep='|',
+                    file=log_file,
+                )
+
     def notify_content_update(self, event_actor_id: int, event_content_id: int):
         """
         Look for all users to be notified about the new content and send them an individual email
@@ -277,6 +302,11 @@ class EmailNotifier(object):
             message.attach(part1)
             message.attach(part2)
 
+            self.log_notification(
+                action='CREATED',
+                recipient=message['To'],
+                subject=message['Subject'],
+            )
             send_email_through(async_email_sender.send_mail, message)
 
     def _build_email_body(self, mako_template_filepath: str, role: UserRoleInWorkspace, content: Content, actor: User) -> str:

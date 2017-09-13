@@ -82,17 +82,28 @@ class RoleInWorkspaceRestController(TIMRestController, BaseController):
     def undelete(self, user_id, old_role):
         user_id = int(user_id)
         role_id = int(old_role)
-        self._add_user_with_role(user_id, role_id, None, _('User {} restored in workspace {} as {}'))
+        self._add_user_with_role(user_id, role_id, False, _('User {} restored in workspace {} as {}'))
         tg.redirect(self.parent_controller.url(tg.tmpl_context.workspace_id))
 
     @tg.expose()
-    def post(self, user_id, role_id, with_notif=False):
+    def post(self, user_id: str, role_id: str, with_notif: str='off'):
         user_id = int(user_id)
         role_id = int(role_id)
-        self._add_user_with_role(user_id, role_id, with_notif, _('User {} added to workspace {} as {}'))
+        self._add_user_with_role(
+            user_id,
+            role_id,
+            on_off_to_boolean(with_notif),
+            _('User {} added to workspace {} as {}')
+        )
         tg.redirect(self.parent_controller.url(tg.tmpl_context.workspace_id))
 
-    def _add_user_with_role(self, user_id: int, role_id: int, with_notif: bool, flash_msg_template)-> UserRoleInWorkspace:
+    def _add_user_with_role(
+            self,
+            user_id: int,
+            role_id: int,
+            with_notif: bool,
+            flash_msg_template: str
+    )-> UserRoleInWorkspace:
         user_api = UserApi(tg.tmpl_context.current_user)
         user = user_api.get_one(user_id)
 
