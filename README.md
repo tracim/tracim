@@ -121,8 +121,6 @@ Get the sources from GitHub:
     git clone https://github.com/tracim/tracim.git
     cd tracim/
 
-*Note: Now everything is documented to be executed from the tracim directory newly created.*
-
 ## Frontend dependencies ##
 
 [//]: # ( from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
@@ -157,15 +155,16 @@ Activate it in your terminal session (**all tracim command execution must be exe
 
 Install Tracim and its dependencies:
 
-    cd tracim && python setup.py develop && cd -
-    pip install -r install/requirements.txt
+    cd tracim/
+    python setup.py develop
+    pip install -r ../install/requirements.txt
 
 ## Configuration files ##
 
 Create configuration files for a development environment and for `WsgiDAV`:
 
-    cp tracim/development.ini.base tracim/development.ini
-    cp tracim/wsgidav.conf.sample tracim/wsgidav.conf
+    cp development.ini.base development.ini
+    cp wsgidav.conf.sample wsgidav.conf
 
 ## Translation ##
 
@@ -178,13 +177,11 @@ Compile translation binary files from available catalogs:
 The last step before running the application is to initialize the database
 schema. This is done through the following command:
 
-    cd tracim && gearbox setup-app && cd -
+    gearbox setup-app
 
-## Running the paste http server ##
+## Running Tracim ##
 
-    gearbox serve
-
-While developing, the following command may be more convenient:
+The two parameters are optional but useful to reload the server upon code changes and to get debug data:
 
     gearbox serve --reload --debug
 
@@ -204,10 +201,10 @@ Which should result in something like this:
     Starting HTTP server on http://0.0.0.0:8080
 
 You can now enter the application at
-[http://localhost:8080](http://localhost:8080) and login with admin user.
+[http://localhost:8080](http://localhost:8080) and login with admin user:
 
- * user : admin@admin.admin
- * password : admin@admin.admin
+ * user : `admin@admin.admin`
+ * password : `admin@admin.admin`
 
 If admin user not created yet, execute following command:
 
