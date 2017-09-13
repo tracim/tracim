@@ -36,7 +36,7 @@ full_stack = true
 # i18n.lang = fr
 
 cache_dir = %(here)s/data
-# preview generator cache directory
+# preview generator cache directory
 preview_cache_dir = /tmp/tracim/preview/
 # file depot storage
 depot_storage_name = tracim
@@ -225,7 +225,7 @@ email.processing_mode = sync
 # radicale.client.base_url.prefix = /
 
 ## WSGIDAV
-wsgidav.config_path = wsgidav.conf
+wsgidav.config_path = %(here)s/wsgidav.conf
 ## url can be extended like 127.0.0.1/webdav
 ## in this case, you have to create your own proxy behind this url.
 ## Do not set http:// prefix.
