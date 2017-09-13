@@ -20,26 +20,41 @@ Install `Apache` server and its [`WSGI` module](https://github.com/GrahamDumplet
 
 ### Configuration ###
 
-Create a file named `/etc/apache2/sites-available/tracim.conf` with the following content:
+Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
     <VirtualHost *:80>
         ServerAdmin webmaster@tracim.mycompany.com
-        ServerName tracim.mycompany.com
+        ServerName localhost/tracim
 
-        WSGIProcessGroup tracim
-        WSGIDaemonProcess tracim user=www-data group=adm threads=4 python-path=/opt/traciminstall/tg2env/lib/python3.5/site-packages
-        WSGIScriptAlias / /opt/traciminstall/tracim/productionapp.wsgi
+        WSGIProcessGroup localhost/tracim
+        WSGIDaemonProcess localhost/tracim user=www-data group=www-data threads=4 python-path=/home/algooapy/Documents/dev/py/tracim/tg2env/lib/python3.5/site-packages
+        # WSGIScriptAlias / /var/www/tracim/tracim/productionapp.wsgi
+        WSGIScriptAlias /tracim /var/www/tracim/tracim/app.wsgi
+        <Directory "/var/www/tracim/tracim">
+            <Files "app.wsgi">
+                Require all granted
+            </Files>
+        </Directory>
 
         #Serve static files directly without TurboGears
-        Alias /assets     /opt/traciminstall/tracim/tracim/public/assets
-        Alias /favicon.ico /opt/traciminstall/tracim/tracim/public/favicon.ico
+        Alias /assets      /var/www/tracim/tracim/tracim/public/assets
+        Alias /favicon.ico /var/www/tracim/tracim/tracim/public/favicon.ico
 
-        CustomLog /var/log/apache2/demotracim-access.log combined
-        ErrorLog /var/log/apache2/demotracim-error.log
+        CustomLog ${APACHE_LOG_DIR}/tracim_access_log combined
+        ErrorLog ${APACHE_LOG_DIR}/tracim_error_log
         LogLevel debug
     </VirtualHost>
+
+Enable this site configuration file:
+
+    sudo a2ensite tracim.conf
+
+Reload `Apache` configuration:
+
+    sudo systemctl reload apache2.service
 
 ## Documentation Links ##
 
 [TurboGears](http://turbogears.readthedocs.io/en/tg2.3.7/cookbook/deploy/mod_wsgi.html)
+
 [mod_wsgi](http://modwsgi.readthedocs.io/en/develop/index.html)

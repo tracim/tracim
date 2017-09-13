@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-APP_CONFIG = "/opt/traciminstallpath/development.ini"
+APP_CONFIG = "/var/www/tracim/tracim/development.ini"
 
 #Setup logging
 # import logging
@@ -10,4 +10,3 @@ APP_CONFIG = "/opt/traciminstallpath/development.ini"
 from paste.deploy import loadapp
 application = loadapp('config:%s' % APP_CONFIG)
 application.debug = False
-
