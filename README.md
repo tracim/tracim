@@ -167,6 +167,12 @@ Create configuration files for a development environment and for `WsgiDAV`:
     cp tracim/development.ini.base tracim/development.ini
     cp tracim/wsgidav.conf.sample tracim/wsgidav.conf
 
+## Translation ##
+
+Compile translation binary files from available catalogs:
+
+    python setup.py compile_catalog
+
 ## Database schema ##
 
 The last step before running the application is to initialize the database

@@ -77,3 +77,6 @@ wsgidav.conf
 # builded files from gulp scripts
 /tracim/tracim/public/assets/dist/
 /tracim/tracim/public/assets/js/main_es5.js
+
+# binary translation files
+*.mo
