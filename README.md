@@ -188,21 +188,6 @@ While developing, the following command may be more convenient:
 
     gearbox serve --reload --debug
 
-## Running the standalone server ##
-
-Now you can run the standalone server:
-
-    ./bin/run.sh
-
-Which should result in something like this:
-
-    13:53:49,982 INFO  [gearbox] Starting subprocess with file monitor
-    13:53:50,646 WARNI [py.warnings] /tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/validation.py:12: ImportWarning: Not importing directory '/tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/i18n': missing __init__.py
-      from .i18n import _
-
-    13:53:50,862 INFO  [gearbox] Starting server in PID 11174.
-    Starting HTTP server on http://0.0.0.0:8080
-
 You can now enter the application at
 [http://localhost:8080](http://localhost:8080) and login with admin user.
 
