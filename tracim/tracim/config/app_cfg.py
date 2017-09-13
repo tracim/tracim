@@ -339,6 +339,10 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_SMTP_PASSWORD = tg.config.get(
             'email.notification.smtp.password',
         )
+        self.EMAIL_NOTIFICATION_LOG_FILE_PATH = tg.config.get(
+            'email.notification.log_file_path',
+            None,
+        )
 
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',
