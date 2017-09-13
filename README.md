@@ -149,7 +149,7 @@ At last, compile frontend files:
 
 Create a python virtual environment:
 
-    virtualenv -p /usr/bin/python3.4 tg2env
+    virtualenv -p /usr/bin/python3 tg2env
 
 Activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**):
 
