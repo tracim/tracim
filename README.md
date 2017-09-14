@@ -186,7 +186,7 @@ The two parameters are optional but useful to reload the server upon code change
     gearbox serve --reload --debug
 
 You can now enter the application at
-[http://localhost:8080](http://localhost:8080) and login with admin user:
+[http://127.0.0.1:8080](http://127.0.0.1:8080) and login with admin user:
 
  * user : `admin@admin.admin`
  * password : `admin@admin.admin`
