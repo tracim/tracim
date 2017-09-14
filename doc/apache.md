@@ -1,17 +1,5 @@
 # Running Tracim through Apache #
 
-## Tracim WSGI application script ##
-
-Copy a `WSGI` application script:
-
-    cp tracim/app.wsgi tracim/productionapp.wsgi
-
-Edit this last's `APP_CONFIG` variable to match your environment:
-
-    APP_CONFIG = "/var/www/tracim/tracim/production.ini"
-
-## Apache WSGI ##
-
 ### Installation ###
 
 Install `Apache` server and its [`WSGI` module](https://github.com/GrahamDumpleton/mod_wsgi):
@@ -23,13 +11,13 @@ Install `Apache` server and its [`WSGI` module](https://github.com/GrahamDumplet
 Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
     <VirtualHost *:80>
-        ServerAdmin webmaster@tracim.mycompany.com
-        ServerName localhost/tracim
+        ServerName tracim.mycompany.com
 
-        WSGIProcessGroup localhost/tracim
-        WSGIDaemonProcess localhost/tracim user=www-data group=www-data threads=4 python-path=/home/algooapy/Documents/dev/py/tracim/tg2env/lib/python3.5/site-packages
-        # WSGIScriptAlias / /var/www/tracim/tracim/productionapp.wsgi
-        WSGIScriptAlias /tracim /var/www/tracim/tracim/app.wsgi
+        WSGIDaemonProcess tracim.mycompany.com user=www-data group=www-data threads=4 python-home=/var/www/tracim/tg2env python-path=/var/www/tracim/tracim lang='C.UTF-8' locale='C.UTF-8'
+        WSGIProcessGroup tracim.mycompany.com
+
+        WSGIScriptAlias / /var/www/tracim/tracim/app.wsgi process-group=tracim.mycompany.com
+
         <Directory "/var/www/tracim/tracim">
             <Files "app.wsgi">
                 Require all granted
@@ -37,12 +25,14 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
         </Directory>
 
         #Serve static files directly without TurboGears
-        Alias /assets      /var/www/tracim/tracim/tracim/public/assets
-        Alias /favicon.ico /var/www/tracim/tracim/tracim/public/favicon.ico
+        Alias /assets          /var/www/tracim/tracim/tracim/public/assets
+        Alias /_caldavzap      /var/www/tracim/tracim/tracim/public/_caldavzap
+        # Alias /calendar_config /var/www/tracim/tracim/tracim/public/ ?????????
+        Alias /favicon.ico     /var/www/tracim/tracim/tracim/public/favicon.ico
 
         CustomLog ${APACHE_LOG_DIR}/tracim_access_log combined
         ErrorLog ${APACHE_LOG_DIR}/tracim_error_log
-        LogLevel debug
+        LogLevel info
     </VirtualHost>
 
 Enable this site configuration file:
