@@ -344,12 +344,20 @@ class UserRestController(TIMRestController):
 
         api.save(user)
 
+        email_sent = True
         if send_email:
             email_manager = get_email_manager()
-            email_manager.notify_created_account(user, password=password)
+            try:
+                email_manager.notify_created_account(user, password=password)
+            except Exception:
+                email_sent = False
 
         api.execute_created_user_actions(user)
-        tg.flash(_('User {} created.').format(user.get_display_name()), CST.STATUS_OK)
+        if not email_sent:
+            tg.flash(_('User {0} created but email was not sent to {1}').format(user.get_display_name(), user.email),
+                     CST.STATUS_WARNING)
+        else:
+            tg.flash(_('User {} created.').format(user.get_display_name()), CST.STATUS_OK)
         tg.redirect(self.url())
 
     @classmethod

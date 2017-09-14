@@ -69,6 +69,7 @@ class EmailSender(object):
             logger.info(self, 'Connecting from SMTP server {}'.format(self._smtp_config.server))
             self._smtp_connection = smtplib.SMTP(self._smtp_config.server, self._smtp_config.port)
             self._smtp_connection.ehlo()
+
             if self._smtp_config.login:
                 try:
                     starttls_result = self._smtp_connection.starttls()
@@ -82,8 +83,11 @@ class EmailSender(object):
                     logger.debug(self, 'SMTP login result: {}'.format(login_res))
                 except Exception as e:
                     logger.debug(self, 'SMTP login error: {}'.format(e.__str__()))
-                
+                    raise e
+
             logger.info(self, 'Connection OK')
+
+
 
     def disconnect(self):
         if self._smtp_connection:
@@ -96,7 +100,7 @@ class EmailSender(object):
         if not self._is_active:
             logger.info(self, 'Not sending email to {} (service desactivated)'.format(message['To']))
         else:
-            self.connect() # Acutally, this connects to SMTP only if required
+            self.connect() # Actually, this connects to SMTP only if required
             logger.info(self, 'Sending email to {}'.format(message['To']))
             self._smtp_connection.send_message(message)
 
