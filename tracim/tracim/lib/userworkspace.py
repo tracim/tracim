@@ -86,16 +86,12 @@ class RoleApi(object):
     def get_one(self, user_id, workspace_id):
         return self._get_one_rsc(user_id, workspace_id).one()
 
-    # TODO - A.P - fix with_notif: bool vs with_notif: str
-    # https://github.com/tracim/tracim/issues/302
     def create_one(self, user: User, workspace: Workspace, role_level: int, with_notif: bool, flush: bool=True) -> UserRoleInWorkspace:
         role = self.create_role()
         role.user_id = user.user_id
         role.workspace = workspace
         role.role = role_level
-        if with_notif is not None:
-            from tracim.lib.helpers import on_off_to_boolean
-            role.do_notify = on_off_to_boolean(with_notif)
+        role.do_notify = with_notif
         if flush:
             DBSession.flush()
         return role

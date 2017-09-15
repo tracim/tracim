@@ -1,4 +1,5 @@
 
+
 # Database #
 
 *Note: This page helps you setting up a **development** environment for `Tracim` and its ORM `SQLAlchemy` with `PostgreSQL` and `MySQL`. To set up a **production** environment, changing default database name, database user name and moreover its password is mandatory.*
@@ -10,8 +11,6 @@ If you want to use `PostgreSQL` as database engine:
     sudo apt install postgresql-server-dev-all postgresql postgresql-client
 
 ### Minimalist introduction to PostgreSQL ###
-
-If you already use/know `PostgreSQL`, you can directly go to *Test the database access*.
 
 #### Driver ####
 
@@ -32,50 +31,40 @@ If you changed the file, reload `PostgreSQL`:
 
 #### Creating a user and associated database ####
 
-You need a database and associated user/password. Tracim comes with `pgtool`, tool that will make this step easy:
+Create user and database:
 
-    ./bin/pgtool help
+    sudo --user=postgres psql \
+         --command="CREATE USER tracimuser WITH PASSWORD 'tracimpassword';" \
+         --command="CREATE DATABASE tracimdb OWNER tracimuser;"
 
-Run the following self explanatory commands:
+Test the database access:
 
-    sudo su postgres
-    ./bin/pgtool create_user tracimuser tracimpassword
-    ./bin/pgtool create_database tracimdb
-    ./bin/pgtool grant_all_privileges tracimdb tracimuser
-    exit
+    psql --username=tracimuser --password --host=localhost --dbname=tracimdb \
+         --command="SELECT NOW();"
 
-#### Test the database access ####
-
-So, now you have a database and an associated user/password. A good habit is to test things before to use them, that's why we want to test the database access. This is easily done with Tracim `pgtool`:
-
-    ./bin/pgtool test_connection tracimdb tracimuser tracimpassword 127.0.0.1
-
-The result is similar to the following :
-
-    PG # CONNECT TO DATABASE
-    ------------------------
-    server:     127.0.0.1
-    database:   tracimdb
-    username:   bibi
+Success output:
 
                   now
     -------------------------------
-     2014-11-10 09:40:23.306199+01
-    (1 row)
+    2017-08-25 15:46:41.105865+02
+    (1 ligne)
 
-In case of failure, you would get something like this:
+Failure output:
 
-    PG # CONNECT TO DATABASE
-    ------------------------
-    server:     127.0.0.1
-    database:   tracimdb
-    username:   bibi
+    psql: FATAL:  password authentication failed for user "tracimuser"
+    FATAL:  password authentication failed for user "tracimuser"
 
-    psql: FATAL:  password authentication failed for user "bibi"
-    FATAL:  password authentication failed for user "bibi"
-    ERRROR
+In this case, delete the user and database and start over:
 
-In this case, delete the user and database you previously created, using `pgtool`, and do it again. Do not forget to run the `grant_all_rights` command!
+    sudo --user=postgres psql \
+         --command="DROP USER tracimuser;" \
+         --command="DROP DATABASE tracimdb;"
+
+[//]: # (The following lines are only necessary to fix permissions on an existing database:)
+[//]: # (    sudo --user=postgres psql \)
+[//]: # (         --dbname=tracimdb \)
+[//]: # (         --command="GRANT ALL PRIVILEGES ON DATABASE tracimdb TO tracimuser;" \)
+[//]: # (         --command="GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;")
 
 ## MySQL ##
 

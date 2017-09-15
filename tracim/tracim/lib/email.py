@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import smtplib
+import typing
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import typing
 from mako.template import Template
 from tg.i18n import ugettext as _
 
 from tracim.lib.base import logger
-from tracim.model import User
-
 from tracim.lib.utils import get_rq_queue
+from tracim.model import User
 
 
 def send_email_through(
@@ -51,7 +50,6 @@ class SmtpConfiguration(object):
         self.port = port
         self.login = login
         self.password = password
-
 
 
 class EmailSender(object):
@@ -95,14 +93,19 @@ class EmailSender(object):
             self._smtp_connection.quit()
             logger.info(self, 'Connection closed.')
 
-
     def send_mail(self, message: MIMEMultipart):
         if not self._is_active:
             logger.info(self, 'Not sending email to {} (service desactivated)'.format(message['To']))
         else:
-            self.connect() # Actually, this connects to SMTP only if required
+            self.connect()  # Actually, this connects to SMTP only if required
             logger.info(self, 'Sending email to {}'.format(message['To']))
             self._smtp_connection.send_message(message)
+            from tracim.lib.notifications import EmailNotifier
+            EmailNotifier.log_notification(
+                action='   SENT',
+                recipient=message['To'],
+                subject=message['Subject'],
+            )
 
 
 class EmailManager(object):
