@@ -51,6 +51,8 @@ var globalInterfaceLanguage = (function (lang) {
             return 'fr_FR';
         case 'en':
             return 'en_US';
+        default:
+            return 'en_US';
     }
 })(window.parent.globalTracimLang)
 
