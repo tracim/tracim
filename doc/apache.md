@@ -6,6 +6,11 @@ Install `Apache` server and its [`WSGI` module](https://github.com/GrahamDumplet
 
     sudo apt install apache2 libapache2-mod-wsgi-py3
 
+Load `Apache` http proxy module:
+
+    sudo a2enmod proxy
+    sudo a2enmod proxy_http
+
 ### Configuration ###
 
 Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
