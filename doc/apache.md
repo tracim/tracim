@@ -8,13 +8,22 @@ Install `Apache` server and its [`WSGI` module](https://github.com/GrahamDumplet
 
 ### Configuration ###
 
-In `tracim/development.ini`, edit the base URL prefix of radicale client line from:
+In `tracim/development.ini`:
+- edit the website base url line from:
 
-    # radicale.client.base_url.prefix = /
+      website.base_url = http://127.0.0.1:8080
 
-To:
+  to:
 
-    radicale.client.base_url.prefix = /caldav
+      website.base_url = http://127.0.0.1
+
+- edit the base URL prefix of radicale client line from:
+
+      # radicale.client.base_url.prefix = /
+
+  to:
+
+      radicale.client.base_url.prefix = /caldav
 
 Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
