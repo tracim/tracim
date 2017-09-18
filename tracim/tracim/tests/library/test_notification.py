@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
+import re
 
 from nose.tools import eq_
 from nose.tools import ok_
-from nose.tools import raises
-
-from sqlalchemy.orm.exc import NoResultFound
-
-import transaction
 
 from tracim.config.app_cfg import CFG
 from tracim.lib.notifications import DummyNotifier
@@ -16,7 +13,6 @@ from tracim.lib.notifications import NotifierFactory
 from tracim.lib.notifications import RealNotifier
 from tracim.model.auth import User
 from tracim.model.data import Content
-
 from tracim.tests import TestStandard
 
 
@@ -43,7 +39,7 @@ class TestDummyNotifier(TestStandard):
     def test_email_subject_tag_list(self):
         tags = EST.all()
 
-        eq_(4,len(tags))
+        eq_(4, len(tags))
         ok_('{website_title}' in tags)
         ok_('{workspace_label}' in tags)
         ok_('{content_label}' in tags)
@@ -51,6 +47,44 @@ class TestDummyNotifier(TestStandard):
 
 
 class TestEmailNotifier(TestStandard):
+
+    def test_unit__log_notification(self):
+        """Check file and format of notification log."""
+        log_path = CFG.get_instance().EMAIL_NOTIFICATION_LOG_FILE_PATH
+        pattern = '\|{act}\|{rec}\|{subj}$\\n'
+        line_1_act = 'CREATED'
+        line_1_rec = 'user 1 <us.er@o.ne>'
+        line_1_subj = 'notification 1'
+        line_1_pattern = pattern.format(
+            act=line_1_act,
+            rec=line_1_rec,
+            subj=line_1_subj,
+        )
+        line_2_act = '   SENT'
+        line_2_rec = 'user 2 <us.er@t.wo>'
+        line_2_subj = 'notification 2'
+        line_2_pattern = pattern.format(
+            act=line_2_act,
+            rec=line_2_rec,
+            subj=line_2_subj,
+        )
+        EmailNotifier.log_notification(
+            action=line_1_act,
+            recipient=line_1_rec,
+            subject=line_1_subj,
+        )
+        EmailNotifier.log_notification(
+            action=line_2_act,
+            recipient=line_2_rec,
+            subject=line_2_subj,
+        )
+        with open(log_path, 'rt') as log_file:
+            line_1 = log_file.readline()
+            line_2 = log_file.readline()
+        os.remove(path=log_path)
+        ok_(re.search(pattern=line_1_pattern, string=line_1))
+        ok_(re.search(pattern=line_2_pattern, string=line_2))
+
     def test_email_notifier__build_name_with_user_id(self):
         u = User()
         u.user_id = 3
@@ -95,4 +129,3 @@ class TestEmailNotifier(TestStandard):
         notifier = EmailNotifier(smtp_config=None, global_config=config)
         email = notifier._get_sender()
         eq_('Robot <noreply@tracim.io>', email)
-

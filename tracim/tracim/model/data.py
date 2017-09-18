@@ -735,9 +735,17 @@ class Content(DeclarativeBase):
     revision_to_serialize = -0  # This flag allow to serialize a given revision if required by the user
 
     id = Column(Integer, primary_key=True)
+    # TODO - A.P - 2017-09-05 - revisions default sorting
+    # The only sorting that makes sens is ordering by "updated" field. But:
+    # - its content will soon replace the one of "created",
+    # - this "updated" field will then be dropped.
+    # So for now, we order by "revision_id" explicitly, but remember to switch
+    # to "created" once "updated" removed.
+    # https://github.com/tracim/tracim/issues/336
     revisions = relationship("ContentRevisionRO",
                              foreign_keys=[ContentRevisionRO.content_id],
-                             back_populates="node")
+                             back_populates="node",
+                             order_by="ContentRevisionRO.revision_id")
     children_revisions = relationship("ContentRevisionRO",
                                       foreign_keys=[ContentRevisionRO.parent_id],
                                       back_populates="parent")

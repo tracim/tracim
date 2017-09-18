@@ -60,8 +60,7 @@ The user interface is easy to use: it's based on the well-known folders and file
 
 ## Licence ##
 
-Tracim is licensed under the terms of the
-[GNU Affero General Public License](http://www.gnu.org/licenses/agpl.txt) as published by the [Free Software Foundation](http://www.fsf.org/).
+Tracim is licensed under the terms of the [MIT License](https://opensource.org/licenses/mit-license.php)
 
 ## Technical information ##
 
@@ -122,8 +121,6 @@ Get the sources from GitHub:
     git clone https://github.com/tracim/tracim.git
     cd tracim/
 
-*Note: Now everything is documented to be executed from the tracim directory newly created.*
-
 ## Frontend dependencies ##
 
 [//]: # ( from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
@@ -150,7 +147,7 @@ At last, compile frontend files:
 
 Create a python virtual environment:
 
-    virtualenv -p /usr/bin/python3.4 tg2env
+    virtualenv -p /usr/bin/python3 tg2env
 
 Activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**):
 
@@ -158,51 +155,41 @@ Activate it in your terminal session (**all tracim command execution must be exe
 
 Install Tracim and its dependencies:
 
-    cd tracim && python setup.py develop && cd -
-    pip install -r install/requirements.txt
+    cd tracim/
+    python setup.py develop
+    pip install -r ../install/requirements.txt
 
 ## Configuration files ##
 
 Create configuration files for a development environment and for `WsgiDAV`:
 
-    cp tracim/development.ini.base tracim/development.ini
-    cp tracim/wsgidav.conf.sample tracim/wsgidav.conf
+    cp development.ini.base development.ini
+    cp wsgidav.conf.sample wsgidav.conf
+
+## Translation ##
+
+Compile translation binary files from available catalogs:
+
+    python setup.py compile_catalog
 
 ## Database schema ##
 
 The last step before running the application is to initialize the database
 schema. This is done through the following command:
 
-    cd tracim && gearbox setup-app && cd -
+    gearbox setup-app
 
-## Running the paste http server ##
+## Running Tracim ##
 
-    gearbox serve
-
-While developing, the following command may be more convenient:
+The two parameters are optional but useful to reload the server upon code changes and to get debug data:
 
     gearbox serve --reload --debug
 
-## Running the standalone server ##
-
-Now you can run the standalone server:
-
-    ./bin/run.sh
-
-Which should result in something like this:
-
-    13:53:49,982 INFO  [gearbox] Starting subprocess with file monitor
-    13:53:50,646 WARNI [py.warnings] /tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/validation.py:12: ImportWarning: Not importing directory '/tmp/tracim/protov1/tg2env/lib/python3.2/site-packages/tw2/core/i18n': missing __init__.py
-      from .i18n import _
-
-    13:53:50,862 INFO  [gearbox] Starting server in PID 11174.
-    Starting HTTP server on http://0.0.0.0:8080
-
 You can now enter the application at
-[http://localhost:8080](http://localhost:8080) and login with admin user.
+[http://127.0.0.1:8080](http://127.0.0.1:8080) and login with admin user:
 
- * user : admin@admin.admin
- * password : admin@admin.admin
+ * user : `admin@admin.admin`
+ * password : `admin@admin.admin`
 
 If admin user not created yet, execute following command:
 

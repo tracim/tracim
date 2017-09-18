@@ -43,7 +43,19 @@ var globalBackgroundSync=true;
 var globalSyncResourcesInterval=120000;
 var globalEnableRefresh=false;
 var globalEnableKbNavigation=true;
-var globalInterfaceLanguage=window.parent.globalTracimLang === 'fr' ? 'fr_FR' : window.parent.globalTracimLang; // globalTracimLang is declared in tracim header (caldavzap in in an iframe)
+// var globalInterfaceLanguage=window.parent.globalTracimLang === 'fr' ? 'fr_FR' : window.parent.globalTracimLang; // Côme - 2017/09/14 - line outdated
+// globalTracimLang is declared in tracim header (caldavzap in in an iframe)
+var globalInterfaceLanguage = (function (lang) {
+    switch (lang) {
+        case 'fr':
+            return 'fr_FR';
+        case 'en':
+            return 'en_US';
+        default:
+            return 'en_US';
+    }
+})(window.parent.globalTracimLang)
+
 var globalInterfaceCustomLanguages=['en_US', 'fr_FR'];
 var globalSortAlphabet=' 0123456789'+
     'AÀÁÂÄÆÃÅĀBCÇĆČDĎEÈÉÊËĒĖĘĚFGĞHIÌÍÎİÏĪĮJKLŁĹĽMNŃÑŇOÒÓÔÖŐŒØÕŌ'+

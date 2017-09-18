@@ -6,32 +6,37 @@ This is where the models used by the authentication stack are defined.
 
 It's perfectly fine to re-use this definition in the tracim application,
 though.
-
 """
+import os
+import time
 import uuid
 
-import os
 from datetime import datetime
-import time
-from hashlib import sha256
-from sqlalchemy.ext.hybrid import hybrid_property
-from tracim.lib.utils import lazy_ugettext as l_
 from hashlib import md5
-
-__all__ = ['User', 'Group', 'Permission']
+from hashlib import sha256
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
 from sqlalchemy import Table
-
-from sqlalchemy.types import Unicode
-from sqlalchemy.types import Integer
-from sqlalchemy.types import DateTime
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import synonym
 from sqlalchemy.types import Boolean
-from sqlalchemy.orm import relation, relationship, synonym
-from tg import request
-from tracim.model import DeclarativeBase, metadata, DBSession
+from sqlalchemy.types import DateTime
+from sqlalchemy.types import Integer
+from sqlalchemy.types import Unicode
+
+from tracim.lib.utils import lazy_ugettext as l_
+from tracim.model import DBSession
+from tracim.model import DeclarativeBase
+from tracim.model import metadata
+if TYPE_CHECKING:
+    from tracim.model.data import Workspace
+
+__all__ = ['User', 'Group', 'Permission']
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions.
@@ -50,6 +55,7 @@ user_group_table = Table('user_group', metadata,
     Column('group_id', Integer, ForeignKey('groups.group_id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
+
 
 class Group(DeclarativeBase):
 
@@ -84,10 +90,8 @@ class Group(DeclarativeBase):
         return DBSession.query(cls).filter_by(group_name=group_name).first()
 
 
-
 class Profile(object):
-    """ This model is the "max" group associated to a given user
-    """
+    """This model is the "max" group associated to a given user."""
 
     _NAME = [Group.TIM_NOBODY_GROUPNAME,
              Group.TIM_USER_GROUPNAME,
@@ -106,15 +110,14 @@ class Profile(object):
         self.label = Profile._LABEL[profile_id]
 
 
-
 class User(DeclarativeBase):
     """
     User definition.
 
     This is the user definition used by :mod:`repoze.who`, which requires at
     least the ``email`` column.
-
     """
+
     __tablename__ = 'users'
 
     user_id = Column(Integer, Sequence('seq__users__user_id'), autoincrement=True, primary_key=True)
@@ -151,7 +154,7 @@ class User(DeclarativeBase):
     @property
     def profile(self) -> Profile:
         profile_id = 0
-        if len(self.groups)>0:
+        if len(self.groups) > 0:
             profile_id = max(group.group_id for group in self.groups)
         return Profile(profile_id)
 
@@ -174,30 +177,37 @@ class User(DeclarativeBase):
         return DBSession.query(cls).filter_by(email=username).first()
 
     @classmethod
-    def _hash_password(cls, password):
+    def _hash_password(cls, cleartext_password: str) -> str:
         salt = sha256()
         salt.update(os.urandom(60))
         salt = salt.hexdigest()
 
         hash = sha256()
         # Make sure password is a str because we cannot hash unicode objects
-        hash.update((password + salt).encode('utf-8'))
+        hash.update((cleartext_password + salt).encode('utf-8'))
         hash = hash.hexdigest()
 
-        password = salt + hash
+        ciphertext_password = salt + hash
 
         # Make sure the hashed password is a unicode object at the end of the
         # process because SQLAlchemy _wants_ unicode objects for Unicode cols
         # FIXME - D.A. - 2013-11-20 - The following line has been removed since using python3. Is this normal ?!
         # password = password.decode('utf-8')
 
-        return password
+        return ciphertext_password
 
-    def _set_password(self, password):
-        """Hash ``password`` on the fly and store its hashed version."""
-        self._password = self._hash_password(password)
+    def _set_password(self, cleartext_password: str) -> None:
+        """
+        Set ciphertext password from cleartext password.
 
-    def _get_password(self):
+        Hash cleartext password on the fly,
+        Store its ciphertext version,
+        Update the WebDAV hash as well.
+        """
+        self._password = self._hash_password(cleartext_password)
+        self.update_webdav_digest_auth(cleartext_password)
+
+    def _get_password(self) -> str:
         """Return the hashed version of the password."""
         return self._password
 
@@ -216,41 +226,45 @@ class User(DeclarativeBase):
 
     webdav_left_digest_response_hash = synonym('_webdav_left_digest_response_hash',
                                                descriptor=property(_get_hash_digest,
-                                                                    _set_hash_digest))
+                                                                   _set_hash_digest))
 
-    def update_webdav_digest_auth(self, password) -> None:
+    def update_webdav_digest_auth(self, cleartext_password: str) -> None:
         self.webdav_left_digest_response_hash \
-            = '{username}:/:{password}'.format(
+            = '{username}:/:{cleartext_password}'.format(
                 username=self.email,
-                password=password,
+                cleartext_password=cleartext_password,
             )
 
-
-    def validate_password(self, password):
+    def validate_password(self, cleartext_password: str) -> bool:
         """
         Check the password against existing credentials.
 
-        :param password: the password that was provided by the user to
-            try and authenticate. This is the clear text version that we will
-            need to match against the hashed one in the database.
-        :type password: unicode object.
+        :param cleartext_password: the password that was provided by the user
+            to try and authenticate. This is the clear text version that we
+            will need to match against the hashed one in the database.
+        :type cleartext_password: unicode object.
         :return: Whether the password is valid.
         :rtype: bool
 
         """
-        if not self.password:
-            return False
-        hash = sha256()
-        hash.update((password + self.password[:64]).encode('utf-8'))
-        return self.password[64:] == hash.hexdigest()
+        result = False
+        if self.password:
+            hash = sha256()
+            hash.update((cleartext_password + self.password[:64]).encode('utf-8'))
+            result = self.password[64:] == hash.hexdigest()
+            if result and not self.webdav_left_digest_response_hash:
+                self.update_webdav_digest_auth(cleartext_password)
+        return result
 
-    def get_display_name(self, remove_email_part=False):
+    def get_display_name(self, remove_email_part: bool=False) -> str:
         """
+        Get a name to display from corresponding member or email.
+
         :param remove_email_part: If True and display name based on email,
-         remove @xxx.xxx part of email in returned value
+            remove @xxx.xxx part of email in returned value
         :return: display name based on user name or email.
         """
-        if self.display_name != None and self.display_name != '':
+        if self.display_name:
             return self.display_name
         else:
             if remove_email_part:
@@ -269,6 +283,7 @@ class User(DeclarativeBase):
     def ensure_auth_token(self) -> None:
         """
         Create auth_token if None, regenerate auth_token if too much old.
+
         auth_token validity is set in
         :return:
         """
@@ -301,7 +316,6 @@ class Permission(DeclarativeBase):
 
     __tablename__ = 'permissions'
 
-
     permission_id = Column(Integer, Sequence('seq__permissions__permission_id'), autoincrement=True, primary_key=True)
     permission_name = Column(Unicode(63), unique=True, nullable=False)
     description = Column(Unicode(255))
@@ -314,4 +328,3 @@ class Permission(DeclarativeBase):
 
     def __unicode__(self):
         return self.permission_name
-
