@@ -8,54 +8,33 @@ Install `Apache` server and its [`WSGI` module](https://github.com/GrahamDumplet
 
 ### Configuration ###
 
-In `tracim/development.ini`:
-- edit the website base url line from:
-
-      website.base_url = http://127.0.0.1:8080
-
-  to:
-
-      website.base_url = http://127.0.0.1
-
-- edit the base URL prefix of radicale client line from:
-
-      # radicale.client.base_url.prefix = /
-
-  to:
-
-      radicale.client.base_url.prefix = /caldav
-
 Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
-    <VirtualHost *:80>
+    Listen 8080
+
+    <VirtualHost *:8080>
         ServerName tracim
 
-        ProxyPreserveHost On
-        ProxyRequests Off
-
-        ProxyPass "/caldav" "http://127.0.0.1"
-        ProxyPassReverse "/caldav" "http://127.0.0.1"
-
-        # ProxyPass "/webdav" "http://127.0.0.1"
-        # ProxyPassReverse "/webdav" "http://127.0.0.1"
-
-        WSGIDaemonProcess tracim user=www-data group=www-data threads=4 python-home=/var/www/tracim/tg2env python-path=/var/www/tracim/tracim lang='C.UTF-8' locale='C.UTF-8'
+        # Serve Tracim through WSGI
+        WSGIDaemonProcess tracim user=[your_user] group=[your_user] threads=4 python-home=[tracim_path]/tg2env python-path=[tracim_path]/tracim lang='C.UTF-8' locale='C.UTF-8'
         WSGIProcessGroup tracim
-        WSGIScriptAlias / /var/www/tracim/tracim/app.wsgi process-group=tracim
-        <Directory "/var/www/tracim/tracim">
+        WSGIScriptAlias / [tracim_path]/tracim/app.wsgi process-group=tracim
+        <Directory "[tracim_path]/tracim">
             <Files "app.wsgi">
                 Require all granted
             </Files>
         </Directory>
 
         # Serve static files directly
-        Alias /assets          /var/www/tracim/tracim/tracim/public/assets
-        Alias /_caldavzap      /var/www/tracim/tracim/tracim/public/_caldavzap
-        Alias /favicon.ico     /var/www/tracim/tracim/tracim/public/favicon.ico
-        <Directory "/var/www/tracim/tracim/tracim/public">
+        Alias /assets          [tracim_path]/tracim/tracim/public/assets
+        Alias /_caldavzap      [tracim_path]/tracim/tracim/public/_caldavzap
+        Alias /favicon.ico     [tracim_path]/tracim/tracim/public/favicon.ico
+        <Directory "[tracim_path]/tracim/tracim/public">
             Require all granted
         </Directory>
     </VirtualHost>
+
+Replace `[tracim_path]` and `[your_user]` by your tracim installation path and your user.
 
 Load needed proxy modules and enable this site configuration file:
 
