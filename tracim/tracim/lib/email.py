@@ -81,8 +81,6 @@ class EmailSender(object):
                     logger.debug(self, 'SMTP login result: {}'.format(login_res))
                 except Exception as e:
                     logger.debug(self, 'SMTP login error: {}'.format(e.__str__()))
-                    raise e
-
             logger.info(self, 'Connection OK')
 
 
