@@ -19,6 +19,7 @@ def send_email_through(
 ) -> None:
     """
     Send mail encapsulation to send it in async or sync mode.
+
     TODO BS 20170126: A global mail/sender management should be a good
                       thing. Actually, this method is an fast solution.
     :param sendmail_callable: A callable who get message on first parameter
@@ -41,9 +42,7 @@ def send_email_through(
 
 
 class SmtpConfiguration(object):
-    """
-    Container class for SMTP configuration used in Tracim
-    """
+    """Container class for SMTP configuration used in Tracim."""
 
     def __init__(self, server: str, port: int, login: str, password: str):
         self.server = server
@@ -54,9 +53,12 @@ class SmtpConfiguration(object):
 
 class EmailSender(object):
     """
-    this class allow to send emails and has no relations with SQLAlchemy and other tg HTTP request environment
-    This means that it can be used in any thread (even through a asyncjob_perform() call
+    Independent email sender class.
+
+    To allow its use in any thread, as an asyncjob_perform() call for
+    example, it has no dependencies on SQLAlchemy nor tg HTTP request.
     """
+
     def __init__(self, config: SmtpConfiguration, really_send_messages):
         self._smtp_config = config
         self._smtp_connection = None
@@ -64,31 +66,49 @@ class EmailSender(object):
 
     def connect(self):
         if not self._smtp_connection:
-            logger.info(self, 'Connecting from SMTP server {}'.format(self._smtp_config.server))
-            self._smtp_connection = smtplib.SMTP(self._smtp_config.server, self._smtp_config.port)
+            log = 'Connecting from SMTP server {}'
+            logger.info(self, log.format(self._smtp_config.server))
+            self._smtp_connection = smtplib.SMTP(
+                self._smtp_config.server,
+                self._smtp_config.port
+            )
             self._smtp_connection.ehlo()
+
             if self._smtp_config.login:
                 try:
                     starttls_result = self._smtp_connection.starttls()
-                    logger.debug(self, 'SMTP start TLS result: {}'.format(starttls_result))
+                    log = 'SMTP start TLS result: {}'
+                    logger.debug(self, log.format(starttls_result))
                 except Exception as e:
-                    logger.debug(self, 'SMTP start TLS error: {}'.format(e.__str__()))
+                    log = 'SMTP start TLS error: {}'
+                    logger.debug(self, log.format(e.__str__()))
 
-            login_res = self._smtp_connection.login(self._smtp_config.login, self._smtp_config.password)
-            logger.debug(self, 'SMTP login result: {}'.format(login_res))
+            if self._smtp_config.login:
+                try:
+                    login_res = self._smtp_connection.login(
+                        self._smtp_config.login,
+                        self._smtp_config.password
+                    )
+                    log = 'SMTP login result: {}'
+                    logger.debug(self, log.format(login_res))
+                except Exception as e:
+                    log = 'SMTP login error: {}'
+                    logger.debug(self, log.format(e.__str__()))
             logger.info(self, 'Connection OK')
 
     def disconnect(self):
         if self._smtp_connection:
-            logger.info(self, 'Disconnecting from SMTP server {}'.format(self._smtp_config.server))
+            log = 'Disconnecting from SMTP server {}'
+            logger.info(self, log.format(self._smtp_config.server))
             self._smtp_connection.quit()
             logger.info(self, 'Connection closed.')
 
     def send_mail(self, message: MIMEMultipart):
         if not self._is_active:
-            logger.info(self, 'Not sending email to {} (service desactivated)'.format(message['To']))
+            log = 'Not sending email to {} (service disabled)'
+            logger.info(self, log.format(message['To']))
         else:
-            self.connect()  # Acutally, this connects to SMTP only if required
+            self.connect()  # Actually, this connects to SMTP only if required
             logger.info(self, 'Sending email to {}'.format(message['To']))
             self._smtp_connection.send_message(message)
             from tracim.lib.notifications import EmailNotifier
@@ -110,7 +130,8 @@ class EmailManager(object):
             password: str,
     ) -> None:
         """
-        Send created account email to given user
+        Send created account email to given user.
+
         :param password: choosed password
         :param user: user to notify
         """
@@ -175,7 +196,8 @@ class EmailManager(object):
 
     def _render(self, mako_template_filepath: str, context: dict):
         """
-        Render mako template with all needed current variables
+        Render mako template with all needed current variables.
+
         :param mako_template_filepath: file path of mako template
         :param context: dict with template context
         :return: template rendered string
