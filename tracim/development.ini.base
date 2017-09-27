@@ -124,7 +124,7 @@ templating.genshi.doctype = html5
 # that does not contain any source code in any form for obvious security
 # reasons.  If disabled, None, False, or not writable, it will fall back
 # to an in-memory cache.
-templating.mako.compiled_templates_dir = %(here)s/data/templates
+templating.mako.compiled_templates_dir = ./data/templates
 
 # WARNING: *THE LINE BELOW MUST BE UNCOMMENTED ON A PRODUCTION ENVIRONMENT*
 # Debug mode will enable the interactive debugging tool, allowing ANYONE to
