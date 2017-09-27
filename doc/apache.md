@@ -34,7 +34,22 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
         </Directory>
     </VirtualHost>
 
-Replace `[tracim_path]` and `[your_user]` by your tracim installation path and your user.
+Replace `[tracim_path]` and `[your_user]` above by your tracim installation path and your user.
+
+Set the `APP_CONFIG` variable of the `tracim/app.wsgi` file to match your tracim installation path:
+
+    # -*- coding: utf-8 -*-
+
+    APP_CONFIG = "[tracim_path]/tracim/development.ini"
+
+    #Setup logging
+    # import logging
+    # logging.config.fileConfig(APP_CONFIG)
+
+    #Load the application
+    from paste.deploy import loadapp
+    application = loadapp('config:%s' % APP_CONFIG)
+    application.debug = False
 
 Load needed proxy modules and enable this site configuration file:
 
