@@ -178,3 +178,12 @@ class RootController(StandardController):
         search_results.keywords = keyword_list
 
         return DictLikeClass(fake_api=fake_api, search=search_results)
+
+    @require(predicates.not_anonymous())
+    @expose('tracim.templates.videoconf')
+    def videoconf(self):
+        user = tmpl_context.current_user
+        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
+        fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
+
+        return DictLikeClass(fake_api=fake_api)
