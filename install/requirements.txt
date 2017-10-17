@@ -8,7 +8,7 @@ Mako==1.0.7
 MarkupSafe==1.0
 PasteDeploy==1.5.2
 Radicale==2.1.8
-SQLAlchemy==1.0.11
+SQLAlchemy==1.1.14
 Tempita==0.5.3dev
 TurboGears2==2.3.7
 Unidecode==0.04.19
