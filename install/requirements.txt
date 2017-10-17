@@ -48,7 +48,7 @@ stevedore==1.27.1
 tg.devtools==2.3.11
 tgapp-resetpassword==0.2.1
 tgext.admin==0.7.4
-tgext.crud==0.7.3
+tgext.crud==0.8.2
 tgext.pluggable==0.6.2
 transaction==1.4.4
 tw2.core==2.2.2
