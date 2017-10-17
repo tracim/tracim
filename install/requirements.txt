@@ -59,7 +59,7 @@ waitress==1.1.0
 who_ldap==3.2.2
 -e git+https://github.com/algoo/wsgidav.git@py3#egg=wsgidav
 zope.interface==4.4.3
-zope.sqlalchemy==0.7.6
+zope.sqlalchemy==0.7.7
 PyYAML
 redis==2.10.5
 typing==3.5.3.0
