@@ -4,7 +4,7 @@ Beaker==1.9.0
 CherryPy==11.0.0
 FormEncode==2.0.0a1
 Genshi==0.7
-Mako==1.0.3
+Mako==1.0.7
 MarkupSafe==0.23
 PasteDeploy==1.5.2
 Radicale==1.1.1
