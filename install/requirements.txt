@@ -13,7 +13,7 @@ Tempita==0.5.3dev
 TurboGears2==2.3.11
 Unidecode==0.04.21
 WebOb==1.7.3
-WebTest==1.4.2
+WebTest==2.0.28
 alembic==0.8.4
 argparse==1.2.1
 backlash==0.0.7
