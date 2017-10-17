@@ -35,7 +35,7 @@ prettytable==7
 py4j==0.10.6
 pyasn1==0.3.7
 pyparsing==2.2.0
-python-dateutil==2.5.3
+python-dateutil==2.6.1
 python-editor==1.0.1
 python-ldap-test==0.2.1
 repoze.lru==0.7
