@@ -7,7 +7,7 @@ Genshi==0.7
 Mako==1.0.7
 MarkupSafe==1.0
 PasteDeploy==1.5.2
-Radicale==1.1.1
+Radicale==2.1.8
 SQLAlchemy==1.0.11
 Tempita==0.5.3dev
 TurboGears2==2.3.7
