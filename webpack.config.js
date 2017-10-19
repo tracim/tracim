@@ -66,6 +66,12 @@ module.exports = {
     }, {
       test: /\.styl$/,
       use: ['style-loader', 'css-loader', 'stylus-loader']
+    }, {
+      test: /\.(jpg|png|svg)$/,
+      use: ['url-loader'],
+      options: {
+        limit: 25000
+      }
     }]
   },
   resolve: {
