@@ -13,6 +13,21 @@ In the following documentation, please replace:
 - `[tracim_path]` by  your tracim installation path,
 - `[your_user]` by your user.
 
+Set the `APP_CONFIG` variable of the `tracim/app.wsgi` file to match your tracim installation path:
+
+    # -*- coding: utf-8 -*-
+
+    APP_CONFIG = "[tracim_path]/tracim/development.ini"
+
+    #Setup logging
+    # import logging
+    # logging.config.fileConfig(APP_CONFIG)
+
+    #Load the application
+    from paste.deploy import loadapp
+    application = loadapp('config:%s' % APP_CONFIG)
+    application.debug = False
+
 Create the file named `/etc/uwsgi/apps-available/tracim_uwsgi.ini` containing:
 
     [uwsgi]
@@ -66,22 +81,6 @@ Create a file named `/etc/nginx/sites-available/tracim_nginx.conf` containing:
             uwsgi_param  SCRIPT_NAME  '';
         }
     }
-
-
-Set the `APP_CONFIG` variable of the `tracim/app.wsgi` file to match your tracim installation path:
-
-    # -*- coding: utf-8 -*-
-
-    APP_CONFIG = "[tracim_path]/tracim/development.ini"
-
-    #Setup logging
-    # import logging
-    # logging.config.fileConfig(APP_CONFIG)
-
-    #Load the application
-    from paste.deploy import loadapp
-    application = loadapp('config:%s' % APP_CONFIG)
-    application.debug = False
 
 Enable this site configuration file:
 
