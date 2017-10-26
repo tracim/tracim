@@ -102,7 +102,7 @@ If you want your own dedicated instance but do not want to manage it by yourself
 
 In case you prefer using Docker:
 
-    docker run -e DATABASE_TYPE=sqlite -p 80:80 -v /tmp/tracim:/etc/tracimetc -v /tmp/tracimvar:/var/tracim algoo/tracim
+    docker run -e DATABASE_TYPE=sqlite -p 80:80 -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
 
 ## Install Tracim on your server ##
 
