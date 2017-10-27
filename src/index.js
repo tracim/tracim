@@ -2,18 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { store } from './store.js'
+import Tracim from './container/Tracim.jsx'
 
 // require('./css/index.styl')
 
-const Temp = class Temp extends React.Component {
-  render () {
-    return (<div>It Works</div>)
-  }
-}
-
 ReactDOM.render(
   <Provider store={store}>
-    <Temp />
+    <Tracim />
   </Provider>
   , document.getElementById('content')
 )

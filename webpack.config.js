@@ -4,7 +4,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
   entry: {
-    app: ['babel-polyfill', './src/index.js'],
+    app: ['babel-polyfill', 'whatwg-fetch', './src/index.js'],
     vendor: [
       'babel-plugin-transform-class-properties',
       'babel-plugin-transform-object-assign',
@@ -16,14 +16,14 @@ module.exports = {
       'react',
       'react-dom',
       'react-redux',
-      'react-router',
-      // 'react-router-dom',
+      // 'react-router',
+      'react-router-dom',
       // 'react-select',
       'redux',
       'redux-logger',
       // 'redux-saga',
       'redux-thunk',
-      // 'whatwg-fetch',
+      'whatwg-fetch',
       // 'classnames'
     ]
   },
@@ -68,7 +68,7 @@ module.exports = {
       use: ['style-loader', 'css-loader', 'stylus-loader']
     }, {
       test: /\.(jpg|png|svg)$/,
-      use: ['url-loader'],
+      loader: 'url-loader',
       options: {
         limit: 25000
       }

@@ -7,11 +7,12 @@ import rootReducer from './reducer/root.js'
 
 // const sagaMiddleware = createSagaMiddleware()
 
-export const store = (
-  (middleware, reduxDevTools) => createStore(rootReducer, compose(middleware, reduxDevTools || (f => f)))
-)(
-  applyMiddleware(thunkMiddleware, /* sagaMiddleware, */ createLogger()),
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+export const store = createStore(
+  rootReducer,
+  compose(
+    applyMiddleware(thunkMiddleware, /* sagaMiddleware, */ createLogger()),
+    (window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()) || (f => f)
+  )
 )
 
 // sagaMiddleware.run(rootSaga)
