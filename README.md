@@ -98,6 +98,12 @@ The easiest way to test Tracim is to test it through the online demo:
 
 If you want your own dedicated instance but do not want to manage it by yourself, let's contact me at damien.accorsi@free.fr
 
+## Docker ##
+
+In case you prefer using Docker:
+
+    docker run -e DATABASE_TYPE=sqlite -p 80:80 -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+
 ## Install Tracim on your server ##
 
 Following the installation documentation below, you'll be able to run your own instance on your server.
