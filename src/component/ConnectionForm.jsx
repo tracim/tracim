@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const Connection = props => {
+export const ConnectionForm = props => {
   return (
     <div>
       <input type='text' onChange={props.onChangeLogin} placeholder='Login' />
