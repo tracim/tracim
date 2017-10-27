@@ -62,7 +62,7 @@ Create a file named `/etc/nginx/sites-available/tracim_nginx.conf` containing:
         }
 
         location /favicon.ico {
-            alias [tracim_path]/tracim/tracim/public/favicon.ico
+            alias [tracim_path]/tracim/tracim/public/favicon.ico;
         }
 
         location /assets {
