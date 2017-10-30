@@ -64,11 +64,11 @@
             menubar:false,
             statusbar:true,
             branding: false,
-            plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker", "link", "code", "contextmenu"],
+            plugins: [ "table", "image", "charmap", "fullscreen", "autolink", "colorpicker", "link", "code", "contextmenu", "lists"],
             language: globalTracimLang === 'fr' ? 'fr_FR' : globalTracimLang, // tinymce does't accept en_US as language, it is its default value named 'en'
             selector:'${selector}',
             toolbar: [
-              "undo redo | bold italic underline strikethrough | link | bullist numlist outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code",
+              "undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code",
             ],
             contextmenu: "link",
             link_context_toolbar: true,
