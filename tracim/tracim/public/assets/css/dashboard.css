@@ -125,8 +125,16 @@ body {
   font-size: 16px;
 }
 .header__navbar__switch-mode.switch-work-mode {
-    background-color: #eee;
-    color: #333;
+  background-color: #eee;
+  color: #333;
+}
+
+#move_folder_popup .sidebarleft {
+  border: 1px solid #ddd;
+  border-top-width: 0;
+}
+#move_folder_popup .sidebarleft__menu__item__link {
+  color: #333;
 }
 
 /*

@@ -51,7 +51,7 @@
                     <li role="presentation"><a href="#move-to-another-workspace" aria-controls="move-to-another-workspace" role="tab" data-toggle="tab">${_('to another workspace')}</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active bg-primary" id="move-to-same-workspace"></div>
+                    <div role="tabpanel" class="tab-pane active" id="move-to-same-workspace"></div>
                     <%
                       selected_id = 'workspace_{}__folder_{}'.format(item.workspace.id, item.folder.id if item.folder else '')
                       apiPath = tg.url('/workspaces/treeview_root')
@@ -60,7 +60,7 @@
                       apiChildParameters = tg.url('', dict(ignore_id=item.id, allowed_content_types='folder'))
                     %>
                     ${LEFT_MENU.TREEVIEW('move-to-same-workspace', apiPath, apiParameters, apiChildPath, apiChildParameters, 'True')}
-                    <div role="tabpanel" class="tab-pane bg-primary" id="move-to-another-workspace"></div>
+                    <div role="tabpanel" class="tab-pane" id="move-to-another-workspace"></div>
                     <%
                       apiPath = tg.url('/workspaces/treeview_root')
                       apiParameters = tg.url('', dict(current_id=None, all_workspaces=1, folder_allowed_content_types='folder', ignore_id=item.id, ignore_workspace_id=item.workspace.id))
