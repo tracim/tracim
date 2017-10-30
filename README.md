@@ -222,3 +222,4 @@ Need help ? Do not hesitate to contact me : damien.accorsi@free.fr
 </a>
 
 BrowserStack support open source project and graciously helps us testing Tracim on every devices.
+
