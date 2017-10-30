@@ -14,5 +14,18 @@ var tracimJsTraduction = {
 }
 
 function __ (tradId) {
-  return tracimJsTraduction[tradId][globalTracimLang]
+  const normalizedLang = (() => {
+    switch (globalTracimLang) { // @TODO - Côme - 2017/10/30 - need a more secure way to handle different langs
+      case 'fr':
+      case 'fr-fr':
+      case 'fr_FR':
+        return 'fr_FR';
+      case 'en':
+      case 'en_US':
+        return 'en_US';
+      default:
+        return 'en_US';
+    }
+  })()
+  return tracimJsTraduction[tradId][normalizedLang]
 }

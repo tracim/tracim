@@ -53,7 +53,7 @@
         % if potential_new_user_nb<=0:
             ${TITLE.H3(_('Members'), 'fa-user', 'workspace-members')}
         % else:
-            ${TITLE.H3_WITH_BUTTON(fake_api.current_user, result.workspace, 'workspace-members', _('Members'), 'add-role-from-existing-user-form', _('add one...'), 'fa-user')}
+            ${TITLE.H3_WITH_BUTTON(fake_api.current_user, result.workspace, 'workspace-members', _('Members'), 'add-role-from-existing-user-form', _('add one...'), 'fa-user', 'btn btn-link')}
 
             <div id="add-role-from-existing-user-form" class="collapse col-sm-9">
                 <div class="pod-inline-form">
