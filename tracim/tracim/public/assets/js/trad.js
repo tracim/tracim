@@ -15,7 +15,7 @@ var tracimJsTraduction = {
 
 function __ (tradId) {
   const normalizedLang = (() => {
-    switch (globalTracimLang) { // this var is set in tracim header
+    switch (globalTracimLang) { // @TODO - Côme - 2017/10/30 - need a more secure way to handle different langs
       case 'fr':
       case 'fr-fr':
       case 'fr_FR':
