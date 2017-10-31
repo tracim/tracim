@@ -221,4 +221,4 @@ Need help ? Do not hesitate to contact me : damien.accorsi@free.fr
     <img src="https://raw.githubusercontent.com/tracim/tracim/master/tracim/tracim/public/assets/img/logo_browserstack.png" width="150">
 </a>
 
-BrowserStack support open source project and graciously helps us testing Tracim on every devices.
+BrowserStack support open source project and graciously helps us testing Tracim on every devices. 
