@@ -979,6 +979,7 @@ def serialize_workspace_default(workspace: Workspace, context: Context):
         id = workspace.workspace_id,
         label = workspace.label,  # FIXME - 2015-08-20 - remove this property
         name = workspace.label,  # use name instead of label
+        is_deleted=workspace.is_deleted,
         url = context.url('/workspaces/{}'.format(workspace.workspace_id))
     )
     return result
