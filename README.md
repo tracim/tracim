@@ -118,7 +118,8 @@ You'll need to install the following packages :
 
     sudo apt install git realpath redis-server \
                      python3 python-virtualenv python3-dev python-pip  python-lxml \
-                     build-essential libxml2-dev libxslt1-dev zlib1g-dev libjpeg-dev
+                     build-essential libxml2-dev libxslt1-dev zlib1g-dev libjpeg-dev \
+                     libmagickwand-6.q16-3
 
 ## Get the source ##
 
