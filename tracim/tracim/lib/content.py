@@ -222,7 +222,7 @@ class ContentApi(object):
             result = result.filter(Content.type.in_(self.DISPLAYABLE_CONTENTS))
 
         if workspace:
-            result = result.filter(Content.workspace_id==workspace.workspace_id)
+            result = result.filter(Content.workspace_id == workspace.workspace_id)
 
         # Security layer: if user provided, filter
         # with user workspaces privileges
