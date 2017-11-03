@@ -66,7 +66,7 @@
         <div class="">
             <p>
                 <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-                ${_('Vous consultez <b>une version archivée</b> de la page courante.')|n}
+                ${_('You are looking at an <b>archived thread</b>.')|n}
             </p>
         </div>
     </div>
@@ -75,7 +75,7 @@
         <div class="">
             <p>
                 <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-                ${_('Vous consultez <b>une version supprimée</b> de la page courante.')|n}
+                ${_('You are looking at a <b>deleted thread</b>.')|n}
             </p>
         </div>
     </div>

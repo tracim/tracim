@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-09-05 16:27+0200\n"
+"POT-Creation-Date: 2017-11-03 16:52+0100\n"
 "PO-Revision-Date: 2017-09-05 16:31+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -242,7 +242,7 @@ msgstr ""
 msgid "Notification disabled for workspace {}"
 msgstr ""
 
-#: tracim/controllers/user.py:100 tracim/controllers/admin/user.py:207
+#: tracim/controllers/user.py:100 tracim/controllers/admin/user.py:202
 msgid "Empty password is not allowed."
 msgstr ""
 
@@ -250,63 +250,67 @@ msgstr ""
 msgid "The current password you typed is wrong"
 msgstr ""
 
-#: tracim/controllers/user.py:108 tracim/controllers/admin/user.py:211
+#: tracim/controllers/user.py:108 tracim/controllers/admin/user.py:206
 msgid "New passwords do not match."
 msgstr ""
 
-#: tracim/controllers/user.py:115
+#: tracim/controllers/user.py:114
 msgid "Your password has been changed"
 msgstr ""
 
-#: tracim/controllers/user.py:183
+#: tracim/controllers/user.py:182
 msgid "Email already in use"
 msgstr ""
 
-#: tracim/controllers/user.py:197
+#: tracim/controllers/user.py:196
 msgid "profile updated."
 msgstr ""
 
-#: tracim/controllers/admin/user.py:91
+#: tracim/controllers/admin/user.py:85
 msgid "You can't change your own profile"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:98 tracim/controllers/admin/user.py:149
+#: tracim/controllers/admin/user.py:91 tracim/controllers/admin/user.py:144
 msgid "Unknown profile"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:105
+#: tracim/controllers/admin/user.py:99
 msgid "User updated."
 msgstr ""
 
-#: tracim/controllers/admin/user.py:121
+#: tracim/controllers/admin/user.py:115
 msgid "User {} is now a basic user"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:134
+#: tracim/controllers/admin/user.py:128
 msgid "User {} can now workspaces"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:145
+#: tracim/controllers/admin/user.py:138
 msgid "User {} is now an administrator"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:218
+#: tracim/controllers/admin/user.py:212
 msgid "The password has been changed"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:246
+#: tracim/controllers/admin/user.py:241
 msgid "User {}: notification enabled for workspace {}"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:260
+#: tracim/controllers/admin/user.py:255
 msgid "User {}: notification disabled for workspace {}"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:326
+#: tracim/controllers/admin/user.py:322
 msgid "A user with email address \"{}\" already exists."
 msgstr ""
 
-#: tracim/controllers/admin/user.py:358
+#: tracim/controllers/admin/user.py:357
+msgid "User {0} created but email was not sent to {1}"
+msgstr ""
+
+#: tracim/controllers/admin/user.py:360
 msgid "User {} created."
 msgstr ""
 
@@ -314,15 +318,15 @@ msgstr ""
 msgid "User {} updated."
 msgstr ""
 
-#: tracim/controllers/admin/user.py:436
+#: tracim/controllers/admin/user.py:435
 msgid "User {} enabled."
 msgstr ""
 
-#: tracim/controllers/admin/user.py:449
+#: tracim/controllers/admin/user.py:448
 msgid "You can't de-activate your own account"
 msgstr ""
 
-#: tracim/controllers/admin/user.py:454
+#: tracim/controllers/admin/user.py:453
 msgid "User {} disabled"
 msgstr ""
 
@@ -340,37 +344,37 @@ msgstr ""
 msgid "User {} restored in workspace {} as {}"
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:92
+#: tracim/controllers/admin/workspace.py:96
 msgid "User {} added to workspace {} as {}"
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:118
+#: tracim/controllers/admin/workspace.py:129
 msgid "You can't change your own role"
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:122
+#: tracim/controllers/admin/workspace.py:133
 msgid "Unknown role"
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:127
+#: tracim/controllers/admin/workspace.py:138
 msgid "No change found."
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:209
+#: tracim/controllers/admin/workspace.py:224
 msgid "{} workspace created."
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:245
+#: tracim/controllers/admin/workspace.py:260
 msgid "{} workspace updated."
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:270
+#: tracim/controllers/admin/workspace.py:285
 msgid ""
 "{} workspace deleted. In case of error, you can <a class=\"alert-link\" "
 "href=\"{}\">restore it</a>."
 msgstr ""
 
-#: tracim/controllers/admin/workspace.py:283
+#: tracim/controllers/admin/workspace.py:298
 msgid "{} workspace restored."
 msgstr ""
 
@@ -393,72 +397,72 @@ msgstr ""
 msgid "Workspaces"
 msgstr ""
 
-#: tracim/lib/content.py:870
+#: tracim/lib/content.py:872
 msgid "The content did not changed"
 msgstr ""
 
-#: tracim/lib/content.py:1151
+#: tracim/lib/content.py:1153
 msgid "New folder"
 msgstr ""
 
-#: tracim/lib/content.py:1156
+#: tracim/lib/content.py:1158
 msgid "New folder {0}"
 msgstr ""
 
-#: tracim/lib/helpers.py:88
+#: tracim/lib/helpers.py:87
 msgid "{date} at {time}"
 msgstr ""
 
-#: tracim/lib/notifications.py:309
+#: tracim/lib/notifications.py:339
 msgid "<span id=\"content-intro-username\">{}</span> added a comment:"
 msgstr ""
 
-#: tracim/lib/notifications.py:311 tracim/lib/notifications.py:320
+#: tracim/lib/notifications.py:341 tracim/lib/notifications.py:350
 msgid "Answer"
 msgstr ""
 
-#: tracim/lib/notifications.py:317 tracim/lib/notifications.py:338
-#: tracim/lib/notifications.py:371 tracim/lib/notifications.py:379
+#: tracim/lib/notifications.py:347 tracim/lib/notifications.py:368
+#: tracim/lib/notifications.py:401 tracim/lib/notifications.py:409
 msgid "View online"
 msgstr ""
 
-#: tracim/lib/notifications.py:321
+#: tracim/lib/notifications.py:351
 msgid "<span id=\"content-intro-username\">{}</span> started a thread entitled:"
 msgstr ""
 
-#: tracim/lib/notifications.py:326
+#: tracim/lib/notifications.py:356
 msgid "<span id=\"content-intro-username\">{}</span> added a file entitled:"
 msgstr ""
 
-#: tracim/lib/notifications.py:333
+#: tracim/lib/notifications.py:363
 msgid "<span id=\"content-intro-username\">{}</span> added a page entitled:"
 msgstr ""
 
-#: tracim/lib/notifications.py:341
+#: tracim/lib/notifications.py:371
 msgid "<span id=\"content-intro-username\">{}</span> uploaded a new revision."
 msgstr ""
 
-#: tracim/lib/notifications.py:345
+#: tracim/lib/notifications.py:375
 msgid "<span id=\"content-intro-username\">{}</span> updated this page."
 msgstr ""
 
-#: tracim/lib/notifications.py:350 tracim/lib/notifications.py:360
+#: tracim/lib/notifications.py:380 tracim/lib/notifications.py:390
 msgid "<p id=\"content-body-intro\">Here is an overview of the changes:</p>"
 msgstr ""
 
-#: tracim/lib/notifications.py:355
+#: tracim/lib/notifications.py:385
 msgid ""
 "<span id=\"content-intro-username\">{}</span> updated the thread "
 "description."
 msgstr ""
 
-#: tracim/lib/notifications.py:374
+#: tracim/lib/notifications.py:404
 msgid ""
 "<span id=\"content-intro-username\">{}</span> updated the file "
 "description."
 msgstr ""
 
-#: tracim/lib/notifications.py:380
+#: tracim/lib/notifications.py:410
 msgid ""
 "<span id=\"content-intro-username\">{}</span> updated the following "
 "status:"
@@ -472,23 +476,23 @@ msgstr ""
 msgid "You're not allowed to access this resource"
 msgstr ""
 
-#: tracim/lib/workspace.py:192 tracim/templates/home.mak:134
+#: tracim/lib/workspace.py:208 tracim/templates/home.mak:134
 #: tracim/templates/master_no_toolbar_no_login.mak:109
 #: tracim/templates/admin/user_getone.mak:72
 #: tracim/templates/admin/workspace_getall.mak:73
 msgid "Workspace"
 msgstr ""
 
-#: tracim/lib/workspace.py:195 tracim/templates/admin/workspace_getone.mak:13
+#: tracim/lib/workspace.py:211 tracim/templates/admin/workspace_getone.mak:13
 #: tracim/templates/admin/workspace_getone.mak:27
 msgid "Workspace {}"
 msgstr ""
 
-#: tracim/model/auth.py:97
+#: tracim/model/auth.py:101
 msgid "Nobody"
 msgstr ""
 
-#: tracim/model/auth.py:98 tracim/templates/master_authenticated.mak:137
+#: tracim/model/auth.py:102 tracim/templates/master_authenticated.mak:137
 #: tracim/templates/master_no_toolbar_no_login.mak:114
 #: tracim/templates/admin/user_getall.mak:11
 #: tracim/templates/admin/user_getall.mak:20
@@ -496,11 +500,11 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
-#: tracim/model/auth.py:99
+#: tracim/model/auth.py:103
 msgid "Global managers"
 msgstr ""
 
-#: tracim/model/auth.py:100
+#: tracim/model/auth.py:104
 msgid "Administrators"
 msgstr ""
 
@@ -1046,7 +1050,7 @@ msgstr ""
 #: tracim/templates/file/edit.mak:13 tracim/templates/file/edit.mak:14
 #: tracim/templates/folder/getone.mak:151 tracim/templates/page/edit.mak:13
 #: tracim/templates/page/edit.mak:14 tracim/templates/page/forms.mak:16
-#: tracim/templates/workspace/getone.mak:227
+#: tracim/templates/workspace/getone.mak:222
 msgid "Title"
 msgstr ""
 
@@ -1145,13 +1149,13 @@ msgstr ""
 
 #: tracim/templates/user_workspace_widgets.mak:80
 #: tracim/templates/folder/getone.mak:154
-#: tracim/templates/workspace/getone.mak:226
+#: tracim/templates/workspace/getone.mak:221
 msgid "Type"
 msgstr ""
 
 #: tracim/templates/user_workspace_widgets.mak:82
 #: tracim/templates/folder/getone.mak:152
-#: tracim/templates/workspace/getone.mak:228
+#: tracim/templates/workspace/getone.mak:223
 msgid "Status"
 msgstr ""
 
@@ -1473,14 +1477,12 @@ msgid ""
 "{last_modification_author})"
 msgstr ""
 
-#: tracim/templates/file/getone.mak:69 tracim/templates/folder/getone.mak:67
-#: tracim/templates/thread/getone.mak:69
-msgid "Vous consultez <b>une version archivÃ©e</b> de la page courante."
+#: tracim/templates/file/getone.mak:69
+msgid "You are looking at an <b>archived file</b>."
 msgstr ""
 
-#: tracim/templates/file/getone.mak:76 tracim/templates/folder/getone.mak:74
-#: tracim/templates/thread/getone.mak:78
-msgid "Vous consultez <b>une version supprimÃ©e</b> de la page courante."
+#: tracim/templates/file/getone.mak:76
+msgid "You are looking at a <b>deleted file</b>."
 msgstr ""
 
 #: tracim/templates/file/getone.mak:85
@@ -1607,23 +1609,31 @@ msgstr ""
 msgid "folder created on {date} at {time} by <b>{author}</b>"
 msgstr ""
 
+#: tracim/templates/folder/getone.mak:67
+msgid "You are looking at an <b>archived folder</b>."
+msgstr ""
+
+#: tracim/templates/folder/getone.mak:74
+msgid "You are looking at a <b>deleted folder</b>."
+msgstr ""
+
 #: tracim/templates/folder/getone.mak:89
 #: tracim/templates/workspace/getone.mak:163
 msgid "New ..."
 msgstr ""
 
 #: tracim/templates/folder/getone.mak:111
-#: tracim/templates/workspace/getone.mak:201
+#: tracim/templates/workspace/getone.mak:197
 msgid "hide..."
 msgstr ""
 
 #: tracim/templates/folder/getone.mak:121
-#: tracim/templates/workspace/getone.mak:210
+#: tracim/templates/workspace/getone.mak:206
 msgid "filter..."
 msgstr ""
 
 #: tracim/templates/folder/getone.mak:146
-#: tracim/templates/workspace/getone.mak:221
+#: tracim/templates/workspace/getone.mak:216
 msgid "This folder has not yet content."
 msgstr ""
 
@@ -1909,6 +1919,14 @@ msgstr ""
 msgid "page created on {date} at {time} by <b>{author}</b>"
 msgstr ""
 
+#: tracim/templates/thread/getone.mak:69
+msgid "You are looking at an <b>archived thread</b>."
+msgstr ""
+
+#: tracim/templates/thread/getone.mak:78
+msgid "You are looking at a <b>deleted thread</b>."
+msgstr ""
+
 #: tracim/templates/thread/getone.mak:119
 msgid "Invert order"
 msgstr ""
@@ -1966,6 +1984,16 @@ msgstr ""
 
 #: tracim/templates/widgets/table_row.mak:53
 msgid "Remove this user from the current workspace"
+msgstr ""
+
+#: tracim/templates/widgets/table_row.mak:68
+#: tracim/templates/widgets/table_row.mak:98
+msgid "archived"
+msgstr ""
+
+#: tracim/templates/widgets/table_row.mak:70
+#: tracim/templates/widgets/table_row.mak:100
+msgid "deleted"
 msgstr ""
 
 #: tracim/templates/widgets/ui.mak:12
@@ -2054,7 +2082,7 @@ msgstr ""
 msgid "You are not allowed to create content"
 msgstr ""
 
-#: tracim/templates/workspace/getone.mak:229
+#: tracim/templates/workspace/getone.mak:224
 msgid "Remarques"
 msgstr ""
 
@@ -2065,4 +2093,10 @@ msgstr ""
 #: tracim/templates/workspace/toolbar.mak:19
 msgid "Delete current workspace"
 msgstr ""
+
+#~ msgid "Vous consultez <b>une version archivÃ©e</b> de la page courante."
+#~ msgstr ""
+
+#~ msgid "Vous consultez <b>une version supprimÃ©e</b> de la page courante."
+#~ msgstr ""
 

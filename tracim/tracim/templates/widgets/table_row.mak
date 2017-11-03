@@ -65,9 +65,9 @@
         <!--td class="folder__content__list__type">
             <span class="${content.type.color}">
                 % if (content.is_archived) :
-                    <i class="fa fa-archive fa-fw tracim-less-visible" title="Archivé"></i>
+                    <i class="fa fa-archive fa-fw tracim-less-visible" title="${_('archived')}"></i>
                 % elif (content.is_deleted) :
-                    <i class="fa fa-trash-o fa-fw tracim-less-visible" title="Supprimé"></i>
+                    <i class="fa fa-trash-o fa-fw tracim-less-visible" title="${_('deleted')}"></i>
                 % endif
                 ${content.type.label}
             </span>
@@ -95,9 +95,9 @@
                     <span class="t-less-visible">
                       ${content.status.label}
                       % if (content.is_archived) :
-                          - Archivé
+                          - ${_('archived')}
                       % elif (content.is_deleted) :
-                          - Supprimé
+                          - ${_('deleted')}
                       % endif
                     </span>
                 </a>
