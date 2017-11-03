@@ -280,6 +280,16 @@ class User(DeclarativeBase):
         from tracim.model.data import UserRoleInWorkspace
         return UserRoleInWorkspace.NOT_APPLICABLE
 
+    def get_active_roles(self) -> ['UserRoleInWorkspace']:
+        """
+        :return: list of roles of the user for all not-deleted workspaces
+        """
+        roles = []
+        for role in self.roles:
+            if not role.workspace.is_deleted:
+                roles.append(role)
+        return roles
+
     def ensure_auth_token(self) -> None:
         """
         Create auth_token if None, regenerate auth_token if too much old.

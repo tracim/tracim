@@ -914,7 +914,7 @@ def serialize_user_for_user(user: User, context: Context):
     result['id'] = user.user_id
     result['name'] = user.get_display_name()
     result['email'] = user.email
-    result['roles'] = context.toDict(user.roles)
+    result['roles'] = context.toDict(user.get_active_roles())
     result['enabled'] = user.is_active
     result['profile'] = user.profile
     result['calendar_url'] = user.calendar_url
