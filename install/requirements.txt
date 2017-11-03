@@ -22,7 +22,7 @@ caldav==0.4.0
 cliff==2.9.1
 cmd2==0.6.9
 coverage==4.4.1
-crank==0.7.3
+crank==0.8.1
 decorator==3.4.0
 gearbox==0.0.7
 icalendar==3.10
