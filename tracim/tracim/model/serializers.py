@@ -996,6 +996,7 @@ def serialize_workspace_in_list_for_one_user(workspace: Workspace, context: Cont
     result = DictLikeClass()
     result['id'] = workspace.workspace_id
     result['name'] = workspace.label
+    result['is_deleted'] = workspace.is_deleted
 
     return result
 
