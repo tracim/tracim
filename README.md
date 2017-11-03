@@ -160,6 +160,10 @@ Activate it in your terminal session (**all tracim command execution must be exe
 
     source tg2env/bin/activate
 
+Ensure latest `pip`/`setuptools` versions are installed:
+
+    pip install --upgrade pip setuptools
+
 Install Tracim and its dependencies:
 
     cd tracim/
