@@ -154,19 +154,6 @@ class RootController(StandardController):
         fake_api.favorites = Context(CTX.CONTENT_LIST).toDict(items, 'contents', 'nb')
         return DictLikeClass(fake_api=fake_api)
 
-        # user_id = tmpl_context.current_user.user_id
-        #
-        # current_user = tmpl_context.current_user
-        # assert user_id==current_user.user_id
-        # api = UserApi(current_user)
-        # current_user = api.get_one(current_user.user_id)
-        # dictified_user = Context(CTX.USER).toDict(current_user, 'user')
-        # current_user_content = Context(CTX.CURRENT_USER).toDict(tmpl_context.current_user)
-        # fake_api_content = DictLikeClass(current_user=current_user_content)
-        # fake_api = Context(CTX.WORKSPACE).toDict(fake_api_content)
-        #
-        # return DictLikeClass(result = dictified_user, fake_api=fake_api)
-
     @require(predicates.not_anonymous())
     @expose('tracim.templates.search.display')
     def search(self, keywords=''):
