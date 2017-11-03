@@ -63,5 +63,5 @@ zope.sqlalchemy==0.7.6
 PyYAML
 redis==2.10.5
 typing==3.5.3.0
-rq==0.7.1
+rq==0.9.1
 click==6.7
