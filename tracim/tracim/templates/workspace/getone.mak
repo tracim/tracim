@@ -77,9 +77,9 @@
     % else:
         <p>
             % if member_nb == 1:
-                ${_('This workspace has {a_open}one member{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', a_close='</a>')|n}
+                ${_('This workspace has {a_open}one member{a_close}').format(a_open='<a class="btn-link" data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', a_close='</a>')|n}
             % else:
-                ${_('This workspace has {a_open}{member_nb} members{a_close}').format(a_open='<a data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', member_nb=member_nb, a_close='</a>')|n}
+                ${_('This workspace has {a_open}{member_nb} members{a_close}').format(a_open='<a class="btn-link" data-toggle="collapse" href="#memberList" aria-expanded="false" aria-controls="memberList">', member_nb=member_nb, a_close='</a>')|n}
                 % if viewable_member_nb != member_nb:
                     <span id="members-whose" style="display: none;">${ _('whose') }:</span>
                 % endif
@@ -112,7 +112,7 @@
 
     % if result.workspace.calendar_enabled:
         <p>
-            ${_('This workspace has {a_open}an associated calendar{a_close}').format(a_open='<a data-toggle="collapse" href="#calendarConfig" aria-expanded="false" aria-controls="calendarConfig">', a_close='</a>')|n}
+            ${_('This workspace has {a_open}an associated calendar{a_close}').format(a_open='<a class="btn-link" data-toggle="collapse" href="#calendarConfig" aria-expanded="false" aria-controls="calendarConfig">', a_close='</a>')|n}
         </p>
         <div class="collapse" id="calendarConfig">
             <p>${_('You can access the calendar using your own software: Outlook, Thunderbird, etc.')}</p>
@@ -122,7 +122,7 @@
     % endif
 
     <p>
-        ${_('You can browse the content of this workspace {a_open}in your file explorer (webdav){a_close}').format(a_open='<a data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
+        ${_('You can browse the content of this workspace {a_open}in your file explorer (webdav){a_close}').format(a_open='<a class="btn-link" data-toggle="collapse" href="#webdavConfig" aria-expanded="false" aria-controls="webdavConfig">', a_close='</a>')|n}
     </p>
     <div class="collapse" id="webdavConfig">
         <div class="row">

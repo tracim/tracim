@@ -75,11 +75,13 @@
                         </tr>
                     </thead>
                     % for role in result.user.roles:
+                        % if not role.workspace.is_deleted:
                         <%
                             enable_link = '/admin/users/{user}/workspaces/{workspace}/enable_notifications?next_url=/admin/users/{user}'
                             disable_link = '/admin/users/{user}/workspaces/{workspace}/disable_notifications?next_url=/admin/users/{user}'
                         %>
                         ${TABLE_ROW.USER_ROLE_IN_WORKSPACE(fake_api.current_user, role, show_id=True, enable_link=enable_link, disable_link=disable_link)}
+                        % endif
                     % endfor
                 </table>
             % endif
