@@ -118,7 +118,8 @@ You'll need to install the following packages :
 
     sudo apt install git realpath redis-server \
                      python3 python-virtualenv python3-dev python-pip  python-lxml \
-                     build-essential libxml2-dev libxslt1-dev zlib1g-dev libjpeg-dev
+                     build-essential libxml2-dev libxslt1-dev zlib1g-dev libjpeg-dev \
+                     libmagickwand-6.q16-3
 
 ## Get the source ##
 
@@ -158,6 +159,10 @@ Create a python virtual environment:
 Activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**):
 
     source tg2env/bin/activate
+
+Ensure latest `pip`/`setuptools` versions are installed:
+
+    pip install --upgrade pip setuptools
 
 Install Tracim and its dependencies:
 
