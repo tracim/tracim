@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pod 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-03 16:52+0100\n"
-"PO-Revision-Date: 2017-11-03 16:56+0100\n"
+"POT-Creation-Date: 2017-11-03 18:01+0100\n"
+"PO-Revision-Date: 2017-11-03 18:01+0100\n"
 "Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
 "Language: fr\n"
 "Language-Team: fr_FR <LL@li.org>\n"
@@ -412,15 +412,15 @@ msgstr "Calendrier personnel"
 msgid "Workspaces"
 msgstr "Espaces de travail"
 
-#: tracim/lib/content.py:872
+#: tracim/lib/content.py:875
 msgid "The content did not changed"
 msgstr "Le contenu est inchangé"
 
-#: tracim/lib/content.py:1153
+#: tracim/lib/content.py:1156
 msgid "New folder"
 msgstr "Nouveau dossier"
 
-#: tracim/lib/content.py:1158
+#: tracim/lib/content.py:1161
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
@@ -1852,12 +1852,12 @@ msgstr ""
 "{last_modification_author})"
 
 #: tracim/templates/page/getone.mak:67
-msgid "You are viewing <b>an archived version</b> of the current page."
-msgstr "Vous consultez <b>une version archivée</b> de la page courante."
+msgid "You are looking at an <b>archived page</b>."
+msgstr "Vous consultez un <b>fichier archivé</b>."
 
 #: tracim/templates/page/getone.mak:74
-msgid "You are viewing <b>a deleted version</b> of the current page."
-msgstr "Vous consultez <b>une version supprimée</b> de la page courante."
+msgid "You are looking at a <b>deleted page</b>."
+msgstr "Vous consultez un <b>fichier supprimé</b>."
 
 #: tracim/templates/page/getone.mak:83
 msgid ""
@@ -2179,3 +2179,9 @@ msgstr "Modifier l'espace de travail courant"
 #: tracim/templates/workspace/toolbar.mak:19
 msgid "Delete current workspace"
 msgstr "Supprimer l'espace de travail"
+
+#~ msgid "You are viewing <b>an archived version</b> of the current page."
+#~ msgstr "Vous consultez <b>une version archivée</b> de la page courante."
+
+#~ msgid "You are viewing <b>a deleted version</b> of the current page."
+#~ msgstr "Vous consultez <b>une version supprimée</b> de la page courante."

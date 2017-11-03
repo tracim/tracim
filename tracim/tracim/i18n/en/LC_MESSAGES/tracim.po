@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-03 16:52+0100\n"
+"POT-Creation-Date: 2017-11-03 18:01+0100\n"
 "PO-Revision-Date: 2017-09-05 16:31+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -397,15 +397,15 @@ msgstr ""
 msgid "Workspaces"
 msgstr ""
 
-#: tracim/lib/content.py:872
+#: tracim/lib/content.py:875
 msgid "The content did not changed"
 msgstr ""
 
-#: tracim/lib/content.py:1153
+#: tracim/lib/content.py:1156
 msgid "New folder"
 msgstr ""
 
-#: tracim/lib/content.py:1158
+#: tracim/lib/content.py:1161
 msgid "New folder {0}"
 msgstr ""
 
@@ -1782,11 +1782,11 @@ msgid ""
 msgstr ""
 
 #: tracim/templates/page/getone.mak:67
-msgid "You are viewing <b>an archived version</b> of the current page."
+msgid "You are looking at an <b>archived page</b>."
 msgstr ""
 
 #: tracim/templates/page/getone.mak:74
-msgid "You are viewing <b>a deleted version</b> of the current page."
+msgid "You are looking at a <b>deleted page</b>."
 msgstr ""
 
 #: tracim/templates/page/getone.mak:83
@@ -2098,5 +2098,11 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Vous consultez <b>une version supprimÃ©e</b> de la page courante."
+#~ msgstr ""
+
+#~ msgid "You are viewing <b>an archived version</b> of the current page."
+#~ msgstr ""
+
+#~ msgid "You are viewing <b>a deleted version</b> of the current page."
 #~ msgstr ""
 
