@@ -47,7 +47,7 @@ sprox==0.9.4
 stevedore==1.20.0
 tg.devtools==2.3.7
 tgapp-resetpassword==0.2.0
-tgext.admin==0.6.4
+tgext.admin==0.7.4
 tgext.crud==0.7.3
 tgext.pluggable==0.6.2
 transaction==1.4.4
