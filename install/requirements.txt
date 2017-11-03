@@ -36,7 +36,7 @@ py4j==0.10.1
 pyasn1==0.1.9
 pyparsing==2.1.0
 python-dateutil==2.5.3
-python-editor==1.0.1
+python-editor==1.0.3
 python-ldap-test==0.2.1
 repoze.lru==0.7
 repoze.who==2.3
