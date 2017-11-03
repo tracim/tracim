@@ -1564,7 +1564,7 @@ msgstr "Supprimer"
 #: tracim/templates/thread/toolbar.mak:53
 #: tracim/templates/thread/toolbar.mak:57
 msgid "Restore"
-msgstr ""
+msgstr "Restaurer"
 
 #: tracim/templates/folder/forms.mak:12
 msgid "New Folder"
