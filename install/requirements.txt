@@ -50,7 +50,7 @@ tgapp-resetpassword==0.2.0
 tgext.admin==0.6.4
 tgext.crud==0.7.3
 tgext.pluggable==0.6.2
-transaction==1.4.4
+transaction==2.1.2
 tw2.core==2.2.2
 tw2.forms==2.2.2.1
 unicode-slugify==0.1.3
