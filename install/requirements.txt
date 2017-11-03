@@ -1,4 +1,4 @@
-pytz==2014.7
+pytz==2017.3
 Babel==2.2.0
 Beaker==1.6.4
 CherryPy==3.6.0
