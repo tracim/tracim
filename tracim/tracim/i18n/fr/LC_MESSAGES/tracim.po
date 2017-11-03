@@ -7,17 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pod 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-03 18:01+0100\n"
+"POT-Creation-Date: 2017-11-03 18:06+0100\n"
 "PO-Revision-Date: 2017-11-03 18:01+0100\n"
 "Last-Translator: Damien Accorsi <damien.accorsi@free.fr>\n"
 "Language: fr\n"
 "Language-Team: fr_FR <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.2.0\n"
-"X-Generator: Poedit 1.6.10\n"
 
 #: tracim/config/app_cfg.py:153 tracim/templates/widgets/forms.mak:15
 #: tracim/templates/widgets/forms.mak:16 tracim/templates/widgets/forms.mak:39
@@ -70,8 +69,8 @@ msgid ""
 "\n"
 "%(password_reset_link)s\n"
 "\n"
-"If you no longer wish to make the above change, or if you did not initiate "
-"this request, please disregard and/or delete this e-mail.\n"
+"If you no longer wish to make the above change, or if you did not "
+"initiate this request, please disregard and/or delete this e-mail.\n"
 msgstr ""
 "\n"
 "Nous avons reçu une requête de réinitialisation du mot de passe pour ce "
@@ -80,8 +79,9 @@ msgstr ""
 "\n"
 "%(password_reset_link)s\n"
 "\n"
-"Si vous ne souhaitez plus procéder à ce changement, ou si vous n'êtes pas à "
-"l'originie de cette requête, merci d'ignorer et/ou supprimer cet e-mail.\n"
+"Si vous ne souhaitez plus procéder à ce changement, ou si vous n'êtes pas"
+" à l'originie de cette requête, merci d'ignorer et/ou supprimer cet "
+"e-mail.\n"
 
 #: tracim/controllers/__init__.py:301 tracim/controllers/content.py:446
 #: tracim/controllers/content.py:604
@@ -106,8 +106,7 @@ msgstr "Statut de {} non mis(e) à jour : {}"
 
 #: tracim/controllers/__init__.py:362
 msgid "{} archived. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
-msgstr ""
-"{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
 
 #: tracim/controllers/__init__.py:372 tracim/controllers/content.py:1152
 msgid "{} not archived: {}"
@@ -124,7 +123,8 @@ msgstr "{} non désarchivé(e) : {}"
 #: tracim/controllers/__init__.py:412
 msgid "{} deleted. <a class=\"alert-link\" href=\"{}\">Cancel action</a>"
 msgstr ""
-"{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+"{} supprimé(e). <a class=\"alert-link\" href=\"{}\">Annuler "
+"l'opération</a>"
 
 #: tracim/controllers/__init__.py:422 tracim/controllers/content.py:120
 #: tracim/controllers/content.py:1214
@@ -195,8 +195,7 @@ msgstr "Vous n'êtes pas autorisé à déplacer ce dossier"
 
 #: tracim/controllers/content.py:816
 msgid "You are not allowed to move this folder to this workspace"
-msgstr ""
-"Vous n'êtes pas autorisé à déplacer ce dossier vers cet espace de travail"
+msgstr "Vous n'êtes pas autorisé à déplacer ce dossier vers cet espace de travail"
 
 #: tracim/controllers/content.py:829
 msgid "Item moved to {} (workspace {})"
@@ -349,9 +348,9 @@ msgstr "Vous ne pouvez pas vous retirer de cet espace de travail."
 
 #: tracim/controllers/admin/workspace.py:77
 msgid ""
-"User {} removed. You can <a class=\"alert-link\" href=\"{}\">restore it</a>"
-msgstr ""
-"{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
+"User {} removed. You can <a class=\"alert-link\" href=\"{}\">restore "
+"it</a>"
+msgstr "{} archivé(e). <a class=\"alert-link\" href=\"{}\">Annuler l'opération</a>"
 
 #: tracim/controllers/admin/workspace.py:85
 msgid "User {} restored in workspace {} as {}"
@@ -383,11 +382,11 @@ msgstr "Espace de travail {} mis à jour."
 
 #: tracim/controllers/admin/workspace.py:285
 msgid ""
-"{} workspace deleted. In case of error, you can <a class=\"alert-link\" href="
-"\"{}\">restore it</a>."
+"{} workspace deleted. In case of error, you can <a class=\"alert-link\" "
+"href=\"{}\">restore it</a>."
 msgstr ""
-"Espace de travail {} supprimé. Vous pouvez <a class=\"alert-link\" href="
-"\"{}\">annuler l'opération</a>."
+"Espace de travail {} supprimé. Vous pouvez <a class=\"alert-link\" "
+"href=\"{}\">annuler l'opération</a>."
 
 #: tracim/controllers/admin/workspace.py:298
 msgid "{} workspace restored."
@@ -430,8 +429,7 @@ msgstr "{date} à {time}"
 
 #: tracim/lib/notifications.py:339
 msgid "<span id=\"content-intro-username\">{}</span> added a comment:"
-msgstr ""
-"<span id=\"content-intro-username\">{}</span> a ajouté un commentaire :"
+msgstr "<span id=\"content-intro-username\">{}</span> a ajouté un commentaire :"
 
 #: tracim/lib/notifications.py:341 tracim/lib/notifications.py:350
 msgid "Answer"
@@ -443,8 +441,7 @@ msgid "View online"
 msgstr "Voir en ligne"
 
 #: tracim/lib/notifications.py:351
-msgid ""
-"<span id=\"content-intro-username\">{}</span> started a thread entitled:"
+msgid "<span id=\"content-intro-username\">{}</span> started a thread entitled:"
 msgstr ""
 "<span id=\"content-intro-username\">{}</span> a lancé une discussion "
 "intitulée :"
@@ -452,12 +449,14 @@ msgstr ""
 #: tracim/lib/notifications.py:356
 msgid "<span id=\"content-intro-username\">{}</span> added a file entitled:"
 msgstr ""
-"<span id=\"content-intro-username\">{}</span> a ajouté un fichier intitulé :"
+"<span id=\"content-intro-username\">{}</span> a ajouté un fichier "
+"intitulé :"
 
 #: tracim/lib/notifications.py:363
 msgid "<span id=\"content-intro-username\">{}</span> added a page entitled:"
 msgstr ""
-"<span id=\"content-intro-username\">{}</span> a ajouté une page intitulée :"
+"<span id=\"content-intro-username\">{}</span> a ajouté une page intitulée"
+" :"
 
 #: tracim/lib/notifications.py:371
 msgid "<span id=\"content-intro-username\">{}</span> uploaded a new revision."
@@ -475,21 +474,24 @@ msgstr "<p id=\"content-body-intro\">Voici un aperçu des modifications :</p>"
 
 #: tracim/lib/notifications.py:385
 msgid ""
-"<span id=\"content-intro-username\">{}</span> updated the thread description."
+"<span id=\"content-intro-username\">{}</span> updated the thread "
+"description."
 msgstr ""
-"<span id=\"content-intro-username\">{}</span> a mis à jour la description de "
-"la discussion."
+"<span id=\"content-intro-username\">{}</span> a mis à jour la description"
+" de la discussion."
 
 #: tracim/lib/notifications.py:404
 msgid ""
-"<span id=\"content-intro-username\">{}</span> updated the file description."
+"<span id=\"content-intro-username\">{}</span> updated the file "
+"description."
 msgstr ""
-"<span id=\"content-intro-username\">{}</span> a mis à jour la description du "
-"fichier."
+"<span id=\"content-intro-username\">{}</span> a mis à jour la description"
+" du fichier."
 
 #: tracim/lib/notifications.py:410
 msgid ""
-"<span id=\"content-intro-username\">{}</span> updated the following status:"
+"<span id=\"content-intro-username\">{}</span> updated the following "
+"status:"
 msgstr ""
 "<span id=\"content-intro-username\">{}</span> a mis à jour le statut "
 "suivant :"
@@ -954,16 +956,16 @@ msgstr ""
 #: tracim/templates/user_get_me.mak:56 tracim/templates/widgets/span.mak:21
 msgid "Email notifications desactivated. Click to subscribe."
 msgstr ""
-"Vous n'êtes pas abonné(e) aux notifications par email. Cliquez pour pour les "
-"activer"
+"Vous n'êtes pas abonné(e) aux notifications par email. Cliquez pour pour "
+"les activer"
 
 #: tracim/templates/user_get_me.mak:66
 msgid ""
-"You can configure your email notifications by clicking on the email icons "
-"above"
+"You can configure your email notifications by clicking on the email icons"
+" above"
 msgstr ""
-"Vous pouvez configurer vos notifications par email en cliquant sur l'icône "
-"\"email\" ci-dessus"
+"Vous pouvez configurer vos notifications par email en cliquant sur "
+"l'icône \"email\" ci-dessus"
 
 #: tracim/templates/user_toolbars.mak:17
 msgid "Edit current user"
@@ -1005,13 +1007,12 @@ msgstr "Activer"
 msgid "Edit my profile"
 msgstr "Mon profil"
 
-#: tracim/templates/user_workspace_forms.mak:9
-#: tracim/templates/file/edit.mak:8 tracim/templates/file/forms.mak:10
-#: tracim/templates/folder/forms.mak:11 tracim/templates/folder/forms.mak:44
-#: tracim/templates/help/page.mak:14 tracim/templates/page/edit.mak:8
-#: tracim/templates/page/forms.mak:10 tracim/templates/thread/edit.mak:9
-#: tracim/templates/thread/forms.mak:11 tracim/templates/widgets/forms.mak:6
-#: tracim/templates/widgets/forms.mak:34
+#: tracim/templates/user_workspace_forms.mak:9 tracim/templates/file/edit.mak:8
+#: tracim/templates/file/forms.mak:10 tracim/templates/folder/forms.mak:11
+#: tracim/templates/folder/forms.mak:44 tracim/templates/help/page.mak:14
+#: tracim/templates/page/edit.mak:8 tracim/templates/page/forms.mak:10
+#: tracim/templates/thread/edit.mak:9 tracim/templates/thread/forms.mak:11
+#: tracim/templates/widgets/forms.mak:6 tracim/templates/widgets/forms.mak:34
 msgid "Close"
 msgstr "Fermer"
 
@@ -1088,8 +1089,7 @@ msgid "Title"
 msgstr "Titre"
 
 #: tracim/templates/user_workspace_forms.mak:54
-#: tracim/templates/file/edit.mak:17 tracim/templates/page/edit.mak:17
-#: tracim/templates/page/forms.mak:20
+#: tracim/templates/page/edit.mak:17 tracim/templates/page/forms.mak:20
 #: tracim/templates/workspace/getone.mak:158
 msgid "Content"
 msgstr "Contenu"
@@ -1143,8 +1143,7 @@ msgstr "Calendrier personnel"
 
 #: tracim/templates/user_workspace_forms.mak:115
 msgid "This calendar URL will work with CalDav compatibles clients"
-msgstr ""
-"Cette url de calendrier fonctionne avec les logiciels compatibles CalDav"
+msgstr "Cette url de calendrier fonctionne avec les logiciels compatibles CalDav"
 
 #: tracim/templates/user_workspace_forms.mak:119
 msgid "Timezone"
@@ -1266,12 +1265,13 @@ msgstr "Envoyer un email à l'utilisateur"
 #: tracim/templates/admin/user_getall.mak:96
 #: tracim/templates/admin/workspace_getall.mak:67
 msgid ""
-"There are no workspace yet. Start by <a class=\"alert-link\" data-toggle="
-"\"collapse\" data-target=\"#create-workspace-form\">creating a workspace</a>."
+"There are no workspace yet. Start by <a class=\"alert-link\" data-"
+"toggle=\"collapse\" data-target=\"#create-workspace-form\">creating a "
+"workspace</a>."
 msgstr ""
-"Il n'y a pas encore d'espaces de travail. Commencez en <a class=\"alert-link"
-"\" data-toggle=\"collapse\" data-target=\"#create-workspace-form\">créant un "
-"espace de travail</a>."
+"Il n'y a pas encore d'espaces de travail. Commencez en <a class=\"alert-"
+"link\" data-toggle=\"collapse\" data-target=\"#create-workspace-"
+"form\">créant un espace de travail</a>."
 
 #: tracim/templates/admin/user_getall.mak:102
 #: tracim/templates/admin/workspace_getone.mak:62
@@ -1386,7 +1386,8 @@ msgstr "Créer un espace de travail"
 
 #: tracim/templates/admin/workspace_getall.mak:37
 #: tracim/templates/admin/workspace_getall.mak:74
-#: tracim/templates/thread/edit.mak:18 tracim/templates/workspace/edit.mak:17
+#: tracim/templates/file/edit.mak:17 tracim/templates/thread/edit.mak:18
+#: tracim/templates/workspace/edit.mak:17
 msgid "Description"
 msgstr "Description"
 
@@ -1429,8 +1430,8 @@ msgstr "Le calendrier est désactivé"
 
 #: tracim/templates/admin/workspace_getone.mak:45
 msgid ""
-"This workspace offers a calendar that you can configure in your software: "
-"Outlook, Thunderbird, etc."
+"This workspace offers a calendar that you can configure in your software:"
+" Outlook, Thunderbird, etc."
 msgstr ""
 "Cet espace de travaille propose un calendrier que vous pouvez configurer "
 "dans votre logiciel : Outlook, Thunderbird, etc."
@@ -1454,19 +1455,21 @@ msgstr "Abonner l'utilisateur aux notifications par email"
 
 #: tracim/templates/admin/workspace_getone.mak:102
 msgid ""
-"There are no user associated to the current workspace. <a class=\"alert-link"
-"\" data-toggle=\"collapse\" data-target=\"#add-role-from-existing-user-form"
-"\">Add one</a>."
+"There are no user associated to the current workspace. <a class=\"alert-"
+"link\" data-toggle=\"collapse\" data-target=\"#add-role-from-existing-"
+"user-form\">Add one</a>."
 msgstr ""
-"Cet espace de travail ne compte aucun membre. <a class=\"alert-link\" data-"
-"toggle=\"collapse\" data-target=\"#add-role-from-existing-user-form"
-"\">Ajouter un membre</a>."
+"Cet espace de travail ne compte aucun membre. <a class=\"alert-link\" "
+"data-toggle=\"collapse\" data-target=\"#add-role-from-existing-user-"
+"form\">Ajouter un membre</a>."
 
 #: tracim/templates/errors/label_invalid_path.mak:6
 msgid ""
-"Chosen label \"{0}\" is invalid because is in conflict with other resource."
+"Chosen label \"{0}\" is invalid because is in conflict with other "
+"resource."
 msgstr ""
-"Le label \"{0}\" est invalide car il est en conflit avec une autre ressource."
+"Le label \"{0}\" est invalide car il est en conflit avec une autre "
+"ressource."
 
 #: tracim/templates/errors/label_invalid_path.mak:9
 msgid "Go Back"
@@ -1491,8 +1494,8 @@ msgstr "Titre (optionnel)"
 #: tracim/templates/file/forms.mak:16
 msgid "you can give a title to the file, otherwise, the filename will be used."
 msgstr ""
-"Vous pouvez donner un titre au fichier ; le nom de fichier sera utilisé par "
-"défaut."
+"Vous pouvez donner un titre au fichier ; le nom de fichier sera utilisé "
+"par défaut."
 
 #: tracim/templates/file/forms.mak:19
 msgid "Select a file"
@@ -1536,8 +1539,8 @@ msgid ""
 "You are reading <b>an old revision</b> of the current file. (the shown "
 "revision is r{})."
 msgstr ""
-"Vous consultez <b>une ancienne version</b> du fichier courant. (la version "
-"affichée est v{})."
+"Vous consultez <b>une ancienne version</b> du fichier courant. (la "
+"version affichée est v{})."
 
 #: tracim/templates/file/getone.mak:88 tracim/templates/page/getone.mak:86
 msgid "Show latest revision"
@@ -1761,13 +1764,12 @@ msgstr ""
 
 #: tracim/templates/help/page-user-role-definition.mak:16
 msgid "This role gives read-only access to workspace resources."
-msgstr ""
-"Ce rôle donne accès en lecteur aux informations de l'espace de travail."
+msgstr "Ce rôle donne accès en lecteur aux informations de l'espace de travail."
 
 #: tracim/templates/help/page-user-role-definition.mak:20
 msgid ""
-"Same as <span style=\"color: #1fdb11;\">reader</span> + contribution rights: "
-"edit, comments, status update."
+"Same as <span style=\"color: #1fdb11;\">reader</span> + contribution "
+"rights: edit, comments, status update."
 msgstr ""
 "Comme <span style=\"color: #1fdb11;\">lecteur</span> + contribution : "
 "modifications, commentaires, mise à jour du statut."
@@ -1783,26 +1785,27 @@ msgstr ""
 
 #: tracim/templates/help/page-user-role-definition.mak:28
 msgid ""
-"Same as <span style=\"color: #ea983d;\">content manager</span> + workspace "
-"management rights: edit workspace, invite users, revoke them."
+"Same as <span style=\"color: #ea983d;\">content manager</span> + "
+"workspace management rights: edit workspace, invite users, revoke them."
 msgstr ""
 "Comme <span style=\"color: #ea983d;\">gestionnaire de contenu</span> + "
 "modification de l'espace de travail."
 
 #: tracim/templates/mail/content_update_body_html.mak:66
 msgid ""
-"{user_display_name}, you receive this email because you are registered on "
-"<i>{website_title}</i> and you are <i>{user_role_label}</i> in the workspace "
-"<a href=\"{workspace_url}\">{workspace_label}</a>."
+"{user_display_name}, you receive this email because you are registered on"
+" <i>{website_title}</i> and you are <i>{user_role_label}</i> in the "
+"workspace <a href=\"{workspace_url}\">{workspace_label}</a>."
 msgstr ""
-"{user_display_name}, vous recevez cet email car vous êtes enregistré sur le "
-"site web <i>{website_title}</i> et vous êtes <i>{user_role_label}</i> dans "
-"l'espace de travail <a href=\"{workspace_url}\">{workspace_label}</a>."
+"{user_display_name}, vous recevez cet email car vous êtes enregistré sur "
+"le site web <i>{website_title}</i> et vous êtes <i>{user_role_label}</i> "
+"dans l'espace de travail <a "
+"href=\"{workspace_url}\">{workspace_label}</a>."
 
 #: tracim/templates/mail/content_update_body_html.mak:70
 msgid ""
-"This email was automatically sent by <i>Tracim</i>, a collaborative software "
-"developped by Algoo."
+"This email was automatically sent by <i>Tracim</i>, a collaborative "
+"software developped by Algoo."
 msgstr ""
 "Cet email a été envoyé automatiquement par <i>Tracim</i>, un logiciel "
 "collaboratif développé par Algoo."
@@ -1820,13 +1823,13 @@ msgstr "Un administrateur vient de vous créer un compte sur {website_title}"
 #: tracim/templates/mail/created_account_body_text.mak:10
 msgid "To go to {website_title}, please click on following link"
 msgstr ""
-"Pour vous rendre sur {website_title}, cliquer sur le lien suivant s'il vous "
-"plaît"
+"Pour vous rendre sur {website_title}, cliquer sur le lien suivant s'il "
+"vous plaît"
 
 #: tracim/templates/mail/created_account_body_html.mak:83
 msgid ""
-"This email was sent by <i>Tracim</i>, a collaborative software developped by "
-"Algoo."
+"This email was sent by <i>Tracim</i>, a collaborative software developped"
+" by Algoo."
 msgstr ""
 "Cet email a été envoyé automatiquement par <i>Tracim</i>, un logiciel "
 "collaboratif développé par Algoo."
@@ -1864,8 +1867,8 @@ msgid ""
 "You are reading <b>an old revision</b> of the current page. (the shown "
 "revision is r{})."
 msgstr ""
-"Vous consultez <b>une ancienne version</b> de la page courante. (la version "
-"affichée est la v{})."
+"Vous consultez <b>une ancienne version</b> de la page courante. (la "
+"version affichée est la v{})."
 
 #: tracim/templates/page/getone.mak:95 tracim/templates/thread/getone.mak:89
 msgid "<b>This information is deprecated</b>"
@@ -2007,11 +2010,11 @@ msgstr "Inverser l'ordre"
 
 #: tracim/templates/thread/getone.mak:127
 msgid ""
-"<b>Note</b>: In case you'd like to post a reply, you must first open again "
-"the thread"
+"<b>Note</b>: In case you'd like to post a reply, you must first open "
+"again the thread"
 msgstr ""
-"<b>Note</b> : si vous souhaitez commenter cette discussion, vous devez tout "
-"d'abord en modifier le statut pour la ré-ouvrir"
+"<b>Note</b> : si vous souhaitez commenter cette discussion, vous devez "
+"tout d'abord en modifier le statut pour la ré-ouvrir"
 
 #: tracim/templates/thread/getone.mak:131
 msgid "Post a reply..."
@@ -2130,8 +2133,8 @@ msgstr "Cet espace de travail propose {a_open}un calendrier associé{a_close}"
 
 #: tracim/templates/workspace/getone.mak:118
 msgid ""
-"You can access the calendar using your own software: Outlook, Thunderbird, "
-"etc."
+"You can access the calendar using your own software: Outlook, "
+"Thunderbird, etc."
 msgstr ""
 "Vous pouvez accéder au calendrier à l'aide de votre propre logiciel : "
 "Outlook, Thunderbird, etc."
@@ -2142,24 +2145,24 @@ msgstr "L'url à configurer est la suivante :"
 
 #: tracim/templates/workspace/getone.mak:125
 msgid ""
-"You can browse the content of this workspace {a_open}in your file explorer "
-"(webdav){a_close}"
+"You can browse the content of this workspace {a_open}in your file "
+"explorer (webdav){a_close}"
 msgstr ""
-"Vous pouvez parcourir cet espace de travail {a_open} dans votre explorateur "
-"de fichier (webdav){a_close}"
+"Vous pouvez parcourir cet espace de travail {a_open} dans votre "
+"explorateur de fichier (webdav){a_close}"
 
 #: tracim/templates/workspace/getone.mak:144
 msgid ""
-"Tracim implements a <a href=\"https://fr.wikipedia.org/wiki/WebDAV\">webdav "
-"interface</a>."
+"Tracim implements a <a "
+"href=\"https://fr.wikipedia.org/wiki/WebDAV\">webdav interface</a>."
 msgstr ""
-"Tracim implémente une <a href=\"https://fr.wikipedia.org/wiki/WebDAV"
-"\">interface WebDAV</a>."
+"Tracim implémente une <a "
+"href=\"https://fr.wikipedia.org/wiki/WebDAV\">interface WebDAV</a>."
 
 #: tracim/templates/workspace/getone.mak:146
 msgid ""
-"You can configure your file explorer to use this interface and browse tracim "
-"content through it."
+"You can configure your file explorer to use this interface and browse "
+"tracim content through it."
 msgstr ""
 "Vous pouvez configurer votre explorateur de fichier pour utiliser cette "
 "interface et parcourir grâce à elle le contenu tracim."
@@ -2185,3 +2188,4 @@ msgstr "Supprimer l'espace de travail"
 
 #~ msgid "You are viewing <b>a deleted version</b> of the current page."
 #~ msgstr "Vous consultez <b>une version supprimée</b> de la page courante."
+

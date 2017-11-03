@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-03 18:01+0100\n"
+"POT-Creation-Date: 2017-11-03 18:06+0100\n"
 "PO-Revision-Date: 2017-09-05 16:31+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -1055,8 +1055,8 @@ msgid "Title"
 msgstr ""
 
 #: tracim/templates/user_workspace_forms.mak:54
-#: tracim/templates/file/edit.mak:17 tracim/templates/page/edit.mak:17
-#: tracim/templates/page/forms.mak:20 tracim/templates/workspace/getone.mak:158
+#: tracim/templates/page/edit.mak:17 tracim/templates/page/forms.mak:20
+#: tracim/templates/workspace/getone.mak:158
 msgid "Content"
 msgstr ""
 
@@ -1349,7 +1349,8 @@ msgstr ""
 
 #: tracim/templates/admin/workspace_getall.mak:37
 #: tracim/templates/admin/workspace_getall.mak:74
-#: tracim/templates/thread/edit.mak:18 tracim/templates/workspace/edit.mak:17
+#: tracim/templates/file/edit.mak:17 tracim/templates/thread/edit.mak:18
+#: tracim/templates/workspace/edit.mak:17
 msgid "Description"
 msgstr ""
 
