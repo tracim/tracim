@@ -110,7 +110,7 @@
               (function initialisePreviewGenerator() {
                 previewGenerator(
                   document.getElementById('previewGenerator'),
-                  'fr_FR',
+                  globalTracimLang,
                   [
                     % for one_url in url:
                       '${one_url}',
