@@ -3,6 +3,7 @@ import os
 import time
 import signal
 
+import tg
 from tg import config
 from tg import require
 from tg import response
@@ -150,12 +151,17 @@ def _lazy_ugettext(text: str):
     :return: lazyfied string or string
     """
     try:
-        # Test if context is available,
+        # Test if tg.translator is defined
+        #
         # cf. https://github.com/tracim/tracim/issues/173
-        context = StackedObjectProxy(name="context")
-        context.translator
+        #
+        # HACK - 2017-11-03 - D.A
+        # Replace context proxyfied by direct access to gettext function
+        # which is not setup in case the tg2 context is not initialized
+        tg.translator.gettext  # raises a TypeError exception if context not set
         return ugettext(text)
-    except TypeError:
+    except TypeError as e:
+        logger.debug(_lazy_ugettext, 'TG2 context not available for translation. TypeError: {}'.format(e))
         return text
 
 lazy_ugettext = lazify(_lazy_ugettext)
