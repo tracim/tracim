@@ -171,7 +171,7 @@ content.update.allowed.duration = 3600
 # They are html ready (you can put html tags they will be interpreted)
 website.title = TRACIM
 website.title.color = #555
-website.home.subtitle = Default login: admin@admin.admin (password: admin@admin.admin)
+website.home.subtitle = Default login: email: admin@admin.admin (password: admin@admin.admin)
 website.home.tag_line = <div class="text-center" style="font-weight: bold;">Collaboration, versionning and traceability</div>
 website.home.below_login_form = in case of problem, please contact the administrator.
 # Values may be 'all' or 'folders'
