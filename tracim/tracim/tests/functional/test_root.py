@@ -30,7 +30,7 @@ class TestRootController(TestController):
         msg = 'copyright &copy; 2013 - {} tracim project.'.format(h.current_year())
         ok_(msg in response)
 
-        forms = BeautifulSoup(response.body).find_all('form')
+        forms = BeautifulSoup(response.body, 'html.parser').find_all('form')
         print('FORMS = ',forms)
         eq_(1, len(forms))
         eq_('w-login-form', forms[0].get('id'))
