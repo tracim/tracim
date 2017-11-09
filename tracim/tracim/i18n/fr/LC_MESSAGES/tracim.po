@@ -1239,8 +1239,8 @@ msgid "shown"
 msgstr "affiché"
 
 #: tracim/templates/admin/user_getall.mak:20
-msgid "manage users and associated workspaces"
-msgstr "gestion des utilisateurs et espaces de travail associés"
+msgid "Manage users and associated workspaces"
+msgstr "Gestion des utilisateurs et espaces de travail associés"
 
 #: tracim/templates/admin/user_getall.mak:32
 msgid "Create a user account..."
@@ -1377,8 +1377,8 @@ msgid "Notifications"
 msgstr "Notifications"
 
 #: tracim/templates/admin/workspace_getall.mak:17
-msgid "manage workspaces and subscribed users"
-msgstr "gestion des espaces de travail et utilisateurs abonnés"
+msgid "Manage workspaces and subscribed users"
+msgstr "Gestion des espaces de travail et utilisateurs abonnés"
 
 #: tracim/templates/admin/workspace_getall.mak:27
 msgid "Create a workspace..."

@@ -17,7 +17,7 @@
 <%def name="TITLE_ROW()">
     <div class="row-fluid">
         <div>
-            ${ROW.TITLE_ROW(_('Users'), 'fa-user', '', 't-user-color', _('manage users and associated workspaces'))}
+            ${ROW.TITLE_ROW(_('Users'), 'fa-user', '', 't-user-color', _('Manage users and associated workspaces'))}
         </div>
     </div>
 </%def>

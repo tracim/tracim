@@ -14,7 +14,7 @@
 </%def>
 
 <%def name="TITLE_ROW()">
-    ${ROW.TITLE_ROW(_('Workspaces'), 'fa-bank', '', 't-user-color', _('manage workspaces and subscribed users'))}
+    ${ROW.TITLE_ROW(_('Workspaces'), 'fa-bank', '', 't-user-color', _('Manage workspaces and subscribed users'))}
 </%def>
 
 <div class="workspace__wrapper">
