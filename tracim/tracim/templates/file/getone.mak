@@ -124,7 +124,7 @@
                     selectedRevision: '${result.file.selected_revision}',
                     weight: '${h.user_friendly_file_size(result.file.file.size)}',
                     height: '300',
-                    modifiedAt: '${h.format_short(created_localized)|n}',
+                    modifiedAt: '${h.format_short(updated_localized)|n}',
                     owner: '${result.file.owner.name}',
                     sourceLink: '${download_url}',
                     pdfAvailable: ${pdf_available}
