@@ -5,6 +5,7 @@ import typing
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr
 
 from lxml.html.diff import htmldiff
 
@@ -270,7 +271,12 @@ class EmailNotifier(object):
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
             to_addr = '{name} <{email}>'.format(name=role.user.display_name, email=role.user.email)
-
+            replyto_addr = self._global_config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL.replace( # nopep8
+                '{content_id}',str(content.content_id)
+            )
+            reference_addr = self._global_config.EMAIL_NOTIFICATION_REFERENCES_EMAIL.replace( #nopep8
+                '{content_id}',str(content.content_id)
+             )
             #
             #  INFO - D.A. - 2014-11-06
             # We do not use .format() here because the subject defined in the .ini file
@@ -287,7 +293,9 @@ class EmailNotifier(object):
             message['Subject'] = subject
             message['From'] = self._get_sender(user)
             message['To'] = to_addr
-
+            message['Reply-to'] = formataddr(('',replyto_addr))
+            message['References'] = formataddr(('',reference_addr))
+            # TODO: add correct header to allow reply
             body_text = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
 
 
