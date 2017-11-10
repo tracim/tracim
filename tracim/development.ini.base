@@ -212,6 +212,9 @@ email.processing_mode = sync
 # email.async.redis.port = 6379
 # email.async.redis.db = 0
 
+# Email reply configuration
+email.reply.activated = False
+
 ## Radical (CalDav server) configuration
 # radicale.server.host = 0.0.0.0
 # radicale.server.port = 5232

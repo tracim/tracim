@@ -28,6 +28,7 @@ from tracim.config import TracimAppConfig
 from tracim.lib.base import logger
 from tracim.lib.daemons import DaemonsManager
 from tracim.lib.daemons import MailSenderDaemon
+from tracim.lib.daemons import MailFetcherDaemon
 from tracim.lib.daemons import RadicaleDaemon
 from tracim.lib.daemons import WsgiDavDaemon
 from tracim.lib.system import InterruptManager
@@ -125,6 +126,9 @@ def start_daemons(manager: DaemonsManager):
 
     if cfg.EMAIL_PROCESSING_MODE == CFG.CST.ASYNC:
         manager.run('mail_sender', MailSenderDaemon)
+
+    if cfg.EMAIL_REPLY_ACTIVATED:
+        manager.run('mail_fetcher',MailFetcherDaemon)
 
 
 def configure_depot():
@@ -343,6 +347,10 @@ class CFG(object):
             'email.notification.log_file_path',
             None,
         )
+
+        self.EMAIL_REPLY_ACTIVATED = asbool(tg.config.get(
+            'email.reply.activated',
+        ))
 
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',

@@ -150,6 +150,21 @@ class Daemon(threading.Thread):
         """
         raise NotImplementedError()
 
+class MailFetcherDaemon(Daemon):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #self._prepare_config()
+        self._fetcher = None
+        self.ok = True
+
+    def run(self):
+        while self.ok:
+            pass
+
+    def stop(self):
+        self.ok = False
+
+
 
 class MailSenderDaemon(Daemon):
     # NOTE: use *args and **kwargs because parent __init__ use strange
