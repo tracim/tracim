@@ -214,6 +214,13 @@ email.processing_mode = sync
 
 # Email reply configuration
 email.reply.activated = False
+email.reply.imap.server = your_imap_server
+email.reply.imap.port = 993
+email.reply.imap.user = your_imap_user
+email.reply.imap.password = your_imap_password
+email.reply.imap.folder = INBOX
+# Delay in seconds between each check
+email.reply.delay = 60
 
 ## Radical (CalDav server) configuration
 # radicale.server.host = 0.0.0.0

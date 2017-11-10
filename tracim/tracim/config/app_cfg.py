@@ -352,6 +352,25 @@ class CFG(object):
             'email.reply.activated',
         ))
 
+        self.EMAIL_REPLY_IMAP_SERVER = tg.config.get(
+            'email.reply.imap.server',
+        )
+        self.EMAIL_REPLY_IMAP_PORT = tg.config.get(
+            'email.reply.imap.port',
+        )
+        self.EMAIL_REPLY_IMAP_USER = tg.config.get(
+            'email.reply.imap.user',
+        )
+        self.EMAIL_REPLY_IMAP_PASSWORD = tg.config.get(
+            'email.reply.imap.password',
+        )
+        self.EMAIL_REPLY_IMAP_FOLDER = tg.config.get(
+            'email.reply.imap.folder',
+        )
+        self.EMAIL_REPLY_DELAY = int(tg.config.get(
+            'email.reply.delay',
+        ))
+
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',
         )

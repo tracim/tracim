@@ -19,6 +19,7 @@ from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
 
 from tracim.lib.utils import get_rq_queue
+from tracim.lib.email_fetcher import MailFetcher
 
 
 class DaemonsManager(object):
@@ -158,11 +159,22 @@ class MailFetcherDaemon(Daemon):
         self.ok = True
 
     def run(self):
-        while self.ok:
-            pass
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+        self._fetcher = MailFetcher(
+            host=cfg.EMAIL_REPLY_IMAP_SERVER,
+            port=cfg.EMAIL_REPLY_IMAP_PORT,
+            user=cfg.EMAIL_REPLY_IMAP_USER,
+            password=cfg.EMAIL_REPLY_IMAP_PASSWORD,
+            folder=cfg.EMAIL_REPLY_IMAP_FOLDER,
+            delay=cfg.EMAIL_REPLY_DELAY
+        )
+        self._fetcher.run()
 
     def stop(self):
-        self.ok = False
+        if self._fetcher:
+            self._fetcher.stop()
+
 
 
 
