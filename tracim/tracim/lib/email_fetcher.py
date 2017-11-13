@@ -6,7 +6,10 @@ import imaplib
 import email
 import email.header
 from email.header import Header, decode_header, make_header
+import requests
 import datetime
+from tracim.controllers.events import VALID_TOKEN_VALUE
+import json
 
 TRACIM_SPECIAL_KEY_HEADER="X-Tracim-Key"
 
@@ -64,10 +67,12 @@ def get_tracim_content_key(mailData:dict) -> Union[str,None]:
     if key is None and 'to' in mailData:
         key = find_key_from_mail_adress(mailData['to'])
     if key is None and 'references' in mailData:
-        mail_adress = mailData['references'].split('>')[0].replace('<','')
+        mail_adress = mailData['references'].split('>')[0].replace('<', '')
         key = find_key_from_mail_adress(mail_adress)
     return key
 
+def get_email_address_from_header(header:str) -> str:
+    return header.split('<')[1].split('>')[0]
 
 def find_key_from_mail_adress(mail_address:str) -> Union[str,None]:
     """ Parse mail_adress-like string
@@ -166,5 +171,12 @@ class MailFetcher(object):
         while self._mails:
             mail = self._mails.pop()
             decoded_mail = decode_mail(mail)
-            key = get_tracim_content_key(decoded_mail)
+            msg = {"token" : VALID_TOKEN_VALUE,
+                   "user_mail" : get_email_address_from_header(decoded_mail['from']),
+                   "content_id" : get_tracim_content_key(decoded_mail),
+                   "payload": {
+                       "content": decoded_mail['body']
+                   }}
+
+            requests.post('http://localhost:8080/events',json=msg)
             pass

@@ -1,4 +1,5 @@
-from email_fetcher import decode_mail, get_tracim_content_key,TRACIM_SPECIAL_KEY_HEADER,find_key_from_mail_adress
+from email_fetcher import decode_mail, get_tracim_content_key,\
+    TRACIM_SPECIAL_KEY_HEADER,find_key_from_mail_adress,get_email_address_from_header
 from email.mime.multipart import MIMEMultipart
 from email.utils import parsedate_tz,mktime_tz
 import datetime
@@ -92,3 +93,7 @@ def test_find_key_from_mail_address_no_key():
 def test_find_key_from_mail_adress_key():
     mail_address="a+key@b"
     assert find_key_from_mail_adress(mail_address) == 'key'
+
+def test_get_email_address_from_header():
+    mail_address = "blabla <a@b>"
+    assert  get_email_address_from_header(mail_address) == "a@b"
