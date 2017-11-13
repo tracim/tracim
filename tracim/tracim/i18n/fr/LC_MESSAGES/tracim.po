@@ -395,7 +395,7 @@ msgstr "Espace de travail {} restauré."
 #: tracim/lib/app_globals.py:26
 #, python-format
 msgid "%B %d at %I:%M%p"
-msgstr "le %d %B à %H:%M"
+msgstr "%d %B à %H:%M"
 
 #: tracim/lib/calendar.py:45
 msgid "My personal calendar"
