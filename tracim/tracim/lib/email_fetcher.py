@@ -109,32 +109,32 @@ class MailFetcher(object):
     def run(self):
         while self._is_active:
             time.sleep(self.delay)
-            if self._connect():
-                self._fetch()
-                self._notify_tracim()
-                self._disconnect()
+            self._connect()
+            self._fetch()
+            self._notify_tracim()
+            self._disconnect()
 
     def stop(self):
         self._is_active = False
 
     def _connect(self):
         ## verify if connected ?
-        if not self._connection:
-            # TODO: Support unencrypted connection ?
-            # TODO: Support keyfile,certfile ?
-            self._connection = imaplib.IMAP4_SSL(self.host,self.port)
-            try:
-                rv, data = self._connection.login(self.user,self.password)
-                return True
-            except Exception as e:
-                log = 'IMAP login error: {}'
-                logger.debug(self, log.format(e.__str__()))
-                self._connection = None
-                return False
-        return False
+        if self._connection:
+            self._disconnect()
+        # TODO: Support unencrypted connection ?
+        # TODO: Support keyfile,certfile ?
+        self._connection = imaplib.IMAP4_SSL(self.host,self.port)
+        try:
+            rv, data = self._connection.login(self.user,self.password)
+        except Exception as e:
+            log = 'IMAP login error: {}'
+            logger.debug(self, log.format(e.__str__()))
+
     def _disconnect(self):
         if self._connection:
+            self._connection.close()
             self._connection.logout()
+            self._connection = None
 
     def _fetch(self):
         """
