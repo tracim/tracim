@@ -57,8 +57,8 @@ Failure output:
 In this case, delete the user and database and start over:
 
     sudo --user=postgres psql \
-         --command="DROP USER tracimuser;" \
-         --command="DROP DATABASE tracimdb;"
+         --command="DROP DATABASE tracimdb;" \
+         --command="DROP USER tracimuser;"
 
 [//]: # (The following lines are only necessary to fix permissions on an existing database:)
 [//]: # (    sudo --user=postgres psql \)
@@ -88,7 +88,7 @@ Connect to `MySQL` with root user (password has been set at "Installation" -> "D
 
 Create a database with following command:
 
-    CREATE DATABASE tracimdb;
+    CREATE DATABASE tracimdb CHARACTER SET = utf8;
 
 Create a user with following command:
 
