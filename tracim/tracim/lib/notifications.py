@@ -208,7 +208,7 @@ class EmailNotifier(object):
         else:
             email_address = email_template.replace('{user_id}', '0')
 
-        return formataddr((mail_sender_name,email_address))
+        return formataddr((mail_sender_name, email_address))
 
     @staticmethod
     def log_notification(
@@ -267,7 +267,7 @@ class EmailNotifier(object):
 
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
-            to_addr = formataddr((role.user.display_name,role.user.email))
+            to_addr = formataddr((role.user.display_name, role.user.email))
 
             #
             #  INFO - D.A. - 2014-11-06
