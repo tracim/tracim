@@ -271,9 +271,13 @@ class EmailNotifier(object):
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
             to_addr = '{name} <{email}>'.format(name=role.user.display_name, email=role.user.email)
+            #
+            # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
+            # references can have multiple values, but only one in this case.
             replyto_addr = self._global_config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL.replace( # nopep8
                 '{content_id}',str(content.content_id)
             )
+
             reference_addr = self._global_config.EMAIL_NOTIFICATION_REFERENCES_EMAIL.replace( #nopep8
                 '{content_id}',str(content.content_id)
              )
@@ -294,6 +298,11 @@ class EmailNotifier(object):
             message['From'] = self._get_sender(user)
             message['To'] = to_addr
             message['Reply-to'] = formataddr(('',replyto_addr))
+            # INFO - G.M - 2017-11-15
+            # References can theorically have label, but in pratice, references
+            # contains only message_id from parents post in thread.
+            # To link this email to a content we create a virtual parent
+            # in reference who contain the content_id.
             message['References'] = formataddr(('',reference_addr))
             # TODO: add correct header to allow reply
             body_text = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
