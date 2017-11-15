@@ -102,7 +102,7 @@ If you want your own dedicated instance but do not want to manage it by yourself
 
 In case you prefer using Docker:
 
-    docker run -e DATABASE_TYPE=sqlite \
+    sudo docker run -e DATABASE_TYPE=sqlite \
                -p 80:80 -p 3030:3030 -p 5232:5232 \
                -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
 
@@ -118,7 +118,7 @@ Following the installation documentation below, you'll be able to run your own i
 
 You'll need to install the following packages :
 
-    sudo apt install git realpath redis-server \
+    sudo apt install git curl realpath redis-server \
                      python3 python-virtualenv python3-dev python-pip  python-lxml \
                      build-essential libxml2-dev libxslt1-dev zlib1g-dev libjpeg-dev \
                      libmagickwand-6.q16-3
