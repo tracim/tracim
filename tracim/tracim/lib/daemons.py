@@ -167,7 +167,8 @@ class MailFetcherDaemon(Daemon):
             user=cfg.EMAIL_REPLY_IMAP_USER,
             password=cfg.EMAIL_REPLY_IMAP_PASSWORD,
             folder=cfg.EMAIL_REPLY_IMAP_FOLDER,
-            delay=cfg.EMAIL_REPLY_DELAY
+            delay=cfg.EMAIL_REPLY_DELAY,
+            endpoint=cfg.WEBSITE_BASE_URL + "/events"
         )
         self._fetcher.run()
 

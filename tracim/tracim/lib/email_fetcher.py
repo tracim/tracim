@@ -95,16 +95,16 @@ def find_key_from_mail_adress(mail_address:str) -> Union[str,None]:
 
 class MailFetcher(object):
 
-    def __init__(self,host,port,user,password,folder,delay):
+    def __init__(self,host,port,user,password,folder,delay,endpoint):
         self._connection = None
         self._mails = []
-
         self.host = host
         self.port = port
         self.user = user
         self.password = password
         self.folder = folder
         self.delay = delay
+        self.endpoint = endpoint
 
         self._is_active = True
 
@@ -181,5 +181,5 @@ class MailFetcher(object):
                        "content": decoded_mail['body']
                    }}
 
-            requests.post('http://localhost:8080/events',json=msg)
+            requests.post(self.endpoint,json=msg)
             pass
