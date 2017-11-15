@@ -5,7 +5,7 @@ import time
 import imaplib
 import datetime
 import json
-from typing import Union
+import typing
 from email.message import Message
 from email.header import Header, decode_header, make_header
 from email.utils import parseaddr, parsedate_tz, mktime_tz
@@ -50,22 +50,22 @@ def decode_mail(msg: Message)-> dict:
         )
 
     except Exception:
-        # TODO: exception -> mail not correctly formatted
+        # FIXME - G.M - 2017-15-11 - handle exceptions correctly
         return {}
-    # TODO : msg.get_body look like the best way to get body
-    # but it's a new feature now (08112017).
+    # FIXME - G.M - 2017-15-11 - get the best body candidate in MIME
+    # msg.get_body() look like the best way to get body but it's a py3.6 feature
     for part in msg.walk():
         if not part.get_content_type() == "text/plain":
             continue
         else:
-            # TODO: check if decoding is working correctly
+            # FIXME: check if decoding is working correctly
             charset = part.get_content_charset('iso-8859-1')
             mail_data['body'] = part.get_payload(decode=True).decode(charset)
             break
     return mail_data
 
 
-def get_tracim_content_key(mail_data: dict) -> Union[str, None]:
+def get_tracim_content_key(mail_data: dict) -> typing.Optional[str]:
 
     """ Link mail_data dict to tracim content
     First try checking special header, them check 'to' header
@@ -82,7 +82,7 @@ def get_tracim_content_key(mail_data: dict) -> Union[str, None]:
     return key
 
 
-def find_key_from_mail_adress(mail_address: str) -> Union[str, None]:
+def find_key_from_mail_adress(mail_address: str) -> typing.Optional[str]:
     """ Parse mail_adress-like string
     to retrieve key.
 
@@ -100,7 +100,8 @@ def find_key_from_mail_adress(mail_address: str) -> Union[str, None]:
 
 class MailFetcher(object):
 
-    def __init__(self, host, port, user, password, folder, delay, endpoint):
+    def __init__(self, host, port, user, password, folder, delay, endpoint) \
+            -> None:
         self._connection = None
         self._mails = []
         self.host = host
@@ -125,11 +126,12 @@ class MailFetcher(object):
         self._is_active = False
 
     def _connect(self) -> None:
-        # verify if connected ?
+        # FIXME - G.M - 2017-11-15 Verify connection/disconnection
+        # Are old connexion properly close this way ?
         if self._connection:
             self._disconnect()
-        # TODO: Support unencrypted connection ?
-        # TODO: Support keyfile,certfile ?
+        # TODO - G.M - 2017-11-15 Support unencrypted connection ?
+        # TODO - G.M - 2017-11-15 Support for keyfile,certfile ?
         self._connection = imaplib.IMAP4_SSL(self.host, self.port)
         try:
             self._connection.login(self.user, self.password)
@@ -152,7 +154,9 @@ class MailFetcher(object):
         rv, data = self._connection.select(self.folder)
         if rv == 'OK':
             # get mails
-            # TODO: search only new mail or drop/moved the added one ?
+            # FIXME - G.M -  2017-11-15 Which files to select as new file ?
+            # Unseen file or All file from a directory (old one should be moved/
+            # deleted from mailbox during this process) ?
             rv, data = self._connection.search(None, "(UNSEEN)")
             if rv == 'OK':
                 # get mail content
@@ -162,14 +166,12 @@ class MailFetcher(object):
                         msg = message_from_bytes(data[0][1])
                         self._mails.append(msg)
                     else:
-                        # TODO : Check best debug value
                         log = 'IMAP : Unable to get mail : {}'
                         logger.debug(self, log.format(str(rv)))
             else:
-                # TODO : Distinct error from empty mailbox ?
+                # FIXME : Distinct error from empty mailbox ?
                 pass
         else:
-            # TODO : Check best debug value
             log = 'IMAP : Unable to open mailbox : {}'
             logger.debug(self, log.format(str(rv)))
 
@@ -183,6 +185,6 @@ class MailFetcher(object):
                    "payload": {
                        "content": decoded_mail['body'],
                    }}
-
+            # FIXME - G.M - 2017-11-15 - Catch exception from http request
             requests.post(self.endpoint, json=msg)
             pass
