@@ -1,15 +1,18 @@
-from email.message import Message
-from typing import Union
 import sys
 import time
 import imaplib
-import email
-import email.header
-from email.header import Header, decode_header, make_header
-import requests
 import datetime
-from tracim.controllers.events import VALID_TOKEN_VALUE
 import json
+from typing import Union
+from email.message import Message
+from email.header import Header, decode_header, make_header
+from email.utils import formataddr,parsedate_tz,mktime_tz
+from email import message_from_bytes
+
+import requests
+
+from tracim.controllers.events import VALID_TOKEN_VALUE
+
 
 TRACIM_SPECIAL_KEY_HEADER="X-Tracim-Key"
 
@@ -35,9 +38,9 @@ def decode_mail(msg:Message)-> dict:
             mailData[TRACIM_SPECIAL_KEY_HEADER] = str_header(msg[TRACIM_SPECIAL_KEY_HEADER])
         # date
         date_h = str_header(msg['Date'])
-        date_tuple = email.utils.parsedate_tz(date_h)
+        date_tuple = parsedate_tz(date_h)
 
-        mailData['date'] = datetime.datetime.fromtimestamp(email.utils.mktime_tz(date_tuple))
+        mailData['date'] = datetime.datetime.fromtimestamp(mktime_tz(date_tuple))
 
     except Exception as e:
         # TODO: exception -> mail not correctly formatted
@@ -152,7 +155,7 @@ class MailFetcher(object):
                 for num in data[0].split():
                     rv, data = self._connection.fetch(num, '(RFC822)')
                     if rv == 'OK':
-                        msg = email.message_from_bytes(data[0][1])
+                        msg = message_from_bytes(data[0][1])
                         self._mails.append(msg)
                         ret = True
                     else:
