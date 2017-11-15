@@ -161,7 +161,7 @@ class EmailManager(object):
             self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
             self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
         ))
-        message['To'] = formataddr(('', user.email))
+        message['To'] = formataddr((user.get_display_name(), user.email))
 
         text_template_file_path = self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT  # nopep8
         html_template_file_path = self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML  # nopep8
