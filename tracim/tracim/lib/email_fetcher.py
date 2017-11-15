@@ -6,7 +6,7 @@ import json
 from typing import Union
 from email.message import Message
 from email.header import Header, decode_header, make_header
-from email.utils import formataddr,parsedate_tz,mktime_tz
+from email.utils import parseaddr,parsedate_tz,mktime_tz
 from email import message_from_bytes
 
 import requests
@@ -30,10 +30,11 @@ def decode_mail(msg:Message)-> dict:
     try:
         mailData['subject'] = str_header(msg['subject'])
         mailData['msg_id'] = str_header(msg['Message-ID'])
-        mailData['from'] = str_header(msg['From'])
+        mailData['from'] = parseaddr(msg['From'])[1]
         # Reply key
-        mailData['to'] = str_header(msg['To'])
-        mailData['references'] = str_header(msg['References'])
+        mailData['to'] = parseaddr(msg['To'])[1]
+
+        mailData['references'] = parseaddr(msg['References'])[1]
         if TRACIM_SPECIAL_KEY_HEADER in msg:
             mailData[TRACIM_SPECIAL_KEY_HEADER] = str_header(msg[TRACIM_SPECIAL_KEY_HEADER])
         # date
@@ -70,12 +71,9 @@ def get_tracim_content_key(mailData:dict) -> Union[str,None]:
     if key is None and 'to' in mailData:
         key = find_key_from_mail_adress(mailData['to'])
     if key is None and 'references' in mailData:
-        mail_adress = mailData['references'].split('>')[0].replace('<', '')
+        mail_adress = mailData['references']
         key = find_key_from_mail_adress(mail_adress)
     return key
-
-def get_email_address_from_header(header:str) -> str:
-    return header.split('<')[1].split('>')[0]
 
 def find_key_from_mail_adress(mail_address:str) -> Union[str,None]:
     """ Parse mail_adress-like string
@@ -95,7 +93,7 @@ def find_key_from_mail_adress(mail_address:str) -> Union[str,None]:
 
 class MailFetcher(object):
 
-    def __init__(self,host,port,user,password,folder,delay,endpoint):
+    def __init__(self, host, port, user, password, folder, delay, endpoint):
         self._connection = None
         self._mails = []
         self.host = host
@@ -175,7 +173,7 @@ class MailFetcher(object):
             mail = self._mails.pop()
             decoded_mail = decode_mail(mail)
             msg = {"token" : VALID_TOKEN_VALUE,
-                   "user_mail" : get_email_address_from_header(decoded_mail['from']),
+                   "user_mail" : decoded_mail['from'],
                    "content_id" : get_tracim_content_key(decoded_mail),
                    "payload": {
                        "content": decoded_mail['body']
