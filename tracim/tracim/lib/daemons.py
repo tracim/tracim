@@ -151,10 +151,15 @@ class Daemon(threading.Thread):
         """
         raise NotImplementedError()
 
+
 class MailFetcherDaemon(Daemon):
+    """
+    Thread containing a daemon who fetch new mail from a mailbox and
+    send http request to a tracim endpoint to handle them.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #self._prepare_config()
         self._fetcher = None
         self.ok = True
 
@@ -168,7 +173,8 @@ class MailFetcherDaemon(Daemon):
             password=cfg.EMAIL_REPLY_IMAP_PASSWORD,
             folder=cfg.EMAIL_REPLY_IMAP_FOLDER,
             delay=cfg.EMAIL_REPLY_DELAY,
-            endpoint=cfg.WEBSITE_BASE_URL + "/events"
+            # FIXME - G.M - 2017-11-15 - proper tracim url formatting
+            endpoint=cfg.WEBSITE_BASE_URL + "/events",
         )
         self._fetcher.run()
 
@@ -176,7 +182,9 @@ class MailFetcherDaemon(Daemon):
         if self._fetcher:
             self._fetcher.stop()
 
-
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        logger.warning('MailFetcherDaemon not implement append_thread_calback')
+        pass
 
 
 class MailSenderDaemon(Daemon):
