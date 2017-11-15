@@ -37,7 +37,8 @@ def decode_mail(msg: Message)-> dict:
         mail_data['from'] = parseaddr(msg['From'])[1]
         # Reply key
         mail_data['to'] = parseaddr(msg['To'])[1]
-
+        # INFO - G.M - 2017-11-15
+        #  We only need to save the first/oldest addr of references
         mail_data['references'] = parseaddr(msg['References'])[1]
         if TRACIM_SPECIAL_KEY_HEADER in msg:
             mail_data[TRACIM_SPECIAL_KEY_HEADER] = str_header(msg[TRACIM_SPECIAL_KEY_HEADER])  # nopep8
@@ -50,11 +51,13 @@ def decode_mail(msg: Message)-> dict:
         )
 
     except Exception:
-        # FIXME - G.M - 2017-15-11 - handle exceptions correctly
+        # FIXME - G.M - 2017-11-15 - handle exceptions correctly
         return {}
-    # FIXME - G.M - 2017-15-11 - get the best body candidate in MIME
+    # FIXME - G.M - 2017-11-15 - get the best body candidate in MIME
     # msg.get_body() look like the best way to get body but it's a py3.6 feature
     for part in msg.walk():
+        # TODO - G.M - 2017-11-15 - Handle HTML mail body
+        # TODO - G.M - 2017-11-15 - Parse properly HTML (and text ?) body
         if not part.get_content_type() == "text/plain":
             continue
         else:
@@ -100,8 +103,22 @@ def find_key_from_mail_adress(mail_address: str) -> typing.Optional[str]:
 
 class MailFetcher(object):
 
-    def __init__(self, host, port, user, password, folder, delay, endpoint) \
+    def __init__(self,
+                 host: str, port: str, user: str, password: str, folder: str,
+                 delay: int, endpoint: str) \
             -> None:
+        """
+        Fetch mail from a mailbox folder through IMAP and add their content to
+        Tracim through http according to mail Headers.
+        Fetch is regular.
+        :param host: imap server hostname
+        :param port: imap connection port
+        :param user: user login of mailbox
+        :param password: user password of mailbox
+        :param folder: mail folder where new mail are fetched
+        :param delay: seconds to wait before fetching new mail again
+        :param endpoint: tracim http endpoint where decoded mail are send.
+        """
         self._connection = None
         self._mails = []
         self.host = host
