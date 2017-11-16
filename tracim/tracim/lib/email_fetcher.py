@@ -12,12 +12,20 @@ from email.utils import parseaddr, parsedate_tz, mktime_tz
 from email import message_from_bytes
 
 import requests
+from bs4 import BeautifulSoup
 
 from tracim.controllers.events import VALID_TOKEN_VALUE
 
 
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
-
+BS_HTML_BODY_PARSE_CONFIG = {
+    'tag_blacklist': ["script", "style", "blockquote"],
+    'class_blacklist': ['moz-cite-prefix'],
+    'tag_whitelist': ['a', 'b', 'strong', 'i', 'br', 'ul', 'li', 'ol',
+                      'em','i', 'u',
+                      'thead', 'tr', 'td','tbody', 'table', 'p', 'pre'],
+    'attrs_whitelist' : ['href']
+}
 
 class DecodedMail(object):
 
@@ -55,10 +63,34 @@ class DecodedMail(object):
             if ctype == "text/plain":
                 body = body_part.get_payload(decode=True).decode(
                     charset)
+
             elif ctype == "text/html":
-                body = body_part.get_payload(decode=True).decode(
+                html_body = body_part.get_payload(decode=True).decode(
                     charset)
+                body = DecodedMail._parse_html_body(html_body)
+
         return body
+
+    @staticmethod
+    def _parse_html_body(html_body:str):
+
+        soup = BeautifulSoup(html_body)
+        config = BS_HTML_BODY_PARSE_CONFIG
+        for tag in soup.findAll():
+            if tag.name.lower() in config['tag_blacklist']:
+                tag.extract()
+            elif 'class' in tag.attrs:
+                for elem in config['class_blacklist']:
+                    if elem in tag.attrs['class']:
+                        tag.extract()
+            elif tag.name.lower() in config['tag_whitelist']:
+                attrs = dict(tag.attrs)
+                for attr in attrs:
+                    if attr not in config['attrs_whitelist']:
+                        del tag.attrs[attr]
+            else:
+                tag.unwrap()
+        return str(soup)
 
     def _get_mime_body_message(self) -> typing.Optional[Message]:
         # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
