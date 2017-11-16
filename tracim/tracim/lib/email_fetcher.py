@@ -33,7 +33,6 @@ def decode_mail(msg: Message)-> dict:
 
     try:
         mail_data['subject'] = str_header(msg['subject'])
-        mail_data['msg_id'] = str_header(msg['Message-ID'])
         mail_data['from'] = parseaddr(msg['From'])[1]
         # Reply key
         mail_data['to'] = parseaddr(msg['To'])[1]
@@ -42,13 +41,6 @@ def decode_mail(msg: Message)-> dict:
         mail_data['references'] = parseaddr(msg['References'])[1]
         if TRACIM_SPECIAL_KEY_HEADER in msg:
             mail_data[TRACIM_SPECIAL_KEY_HEADER] = str_header(msg[TRACIM_SPECIAL_KEY_HEADER])  # nopep8
-        # date
-        date_h = str_header(msg['Date'])
-        date_tuple = parsedate_tz(date_h)
-
-        mail_data['date'] = datetime.datetime.fromtimestamp(
-            mktime_tz(date_tuple)
-        )
 
     except Exception:
         # FIXME - G.M - 2017-11-15 - handle exceptions correctly
