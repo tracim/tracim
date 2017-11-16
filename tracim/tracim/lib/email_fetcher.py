@@ -19,101 +19,102 @@ from tracim.controllers.events import VALID_TOKEN_VALUE
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
 
 
-def str_header(header: Header) -> str:
-    return str(make_header(decode_header(header)))
+class DecodedMail(object):
 
+    def __init__(self, message: Message):
+        self._message = message
 
-def decode_mail(msg: Message)-> dict:
-    """
-    Get useful header and body content and decode from Message
-    :param msg:
-    :return:
-    """
-    mail_data = {}
-
-    try:
-        mail_data['subject'] = str_header(msg['subject'])
-        mail_data['from'] = parseaddr(msg['From'])[1]
-        # Reply key
-        mail_data['to'] = parseaddr(msg['To'])[1]
-        # INFO - G.M - 2017-11-15
-        #  We only need to save the first/oldest addr of references
-        mail_data['references'] = parseaddr(msg['References'])[1]
-        if TRACIM_SPECIAL_KEY_HEADER in msg:
-            mail_data[TRACIM_SPECIAL_KEY_HEADER] = str_header(msg[TRACIM_SPECIAL_KEY_HEADER])  # nopep8
-
-    except Exception:
-        # FIXME - G.M - 2017-11-15 - handle exceptions correctly
-        return {}
-
-    # TODO - G.M - 2017-11-15 - Parse properly HTML (and text ?) body
-    body = get_body_mime_part(msg)
-    if body:
-        charset = body.get_content_charset('iso-8859-1')
-        ctype = body.get_content_type()
-        if ctype == "text/plain":
-            mail_data['body'] = body.get_payload(decode=True).decode(charset)
-        elif ctype == "text/html":
-            mail_data['body'] = body.get_payload(decode=True).decode(charset)
+    def _decode_header(self, header_title: str) -> typing.Optional[str]:
+        # FIXME : Handle exception
+        if header_title in self._message:
+            return str(make_header(decode_header(header)))
         else:
-            pass
-    else:
-        pass
+            return None
 
-    return mail_data
+    def get_subject(self) -> typing.Optional[str]:
+        return self._decode_header('subject')
 
+    def get_from_address(self) -> typing.Optional[str]:
+        return parseaddr(self._message['From'])[1]
 
-def get_body_mime_part(msg) -> Message:
-    # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
-    # FIXME - G.M - 2017-11-16 - Check support for non-multipart mail
-    #assert msg.is_multipart()
-    part = None
-    # Check for html
-    for part in msg.walk():
-        ctype = part.get_content_type()
-        cdispo = str(part.get('Content-Disposition'))
-        if ctype == 'text/html' and 'attachment' not in cdispo:
-            return part
-    # checj fir plain text
-    for part in msg.walk():
-        ctype = part.get_content_type()
-        cdispo = str(part.get('Content-Disposition'))
-        if ctype == 'text/plain' and 'attachment' not in cdispo:
-            return part
-    return part
+    def get_to_address(self)-> typing.Optional[str]:
+        return parseaddr(self._message['To'])[1]
 
+    def get_first_ref(self) -> typing.Optional[str]:
+        return parseaddr(self._message['References'])[1]
 
-def get_tracim_content_key(mail_data: dict) -> typing.Optional[str]:
+    def get_special_key(self) -> typing.Optional[str]:
+        return self._decode_header(TRACIM_SPECIAL_KEY_HEADER)
 
-    """ Link mail_data dict to tracim content
-    First try checking special header, them check 'to' header
-    and finally check first(oldest) mail-id of 'references' header
-    """
-    key = None
-    if TRACIM_SPECIAL_KEY_HEADER in mail_data:
-        key = mail_data[TRACIM_SPECIAL_KEY_HEADER]
-    if key is None and 'to' in mail_data:
-        key = find_key_from_mail_adress(mail_data['to'])
-    if key is None and 'references' in mail_data:
-        mail_adress = mail_data['references']
-        key = find_key_from_mail_adress(mail_adress)
-    return key
+    def get_body(self) -> typing.Optional[str]:
+        body_part = self._get_mime_body_message()
+        body = None
+        if body_part:
+            charset = body_part.get_content_charset('iso-8859-1')
+            ctype = body_part.get_content_type()
+            if ctype == "text/plain":
+                body = body_part.get_payload(decode=True).decode(
+                    charset)
+            elif ctype == "text/html":
+                body = body_part.get_payload(decode=True).decode(
+                    charset)
+        return body
 
+    def _get_mime_body_message(self) -> typing.Optional[Message]:
+        # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
+        # FIXME - G.M - 2017-11-16 - Check support for non-multipart mail
+        # assert msg.is_multipart()
+        part = None
+        # Check for html
+        for part in self._message.walk():
+            ctype = part.get_content_type()
+            cdispo = str(part.get('Content-Disposition'))
+            if ctype == 'text/html' and 'attachment' not in cdispo:
+                return part
+        # checj fir plain text
+        for part in self._message.walk():
+            ctype = part.get_content_type()
+            cdispo = str(part.get('Content-Disposition'))
+            if ctype == 'text/plain' and 'attachment' not in cdispo:
+                return part
+        return part
 
-def find_key_from_mail_adress(mail_address: str) -> typing.Optional[str]:
-    """ Parse mail_adress-like string
-    to retrieve key.
+    def get_key(self) -> typing.Optional[str]:
 
-    :param mail_address: user+key@something like string
-    :return: key
-    """
-    username = mail_address.split('@')[0]
-    username_data = username.split('+')
-    if len(username_data) == 2:
-        key = username_data[1]
-    else:
+        """
+        First try checking special header, them check 'to' header
+        and finally check first(oldest) mail-id of 'references' header
+        """
         key = None
-    return key
+        first_ref = self.get_first_ref()
+        to_address = self.get_to_address()
+        special_key = self.get_special_key()
+
+        if special_key:
+            key = special_key
+        if not key and to_address:
+            key = DecodedMail.find_key_from_mail_address(to_address)
+        if not key and first_ref:
+            key = DecodedMail.find_key_from_mail_address(first_ref)
+
+        return key
+
+    @staticmethod
+    def find_key_from_mail_address(mail_address: str) \
+            -> typing.Optional[str]:
+        """ Parse mail_adress-like string
+        to retrieve key.
+
+        :param mail_address: user+key@something like string
+        :return: key
+        """
+        username = mail_address.split('@')[0]
+        username_data = username.split('+')
+        if len(username_data) == 2:
+            key = username_data[1]
+        else:
+            key = None
+        return key
 
 
 class MailFetcher(object):
@@ -196,7 +197,8 @@ class MailFetcher(object):
                     rv, data = self._connection.fetch(num, '(RFC822)')
                     if rv == 'OK':
                         msg = message_from_bytes(data[0][1])
-                        self._mails.append(msg)
+                        decodedmsg = DecodedMail(msg)
+                        self._mails.append(decodedmsg)
                     else:
                         log = 'IMAP : Unable to get mail : {}'
                         logger.debug(self, log.format(str(rv)))
@@ -210,12 +212,11 @@ class MailFetcher(object):
     def _notify_tracim(self) -> None:
         while self._mails:
             mail = self._mails.pop()
-            decoded_mail = decode_mail(mail)
             msg = {"token": VALID_TOKEN_VALUE,
-                   "user_mail": decoded_mail['from'],
-                   "content_id": get_tracim_content_key(decoded_mail),
+                   "user_mail": mail.get_from_address(),
+                   "content_id": mail.get_key(),
                    "payload": {
-                       "content": decoded_mail['body'],
+                       "content": mail.get_body(),
                    }}
             # FIXME - G.M - 2017-11-15 - Catch exception from http request
             requests.post(self.endpoint, json=msg)
