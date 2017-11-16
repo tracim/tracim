@@ -24,10 +24,11 @@ BS_HTML_BODY_PARSE_CONFIG = {
     'tag_blacklist': ["script", "style", "blockquote"],
     'class_blacklist': ['moz-cite-prefix'],
     'tag_whitelist': ['a', 'b', 'strong', 'i', 'br', 'ul', 'li', 'ol',
-                      'em','i', 'u',
-                      'thead', 'tr', 'td','tbody', 'table', 'p', 'pre'],
-    'attrs_whitelist' : ['href']
+                      'em', 'i', 'u',
+                      'thead', 'tr', 'td', 'tbody', 'table', 'p', 'pre'],
+    'attrs_whitelist': ['href'],
 }
+
 
 class DecodedMail(object):
 
@@ -75,15 +76,14 @@ class DecodedMail(object):
         return body
 
     @staticmethod
-    def _parse_txt_body(txt_body:str):
+    def _parse_txt_body(txt_body: str):
         txt_body = EmailReplyParser.parse_reply(txt_body)
         html_body = markdown.markdown(txt_body)
         body = DecodedMail._parse_html_body(html_body)
         return body
 
     @staticmethod
-    def _parse_html_body(html_body:str):
-
+    def _parse_html_body(html_body: str):
         soup = BeautifulSoup(html_body)
         config = BS_HTML_BODY_PARSE_CONFIG
         for tag in soup.findAll():
