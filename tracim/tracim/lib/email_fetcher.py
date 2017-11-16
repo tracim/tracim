@@ -53,19 +53,42 @@ def decode_mail(msg: Message)-> dict:
     except Exception:
         # FIXME - G.M - 2017-11-15 - handle exceptions correctly
         return {}
-    # FIXME - G.M - 2017-11-15 - get the best body candidate in MIME
-    # msg.get_body() look like the best way to get body but it's a py3.6 feature
-    for part in msg.walk():
-        # TODO - G.M - 2017-11-15 - Handle HTML mail body
-        # TODO - G.M - 2017-11-15 - Parse properly HTML (and text ?) body
-        if not part.get_content_type() == "text/plain":
-            continue
+
+    # TODO - G.M - 2017-11-15 - Parse properly HTML (and text ?) body
+    body = get_body_mime_part(msg)
+    if body:
+        charset = body.get_content_charset('iso-8859-1')
+        ctype = body.get_content_type()
+        if ctype == "text/plain":
+            mail_data['body'] = body.get_payload(decode=True).decode(charset)
+        elif ctype == "text/html":
+            mail_data['body'] = body.get_payload(decode=True).decode(charset)
         else:
-            # FIXME: check if decoding is working correctly
-            charset = part.get_content_charset('iso-8859-1')
-            mail_data['body'] = part.get_payload(decode=True).decode(charset)
-            break
+            pass
+    else:
+        pass
+
     return mail_data
+
+
+def get_body_mime_part(msg) -> Message:
+    # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
+    # FIXME - G.M - 2017-11-16 - Check support for non-multipart mail
+    #assert msg.is_multipart()
+    part = None
+    # Check for html
+    for part in msg.walk():
+        ctype = part.get_content_type()
+        cdispo = str(part.get('Content-Disposition'))
+        if ctype == 'text/html' and 'attachment' not in cdispo:
+            return part
+    # checj fir plain text
+    for part in msg.walk():
+        ctype = part.get_content_type()
+        cdispo = str(part.get('Content-Disposition'))
+        if ctype == 'text/plain' and 'attachment' not in cdispo:
+            return part
+    return part
 
 
 def get_tracim_content_key(mail_data: dict) -> typing.Optional[str]:
