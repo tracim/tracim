@@ -11,8 +11,10 @@ from email.header import Header, decode_header, make_header
 from email.utils import parseaddr, parsedate_tz, mktime_tz
 from email import message_from_bytes
 
+import markdown
 import requests
 from bs4 import BeautifulSoup
+from email_reply_parser import EmailReplyParser
 
 from tracim.controllers.events import VALID_TOKEN_VALUE
 
@@ -61,14 +63,22 @@ class DecodedMail(object):
             charset = body_part.get_content_charset('iso-8859-1')
             ctype = body_part.get_content_type()
             if ctype == "text/plain":
-                body = body_part.get_payload(decode=True).decode(
+                txt_body = body_part.get_payload(decode=True).decode(
                     charset)
+                body = DecodedMail._parse_txt_body(txt_body)
 
             elif ctype == "text/html":
                 html_body = body_part.get_payload(decode=True).decode(
                     charset)
                 body = DecodedMail._parse_html_body(html_body)
 
+        return body
+
+    @staticmethod
+    def _parse_txt_body(txt_body:str):
+        txt_body = EmailReplyParser.parse_reply(txt_body)
+        html_body = markdown.markdown(txt_body)
+        body = DecodedMail._parse_html_body(html_body)
         return body
 
     @staticmethod
