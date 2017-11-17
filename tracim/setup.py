@@ -41,11 +41,7 @@ install_requires = [
     'rq==0.7.1',
     'filedepot>=0.5.0',
     'preview-generator',
-    'beautifulsoup4',
-    'markdown',
-    'email_reply_parser',
-    'requests',
-]
+ }
 
 setup(
     name='tracim',
