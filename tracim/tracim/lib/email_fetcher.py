@@ -16,8 +16,8 @@ import requests
 from bs4 import BeautifulSoup
 from email_reply_parser import EmailReplyParser
 
+from tracim.lib.base import logger
 from tracim.controllers.events import VALID_TOKEN_VALUE
-
 
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
 BS_HTML_BODY_PARSE_CONFIG = {
@@ -258,6 +258,7 @@ class MailFetcher(object):
             logger.debug(self, log.format(str(rv)))
 
     def _notify_tracim(self) -> None:
+        unsended_mail = []
         while self._mails:
             mail = self._mails.pop()
             msg = {"token": VALID_TOKEN_VALUE,
@@ -266,6 +267,30 @@ class MailFetcher(object):
                    "payload": {
                        "content": mail.get_body(),
                    }}
-            # FIXME - G.M - 2017-11-15 - Catch exception from http request
-            requests.post(self.endpoint, json=msg)
-            pass
+            try:
+                r = requests.post(self.endpoint, json=msg)
+                response = r.json()
+                if not 'status' in response:
+                    log = 'bad response: {}'
+                    logger.error(self, log.format(str(response)))
+                else:
+                    if response['status'] == 'ok':
+                        pass
+                    elif response['status'] == 'error' and 'error' in response:
+                        log = 'error with email: {}'
+                        logger.error(self, log.format(str(response['error'])))
+                    else:
+                        log = 'Unknown error with email'
+            # TODO - G.M - Verify exception correctly works
+            except requests.exceptions.Timeout:
+                log = 'Timeout error to transmit fetched mail to tracim : {}'
+                logger.error(self, log.format(str(e)))
+                unsended_mail.append(mail)
+                break
+            except requests.exceptions.RequestException as e:
+                log = 'Fail to transmit fetched mail to tracim : {}'
+                logger.error(self, log.format(str(e)))
+                break
+        # FIXME - G.M - 2017-11-17 Avoid too short-timed infinite retry ?
+        # retry later to send those mail
+        self._mails = unsended_mail
