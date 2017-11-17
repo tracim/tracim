@@ -24,6 +24,7 @@ BS_HTML_BODY_PARSE_CONFIG = {
     'tag_blacklist': ["script", "style", "blockquote"],
     'class_blacklist': ['moz-cite-prefix','gmail_extra','gmail_quote',
                         'yahoo_quoted'],
+    'id_blacklist': ['reply-intro'],
     'tag_whitelist': ['a', 'b', 'strong', 'i', 'br', 'ul', 'li', 'ol',
                       'em', 'i', 'u',
                       'thead', 'tr', 'td', 'tbody', 'table', 'p', 'pre'],
@@ -93,6 +94,10 @@ class DecodedMail(object):
             elif 'class' in tag.attrs:
                 for elem in config['class_blacklist']:
                     if elem in tag.attrs['class']:
+                        tag.extract()
+            elif 'id' in tag.attrs:
+                for elem in config['id_blacklist']:
+                    if elem in tag.attrs['id']:
                         tag.extract()
             elif tag.name.lower() in config['tag_whitelist']:
                 attrs = dict(tag.attrs)
