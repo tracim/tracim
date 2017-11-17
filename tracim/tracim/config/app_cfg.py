@@ -303,6 +303,12 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = tg.config.get(
             'email.notification.from.default_label'
         )
+        self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = tg.config.get(
+            'email.notification.reply_to.email',
+        )
+        self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = tg.config.get(
+            'email.notification.references.email'
+        )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get(
             'email.notification.content_update.template.html',
         )
