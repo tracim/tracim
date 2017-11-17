@@ -14,15 +14,23 @@ class EventsRestController(RestController):
     def post(self):
         json = request.json_body
         if 'token' in json and json['token'] == VALID_TOKEN_VALUE:
-            ## TODO check json content
+            # TODO check json content
             uapi = UserApi(None)
-            ## TODO support Empty result error
+            # TODO support Empty result error
             user = uapi.get_one_by_email(json['user_mail'])
             api = ContentApi(user)
 
             thread = api.get_one(json['content_id'],content_type=ContentType.Any)
-            ## TODO Check type ? Commebt Not allowed for Folder
-            api.create_comment(thread.workspace, thread, json['payload']['content'], True)
+            # INFO - G.M - 2017-11-17
+            # When content_id is a sub-elem of a main content like Comment,
+            # Attach the thread to the main content.
+            if thread.type == ContentType.Comment:
+                thread = thread.parent
+            if thread.type == ContentType.Folder:
+                return {'status': 'error',
+                        'error': 'comment for folder not allowed'}
+            api.create_comment(thread.workspace, thread,
+                               json['payload']['content'], True)
         else:
             return {'status': 'error',
                     'error': 'invalid token'}
