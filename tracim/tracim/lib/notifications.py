@@ -5,6 +5,7 @@ import typing
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr
 
 from lxml.html.diff import htmldiff
 
@@ -207,10 +208,7 @@ class EmailNotifier(object):
         else:
             email_address = email_template.replace('{user_id}', '0')
 
-        return '{label} <{email_address}>'.format(
-            label = Header(mail_sender_name).encode(),
-            email_address = email_address
-        )
+        return formataddr((mail_sender_name, email_address))
 
     @staticmethod
     def log_notification(
@@ -269,7 +267,7 @@ class EmailNotifier(object):
 
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
-            to_addr = '{name} <{email}>'.format(name=role.user.display_name, email=role.user.email)
+            to_addr = formataddr((role.user.display_name, role.user.email))
 
             #
             #  INFO - D.A. - 2014-11-06
