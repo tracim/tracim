@@ -22,7 +22,8 @@ from tracim.controllers.events import VALID_TOKEN_VALUE
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
 BS_HTML_BODY_PARSE_CONFIG = {
     'tag_blacklist': ["script", "style", "blockquote"],
-    'class_blacklist': ['moz-cite-prefix'],
+    'class_blacklist': ['moz-cite-prefix','gmail_extra','gmail_quote',
+                        'yahoo_quoted'],
     'tag_whitelist': ['a', 'b', 'strong', 'i', 'br', 'ul', 'li', 'ol',
                       'em', 'i', 'u',
                       'thead', 'tr', 'td', 'tbody', 'table', 'p', 'pre'],
