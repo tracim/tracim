@@ -22,7 +22,7 @@ from tracim.controllers.events import VALID_TOKEN_VALUE
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
 BS_HTML_BODY_PARSE_CONFIG = {
     'tag_blacklist': ["script", "style", "blockquote"],
-    'class_blacklist': ['moz-cite-prefix','gmail_extra','gmail_quote',
+    'class_blacklist': ['moz-cite-prefix', 'gmail_extra', 'gmail_quote',
                         'yahoo_quoted'],
     'id_blacklist': ['reply-intro'],
     'tag_whitelist': ['a', 'b', 'strong', 'i', 'br', 'ul', 'li', 'ol',
@@ -111,7 +111,6 @@ class DecodedMail(object):
     def _get_mime_body_message(self) -> typing.Optional[Message]:
         # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
         # FIXME - G.M - 2017-11-16 - Check support for non-multipart mail
-        # assert msg.is_multipart()
         part = None
         # Check for html
         for part in self._message.walk():
@@ -119,7 +118,7 @@ class DecodedMail(object):
             cdispo = str(part.get('Content-Disposition'))
             if ctype == 'text/html' and 'attachment' not in cdispo:
                 return part
-        # checj fir plain text
+        # check for plain text
         for part in self._message.walk():
             ctype = part.get_content_type()
             cdispo = str(part.get('Content-Disposition'))
@@ -270,7 +269,7 @@ class MailFetcher(object):
             try:
                 r = requests.post(self.endpoint, json=msg)
                 response = r.json()
-                if not 'status' in response:
+                if 'status' not in response:
                     log = 'bad response: {}'
                     logger.error(self, log.format(str(response)))
                 else:
