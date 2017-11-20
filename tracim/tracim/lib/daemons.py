@@ -175,6 +175,7 @@ class MailFetcherDaemon(Daemon):
             delay=cfg.EMAIL_REPLY_DELAY,
             # FIXME - G.M - 2017-11-15 - proper tracim url formatting
             endpoint=cfg.WEBSITE_BASE_URL + "/events",
+            token=cfg.EMAIL_REPLY_TOKEN,
         )
         self._fetcher.run()
 

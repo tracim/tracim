@@ -17,7 +17,6 @@ from bs4 import BeautifulSoup
 from email_reply_parser import EmailReplyParser
 
 from tracim.lib.base import logger
-from tracim.controllers.events import VALID_TOKEN_VALUE
 
 TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
 BS_HTML_BODY_PARSE_CONFIG = {
@@ -168,7 +167,7 @@ class MailFetcher(object):
 
     def __init__(self,
                  host: str, port: str, user: str, password: str, folder: str,
-                 delay: int, endpoint: str) \
+                 delay: int, endpoint: str, token:str) \
             -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -181,6 +180,7 @@ class MailFetcher(object):
         :param folder: mail folder where new mail are fetched
         :param delay: seconds to wait before fetching new mail again
         :param endpoint: tracim http endpoint where decoded mail are send.
+        :param token: token to authenticate http connexion
         """
         self._connection = None
         self._mails = []
@@ -191,6 +191,7 @@ class MailFetcher(object):
         self.folder = folder
         self.delay = delay
         self.endpoint = endpoint
+        self.token = token
 
         self._is_active = True
 
@@ -260,7 +261,7 @@ class MailFetcher(object):
         unsended_mail = []
         while self._mails:
             mail = self._mails.pop()
-            msg = {"token": VALID_TOKEN_VALUE,
+            msg = {"token": self.token,
                    "user_mail": mail.get_from_address(),
                    "content_id": mail.get_key(),
                    "payload": {

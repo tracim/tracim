@@ -221,6 +221,8 @@ email.reply.imap.port = 993
 email.reply.imap.user = your_imap_user
 email.reply.imap.password = your_imap_password
 email.reply.imap.folder = INBOX
+# Token for communication between mail fetcher and tracim controller
+email.reply.token = mysecuretoken
 # Delay in seconds between each check
 email.reply.delay = 60
 

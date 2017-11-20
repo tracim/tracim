@@ -376,6 +376,9 @@ class CFG(object):
         self.EMAIL_REPLY_DELAY = int(tg.config.get(
             'email.reply.delay',
         ))
+        self.EMAIL_REPLY_TOKEN = tg.config.get(
+            'email.reply.token',
+        )
 
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',

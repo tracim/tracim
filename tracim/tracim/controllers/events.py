@@ -7,15 +7,17 @@ from tracim.lib.content import ContentApi
 from tracim.lib.user import UserApi
 from tracim.model.data import ContentType
 
-VALID_TOKEN_VALUE="djkflhqsfhyqsdb fq"
-
 class EventsRestController(RestController):
 
 
     @tg.expose('json')
     def post(self):
         json = request.json_body
-        if 'token' in json and json['token'] == VALID_TOKEN_VALUE:
+
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        if 'token' in json and json['token'] == cfg.EMAIL_REPLY_TOKEN:
             if 'user_mail' not in json or 'content_id' not in json:
                 return {'status': 'error',
                         'error': 'bad json',}
