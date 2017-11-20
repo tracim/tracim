@@ -7,8 +7,8 @@ from tracim.lib.content import ContentApi
 from tracim.lib.user import UserApi
 from tracim.model.data import ContentType
 
-class EventsRestController(RestController):
 
+class EventsRestController(RestController):
 
     @tg.expose('json')
     def post(self):
@@ -20,22 +20,22 @@ class EventsRestController(RestController):
         if 'token' in json and json['token'] == cfg.EMAIL_REPLY_TOKEN:
             if 'user_mail' not in json or 'content_id' not in json:
                 return {'status': 'error',
-                        'error': 'bad json',}
+                        'error': 'bad json', }
             uapi = UserApi(None)
             # TODO support Empty result error
             try:
                 user = uapi.get_one_by_email(json['user_mail'])
-            except NoResultFound :
+            except NoResultFound:
                 return {'status': 'error',
-                        'error': 'bad user mail',}
+                        'error': 'bad user mail', }
             api = ContentApi(user)
 
             try:
                 thread = api.get_one(json['content_id'],
                                      content_type=ContentType.Any)
-            except NoResultFound :
+            except NoResultFound:
                 return {'status': 'error',
-                        'error': 'bad content id',}
+                        'error': 'bad content id', }
             # INFO - G.M - 2017-11-17
             # When content_id is a sub-elem of a main content like Comment,
             # Attach the thread to the main content.
@@ -43,10 +43,10 @@ class EventsRestController(RestController):
                 thread = thread.parent
             if thread.type == ContentType.Folder:
                 return {'status': 'error',
-                        'error': 'comment for folder not allowed',}
+                        'error': 'comment for folder not allowed', }
             api.create_comment(thread.workspace, thread,
                                json['payload']['content'], True)
-            return {'status': 'ok',}
+            return {'status': 'ok', }
         else:
             return {'status': 'error',
-                    'error': 'invalid token',}
+                    'error': 'invalid token', }
