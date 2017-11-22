@@ -88,16 +88,8 @@ class DecodedMail(object):
         soup = BeautifulSoup(html_body)
         config = BS_HTML_BODY_PARSE_CONFIG
         for tag in soup.findAll():
-            if tag.name.lower() in config['tag_blacklist']:
+            if DecodedMail._tag_to_extract(tag):
                 tag.extract()
-            elif 'class' in tag.attrs:
-                for elem in config['class_blacklist']:
-                    if elem in tag.attrs['class']:
-                        tag.extract()
-            elif 'id' in tag.attrs:
-                for elem in config['id_blacklist']:
-                    if elem in tag.attrs['id']:
-                        tag.extract()
             elif tag.name.lower() in config['tag_whitelist']:
                 attrs = dict(tag.attrs)
                 for attr in attrs:
@@ -106,6 +98,22 @@ class DecodedMail(object):
             else:
                 tag.unwrap()
         return str(soup)
+
+    @staticmethod
+    def _tag_to_extract(tag) -> bool:
+        config = BS_HTML_BODY_PARSE_CONFIG
+        if tag.name.lower() in config['tag_blacklist']:
+            return True
+        if 'class' in tag.attrs:
+            for elem in config['class_blacklist']:
+                if elem in tag.attrs['class']:
+                    return True
+        if 'id' in tag.attrs:
+            for elem in config['id_blacklist']:
+                if elem in tag.attrs['id']:
+                    return True
+        return False
+
 
     def _get_mime_body_message(self) -> typing.Optional[Message]:
         # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
