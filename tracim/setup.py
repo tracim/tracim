@@ -41,7 +41,7 @@ install_requires = [
     'rq==0.7.1',
     'filedepot>=0.5.0',
     'preview-generator',
- }
+]
 
 setup(
     name='tracim',
