@@ -139,22 +139,20 @@ class DecodedMail(object):
     def get_key(self) -> typing.Optional[str]:
 
         """
+        key is the string contain in some mail header we need to retrieve.
         First try checking special header, them check 'to' header
         and finally check first(oldest) mail-id of 'references' header
         """
-        key = None
         first_ref = self.get_first_ref()
         to_address = self.get_to_address()
         special_key = self.get_special_key()
 
         if special_key:
-            key = special_key
-        if not key and to_address:
-            key = DecodedMail.find_key_from_mail_address(to_address)
-        if not key and first_ref:
-            key = DecodedMail.find_key_from_mail_address(first_ref)
-
-        return key
+            return special_key
+        if to_address:
+            return DecodedMail.find_key_from_mail_address(to_address)
+        if first_ref:
+            return DecodedMail.find_key_from_mail_address(first_ref)
 
     @classmethod
     def find_key_from_mail_address(cls, mail_address: str) \
@@ -168,10 +166,8 @@ class DecodedMail(object):
         username = mail_address.split('@')[0]
         username_data = username.split('+')
         if len(username_data) == 2:
-            key = username_data[1]
-        else:
-            key = None
-        return key
+            return username_data[1]
+        return None
 
 
 class MailFetcher(object):
