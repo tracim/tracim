@@ -18,9 +18,9 @@ from email_reply_parser import EmailReplyParser
 
 from tracim.lib.base import logger
 
-TRACIM_SPECIAL_KEY_HEADER = "X-Tracim-Key"
-BS_HTML_BODY_PARSE_CONFIG = {
-    'tag_blacklist': ["script", "style", "blockquote"],
+TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
+BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG = {
+    'tag_blacklist': ['script', 'style', 'blockquote'],
     'class_blacklist': ['moz-cite-prefix', 'gmail_extra', 'gmail_quote',
                         'yahoo_quoted'],
     'id_blacklist': ['reply-intro'],
@@ -29,6 +29,8 @@ BS_HTML_BODY_PARSE_CONFIG = {
                       'thead', 'tr', 'td', 'tbody', 'table', 'p', 'pre'],
     'attrs_whitelist': ['href'],
 }
+CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
+CONTENT_TYPE_TEXT_HTML = 'text/html'
 
 
 class DecodedMail(object):
@@ -63,30 +65,30 @@ class DecodedMail(object):
         body = None
         if body_part:
             charset = body_part.get_content_charset('iso-8859-1')
-            ctype = body_part.get_content_type()
-            if ctype == "text/plain":
+            content_type = body_part.get_content_type()
+            if content_type == CONTENT_TYPE_TEXT_PLAIN:
                 txt_body = body_part.get_payload(decode=True).decode(
                     charset)
                 body = DecodedMail._parse_txt_body(txt_body)
 
-            elif ctype == "text/html":
+            elif content_type == CONTENT_TYPE_TEXT_HTML:
                 html_body = body_part.get_payload(decode=True).decode(
                     charset)
                 body = DecodedMail._parse_html_body(html_body)
 
         return body
 
-    @staticmethod
-    def _parse_txt_body(txt_body: str):
+    @classmethod
+    def _parse_txt_body(cls, txt_body: str):
         txt_body = EmailReplyParser.parse_reply(txt_body)
         html_body = markdown.markdown(txt_body)
         body = DecodedMail._parse_html_body(html_body)
         return body
 
-    @staticmethod
-    def _parse_html_body(html_body: str):
+    @classmethod
+    def _parse_html_body(cls, html_body: str):
         soup = BeautifulSoup(html_body)
-        config = BS_HTML_BODY_PARSE_CONFIG
+        config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
         for tag in soup.findAll():
             if DecodedMail._tag_to_extract(tag):
                 tag.extract()
@@ -99,9 +101,9 @@ class DecodedMail(object):
                 tag.unwrap()
         return str(soup)
 
-    @staticmethod
-    def _tag_to_extract(tag) -> bool:
-        config = BS_HTML_BODY_PARSE_CONFIG
+    @classmethod
+    def _tag_to_extract(cls, tag) -> bool:
+        config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
         if tag.name.lower() in config['tag_blacklist']:
             return True
         if 'class' in tag.attrs:
@@ -114,22 +116,23 @@ class DecodedMail(object):
                     return True
         return False
 
-
     def _get_mime_body_message(self) -> typing.Optional[Message]:
         # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
         # FIXME - G.M - 2017-11-16 - Check support for non-multipart mail
         part = None
         # Check for html
         for part in self._message.walk():
-            ctype = part.get_content_type()
-            cdispo = str(part.get('Content-Disposition'))
-            if ctype == 'text/html' and 'attachment' not in cdispo:
+            content_type = part.get_content_type()
+            content_dispo = str(part.get('Content-Disposition'))
+            if content_type == CONTENT_TYPE_TEXT_HTML \
+                    and 'attachment' not in content_dispo:
                 return part
         # check for plain text
         for part in self._message.walk():
-            ctype = part.get_content_type()
-            cdispo = str(part.get('Content-Disposition'))
-            if ctype == 'text/plain' and 'attachment' not in cdispo:
+            content_type = part.get_content_type()
+            content_dispo = str(part.get('Content-Disposition'))
+            if content_type == CONTENT_TYPE_TEXT_PLAIN and 'attachment' \
+                    not in content_dispo:
                 return part
         return part
 
@@ -153,8 +156,8 @@ class DecodedMail(object):
 
         return key
 
-    @staticmethod
-    def find_key_from_mail_address(mail_address: str) \
+    @classmethod
+    def find_key_from_mail_address(cls, mail_address: str) \
             -> typing.Optional[str]:
         """ Parse mail_adress-like string
         to retrieve key.
@@ -174,8 +177,14 @@ class DecodedMail(object):
 class MailFetcher(object):
 
     def __init__(self,
-                 host: str, port: str, user: str, password: str, folder: str,
-                 delay: int, endpoint: str, token:str) \
+                 host: str,
+                 port: str,
+                 user: str,
+                 password: str,
+                 folder: str,
+                 delay: int,
+                 endpoint: str,
+                 token: str) \
             -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -269,11 +278,11 @@ class MailFetcher(object):
         unsended_mail = []
         while self._mails:
             mail = self._mails.pop()
-            msg = {"token": self.token,
-                   "user_mail": mail.get_from_address(),
-                   "content_id": mail.get_key(),
-                   "payload": {
-                       "content": mail.get_body(),
+            msg = {'token': self.token,
+                   'user_mail': mail.get_from_address(),
+                   'content_id': mail.get_key(),
+                   'payload': {
+                       'content': mail.get_body(),
                    }}
             try:
                 r = requests.post(self.endpoint, json=msg)

@@ -8,7 +8,7 @@ from tracim.lib.user import UserApi
 from tracim.model.data import ContentType
 
 
-class EventsRestController(RestController):
+class EventRestController(RestController):
 
     @tg.expose('json')
     def post(self):

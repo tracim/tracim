@@ -373,8 +373,8 @@ class CFG(object):
         self.EMAIL_REPLY_IMAP_FOLDER = tg.config.get(
             'email.reply.imap.folder',
         )
-        self.EMAIL_REPLY_DELAY = int(tg.config.get(
-            'email.reply.delay',
+        self.EMAIL_REPLY_CHECK_HEARTBEAT = int(tg.config.get(
+            'email.reply.check.heartbeat',
         ))
         self.EMAIL_REPLY_TOKEN = tg.config.get(
             'email.reply.token',

@@ -22,7 +22,7 @@ from tracim.controllers.help import HelpController
 from tracim.controllers.previews import PreviewsController
 from tracim.controllers.user import UserRestController
 from tracim.controllers.workspace import UserWorkspaceRestController
-from tracim.controllers.events import EventsRestController
+from tracim.controllers.events import EventRestController
 from tracim.lib import CST
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
@@ -62,7 +62,7 @@ class RootController(StandardController):
     previews = PreviewsController()
 
     content = ContentController()
-    events = EventsRestController()
+    events = EventRestController()
     # api
     api = APIController()
 
