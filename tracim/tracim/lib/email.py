@@ -4,6 +4,7 @@ import typing
 from email.message import Message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr
 
 from mako.template import Template
 from tg.i18n import ugettext as _
@@ -156,11 +157,11 @@ class EmailManager(object):
             )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
-        message['From'] = '{0} <{1}>'.format(
+        message['From'] = formataddr((
             self._global_config.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL,
             self._global_config.EMAIL_NOTIFICATION_FROM_EMAIL,
-        )
-        message['To'] = user.email
+        ))
+        message['To'] = formataddr((user.get_display_name(), user.email))
 
         text_template_file_path = self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT  # nopep8
         html_template_file_path = self._global_config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML  # nopep8

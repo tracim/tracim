@@ -86,8 +86,5 @@ setup(
             'mail sender = tracim.command.mail:MailSenderCommend',
         ]
     },
-    dependency_links=[
-        'http://github.com/algoo/preview-generator/tarball/master#egg=preview_generator-1.0',
-    ],
     zip_safe=False,
 )

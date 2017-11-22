@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Candy - Chats are not dead yet</title>
+	<link rel="stylesheet" type="text/css" href="candy/libs.min.css" />
+	<link rel="stylesheet" type="text/css" href="candy/res/default.css" />
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="candy/libs.min.js"></script>
+	<script type="text/javascript" src="candy/candy.min.js"></script>
+	<script type="text/javascript">
+$(document).ready(function() {
+            Candy.init('https://prosody/http-bind?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTY1MjY3MzUsImF1ZCI6IioiLCJpYXQiOjE1MDc4ODY3MzUsImlzcyI6InRlc3QiLCJyb29tIjoidGVzdCIsIm5iZiI6MTUwNzg4NjczNX0.Ht2g8tqtkbVNLPoqqXVAO-RsjYGo7xn15Ydg8mKyrp8', {
+                core: {
+                    // only set this to true if developing / debugging errors
+                    debug: true,
+                    // autojoin is a *required* parameter if you don't have a plugin (e.g. roomPanel) for it
+                    //   true
+                    //     -> fetch info from server (NOTE: does only work with openfire server)
+                    //   ['test@conference.example.com']
+                    //     -> array of rooms to join after connecting
+                    autojoin: ['test@conference.prosody']
+                },
+                view: { language: 'fr',
+                        assets: 'candy/res/' }
+            });
+            //Candy.Core.connect("john@auth.prosody","j");
+            Candy.Core.connect('prosody',null,'bidule');
+        });
+
+	</script>
+</head>
+<body>
+	<div id="candy"></div>
+</body>
+</html>

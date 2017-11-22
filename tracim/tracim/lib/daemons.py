@@ -351,8 +351,8 @@ from tracim.lib.webdav.sql_domain_controller import TracimDomainController
 from inspect import isfunction
 import traceback
 
-from wsgidav.server.cherrypy import wsgiserver
-from wsgidav.server.cherrypy.wsgiserver.wsgiserver3 import CherryPyWSGIServer
+from cherrypy import wsgiserver
+from cherrypy.wsgiserver import CherryPyWSGIServer
 
 DEFAULT_CONFIG_FILE = "wsgidav.conf"
 PYTHON_VERSION = "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
