@@ -196,7 +196,6 @@ class MailFetcher(object):
         :param token: token to authenticate http connexion
         """
         self._connection = None
-        self._mails = []
         self.host = host
         self.port = port
         self.user = user
@@ -212,15 +211,18 @@ class MailFetcher(object):
         while self._is_active:
             time.sleep(self.delay)
             self._connect()
-            self._fetch()
-            self._notify_tracim()
+            mails = self._fetch()
+            # TODO - G.M -  2017-11-22 retry sending unsended mail
+            # These mails are return by _notify_tracim, flag them with "unseen"
+            # or store them until new _notify_tracim call
+            self._notify_tracim(mails)
             self._disconnect()
 
     def stop(self) -> None:
         self._is_active = False
 
     def _connect(self) -> None:
-        # FIXME - G.M - 2017-11-15 Verify connection/disconnection
+        # TODO - G.M - 2017-11-15 Verify connection/disconnection
         # Are old connexion properly close this way ?
         if self._connection:
             self._disconnect()
@@ -239,16 +241,17 @@ class MailFetcher(object):
             self._connection.logout()
             self._connection = None
 
-    def _fetch(self) -> None:
+    def _fetch(self) -> list:
         """
         Get news message from mailbox
+        :return: list of new mails
         """
-
+        mails = []
         # select mailbox
         rv, data = self._connection.select(self.folder)
         if rv == 'OK':
             # get mails
-            # FIXME - G.M -  2017-11-15 Which files to select as new file ?
+            # TODO - G.M -  2017-11-15 Which files to select as new file ?
             # Unseen file or All file from a directory (old one should be moved/
             # deleted from mailbox during this process) ?
             rv, data = self._connection.search(None, "(UNSEEN)")
@@ -259,7 +262,7 @@ class MailFetcher(object):
                     if rv == 'OK':
                         msg = message_from_bytes(data[0][1])
                         decodedmsg = DecodedMail(msg)
-                        self._mails.append(decodedmsg)
+                        mails.append(decodedmsg)
                     else:
                         log = 'IMAP : Unable to get mail : {}'
                         logger.debug(self, log.format(str(rv)))
@@ -269,11 +272,17 @@ class MailFetcher(object):
         else:
             log = 'IMAP : Unable to open mailbox : {}'
             logger.debug(self, log.format(str(rv)))
+        return mails
 
-    def _notify_tracim(self) -> None:
-        unsended_mail = []
-        while self._mails:
-            mail = self._mails.pop()
+    def _notify_tracim(self, mails: list) -> list:
+        """
+        Send http request to tracim endpoint
+        :param mails: list of mails to send
+        :return: unsended mails
+        """
+        unsended_mails = []
+        while mails:
+            mail = mails.pop()
             msg = {'token': self.token,
                    'user_mail': mail.get_from_address(),
                    'content_id': mail.get_key(),
@@ -283,7 +292,7 @@ class MailFetcher(object):
             try:
                 r = requests.post(self.endpoint, json=msg)
                 if r.status_code not in [200, 204]:
-                    log = 'bad status code response when sending mail to tracim: {}' # nopep8
+                    log = 'bad status code response when sending mail to tracim: {}'  # nopep8
                     logger.error(self, log.format(str(r.status_code)))
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout:
@@ -295,6 +304,4 @@ class MailFetcher(object):
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
                 break
-        # FIXME - G.M - 2017-11-17 Avoid too short-timed infinite retry ?
-        # retry later to send those mail
-        self._mails = unsended_mail
+        return unsended_mails
