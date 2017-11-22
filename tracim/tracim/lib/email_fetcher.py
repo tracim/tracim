@@ -282,18 +282,9 @@ class MailFetcher(object):
                    }}
             try:
                 r = requests.post(self.endpoint, json=msg)
-                response = r.json()
-                if 'status' not in response:
-                    log = 'bad response: {}'
-                    logger.error(self, log.format(str(response)))
-                else:
-                    if response['status'] == 'ok':
-                        pass
-                    elif response['status'] == 'error' and 'error' in response:
-                        log = 'error with email: {}'
-                        logger.error(self, log.format(str(response['error'])))
-                    else:
-                        log = 'Unknown error with email'
+                if r.status_code not in [200, 204]:
+                    log = 'bad status code response when sending mail to tracim: {}' # nopep8
+                    logger.error(self, log.format(str(r.status_code)))
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
