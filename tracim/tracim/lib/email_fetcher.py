@@ -265,6 +265,10 @@ class MailFetcher(object):
             if rv == 'OK':
                 # get mail content
                 for num in data[0].split():
+                    # INFO - G.M - 2017-11-23 - Fetch (RFC288) to retrieve all complete mails
+                    # see example : https://docs.python.org/fr/3.5/library/imaplib.html#imap4-example .
+                    # Be careful, This method remove also mails from Unseen mails
+
                     rv, data = self._connection.fetch(num, '(RFC822)')
                     if rv == 'OK':
                         msg = message_from_bytes(data[0][1])
