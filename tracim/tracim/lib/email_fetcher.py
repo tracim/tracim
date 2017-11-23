@@ -176,7 +176,7 @@ class MailFetcher(object):
                  port: str,
                  user: str,
                  password: str,
-                 ssl: bool,
+                 use_ssl: bool,
                  folder: str,
                  delay: int,
                  endpoint: str,
@@ -190,7 +190,7 @@ class MailFetcher(object):
         :param port: imap connection port
         :param user: user login of mailbox
         :param password: user password of mailbox
-        :param ssl: use imap over ssl connection
+        :param use_ssl: use imap over ssl connection
         :param folder: mail folder where new mail are fetched
         :param delay: seconds to wait before fetching new mail again
         :param endpoint: tracim http endpoint where decoded mail are send.
@@ -201,7 +201,7 @@ class MailFetcher(object):
         self.port = port
         self.user = user
         self.password = password
-        self.ssl = ssl
+        self.use_ssl = use_ssl
         self.folder = folder
         self.delay = delay
         self.endpoint = endpoint
@@ -236,7 +236,7 @@ class MailFetcher(object):
         # TODO - G.M - 2017-11-23 Support for predefined SSLContext ?
         # without ssl_context param, tracim use default security configuration
         # which is great in most case.
-        if self.ssl:
+        if self.use_ssl:
             self._connection = imaplib.IMAP4_SSL(self.host, self.port)
         else:
             self._connection = imaplib.IMAP4(self.host, self.port)
