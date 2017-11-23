@@ -289,12 +289,15 @@ class EmailNotifier(object):
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
+            reply_to_label = l_('{username} in workspace {workspace}').format(
+                username=user.display_name,
+                workspace=main_content.workspace.label)
 
             message = MIMEMultipart('alternative')
             message['Subject'] = subject
             message['From'] = self._get_sender(user)
             message['To'] = to_addr
-            message['Reply-to'] = formataddr(('',replyto_addr))
+            message['Reply-to'] = formataddr((reply_to_label, replyto_addr))
             # INFO - G.M - 2017-11-15
             # References can theorically have label, but in pratice, references
             # contains only message_id from parents post in thread.
