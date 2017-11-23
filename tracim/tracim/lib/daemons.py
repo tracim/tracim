@@ -171,6 +171,7 @@ class MailFetcherDaemon(Daemon):
             port=cfg.EMAIL_REPLY_IMAP_PORT,
             user=cfg.EMAIL_REPLY_IMAP_USER,
             password=cfg.EMAIL_REPLY_IMAP_PASSWORD,
+            ssl=cfg.EMAIL_REPLY_IMAP_SSL,
             folder=cfg.EMAIL_REPLY_IMAP_FOLDER,
             delay=cfg.EMAIL_REPLY_CHECK_HEARTBEAT,
             # FIXME - G.M - 2017-11-15 - proper tracim url formatting

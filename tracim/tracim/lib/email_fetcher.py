@@ -176,6 +176,7 @@ class MailFetcher(object):
                  port: str,
                  user: str,
                  password: str,
+                 ssl: bool,
                  folder: str,
                  delay: int,
                  endpoint: str,
@@ -189,6 +190,7 @@ class MailFetcher(object):
         :param port: imap connection port
         :param user: user login of mailbox
         :param password: user password of mailbox
+        :param ssl: use imap over ssl connection
         :param folder: mail folder where new mail are fetched
         :param delay: seconds to wait before fetching new mail again
         :param endpoint: tracim http endpoint where decoded mail are send.
@@ -199,6 +201,7 @@ class MailFetcher(object):
         self.port = port
         self.user = user
         self.password = password
+        self.ssl = ssl
         self.folder = folder
         self.delay = delay
         self.endpoint = endpoint
@@ -225,11 +228,14 @@ class MailFetcher(object):
         # Are old connexion properly close this way ?
         if self._connection:
             self._disconnect()
-        # TODO - G.M - 2017-11-15 Support unencrypted connection ?
         # TODO - G.M - 2017-11-23 Support for predefined SSLContext ?
         # without ssl_context param, tracim use default security configuration
         # which is great in most case.
-        self._connection = imaplib.IMAP4_SSL(self.host, self.port)
+        if self.ssl:
+            self._connection = imaplib.IMAP4_SSL(self.host, self.port)
+        else:
+            self._connection = imaplib.IMAP4(self.host, self.port)
+
         try:
             self._connection.login(self.user, self.password)
         except Exception as e:
