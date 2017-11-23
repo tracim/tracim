@@ -87,7 +87,7 @@ class DecodedMail(object):
 
     @classmethod
     def _parse_html_body(cls, html_body: str):
-        soup = BeautifulSoup(html_body)
+        soup = BeautifulSoup(html_body,'html.parser')
         config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
         for tag in soup.findAll():
             if DecodedMail._tag_to_extract(tag):
