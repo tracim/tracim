@@ -212,13 +212,18 @@ class MailFetcher(object):
     def run(self) -> None:
         while self._is_active:
             time.sleep(self.delay)
-            self._connect()
-            mails = self._fetch()
-            # TODO - G.M -  2017-11-22 retry sending unsended mail
-            # These mails are return by _notify_tracim, flag them with "unseen"
-            # or store them until new _notify_tracim call
-            self._notify_tracim(mails)
-            self._disconnect()
+            try:
+                self._connect()
+                mails = self._fetch()
+                # TODO - G.M -  2017-11-22 retry sending unsended mail
+                # These mails are return by _notify_tracim, flag them with "unseen"
+                # or store them until new _notify_tracim call
+                self._notify_tracim(mails)
+                self._disconnect()
+            except Exception as e:
+                # TODO - G.M - 2017-11-23 - Identify possible exceptions
+                log = 'IMAP error: {}'
+                logger.warning(self, log.format(e.__str__()))
 
     def stop(self) -> None:
         self._is_active = False
@@ -240,7 +245,7 @@ class MailFetcher(object):
             self._connection.login(self.user, self.password)
         except Exception as e:
             log = 'IMAP login error: {}'
-            logger.debug(self, log.format(e.__str__()))
+            logger.warning(self, log.format(e.__str__()))
 
     def _disconnect(self) -> None:
         if self._connection:
