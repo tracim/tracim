@@ -289,7 +289,7 @@ class EmailNotifier(object):
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
-            reply_to_label = l_('{username} in workspace {workspace}').format(
+            reply_to_label = l_('{username} & all members of {workspace}').format(
                 username=user.display_name,
                 workspace=main_content.workspace.label)
 
