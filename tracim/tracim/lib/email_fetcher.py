@@ -117,8 +117,7 @@ class DecodedMail(object):
         return False
 
     def _get_mime_body_message(self) -> typing.Optional[Message]:
-        # FIXME - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
-        # FIXME - G.M - 2017-11-16 - Check support for non-multipart mail
+        # TODO - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
         part = None
         # Check for html
         for part in self._message.walk():
@@ -227,7 +226,9 @@ class MailFetcher(object):
         if self._connection:
             self._disconnect()
         # TODO - G.M - 2017-11-15 Support unencrypted connection ?
-        # TODO - G.M - 2017-11-15 Support for keyfile,certfile ?
+        # TODO - G.M - 2017-11-23 Support for predefined SSLContext ?
+        # without ssl_context param, tracim use default security configuration
+        # which is great in most case.
         self._connection = imaplib.IMAP4_SSL(self.host, self.port)
         try:
             self._connection.login(self.user, self.password)
