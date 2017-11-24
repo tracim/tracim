@@ -19,6 +19,7 @@ from email_reply_parser import EmailReplyParser
 from tracim.lib.base import logger
 
 TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
+# TODO BS 20171124: Think about replace thin dict config by object
 BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG = {
     'tag_blacklist': ['script', 'style', 'blockquote'],
     'class_blacklist': ['moz-cite-prefix', 'gmail_extra', 'gmail_quote',
