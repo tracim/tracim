@@ -268,7 +268,16 @@ class EmailNotifier(object):
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
             to_addr = formataddr((role.user.display_name, role.user.email))
+            #
+            # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
+            # references can have multiple values, but only one in this case.
+            replyto_addr = self._global_config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL.replace( # nopep8
+                '{content_id}',str(content.content_id)
+            )
 
+            reference_addr = self._global_config.EMAIL_NOTIFICATION_REFERENCES_EMAIL.replace( #nopep8
+                '{content_id}',str(content.content_id)
+             )
             #
             #  INFO - D.A. - 2014-11-06
             # We do not use .format() here because the subject defined in the .ini file
@@ -280,12 +289,21 @@ class EmailNotifier(object):
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
+            reply_to_label = l_('{username} & all members of {workspace}').format(
+                username=user.display_name,
+                workspace=main_content.workspace.label)
 
             message = MIMEMultipart('alternative')
             message['Subject'] = subject
             message['From'] = self._get_sender(user)
             message['To'] = to_addr
-
+            message['Reply-to'] = formataddr((reply_to_label, replyto_addr))
+            # INFO - G.M - 2017-11-15
+            # References can theorically have label, but in pratice, references
+            # contains only message_id from parents post in thread.
+            # To link this email to a content we create a virtual parent
+            # in reference who contain the content_id.
+            message['References'] = formataddr(('',reference_addr))
             body_text = self._build_email_body(self._global_config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
 
 

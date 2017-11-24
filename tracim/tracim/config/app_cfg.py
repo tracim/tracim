@@ -28,6 +28,7 @@ from tracim.config import TracimAppConfig
 from tracim.lib.base import logger
 from tracim.lib.daemons import DaemonsManager
 from tracim.lib.daemons import MailSenderDaemon
+from tracim.lib.daemons import MailFetcherDaemon
 from tracim.lib.daemons import RadicaleDaemon
 from tracim.lib.daemons import WsgiDavDaemon
 from tracim.lib.system import InterruptManager
@@ -125,6 +126,9 @@ def start_daemons(manager: DaemonsManager):
 
     if cfg.EMAIL_PROCESSING_MODE == CFG.CST.ASYNC:
         manager.run('mail_sender', MailSenderDaemon)
+
+    if cfg.EMAIL_REPLY_ACTIVATED:
+        manager.run('mail_fetcher',MailFetcherDaemon)
 
 
 def configure_depot():
@@ -299,6 +303,12 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = tg.config.get(
             'email.notification.from.default_label'
         )
+        self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = tg.config.get(
+            'email.notification.reply_to.email',
+        )
+        self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = tg.config.get(
+            'email.notification.references.email'
+        )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = tg.config.get(
             'email.notification.content_update.template.html',
         )
@@ -343,6 +353,37 @@ class CFG(object):
             'email.notification.log_file_path',
             None,
         )
+
+        self.EMAIL_REPLY_ACTIVATED = asbool(tg.config.get(
+            'email.reply.activated',
+            False,
+        ))
+
+        self.EMAIL_REPLY_IMAP_SERVER = tg.config.get(
+            'email.reply.imap.server',
+        )
+        self.EMAIL_REPLY_IMAP_PORT = tg.config.get(
+            'email.reply.imap.port',
+        )
+        self.EMAIL_REPLY_IMAP_USER = tg.config.get(
+            'email.reply.imap.user',
+        )
+        self.EMAIL_REPLY_IMAP_PASSWORD = tg.config.get(
+            'email.reply.imap.password',
+        )
+        self.EMAIL_REPLY_IMAP_FOLDER = tg.config.get(
+            'email.reply.imap.folder',
+        )
+        self.EMAIL_REPLY_CHECK_HEARTBEAT = int(tg.config.get(
+            'email.reply.check.heartbeat',
+            60,
+        ))
+        self.EMAIL_REPLY_TOKEN = tg.config.get(
+            'email.reply.token',
+        )
+        self.EMAIL_REPLY_IMAP_USE_SSL = asbool(tg.config.get(
+            'email.reply.imap.use_ssl',
+        ))
 
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',

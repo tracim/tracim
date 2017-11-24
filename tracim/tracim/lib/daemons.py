@@ -19,6 +19,7 @@ from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
 
 from tracim.lib.utils import get_rq_queue
+from tracim.lib.email_fetcher import MailFetcher
 
 
 class DaemonsManager(object):
@@ -149,6 +150,43 @@ class Daemon(threading.Thread):
         :param callback: callback to execute in your thread.
         """
         raise NotImplementedError()
+
+
+class MailFetcherDaemon(Daemon):
+    """
+    Thread containing a daemon who fetch new mail from a mailbox and
+    send http request to a tracim endpoint to handle them.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._fetcher = None  # type: MailFetcher
+        self.ok = True
+
+    def run(self) -> None:
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+        self._fetcher = MailFetcher(
+            host=cfg.EMAIL_REPLY_IMAP_SERVER,
+            port=cfg.EMAIL_REPLY_IMAP_PORT,
+            user=cfg.EMAIL_REPLY_IMAP_USER,
+            password=cfg.EMAIL_REPLY_IMAP_PASSWORD,
+            use_ssl=cfg.EMAIL_REPLY_IMAP_USE_SSL,
+            folder=cfg.EMAIL_REPLY_IMAP_FOLDER,
+            delay=cfg.EMAIL_REPLY_CHECK_HEARTBEAT,
+            # FIXME - G.M - 2017-11-15 - proper tracim url formatting
+            endpoint=cfg.WEBSITE_BASE_URL + "/events",
+            token=cfg.EMAIL_REPLY_TOKEN,
+        )
+        self._fetcher.run()
+
+    def stop(self) -> None:
+        if self._fetcher:
+            self._fetcher.stop()
+
+    def append_thread_callback(self, callback: collections.Callable) -> None:
+        logger.warning('MailFetcherDaemon not implement append_thread_calback')
+        pass
 
 
 class MailSenderDaemon(Daemon):
