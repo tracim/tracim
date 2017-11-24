@@ -1,4 +1,5 @@
 import tg
+import typing
 from tg import request
 from tg import Response
 from tg import abort
@@ -14,7 +15,7 @@ from tracim.config.app_cfg import CFG
 class EventRestController(RestController):
 
     @tg.expose('json')
-    def post(self):
+    def post(self) -> Response:
         cfg = CFG.get_instance()
 
         try:

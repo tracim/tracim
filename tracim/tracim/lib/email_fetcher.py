@@ -13,7 +13,7 @@ from email import message_from_bytes
 
 import markdown
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from email_reply_parser import EmailReplyParser
 
 from tracim.lib.base import logger
@@ -35,27 +35,26 @@ CONTENT_TYPE_TEXT_HTML = 'text/html'
 
 
 class DecodedMail(object):
-
-    def __init__(self, message: Message):
+    def __init__(self, message: Message) -> None:
         self._message = message
 
     def _decode_header(self, header_title: str) -> typing.Optional[str]:
         # FIXME : Handle exception
         if header_title in self._message:
-            return str(make_header(decode_header(header)))
+            return str(make_header(decode_header(self._message[header_title])))
         else:
             return None
 
     def get_subject(self) -> typing.Optional[str]:
         return self._decode_header('subject')
 
-    def get_from_address(self) -> typing.Optional[str]:
+    def get_from_address(self) -> str:
         return parseaddr(self._message['From'])[1]
 
-    def get_to_address(self)-> typing.Optional[str]:
+    def get_to_address(self) -> str:
         return parseaddr(self._message['To'])[1]
 
-    def get_first_ref(self) -> typing.Optional[str]:
+    def get_first_ref(self) -> str:
         return parseaddr(self._message['References'])[1]
 
     def get_special_key(self) -> typing.Optional[str]:
@@ -80,14 +79,14 @@ class DecodedMail(object):
         return body
 
     @classmethod
-    def _parse_txt_body(cls, txt_body: str):
+    def _parse_txt_body(cls, txt_body: str) -> str:
         txt_body = EmailReplyParser.parse_reply(txt_body)
         html_body = markdown.markdown(txt_body)
         body = DecodedMail._parse_html_body(html_body)
         return body
 
     @classmethod
-    def _parse_html_body(cls, html_body: str):
+    def _parse_html_body(cls, html_body: str) -> str:
         soup = BeautifulSoup(html_body, 'html.parser')
         config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
         for tag in soup.findAll():
@@ -103,7 +102,7 @@ class DecodedMail(object):
         return str(soup)
 
     @classmethod
-    def _tag_to_extract(cls, tag) -> bool:
+    def _tag_to_extract(cls, tag: Tag) -> bool:
         config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
         if tag.name.lower() in config['tag_blacklist']:
             return True
@@ -154,9 +153,13 @@ class DecodedMail(object):
         if first_ref:
             return DecodedMail.find_key_from_mail_address(first_ref)
 
+        return None
+
     @classmethod
-    def find_key_from_mail_address(cls, mail_address: str) \
-            -> typing.Optional[str]:
+    def find_key_from_mail_address(
+        cls,
+        mail_address: str,
+    ) -> typing.Optional[str]:
         """ Parse mail_adress-like string
         to retrieve key.
 
@@ -171,18 +174,18 @@ class DecodedMail(object):
 
 
 class MailFetcher(object):
-
-    def __init__(self,
-                 host: str,
-                 port: str,
-                 user: str,
-                 password: str,
-                 use_ssl: bool,
-                 folder: str,
-                 delay: int,
-                 endpoint: str,
-                 token: str) \
-            -> None:
+    def __init__(
+        self,
+        host: str,
+        port: str,
+        user: str,
+        password: str,
+        use_ssl: bool,
+        folder: str,
+        delay: int,
+        endpoint: str,
+        token: str,
+    ) -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
         Tracim through http according to mail Headers.
@@ -255,7 +258,7 @@ class MailFetcher(object):
             self._connection.logout()
             self._connection = None
 
-    def _fetch(self) -> list:
+    def _fetch(self) -> typing.List[Message]:
         """
         Get news message from mailbox
         :return: list of new mails
@@ -266,16 +269,16 @@ class MailFetcher(object):
         if rv == 'OK':
             # get mails
             # TODO - G.M -  2017-11-15 Which files to select as new file ?
-            # Unseen file or All file from a directory (old one should be moved/
-            # deleted from mailbox during this process) ?
+            # Unseen file or All file from a directory (old one should be
+            #  moved/ deleted from mailbox during this process) ?
             rv, data = self._connection.search(None, "(UNSEEN)")
             if rv == 'OK':
                 # get mail content
                 for num in data[0].split():
-                    # INFO - G.M - 2017-11-23 - Fetch (RFC288) to retrieve all complete mails
-                    # see example : https://docs.python.org/fr/3.5/library/imaplib.html#imap4-example .
-                    # Be careful, This method remove also mails from Unseen mails
-
+                    # INFO - G.M - 2017-11-23 - Fetch (RFC288) to retrieve all
+                    # complete mails see example : https://docs.python.org/fr/3.5/library/imaplib.html#imap4-example .  # nopep8
+                    # Be careful, This method remove also mails from Unseen
+                    # mails
                     rv, data = self._connection.fetch(num, '(RFC822)')
                     if rv == 'OK':
                         msg = message_from_bytes(data[0][1])
@@ -291,13 +294,20 @@ class MailFetcher(object):
             logger.debug(self, log.format(str(rv)))
         return messages
 
-    def _notify_tracim(self, mails: list) -> list:
+    def _notify_tracim(
+        self,
+        mails: typing.List[DecodedMail],
+    ) -> typing.List[DecodedMail]:
         """
         Send http request to tracim endpoint
         :param mails: list of mails to send
         :return: unsended mails
         """
         unsended_mails = []
+        # TODO BS 20171124: Look around mail.get_from_address(), mail.get_key()
+        # , mail.get_body() etc ... for raise InvalidEmailError if missing
+        #  required informations (actually get_from_address raise IndexError
+        #  if no from address for example) and catch it here
         while mails:
             mail = mails.pop()
             msg = {'token': self.token,
@@ -312,13 +322,14 @@ class MailFetcher(object):
                     log = 'bad status code response when sending mail to tracim: {}'  # nopep8
                     logger.error(self, log.format(str(r.status_code)))
             # TODO - G.M - Verify exception correctly works
-            except requests.exceptions.Timeout:
+            except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                unsended_mail.append(mail)
+                unsended_mails.append(mail)
                 break
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
                 break
+
         return unsended_mails

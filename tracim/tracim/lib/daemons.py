@@ -158,12 +158,12 @@ class MailFetcherDaemon(Daemon):
     send http request to a tracim endpoint to handle them.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._fetcher = None
+        self._fetcher = None  # type: MailFetcher
         self.ok = True
 
-    def run(self):
+    def run(self) -> None:
         from tracim.config.app_cfg import CFG
         cfg = CFG.get_instance()
         self._fetcher = MailFetcher(
@@ -180,7 +180,7 @@ class MailFetcherDaemon(Daemon):
         )
         self._fetcher.run()
 
-    def stop(self):
+    def stop(self) -> None:
         if self._fetcher:
             self._fetcher.stop()
 
