@@ -375,6 +375,7 @@ class CFG(object):
         )
         self.EMAIL_REPLY_CHECK_HEARTBEAT = int(tg.config.get(
             'email.reply.check.heartbeat',
+            60,
         ))
         self.EMAIL_REPLY_TOKEN = tg.config.get(
             'email.reply.token',
