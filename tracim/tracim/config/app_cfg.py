@@ -356,6 +356,7 @@ class CFG(object):
 
         self.EMAIL_REPLY_ACTIVATED = asbool(tg.config.get(
             'email.reply.activated',
+            False,
         ))
 
         self.EMAIL_REPLY_IMAP_SERVER = tg.config.get(
