@@ -87,7 +87,7 @@ class DecodedMail(object):
 
     @classmethod
     def _parse_html_body(cls, html_body: str):
-        soup = BeautifulSoup(html_body,'html.parser')
+        soup = BeautifulSoup(html_body, 'html.parser')
         config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
         for tag in soup.findAll():
             if DecodedMail._tag_to_extract(tag):
@@ -130,8 +130,8 @@ class DecodedMail(object):
         for part in self._message.walk():
             content_type = part.get_content_type()
             content_dispo = str(part.get('Content-Disposition'))
-            if content_type == CONTENT_TYPE_TEXT_PLAIN and 'attachment' \
-                    not in content_dispo:
+            if content_type == CONTENT_TYPE_TEXT_PLAIN \
+                    and 'attachment' not in content_dispo:
                 return part
         return part
 
@@ -214,11 +214,12 @@ class MailFetcher(object):
             time.sleep(self.delay)
             try:
                 self._connect()
-                mails = self._fetch()
+                messages = self._fetch()
                 # TODO - G.M -  2017-11-22 retry sending unsended mail
                 # These mails are return by _notify_tracim, flag them with "unseen"
                 # or store them until new _notify_tracim call
-                self._notify_tracim(mails)
+                cleaned_mails = [DecodedMail(msg) for msg in messages]
+                self._notify_tracim(cleaned_mails)
                 self._disconnect()
             except Exception as e:
                 # TODO - G.M - 2017-11-23 - Identify possible exceptions
@@ -258,7 +259,7 @@ class MailFetcher(object):
         Get news message from mailbox
         :return: list of new mails
         """
-        mails = []
+        messages = []
         # select mailbox
         rv, data = self._connection.select(self.folder)
         if rv == 'OK':
@@ -277,8 +278,7 @@ class MailFetcher(object):
                     rv, data = self._connection.fetch(num, '(RFC822)')
                     if rv == 'OK':
                         msg = message_from_bytes(data[0][1])
-                        decodedmsg = DecodedMail(msg)
-                        mails.append(decodedmsg)
+                        messages.append(msg)
                     else:
                         log = 'IMAP : Unable to get mail : {}'
                         logger.debug(self, log.format(str(rv)))
@@ -288,7 +288,7 @@ class MailFetcher(object):
         else:
             log = 'IMAP : Unable to open mailbox : {}'
             logger.debug(self, log.format(str(rv)))
-        return mails
+        return messages
 
     def _notify_tracim(self, mails: list) -> list:
         """
