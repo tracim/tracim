@@ -26,12 +26,19 @@ class BodyMailParts(object):
     Data Structure to Distinct part of a Mail body into a "list" of BodyMailPart
     When 2 similar BodyMailPart (same part_type) are added one after the other,
     it doesn't create a new Part, it just merge those elements into one.
-    It should always have only one Signature type part, at the end of the body.
+    It should always have only one Signature type part, normally
+    at the end of the body.
     This object doesn't provide other set method than append() in order to
     preserve object coherence.
     """
     def __init__(self) -> None:
         self._list = []  # type; List[BodyMailPart]
+        # INFO - G.M -
+        # automatically merge new value with last item if true, without any
+        # part_type check, same type as the older one, useful when some tag
+        # say "all elem after me is Signature"
+        self.follow = False
+
 
     def __len__(self) -> int:
         return len(self._list)
@@ -45,11 +52,12 @@ class BodyMailParts(object):
 
     def append(self, value) -> None:
         BodyMailParts._check_value(value)
-        self._check_sign_last_elem(value)
         self._append(value)
 
     def _append(self, value):
-        if len(self._list) > 0 and self._list[-1].part_type == value.part_type:
+        same_type_as_last =len(self._list) > 0 and \
+                           self._list[-1].part_type == value.part_type
+        if same_type_as_last or self.follow :
             self._list[-1].text += value.text
         else:
             self._list.append(value)
@@ -58,37 +66,6 @@ class BodyMailParts(object):
     def _check_value(cls, value) -> None:
         if not isinstance(value, BodyMailPart):
             raise TypeError()
-
-    def _check_sign_last_elem(self, value: BodyMailPart) -> None:
-        """
-        Check if last elem is a signature, if true, refuse to add a
-        non-signature item.
-        :param value: BodyMailPart to check
-        :return: None
-        """
-        if len(self._list) > 0:
-            if self._list[-1].part_type == BodyMailPartType.Signature and \
-                            value.part_type != BodyMailPartType.Signature:
-                raise SignatureIndexError(
-                    "Can't add element after signature element.")
-
-    def disable_signature(self) -> None:
-        """
-        Consider the chosen signature to a normal main content element
-        :return: None
-        """
-        if (
-            len(self._list) > 0 and
-            self._list[-1].part_type == BodyMailPartType.Signature
-        ):
-            self._list[-1].part_type = BodyMailPartType.Main
-            # If possible, concatenate with previous elem
-            if (
-                len(self._list) > 1 and
-                self._list[-2].part_type == BodyMailPartType.Main
-            ):
-                self._list[-2].text += self._list[-1].text
-                del self._list[-1]
 
     def drop_part_type(self, part_type: str) -> None:
         """
@@ -151,6 +128,7 @@ class HtmlMailQuoteChecker(HtmlChecker):
         return cls._is_standard_quote(elem) \
                or cls._is_thunderbird_quote(elem) \
                or cls._is_gmail_quote(elem) \
+               or cls._is_outlook_com_quote(elem) \
                or cls._is_yahoo_quote(elem) \
                or cls._is_roundcube_quote(elem)
 
@@ -183,6 +161,15 @@ class HtmlMailQuoteChecker(HtmlChecker):
         return False
 
     @classmethod
+    def _is_outlook_com_quote(
+        cls,
+        elem: typing.Union[Tag, NavigableString]
+    ) -> bool:
+        if cls._has_attr_value(elem, 'id', 'divRplyFwdMsg'):
+            return True
+        return False
+
+    @classmethod
     def _is_yahoo_quote(
             cls,
             elem: typing.Union[Tag, NavigableString]
@@ -205,7 +192,8 @@ class HtmlMailSignatureChecker(HtmlChecker):
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
         return cls._is_thunderbird_signature(elem) \
-               or cls._is_gmail_signature(elem)
+               or cls._is_gmail_signature(elem) \
+               or cls._is_outlook_com_signature(elem)
 
     @classmethod
     def _is_thunderbird_signature(
@@ -233,6 +221,14 @@ class HtmlMailSignatureChecker(HtmlChecker):
                     return True
         return False
 
+    @classmethod
+    def _is_outlook_com_signature(
+            cls,
+            elem: typing.Union[Tag, NavigableString]
+    ) -> bool:
+        if cls._has_attr_value(elem, 'id', 'Signature'):
+            return True
+        return False
 
 class ParsedHTMLMail(object):
     """
@@ -273,9 +269,18 @@ class ParsedHTMLMail(object):
                 tree.find().name.lower() in ['body', 'div']:
             tree.find().unwrap()
 
-        # drop some not useful html elem
+        # drop some html elem
         for tag in tree.findAll():
-            if tag.name.lower() in ['br']:
+            # HACK - G.M - 2017-11-28 - Unwrap outlook.com mail
+            # if Text -> Signature -> Quote Mail
+            # Text and signature are wrapped into divtagdefaultwrapper
+            if tag.attrs.get('id'):
+                if 'divtagdefaultwrapper' in tag.attrs['id']:
+                    tag.unwrap()
+            # Hack - G.M - 2017-11-28 : remove tag with no enclosure
+            # <br> and <hr> tag alone broke html.parser tree,
+            # Using another parser may be a solution.
+            if tag.name.lower() in ['br','hr']:
                 tag.unwrap()
                 continue
             if tag.name.lower() in ['script', 'style']:
@@ -298,11 +303,11 @@ class ParsedHTMLMail(object):
             elif HtmlMailSignatureChecker.is_signature(tag):
                 part_type = BodyMailPartType.Signature
             element = BodyMailPart(txt, part_type)
-            try:
-                elements.append(element)
-            except SignatureIndexError:
-                elements.disable_signature()
-                elements.append(element)
+            elements.append(element)
+            # INFO - G.M - 2017-11-28 - Outlook.com special case
+            # all after quote tag is quote
+            if HtmlMailQuoteChecker._is_outlook_com_quote(tag):
+                elements.follow = True
         return elements
 
     @classmethod

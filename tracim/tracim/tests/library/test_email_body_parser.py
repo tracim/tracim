@@ -53,6 +53,16 @@ class TestHtmlMailQuoteChecker(TestStandard):
         main_elem = soup.find()
         assert HtmlMailQuoteChecker._is_gmail_quote(main_elem) is False
 
+    def test_unit__is_outlook_com_quote_ok(self):
+        soup = BeautifulSoup('<div id="divRplyFwdMsg"></div>', 'html.parser')
+        main_elem = soup.find()
+        assert HtmlMailQuoteChecker._is_outlook_com_quote(main_elem) is True
+
+    def test_unit__is_outlook_com_quote_no(self):
+        soup = BeautifulSoup('<div id="Signature"></div>', 'html.parser')
+        main_elem = soup.find()
+        assert HtmlMailQuoteChecker._is_outlook_com_quote(main_elem) is False
+
     # TODO - G.M - 2017-11-24 - Check Yahoo and New roundcube html mail with
     # correct mail example
 
@@ -96,6 +106,18 @@ class TestHtmlMailSignatureChecker(TestStandard):
         main_elem = soup.find()
         assert HtmlMailSignatureChecker._is_gmail_signature(main_elem) is True
 
+    def test_unit__is_outlook_com_signature_no(self):
+        soup = BeautifulSoup('<div id="divRplyFwdMsg"></div>', 'html.parser')
+        main_elem = soup.find()
+        assert HtmlMailSignatureChecker._is_outlook_com_signature(main_elem) \
+               is False
+
+    def test_unit__is_outlook_com_signature_ok(self):
+        soup = BeautifulSoup('<div id="Signature"></div>', 'html.parser')
+        main_elem = soup.find()
+        assert HtmlMailSignatureChecker._is_outlook_com_signature(main_elem) \
+               is True
+
 class TestBodyMailsParts(TestStandard):
 
     def test_unit__std_list_methods(self):
@@ -137,60 +159,6 @@ class TestBodyMailsParts(TestStandard):
         mail_parts = BodyMailParts()
         a = BodyMailPart('a', BodyMailPartType.Main)
         mail_parts._check_value(a)
-
-    @raises(SignatureIndexError)
-    def test_unit__check_sign_last_elem_check_main_after_sign(self):
-        mail_parts = BodyMailParts()
-        a = BodyMailPart('a', BodyMailPartType.Main)
-        mail_parts._list.append(a)
-        b = BodyMailPart('b', BodyMailPartType.Signature)
-        mail_parts._list.append(b)
-        c = BodyMailPart('c', BodyMailPartType.Main)
-        mail_parts._check_sign_last_elem(c)
-
-    def test_unit__check_sign_last_elem_check_sign_after_sign(self):
-        mail_parts = BodyMailParts()
-        a = BodyMailPart('a', BodyMailPartType.Main)
-        mail_parts._list.append(a)
-        b = BodyMailPart('b', BodyMailPartType.Signature)
-        mail_parts._list.append(b)
-        c = BodyMailPart('c', BodyMailPartType.Signature)
-        mail_parts._check_sign_last_elem(c)
-
-    def test_unit__disable_signature_no_sign(self):
-        mail_parts = BodyMailParts()
-        a = BodyMailPart('a', BodyMailPartType.Main)
-        mail_parts._list.append(a)
-        b = BodyMailPart('b', BodyMailPartType.Quote)
-        mail_parts._list.append(b)
-        mail_parts.disable_signature()
-        assert mail_parts[1] == b
-
-    def test_unit__disable_signature_sign_quote_as_previous_elem(self):
-        mail_parts = BodyMailParts()
-        a = BodyMailPart('a', BodyMailPartType.Main)
-        mail_parts._list.append(a)
-        b = BodyMailPart('b', BodyMailPartType.Quote)
-        mail_parts._list.append(b)
-        c = BodyMailPart('c', BodyMailPartType.Signature)
-        mail_parts._list.append(c)
-        mail_parts.disable_signature()
-        assert len(mail_parts) == 3
-        assert mail_parts[2].text == 'c'
-        assert mail_parts[2].part_type == BodyMailPartType.Main
-
-    def test_unit__disable_signature_sign_main_as_previous_elem(self):
-        mail_parts = BodyMailParts()
-        a = BodyMailPart('a', BodyMailPartType.Quote)
-        mail_parts._list.append(a)
-        b = BodyMailPart('b', BodyMailPartType.Main)
-        mail_parts._list.append(b)
-        c = BodyMailPart('c', BodyMailPartType.Signature)
-        mail_parts._list.append(c)
-        mail_parts.disable_signature()
-        assert len(mail_parts) == 2
-        assert mail_parts[1].text == 'bc'
-        assert mail_parts[1].part_type == BodyMailPartType.Main
 
     def test_unit__drop_part_type(self):
         mail_parts = BodyMailParts()
@@ -251,13 +219,14 @@ class TestBodyMailsParts(TestStandard):
 
 class TestParsedMail(TestStandard):
 
-    def test_other__check_gmail_mail(self):
+    def test_other__check_gmail_mail_text_only(self):
         text_only = '''<div dir="ltr">Voici le texte<br></div>'''
         mail = ParsedHTMLMail(text_only)
         elements = mail.get_elements()
         assert len(elements) == 1
         assert elements[0].part_type == BodyMailPartType.Main
 
+    def test_other__check_gmail_mail_text_signature(self):
         text_and_signature = '''
         <div dir="ltr">POF<br clear="all"><div><br>-- <br>
         <div class="gmail_signature" data-smartmail="gmail_signature">
@@ -273,6 +242,7 @@ class TestParsedMail(TestStandard):
         assert elements[0].part_type == BodyMailPartType.Main
         assert elements[1].part_type == BodyMailPartType.Signature
 
+    def test_other__check_gmail_mail_text_quote(self):
         text_and_quote = '''
         <div dir="ltr">Réponse<br>
         <div class="gmail_extra"><br>
@@ -301,6 +271,7 @@ class TestParsedMail(TestStandard):
         assert elements[0].part_type == BodyMailPartType.Main
         assert elements[1].part_type == BodyMailPartType.Quote
 
+    def test_other__check_gmail_mail_text_quote_text(self):
         text_quote_text = '''
               <div dir="ltr">Avant<br>
               <div class="gmail_extra"><br>
@@ -338,7 +309,7 @@ class TestParsedMail(TestStandard):
         assert elements[1].part_type == BodyMailPartType.Quote
         assert elements[2].part_type == BodyMailPartType.Main
 
-
+    def test_other__check_gmail_mail_text_quote_signature(self):
         text_quote_signature = '''
         <div dir="ltr">Hey !<br>
                  </div>
@@ -390,6 +361,7 @@ class TestParsedMail(TestStandard):
         assert elements[0].part_type == BodyMailPartType.Main
         assert elements[1].part_type == BodyMailPartType.Quote
 
+    def test_other__check_gmail_mail_text_quote_text_signature(self):
         text_quote_text_sign = '''
         <div dir="ltr">Test<br>
         <div class="gmail_extra"><br>
@@ -442,7 +414,7 @@ class TestParsedMail(TestStandard):
         assert elements[2].part_type == BodyMailPartType.Main
         assert elements[3].part_type == BodyMailPartType.Signature
 
-    def test_other__check_thunderbird_mail(self):
+    def test_other__check_thunderbird_mail_text_only(self):
 
         text_only = '''Coucou<br><br><br>'''
         mail = ParsedHTMLMail(text_only)
@@ -450,6 +422,7 @@ class TestParsedMail(TestStandard):
         assert len(elements) == 1
         assert elements[0].part_type == BodyMailPartType.Main
 
+    def test_other__check_thunderbird_mail_text_signature(self):
         text_and_signature = '''
         <p>Test<br>
         </p>
@@ -462,6 +435,7 @@ class TestParsedMail(TestStandard):
         assert elements[0].part_type == BodyMailPartType.Main
         assert elements[1].part_type == BodyMailPartType.Signature
 
+    def test_other__check_thunderbird_mail_text_quote(self):
         text_and_quote = '''
             <p>Pof<br>
             </p>
@@ -486,6 +460,7 @@ class TestParsedMail(TestStandard):
         assert elements[0].part_type == BodyMailPartType.Main
         assert elements[1].part_type == BodyMailPartType.Quote
 
+    def test_other__check_thunderbird_mail_text_quote_text(self):
         text_quote_text = '''
         <p>Pof<br>
         </p>
@@ -523,6 +498,7 @@ class TestParsedMail(TestStandard):
         assert elements[1].part_type == BodyMailPartType.Quote
         assert elements[2].part_type == BodyMailPartType.Main
 
+    def test_other__check_thunderbird_mail_text_quote_signature(self):
         text_quote_signature = '''
         <p>Coucou<br>
         </p>
@@ -554,6 +530,7 @@ class TestParsedMail(TestStandard):
         assert elements[1].part_type == BodyMailPartType.Quote
         assert elements[2].part_type == BodyMailPartType.Signature
 
+    def test_other__check_thunderbird_mail_text_quote_text_signature(self):
         text_quote_text_sign = '''
         <p>Avant<br>
         </p>
@@ -579,4 +556,168 @@ class TestParsedMail(TestStandard):
         assert elements[2].part_type == BodyMailPartType.Main
         assert elements[3].part_type == BodyMailPartType.Signature
 
+    # INFO - G.M - 2017-11-28 - Test for outlook.com webapp html mail
+    # outlook.com ui doesn't seems to allow complex reply, new message
+    # and signature are always before quoted one.
+
+    def test_other__check_outlook_com_mail_text_only(self):
+
+        text_only = '''
+        <div id="divtagdefaultwrapper"
+        style="font-size:12pt;color:#000000;
+        font-family:Calibri,Helvetica,sans-serif;"
+        dir="ltr">
+        <p style="margin-top:0;margin-bottom:0">message<br>
+        </p>
+        </div>
+        '''
+        mail = ParsedHTMLMail(text_only)
+        elements = mail.get_elements()
+        assert len(elements) == 1
+        assert elements[0].part_type == BodyMailPartType.Main
+
+    def test_other__check_outlook_com_mail_text_signature(self):
+        text_and_signature = '''
+        <div id="divtagdefaultwrapper"
+        style="font-size:12pt;color:#000000;
+        font-family:Calibri,Helvetica,sans-serif;"
+          dir="ltr">
+          <p style="margin-top:0;margin-bottom:0">Test<br>
+          </p>
+          <p style="margin-top:0;margin-bottom:0"><br>
+          </p>
+          <div id="Signature">
+            <div id="divtagdefaultwrapper" style="font-size: 12pt; color:
+              rgb(0, 0, 0); background-color: rgb(255, 255, 255);
+              font-family:
+              Calibri,Arial,Helvetica,sans-serif,&quot;EmojiFont&quot;,&quot;Apple
+              Color Emoji&quot;,&quot;Segoe UI
+              Emoji&quot;,NotoColorEmoji,&quot;Segoe UI
+              Symbol&quot;,&quot;Android Emoji&quot;,EmojiSymbols;">
+              Envoyé à partir de <a href="http://aka.ms/weboutlook"
+                id="LPNoLP">Outlook</a></div>
+          </div>
+        </div>
+        '''
+        mail = ParsedHTMLMail(text_and_signature)
+        elements = mail.get_elements()
+        assert len(elements) == 2
+        assert elements[0].part_type == BodyMailPartType.Main
+        assert elements[1].part_type == BodyMailPartType.Signature
+
+    def test_other__check_outlook_com_mail_text_quote(self):
+        text_and_quote = '''
+        <div id="divtagdefaultwrapper"
+        style="font-size:12pt;color:#000000;font-family:Calibri,Helvetica,sans-serif;"
+        dir="ltr">
+        <p style="margin-top:0;margin-bottom:0">Salut !<br>
+        </p>
+        </div>
+        <hr style="display:inline-block;width:98%" tabindex="-1">
+        <div id="divRplyFwdMsg" dir="ltr"><font style="font-size:11pt"
+        color="#000000" face="Calibri, sans-serif"><b>De :</b> John Doe<br>
+        <b>Envoyé :</b> mardi 28 novembre 2017 12:44:59<br>
+        <b>À :</b> dev.bidule@localhost.fr<br>
+        <b>Objet :</b> voila</font>
+        <div>&nbsp;</div>
+        </div>
+        <style type="text/css" style="display:none">
+        <!--
+        p
+        &#x09;{margin-top:0;
+        &#x09;margin-bottom:0}
+        -->
+        </style>
+        <div dir="ltr">
+        <div id="x_divtagdefaultwrapper" dir="ltr" style="font-size:12pt;
+        color:#000000; font-family:Calibri,Helvetica,sans-serif">
+        Contenu
+        <p style="margin-top:0; margin-bottom:0"><br>
+        </p>
+        <div id="x_Signature">
+          <div id="x_divtagdefaultwrapper" dir="ltr"
+            style="font-size:12pt; color:rgb(0,0,0);
+            background-color:rgb(255,255,255);
+        font-family:Calibri,Arial,Helvetica,sans-serif,&quot;EmojiFont&quot;,&quot;Apple
+            Color Emoji&quot;,&quot;Segoe UI
+            Emoji&quot;,NotoColorEmoji,&quot;Segoe UI
+            Symbol&quot;,&quot;Android Emoji&quot;,EmojiSymbols">
+            DLMQDNLQNDMLQS<br>
+            qs<br>
+            dqsd<br>
+            d<br>
+            qsd<br>
+          </div>
+        </div>
+        </div>
+        </div>
+        '''
+        mail = ParsedHTMLMail(text_and_quote)
+        elements = mail.get_elements()
+        assert len(elements) == 2
+        assert elements[0].part_type == BodyMailPartType.Main
+        assert elements[1].part_type == BodyMailPartType.Quote
+
+    def test_other__check_outlook_com_mail_text_signature_quote(self):
+        text_signature_quote = '''
+        <div id="divtagdefaultwrapper"
+        style="font-size:12pt;color:#000000;font-family:Calibri,Helvetica,sans-serif;"
+        dir="ltr">
+        <p style="margin-top:0;margin-bottom:0">Salut !<br>
+        </p>
+        <p style="margin-top:0;margin-bottom:0"><br>
+        </p>
+        <div id="Signature">
+        <div id="divtagdefaultwrapper" dir="ltr" style="font-size: 12pt;
+        color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);
+        font-family:
+        Calibri,Arial,Helvetica,sans-serif,&quot;EmojiFont&quot;,&quot;Apple
+        Color Emoji&quot;,&quot;Segoe UI
+        Emoji&quot;,NotoColorEmoji,&quot;Segoe UI
+        Symbol&quot;,&quot;Android Emoji&quot;,EmojiSymbols;">
+        Envoyée depuis Outlook<br>
+        </div>
+        </div>
+        </div>
+        <hr style="display:inline-block;width:98%" tabindex="-1">
+        <div id="divRplyFwdMsg" dir="ltr"><font style="font-size:11pt"
+        color="#000000" face="Calibri, sans-serif"><b>De :</b> John Doe
+        &lt;dev.bidule@localhost.fr&gt;<br>
+        <b>Envoyé :</b> mardi 28 novembre 2017 12:51:42<br>
+        <b>À :</b> John Doe<br>
+        <b>Objet :</b> Re: Test</font>
+        <div>&nbsp;</div>
+        </div>
+        <div style="background-color:#FFFFFF">
+        <p>Coucou<br>
+        </p>
+        <br>
+        <div class="x_moz-cite-prefix">Le 28/11/2017 à 12:39, John Doe a
+        écrit&nbsp;:<br>
+        </div>
+        <blockquote type="cite">
+        <div id="x_divtagdefaultwrapper" dir="ltr">
+        <p>Test<br>
+        </p>
+        <p><br>
+        </p>
+        <div id="x_Signature">
+        <div id="x_divtagdefaultwrapper">Envoyé à partir de <a
+        href="http://aka.ms/weboutlook" id="LPNoLP">
+        Outlook</a></div>
+        </div>
+        </div>
+        </blockquote>
+        <br>
+        <div class="x_moz-signature">-- <br>
+        TEST DE signature</div>
+        </div>
+        '''
+
+        mail = ParsedHTMLMail(text_signature_quote)
+        elements = mail.get_elements()
+        assert len(elements) == 3
+        assert elements[0].part_type == BodyMailPartType.Main
+        assert elements[1].part_type == BodyMailPartType.Signature
+        assert elements[2].part_type == BodyMailPartType.Quote
 
