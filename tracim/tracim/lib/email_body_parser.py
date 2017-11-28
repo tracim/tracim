@@ -54,7 +54,7 @@ class BodyMailParts(object):
         BodyMailParts._check_value(value)
         self._append(value)
 
-    def _append(self, value):
+    def _append(self, value) -> None:
         same_type_as_last =len(self._list) > 0 and \
                            self._list[-1].part_type == value.part_type
         if same_type_as_last or self.follow :
@@ -243,7 +243,7 @@ class ParsedHTMLMail(object):
     def __str__(self):
         return str(self._parse_mail())
 
-    def get_elements(self):
+    def get_elements(self) -> BodyMailParts:
         tree = self._make_sanitized_tree()
         return self._distinct_elements(tree)
 
@@ -252,7 +252,7 @@ class ParsedHTMLMail(object):
         elements = self._process_elements(elements)
         return elements
 
-    def _make_sanitized_tree(self):
+    def _make_sanitized_tree(self) -> BeautifulSoup:
         """
         Get only html body content and remove some unneeded elements
         :return:
@@ -331,22 +331,19 @@ class ParsedHTMLMail(object):
         return elements
 
     @classmethod
-    def _process_quote_first_case(cls, elements: BodyMailParts):
+    def _process_quote_first_case(cls, elements: BodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Signature)
-        pass
 
     @classmethod
-    def _process_main_first_case(cls, elements: BodyMailParts):
+    def _process_main_first_case(cls, elements: BodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Quote)
         elements.drop_part_type(BodyMailPartType.Signature)
-        pass
 
     @classmethod
-    def _process_multiples_elems_case(cls, elements: BodyMailParts):
+    def _process_multiples_elems_case(cls, elements: BodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Signature)
-        pass
 
     @classmethod
-    def _process_default_case(cls, elements: BodyMailParts):
+    def _process_default_case(cls, elements: BodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Quote)
         elements.drop_part_type(BodyMailPartType.Signature)
