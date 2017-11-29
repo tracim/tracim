@@ -101,6 +101,7 @@ class BodyMailParts(object):
 class SignatureIndexError(Exception):
     pass
 
+
 class ProprietaryHTMLProperties(object):
     # Gmail
     Gmail_extras_class = 'gmail_extra'
@@ -119,6 +120,8 @@ class ProprietaryHTMLProperties(object):
     # INFO - G.M - 2017-11-29 - New tag
     # see : https://github.com/roundcube/roundcubemail/issues/6049
     Roundcube_quote_prefix_class = 'reply-intro'
+
+
 
 class HtmlChecker(object):
 
@@ -181,9 +184,9 @@ class HtmlMailQuoteChecker(HtmlChecker):
                 ProprietaryHTMLProperties.Gmail_extras_class):
             for child in elem.children:
                 if cls._has_attr_value(
-                    child,
-                    'class',
-                    ProprietaryHTMLProperties.Gmail_quote_class):
+                        child,
+                        'class',
+                        ProprietaryHTMLProperties.Gmail_quote_class):
                     return True
         return False
 
@@ -283,6 +286,10 @@ class HtmlMailSignatureChecker(HtmlChecker):
         return False
 
 
+class PreSanitizeConfig(object):
+    Ignored_tags = ['br', 'hr', 'script', 'style']
+    meta_tag = ['body','div']
+
 class ParsedHTMLMail(object):
     """
     Parse HTML Mail depending of some rules.
@@ -297,7 +304,7 @@ class ParsedHTMLMail(object):
         return str(self._parse_mail())
 
     def get_elements(self) -> BodyMailParts:
-        tree = self._make_sanitized_tree()
+        tree = self._get_proper_main_body_tree()
         return self._distinct_elements(tree)
 
     def _parse_mail(self) -> BodyMailParts:
@@ -305,10 +312,10 @@ class ParsedHTMLMail(object):
         elements = self._process_elements(elements)
         return elements
 
-    def _make_sanitized_tree(self) -> BeautifulSoup:
+    def _get_proper_main_body_tree(self) -> BeautifulSoup:
         """
-        Get only html body content and remove some unneeded elements
-        :return:
+        Get html body tree without some kind of wrapper.
+        We need to have text, quote and signature parts at the same tree level
         """
         tree = BeautifulSoup(self.src_html_body, 'html.parser')
 
@@ -317,12 +324,11 @@ class ParsedHTMLMail(object):
         if subtree:
             tree = BeautifulSoup(str(subtree), 'html.parser')
 
-        # if some sort of "meta_div", unwrap it
+        # if some kind of "meta_div", unwrap it
         while len(tree.findAll(recursive=None)) == 1 and \
-                tree.find().name.lower() in ['body', 'div']:
+                tree.find().name.lower() in PreSanitizeConfig.meta_tag:
             tree.find().unwrap()
 
-        # drop some html elem
         for tag in tree.findAll():
             # HACK - G.M - 2017-11-28 - Unwrap outlook.com mail
             # if Text -> Signature -> Quote Mail
@@ -331,38 +337,37 @@ class ParsedHTMLMail(object):
                 if ProprietaryHTMLProperties.Outlook_com_wrapper_id\
                         in tag.attrs['id']:
                     tag.unwrap()
-            # Hack - G.M - 2017-11-28 : remove tag with no enclosure
-            # <br> and <hr> tag alone broke html.parser tree,
-            # Using another parser may be a solution.
-            if tag.name.lower() in ['br', 'hr']:
-                tag.unwrap()
-                continue
-            if tag.name.lower() in ['script', 'style']:
-                tag.extract()
-
         return tree
 
     @classmethod
     def _distinct_elements(cls, tree: BeautifulSoup) -> BodyMailParts:
-        elements = BodyMailParts()
-        for tag in list(tree):
-            txt = str(tag)
+        parts = BodyMailParts()
+        for elem in list(tree):
+            part_txt = str(elem)
             part_type = BodyMailPartType.Main
-            if isinstance(tag, NavigableString):
-                txt = tag.replace('\n', '').strip()
-            if not txt:
-                continue
-            if HtmlMailQuoteChecker.is_quote(tag):
+            # sanitize NavigableString
+            if isinstance(elem, NavigableString):
+                part_txt = part_txt.replace('\n', '').strip()
+
+            if HtmlMailQuoteChecker.is_quote(elem):
                 part_type = BodyMailPartType.Quote
-            elif HtmlMailSignatureChecker.is_signature(tag):
+            elif HtmlMailSignatureChecker.is_signature(elem):
                 part_type = BodyMailPartType.Signature
-            element = BodyMailPart(txt, part_type)
-            elements.append(element)
+            else:
+                # INFO - G.M -2017-11-28 - ignore unwanted parts
+                if not part_txt:
+                    continue
+                if isinstance(elem, Tag) \
+                        and elem.name.lower() in PreSanitizeConfig.Ignored_tags:
+                    continue
+
+            part = BodyMailPart(part_txt, part_type)
+            parts.append(part)
             # INFO - G.M - 2017-11-28 - Outlook.com special case
             # all after quote tag is quote
-            if HtmlMailQuoteChecker._is_outlook_com_quote(tag):
-                elements.follow = True
-        return elements
+            if HtmlMailQuoteChecker._is_outlook_com_quote(elem):
+                parts.follow = True
+        return parts
 
     @classmethod
     def _process_elements(cls, elements: BodyMailParts) -> BodyMailParts:
