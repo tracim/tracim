@@ -47,7 +47,8 @@ class BodyMailParts(object):
 
     def __delitem__(self, index) -> None:
         del self._list[index]
-        # Todo : check consistance
+        # FIXME - G.M - 2017-11-27 - Preserve BodyMailParts consistence
+        # check elem after and before index and merge them if necessary.
 
     def append(self, value) -> None:
         BodyMailParts._check_value(value)
@@ -100,6 +101,24 @@ class BodyMailParts(object):
 class SignatureIndexError(Exception):
     pass
 
+class ProprietaryHTMLProperties(object):
+    # Gmail
+    Gmail_extras_class = 'gmail_extra'
+    Gmail_quote_class = 'gmail_quote'
+    Gmail_signature_class = 'gmail_signature'
+    # Thunderbird
+    Thunderbird_quote_prefix_class = 'moz-cite-prefix'
+    Thunderbird_signature_class = 'moz-signature'
+    # Outlook.com
+    Outlook_com_quote_id = 'divRplyFwdMsg'
+    Outlook_com_signature_id = 'Signature'
+    Outlook_com_wrapper_id = 'divtagdefaultwrapper'
+    # Yahoo
+    Yahoo_quote_class = 'yahoo_quoted'
+    # Roundcube
+    # INFO - G.M - 2017-11-29 - New tag
+    # see : https://github.com/roundcube/roundcubemail/issues/6049
+    Roundcube_quote_prefix_class = 'reply-intro'
 
 class HtmlChecker(object):
 
@@ -146,16 +165,25 @@ class HtmlMailQuoteChecker(HtmlChecker):
             cls,
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        return cls._has_attr_value(elem, 'class', 'moz-cite-prefix')
+        return cls._has_attr_value(
+            elem,
+            'class',
+            ProprietaryHTMLProperties.Thunderbird_quote_prefix_class)
 
     @classmethod
     def _is_gmail_quote(
             cls,
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        if cls._has_attr_value(elem, 'class', 'gmail_extra'):
+        if cls._has_attr_value(
+                elem,
+                'class',
+                ProprietaryHTMLProperties.Gmail_extras_class):
             for child in elem.children:
-                if cls._has_attr_value(child, 'class', 'gmail_quote'):
+                if cls._has_attr_value(
+                    child,
+                    'class',
+                    ProprietaryHTMLProperties.Gmail_quote_class):
                     return True
         return False
 
@@ -164,7 +192,10 @@ class HtmlMailQuoteChecker(HtmlChecker):
         cls,
         elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        if cls._has_attr_value(elem, 'id', 'divRplyFwdMsg'):
+        if cls._has_attr_value(
+                elem,
+                'id',
+                ProprietaryHTMLProperties.Outlook_com_quote_id):
             return True
         return False
 
@@ -173,14 +204,20 @@ class HtmlMailQuoteChecker(HtmlChecker):
             cls,
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        return cls._has_attr_value(elem, 'class', 'yahoo_quoted')
+        return cls._has_attr_value(
+            elem,
+            'class',
+            ProprietaryHTMLProperties.Yahoo_quote_class)
 
     @classmethod
     def _is_roundcube_quote(
             cls,
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        return cls._has_attr_value(elem, 'id', 'reply-intro')
+        return cls._has_attr_value(
+            elem,
+            'id',
+            ProprietaryHTMLProperties.Roundcube_quote_prefix_class)
 
 
 class HtmlMailSignatureChecker(HtmlChecker):
@@ -199,24 +236,37 @@ class HtmlMailSignatureChecker(HtmlChecker):
             cls,
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        return cls._has_attr_value(elem,
-                                   'class',
-                                   'moz-signature')
+        return cls._has_attr_value(
+            elem,
+            'class',
+            ProprietaryHTMLProperties.Thunderbird_signature_class)
 
     @classmethod
     def _is_gmail_signature(
             cls,
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        if cls._has_attr_value(elem, 'class', 'gmail_signature'):
+        if cls._has_attr_value(
+                elem,
+                'class',
+                ProprietaryHTMLProperties.Gmail_signature_class):
             return True
-        if cls._has_attr_value(elem, 'class', 'gmail_extra'):
+        if cls._has_attr_value(
+                elem,
+                'class',
+                ProprietaryHTMLProperties.Gmail_extras_class):
             for child in elem.children:
-                if cls._has_attr_value(child, 'class', 'gmail_signature'):
+                if cls._has_attr_value(
+                        child,
+                        'class',
+                        ProprietaryHTMLProperties.Gmail_signature_class):
                     return True
         if isinstance(elem, Tag) and elem.name.lower() == 'div':
             for child in elem.children:
-                if cls._has_attr_value(child, 'class', 'gmail_signature'):
+                if cls._has_attr_value(
+                        child,
+                        'class',
+                        ProprietaryHTMLProperties.Gmail_signature_class):
                     return True
         return False
 
@@ -225,7 +275,10 @@ class HtmlMailSignatureChecker(HtmlChecker):
             cls,
             elem: typing.Union[Tag, NavigableString]
     ) -> bool:
-        if cls._has_attr_value(elem, 'id', 'Signature'):
+        if cls._has_attr_value(
+                elem,
+                'id',
+                ProprietaryHTMLProperties.Outlook_com_signature_id):
             return True
         return False
 
@@ -275,7 +328,8 @@ class ParsedHTMLMail(object):
             # if Text -> Signature -> Quote Mail
             # Text and signature are wrapped into divtagdefaultwrapper
             if tag.attrs.get('id'):
-                if 'divtagdefaultwrapper' in tag.attrs['id']:
+                if ProprietaryHTMLProperties.Outlook_com_wrapper_id\
+                        in tag.attrs['id']:
                     tag.unwrap()
             # Hack - G.M - 2017-11-28 : remove tag with no enclosure
             # <br> and <hr> tag alone broke html.parser tree,
