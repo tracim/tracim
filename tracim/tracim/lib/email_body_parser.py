@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from bs4 import Tag
 from bs4 import NavigableString
 
+# BodyParts and Body Parts Objects #
 
 class BodyMailPartType(object):
     Signature = 'sign'
@@ -101,8 +102,13 @@ class BodyMailParts(object):
 class SignatureIndexError(Exception):
     pass
 
+# Elements Checkers #
 
-class ProprietaryHTMLProperties(object):
+class ProprietaryHTMLAttrValues(object):
+    """
+    This are all Proprietary (mail client specific) html attr value we need to
+    check Html Elements
+    """
     # Gmail
     Gmail_extras_class = 'gmail_extra'
     Gmail_quote_class = 'gmail_quote'
@@ -120,7 +126,6 @@ class ProprietaryHTMLProperties(object):
     # INFO - G.M - 2017-11-29 - New tag
     # see : https://github.com/roundcube/roundcubemail/issues/6049
     Roundcube_quote_prefix_class = 'reply-intro'
-
 
 
 class HtmlChecker(object):
@@ -171,7 +176,7 @@ class HtmlMailQuoteChecker(HtmlChecker):
         return cls._has_attr_value(
             elem,
             'class',
-            ProprietaryHTMLProperties.Thunderbird_quote_prefix_class)
+            ProprietaryHTMLAttrValues.Thunderbird_quote_prefix_class)
 
     @classmethod
     def _is_gmail_quote(
@@ -181,12 +186,12 @@ class HtmlMailQuoteChecker(HtmlChecker):
         if cls._has_attr_value(
                 elem,
                 'class',
-                ProprietaryHTMLProperties.Gmail_extras_class):
+                ProprietaryHTMLAttrValues.Gmail_extras_class):
             for child in elem.children:
                 if cls._has_attr_value(
                         child,
                         'class',
-                        ProprietaryHTMLProperties.Gmail_quote_class):
+                        ProprietaryHTMLAttrValues.Gmail_quote_class):
                     return True
         return False
 
@@ -198,7 +203,7 @@ class HtmlMailQuoteChecker(HtmlChecker):
         if cls._has_attr_value(
                 elem,
                 'id',
-                ProprietaryHTMLProperties.Outlook_com_quote_id):
+                ProprietaryHTMLAttrValues.Outlook_com_quote_id):
             return True
         return False
 
@@ -210,7 +215,7 @@ class HtmlMailQuoteChecker(HtmlChecker):
         return cls._has_attr_value(
             elem,
             'class',
-            ProprietaryHTMLProperties.Yahoo_quote_class)
+            ProprietaryHTMLAttrValues.Yahoo_quote_class)
 
     @classmethod
     def _is_roundcube_quote(
@@ -220,7 +225,7 @@ class HtmlMailQuoteChecker(HtmlChecker):
         return cls._has_attr_value(
             elem,
             'id',
-            ProprietaryHTMLProperties.Roundcube_quote_prefix_class)
+            ProprietaryHTMLAttrValues.Roundcube_quote_prefix_class)
 
 
 class HtmlMailSignatureChecker(HtmlChecker):
@@ -242,7 +247,7 @@ class HtmlMailSignatureChecker(HtmlChecker):
         return cls._has_attr_value(
             elem,
             'class',
-            ProprietaryHTMLProperties.Thunderbird_signature_class)
+            ProprietaryHTMLAttrValues.Thunderbird_signature_class)
 
     @classmethod
     def _is_gmail_signature(
@@ -252,24 +257,24 @@ class HtmlMailSignatureChecker(HtmlChecker):
         if cls._has_attr_value(
                 elem,
                 'class',
-                ProprietaryHTMLProperties.Gmail_signature_class):
+                ProprietaryHTMLAttrValues.Gmail_signature_class):
             return True
         if cls._has_attr_value(
                 elem,
                 'class',
-                ProprietaryHTMLProperties.Gmail_extras_class):
+                ProprietaryHTMLAttrValues.Gmail_extras_class):
             for child in elem.children:
                 if cls._has_attr_value(
                         child,
                         'class',
-                        ProprietaryHTMLProperties.Gmail_signature_class):
+                        ProprietaryHTMLAttrValues.Gmail_signature_class):
                     return True
         if isinstance(elem, Tag) and elem.name.lower() == 'div':
             for child in elem.children:
                 if cls._has_attr_value(
                         child,
                         'class',
-                        ProprietaryHTMLProperties.Gmail_signature_class):
+                        ProprietaryHTMLAttrValues.Gmail_signature_class):
                     return True
         return False
 
@@ -281,20 +286,27 @@ class HtmlMailSignatureChecker(HtmlChecker):
         if cls._has_attr_value(
                 elem,
                 'id',
-                ProprietaryHTMLProperties.Outlook_com_signature_id):
+                ProprietaryHTMLAttrValues.Outlook_com_signature_id):
             return True
         return False
 
+# ParsedHTMLMail #
+
 
 class PreSanitizeConfig(object):
+    """
+    To avoid problems, html need to be a bit during parsing to distinct
+    Main,Quote and Signature elements
+    """
     Ignored_tags = ['br', 'hr', 'script', 'style']
-    meta_tag = ['body','div']
+    meta_tag = ['body', 'div']
+
 
 class ParsedHTMLMail(object):
     """
     Parse HTML Mail depending of some rules.
     Distinct part of html mail body using BodyMailParts object and
-    process different rules.
+    process differents rules using HtmlChecker(s)
     """
 
     def __init__(self, html_body: str):
@@ -334,7 +346,7 @@ class ParsedHTMLMail(object):
             # if Text -> Signature -> Quote Mail
             # Text and signature are wrapped into divtagdefaultwrapper
             if tag.attrs.get('id'):
-                if ProprietaryHTMLProperties.Outlook_com_wrapper_id\
+                if ProprietaryHTMLAttrValues.Outlook_com_wrapper_id\
                         in tag.attrs['id']:
                     tag.unwrap()
         return tree
