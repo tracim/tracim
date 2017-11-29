@@ -17,6 +17,7 @@ server.post('/user/login', (req, res) => {
 })
 server.get('/user_logged', (req, res) => res.jsonp(jsonDb.user_logged))
 server.delete('/deletenodata', (req,res) => res.status(204).jsonp(''))
+server.patch('/user', (req, res) => res.jsonp({lang: 'fr'}))
 
 // server.put('/api/data/raw_materials_vendors/:vendorid', (req, res) => {
 //  res.jsonp(jsonVendorColorData.vendorVariableData)

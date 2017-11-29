@@ -1,8 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Header } from '../component/Header.jsx'
 import { ConnectionForm } from '../component/ConnectionForm.jsx'
-import { Footer } from '../component/Footer.jsx'
 import { userLogin } from '../action-creator.async.js'
 
 class Login extends React.Component {
@@ -23,13 +21,12 @@ class Login extends React.Component {
     const { user } = this.props
     return (
       <div>
-        <Header user={user} />
         <ConnectionForm
+          user={user}
           onChangeLogin={this.handleChangeLogin}
           onChangePassword={this.handleChangePassword}
           onClickSubmit={this.handleClickSubmit}
         />
-        <Footer />
       </div>
     )
   }

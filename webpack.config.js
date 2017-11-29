@@ -16,7 +16,6 @@ module.exports = {
       'react',
       'react-dom',
       'react-redux',
-      // 'react-router',
       'react-router-dom',
       // 'react-select',
       'redux',
@@ -24,7 +23,7 @@ module.exports = {
       // 'redux-saga',
       'redux-thunk',
       'whatwg-fetch',
-      // 'classnames'
+      'classnames'
     ]
   },
   output: {
@@ -40,12 +39,13 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
-    }
+    },
+    historyApiFallback: true
     // headers: {
     //   'Access-Control-Allow-Origin': '*'
     // }
   },
-  devtool: isProduction ? false : 'cheap-eval-source-map',
+  devtool: isProduction ? false : 'cheap-module-source-map',
   module: {
     rules: [{
       test: /\.jsx?$/,
@@ -77,23 +77,23 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx']
   },
-  plugins: isProduction
-    ? [
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        filename: 'tracim.vendor.bundle.js'
-      }),
-      new webpack.DefinePlugin({
-        'process.env': { 'NODE_ENV': JSON.stringify('production') }
-      }),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: { warnings: false }
-      })
-    ]
-    : [
+  plugins:[
+    ...[ // generic plugins always present
       new webpack.optimize.CommonsChunkPlugin({
         name: 'vendor',
         filename: 'tracim.vendor.bundle.js'
       })
-    ]
+    ],
+    ...(isProduction
+      ? [ // production specific plugins
+        new webpack.DefinePlugin({
+          'process.env': { 'NODE_ENV': JSON.stringify('production') }
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+          compress: { warnings: false }
+        })
+      ]
+      : [] // development specific plugins
+    )
+  ]
 }

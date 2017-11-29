@@ -1,8 +1,10 @@
 import { FETCH_CONFIG } from './helper.js'
 import {
   USER_LOGIN,
+  USER_DATA,
   USER_CONNECTED,
-  updateUserConnected
+  updateUserConnected,
+  updateUserData
 } from './action-creator.sync.js'
 
 /*
@@ -32,24 +34,21 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       case 304:
         return fetchResult.json()
       case 204:
-        return ''
       case 400:
       case 404:
-        return ''
       case 409:
-        return ''
       case 500:
       case 501:
       case 502:
       case 503:
       case 504:
-        const jsonRes = await fetchResult.json()
-        return jsonRes.errorHandled ? jsonRes.errorMsg : ''
+        return '' // @TODO : handle errors
     }
   })()
   if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
 
-  dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+  if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+  else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
 
   return fetchResult
 }
@@ -72,6 +71,16 @@ export const getUserConnected = () => async dispatch => {
     dispatch
   })
   if (fetchUserLogged.status === 200) dispatch(updateUserConnected(fetchUserLogged.json))
+}
+
+export const updateUserLang = newLang => async dispatch => {
+  const fetchUpdateUserLang = await fetchWrapper({
+    url: 'http://localhost:3001/user',
+    param: {...FETCH_CONFIG, method: 'PATCH', body: JSON.stringify({lang: newLang})},
+    actionName: USER_DATA,
+    dispatch
+  })
+  if (fetchUpdateUserLang.status === 200) dispatch(updateUserData({lang: fetchUpdateUserLang.json.lang}))
 }
 
 // export const testResponseNoData = () => async dispatch => {
