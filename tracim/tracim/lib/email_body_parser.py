@@ -39,7 +39,6 @@ class BodyMailParts(object):
         # say "all elem after me is Signature"
         self.follow = False
 
-
     def __len__(self) -> int:
         return len(self._list)
 
@@ -55,9 +54,9 @@ class BodyMailParts(object):
         self._append(value)
 
     def _append(self, value) -> None:
-        same_type_as_last =len(self._list) > 0 and \
-                           self._list[-1].part_type == value.part_type
-        if same_type_as_last or self.follow :
+        same_type_as_last = len(self._list) > 0 and \
+                            self._list[-1].part_type == value.part_type
+        if same_type_as_last or self.follow:
             self._list[-1].text += value.text
         else:
             self._list.append(value)
@@ -215,7 +214,7 @@ class HtmlMailSignatureChecker(HtmlChecker):
             for child in elem.children:
                 if cls._has_attr_value(child, 'class', 'gmail_signature'):
                     return True
-        if isinstance(elem,Tag) and elem.name.lower() == 'div':
+        if isinstance(elem, Tag) and elem.name.lower() == 'div':
             for child in elem.children:
                 if cls._has_attr_value(child, 'class', 'gmail_signature'):
                     return True
@@ -229,6 +228,7 @@ class HtmlMailSignatureChecker(HtmlChecker):
         if cls._has_attr_value(elem, 'id', 'Signature'):
             return True
         return False
+
 
 class ParsedHTMLMail(object):
     """
@@ -280,7 +280,7 @@ class ParsedHTMLMail(object):
             # Hack - G.M - 2017-11-28 : remove tag with no enclosure
             # <br> and <hr> tag alone broke html.parser tree,
             # Using another parser may be a solution.
-            if tag.name.lower() in ['br','hr']:
+            if tag.name.lower() in ['br', 'hr']:
                 tag.unwrap()
                 continue
             if tag.name.lower() in ['script', 'style']:
