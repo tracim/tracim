@@ -1,0 +1,157 @@
+.header
+  width 100%
+  box-shadow shadow-bottom
+  background off-white
+  &__logo
+    &__img
+      margin-left 40px
+      width 150px
+  &__menu
+    justify-content flex-end
+    &__list
+      display none
+      margin-left 50px
+      .list__item
+        padding-right 30px
+        &__link
+          color blue
+          font-size 16px
+          &:hover
+            color dark-blue
+    &__rightside
+      display flex
+      justify-content flex-end
+      margin-top 15px
+      width 60%
+      list-style none
+      &__itemsearch
+        margin-right 8%
+        width 55%
+        &__search
+          width 100%
+          .search__addonsearch
+            background-color transparent
+      .btnnavbar
+        border 1px solid grey
+        background-color transparent
+        cursor pointer
+      &__itemlanguage
+        &__languagedropdown
+          .languagedropdown
+            &__btnlanguage
+              margin-right 25px
+              color dark-grey
+              &:focus
+                box-shadow shadow-all-side-blue
+                border-radius 5px
+                background-color transparent
+              &__imgselected
+                margin-right 10px
+                width 20px
+                height 15px
+            &__subdropdown
+              padding 0
+              min-width 0
+              .subdropdown
+                &__flag
+                  width 25px
+                  height 18px
+      &__itemquestion
+        &__btnquestion
+          margin-right 30px
+          .btnquestion__icon
+            color dark-grey
+      &__itemprofil
+        &__profilgroup
+          .profilgroup__name
+            border 0
+            padding 0 5px
+            background-color transparent
+            &:hover
+              background-color light-grey
+            &:focus
+              box-shadow shadow-all-side-blue
+              background-color light-grey
+            &::after //bootstrap overrides
+              vertical-align middle
+              color dark-grey
+            &__imgprofil
+              display inline-block
+              margin-right 10px
+              width 40px
+              height 40px
+            &__text
+              display inline-block
+              vertical-align middle
+              margin-right 10px
+              color dark-grey
+          .profilgroup__sub
+            color dark-grey
+            cursor pointer
+            &:focus
+              box-shadow none
+          .profilgroup__setting
+            padding 0
+            &__link
+              padding 10px 0
+
+@media (min-width: min-lg) and (max-width: max-lg)
+  .header__menu__rightside
+    width 100%
+
+@media (min-width: min-md) and (max-width: max-md)
+  .header
+    &__logo__img
+        margin-left 0
+    &__menu
+      &__list
+        margin-left 0
+      &__rightside
+        width 67%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .header
+    position fixed
+    z-index 2
+    &__logo__img
+      margin-left 0
+    &__menu
+      &__list
+        margin-left 0
+        .list__item
+          padding-right 0
+          padding-bottom 12px
+      &__rightside
+        margin-top 12px
+        padding-left 0
+        justify-content center
+        width 100%
+        &__itemsearch
+          margin-right 45px
+        &__itemquestion
+          display none
+
+@media (max-width: max-xs)
+  .header
+    position fixed
+    z-index 2
+    &__logo__img
+      margin-left 0
+    &__menu__list
+      margin-left 0
+      .list__item
+        padding-right 0
+        padding-bottom 12px
+      &__rightside
+        padding-top 12px
+        justify-content center
+        width 100%
+        padding-left 0
+        &__itemsearch
+          margin-right 6%
+          width 100%
+        &__itemlanguage__languagedropdown
+          .languagedropdown__btnlanguage
+            margin-right 0
+        &__itemquestion
+          display none
