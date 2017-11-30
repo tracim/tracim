@@ -48,13 +48,17 @@ class BodyMailParts(object):
         BodyMailParts._check_value(value)
         self._append(value)
 
-    def _append(self, value) -> None:
-        same_type_as_last = len(self._list) > 0 and \
-                            self._list[-1].part_type == value.part_type
-        if same_type_as_last or self.follow:
-            self._list[-1].text += value.text
-        else:
+    def _append(self, value, follow=None) -> None:
+        if follow is None:
+            follow = self.follow
+
+        if len(self._list) < 1:
             self._list.append(value)
+        else:
+            if self._list[-1].part_type == value.part_type or follow:
+                self._list[-1].text += value.text
+            else:
+                self._list.append(value)
 
     @classmethod
     def _check_value(cls, value) -> None:
@@ -69,9 +73,10 @@ class BodyMailParts(object):
         """
         new_list = [x for x in self._list if x.part_type != part_type]
         self._list = []
+
         # INFO - G.M - 2017-11-27 - use append() to have a consistent list
         for elem in new_list:
-            self.append(elem)
+            self._append(elem, follow=False)
 
     def get_nb_part_type(self, part_type: str) -> int:
         """

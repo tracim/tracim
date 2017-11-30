@@ -148,6 +148,25 @@ class TestBodyMailsParts(TestStandard):
         assert mail_parts[0] == a
         assert mail_parts[1] == b
 
+    def test_unit__append_follow(self):
+        mail_parts = BodyMailParts()
+        mail_parts.follow = True
+        a = BodyMailPart('a', BodyMailPartType.Main)
+        mail_parts._append(a)
+        b = BodyMailPart('b', BodyMailPartType.Quote)
+        mail_parts._append(b)
+        assert len(mail_parts) == 1
+        assert mail_parts[0].part_type == BodyMailPartType.Main
+        assert mail_parts[0].text == 'ab'
+
+    def test_unit__append_dont_follow_when_first(self):
+        mail_parts = BodyMailParts()
+        a = BodyMailPart('a', BodyMailPartType.Main)
+        mail_parts._append(a,follow=True)
+        assert len(mail_parts) == 1
+        assert mail_parts[0].part_type == BodyMailPartType.Main
+        assert mail_parts[0].text == 'a'
+
     @raises(TypeError)
     def test_unit__check_value__type_error(self):
         mail_parts = BodyMailParts()
@@ -174,6 +193,23 @@ class TestBodyMailsParts(TestStandard):
         assert mail_parts[1].text == 'c'
         assert mail_parts[1].part_type == BodyMailPartType.Signature
 
+    def test_unit__drop_part_type_verify_no_follow_incidence(self):
+        mail_parts = BodyMailParts()
+        a = BodyMailPart('a', BodyMailPartType.Main)
+        mail_parts._list.append(a)
+        b = BodyMailPart('b', BodyMailPartType.Quote)
+        mail_parts._list.append(b)
+        c = BodyMailPart('c', BodyMailPartType.Signature)
+        mail_parts._list.append(c)
+        mail_parts.follow = True
+        mail_parts.drop_part_type(BodyMailPartType.Quote)
+        assert len(mail_parts) == 2
+        assert mail_parts[0].text == 'a'
+        assert mail_parts[0].part_type == BodyMailPartType.Main
+        assert len(mail_parts) == 2
+        assert mail_parts[1].text == 'c'
+        assert mail_parts[1].part_type == BodyMailPartType.Signature
+
     def test_unit__drop_part_type_consistence(self):
         mail_parts = BodyMailParts()
         a = BodyMailPart('a', BodyMailPartType.Main)
@@ -186,6 +222,7 @@ class TestBodyMailsParts(TestStandard):
         assert len(mail_parts) == 1
         assert mail_parts[0].text == 'ac'
         assert mail_parts[0].part_type == BodyMailPartType.Main
+
 
     def test_unit__get_nb_part_type(self):
         mail_parts = BodyMailParts()
