@@ -6,6 +6,7 @@ from bs4 import NavigableString
 
 # BodyParts and Body Parts Objects #
 
+
 class BodyMailPartType(object):
     Signature = 'sign'
     Main = 'main'
@@ -98,11 +99,8 @@ class BodyMailParts(object):
             s_mail += elem.text
         return str(s_mail)
 
-
-class SignatureIndexError(Exception):
-    pass
-
 # Elements Checkers #
+
 
 class ProprietaryHTMLAttrValues(object):
     """

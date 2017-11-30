@@ -3,7 +3,6 @@ from tracim.lib.email_body_parser import HtmlMailSignatureChecker
 from tracim.lib.email_body_parser import BodyMailParts
 from tracim.lib.email_body_parser import BodyMailPart
 from tracim.lib.email_body_parser import BodyMailPartType
-from tracim.lib.email_body_parser import SignatureIndexError
 from tracim.lib.email_body_parser import ParsedHTMLMail
 from tracim.tests import TestStandard
 from bs4 import BeautifulSoup,Tag
