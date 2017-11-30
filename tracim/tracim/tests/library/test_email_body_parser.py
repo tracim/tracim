@@ -1,12 +1,11 @@
-from tracim.lib.email_body_parser import HtmlMailQuoteChecker
-from tracim.lib.email_body_parser import HtmlMailSignatureChecker
-from tracim.lib.email_body_parser import BodyMailParts
-from tracim.lib.email_body_parser import BodyMailPart
-from tracim.lib.email_body_parser import BodyMailPartType
-from tracim.lib.email_body_parser import ParsedHTMLMail
-from tracim.tests import TestStandard
-from bs4 import BeautifulSoup,Tag
+from bs4 import BeautifulSoup
 from nose.tools import raises
+from tracim.lib.email_processing.checkers import HtmlMailQuoteChecker, \
+    HtmlMailSignatureChecker
+from tracim.lib.email_processing.parser import ParsedHTMLMail
+from tracim.lib.email_processing.models import BodyMailPartType, BodyMailPart, \
+    BodyMailParts
+from tracim.tests import TestStandard
 
 
 class TestHtmlMailQuoteChecker(TestStandard):

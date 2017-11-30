@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import time
 import imaplib
-import datetime
-import json
+import time
 import typing
-from email.message import Message
-from email.header import Header, decode_header, make_header
-from email.utils import parseaddr, parsedate_tz, mktime_tz
 from email import message_from_bytes
+from email.header import decode_header, make_header
+from email.message import Message
+from email.utils import parseaddr
 
 import markdown
 import requests
 from bs4 import BeautifulSoup, Tag
 from email_reply_parser import EmailReplyParser
-
 from tracim.lib.base import logger
-from tracim.lib.email_body_parser import ParsedHTMLMail
+from tracim.lib.email_processing.parser import ParsedHTMLMail
 
 TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 # TODO BS 20171124: Think about replace thin dict config by object
