@@ -128,7 +128,7 @@ def start_daemons(manager: DaemonsManager):
         manager.run('mail_sender', MailSenderDaemon)
 
     if cfg.EMAIL_REPLY_ACTIVATED:
-        manager.run('mail_fetcher',MailFetcherDaemon)
+        manager.run('mail_fetcher', MailFetcherDaemon)
 
 
 def configure_depot():

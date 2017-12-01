@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 
 # -*- coding: utf-8 -*-
+
+
 class BodyMailPartType(object):
     Signature = 'sign'
     Main = 'main'
@@ -98,6 +100,7 @@ class BodyMailParts(object):
             s_mail += elem.text
         return str(s_mail)
 
+
 class HtmlBodyMailParts(BodyMailParts):
 
     def append(self, value):
@@ -109,4 +112,4 @@ class HtmlBodyMailParts(BodyMailParts):
             if not txt:
                 value.part_type = self._list[-1].part_type
         BodyMailParts._check_value(value)
-        BodyMailParts._append(self,value)
+        BodyMailParts._append(self, value)

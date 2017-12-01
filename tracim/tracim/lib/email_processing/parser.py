@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
-from bs4 import NavigableString
-from bs4 import Tag
 
 from tracim.lib.email_processing.checkers import ProprietaryHTMLAttrValues
 from tracim.lib.email_processing.checkers import HtmlMailQuoteChecker
@@ -9,6 +7,7 @@ from tracim.lib.email_processing.checkers import HtmlMailSignatureChecker
 from tracim.lib.email_processing.models import BodyMailPartType
 from tracim.lib.email_processing.models import BodyMailPart
 from tracim.lib.email_processing.models import HtmlBodyMailParts
+
 
 class PreSanitizeConfig(object):
     """
@@ -88,7 +87,10 @@ class ParsedHTMLMail(object):
         return parts
 
     @classmethod
-    def _process_elements(cls, elements: HtmlBodyMailParts) -> HtmlBodyMailParts:
+    def _process_elements(
+            cls,
+            elements: HtmlBodyMailParts,
+    ) -> HtmlBodyMailParts:
         if len(elements) >= 2:
             # Case 1 and 2, only one main and one quote
             if elements.get_nb_part_type('main') == 1 and \
