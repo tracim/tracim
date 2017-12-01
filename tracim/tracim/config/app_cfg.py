@@ -388,6 +388,10 @@ class CFG(object):
             'email.reply.use_html_parsing',
             True,
         ))
+        self.EMAIL_REPLY_USE_TXT_PARSING = asbool(tg.config.get(
+            'email.reply.use_txt_parsing',
+            True,
+        ))
 
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',

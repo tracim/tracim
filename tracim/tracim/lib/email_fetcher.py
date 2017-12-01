@@ -58,7 +58,8 @@ class DecodedMail(object):
 
     def get_body(
             self,
-            use_html_parsing=True
+            use_html_parsing=True,
+            use_txt_parsing=True,
     ) -> typing.Optional[str]:
         body_part = self._get_mime_body_message()
         body = None
@@ -68,7 +69,10 @@ class DecodedMail(object):
             if content_type == CONTENT_TYPE_TEXT_PLAIN:
                 txt_body = body_part.get_payload(decode=True).decode(
                     charset)
-                body = DecodedMail._parse_txt_body(txt_body)
+                if use_txt_parsing:
+                    txt_body = EmailReplyParser.parse_reply(txt_body)
+                html_body = markdown.markdown(txt_body)
+                body = DecodedMail._sanitize_html_body(html_body)
 
             elif content_type == CONTENT_TYPE_TEXT_HTML:
                 html_body = body_part.get_payload(decode=True).decode(
@@ -77,14 +81,6 @@ class DecodedMail(object):
                     html_body = str(ParsedHTMLMail(html_body))
                 body = DecodedMail._sanitize_html_body(html_body)
 
-        return body
-
-    @classmethod
-    def _parse_txt_body(cls, txt_body: str) -> str:
-        # TODO - G.M - 2017-11-30 - Add option to disable parsing
-        txt_body = EmailReplyParser.parse_reply(txt_body)
-        html_body = markdown.markdown(txt_body)
-        body = DecodedMail._sanitize_html_body(html_body)
         return body
 
     @classmethod
@@ -187,7 +183,8 @@ class MailFetcher(object):
         delay: int,
         endpoint: str,
         token: str,
-        use_html_parsing: bool
+        use_html_parsing: bool,
+        use_txt_parsing: bool,
     ) -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -215,6 +212,7 @@ class MailFetcher(object):
         self.endpoint = endpoint
         self.token = token
         self.use_html_parsing = use_html_parsing
+        self.use_txt_parsing = use_txt_parsing
 
         self._is_active = True
 
@@ -320,7 +318,8 @@ class MailFetcher(object):
                    'content_id': mail.get_key(),
                    'payload': {
                        'content': mail.get_body(
-                           use_html_parsing=self.use_html_parsing),
+                           use_html_parsing=self.use_html_parsing,
+                           use_txt_parsing=self.use_txt_parsing),
                    }}
             try:
                 r = requests.post(self.endpoint, json=msg)
