@@ -15,7 +15,7 @@ class TestHtmlMailQuoteChecker(TestStandard):
         assert HtmlMailQuoteChecker._is_standard_quote(main_elem) is True
 
     def test_unit__is_standard_quote_no(self):
-        soup = BeautifulSoup('<a></a>')
+        soup = BeautifulSoup('<a></a>', 'html.parser')
         main_elem = soup.find()
         assert HtmlMailQuoteChecker._is_standard_quote(main_elem) is False
 
@@ -26,7 +26,7 @@ class TestHtmlMailQuoteChecker(TestStandard):
         assert HtmlMailQuoteChecker._is_thunderbird_quote(main_elem) is True
 
     def test_unit__is_thunderbird_quote_no(self):
-        soup = BeautifulSoup('<div class="nothing"></div>')
+        soup = BeautifulSoup('<div class="nothing"></div>', 'html.parser')
         main_elem = soup.find()
         assert HtmlMailQuoteChecker._is_thunderbird_quote(main_elem) is False
 

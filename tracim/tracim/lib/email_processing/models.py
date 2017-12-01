@@ -104,7 +104,8 @@ class HtmlBodyMailParts(BodyMailParts):
         # INFO - G.M - 2017-12-01 - Override part_type is elem has no content.
         # Choose last elem part_type instead of the proposed one.
         if len(self._list) > 0:
-            txt = BeautifulSoup(value.text).get_text().replace('\n','').strip()
+            txt = BeautifulSoup(value.text, 'html.parser').get_text()
+            txt = txt.replace('\n', '').strip()
             if not txt:
                 value.part_type = self._list[-1].part_type
         BodyMailParts._check_value(value)
