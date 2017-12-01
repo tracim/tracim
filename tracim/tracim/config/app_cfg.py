@@ -384,6 +384,10 @@ class CFG(object):
         self.EMAIL_REPLY_IMAP_USE_SSL = asbool(tg.config.get(
             'email.reply.imap.use_ssl',
         ))
+        self.EMAIL_REPLY_USE_HTML_PARSING = asbool(tg.config.get(
+            'email.reply.use_html_parsing',
+            True,
+        ))
 
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',

@@ -226,6 +226,7 @@ email.reply.imap.use_ssl = true
 email.reply.token = mysecuretoken
 # Delay in seconds between each check
 email.reply.check.heartbeat = 60
+email.reply.use_html_parsing = true
 
 ## Radical (CalDav server) configuration
 # radicale.server.host = 0.0.0.0

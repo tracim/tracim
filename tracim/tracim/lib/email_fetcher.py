@@ -56,7 +56,10 @@ class DecodedMail(object):
     def get_special_key(self) -> typing.Optional[str]:
         return self._decode_header(TRACIM_SPECIAL_KEY_HEADER)
 
-    def get_body(self) -> typing.Optional[str]:
+    def get_body(
+            self,
+            use_html_parsing=True
+    ) -> typing.Optional[str]:
         body_part = self._get_mime_body_message()
         body = None
         if body_part:
@@ -70,13 +73,15 @@ class DecodedMail(object):
             elif content_type == CONTENT_TYPE_TEXT_HTML:
                 html_body = body_part.get_payload(decode=True).decode(
                     charset)
-                html_body = str(ParsedHTMLMail(html_body))
+                if use_html_parsing:
+                    html_body = str(ParsedHTMLMail(html_body))
                 body = DecodedMail._sanitize_html_body(html_body)
 
         return body
 
     @classmethod
     def _parse_txt_body(cls, txt_body: str) -> str:
+        # TODO - G.M - 2017-11-30 - Add option to disable parsing
         txt_body = EmailReplyParser.parse_reply(txt_body)
         html_body = markdown.markdown(txt_body)
         body = DecodedMail._sanitize_html_body(html_body)
@@ -182,6 +187,7 @@ class MailFetcher(object):
         delay: int,
         endpoint: str,
         token: str,
+        use_html_parsing: bool
     ) -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -196,6 +202,7 @@ class MailFetcher(object):
         :param delay: seconds to wait before fetching new mail again
         :param endpoint: tracim http endpoint where decoded mail are send.
         :param token: token to authenticate http connexion
+        :param use_html_parsing: parse html mail
         """
         self._connection = None
         self.host = host
@@ -207,6 +214,7 @@ class MailFetcher(object):
         self.delay = delay
         self.endpoint = endpoint
         self.token = token
+        self.use_html_parsing = use_html_parsing
 
         self._is_active = True
 
@@ -217,7 +225,7 @@ class MailFetcher(object):
                 self._connect()
                 messages = self._fetch()
                 # TODO - G.M -  2017-11-22 retry sending unsended mail
-                # These mails are return by _notify_tracim, flag them with "unseen"
+                # These mails are return by _notify_tracim, flag them with "unseen" # nopep8
                 # or store them until new _notify_tracim call
                 cleaned_mails = [DecodedMail(msg) for msg in messages]
                 self._notify_tracim(cleaned_mails)
@@ -311,7 +319,8 @@ class MailFetcher(object):
                    'user_mail': mail.get_from_address(),
                    'content_id': mail.get_key(),
                    'payload': {
-                       'content': mail.get_body(),
+                       'content': mail.get_body(
+                           use_html_parsing=self.use_html_parsing),
                    }}
             try:
                 r = requests.post(self.endpoint, json=msg)
