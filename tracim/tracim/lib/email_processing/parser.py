@@ -8,14 +8,13 @@ from tracim.lib.email_processing.checkers import HtmlMailQuoteChecker
 from tracim.lib.email_processing.checkers import HtmlMailSignatureChecker
 from tracim.lib.email_processing.models import BodyMailPartType
 from tracim.lib.email_processing.models import BodyMailPart
-from tracim.lib.email_processing.models import BodyMailParts
+from tracim.lib.email_processing.models import HtmlBodyMailParts
 
 class PreSanitizeConfig(object):
     """
-    To avoid problems, html need to be a bit during parsing to distinct
+    To avoid problems, html need to be sanitize a bit during parsing to distinct
     Main,Quote and Signature elements
     """
-    Ignored_tags = ['br', 'hr', 'script', 'style']
     meta_tag = ['body', 'div']
 
 
@@ -32,11 +31,11 @@ class ParsedHTMLMail(object):
     def __str__(self):
         return str(self._parse_mail())
 
-    def get_elements(self) -> BodyMailParts:
+    def get_elements(self) -> HtmlBodyMailParts:
         tree = self._get_proper_main_body_tree()
         return self._distinct_elements(tree)
 
-    def _parse_mail(self) -> BodyMailParts:
+    def _parse_mail(self) -> HtmlBodyMailParts:
         elements = self.get_elements()
         elements = self._process_elements(elements)
         return elements
@@ -69,26 +68,16 @@ class ParsedHTMLMail(object):
         return tree
 
     @classmethod
-    def _distinct_elements(cls, tree: BeautifulSoup) -> BodyMailParts:
-        parts = BodyMailParts()
+    def _distinct_elements(cls, tree: BeautifulSoup) -> HtmlBodyMailParts:
+        parts = HtmlBodyMailParts()
         for elem in list(tree):
             part_txt = str(elem)
             part_type = BodyMailPartType.Main
-            # sanitize NavigableString
-            if isinstance(elem, NavigableString):
-                part_txt = part_txt.replace('\n', '').strip()
 
             if HtmlMailQuoteChecker.is_quote(elem):
                 part_type = BodyMailPartType.Quote
             elif HtmlMailSignatureChecker.is_signature(elem):
                 part_type = BodyMailPartType.Signature
-            else:
-                # INFO - G.M -2017-11-28 - ignore unwanted parts
-                if not part_txt:
-                    continue
-                if isinstance(elem, Tag) \
-                        and elem.name.lower() in PreSanitizeConfig.Ignored_tags:
-                    continue
 
             part = BodyMailPart(part_txt, part_type)
             parts.append(part)
@@ -99,7 +88,7 @@ class ParsedHTMLMail(object):
         return parts
 
     @classmethod
-    def _process_elements(cls, elements: BodyMailParts) -> BodyMailParts:
+    def _process_elements(cls, elements: HtmlBodyMailParts) -> HtmlBodyMailParts:
         if len(elements) >= 2:
             # Case 1 and 2, only one main and one quote
             if elements.get_nb_part_type('main') == 1 and \
@@ -119,19 +108,19 @@ class ParsedHTMLMail(object):
         return elements
 
     @classmethod
-    def _process_quote_first_case(cls, elements: BodyMailParts) -> None:
+    def _process_quote_first_case(cls, elements: HtmlBodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Signature)
 
     @classmethod
-    def _process_main_first_case(cls, elements: BodyMailParts) -> None:
+    def _process_main_first_case(cls, elements: HtmlBodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Quote)
         elements.drop_part_type(BodyMailPartType.Signature)
 
     @classmethod
-    def _process_multiples_elems_case(cls, elements: BodyMailParts) -> None:
+    def _process_multiples_elems_case(cls, elements: HtmlBodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Signature)
 
     @classmethod
-    def _process_default_case(cls, elements: BodyMailParts) -> None:
+    def _process_default_case(cls, elements: HtmlBodyMailParts) -> None:
         elements.drop_part_type(BodyMailPartType.Quote)
         elements.drop_part_type(BodyMailPartType.Signature)

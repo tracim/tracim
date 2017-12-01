@@ -1,3 +1,5 @@
+from bs4 import BeautifulSoup
+
 # -*- coding: utf-8 -*-
 class BodyMailPartType(object):
     Signature = 'sign'
@@ -96,3 +98,14 @@ class BodyMailParts(object):
             s_mail += elem.text
         return str(s_mail)
 
+class HtmlBodyMailParts(BodyMailParts):
+
+    def append(self, value):
+        # INFO - G.M - 2017-12-01 - Override part_type is elem has no content.
+        # Choose last elem part_type instead of the proposed one.
+        if len(self._list) > 0:
+            txt = BeautifulSoup(value.text).get_text().replace('\n','').strip()
+            if not txt:
+                value.part_type = self._list[-1].part_type
+        BodyMailParts._check_value(value)
+        BodyMailParts._append(self,value)
