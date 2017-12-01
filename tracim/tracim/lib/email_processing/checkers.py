@@ -37,10 +37,26 @@ class HtmlChecker(object):
             attribute_name: str,
             attribute_value: str,
     )-> bool:
+        """
+        Check if elem contains attribute named attribute_name with
+        attribute_value : example <a id="ident"> elem contain attribute
+        with id as attribute_name and ident as attribute_value.
+        Checking is not case_sensitive.
+
+        :param elem: Tag or String Html Element
+        :param attribute_name: Html attribute name
+        :param attribute_value: Html attribute value
+        :return: True only if Element contain this attribute.
+        """
         if isinstance(elem, Tag) and \
-                        attribute_name in elem.attrs and \
-                        attribute_value in elem.attrs[attribute_name]:
-            return True
+              attribute_name in elem.attrs:
+              # INFO - G.M - 2017-12-01 - attrs[value}] can be string or list
+              # use get_attribute_list to always check in a list
+              # see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#multi-valued-attributes # nopep8
+            values_lower=[value.lower()
+                            for value
+                            in elem.get_attribute_list(attribute_name) ]
+            return attribute_value.lower() in values_lower
         return False
 
 
