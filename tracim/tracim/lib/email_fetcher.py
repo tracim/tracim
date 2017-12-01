@@ -10,22 +10,12 @@ from email.utils import parseaddr
 
 import markdown
 import requests
-from bs4 import BeautifulSoup, Tag
 from email_reply_parser import EmailReplyParser
 from tracim.lib.base import logger
 from tracim.lib.email_processing.parser import ParsedHTMLMail
+from tracim.lib.email_processing.sanitizer import HtmlSanitizer
 
 TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
-# TODO BS 20171124: Think about replace thin dict config by object
-BEAUTIFULSOUP_HTML_BODY_SANITIZE_CONFIG = {
-    'tag_blacklist': ['script', 'style'],
-    'class_blacklist': [],
-    'id_blacklist': ['reply-intro'],
-    'tag_whitelist': ['a', 'b', 'strong', 'i', 'br', 'ul', 'li', 'ol',
-                      'em', 'i', 'u', 'blockquote', 'h1','h2','h3','h4',
-                      'thead', 'tr', 'td', 'tbody', 'table', 'p', 'pre'],
-    'attrs_whitelist': ['href'],
-}
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
@@ -72,47 +62,16 @@ class DecodedMail(object):
                 if use_txt_parsing:
                     txt_body = EmailReplyParser.parse_reply(txt_body)
                 html_body = markdown.markdown(txt_body)
-                body = DecodedMail._sanitize_html_body(html_body)
+                body = HtmlSanitizer.sanitize(html_body)
 
             elif content_type == CONTENT_TYPE_TEXT_HTML:
                 html_body = body_part.get_payload(decode=True).decode(
                     charset)
                 if use_html_parsing:
                     html_body = str(ParsedHTMLMail(html_body))
-                body = DecodedMail._sanitize_html_body(html_body)
+                body = HtmlSanitizer.sanitize(html_body)
 
         return body
-
-    @classmethod
-    def _sanitize_html_body(cls, html_body: str) -> str:
-        soup = BeautifulSoup(html_body, 'html.parser')
-        config = BEAUTIFULSOUP_HTML_BODY_SANITIZE_CONFIG
-        for tag in soup.findAll():
-            if DecodedMail._tag_to_extract(tag):
-                tag.extract()
-            elif tag.name.lower() in config['tag_whitelist']:
-                attrs = dict(tag.attrs)
-                for attr in attrs:
-                    if attr not in config['attrs_whitelist']:
-                        del tag.attrs[attr]
-            else:
-                tag.unwrap()
-        return str(soup)
-
-    @classmethod
-    def _tag_to_extract(cls, tag: Tag) -> bool:
-        config = BEAUTIFULSOUP_HTML_BODY_SANITIZE_CONFIG
-        if tag.name.lower() in config['tag_blacklist']:
-            return True
-        if 'class' in tag.attrs:
-            for elem in config['class_blacklist']:
-                if elem in tag.attrs['class']:
-                    return True
-        if 'id' in tag.attrs:
-            for elem in config['id_blacklist']:
-                if elem in tag.attrs['id']:
-                    return True
-        return False
 
     def _get_mime_body_message(self) -> typing.Optional[Message]:
         # TODO - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
