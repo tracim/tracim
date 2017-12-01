@@ -159,6 +159,7 @@ class MailFetcher(object):
         :param endpoint: tracim http endpoint where decoded mail are send.
         :param token: token to authenticate http connexion
         :param use_html_parsing: parse html mail
+        :param use_txt_parsing: parse txt mail
         """
         self._connection = None
         self.host = host

@@ -48,20 +48,21 @@ class HtmlChecker(object):
         :param attribute_value: Html attribute value
         :return: True only if Element contain this attribute.
         """
-        if isinstance(elem, Tag) and \
-              attribute_name in elem.attrs:
-              # INFO - G.M - 2017-12-01 - attrs[value}] can be string or list
-              # use get_attribute_list to always check in a list
-              # see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#multi-valued-attributes # nopep8
-            values_lower=[value.lower()
+        if isinstance(elem, Tag) and attribute_name in elem.attrs:
+            # INFO - G.M - 2017-12-01 - attrs[value}] can be string or list
+            # use get_attribute_list to always check in a list
+            # see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#multi-valued-attributes # nopep8
+            values_lower = [value.lower()
                             for value
-                            in elem.get_attribute_list(attribute_name) ]
+                            in elem.get_attribute_list(attribute_name)]
             return attribute_value.lower() in values_lower
         return False
 
 
 class HtmlMailQuoteChecker(HtmlChecker):
-
+    """
+    Check if one HTML Element from Body Mail look-like a quote or not.
+    """
     @classmethod
     def is_quote(
             cls,
@@ -145,6 +146,9 @@ class HtmlMailQuoteChecker(HtmlChecker):
 
 
 class HtmlMailSignatureChecker(HtmlChecker):
+    """
+    Check if one HTML Element from Body Mail look-like a signature or not.
+    """
 
     @classmethod
     def is_signature(
@@ -205,4 +209,3 @@ class HtmlMailSignatureChecker(HtmlChecker):
                 ProprietaryHTMLAttrValues.Outlook_com_signature_id):
             return True
         return False
-

@@ -116,6 +116,7 @@ class TestHtmlMailSignatureChecker(TestStandard):
         assert HtmlMailSignatureChecker._is_outlook_com_signature(main_elem) \
                is True
 
+
 class TestBodyMailsParts(TestStandard):
 
     def test_unit__std_list_methods(self):
@@ -162,7 +163,7 @@ class TestBodyMailsParts(TestStandard):
     def test_unit__append_dont_follow_when_first(self):
         mail_parts = BodyMailParts()
         a = BodyMailPart('a', BodyMailPartType.Main)
-        mail_parts._append(a,follow=True)
+        mail_parts._append(a, follow=True)
         assert len(mail_parts) == 1
         assert mail_parts[0].part_type == BodyMailPartType.Main
         assert mail_parts[0].text == 'a'
@@ -222,7 +223,6 @@ class TestBodyMailsParts(TestStandard):
         assert len(mail_parts) == 1
         assert mail_parts[0].text == 'ac'
         assert mail_parts[0].part_type == BodyMailPartType.Main
-
 
     def test_unit__get_nb_part_type(self):
         mail_parts = BodyMailParts()
@@ -542,7 +542,7 @@ class TestParsedMail(TestStandard):
         écrit&nbsp;:<br>
         </div>
         <blockquote type="cite"
-        cite="mid:4e6923e2-796d-eccf-84b7-6824da4151ee@localhost.fr">Réponse <br>
+        cite="mid:4e6923e2-796d-eccf-84b7-6824da4151ee@localhost.fr">Réponse<br>
         <br>
         Le 28/11/2017 à 11:21, John Doe a écrit&nbsp;: <br>
         <blockquote type="cite"> <br>
@@ -755,4 +755,3 @@ class TestParsedMail(TestStandard):
         assert elements[0].part_type == BodyMailPartType.Main
         assert elements[1].part_type == BodyMailPartType.Signature
         assert elements[2].part_type == BodyMailPartType.Quote
-
