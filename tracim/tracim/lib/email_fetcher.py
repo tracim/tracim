@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import time
 import imaplib
-import datetime
 import json
 import typing
 from email.message import Message
-from email.header import Header, decode_header, make_header
-from email.utils import parseaddr, parsedate_tz, mktime_tz
+from email.header import decode_header
+from email.header import make_header
+from email.utils import parseaddr
 from email import message_from_bytes
 
 import markdown
 import requests
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
+from bs4 import Tag
 from email_reply_parser import EmailReplyParser
 
 from tracim.lib.base import logger
@@ -214,7 +214,9 @@ class MailFetcher(object):
         self._is_active = True
 
     def run(self) -> None:
+        logger.info(self, 'Starting MailFetcher')
         while self._is_active:
+            logger.debug(self, 'sleep for {}'.format(self.delay))
             time.sleep(self.delay)
             try:
                 self._connect()
@@ -237,20 +239,32 @@ class MailFetcher(object):
         # TODO - G.M - 2017-11-15 Verify connection/disconnection
         # Are old connexion properly close this way ?
         if self._connection:
+            logger.debug(self, 'Disconnect from IMAP')
             self._disconnect()
         # TODO - G.M - 2017-11-23 Support for predefined SSLContext ?
         # without ssl_context param, tracim use default security configuration
         # which is great in most case.
         if self.use_ssl:
+            logger.debug(self, 'Connect IMAP {}:{} using SSL'.format(
+                self.host,
+                self.port,
+            ))
             self._connection = imaplib.IMAP4_SSL(self.host, self.port)
         else:
+            logger.debug(self, 'Connect IMAP {}:{}'.format(
+                self.host,
+                self.port,
+            ))
             self._connection = imaplib.IMAP4(self.host, self.port)
 
         try:
+            logger.debug(self, 'Login IMAP with login {}'.format(
+                self.user,
+            ))
             self._connection.login(self.user, self.password)
         except Exception as e:
             log = 'IMAP login error: {}'
-            logger.warning(self, log.format(e.__str__()))
+            logger.error(self, log.format(e.__str__()))
 
     def _disconnect(self) -> None:
         if self._connection:
@@ -265,33 +279,52 @@ class MailFetcher(object):
         """
         messages = []
         # select mailbox
+        logger.debug(self, 'Fetch messages from folder {}'.format(
+            self.folder,
+        ))
         rv, data = self._connection.select(self.folder)
+        logger.debug(self, 'Response status {}'.format(
+            rv,
+        ))
         if rv == 'OK':
             # get mails
             # TODO - G.M -  2017-11-15 Which files to select as new file ?
             # Unseen file or All file from a directory (old one should be
             #  moved/ deleted from mailbox during this process) ?
+            logger.debug(self, 'Fetch unseen messages')
             rv, data = self._connection.search(None, "(UNSEEN)")
+            logger.debug(self, 'Response status {}'.format(
+                rv,
+            ))
             if rv == 'OK':
                 # get mail content
+                logger.debug(self, 'Found {} unseen mails'.format(
+                    len(data[0].split()),
+                ))
                 for num in data[0].split():
                     # INFO - G.M - 2017-11-23 - Fetch (RFC288) to retrieve all
                     # complete mails see example : https://docs.python.org/fr/3.5/library/imaplib.html#imap4-example .  # nopep8
                     # Be careful, This method remove also mails from Unseen
                     # mails
+                    logger.debug(self, 'Fetch mail "{}"'.format(
+                        num,
+                    ))
                     rv, data = self._connection.fetch(num, '(RFC822)')
+                    logger.debug(self, 'Response status {}'.format(
+                        rv,
+                    ))
                     if rv == 'OK':
                         msg = message_from_bytes(data[0][1])
                         messages.append(msg)
                     else:
                         log = 'IMAP : Unable to get mail : {}'
-                        logger.debug(self, log.format(str(rv)))
+                        logger.error(self, log.format(str(rv)))
             else:
-                # FIXME : Distinct error from empty mailbox ?
-                pass
+                log = 'IMAP : Unable to get unseen mail : {}'
+                logger.error(self, log.format(str(rv)))
         else:
             log = 'IMAP : Unable to open mailbox : {}'
-            logger.debug(self, log.format(str(rv)))
+            logger.error(self, log.format(str(rv)))
         return messages
 
     def _notify_tracim(
@@ -303,6 +336,9 @@ class MailFetcher(object):
         :param mails: list of mails to send
         :return: unsended mails
         """
+        logger.debug(self, 'Notify tracim about {} new responses'.format(
+            len(mails),
+        ))
         unsended_mails = []
         # TODO BS 20171124: Look around mail.get_from_address(), mail.get_key()
         # , mail.get_body() etc ... for raise InvalidEmailError if missing
@@ -317,19 +353,28 @@ class MailFetcher(object):
                        'content': mail.get_body(),
                    }}
             try:
+                logger.debug(
+                    self,
+                    'Contact API on {} with body {}'.format(
+                        self.endpoint,
+                        json.dumps(msg),
+                    ),
+                )
                 r = requests.post(self.endpoint, json=msg)
                 if r.status_code not in [200, 204]:
-                    log = 'bad status code response when sending mail to tracim: {}'  # nopep8
-                    logger.error(self, log.format(str(r.status_code)))
+                    details = r.json().get('msg')
+                    log = 'bad status code {} response when sending mail to tracim: {}'  # nopep8
+                    logger.error(self, log.format(
+                        str(r.status_code),
+                        details,
+                    ))
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
                 unsended_mails.append(mail)
-                break
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                break
 
         return unsended_mails
