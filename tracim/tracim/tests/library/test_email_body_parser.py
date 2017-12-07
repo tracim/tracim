@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
 from nose.tools import raises
-from tracim.lib.email_processing.checkers import HtmlMailQuoteChecker, \
-    HtmlMailSignatureChecker
+
+from tracim.lib.email_processing.checkers import HtmlMailQuoteChecker
+from tracim.lib.email_processing.checkers import HtmlMailSignatureChecker
 from tracim.lib.email_processing.parser import ParsedHTMLMail
-from tracim.lib.email_processing.models import BodyMailPartType, BodyMailPart, \
-    BodyMailParts
+from tracim.lib.email_processing.models import BodyMailPartType
+from tracim.lib.email_processing.models import BodyMailPart
+from tracim.lib.email_processing.models import BodyMailParts
 from tracim.tests import TestStandard
 
 
