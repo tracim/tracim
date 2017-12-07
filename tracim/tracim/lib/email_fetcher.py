@@ -4,32 +4,20 @@ import time
 import imaplib
 import json
 import typing
-from email.message import Message
+from email import message_from_bytes
 from email.header import decode_header
 from email.header import make_header
+from email.message import Message
 from email.utils import parseaddr
-from email import message_from_bytes
 
 import markdown
 import requests
-from bs4 import BeautifulSoup
-from bs4 import Tag
 from email_reply_parser import EmailReplyParser
-
 from tracim.lib.base import logger
+from tracim.lib.email_processing.parser import ParsedHTMLMail
+from tracim.lib.email_processing.sanitizer import HtmlSanitizer
 
 TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
-# TODO BS 20171124: Think about replace thin dict config by object
-BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG = {
-    'tag_blacklist': ['script', 'style', 'blockquote'],
-    'class_blacklist': ['moz-cite-prefix', 'gmail_extra', 'gmail_quote',
-                        'yahoo_quoted'],
-    'id_blacklist': ['reply-intro'],
-    'tag_whitelist': ['a', 'b', 'strong', 'i', 'br', 'ul', 'li', 'ol',
-                      'em', 'i', 'u',
-                      'thead', 'tr', 'td', 'tbody', 'table', 'p', 'pre'],
-    'attrs_whitelist': ['href'],
-}
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
@@ -60,7 +48,11 @@ class DecodedMail(object):
     def get_special_key(self) -> typing.Optional[str]:
         return self._decode_header(TRACIM_SPECIAL_KEY_HEADER)
 
-    def get_body(self) -> typing.Optional[str]:
+    def get_body(
+            self,
+            use_html_parsing=True,
+            use_txt_parsing=True,
+    ) -> typing.Optional[str]:
         body_part = self._get_mime_body_message()
         body = None
         if body_part:
@@ -69,52 +61,19 @@ class DecodedMail(object):
             if content_type == CONTENT_TYPE_TEXT_PLAIN:
                 txt_body = body_part.get_payload(decode=True).decode(
                     charset)
-                body = DecodedMail._parse_txt_body(txt_body)
+                if use_txt_parsing:
+                    txt_body = EmailReplyParser.parse_reply(txt_body)
+                html_body = markdown.markdown(txt_body)
+                body = HtmlSanitizer.sanitize(html_body)
 
             elif content_type == CONTENT_TYPE_TEXT_HTML:
                 html_body = body_part.get_payload(decode=True).decode(
                     charset)
-                body = DecodedMail._parse_html_body(html_body)
+                if use_html_parsing:
+                    html_body = str(ParsedHTMLMail(html_body))
+                body = HtmlSanitizer.sanitize(html_body)
 
         return body
-
-    @classmethod
-    def _parse_txt_body(cls, txt_body: str) -> str:
-        txt_body = EmailReplyParser.parse_reply(txt_body)
-        html_body = markdown.markdown(txt_body)
-        body = DecodedMail._parse_html_body(html_body)
-        return body
-
-    @classmethod
-    def _parse_html_body(cls, html_body: str) -> str:
-        soup = BeautifulSoup(html_body, 'html.parser')
-        config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
-        for tag in soup.findAll():
-            if DecodedMail._tag_to_extract(tag):
-                tag.extract()
-            elif tag.name.lower() in config['tag_whitelist']:
-                attrs = dict(tag.attrs)
-                for attr in attrs:
-                    if attr not in config['attrs_whitelist']:
-                        del tag.attrs[attr]
-            else:
-                tag.unwrap()
-        return str(soup)
-
-    @classmethod
-    def _tag_to_extract(cls, tag: Tag) -> bool:
-        config = BEAUTIFULSOUP_HTML_BODY_PARSE_CONFIG
-        if tag.name.lower() in config['tag_blacklist']:
-            return True
-        if 'class' in tag.attrs:
-            for elem in config['class_blacklist']:
-                if elem in tag.attrs['class']:
-                    return True
-        if 'id' in tag.attrs:
-            for elem in config['id_blacklist']:
-                if elem in tag.attrs['id']:
-                    return True
-        return False
 
     def _get_mime_body_message(self) -> typing.Optional[Message]:
         # TODO - G.M - 2017-11-16 - Use stdlib msg.get_body feature for py3.6+
@@ -185,6 +144,8 @@ class MailFetcher(object):
         delay: int,
         endpoint: str,
         token: str,
+        use_html_parsing: bool,
+        use_txt_parsing: bool,
     ) -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -199,6 +160,8 @@ class MailFetcher(object):
         :param delay: seconds to wait before fetching new mail again
         :param endpoint: tracim http endpoint where decoded mail are send.
         :param token: token to authenticate http connexion
+        :param use_html_parsing: parse html mail
+        :param use_txt_parsing: parse txt mail
         """
         self._connection = None
         self.host = host
@@ -210,6 +173,8 @@ class MailFetcher(object):
         self.delay = delay
         self.endpoint = endpoint
         self.token = token
+        self.use_html_parsing = use_html_parsing
+        self.use_txt_parsing = use_txt_parsing
 
         self._is_active = True
 
@@ -222,7 +187,7 @@ class MailFetcher(object):
                 self._connect()
                 messages = self._fetch()
                 # TODO - G.M -  2017-11-22 retry sending unsended mail
-                # These mails are return by _notify_tracim, flag them with "unseen"
+                # These mails are return by _notify_tracim, flag them with "unseen" # nopep8
                 # or store them until new _notify_tracim call
                 cleaned_mails = [DecodedMail(msg) for msg in messages]
                 self._notify_tracim(cleaned_mails)
@@ -350,7 +315,9 @@ class MailFetcher(object):
                    'user_mail': mail.get_from_address(),
                    'content_id': mail.get_key(),
                    'payload': {
-                       'content': mail.get_body(),
+                       'content': mail.get_body(
+                           use_html_parsing=self.use_html_parsing,
+                           use_txt_parsing=self.use_txt_parsing),
                    }}
             try:
                 logger.debug(

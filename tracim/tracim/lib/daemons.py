@@ -177,6 +177,8 @@ class MailFetcherDaemon(Daemon):
             # FIXME - G.M - 2017-11-15 - proper tracim url formatting
             endpoint=cfg.WEBSITE_BASE_URL + "/events",
             token=cfg.EMAIL_REPLY_TOKEN,
+            use_html_parsing=cfg.EMAIL_REPLY_USE_HTML_PARSING,
+            use_txt_parsing=cfg.EMAIL_REPLY_USE_TXT_PARSING,
         )
         self._fetcher.run()
 
