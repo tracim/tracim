@@ -26,7 +26,7 @@ class DecodedMail(object):
     def __init__(self, message: Message) -> None:
         self._message = message
 
-    def _decode_header(self, git addheader_title: str) -> typing.Optional[str]:
+    def _decode_header(self, header_title: str) -> typing.Optional[str]:
         # FIXME : Handle exception
         if header_title in self._message:
             return str(make_header(decode_header(self._message[header_title])))
