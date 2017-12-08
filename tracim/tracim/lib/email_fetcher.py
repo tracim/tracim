@@ -22,9 +22,16 @@ CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
 
+class MessageContainer(object):
+    def __init__(self, message: Message, uid: int) -> None:
+        self.message = message
+        self.uid = uid
+
+
 class DecodedMail(object):
-    def __init__(self, message: Message) -> None:
+    def __init__(self, message: Message, uid: int=None) -> None:
         self._message = message
+        self.uid = uid
 
     def _decode_header(self, header_title: str) -> typing.Optional[str]:
         # FIXME : Handle exception
@@ -186,10 +193,8 @@ class MailFetcher(object):
             try:
                 self._connect()
                 messages = self._fetch()
-                # TODO - G.M -  2017-11-22 retry sending unsended mail
-                # These mails are return by _notify_tracim, flag them with "unseen" # nopep8
-                # or store them until new _notify_tracim call
-                cleaned_mails = [DecodedMail(msg) for msg in messages]
+                cleaned_mails = [DecodedMail(m.message, m.uid)
+                                 for m in messages]
                 self._notify_tracim(cleaned_mails)
                 self._disconnect()
             except Exception as e:
@@ -237,7 +242,7 @@ class MailFetcher(object):
             self._connection.logout()
             self._connection = None
 
-    def _fetch(self) -> typing.List[Message]:
+    def _fetch(self) -> typing.List[MessageContainer]:
         """
         Get news message from mailbox
         :return: list of new mails
@@ -266,21 +271,22 @@ class MailFetcher(object):
                 logger.debug(self, 'Found {} unseen mails'.format(
                     len(data[0].split()),
                 ))
-                for num in data[0].split():
-                    # INFO - G.M - 2017-11-23 - Fetch (RFC288) to retrieve all
-                    # complete mails see example : https://docs.python.org/fr/3.5/library/imaplib.html#imap4-example .  # nopep8
-                    # Be careful, This method remove also mails from Unseen
-                    # mails
+                for uid in data[0].split():
+                    # INFO - G.M - 2017-12-08 - Fetch BODY.PEEK[]
+                    # Retrieve all mail(body and header) but don't set mail
+                    # as seen because of PEEK
+                    # see rfc3501
                     logger.debug(self, 'Fetch mail "{}"'.format(
-                        num,
+                        uid,
                     ))
-                    rv, data = self._connection.fetch(num, '(RFC822)')
+                    rv, data = self._connection.fetch(uid, 'BODY.PEEK[]')
                     logger.debug(self, 'Response status {}'.format(
                         rv,
                     ))
                     if rv == 'OK':
                         msg = message_from_bytes(data[0][1])
-                        messages.append(msg)
+                        msg_container = MessageContainer(msg, uid)
+                        messages.append(msg_container)
                     else:
                         log = 'IMAP : Unable to get mail : {}'
                         logger.error(self, log.format(str(rv)))
@@ -335,6 +341,8 @@ class MailFetcher(object):
                         str(r.status_code),
                         details,
                     ))
+                else:
+                    self._set_flag(mail.uid)
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
@@ -345,3 +353,17 @@ class MailFetcher(object):
                 logger.error(self, log.format(str(e)))
 
         return unsended_mails
+
+    def _set_flag(self, uid):
+        assert uid is not None
+        rv, data = self._connection.store(
+            uid,
+            '+FLAGS',
+            '\\Seen'
+        )
+        if rv == 'OK':
+            log = 'Message {} set as seen.'.format(uid)
+            logger.debug(self, log)
+        else:
+            log = 'Can not set Message {} as seen : {}'.format(uid, rv)
+            logger.error(self, log)
