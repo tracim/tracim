@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const Logo = props => {
   return (
-    <div className='loginpage__content__logo'>
+    <div className={props.customClass}>
       <img src={props.logoSrc} />
     </div>
   )
@@ -11,5 +11,10 @@ const Logo = props => {
 export default Logo
 
 Logo.PropTypes = {
-  logoSrc: PropTypes.string.isRequired
+  logoSrc: PropTypes.string.isRequired,
+  customClass: PropTypes.string
+}
+
+Logo.defaultProps = {
+  customClass: ''
 }

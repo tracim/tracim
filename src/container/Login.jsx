@@ -38,13 +38,11 @@ class Login extends React.Component {
     //   </div>
     // )
     const LoginWrapper = props => (
-      <div className='loginpage'>
-        <section className='loginpage__content'>
-          <div className='container-fluid'>
-            {props.children}
-          </div>
-        </section>
-      </div>
+      <section className='loginpage'>
+        <div className='container-fluid'>
+          {props.children}
+        </div>
+      </section>
     )
     const LoginCardWrapper = props => (
       <div className='row justify-content-center'>
@@ -65,10 +63,10 @@ class Login extends React.Component {
     )
     return (
       <LoginWrapper>
-        <LoginLogo logoSrc={LoginLogoImg} />
+        <LoginLogo customClass='loginpage__logo' logoSrc={LoginLogoImg} />
 
         <LoginCardWrapper>
-          <Card customClass='loginpage__content__connection'>
+          <Card customClass='loginpage__connection'>
             <CardHeader customClass='connection__header text-center'>{'Connexion'}</CardHeader>
 
             <CardBody formClass='connection__form'>

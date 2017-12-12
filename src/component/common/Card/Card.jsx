@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 
 const Card = props => {
   return (
-    <div className='loginpage__content__connection card'>
+    <div className={classnames(props.customClass, 'card')}>
       {props.children}
     </div>
   )
@@ -11,5 +12,10 @@ const Card = props => {
 export default Card
 
 Card.PropTypes = {
-  children: PropTypes.element.isRequired
+  children: PropTypes.element.isRequired,
+  customClass: PropTypes.string
+}
+
+Card.defaultProps = {
+  customClass: ''
 }
