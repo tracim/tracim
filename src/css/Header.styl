@@ -1,7 +1,9 @@
 .header
+  position fixed
   width 100%
   box-shadow shadow-bottom
   background off-white
+  z-index 3
   &__logo
     &__img
       margin-left 40px
@@ -20,9 +22,8 @@
             color dark-blue
     &__rightside
       display flex
-      justify-content flex-end
       margin-top 15px
-      width 60%
+      width 100%
       list-style none
       &__itemsearch
         margin-right 8%
@@ -96,62 +97,40 @@
               padding 10px 0
 
 @media (min-width: min-lg) and (max-width: max-lg)
-  .header__menu__rightside
-    width 100%
+  .header
+    &__menu
+      &__rightside
+        width 100%
 
 @media (min-width: min-md) and (max-width: max-md)
   .header
     &__logo__img
-        margin-left 0
+      margin-left 0
     &__menu
-      &__list
-        margin-left 0
       &__rightside
-        width 67%
+        width 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .header
-    position fixed
-    z-index 2
     &__logo__img
       margin-left 0
     &__menu
-      &__list
-        margin-left 0
-        .list__item
-          padding-right 0
-          padding-bottom 12px
       &__rightside
-        margin-top 12px
         padding-left 0
-        justify-content center
         width 100%
-        &__itemsearch
-          margin-right 45px
         &__itemquestion
           display none
 
 @media (max-width: max-xs)
   .header
-    position fixed
-    z-index 2
     &__logo__img
       margin-left 0
-    &__menu__list
-      margin-left 0
-      .list__item
-        padding-right 0
-        padding-bottom 12px
+    &__menu
       &__rightside
-        padding-top 12px
-        justify-content center
-        width 100%
+        flex-wrap wrap
         padding-left 0
-        &__itemsearch
-          margin-right 6%
-          width 100%
-        &__itemlanguage__languagedropdown
-          .languagedropdown__btnlanguage
-            margin-right 0
+        width 418px
         &__itemquestion
           display none
+        &__itemprofil__profilgroup
+          margin-top 20px

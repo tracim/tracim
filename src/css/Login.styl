@@ -1,14 +1,15 @@
 .loginpage
   &__content
     position relative
-    min-height calc(100vh - 139px)
+    padding-top 85px // 85 = header height
+    min-height 100%
     background dark-blue url('../img/tracimLogoAsBg.png') no-repeat 25% 3px
     background-size contain
     display table
     width 100%
     &__logo
       margin 0 auto
-      padding 50px 0
+      padding 35px 0
       width 170px
     &__connection
       border none
@@ -67,7 +68,6 @@
           padding-bottom 2px
           border-bottom 1px solid dark-grey
 
-
 @media (min-width: min-lg) and (max-width: max-lg)
   .loginpage__content
     .connection__form
@@ -82,14 +82,12 @@
   .loginpage__content
     padding-top 69px
     display block
-    min-height calc(100vh - 50px)
     .connection__form
       width 90%
 
 @media (max-width: max-xs)
   .loginpage__content
     padding-top 69px
-    min-height calc(100vh - 50px)
     background-size cover
     display block
     &__connection

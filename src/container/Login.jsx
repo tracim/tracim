@@ -40,7 +40,7 @@ class Login extends React.Component {
     const LoginWrapper = props => (
       <div className='loginpage'>
         <section className='loginpage__content'>
-          <div className='container-fluid contentbody'>
+          <div className='container-fluid'>
             {props.children}
           </div>
         </section>
@@ -122,29 +122,3 @@ class Login extends React.Component {
 
 const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(Login)
-
-/*
-<form>
-  <div className='row mt-4 mb-4'>
-
-    <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
-      <div className='connection__form__rememberme form-check'>
-        <label className='connection__form__rememberme__label form-check-label'>
-          <input type='checkbox' className='connection__form__rememberme__label__checkbox form-check-input' />
-          Se souvenir de moi
-        </label>
-      </div>
-    </div>
-
-    <div className='col-12 col-sm-6 col-md-6 col-lg-6 text-sm-right'>
-      <div className='connection__form__pwforgot'>
-        Mot de passe oublié ?
-      </div>
-    </div>
-
-  </div>
-
-  <button type='submit' className='connection__form__btnsubmit btn btn-primary'>Connexion</button>
-
-</form>
-*/

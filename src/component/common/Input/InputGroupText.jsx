@@ -27,7 +27,7 @@ InputGroupText.PropTypes = {
   parentClassName: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   icon: PropTypes.string,
-  type: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['text', 'email', 'password', 'tel']).isRequired,
   placeHolder: PropTypes.string,
   invalidMsg: PropTypes.string,
   onChange: PropTypes.func
