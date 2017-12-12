@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-// import HeaderTpl from '../component/HeaderTpl.jsx'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import MenuLinkList from '../component/Header/MenuLinkList.jsx'
@@ -13,10 +12,6 @@ import logoHeader from '../img/logoHeader.svg'
 import flagFr from '../img/flagFr.png'
 import flagEn from '../img/flagEn.png'
 // import { updateUserLang } from '../action-creator.async.js'
-
-const HeaderWrapper = props => <header><nav className='header navbar navbar-expand-md navbar-light bg-light'>{props.children}</nav></header>
-const HeaderMenuRightWrapper = props => <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>{props.children}</div>
-const MenuActionListWrapper = props => <ul className='header__menu__rightside'>{ props.children }</ul>
 
 class Header extends React.Component {
   // handleChangeLang = newLang => this.props.dispatch(updateUserLang(newLang))
@@ -39,13 +34,6 @@ class Header extends React.Component {
   handleClickLogout = () => {}
 
   render () {
-    // return (
-    //   <HeaderTpl
-    //     user={this.props.user}
-    //     onChangeLang={this.handleChangeLang}
-    //     onSubmitSearch={this.handleSubmitSearch}
-    //   />
-    // )
     const { user } = this.props
     const langList = [{ // @TODO this should come from API
       id: 'fr',
@@ -65,6 +53,9 @@ class Header extends React.Component {
     //   'S_zkvxpAJO0g?size=800x600&size_mode=3'
     // }
 
+    const HeaderWrapper = props => <header><nav className='header navbar navbar-expand-md navbar-light bg-light'>{props.children}</nav></header>
+    const HeaderMenuRightWrapper = props => <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>{props.children}</div>
+    const MenuActionListWrapper = props => <ul className='header__menu__rightside'>{ props.children }</ul>
     return (
       <HeaderWrapper>
         <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
