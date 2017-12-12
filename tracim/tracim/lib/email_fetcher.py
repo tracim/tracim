@@ -24,6 +24,8 @@ CONTENT_TYPE_TEXT_HTML = 'text/html'
 
 IMAP_SEEN_FLAG = '\\Seen'
 IMAP_CHECKED_FLAG = '\\Flagged'
+MAIL_FETCHER_FILELOCK_TIMEOUT = 10
+
 
 class MessageContainer(object):
     def __init__(self, message: Message, uid: int) -> None:
@@ -196,7 +198,9 @@ class MailFetcher(object):
             time.sleep(self.delay)
             try:
                 self._connect()
-                with self.lock.acquire(timeout=10):
+                with self.lock.acquire(
+                        timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
+                ):
                     messages = self._fetch()
                 cleaned_mails = [DecodedMail(m.message, m.uid)
                                  for m in messages]
