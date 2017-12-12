@@ -67,3 +67,4 @@ rq==0.7.1
 click==6.7
 markdown==2.6.9
 email_reply_parser==0.5.9
+filelock==2.0.13

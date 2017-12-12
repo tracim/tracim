@@ -179,6 +179,7 @@ class MailFetcherDaemon(Daemon):
             token=cfg.EMAIL_REPLY_TOKEN,
             use_html_parsing=cfg.EMAIL_REPLY_USE_HTML_PARSING,
             use_txt_parsing=cfg.EMAIL_REPLY_USE_TXT_PARSING,
+            filelock_path=cfg.EMAIL_REPLY_FILELOCK_PATH,
         )
         self._fetcher.run()
 

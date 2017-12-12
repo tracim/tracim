@@ -70,6 +70,7 @@ wsgidav.conf
 # Temporary files
 *~
 *.sqlite
+*.lock
 
 # npm packages
 /node_modules/

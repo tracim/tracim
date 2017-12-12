@@ -10,6 +10,7 @@ from email.header import make_header
 from email.message import Message
 from email.utils import parseaddr
 
+import filelock
 import markdown
 import requests
 from email_reply_parser import EmailReplyParser
@@ -21,6 +22,8 @@ TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
+IMAP_SEEN_FLAG = '\\Seen'
+IMAP_CHECKED_FLAG = '\\Flagged'
 
 class MessageContainer(object):
     def __init__(self, message: Message, uid: int) -> None:
@@ -153,6 +156,7 @@ class MailFetcher(object):
         token: str,
         use_html_parsing: bool,
         use_txt_parsing: bool,
+        filelock_path: str,
     ) -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -182,7 +186,7 @@ class MailFetcher(object):
         self.token = token
         self.use_html_parsing = use_html_parsing
         self.use_txt_parsing = use_txt_parsing
-
+        self.lock = filelock.FileLock(filelock_path)
         self._is_active = True
 
     def run(self) -> None:
@@ -192,7 +196,8 @@ class MailFetcher(object):
             time.sleep(self.delay)
             try:
                 self._connect()
-                messages = self._fetch()
+                with self.lock.acquire(timeout=10):
+                    messages = self._fetch()
                 cleaned_mails = [DecodedMail(m.message, m.uid)
                                  for m in messages]
                 self._notify_tracim(cleaned_mails)
@@ -204,6 +209,7 @@ class MailFetcher(object):
 
     def stop(self) -> None:
         self._is_active = False
+        del self.lock
 
     def _connect(self) -> None:
         # TODO - G.M - 2017-11-15 Verify connection/disconnection
@@ -262,6 +268,7 @@ class MailFetcher(object):
             # Unseen file or All file from a directory (old one should be
             #  moved/ deleted from mailbox during this process) ?
             logger.debug(self, 'Fetch unseen messages')
+
             rv, data = self._connection.search(None, "(UNSEEN)")
             logger.debug(self, 'Response status {}'.format(
                 rv,
@@ -287,6 +294,7 @@ class MailFetcher(object):
                         msg = message_from_bytes(data[0][1])
                         msg_container = MessageContainer(msg, uid)
                         messages.append(msg_container)
+                        self._set_flag(uid, IMAP_SEEN_FLAG)
                     else:
                         log = 'IMAP : Unable to get mail : {}'
                         logger.error(self, log.format(str(rv)))
@@ -301,7 +309,7 @@ class MailFetcher(object):
     def _notify_tracim(
         self,
         mails: typing.List[DecodedMail],
-    ) -> typing.List[DecodedMail]:
+    ) -> None:
         """
         Send http request to tracim endpoint
         :param mails: list of mails to send
@@ -341,29 +349,66 @@ class MailFetcher(object):
                         str(r.status_code),
                         details,
                     ))
+                # Flag all correctly checked mail, unseen the others
+                if r.status_code in [200, 204, 400]:
+                    self._set_flag(mail.uid, IMAP_CHECKED_FLAG)
                 else:
-                    self._set_flag(mail.uid)
+                    self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
                 unsended_mails.append(mail)
+                self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
+                self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
 
-        return unsended_mails
-
-    def _set_flag(self, uid):
+    def _set_flag(
+            self,
+            uid: int,
+            flag: str,
+            ) -> None:
         assert uid is not None
+
         rv, data = self._connection.store(
             uid,
             '+FLAGS',
-            '\\Seen'
+            flag,
         )
         if rv == 'OK':
-            log = 'Message {} set as seen.'.format(uid)
+            log = 'Message {uid} set as {flag}.'.format(
+                uid=uid,
+                flag=flag)
             logger.debug(self, log)
         else:
-            log = 'Can not set Message {} as seen : {}'.format(uid, rv)
+            log = 'Can not set Message {uid} as {flag} : {rv}'.format(
+                uid=uid,
+                flag=flag,
+                rv=rv)
+            logger.error(self, log)
+
+    def _unset_flag(
+            self,
+            uid: int,
+            flag: str,
+            ) -> None:
+        assert uid is not None
+
+        rv, data = self._connection.store(
+            uid,
+            '-FLAGS',
+            flag,
+        )
+        if rv == 'OK':
+            log = 'Message {uid} unset as {flag}.'.format(
+                uid=uid,
+                flag=flag)
+            logger.debug(self, log)
+        else:
+            log = 'Can not unset Message {uid} as {flag} : {rv}'.format(
+                uid=uid,
+                flag=flag,
+                rv=rv)
             logger.error(self, log)
