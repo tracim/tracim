@@ -230,7 +230,7 @@ email.reply.use_html_parsing = true
 email.reply.use_txt_parsing = true
 # Lockfile path is required for email_reply feature,
 # it's just an empty file use to prevent concurrent access to imap unseen mail
-email.reply.filelock_path = %(here)s/email_fetcher.lock
+email.reply.lockfile_path = %(here)s/email_fetcher.lock
 
 ## Radical (CalDav server) configuration
 # radicale.server.host = 0.0.0.0

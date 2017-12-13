@@ -158,7 +158,7 @@ class MailFetcher(object):
         token: str,
         use_html_parsing: bool,
         use_txt_parsing: bool,
-        filelock_path: str,
+        lockfile_path: str,
     ) -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -188,7 +188,7 @@ class MailFetcher(object):
         self.token = token
         self.use_html_parsing = use_html_parsing
         self.use_txt_parsing = use_txt_parsing
-        self.lock = filelock.FileLock(filelock_path)
+        self.lock = filelock.FileLock(lockfile_path)
         self._is_active = True
 
     def run(self) -> None:
