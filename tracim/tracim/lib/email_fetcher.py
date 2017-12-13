@@ -223,7 +223,6 @@ class MailFetcher(object):
 
     def stop(self) -> None:
         self._is_active = False
-        del self.lock
 
     def _connect(self) -> None:
         # TODO - G.M - 2017-11-15 Verify connection/disconnection
