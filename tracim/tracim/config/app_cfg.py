@@ -394,7 +394,7 @@ class CFG(object):
         ))
         self.EMAIL_REPLY_LOCKFILE_PATH = tg.config.get(
             'email.reply.lockfile_path',
-            '/tmp/tracim/email_fetcher.lock'
+            '/tmp/tracim_email_fetcher.lock'
         )
 
         self.TRACKER_JS_PATH = tg.config.get(
