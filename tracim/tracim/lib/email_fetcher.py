@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import time
 import imaplib
 import json
@@ -188,8 +189,14 @@ class MailFetcher(object):
         self.token = token
         self.use_html_parsing = use_html_parsing
         self.use_txt_parsing = use_txt_parsing
-        self.lock = filelock.FileLock(lockfile_path)
+        self._set_lock(lockfile_path)
         self._is_active = True
+
+    def _set_lock(self, lockfile_path):
+        dir_path = os.path.dirname(lockfile_path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+        self.lock = filelock.FileLock(lockfile_path)
 
     def run(self) -> None:
         logger.info(self, 'Starting MailFetcher')
