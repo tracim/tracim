@@ -206,6 +206,9 @@ class MailFetcher(object):
                                  for m in messages]
                 self._notify_tracim(cleaned_mails)
                 self._disconnect()
+            except filelock.Timeout as e:
+                log = 'Mail Fetcher Lock Timeout {}'
+                logger.warning(self, log.format(e.__str__()))
             except Exception as e:
                 # TODO - G.M - 2017-11-23 - Identify possible exceptions
                 log = 'IMAP error: {}'
