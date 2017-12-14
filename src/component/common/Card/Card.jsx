@@ -22,10 +22,12 @@ Card.propTypes = {
   // ),
 
   // from http://www.mattzabriskie.com/blog/react-validating-children
-  children: PropTypes.arrayOf((propValue, key, componentName /* , location, propFullName */) => {
+  children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
     if (
-      key >= 3 ||
-      propValue.some(p => p.type !== CardHeader && p.type !== CardBody)
+      children.length > 2 ||
+      children[0].type !== CardHeader ||
+      children[1].type !== CardBody
+      // children.some(p => p.type !== CardHeader && p.type !== CardBody)
     ) {
       return new Error(`PropType Error: childrens of ${componentName} must be: 1 CardHeader and 1 CardBody.`)
     }

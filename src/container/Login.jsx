@@ -16,12 +16,14 @@ class Login extends React.Component {
     super(props)
     this.state = {
       inputLogin: '',
-      inputPassword: ''
+      inputPassword: '',
+      inputRememberMe: false
     }
   }
 
   handleChangeLogin = e => this.setState({inputLogin: e.target.value})
   handleChangePassword = e => this.setState({inputPassword: e.target.value})
+  handleChangeRememberMe = () => this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
 
   handleClickSubmit = () => this.props.dispatch(userLogin(this.state.inputLogin, this.state.inputPassword))
 
@@ -67,6 +69,8 @@ class Login extends React.Component {
                         parentClassName='connection__form__rememberme'
                         customClass=''
                         label='Se souvenir de moi'
+                        checked={this.state.inputRememberMe}
+                        onChange={this.handleChangeRememberMe}
                       />
                     </div>
 
