@@ -4,12 +4,13 @@ import classnames from 'classnames'
 
 const InputGroupText = props => {
   return (
-    <div className={classnames(`${props.parentClassName}`, props.customClass, 'form-check')}>
-      <label className={classnames(`${props.parentClassName}__label`, 'form-check-label')}>
-        <input type='checkbox' className={classnames(`${props.parentClassName}__label__checkbox`, 'form-check-input')} />
+    <label className={classnames(`${props.parentClassName}`, props.customClass, 'custom-control custom-checkbox')}>
+      <input type='checkbox' className='custom-control-input' />
+      <span className={classnames(`${props.parentClassName}__checkbox`, 'custom-control-indicator')} />
+      <span className={classnames(`${props.parentClassName}__label`, 'custom-control-description')}>
         {props.label}
-      </label>
-    </div>
+      </span>
+    </label>
   )
 }
 

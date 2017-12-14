@@ -12,6 +12,7 @@ const InputGroupText = props => {
         type={props.type}
         className={classnames(`${props.parentClassName}__input`, 'form-control')}
         placeholder={props.placeHolder}
+        value={props.value}
         onChange={props.onChange}
       />
       <div className={classnames(`${props.parentClassName}__msgerror`, 'invalid-feedback')}>
@@ -25,9 +26,10 @@ export default InputGroupText
 
 InputGroupText.PropTypes = {
   parentClassName: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['text', 'email', 'password', 'tel']).isRequired,
   customClass: PropTypes.string,
   icon: PropTypes.string,
-  type: PropTypes.oneOf(['text', 'email', 'password', 'tel']).isRequired,
   placeHolder: PropTypes.string,
   invalidMsg: PropTypes.string,
   onChange: PropTypes.func
