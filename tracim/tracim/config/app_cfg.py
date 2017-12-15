@@ -392,6 +392,14 @@ class CFG(object):
             'email.reply.use_txt_parsing',
             True,
         ))
+        self.EMAIL_REPLY_LOCKFILE_PATH = tg.config.get(
+            'email.reply.lockfile_path',
+            ''
+        )
+        if not self.EMAIL_REPLY_LOCKFILE_PATH and self.EMAIL_REPLY_ACTIVATED:
+            raise Exception(
+                mandatory_msg.format('email.reply.lockfile_path')
+            )
 
         self.TRACKER_JS_PATH = tg.config.get(
             'js_tracker_path',
