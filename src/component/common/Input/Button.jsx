@@ -7,6 +7,7 @@ const Button = props => {
     <button
       type={props.htmlType}
       className={classnames(props.customClass, 'btn', `btn-${props.bootstrapType}`)}
+      onClick={props.onClick}
     >
       {props.label}
     </button>

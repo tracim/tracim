@@ -25,7 +25,13 @@ class Login extends React.Component {
   handleChangePassword = e => this.setState({inputPassword: e.target.value})
   handleChangeRememberMe = () => this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
 
-  handleClickSubmit = () => this.props.dispatch(userLogin(this.state.inputLogin, this.state.inputPassword))
+  handleClickSubmit = () => {
+    const { history, dispatch } = this.props
+    const { inputLogin, inputPassword } = this.state
+
+    dispatch(userLogin(inputLogin, inputPassword))
+    .then(() => history.push('/'))
+  }
 
   render () {
     return (

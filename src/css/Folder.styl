@@ -1,0 +1,124 @@
+/****** FOLDER CLOSE *******/
+
+folderclose()
+  height 0
+  visibility hidden
+  opacity 0
+  border 0
+
+/*****************************/
+
+/****** FOLDER OPEN *******/
+
+folderopen()
+  height 100%
+  opacity 1
+  visibility visible
+  transition opacity 1s
+
+/*****************************/
+
+.folder
+  padding-left 30px
+  &:last-child
+    border-bottom 1px solid dark-blue
+  & > .inFolder
+    folderclose()
+    &:last-child
+      border-bottom 0
+  & > .folder
+    folderclose()
+  &.active
+    & > .inFolder
+      border 1px solid dark-blue
+      border-bottom 0
+      folderopen()
+    & > .folder
+      folderopen()
+    & > .folder__header
+      .folder__header__triangleborder
+        display block
+        &__triangle
+          display block
+  &__header
+    position relative
+    display flex
+    justify-content space-between
+    margin-left -30px
+    border 1px solid dark-blue
+    border-bottom 0
+    background-color light-grey
+    cursor pointer
+    &:hover
+      background-color hover
+      .folder__header__triangleborder__triangle
+        border-color hover transparent transparent transparent
+    &__triangleborder
+      display none
+      position absolute
+      top 61px
+      left -1px
+      border-style solid
+      border-width 25px 30px 0 30px
+      border-color dark-blue transparent transparent transparent
+      z-index 1
+      &__triangle
+        display none
+        position absolute
+        top -26px
+        left -30px
+        border-style solid
+        border-width 25px 30px 0 30px
+        border-color light-grey transparent transparent transparent
+    &__name
+      display flex
+      padding-left 5px
+      &__icon
+        margin auto 15px
+        font-size 25px
+        color dark-blue
+      &__text
+        margin auto 15px
+        font-size 17px
+        color dark-blue
+      &__addbtn
+        margin auto 0
+        cursor pointer
+        &:hover > .folder__header__name__addbtn__text
+          color white
+        &__text
+          border 1px solid dark-blue
+          background-color transparent
+          color dark-blue
+          font-size 17px
+    &__contenttype
+      display flex
+      &__text
+        padding 18px 15px
+        font-size 17px
+        color dark-blue
+      &__icon
+        padding 18px 5px
+        font-size 17px
+        color dark-blue
+        & > i
+          margin-right 15px
+
+/*****************************/
+
+/**** MEDIA 575px ****/
+
+@media (max-width: max-xs)
+
+  .folder
+    &__header
+      &__triangleborder
+        top 59px
+      &__name
+        &__icon
+          padding 14px 15px
+          font-size 20px
+        &__text
+          font-size 15px
+      &__contenttype
+        display none

@@ -1,0 +1,72 @@
+.pageWrapperGeneric
+  display table-cell
+  vertical-align top
+  padding-top 87px
+  width 100%
+  &__header
+    display flex
+  &__content
+    margin 10px 10px 120px 10px
+@media (min-width: min-md) and (max-width: max-md)
+  .pageWrapperGeneric
+    display block
+    padding-top 87px
+    &__header
+      margin 95px 0 5px 30px
+    &__content
+      margin 0
+@media (min-width: min-sm) and (max-width: max-sm)
+  .pageWrapperGeneric
+    display block
+    padding-top 87px
+    &__header
+      margin 95px 0 35px 0
+      &__title
+        display inline-block
+        margin-left 0
+    &__content
+      margin 0
+@media (max-width: max-xs)
+  .pageWrapperGeneric
+    display block
+    padding-top 87px
+    &__header
+      display block
+      margin-top 60px
+    &__content
+      margin 0
+
+
+.pageTitleGeneric
+  display flex
+  margin 45px 0
+  &__title
+    margin-left 10px
+    font-size 30px
+    color dark-grey
+@media (max-width: max-xs)
+  .pageTitleGeneric
+    display block
+
+
+.pageContentGeneric
+  margin 10px 10px 120px 10px
+
+
+.dropdownCreateBtn
+  &__label
+    padding 10px 65px
+    background-color green
+    cursor pointer
+    &__text
+      display inline-block
+      color white
+    &::after //bootstrap override
+      display inline-block
+      margin-left 30px
+      color white
+  &__setting
+    padding 0
+    cursor pointer
+    .setting__link
+      padding 5px 65px 5px 10px
