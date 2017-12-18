@@ -2,7 +2,6 @@ folderclose()
   height 0
   visibility hidden
   opacity 0
-  border 0
 
 folderopen()
   height 100%
@@ -13,16 +12,13 @@ folderopen()
 border-style = 1px solid dark-blue
 .folder__header
   border border-style
-  border-top 0
 .file
   border border-style
-  border-top 0
-.folder + .file
-  border-top border-style
-.folder:last-child > .folder__header
-  border-bottom border-style
-.folder:not(:last-child) > .folder__header
-  border-bottom border-style
+.folder + .file, .file + .file
+  border-bottom 0
+.folder__content > .file, .folder__content > .folder
+  border-bottom 0
+// @TODO the very last line of file or folder has to be added a border bottom in js
 
 .folder
   padding-left 30px
@@ -30,8 +26,8 @@ border-style = 1px solid dark-blue
     folderopen()
   & > .folder__content
     folderclose()
-    //& > .fileitem__rowfile, > .folder__header
-    //  folderclose()
+    & > .file, > .folder
+      folderclose()
   &.active
     & > .folder__header
       .folder__header__triangleborder
@@ -40,6 +36,8 @@ border-style = 1px solid dark-blue
           display block
     & > .folder__content
       folderopen()
+      & > .file, > .folder
+        folderopen()
 
 
   &__header
