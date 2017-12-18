@@ -31,7 +31,7 @@ class Workspace extends React.Component {
 
         <PageContent parentClass='workspace__content'>
 
-          <div className='workspace__content__fileandfolder'>
+          <div className='workspace__content__fileandfolder folder active'>
             <FileItemHeader />
 
             <FileItem
@@ -54,20 +54,22 @@ class Workspace extends React.Component {
             />
 
             <Folder>
-              <FileItem type='file' name='Facture 57839 - Société ABC - 01/09/2017' status='current' customClass='inFolder' />
-              <FileItem type='file' name='Facture 57839 - Société ABC - 01/09/2017' status='current' customClass='inFolder' />
-              <FileItem type='task' name='Editer la facture pour Phillipe GIRARD' status='check' customClass='inFolder' />
+              <FileItem type='file' name='Facture 57839 - Société ABC - 01/09/2017' status='current' />
+              <FileItem type='file' name='Facture 57839 - Société ABC - 01/09/2017' status='current' />
+              <FileItem type='task' name='Editer la facture pour Phillipe GIRARD' status='check' />
 
               <Folder>
-                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='nouse' customClass='inFolder' />
-                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='check' customClass='inFolder' />
+                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='nouse' />
+                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='check' />
               </Folder>
-              <FileItem name='Facture 57841 - Pierre Maurice - 06/06/2017' type='file' status='current' customClass='inFolder' />
-              <FileItem type='file' name='Facture 57840 - Jean-michel Chevalier - 04/09/2017' status='check' customClass='inFolder' />
-              <FileItem name='Facture 57841 - Pierre Maurice - 06/06/2017' type='file' status='current' customClass='inFolder' />
+
+              <FileItem name='Facture 57841 - Pierre Maurice - 06/06/2017' type='file' status='current' />
+              <FileItem type='file' name='Facture 57840 - Jean-michel Chevalier - 04/09/2017' status='check' />
+              <FileItem name='Facture 57841 - Pierre Maurice - 06/06/2017' type='file' status='current' />
+
               <Folder>
-                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='nouse' customClass='inFolder' />
-                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='check' customClass='inFolder' />
+                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='nouse' />
+                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='check' />
               </Folder>
             </Folder>
           </div>

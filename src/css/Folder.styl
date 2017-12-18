@@ -10,33 +10,43 @@ folderopen()
   visibility visible
   transition opacity 1s
 
+border-style = 1px solid dark-blue
+.folder__header
+  border border-style
+  border-top 0
+.file
+  border border-style
+  border-top 0
+.folder + .file
+  border-top border-style
+.folder:last-child > .folder__header
+  border-bottom border-style
+.folder:not(:last-child) > .folder__header
+  border-bottom border-style
+
 .folder
   padding-left 30px
-  &:last-child
-    border-bottom 1px solid dark-blue
-  & > .inFolder
+  & > .folder__header
+    folderopen()
+  & > .folder__content
     folderclose()
-  & > .folder
-    folderclose()
+    //& > .fileitem__rowfile, > .folder__header
+    //  folderclose()
   &.active
-    & > .inFolder
-      border 1px solid dark-blue
-      border-bottom 0
-      folderopen()
-    & > .folder
-      folderopen()
     & > .folder__header
       .folder__header__triangleborder
         display block
         &__triangle
           display block
+    & > .folder__content
+      folderopen()
+
 
   &__header
     position relative
     display flex
     justify-content space-between
     margin-left -30px
-    border 1px solid dark-blue
     border-bottom 0
     background-color light-grey
     cursor pointer
@@ -47,7 +57,7 @@ folderopen()
     &__triangleborder
       display none
       position absolute
-      top 61px
+      top 62px
       left -1px
       border-style solid
       border-width 25px 30px 0 30px

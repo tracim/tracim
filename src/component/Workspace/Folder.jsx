@@ -50,7 +50,10 @@ class Folder extends Component {
             </div>
           </div>
         </div>
-        { this.props.children }
+
+        <div className='folder__content'>
+          { this.props.children }
+        </div>
       </div>
     )
   }

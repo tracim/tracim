@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-import imgProfil from '../img/img_profil.png'
+import imgProfil from '../img/imgProfil.png'
 
 class Chat extends Component {
   render () {

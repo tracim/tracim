@@ -1,11 +1,8 @@
-.fileitem__rowfile
+.file
   display flex
-  border 1px solid dark-blue
   border-bottom 0
   &:hover
     background-color hover-files
-  &:last-child
-    border-bottom 1px solid dark-blue
   &__type
     font-size 30px
     text-align center
@@ -31,7 +28,7 @@
     text-align center
 
 @media (min-width: max-xs) and (max-width: max-lg)
-  .fileitem__rowfile
+  .file
     border-right 1px solid grey
     &__name__icons
         margin-top 5px
