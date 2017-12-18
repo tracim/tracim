@@ -245,8 +245,8 @@ class MailFetcher(object):
             ))
             self._connection.login(self.user, self.password)
         except Exception as e:
-            log = 'IMAP login error: {}'
-            logger.error(self, log.format(e.__str__()))
+            log = 'Error during execution: {}'
+            logger.error(self, log.format(e.__str__()), exc_info=1)
 
     def _disconnect(self) -> None:
         if self._connection:
