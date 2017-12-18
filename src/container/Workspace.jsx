@@ -31,7 +31,7 @@ class Workspace extends React.Component {
 
         <PageContent parentClass='workspace__content'>
 
-          <div className='workspace__content__fileandfolder folder active'>
+          <div className='workspace__content__fileandfolder folder__content active'>
             <FileItemHeader />
 
             <FileItem

@@ -1,14 +1,5 @@
-folderclose()
-  height 0
-  visibility hidden
-  opacity 0
-
-folderopen()
-  height 100%
-  opacity 1
-  visibility visible
-  transition opacity 1s
-
+// -----------------------------------------------------
+// border management for Workspace container
 border-style = 1px solid dark-blue
 .folder__header
   border border-style
@@ -19,6 +10,18 @@ border-style = 1px solid dark-blue
 .folder__content > .file, .folder__content > .folder
   border-bottom 0
 // @TODO the very last line of file or folder has to be added a border bottom in js
+// -----------------------------------------------------
+
+folderclose()
+  height 0
+  visibility hidden
+  opacity 0
+
+folderopen()
+  height 100%
+  opacity 1
+  visibility visible
+  transition opacity 1s
 
 .folder
   padding-left 30px
@@ -38,7 +41,6 @@ border-style = 1px solid dark-blue
       folderopen()
       & > .file, > .folder
         folderopen()
-
 
   &__header
     position relative
