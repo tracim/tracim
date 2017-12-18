@@ -1,3 +1,4 @@
+import typing
 from bs4 import BeautifulSoup, Tag
 from tracim.lib.email_processing.sanitizer_config.attrs_whitelist import \
     ATTRS_WHITELIST
@@ -31,7 +32,7 @@ class HtmlSanitizer(object):
     """
 
     @classmethod
-    def sanitize(cls, html_body: str) -> str:
+    def sanitize(cls, html_body: str) -> typing.Optional[str]:
         soup = BeautifulSoup(html_body, 'html.parser')
         for tag in soup.findAll():
             if cls._tag_to_extract(tag):
@@ -43,7 +44,17 @@ class HtmlSanitizer(object):
                         del tag.attrs[attr]
             else:
                 tag.unwrap()
-        return str(soup)
+
+        if cls._is_content_empty(soup):
+            return None
+        else:
+            return str(soup)
+
+    @classmethod
+    def _is_content_empty(cls, soup):
+        img = soup.find('img')
+        txt = soup.get_text().replace('\n', '').strip()
+        return (not img and not txt)
 
     @classmethod
     def _tag_to_extract(cls, tag: Tag) -> bool:
