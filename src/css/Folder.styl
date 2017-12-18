@@ -1,14 +1,8 @@
-/****** FOLDER CLOSE *******/
-
 folderclose()
   height 0
   visibility hidden
   opacity 0
   border 0
-
-/*****************************/
-
-/****** FOLDER OPEN *******/
 
 folderopen()
   height 100%
@@ -16,16 +10,12 @@ folderopen()
   visibility visible
   transition opacity 1s
 
-/*****************************/
-
 .folder
   padding-left 30px
   &:last-child
     border-bottom 1px solid dark-blue
   & > .inFolder
     folderclose()
-    &:last-child
-      border-bottom 0
   & > .folder
     folderclose()
   &.active
@@ -40,6 +30,7 @@ folderopen()
         display block
         &__triangle
           display block
+
   &__header
     position relative
     display flex
@@ -50,9 +41,9 @@ folderopen()
     background-color light-grey
     cursor pointer
     &:hover
-      background-color hover
+      background-color hover-folder
       .folder__header__triangleborder__triangle
-        border-color hover transparent transparent transparent
+        border-color hover-folder transparent transparent transparent
     &__triangleborder
       display none
       position absolute
@@ -104,12 +95,7 @@ folderopen()
         & > i
           margin-right 15px
 
-/*****************************/
-
-/**** MEDIA 575px ****/
-
 @media (max-width: max-xs)
-
   .folder
     &__header
       &__triangleborder

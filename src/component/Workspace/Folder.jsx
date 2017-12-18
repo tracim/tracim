@@ -1,4 +1,8 @@
 import React, { Component } from 'react'
+// import PropTypes from 'prop-types'
+// import classnames from 'classnames'
+
+// @TODO set Folder as a component, state open will come from parent container (which will come from redux)
 
 class Folder extends Component {
   constructor (props) {
@@ -10,6 +14,10 @@ class Folder extends Component {
   }
 
   handleClickToggleFolder = () => this.setState({open: !this.state.open})
+  handleClickNewFile = e => {
+    e.stopPropagation() // because we have a link inside a link (togler and newFile)
+    console.log('new file') // @TODO
+  }
 
   render () {
     return (
@@ -25,7 +33,7 @@ class Folder extends Component {
             <div className='folder__header__name__text'>
               Dossier Facture
             </div>
-            <div className='folder__header__name__addbtn'>
+            <div className='folder__header__name__addbtn' onClick={this.handleClickNewFile}>
               <div className='folder__header__name__addbtn__text btn btn-primary'>
                 créer ...
               </div>

@@ -10,7 +10,7 @@ const Logo = props => {
 }
 export default Logo
 
-Logo.PropTypes = {
+Logo.propTypes = {
   logoSrc: PropTypes.string.isRequired,
   customClass: PropTypes.string
 }

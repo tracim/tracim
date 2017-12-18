@@ -12,7 +12,7 @@ const LoginBtnForgotPw = props => {
 
 export default LoginBtnForgotPw
 
-LoginBtnForgotPw.PropTypes = {
+LoginBtnForgotPw.propTypes = {
   customClass: PropTypes.string,
   label: PropTypes.string
 }
