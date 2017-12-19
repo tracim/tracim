@@ -26,7 +26,8 @@ CONTENT_TYPE_TEXT_HTML = 'text/html'
 IMAP_SEEN_FLAG = SEEN
 IMAP_CHECKED_FLAG = FLAGGED
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
-
+MAIL_FETCHER_CONNECTION_TIMEOUT = 60*9
+IDLE_MODE = True
 
 class MessageContainer(object):
     def __init__(self, message: Message, uid: int) -> None:
@@ -196,16 +197,25 @@ class MailFetcher(object):
         while self._is_active:
             try:
                 imapc = IMAPClient(self.host, ssl=self.use_ssl)
-                logger.debug(self, 'sleep for {}'.format(self.delay))
-                time.sleep(self.delay)
                 imapc.login(self.user, self.password)
-                with self.lock.acquire(
-                        timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
-                ):
-                    messages = self._fetch(imapc)
-                    cleaned_mails = [DecodedMail(m.message, m.uid)
-                                     for m in messages]
-                    self._notify_tracim(cleaned_mails, imapc)
+                # select mailbox
+                logger.debug(self, 'Select folder {}'.format(
+                    self.folder,
+                ))
+                deadline = time.time() + MAIL_FETCHER_CONNECTION_TIMEOUT
+                while time.time() < deadline:
+                    self._check_mail(imapc)
+
+                    if IDLE_MODE and imapc.has_capability('IDLE'):
+                        logger.debug(self, 'wail for event(IDLE)')
+                        imapc.idle()
+                        imapc.idle_check(
+                            timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
+                        )
+                        imapc.idle_done()
+                    else:
+                        logger.debug(self, 'sleep for {}'.format(self.delay))
+                        time.sleep(self.delay)
             except filelock.Timeout as e:
                 log = 'Mail Fetcher Lock Timeout {}'
                 logger.warning(self, log.format(e.__str__()))
@@ -215,31 +225,36 @@ class MailFetcher(object):
             finally:
                 imapc.logout()
 
+    def _check_mail(self, imapc: IMAPClient) -> None:
+        with self.lock.acquire(
+                timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
+        ):
+            messages = self._fetch(imapc)
+            cleaned_mails = [DecodedMail(m.message, m.uid)
+                             for m in messages]
+            self._notify_tracim(cleaned_mails, imapc)
+
     def stop(self) -> None:
         self._is_active = False
 
-    def _fetch(self, imapclient: IMAPClient) -> typing.List[MessageContainer]:
+    def _fetch(self, imapc: IMAPClient) -> typing.List[MessageContainer]:
         """
         Get news message from mailbox
         :return: list of new mails
         """
         messages = []
-        # select mailbox
-        logger.debug(self, 'Fetch messages from folder {}'.format(
-            self.folder,
-        ))
 
-        imapclient.select_folder(self.folder)
+        imapc.select_folder(self.folder)
         logger.debug(self, 'Fetch unseen messages')
-        uids = imapclient.search(['UNSEEN'])
+        uids = imapc.search(['UNSEEN'])
         logger.debug(self, 'Found {} unseen mails'.format(
             len(uids),
         ))
-        imapclient.add_flags(uids, IMAP_SEEN_FLAG)
+        imapc.add_flags(uids, IMAP_SEEN_FLAG)
         logger.debug(self, 'Temporary Flag {} mails as seen'.format(
             len(uids),
         ))
-        for msgid, data in imapclient.fetch(uids, ['BODY.PEEK[]']).items():
+        for msgid, data in imapc.fetch(uids, ['BODY.PEEK[]']).items():
             # INFO - G.M - 2017-12-08 - Fetch BODY.PEEK[]
             # Retrieve all mail(body and header) but don't set mail
             # as seen because of PEEK
