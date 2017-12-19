@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import time
-import imaplib
 import json
 import typing
 from email import message_from_bytes
@@ -13,6 +12,8 @@ from email.utils import parseaddr
 import filelock
 import markdown
 import requests
+from imapclient import IMAPClient, FLAGGED, SEEN
+
 from email_reply_parser import EmailReplyParser
 from tracim.lib.base import logger
 from tracim.lib.email_processing.parser import ParsedHTMLMail
@@ -22,8 +23,8 @@ TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
-IMAP_SEEN_FLAG = '\\Seen'
-IMAP_CHECKED_FLAG = '\\Flagged'
+IMAP_SEEN_FLAG = SEEN
+IMAP_CHECKED_FLAG = FLAGGED
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
 
 
@@ -176,7 +177,6 @@ class MailFetcher(object):
         :param use_html_parsing: parse html mail
         :param use_txt_parsing: parse txt mail
         """
-        self._connection = None
         self.host = host
         self.port = port
         self.user = user
@@ -194,67 +194,31 @@ class MailFetcher(object):
     def run(self) -> None:
         logger.info(self, 'Starting MailFetcher')
         while self._is_active:
-            logger.debug(self, 'sleep for {}'.format(self.delay))
-            time.sleep(self.delay)
             try:
-                self._connect()
+                imapc = IMAPClient(self.host, ssl=self.use_ssl)
+                logger.debug(self, 'sleep for {}'.format(self.delay))
+                time.sleep(self.delay)
+                imapc.login(self.user, self.password)
                 with self.lock.acquire(
                         timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
                 ):
-                    messages = self._fetch()
-                cleaned_mails = [DecodedMail(m.message, m.uid)
-                                 for m in messages]
-                self._notify_tracim(cleaned_mails)
-                self._disconnect()
+                    messages = self._fetch(imapc)
+                    cleaned_mails = [DecodedMail(m.message, m.uid)
+                                     for m in messages]
+                    self._notify_tracim(cleaned_mails, imapc)
             except filelock.Timeout as e:
                 log = 'Mail Fetcher Lock Timeout {}'
                 logger.warning(self, log.format(e.__str__()))
             except Exception as e:
-                # TODO - G.M - 2017-11-23 - Identify possible exceptions
-                log = 'IMAP error: {}'
-                logger.warning(self, log.format(e.__str__()))
+                log = 'Mail Fetcher error {}'
+                logger.error(self, log.format(e.__str__()))
+            finally:
+                imapc.logout()
 
     def stop(self) -> None:
         self._is_active = False
 
-    def _connect(self) -> None:
-        # TODO - G.M - 2017-11-15 Verify connection/disconnection
-        # Are old connexion properly close this way ?
-        if self._connection:
-            logger.debug(self, 'Disconnect from IMAP')
-            self._disconnect()
-        # TODO - G.M - 2017-11-23 Support for predefined SSLContext ?
-        # without ssl_context param, tracim use default security configuration
-        # which is great in most case.
-        if self.use_ssl:
-            logger.debug(self, 'Connect IMAP {}:{} using SSL'.format(
-                self.host,
-                self.port,
-            ))
-            self._connection = imaplib.IMAP4_SSL(self.host, self.port)
-        else:
-            logger.debug(self, 'Connect IMAP {}:{}'.format(
-                self.host,
-                self.port,
-            ))
-            self._connection = imaplib.IMAP4(self.host, self.port)
-
-        try:
-            logger.debug(self, 'Login IMAP with login {}'.format(
-                self.user,
-            ))
-            self._connection.login(self.user, self.password)
-        except Exception as e:
-            log = 'Error during execution: {}'
-            logger.error(self, log.format(e.__str__()), exc_info=1)
-
-    def _disconnect(self) -> None:
-        if self._connection:
-            self._connection.close()
-            self._connection.logout()
-            self._connection = None
-
-    def _fetch(self) -> typing.List[MessageContainer]:
+    def _fetch(self, imapclient: IMAPClient) -> typing.List[MessageContainer]:
         """
         Get news message from mailbox
         :return: list of new mails
@@ -264,67 +228,43 @@ class MailFetcher(object):
         logger.debug(self, 'Fetch messages from folder {}'.format(
             self.folder,
         ))
-        rv, data = self._connection.select(self.folder)
-        logger.debug(self, 'Response status {}'.format(
-            rv,
-        ))
-        if rv == 'OK':
-            # get mails
-            # TODO - G.M -  2017-11-15 Which files to select as new file ?
-            # Unseen file or All file from a directory (old one should be
-            #  moved/ deleted from mailbox during this process) ?
-            logger.debug(self, 'Fetch unseen messages')
 
-            rv, data = self._connection.search(None, "(UNSEEN)")
-            logger.debug(self, 'Response status {}'.format(
-                rv,
+        imapclient.select_folder(self.folder)
+        logger.debug(self, 'Fetch unseen messages')
+        uids = imapclient.search(['UNSEEN'])
+        logger.debug(self, 'Found {} unseen mails'.format(
+            len(uids),
+        ))
+        imapclient.add_flags(uids, IMAP_SEEN_FLAG)
+        logger.debug(self, 'Temporary Flag {} mails as seen'.format(
+            len(uids),
+        ))
+        for msgid, data in imapclient.fetch(uids, ['BODY.PEEK[]']).items():
+            # INFO - G.M - 2017-12-08 - Fetch BODY.PEEK[]
+            # Retrieve all mail(body and header) but don't set mail
+            # as seen because of PEEK
+            # see rfc3501
+            logger.debug(self, 'Fetch mail "{}"'.format(
+                msgid,
             ))
-            if rv == 'OK':
-                # get mail content
-                logger.debug(self, 'Found {} unseen mails'.format(
-                    len(data[0].split()),
-                ))
-                for uid in data[0].split():
-                    # INFO - G.M - 2017-12-08 - Fetch BODY.PEEK[]
-                    # Retrieve all mail(body and header) but don't set mail
-                    # as seen because of PEEK
-                    # see rfc3501
-                    logger.debug(self, 'Fetch mail "{}"'.format(
-                        uid,
-                    ))
-                    rv, data = self._connection.fetch(uid, 'BODY.PEEK[]')
-                    logger.debug(self, 'Response status {}'.format(
-                        rv,
-                    ))
-                    if rv == 'OK':
-                        msg = message_from_bytes(data[0][1])
-                        msg_container = MessageContainer(msg, uid)
-                        messages.append(msg_container)
-                        self._set_flag(uid, IMAP_SEEN_FLAG)
-                    else:
-                        log = 'IMAP : Unable to get mail : {}'
-                        logger.error(self, log.format(str(rv)))
-            else:
-                log = 'IMAP : Unable to get unseen mail : {}'
-                logger.error(self, log.format(str(rv)))
-        else:
-            log = 'IMAP : Unable to open mailbox : {}'
-            logger.error(self, log.format(str(rv)))
+            msg = message_from_bytes(data[b'BODY[]'])
+            msg_container = MessageContainer(msg, msgid)
+            messages.append(msg_container)
         return messages
 
     def _notify_tracim(
         self,
         mails: typing.List[DecodedMail],
+        imapc: IMAPClient
     ) -> None:
         """
         Send http request to tracim endpoint
         :param mails: list of mails to send
-        :return: unsended mails
+        :return: none
         """
         logger.debug(self, 'Notify tracim about {} new responses'.format(
             len(mails),
         ))
-        unsended_mails = []
         # TODO BS 20171124: Look around mail.get_from_address(), mail.get_key()
         # , mail.get_body() etc ... for raise InvalidEmailError if missing
         #  required informations (actually get_from_address raise IndexError
@@ -357,64 +297,15 @@ class MailFetcher(object):
                     ))
                 # Flag all correctly checked mail, unseen the others
                 if r.status_code in [200, 204, 400]:
-                    self._set_flag(mail.uid, IMAP_CHECKED_FLAG)
+                    imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
                 else:
-                    self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
+                    imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                unsended_mails.append(mail)
-                self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
+                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
-
-    def _set_flag(
-            self,
-            uid: int,
-            flag: str,
-            ) -> None:
-        assert uid is not None
-
-        rv, data = self._connection.store(
-            uid,
-            '+FLAGS',
-            flag,
-        )
-        if rv == 'OK':
-            log = 'Message {uid} set as {flag}.'.format(
-                uid=uid,
-                flag=flag)
-            logger.debug(self, log)
-        else:
-            log = 'Can not set Message {uid} as {flag} : {rv}'.format(
-                uid=uid,
-                flag=flag,
-                rv=rv)
-            logger.error(self, log)
-
-    def _unset_flag(
-            self,
-            uid: int,
-            flag: str,
-            ) -> None:
-        assert uid is not None
-
-        rv, data = self._connection.store(
-            uid,
-            '-FLAGS',
-            flag,
-        )
-        if rv == 'OK':
-            log = 'Message {uid} unset as {flag}.'.format(
-                uid=uid,
-                flag=flag)
-            logger.debug(self, log)
-        else:
-            log = 'Can not unset Message {uid} as {flag} : {rv}'.format(
-                uid=uid,
-                flag=flag,
-                rv=rv)
-            logger.error(self, log)
+                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
