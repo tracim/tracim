@@ -27,5 +27,100 @@
     <script src="./dev/jquery-3.2.1.js"></script>
     <script src="./dev/popper-1.12.3.js"></script>
     <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
+
+    <script type="text/javascript">
+      if (window.matchMedia("(min-width:1200px)").matches) {
+
+        var jsScript = document.createElement("script");
+        jsScript.type = "text/javascript";
+        jsScript.src = "https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=dfdhxdokxj2wagzkbxfgysgh86d6rr9m3dln0172vo3shipc";
+        console.log("load the lib");
+
+        jsScript.onload = function() {
+          function base64EncodeAndTinyMceInsert (files) {
+            for (var i = 0; i < files.length; i++) {
+              if (files[i].size > 1000000)
+                files[i].allowed = confirm(files[i].name + " fait plus de 1mo et peut prendre du temps à insérer, voulez-vous continuer ?")
+            }
+
+            for (var i = 0; i < files.length; i++) {
+              if (files[i].allowed !== false && files[i].type.match('image.*')) {
+                var img = document.createElement('img')
+
+                var fr = new FileReader()
+
+                fr.readAsDataURL(files[i])
+
+                fr.onloadend = function (e) {
+                  img.src = e.target.result
+                  tinymce.activeEditor.execCommand('mceInsertContent', false, img.outerHTML)
+                }
+              }
+            }
+          }
+
+          // HACK: The tiny mce source code modal contain a textarea, but we
+          // can't edit it (like it's readonly). The following solution
+          // solve the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
+          $(document).on('focusin', function(e) {
+            if ($(e.target).closest(".mce-window").length) {
+              e.stopImmediatePropagation();
+            }
+          });
+
+          tinymce.init({
+            selector: 'textarea',
+            height: 130,
+            // width: 530,
+            menubar: false,
+            resize: false,
+            plugins: [
+              'advlist autolink lists link image charmap print preview anchor textcolor',
+              'searchreplace visualblocks code fullscreen',
+              'insertdatetime media table contextmenu paste code help'
+            ],
+            toolbar: 'insert | formatselect | bold italic underline strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | table | code ',
+            content_css: [
+              '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+              '//www.tinymce.com/css/codepen.min.css'
+            ],
+            setup: function ($editor) {
+              //////////////////////////////////////////////
+              // add custom btn to handle image by selecting them with system explorer
+              $editor.addButton('customInsertImage', {
+                icon: 'mce-ico mce-i-image',
+                title: 'Image',
+                onclick: function () {
+                  if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
+
+                  fileTag = document.createElement('input')
+                  fileTag.id = 'hidden_tinymce_fileinput'
+                  fileTag.type = 'file'
+                  $('body').append(fileTag)
+
+                  $('#hidden_tinymce_fileinput').on('change', function () {
+                    base64EncodeAndTinyMceInsert($(this)[0].files)
+                  })
+
+                  $('#hidden_tinymce_fileinput').click()
+                }
+              })
+
+              //////////////////////////////////////////////
+              // Handle drag & drop image into TinyMce by encoding them in base64 (to avoid uploading them somewhere and keep saving comment in string format)
+              $editor
+                .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                })
+                .on('drop', function(e) {
+                  base64EncodeAndTinyMceInsert(e.dataTransfer.files)
+                })
+            }
+          });
+        }
+        document.getElementsByTagName("body")[0].appendChild(jsScript);
+      }
+    </script>
   </body>
 </html>
