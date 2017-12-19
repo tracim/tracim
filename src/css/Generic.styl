@@ -70,3 +70,119 @@
     cursor pointer
     .setting__link
       padding 5px 65px 5px 10px
+
+
+.wsFileGeneric
+  position fixed
+  top 85px
+  right 0
+  border 1px solid grey
+  height 100%
+  background-color light-grey
+  box-shadow shadow-page
+  visibility hidden
+  &.visible
+    visibility visible
+  &__header
+    display flex
+    align-items center
+    padding 15px
+    height 64px
+    &__icon
+      margin-right 15px
+      font-size 22px
+      color white
+    &__title
+      margin-right 15px
+      color white
+      text-overflow ellipsis
+      overflow hidden
+      white-space nowrap
+    &__close
+      border 1px solid white
+      border-radius 5px
+      padding 2px 5px
+      cursor pointer
+      & > i
+        color white
+        font-size 20px
+  &__option
+    border-bottom 1px solid grey
+    padding 15px
+    height 58px
+    background-color off-white
+    & > i
+      vertical-align middle
+      margin-right 15px
+      font-size 25px
+      cursor pointer
+    &__menu
+      display inline-block
+      vertical-align middle
+      &__action
+        display inline-block
+        margin-right 10px
+        font-size 18px
+        cursor pointer
+  &__wrapper
+    display flex
+    flex-direction column
+  &__messagelist
+    margin-bottom 0
+    flex-grow 1
+    border-bottom 1px solid grey
+    overflow-Y auto
+    list-style none
+    &__item
+      &__avatar
+        position relative
+        top 43px
+        left -25px
+        width 45px
+        height 45px
+      &__createhour
+        margin-left 30px
+        opacity 0.7
+        font-size 14px
+      &__content
+        border 1px solid grey
+        border-radius 5px
+        padding 15px
+        background-color off-white
+        font-size 15px
+        z-index -1
+  &__texteditor
+    padding 2px
+    &__simpletext
+      display none
+      width 70%
+      margin-right 35px
+      &__icon
+        cursor pointer
+    &__wysiwyg
+      display block
+      & > textarea
+        width 100%
+        height 130px
+    &__submit
+      margin 10px 0
+      &__btn
+        display flex
+        background-color transparent
+        &__icon
+          margin-left 10px
+
+.sended
+  .wsFileGeneric__messagelist__item__content
+    margin-right 25%
+
+.received
+  .wsFileGeneric__messagelist__item
+    &__avatar
+      left 93%
+    &__createhour
+      text-align right
+      margin-right 50px
+    &__content
+      margin-left 25%
+      color white

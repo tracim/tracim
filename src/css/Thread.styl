@@ -1,0 +1,55 @@
+.wsFileThread
+  width 550px
+  &__header
+    color white
+    background-color blue
+  &__wrapper
+    height calc(100% - 209px) /* height of chat__header + height of option + top of chat */
+  &__messagelist
+    padding 15px 35px
+    &__item
+      &__content
+        color dark-blue
+  &__texteditor
+    &__simpletext
+      &__input
+        &:focus
+          color dark-blue
+          border-color dark-blue
+    &__submit
+      &__btn
+        color dark-blue
+
+.received
+  .wsFileThread__messagelist__item__content
+      background-color dark-blue
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .wsFileThread
+    &__texteditor
+      padding 7px
+      &__simpletext
+        display inline-flex
+      &__submit
+        display inline-flex
+        width 80px
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .wsFileThread
+    top 69px
+
+@media (max-width: max-xs)
+  .wsFileThread
+    top 69px
+    width 100%
+    box-shadow none
+    z-index 1
+    &__texteditor
+      padding 7px
+      &__simpletext
+        display inline-flex
+        margin-right 15px
+        width 62%
+      &__submit
+        display inline-flex
+        width 80px

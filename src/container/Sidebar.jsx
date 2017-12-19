@@ -1,265 +1,62 @@
 import React from 'react'
 import {connect} from 'react-redux'
+import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 
 class Sidebar extends React.Component {
-  // constructor (props) {
-  //   super(props)
-  //   this.state = {
-  //     inputLogin: '',
-  //     inputPassword: ''
-  //   }
-  // }
+  constructor (props) {
+    super(props)
+    this.state = {
+      firstWsOpen: false
+    }
+  }
 
-  // <div className='sidebar-expandbar'>
-  //   <i className='fa fa-minus-square-o sidebar-expandbar__icon' />
-  // </div>
+  handleClickWorkspace = wsId => {
+    // console.log('sidebar handleClickWs')
+    this.setState(prev => ({firstWsOpen: !prev.firstWsOpen})) // delete this, purpose is only to test transition on click
+    // console.log('sidebar firstwsOpen toggled')
+  }
 
   render () {
+    // <div className='sidebar-expandbar'>
+    //   <i className='fa fa-minus-square-o sidebar-expandbar__icon' />
+    // </div>
     return (
       <div className='sidebar d-none d-lg-table-cell'>
         <nav className='sidebar__navigation navbar navbar-light'>
-          <div className='sidebar__navigation__menu'>
-            <ul className='sidebar__navigation__menu__workspace navbar-nav collapse navbar-collapse'>
-              <li className='sidebar__navigation__menu__workspace__item nav-item dropdown'>
-                <div className='sidebar__navigation__menu__workspace__item__number'>
-                  01
-                </div>
+          <ul className='sidebar__navigation__workspace navbar-nav collapse navbar-collapse'>
+            <WorkspaceListItem
+              number={1}
+              name='workspace 1 sympa'
+              isOpen={this.state.firstWsOpen}
+              onClickTitle={() => this.handleClickWorkspace(1)}
+            />
 
-                <div className='sidebar__navigation__menu__workspace__item__name'>
-                  Workspace 1
-                </div>
+            <li className='sidebar__navigation__workspace__item nav-item dropdown'>
+              <div className='sidebar__navigation__workspace__item__number'>
+                02
+              </div>
+              <div className='sidebar__navigation__workspace__item__name'>
+                Workspace 2
+              </div>
 
-                <div className='sidebar__navigation__menu__workspace__item__icon'>
-                  <i className='fa fa-chevron-down' />
-                </div>
-                <ul className='sidebar__navigation__menu__workspace__item__submenu'>
-                  <li className='sidebar__navigation__menu__workspace__item__submenu__dropdown'>
-                    <div
-                      className='sidebar__navigation__menu__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
-                      role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                      <div className='dropdown__icon'>
-                        <i className='fa fa-th' />
-                      </div>
-                      <div className='dropdown__title' id='navbarDropdown'>
-                        <div className='dropdown__title__text'>
-                          Tous les fichiers
-                        </div>
-                      </div>
-                    </div>
-                    <div className='dropdown__subdropdown dropdown-menu' aria-labelledby='navbarDropdown'>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Archivés
-                        </div>
-                      </div>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Supprimés
-                        </div>
-                      </div>
-                    </div>
-                  </li>
+              <div className='sidebar__navigation__workspace__item__icon'>
+                <i className='fa fa-chevron-down' />
+              </div>
+            </li>
 
-                  <li className='sidebar__navigation__menu__workspace__item__submenu__dropdown'>
-                    <div
-                      className='sidebar__navigation__menu__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
-                      role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                      <div className='dropdown__icon'>
-                        <i className='fa fa-signal dashboard-color' />
-                      </div>
-                      <div className='dropdown__title' id='navbarDropdown'>
-                        <div className='dropdown__title__text'>
-                          Tableau de bord
-                        </div>
-                      </div>
-                    </div>
-                    <div className='dropdown__subdropdown dropdown-menu' aria-labelledby='navbarDropdown'>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Archivés
-                        </div>
-                      </div>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Supprimés
-                        </div>
-                      </div>
-                    </div>
-                  </li>
+            <li className='sidebar__navigation__workspace__item nav-item dropdown'>
+              <div className='sidebar__navigation__workspace__item__number'>
+                03
+              </div>
+              <div className='sidebar__navigation__workspace__item__name'>
+                Workspace 3
+              </div>
 
-                  <li className='sidebar__navigation__menu__workspace__item__submenu__dropdown'>
-                    <div
-                      className='sidebar__navigation__menu__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
-                      role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                      <div className='dropdown__icon'>
-                        <i className='fa fa-list-ul task-color' />
-                      </div>
-                      <div className='dropdown__title'>
-                        <div className='dropdown__title__text'>
-                          Liste des tâches
-                        </div>
-                      </div>
-                    </div>
-                    <div className='dropdown__subdropdown dropdown-menu' aria-labelledby='navbarDropdown'>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Archivés
-                        </div>
-                      </div>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Supprimés
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-
-                  <li className='sidebar__navigation__menu__workspace__item__submenu__dropdown'>
-                    <div
-                      className='sidebar__navigation__menu__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
-                      role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                      <div className='dropdown__icon'>
-                        <i className='fa fa-folder-o docandfile-color' />
-                      </div>
-                      <div className='dropdown__title'>
-                        <div className='dropdown__title__text'>
-                          Documents & fichiers
-                        </div>
-                      </div>
-                    </div>
-                    <div className='dropdown__subdropdown dropdown-menu' aria-labelledby='navbarDropdown'>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Archivés
-                        </div>
-                      </div>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Supprimés
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-
-                  <li className='sidebar__navigation__menu__workspace__item__submenu__dropdown'>
-                    <div
-                      className='sidebar__navigation__menu__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
-                      role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                      <div className='dropdown__icon'>
-                        <i className='fa fa-comments talk-color' />
-                      </div>
-                      <div className='dropdown__title'>
-                        <div className='dropdown__title__text'>
-                          Discussions
-                        </div>
-                      </div>
-                    </div>
-                    <div className='dropdown__subdropdown dropdown-menu' aria-labelledby='navbarDropdown'>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Archivés
-                        </div>
-                      </div>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Supprimés
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-
-                  <li className='sidebar__navigation__menu__workspace__item__submenu__dropdown'>
-                    <div
-                      className='sidebar__navigation__menu__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
-                      role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                      <div className='dropdown__icon'>
-                        <i className='fa fa-calendar calendar-color' />
-                      </div>
-                      <div className='dropdown__title'>
-                        <div className='dropdown__title__text'>
-                          Calendrier
-                        </div>
-                      </div>
-                    </div>
-                    <div className='dropdown__subdropdown dropdown-menu' aria-labelledby='navbarDropdown'>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Archivés
-                        </div>
-                      </div>
-                      <div className='dropdown__subdropdown__item dropdown-item'>
-                        <div className='dropdown__subdropdown__item__iconfile alignname'>
-                          <i className='fa fa-file-text-o' />
-                        </div>
-                        <div className='dropdown__subdropdown__item__textfile alignname'>
-                          Documents Supprimés
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </li>
-
-              <li className='sidebar__navigation__menu__workspace__item nav-item dropdown'>
-                <div className='sidebar__navigation__menu__workspace__item__number'>
-                  02
-                </div>
-                <div className='sidebar__navigation__menu__workspace__item__name'>
-                  Workspace 2
-                </div>
-
-                <div className='sidebar__navigation__menu__workspace__item__icon'>
-                  <i className='fa fa-chevron-down' />
-                </div>
-              </li>
-
-              <li className='sidebar__navigation__menu__workspace__item nav-item dropdown'>
-                <div className='sidebar__navigation__menu__workspace__item__number'>
-                  03
-                </div>
-                <div className='sidebar__navigation__menu__workspace__item__name'>
-                  Workspace 3
-                </div>
-
-                <div className='sidebar__navigation__menu__workspace__item__icon'>
-                  <i className='fa fa-chevron-down' />
-                </div>
-              </li>
-            </ul>
-          </div>
+              <div className='sidebar__navigation__workspace__item__icon'>
+                <i className='fa fa-chevron-down' />
+              </div>
+            </li>
+          </ul>
         </nav>
 
         <div className='sidebar__btnnewworkspace'>

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import Folder from '../component/Workspace/Folder.jsx'
 import FileItem from '../component/Workspace/FileItem.jsx'
 import FileItemHeader from '../component/Workspace/FileItemHeader.jsx'
-// import Chat from './Chat.jsx'
+import Thread from './Thread.jsx'
 // import PageText from './PageText.jsx'
 import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
@@ -56,28 +56,28 @@ class Workspace extends React.Component {
             <Folder>
               <FileItem type='file' name='Facture 57839 - Société ABC - 01/09/2017' status='current' />
               <FileItem type='file' name='Facture 57839 - Société ABC - 01/09/2017' status='current' />
-              <FileItem type='task' name='Editer la facture pour Phillipe GIRARD' status='check' />
+              <FileItem type='task' name='Editer la facture pour Phillipe GIRARD' status='validated' />
 
               <Folder>
-                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='nouse' />
-                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='check' />
+                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='canceled' />
+                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='validated' />
               </Folder>
 
               <FileItem name='Facture 57841 - Pierre Maurice - 06/06/2017' type='file' status='current' />
-              <FileItem type='file' name='Facture 57840 - Jean-michel Chevalier - 04/09/2017' status='check' />
+              <FileItem type='file' name='Facture 57840 - Jean-michel Chevalier - 04/09/2017' status='validated' />
               <FileItem name='Facture 57841 - Pierre Maurice - 06/06/2017' type='file' status='current' />
 
               <Folder>
-                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='nouse' />
-                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='check' />
+                <FileItem type='chat' name='Discussions à propos du nouveau système de facturation' status='canceled' />
+                <FileItem type='file' name='Facture 57537 - Claudia Martin - 14/08/2017' status='validated' />
               </Folder>
             </Folder>
           </div>
 
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
+          <Thread visible={this.state.activeFileType === 'chat'} />
           {/*
-          <Chat visible={this.state.activeFileType === 'chat'} />
           <PageText visible={this.state.activeFileType === 'file'} />
           */}
         </PageContent>

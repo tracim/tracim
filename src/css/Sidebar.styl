@@ -43,76 +43,78 @@ sidebar-width = 300px
       padding 15px 30px
   &__navigation
     padding 0
-    &__menu
-      &__workspace
-        flex-direction column
-        &__item
-          position relative
-          margin-top 2px
-          width sidebar-width
-          background-color blue
-          cursor pointer
-          &__number
-            display inline-block
-            padding 5px 0 5px 0
-            width 50px
-            font-size 20px
-            letter-spacing 2px
-            text-align center
-            background-color light-blue
-          &__name
-            display inline-block
-            vertical-align top
-            padding 5px 5px
-            width 220px
-            font-size 20px
-            color white
-            white-space nowrap
-            overflow hidden
-            text-overflow ellipsis
-          &__icon
-            display inline-block
-            color white
-          &__submenu
-            margin-bottom 0
-            padding-left 0
-            list-style none
-            background-color opacity-blue
-            &__dropdown
-              border-top 1px solid dark-blue
-              &:hover
-                background-color light-blue
-              &__showdropdown
-                padding 10px 0
-              .dropdown__icon
+    &__workspace
+      flex-direction column
+      &__item
+        position relative
+        margin-top 2px
+        width sidebar-width
+        background-color blue
+        cursor pointer
+        &__number
+          display inline-block
+          padding 5px 0 5px 0
+          width 50px
+          font-size 20px
+          letter-spacing 2px
+          text-align center
+          background-color light-blue
+        &__name
+          display inline-block
+          vertical-align top
+          padding 5px 5px
+          width 220px
+          font-size 20px
+          color white
+          white-space nowrap
+          overflow hidden
+          text-overflow ellipsis
+        &__icon
+          display inline-block
+          color white
+        &__submenu
+          margin-bottom 0
+          padding-left 0
+          height 0 // height is handled is js
+          list-style none
+          background-color opacity-blue
+          overflow hidden
+          transition height 0.5s
+          &__dropdown
+            border-top 1px solid dark-blue
+            &:hover
+              background-color light-blue
+            &__showdropdown
+              padding 10px 0
+            .dropdown__icon
+              display inline-block
+              margin 0 35px 0 15px
+              font-size 20px
+            .dropdown__title
+              position relative
+              display inline-block
+              font-size 18px
+              font-weight 400
+              color dark-grey
+              cursor pointer
+              &::after //bootstrap override
+                position absolute
+                top 10px
+                left 100%
+              &__text
                 display inline-block
-                margin 0 35px 0 15px
-                font-size 20px
-              .dropdown__title
-                position relative
+                width 200px
+            .dropdown__subdropdown
+              border-radius 0
+              padding 0
+              .alignname
                 display inline-block
                 font-size 18px
-                font-weight 400
-                color dark-grey
+              &__item
                 cursor pointer
-                &::after //bootstrap override
-                  position absolute
-                  top 10px
-                  left 100%
-                &__text
-                  display inline-block
-                  width 200px
-              .dropdown__subdropdown
-                border-radius 0
-                padding 0
-                .alignname
-                  display inline-block
-                  font-size 18px
-                &__item
-                  cursor pointer
-                  border-top 1px solid dark-blue
-                  padding 13px 0
-                  &__iconfile
-                    padding-left 18px
-                  &__textfile
-                    margin-left 38px
+                border-top 1px solid dark-blue
+                padding 13px 0
+                &__iconfile
+                  padding-left 18px
+                &__textfile
+                  margin-left 38px
