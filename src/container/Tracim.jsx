@@ -5,12 +5,23 @@ import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
 import Login from './Login.jsx'
 import Page from './Page.jsx'
-import Workspace from './Workspace.jsx'
+import WorkspaceContent from './WorkspaceContent.jsx'
 import {
   Route,
   withRouter
 } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute.jsx'
+
+const SidebarWrapper = props => {
+  if (props.locationPath !== '/login') {
+    return (
+      <div className='sidebarpagecontainer'>
+        <Sidebar />
+        {props.children}
+      </div>
+    )
+  } else return props.children
+}
 
 class Tracim extends React.Component {
   render () {
@@ -21,15 +32,12 @@ class Tracim extends React.Component {
 
         <Route path='/login' component={Login} />
 
-        <div className='sidebarpagecontainer'>
+        <SidebarWrapper locationPath={location.pathname}>
 
-          { location.pathname !== '/login' && // cant find "except" in <Route path />
-            <Sidebar />
-          }
-          <Route exact path='/' component={Workspace} />
+          <PrivateRoute exact path='/' component={WorkspaceContent} />
           <PrivateRoute path='/page' component={Page} />
 
-        </div>
+        </SidebarWrapper>
 
         <Footer />
       </div>

@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-// import PropTypes from 'prop-types'
-// import classnames from 'classnames'
+import PropTypes from 'prop-types'
+import classnames from 'classnames'
+import FileItem from './FileItem.jsx'
 
-// @TODO set Folder as a component, state open will come from parent container (which will come from redux)
+// @TODO set Folder as a component, state open will come from parent container (which will come from redux) // update: or not ?
 
 class Folder extends Component {
   constructor (props) {
@@ -20,8 +21,9 @@ class Folder extends Component {
   }
 
   render () {
+    const { title, content } = this.props.folderData
     return (
-      <div className={'folder' + (this.state.open ? ' active' : '')}>
+      <div className={classnames('folder', {'active': this.state.open})}>
         <div className='folder__header' onClick={this.handleClickToggleFolder}>
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
@@ -31,7 +33,7 @@ class Folder extends Component {
               <i className='fa fa-folder-open-o' />
             </div>
             <div className='folder__header__name__text'>
-              Dossier Facture
+              { title }
             </div>
             <div className='folder__header__name__addbtn' onClick={this.handleClickNewFile}>
               <div className='folder__header__name__addbtn__text btn btn-primary'>
@@ -52,7 +54,16 @@ class Folder extends Component {
         </div>
 
         <div className='folder__content'>
-          { this.props.children }
+          { content.map(c => c.type === 'folder'
+            ? <Folder folderData={c} key={c.id} />
+            : <FileItem
+              name={c.title}
+              type={c.type}
+              status={c.status}
+              onClickItem={() => {}}
+              key={c.id}
+            />
+          )}
         </div>
       </div>
     )
@@ -60,3 +71,10 @@ class Folder extends Component {
 }
 
 export default Folder
+
+Folder.propTypes = {
+  folderData: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    content: PropTypes.array
+  })
+}

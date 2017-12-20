@@ -27,9 +27,9 @@ class Login extends React.Component {
 
   handleClickSubmit = () => {
     const { history, dispatch } = this.props
-    const { inputLogin, inputPassword } = this.state
+    const { inputLogin, inputPassword, inputRememberMe } = this.state
 
-    dispatch(userLogin(inputLogin, inputPassword))
+    dispatch(userLogin(inputLogin, inputPassword, inputRememberMe))
     .then(() => history.push('/'))
   }
 

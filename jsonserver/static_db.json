@@ -6,5 +6,43 @@
     "firstname": "Côme",
     "lastname": "Stoilenom",
     "email": "osef@algoo.fr"
+  },
+  "workspace_detail": {
+    "id": 1,
+    "title": "Mission interne - développement",
+    "owner_id": 5,
+    "content": [
+      {
+        "id": 1,
+        "title": "La programmation fonctionnelle",
+        "type": "pageHtml",
+        "status": "validated"
+      },
+      {
+        "id": 2,
+        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "type": "thread",
+        "status": "current"
+      },
+      {
+        "id": 3,
+        "title": "Programmation objet",
+        "type": "folder",
+        "content": [
+          {
+            "id": 4,
+            "title": "des trucs de backend",
+            "type": "file",
+            "status": "outdated"
+          },
+          {
+            "id": 5,
+            "title": "on s'emmerde",
+            "type": "pageHtml",
+            "status": "outdated"
+          }
+        ]
+      }
+    ]
   }
 }

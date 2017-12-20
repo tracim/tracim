@@ -6,6 +6,8 @@ import {
 export default function user (state = {
   isLoggedIn: false,
   username: '',
+  firstname: '',
+  lastname: '',
   email: ''
 }, action) {
   switch (action.type) {

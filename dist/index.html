@@ -34,7 +34,6 @@
         var jsScript = document.createElement("script");
         jsScript.type = "text/javascript";
         jsScript.src = "https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=dfdhxdokxj2wagzkbxfgysgh86d6rr9m3dln0172vo3shipc";
-        console.log("load the lib");
 
         jsScript.onload = function() {
           function base64EncodeAndTinyMceInsert (files) {
@@ -91,18 +90,20 @@
                 icon: 'mce-ico mce-i-image',
                 title: 'Image',
                 onclick: function () {
-                  if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
+                  var hiddenTinyMceInput = $('#hidden_tinymce_fileinput')
+
+                  if (hiddenTinyMceInput.length > 0) hiddenTinyMceInput.remove()
 
                   fileTag = document.createElement('input')
                   fileTag.id = 'hidden_tinymce_fileinput'
                   fileTag.type = 'file'
                   $('body').append(fileTag)
 
-                  $('#hidden_tinymce_fileinput').on('change', function () {
+                  hiddenTinyMceInput.on('change', function () {
                     base64EncodeAndTinyMceInsert($(this)[0].files)
                   })
 
-                  $('#hidden_tinymce_fileinput').click()
+                  hiddenTinyMceInput.click()
                 }
               })
 
