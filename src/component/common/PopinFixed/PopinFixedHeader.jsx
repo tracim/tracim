@@ -13,6 +13,10 @@ const PopinFixedHeader = props => {
         {props.name}
       </div>
 
+      <div className={classnames('wsFileGeneric__header__edittitle', `${props.customClass}__header__changetitle`)}>
+        <i className='fa fa-pencil' />
+      </div>
+
       <div className={classnames('wsFileGeneric__header__close', `${props.customClass}__header__close`)}>
         <i className='fa fa-times' />
       </div>
