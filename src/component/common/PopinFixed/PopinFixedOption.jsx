@@ -7,9 +7,6 @@ const PopinFixedOption = props => {
     <div className='wsFileGeneric__option'>
       <div className='wsFileGeneric__option__menu'>
         <div className='wsFileGeneric__option__menu__action'>
-          <i className='fa fa-pencil' />
-        </div>
-        <div className='wsFileGeneric__option__menu__action'>
           <i className='fa fa-archive' />
         </div>
         <div className='wsFileGeneric__option__menu__action'>
