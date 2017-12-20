@@ -22,11 +22,13 @@ class Tracim extends React.Component {
         <Route path='/login' component={Login} />
 
         <div className='sidebarpagecontainer'>
+
           { location.pathname !== '/login' && // cant find "except" in <Route path />
             <Sidebar />
           }
           <Route exact path='/' component={Workspace} />
           <PrivateRoute path='/page' component={Page} />
+
         </div>
 
         <Footer />

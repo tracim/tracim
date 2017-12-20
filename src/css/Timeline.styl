@@ -1,0 +1,68 @@
+.timeline
+  &__messagelist
+    flex 1 1 0
+    margin-bottom 0
+    padding-left 0
+    border-bottom 1px solid grey
+    overflow-Y auto
+    list-style none
+    &__item
+      &__avatar
+        position relative
+        top 43px
+        left -25px
+        width 45px
+        height 45px
+      &__createhour
+        margin-left 30px
+        opacity 0.7
+        font-size 14px
+      &__content
+        border 1px solid grey
+        border-radius 5px
+        padding 15px
+        background-color off-white
+        font-size 15px
+        z-index -1
+    &__version
+      display flex
+      justify-content space-between
+      padding 10px 0
+      width 100%
+      &__date
+        margin auto 25px
+  &__texteditor
+    padding 2px
+    &__simpletext
+      display none
+      width 70%
+      margin-right 35px
+      &__icon
+        cursor pointer
+    &__wysiwyg
+      display block
+      & > textarea
+        width 100%
+        height 130px
+    &__submit
+      margin 10px 0
+      &__btn
+        display flex
+        cursor pointer
+        &__icon
+          margin-left 10px
+
+.sended
+  .timeline__messagelist__item__content
+    margin-right 25%
+
+.received
+  .timeline__messagelist__item
+    &__avatar
+      left 93%
+    &__createhour
+      text-align right
+      margin-right 50px
+    &__content
+      margin-left 25%
+      color white

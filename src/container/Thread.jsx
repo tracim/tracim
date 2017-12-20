@@ -43,9 +43,11 @@ class Thread extends Component {
               <div className='wsFileGeneric__messagelist__item__avatar'>
                 <img src={imgProfil} alt='avatar' />
               </div>
+
               <div className='wsFileGeneric__messagelist__item__createhour'>
                 27/11/17 à 11h45
               </div>
+
               <div className='wsFileThread__messagelist__item__content wsFileGeneric__messagelist__item__content'>
                 Proident esse laboris in sed officia exercitation ut anim ea.
               </div>

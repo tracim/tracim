@@ -1,0 +1,211 @@
+.wsFileText
+  width 1200px
+  height calc(100% - 85px)
+  overflow-Y auto
+  &__header
+    background-color orange
+  &__contentpage
+    display flex
+    overflow-Y auto
+    &__textnote
+      margin 10px
+      border-radius 10px
+      padding 25px
+      width 55%
+      height 100%
+      background-color off-white
+      &__latestversion
+        text-align right
+        opacity 0.7
+      &__title
+        margin 10px 0
+        font-size 30px
+        color orange
+      &__data
+        flex-grow 1
+        flex-shrink 1
+        flex-basis 0
+    &__wrapper
+      margin 10px
+      border-radius 10px
+      width 45%
+      height 100%
+      background-color off-white
+    &__header
+      border-top-left-radius 10px
+      border-top-right-radius 10px
+      padding 10px 0
+      text-align center
+      font-size 20px
+      color dark-grey
+      background-color hover-grey
+    &__messagelist
+      min-height 300px
+      &__item
+        padding 0 25px 20px 35px
+        &__content
+          color dark-grey
+      &__version
+        margin-top 40px
+        background-color hover-grey
+        &__btn
+          margin-left 15px
+          padding 5px 25px
+          border-radius 5px
+          width 145px
+          color white
+          font-size 17px
+          background-color orange
+          & > i
+            margin-right 10px
+            color dark-grey
+            font-size 22px
+          &:hover
+            background-color dark-orange
+          &:focus
+            background-color dark-orange
+        &__date
+          color orange
+          font-size 17px
+    &__texteditor
+      &__simpletext
+        &__input
+          &:focus
+            color orange
+            border-color orange
+      &__submit
+        &__btn
+          border-color orange
+          background-color orange
+          color white
+          &:hover
+            border-color orange
+            background-color orange
+          &:focus
+            border-color orange
+            background-color orange
+
+/***** CLASS MESSAGELISTSIZE *****/
+
+.messagelistOpen
+  .wsFileText__contentpage__messagelist
+    flex 0
+    min-height 0
+
+/*********************************/
+
+/***** SENDER RECEIVER *****/
+
+.received
+  .wsFileText__contentpage__messagelist__item__content
+      background-color orange
+
+/*****************************/
+
+/**** MEDIA QUERIES ****/
+
+@media (min-width: max-xs) and (max-width: max-lg)
+
+  .wsFileText
+    &__contentpage
+      display block
+      overflow-Y scroll
+      &__textnote
+        margin-right 10px
+        padding 10px 20px
+        width auto
+        overflow-Y hidden
+        &__latestversion
+          padding-top 10px
+      &__wrapper
+        width auto
+      &__texteditor
+        &__simpletext
+          display inline-flex
+          display ms-inline-flex
+          width 60%
+        &__submit
+          display inline-flex
+          display ms-inline-flex
+          margin 10px 0
+          &__btn
+            display flex
+            margin-left 35px
+            &__icon
+              margin-left 15px
+
+/**** MEDIA 992px & 1199px ****/
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .wsFileText
+    width 692px
+    &__contentpage__texteditor__simpletext
+      margin-left 15px
+
+/******************************/
+
+/**** MEDIA 768px & 991px ****/
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .wsFileText
+    width 768px
+    &__contentpage__texteditor__simpletext
+      margin-left 25px
+
+/******************************/
+
+/**** MEDIA 576px & 767px ****/
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .wsFileText
+      top 69px
+      width 576px
+      height calc(100% - 69px)
+      &__contentpage__texteditor__simpletext
+        margin-left 10px
+
+/******************************/
+
+/**** MEDIA 575px ****/
+
+@media (max-width: max-xs)
+
+  .wsFileText
+    top 70px
+    height calc(100% - 70px)
+    width 100%
+    box-shadow none
+    &__contentpage
+      display block
+      overflow-Y scroll
+      &__textnote
+        margin-right 10px
+        width auto
+        overflow-Y hidden
+        font-size 15px
+      &__wrapper
+        width auto
+      &__messagelist
+        &__item
+          padding 0 35px 20px 30px
+        &__version
+          &__btn
+            font-size 17px
+            vertical-align middle
+          &__dateversion
+            font-size 15px
+      &__texteditor
+        &__simpletext
+          margin 10px 0
+          display flex
+          width 95%
+          margin-left 10px
+        &__submit
+          &__btn
+            display flex
+            margin 0 auto
+            &__icon
+              margin-left 10px
