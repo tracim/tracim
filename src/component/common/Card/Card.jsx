@@ -14,13 +14,6 @@ const Card = props => {
 export default Card
 
 Card.propTypes = {
-  // check https://stackoverflow.com/questions/27366077/only-allow-children-of-a-specific-type-in-a-react-component
-  // children: PropTypes.arrayOf( // children is an array
-  //   PropTypes.shape({ // of objects
-  //     type: PropTypes.oneOf([CardHeader, CardBody]) // that as an attribute 'type' equals to CardHeader or CardBody
-  //   })
-  // ),
-
   // from http://www.mattzabriskie.com/blog/react-validating-children
   children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
     if (
