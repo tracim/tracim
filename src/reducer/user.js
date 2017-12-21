@@ -3,8 +3,18 @@ import {
   USER_DATA
 } from '../action-creator.sync.js'
 
+const serializeUser = data => ({
+  id: data.user.id,
+  isLoggedIn: data.logged,
+  username: data.user.username,
+  firstname: data.user.firstname,
+  lastname: data.user.lastname,
+  email: data.user.email
+})
+
 export default function user (state = {
-  isLoggedIn: false,
+  id: 0,
+  isLoggedIn: undefined,
   username: '',
   firstname: '',
   lastname: '',
@@ -12,7 +22,7 @@ export default function user (state = {
 }, action) {
   switch (action.type) {
     case `Update/${USER_CONNECTED}`:
-      return {...state, isLoggedIn: true, ...action.user}
+      return serializeUser(action.user)
 
     case `Update/${USER_DATA}`:
       return {...state, ...action.data}

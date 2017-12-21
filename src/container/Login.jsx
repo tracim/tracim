@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router'
 import LoginLogo from '../component/Login/LoginLogo.jsx'
 import LoginLogoImg from '../img/logoTracimWhite.svg'
 import { userLogin } from '../action-creator.async.js'
@@ -34,7 +35,8 @@ class Login extends React.Component {
   }
 
   render () {
-    return (
+    if (this.props.user.isLoggedIn) return <Redirect to={{pathname: '/'}} />
+    else return (
       <section className='loginpage'>
         <div className='container-fluid'>
 

@@ -75,9 +75,9 @@ export const userLogin = (login, password, rememberMe) => async dispatch => {
   if (fetchUserLogin.status === 200) dispatch(updateUserConnected(fetchUserLogin.json))
 }
 
-export const getUserConnected = () => async dispatch => {
+export const getIsUserConnected = () => async dispatch => {
   const fetchUserLogged = await fetchWrapper({
-    url: 'http://localhost:3001/user_logged',
+    url: 'http://localhost:3001/user/is_logged_in',
     param: {...FETCH_CONFIG, method: 'GET'},
     actionName: USER_CONNECTED,
     dispatch

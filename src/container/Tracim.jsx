@@ -11,39 +11,51 @@ import {
   withRouter
 } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute.jsx'
+import { getIsUserConnected } from '../action-creator.async.js'
 
 const SidebarWrapper = props => {
-  if (props.locationPath !== '/login') {
-    return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-        {props.children}
-      </div>
-    )
-  } else return props.children
+  if (props.locationPath !== '/login') return (
+    <div className='sidebarpagecontainer'>
+      <Sidebar />
+      {props.children}
+    </div>
+  )
+  else return props.children
 }
 
 class Tracim extends React.Component {
+  componentDidMount = () => {
+    this.props.dispatch(getIsUserConnected())
+  }
+
   render () {
-    const { location } = this.props
+    const { user, location } = this.props
+
     return (
       <div>
         <Header />
 
-        <Route path='/login' component={Login} />
+        { user.isLoggedIn === undefined
+          ? (<div />) // while we dont know if user is connected, display nothing but the header @TODO show loader
+          : (
+            <div>
+              <Route path='/login' component={Login} />
 
-        <SidebarWrapper locationPath={location.pathname}>
+              <SidebarWrapper locationPath={location.pathname}>
 
-          <PrivateRoute exact path='/' component={WorkspaceContent} />
-          <PrivateRoute path='/page' component={Page} />
+                <PrivateRoute exact path='/' component={WorkspaceContent} />
+                <PrivateRoute path='/page' component={Page} />
 
-        </SidebarWrapper>
+              </SidebarWrapper>
 
-        <Footer />
+              <Footer />
+            </div>
+          )
+        }
       </div>
     )
   }
 }
 
-const mapStateToProps = () => ({})
+const mapStateToProps = ({ user }) => ({ user })
 export default withRouter(connect(mapStateToProps)(Tracim))

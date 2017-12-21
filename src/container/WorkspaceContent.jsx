@@ -43,13 +43,15 @@ class WorkspaceContent extends React.Component {
 
             { workspace.content.map(c => c.type === 'folder'
               ? <Folder folderData={c} key={c.id} />
-              : <FileItem
-                name={c.title}
-                type={c.type}
-                status={c.status}
-                onClickItem={() => this.setState({activeFileType: 'file'})}
-                key={c.id}
-              />
+              : (
+                <FileItem
+                  name={c.title}
+                  type={c.type}
+                  status={c.status}
+                  onClickItem={() => this.setState({activeFileType: 'file'})}
+                  key={c.id}
+                />
+              )
             )}
           </div>
 
