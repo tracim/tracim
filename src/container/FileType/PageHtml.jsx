@@ -11,7 +11,7 @@ class PageHtml extends Component {
       <PopinFixed customClass={'wsFileText'}>
         <PopinFixedHeader
           customClass='wsFileText'
-          icon='fa fa-file-text-o'
+          icon='fa fa-file-word-o'
           name='Facture 57840 - Jean-michel Chevalier - 04/09/2017'
         />
 

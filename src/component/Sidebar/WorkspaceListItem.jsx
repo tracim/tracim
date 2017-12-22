@@ -46,6 +46,11 @@ const WorkspaceListItem = props => {
         id={`sidebarSubMenu_${props.number}`}
       >
         <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
+
+          <div className='dropdown__icon'>
+            <i className='fa fa-th' />
+          </div>
+
           <div
             className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
             role='button'
@@ -53,9 +58,6 @@ const WorkspaceListItem = props => {
             aria-haspopup='true'
             aria-expanded='false'
           >
-            <div className='dropdown__icon'>
-              <i className='fa fa-th' />
-            </div>
 
             <div className='dropdown__title' id='navbarDropdown'>
               <div className='dropdown__title__text'>
@@ -90,6 +92,11 @@ const WorkspaceListItem = props => {
         </li>
 
         <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
+
+          <div className='dropdown__icon'>
+            <i className='fa fa-signal dashboard-color' />
+          </div>
+
           <div
             className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
             role='button'
@@ -97,9 +104,6 @@ const WorkspaceListItem = props => {
             aria-haspopup='true'
             aria-expanded='false'
           >
-            <div className='dropdown__icon'>
-              <i className='fa fa-signal dashboard-color' />
-            </div>
 
             <div className='dropdown__title' id='navbarDropdown'>
               <div className='dropdown__title__text'>
@@ -110,6 +114,11 @@ const WorkspaceListItem = props => {
         </li>
 
         <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
+
+          <div className='dropdown__icon'>
+            <i className='fa fa-list-ul task-color' />
+          </div>
+
           <div
             className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
             role='button'
@@ -117,9 +126,6 @@ const WorkspaceListItem = props => {
             aria-haspopup='true'
             aria-expanded='false'
           >
-            <div className='dropdown__icon'>
-              <i className='fa fa-list-ul task-color' />
-            </div>
 
             <div className='dropdown__title' id='navbarDropdown'>
               <div className='dropdown__title__text'>
@@ -130,6 +136,11 @@ const WorkspaceListItem = props => {
         </li>
 
         <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
+
+          <div className='dropdown__icon'>
+            <i className='fa fa-folder-o docandfile-color' />
+          </div>
+
           <div
             className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
             role='button'
@@ -137,9 +148,6 @@ const WorkspaceListItem = props => {
             aria-haspopup='true'
             aria-expanded='false'
           >
-            <div className='dropdown__icon'>
-              <i className='fa fa-folder-o docandfile-color' />
-            </div>
 
             <div className='dropdown__title' id='navbarDropdown'>
               <div className='dropdown__title__text'>
@@ -150,6 +158,11 @@ const WorkspaceListItem = props => {
         </li>
 
         <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
+
+          <div className='dropdown__icon'>
+            <i className='fa fa-comments talk-color' />
+          </div>
+
           <div
             className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
             role='button'
@@ -157,9 +170,6 @@ const WorkspaceListItem = props => {
             aria-haspopup='true'
             aria-expanded='false'
           >
-            <div className='dropdown__icon'>
-              <i className='fa fa-comments talk-color' />
-            </div>
 
             <div className='dropdown__title' id='navbarDropdown'>
               <div className='dropdown__title__text'>
@@ -170,6 +180,11 @@ const WorkspaceListItem = props => {
         </li>
 
         <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
+
+          <div className='dropdown__icon'>
+            <i className='fa fa-calendar calendar-color' />
+          </div>
+
           <div
             className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown dropdown-toggle'
             role='button'
@@ -177,9 +192,6 @@ const WorkspaceListItem = props => {
             aria-haspopup='true'
             aria-expanded='false'
           >
-            <div className='dropdown__icon'>
-              <i className='fa fa-calendar calendar-color' />
-            </div>
 
             <div className='dropdown__title' id='navbarDropdown'>
               <div className='dropdown__title__text'>

@@ -2,7 +2,7 @@
   position fixed
   width 100%
   box-shadow shadow-bottom
-  background off-white
+  background mainColor
   z-index 3
   &__logo
     &__img
@@ -19,7 +19,7 @@
           color blue
           font-size 16px
           &:hover
-            color dark-blue
+            color darkBlue
     &__rightside
       display flex
       margin-top 15px
@@ -40,7 +40,7 @@
           .languagedropdown
             &__btnlanguage
               margin-right 25px
-              color dark-grey
+              color darkGrey
               &:focus
                 box-shadow shadow-all-side-blue
                 border-radius 5px
@@ -60,7 +60,7 @@
         &__btnquestion
           margin-right 30px
           .btnquestion__icon
-            color dark-grey
+            color darkGrey
       &__itemprofil
         &__profilgroup
           .profilgroup__name
@@ -68,13 +68,13 @@
             padding 0 5px
             background-color transparent
             &:hover
-              background-color light-grey
+              background-color lightGrey
             &:focus
               box-shadow shadow-all-side-blue
-              background-color light-grey
+              background-color lightGrey
             &::after //bootstrap overrides
               vertical-align middle
-              color dark-grey
+              color darkGrey
             &__imgprofil
               display inline-block
               margin-right 10px
@@ -84,7 +84,7 @@
               display inline-block
               vertical-align middle
               margin-right 10px
-              color dark-grey
+              color darkGrey
           .profilgroup__sub
             color dark-grey
             cursor pointer

@@ -3,7 +3,10 @@
   height calc(100% - 85px)
   overflow-Y auto
   &__header
-    background-color orange
+    background-color htmlColor
+    &__icon
+      .fa-file-word-o
+        color white
   &__contentpage
     display flex
     overflow-Y auto
@@ -20,7 +23,7 @@
       &__title
         margin 10px 0
         font-size 30px
-        color orange
+        color htmlColor
       &__data
         flex-grow 1
         flex-shrink 1
@@ -38,7 +41,7 @@
       text-align center
       font-size 20px
       color dark-grey
-      background-color hover-grey
+      background-color grey-hover
     &__messagelist
       min-height 300px
       &__item
@@ -46,42 +49,42 @@
           color dark-grey
       &__version
         margin-top 40px
-        background-color hover-grey
+        background-color grey-hover
         &__btn
           padding 5px 25px
           border-radius 5px
           width 145px
           color white
           font-size 17px
-          background-color orange
+          background-color htmlColor
           & > i
             margin-right 10px
             color dark-grey
             font-size 22px
           &:hover
-            background-color dark-orange
+            background-color darkHtmlColor
           &:focus
-            background-color dark-orange
+            background-color darkHtmlColor
         &__date
-          color orange
+          color fontColor
           font-size 17px
     &__texteditor
       &__simpletext
         &__input
           &:focus
-            color orange
-            border-color orange
+            color htmlColor
+            border-color htmlColor
       &__submit
         &__btn
-          border-color orange
-          background-color orange
+          border-color htmlColor
+          background-color htmlColor
           color white
           &:hover
-            border-color orange
-            background-color orange
+            border-color htmlColor
+            background-color htmlColor
           &:focus
-            border-color orange
-            background-color orange
+            border-color htmlColor
+            background-color htmlColor
 
 /***** CLASS MESSAGELISTSIZE *****/
 
@@ -96,7 +99,7 @@
 
 .received
   .wsFileText__contentpage__messagelist__item__content
-      background-color orange
+      background-color htmlColor
 
 /*****************************/
 

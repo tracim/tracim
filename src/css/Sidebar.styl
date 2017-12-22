@@ -2,7 +2,7 @@
   position absolute
   left 0
   display none
-  border 1px solid dark-blue
+  border 1px solid darkBlue
   border-top-width 2px
   padding 11px 15px
   background-color blue
@@ -17,7 +17,7 @@
 .sidebar
   display none
   min-height 100%
-  background-color dark-blue
+  background-color secondColor
   z-index 1
 
 sidebar-width = 300px
@@ -42,20 +42,20 @@ sidebar-width = 300px
         position relative
         margin-top 2px
         width sidebar-width
-        background-color blue
+        background-color thirdColor
         cursor pointer
         &__number
           display inline-block
-          padding 5px 0 5px 0
+          padding 10px 0
           width 50px
           font-size 20px
           letter-spacing 2px
           text-align center
-          background-color light-blue
+          background-color rgba(253,253,253,0.3)
         &__name
           display inline-block
           vertical-align top
-          padding 5px 5px
+          padding 10px 5px
           width 220px
           font-size 20px
           color white
@@ -70,25 +70,29 @@ sidebar-width = 300px
           padding-left 0
           height 0 // height is handled is js
           list-style none
-          background-color opacity-blue
+          background-color fourthColor
           overflow hidden
           transition height 0.5s
           &__dropdown
-            border-top 1px solid dark-blue
+            border-top 1px solid darkBlue
             &:hover
-              background-color light-blue
+              background-color lightBlue
             &__showdropdown
-              padding 10px 0
+              display inline-block
+              padding 10px 15px
             .dropdown__icon
               display inline-block
-              margin 0 35px 0 15px
+              padding 10px 15px
+              width 50px
+              text-align center
+              background-color rgba(253,253,253,0.3)
               font-size 20px
             .dropdown__title
               position relative
               display inline-block
               font-size 18px
               font-weight 400
-              color dark-grey
+              color darkGrey
               cursor pointer
               &::after //bootstrap override
                 position absolute
@@ -98,6 +102,7 @@ sidebar-width = 300px
                 display inline-block
                 width 200px
             .dropdown__subdropdown
+              margin 0
               border-radius 0
               padding 0
               .alignname
@@ -105,7 +110,7 @@ sidebar-width = 300px
                 font-size 18px
               &__item
                 cursor pointer
-                border-top 1px solid dark-blue
+                border-top 1px solid darkBlue
                 padding 13px 0
                 &__iconfile
                   padding-left 18px
