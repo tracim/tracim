@@ -7,15 +7,12 @@ import { Route, Redirect, withRouter } from 'react-router-dom'
 
 // /!\ you shall destruct props.component otherwise you get a warning:
 // "You should not use <Route component> and <Route render> in the same route; <Route render> will be ignored
-const PrivateRoute = ({ component: Component, ...rest }) => {
-  if (rest.user.isLoggedIn === undefined) return <div />
-  else return (
-    <Route {...rest} render={props => rest.user.isLoggedIn
-      ? <Component {...props} />
-      : <Redirect to={{pathname: '/login', state: {from: props.location}}} />
-    } />
-  )
-}
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={props => rest.user.isLoggedIn
+    ? <Component {...props} />
+    : <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+  } />
+)
 
 const mapStateToProps = ({ user }) => ({ user })
 export default withRouter(connect(mapStateToProps)(PrivateRoute))

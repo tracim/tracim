@@ -4,7 +4,6 @@ import Footer from '../component/Footer.jsx'
 import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
 import Login from './Login.jsx'
-import Page from './Page.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import {
   Route,
@@ -13,16 +12,6 @@ import {
 import PrivateRoute from './PrivateRoute.jsx'
 import { getIsUserConnected } from '../action-creator.async.js'
 
-const SidebarWrapper = props => {
-  if (props.locationPath !== '/login') return (
-    <div className='sidebarpagecontainer'>
-      <Sidebar />
-      {props.children}
-    </div>
-  )
-  else return props.children
-}
-
 class Tracim extends React.Component {
   componentDidMount = () => {
     this.props.dispatch(getIsUserConnected())
@@ -30,6 +19,17 @@ class Tracim extends React.Component {
 
   render () {
     const { user, location } = this.props
+
+    const SidebarWrapper = props => {
+      if (props.locationPath !== '/login') {
+        return (
+          <div className='sidebarpagecontainer'>
+            <Sidebar />
+            {props.children}
+          </div>
+        )
+      } else return props.children
+    }
 
     return (
       <div>
@@ -44,7 +44,6 @@ class Tracim extends React.Component {
               <SidebarWrapper locationPath={location.pathname}>
 
                 <PrivateRoute exact path='/' component={WorkspaceContent} />
-                <PrivateRoute path='/page' component={Page} />
 
               </SidebarWrapper>
 
