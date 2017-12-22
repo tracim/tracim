@@ -25,6 +25,30 @@
         "status": "current"
       },
       {
+        "id": 6,
+        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "type": "file",
+        "status": "current"
+      },
+      {
+        "id": 10,
+        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "type": "pageMarkdown",
+        "status": "current"
+      },
+      {
+        "id": 7,
+        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "type": "task",
+        "status": "current"
+      },
+      {
+        "id": 8,
+        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "type": "issue",
+        "status": "current"
+      },
+      {
         "id": 3,
         "title": "Programmation objet",
         "type": "folder",

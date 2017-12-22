@@ -7,17 +7,17 @@ const FileItem = props => {
   const iconType = (() => {
     switch (props.type) {
       case FILE_TYPE.PAGE_HTML:
-        return 'fa fa-exclamation-triangle'
+        return 'fa fa-file-word-o'
       case FILE_TYPE.PAGE_MARKDOWN:
-        return 'fa fa-exclamation-triangle'
+        return 'fa fa-file-code-o'
       case FILE_TYPE.FILE:
         return 'fa fa-file-text-o docandfile-color'
       case FILE_TYPE.THREAD:
-        return 'fa fa-comments talk-color'
+        return 'fa fa-comments-o talk-color'
       case FILE_TYPE.TASK:
         return 'fa fa-list-ul task-color'
       case FILE_TYPE.ISSUE:
-        return 'fa fa-exclamation-triangle'
+        return 'fa fa-ticket'
     }
   })()
 

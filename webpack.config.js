@@ -83,8 +83,8 @@ module.exports = {
       new webpack.optimize.CommonsChunkPlugin({
         name: 'vendor',
         filename: 'tracim.vendor.bundle.js'
-      }),
-      new dashboardPlugin()
+      })
+      // new dashboardPlugin()
     ],
     ...(isProduction
       ? [ // production specific plugins
