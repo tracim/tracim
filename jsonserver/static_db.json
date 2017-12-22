@@ -18,7 +18,8 @@
         "id": 1,
         "title": "La programmation fonctionnelle",
         "type": "pageHtml",
-        "status": "validated"
+        "status": "validated",
+        "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle"
       },
       {
         "id": 2,
@@ -28,25 +29,25 @@
       },
       {
         "id": 6,
-        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "title": "Une photo moche",
         "type": "file",
         "status": "current"
       },
       {
         "id": 10,
-        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "title": "le README.md d'un random repo github",
         "type": "pageMarkdown",
         "status": "current"
       },
       {
         "id": 7,
-        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "title": "Une liste de truc à faire que je ferai jamais",
         "type": "task",
         "status": "current"
       },
       {
         "id": 8,
-        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "title": "Ça, ça marche pas. Merci de le fix",
         "type": "issue",
         "status": "current"
       },
