@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import PopinFixed from '../component/common/PopinFixed/PopinFixed'
-import PopinFixedHeader from '../component/common/PopinFixed/PopinFixedHeader.jsx'
-import PopinFixedOption from '../component/common/PopinFixed/PopinFixedOption.jsx'
-import PopinFixedContent from '../component/common/PopinFixed/PopinFixedContent.jsx'
-import Timeline from '../component/Timeline.jsx'
+import PopinFixed from '../../component/common/PopinFixed/PopinFixed'
+import PopinFixedHeader from '../../component/common/PopinFixed/PopinFixedHeader.jsx'
+import PopinFixedOption from '../../component/common/PopinFixed/PopinFixedOption.jsx'
+import PopinFixedContent from '../../component/common/PopinFixed/PopinFixedContent.jsx'
+import Timeline from '../../component/Timeline.jsx'
 
-class PageText extends Component {
+class PageHtml extends Component {
   render () {
     return (
       <PopinFixed customClass={'wsFileText'}>
@@ -25,7 +25,7 @@ class PageText extends Component {
   }
 }
 
-export default PageText
+export default PageHtml
 
 /*
       <div className={classnames('wsFileText wsFileGeneric', {'visible': this.props.visible})}>

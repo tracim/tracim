@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-import imgProfil from '../img/imgProfil.png'
+import imgProfil from '../../img/imgProfil.png'
 
 class Thread extends Component {
   render () {

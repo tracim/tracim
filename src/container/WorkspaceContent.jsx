@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import Folder from '../component/Workspace/Folder.jsx'
 import FileItem from '../component/Workspace/FileItem.jsx'
 import FileItemHeader from '../component/Workspace/FileItemHeader.jsx'
-import Thread from './Thread.jsx'
-// import PageText from './PageText.jsx'
+// import Thread from './FileType/Thread.jsx'
+import PageHtml from './FileType/PageHtml.jsx'
 import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
@@ -43,21 +43,23 @@ class WorkspaceContent extends React.Component {
 
             { workspace.content.map(c => c.type === 'folder'
               ? <Folder folderData={c} key={c.id} />
-              : <FileItem
-                name={c.title}
-                type={c.type}
-                status={c.status}
-                onClickItem={() => this.setState({activeFileType: 'thread'})}
-                key={c.id}
-              />
+              : (
+                <FileItem
+                  name={c.title}
+                  type={c.type}
+                  status={c.status}
+                  onClickItem={() => this.setState({activeFileType: 'file'})}
+                  key={c.id}
+                />
+              )
             )}
           </div>
 
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
-          <Thread visible={this.state.activeFileType === 'thread'} />
+          <PageHtml visible={this.state.activeFileType === 'file'} />
           {/*
-          <PageText visible={this.state.activeFileType === 'file'} />
+          <Thread visible={this.state.activeFileType === 'chat'} />
           */}
         </PageContent>
 

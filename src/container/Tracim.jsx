@@ -4,46 +4,57 @@ import Footer from '../component/Footer.jsx'
 import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
 import Login from './Login.jsx'
-import Page from './Page.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import {
   Route,
   withRouter
 } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute.jsx'
-
-const SidebarWrapper = props => {
-  if (props.locationPath !== '/login') {
-    return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-        {props.children}
-      </div>
-    )
-  } else return props.children
-}
+import { getIsUserConnected } from '../action-creator.async.js'
 
 class Tracim extends React.Component {
+  componentDidMount = () => {
+    this.props.dispatch(getIsUserConnected())
+  }
+
   render () {
-    const { location } = this.props
+    const { user, location } = this.props
+
+    const SidebarWrapper = props => {
+      if (props.locationPath !== '/login') {
+        return (
+          <div className='sidebarpagecontainer'>
+            <Sidebar />
+            {props.children}
+          </div>
+        )
+      } else return props.children
+    }
+
     return (
       <div>
         <Header />
 
-        <Route path='/login' component={Login} />
+        { user.isLoggedIn === undefined
+          ? (<div />) // while we dont know if user is connected, display nothing but the header @TODO show loader
+          : (
+            <div>
+              <Route path='/login' component={Login} />
 
-        <SidebarWrapper locationPath={location.pathname}>
+              <SidebarWrapper locationPath={location.pathname}>
 
-          <PrivateRoute exact path='/' component={WorkspaceContent} />
-          <PrivateRoute path='/page' component={Page} />
+                <PrivateRoute exact path='/' component={WorkspaceContent} />
 
-        </SidebarWrapper>
+              </SidebarWrapper>
 
-        <Footer />
+              <Footer />
+            </div>
+          )
+        }
       </div>
     )
   }
 }
 
-const mapStateToProps = () => ({})
+const mapStateToProps = ({ user }) => ({ user })
 export default withRouter(connect(mapStateToProps)(Tracim))
