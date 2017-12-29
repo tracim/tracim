@@ -11,3 +11,6 @@ export const updateWorkspaceData = workspace => ({ type: `Update/${WORKSPACE}`, 
 export const FILE_CONTENT = 'FileContent'
 export const setActiveFileContent = file => ({ type: `Set/${FILE_CONTENT}/Active`, file })
 export const hideActiveFileContent = () => ({ type: `Set/${FILE_CONTENT}/Hide` })
+
+export const PLUGIN_LIST = 'Plugin/List'
+export const setPluginList = pluginList => ({ type: `Set/${PLUGIN_LIST}`, pluginList })

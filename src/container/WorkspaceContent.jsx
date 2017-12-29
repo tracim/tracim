@@ -8,7 +8,10 @@ import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import FileContentViewer from '../component/Workspace/FileContentViewer.jsx'
-import { getWorkspaceContent } from '../action-creator.async.js'
+import {
+  getPluginList,
+  getWorkspaceContent
+} from '../action-creator.async.js'
 import { setActiveFileContent, hideActiveFileContent } from '../action-creator.sync.js'
 
 class WorkspaceContent extends React.Component {
@@ -21,9 +24,11 @@ class WorkspaceContent extends React.Component {
 
   componentDidMount () {
     this.props.dispatch(getWorkspaceContent(/* this.props.workspace.id */1))
+    this.props.dispatch(getPluginList())
   }
 
   handleClickFileItem = file => {
+    console.log(file)
     this.props.dispatch(setActiveFileContent(file))
   }
 

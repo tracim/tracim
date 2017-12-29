@@ -4,27 +4,28 @@ import PopinFixed from '../common/PopinFixed/PopinFixed'
 import PopinFixedHeader from '../common/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from '../common/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from '../common/PopinFixed/PopinFixedContent.jsx'
-import PageHtml from './FileType/PageHtml.jsx'
-import Thread from './FileType/Thread.jsx'
-import Timeline from '../Timeline.jsx'
 import { FILE_TYPE } from '../../helper.js'
+// import PluginContentType from '../PluginContentType.jsx'
+import PageHtml from '../../plugin/ContentType/PageHtml/PageHtml.jsx'
+// import Thread from '../../plugin/ContentType/Thread/Thread.jsx'
 
 const FileContentViewer = props => {
-  const { customClass, icon } = FILE_TYPE.find(f => f.name === props.file.type) || {customClass: '', icon: ''}
+  const defaultPlugin = {
+    customClass: '',
+    icon: '',
+    componentLeft: undefined,
+    componentRight: undefined
+  }
+  const { customClass, icon, componentLeft, componentRight } = FILE_TYPE.find(f => f.name === props.file.type) || defaultPlugin
 
-  const [leftPart, rightPart] = (() => {
-    switch (props.file.type) {
-      case FILE_TYPE[0].name: // pageHtml
-        return [
-          <PageHtml version={props.file.version} text={props.file.text} />,
-          <Timeline customClass={`${customClass}__contentpage`} />
-        ]
-      case FILE_TYPE[3].name: // thread
-        return [
-          <Thread />
-        ]
+  const PluginLeft = props => {
+    console.log('componentLeft === PageHtml.name', componentLeft === PageHtml.name)
+    switch (componentLeft) {
+      case PageHtml.name:
+        return <PageHtml version={props.file.version} text={props.file.text} />
     }
-  })()
+    // componentLeft is a string, I cant do <componentLeft /> because it needs to be a react object (component) like PageHtml is
+  }
 
   return (
     <PopinFixed customClass={`${customClass}`}>
@@ -38,8 +39,8 @@ const FileContentViewer = props => {
       <PopinFixedOption customClass={`${customClass}`} />
 
       <PopinFixedContent customClass={`${customClass}__contentpage`}>
-        { leftPart }
-        { rightPart }
+        {/* <PluginContentType customeClass={customClass} file={props.file} /> */}
+        <PluginLeft file={props.file} />
       </PopinFixedContent>
     </PopinFixed>
   )

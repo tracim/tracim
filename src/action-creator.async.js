@@ -6,7 +6,9 @@ import {
   updateUserConnected,
   updateUserData,
   WORKSPACE,
-  updateWorkspaceData
+  updateWorkspaceData,
+  PLUGIN_LIST,
+  setPluginList
 } from './action-creator.sync.js'
 
 /*
@@ -113,4 +115,14 @@ export const getWorkspaceContent = workspaceId => async dispatch => {
     dispatch
   })
   if (fetchGetWorkspaceContent.status === 200) dispatch(updateWorkspaceData(fetchGetWorkspaceContent.json))
+}
+
+export const getPluginList = () => async dispatch => {
+  const fetchGetPluginList = await fetchWrapper({
+    url: `http://localhost:3001/plugin/file_content`,
+    param: {...FETCH_CONFIG, method: 'GET'},
+    actionName: PLUGIN_LIST,
+    dispatch
+  })
+  if (fetchGetPluginList.status === 200) dispatch(setPluginList(fetchGetPluginList.json))
 }

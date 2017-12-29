@@ -9,6 +9,43 @@
       "email": "osef@algoo.fr"
     }
   },
+  "file_content": [{
+    "name": "PageHtml",
+    "componentLeft": "PageHtml",
+    "componentRight": "Timeline",
+    "customClass": "wsContentPageHtml",
+    "icon": "fa fa-file-word-o"
+  }, {
+    "name": "PageMarkdown",
+    "componentLeft": "PageMarkdown",
+    "componentRight": "undefined",
+    "customClass": "wsContentPageMarkdown",
+    "icon": "fa fa-file-code-o"
+  }, {
+    "name": "File",
+    "componentLeft": "File",
+    "componentRight": "undefined",
+    "customClass": "wsContentFile",
+    "icon": "fa fa-file-text-o"
+  }, {
+    "name": "Thread",
+    "componentLeft": "Thread",
+    "componentRight": "undefined",
+    "customClass": "wsContentThread",
+    "icon": "fa fa-comments-o"
+  }, {
+    "name": "Task",
+    "componentLeft": "Task",
+    "componentRight": "undefined",
+    "customClass": "wsContentTask",
+    "icon": "fa fa-list-ul"
+  }, {
+    "name": "Issue",
+    "componentLeft": "Issue",
+    "componentRight": "undefined",
+    "customClass": "wsContentIssue",
+    "icon": "fa fa-ticket"
+  }],
   "workspace_detail": {
     "id": 1,
     "title": "Mission interne - développement",
@@ -17,38 +54,39 @@
       {
         "id": 1,
         "title": "La programmation fonctionnelle",
-        "type": "pageHtml",
+        "type": "PageHtml",
         "status": "validated",
+        "version": "3",
         "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle"
       },
       {
         "id": 2,
         "title": "La prommation fonctionnelle est-elle vraiment utile ?",
-        "type": "thread",
+        "type": "Thread",
         "status": "current"
       },
       {
         "id": 6,
         "title": "Une photo moche",
-        "type": "file",
+        "type": "File",
         "status": "current"
       },
       {
         "id": 10,
         "title": "le README.md d'un random repo github",
-        "type": "pageMarkdown",
+        "type": "PageMarkdown",
         "status": "current"
       },
       {
         "id": 7,
         "title": "Une liste de truc à faire que je ferai jamais",
-        "type": "task",
+        "type": "Task",
         "status": "current"
       },
       {
         "id": 8,
         "title": "Ça, ça marche pas. Merci de le fix",
-        "type": "issue",
+        "type": "Issue",
         "status": "current"
       },
       {
@@ -59,13 +97,13 @@
           {
             "id": 4,
             "title": "des trucs de backend",
-            "type": "file",
+            "type": "File",
             "status": "outdated"
           },
           {
             "id": 5,
             "title": "on s'emmerde",
-            "type": "pageHtml",
+            "type": "PageHtml",
             "status": "outdated"
           }
         ]
