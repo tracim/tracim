@@ -1,6 +1,9 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
+import PopinFixedHeader from './PopinFixedHeader.jsx'
+import PopinFixedOption from './PopinFixedOption.jsx'
+import PopinFixedContent from './PopinFixedContent.jsx'
 
 const PopinFixed = props => {
   return (
@@ -13,6 +16,22 @@ const PopinFixed = props => {
 export default PopinFixed
 
 PopinFixed.propTypes = {
+  customClass: PropTypes.string,
+  visible: PropTypes.bool
+}
+
+PopinFixed.propTypes = {
+  // from http://www.mattzabriskie.com/blog/react-validating-children
+  children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
+    if (
+      children.length > 3 ||
+      children[0].type !== PopinFixedHeader ||
+      children[1].type !== PopinFixedOption ||
+      children[2].type !== PopinFixedContent
+    ) {
+      return new Error(`PropType Error: childrens of ${componentName} must be: 1 PopinFixedHeader, 1 PopinFixedOption and 1 PopinFixedContent.`)
+    }
+  }).isRequired,
   customClass: PropTypes.string,
   visible: PropTypes.bool
 }

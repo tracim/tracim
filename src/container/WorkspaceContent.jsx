@@ -3,14 +3,14 @@ import { connect } from 'react-redux'
 import Folder from '../component/Workspace/Folder.jsx'
 import FileItem from '../component/Workspace/FileItem.jsx'
 import FileItemHeader from '../component/Workspace/FileItemHeader.jsx'
-// import Thread from './Thread.jsx'
-// import PageText from './PageText.jsx'
 import Preview from './Preview.jsx'
 import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
+import FileContentViewer from '../component/Workspace/FileContentViewer.jsx'
 import { getWorkspaceContent } from '../action-creator.async.js'
+import { setActiveFileContent, hideActiveFileContent } from '../action-creator.sync.js'
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -24,8 +24,16 @@ class WorkspaceContent extends React.Component {
     this.props.dispatch(getWorkspaceContent(/* this.props.workspace.id */1))
   }
 
+  handleClickFileItem = file => {
+    this.props.dispatch(setActiveFileContent(file))
+  }
+
+  handleClickCloseBtn = () => {
+    this.props.dispatch(hideActiveFileContent())
+  }
+
   render () {
-    const { workspace } = this.props
+    const { workspace, activeFileContent } = this.props
 
     return (
       <PageWrapper customeClass='workspace'>
@@ -44,24 +52,26 @@ class WorkspaceContent extends React.Component {
 
             { workspace.content.map(c => c.type === 'folder'
               ? <Folder folderData={c} key={c.id} />
-              : <FileItem
-                name={c.title}
-                type={c.type}
-                status={c.status}
-                onClickItem={() => this.setState({activeFileType: 'file'})}
-                key={c.id}
-              />
+              : (
+                <FileItem
+                  name={c.title}
+                  type={c.type}
+                  status={c.status}
+                  onClickItem={() => this.handleClickFileItem(c)}
+                  key={c.id}
+                />
+              )
             )}
           </div>
 
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
-          <Preview visible={this.state.activeFileType === 'file'} />
-
-          {/*
-          <PageText visible={this.state.activeFileType === 'file'} />
-          <Thread visible={this.state.activeFileType === 'thread'} />
-          */}
+          { activeFileContent.display &&
+            <FileContentViewer
+              file={activeFileContent}
+              onClose={this.handleClickCloseBtn}
+            />
+          }
         </PageContent>
 
       </PageWrapper>
@@ -69,5 +79,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspace }) => ({ workspace })
+const mapStateToProps = ({ workspace, activeFileContent }) => ({ workspace, activeFileContent })
 export default connect(mapStateToProps)(WorkspaceContent)

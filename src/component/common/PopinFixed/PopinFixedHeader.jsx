@@ -17,7 +17,10 @@ const PopinFixedHeader = props => {
         <i className='fa fa-pencil' />
       </div>
 
-      <div className={classnames('wsFileGeneric__header__close', `${props.customClass}__header__close`)}>
+      <div
+        className={classnames('wsFileGeneric__header__close', `${props.customClass}__header__close`)}
+        onClick={props.onClickCloseBtn}
+      >
         <i className='fa fa-times' />
       </div>
     </div>
@@ -28,6 +31,7 @@ export default PopinFixedHeader
 
 PopinFixedHeader.propTypes = {
   icon: PropTypes.string.isRequired,
+  onClickCloseBtn: PropTypes.func.isRequired,
   customClass: PropTypes.string,
   name: PropTypes.string
 }

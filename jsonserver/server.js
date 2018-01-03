@@ -24,6 +24,9 @@ server.post('/user/login', (req, res) => {
   if (req.body.login !== '' && req.body.password !== '') return res.jsonp(jsonDb.user_logged)
   else return res.jsonp('error')
 })
+
+server.get('/user/is_logged_in', (req, res) => res.jsonp(jsonDb.user_logged))
+
 server.get('/workspace/:id', (req, res) => res.jsonp(jsonDb.workspace_detail))
 
 server.use(router)

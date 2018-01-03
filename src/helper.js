@@ -5,11 +5,28 @@ export const FETCH_CONFIG = {
   }
 }
 
-export const FILE_TYPE = {
-  PAGE_HTML: 'pageHtml',
-  PAGE_MARKDOWN: 'pageMarkdown',
-  FILE: 'file',
-  THREAD: 'thread',
-  TASK: 'task',
-  ISSUE: 'issue'
-}
+export const FILE_TYPE = [{
+  name: 'pageHtml',
+  customClass: 'wsFilePageHtml',
+  icon: 'fa fa-file-word-o'
+}, {
+  name: 'pageMarkdown',
+  customClass: 'wsFilePageMarkdown',
+  icon: 'fa fa-file-code-o'
+}, {
+  name: 'file',
+  customClass: 'wsFileFile',
+  icon: 'fa fa-file-image-o'
+}, {
+  name: 'thread',
+  customClass: 'wsFileThread',
+  icon: 'fa fa-comments-o'
+}, {
+  name: 'task',
+  customClass: 'wsFileTask',
+  icon: 'fa fa-list-ul'
+}, {
+  name: 'issue',
+  customClass: 'wsFileIssue',
+  icon: 'fa fa-ticket'
+}]

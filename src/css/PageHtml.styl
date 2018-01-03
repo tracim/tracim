@@ -1,4 +1,4 @@
-.wsFileText
+.wsFilePageHtml
   width 1200px
   height calc(100% - 85px)
   overflow-Y auto
@@ -20,14 +20,8 @@
       &__latestversion
         text-align right
         opacity 0.7
-      &__title
-        margin 10px 0
-        font-size 30px
-        color htmlColor
-      &__data
-        flex-grow 1
-        flex-shrink 1
-        flex-basis 0
+      &__text
+        font-size 14px
     &__wrapper
       margin 10px
       border-radius 10px
@@ -86,28 +80,17 @@
             border-color htmlColor
             background-color htmlColor
 
-/***** CLASS MESSAGELISTSIZE *****/
-
 .messagelistOpen
-  .wsFileText__contentpage__messagelist
+  .wsFilePageHtml__contentpage__messagelist
     flex 0
     min-height 0
 
-/*********************************/
-
-/***** SENDER RECEIVER *****/
-
 .received
-  .wsFileText__contentpage__messagelist__item__content
+  .wsFilePageHtml__contentpage__messagelist__item__content
       background-color htmlColor
 
-/*****************************/
-
-/**** MEDIA QUERIES ****/
-
 @media (min-width: max-xs) and (max-width: max-lg)
-
-  .wsFileText
+  .wsFilePageHtml
     &__contentpage
       display block
       overflow-Y scroll
@@ -123,11 +106,9 @@
       &__texteditor
         &__simpletext
           display inline-flex
-          display ms-inline-flex
           width 60%
         &__submit
           display inline-flex
-          display ms-inline-flex
           margin 10px 0
           &__btn
             display flex
@@ -135,46 +116,28 @@
             &__icon
               margin-left 15px
 
-/**** MEDIA 992px & 1199px ****/
-
 @media (min-width: min-lg) and (max-width: max-lg)
-
-  .wsFileText
+  .wsFilePageHtml
     width 692px
     &__contentpage__texteditor__simpletext
       margin-left 15px
 
-/******************************/
-
-/**** MEDIA 768px & 991px ****/
-
 @media (min-width: min-md) and (max-width: max-md)
-
-  .wsFileText
+  .wsFilePageHtml
     width 768px
     &__contentpage__texteditor__simpletext
       margin-left 25px
 
-/******************************/
-
-/**** MEDIA 576px & 767px ****/
-
 @media (min-width: min-sm) and (max-width: max-sm)
-
-  .wsFileText
+  .wsFilePageHtml
       top 69px
       width 576px
       height calc(100% - 69px)
       &__contentpage__texteditor__simpletext
         margin-left 10px
 
-/******************************/
-
-/**** MEDIA 575px ****/
-
 @media (max-width: max-xs)
-
-  .wsFileText
+  .wsFilePageHtml
     top 70px
     height calc(100% - 70px)
     width 100%
