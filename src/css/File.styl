@@ -86,64 +86,65 @@
           margin 0 5px
           font-size 20px
           cursor pointer
-    .timeline
+    &__wrapper
       margin 10px
       border-radius 10px
       width 45%
       height calc(100% - 150px)
       background-color off-white
-      overflow scroll
-      &__header
-        border-top-left-radius 10px
-        border-top-right-radius 10px
-        padding 10px 0
-        text-align center
-        font-size 20px
-        color dark-grey
-        background-color grey-hover
-      &__messagelist
-        min-height 300px
-        &__item
-          &__content
-            color dark-grey
-        &__version
-          margin-top 40px
+      overflow-Y auto
+      .timeline
+        &__header
+          border-top-left-radius 10px
+          border-top-right-radius 10px
+          padding 10px 0
+          text-align center
+          font-size 20px
+          color dark-grey
           background-color grey-hover
-          &__btn
-            padding 5px 25px
-            border-radius 5px
-            width 145px
-            color white
-            font-size 17px
-            background-color fileColor
-            & > i
-              margin-right 10px
+        &__messagelist
+          min-height 300px
+          &__item
+            &__content
               color dark-grey
-              font-size 22px
-            &:hover
-              background-color lightFileColor
-            &:focus
-              background-color lightFileColor
-          &__date
-            color fontColor
-            font-size 17px
-      &__texteditor
-        &__simpletext
-          &__input
-            &:focus
-              color htmlColor
-              border-color htmlColor
-        &__submit
-          &__btn
-            border-color htmlColor
-            background-color htmlColor
-            color white
-            &:hover
+          &__version
+            margin-top 40px
+            background-color grey-hover
+            &__btn
+              padding 5px 25px
+              border-radius 5px
+              width 145px
+              color white
+              font-size 17px
+              background-color fileColor
+              & > i
+                margin-right 10px
+                color dark-grey
+                font-size 22px
+              &:hover
+                background-color lightFileColor
+              &:focus
+                background-color lightFileColor
+            &__date
+              color fontColor
+              font-size 17px
+        &__texteditor
+          &__simpletext
+            &__input
+              &:focus
+                color htmlColor
+                border-color htmlColor
+          &__submit
+            &__btn
               border-color htmlColor
               background-color htmlColor
-            &:focus
-              border-color htmlColor
-              background-color htmlColor
+              color white
+              &:hover
+                border-color htmlColor
+                background-color htmlColor
+              &:focus
+                border-color htmlColor
+                background-color htmlColor
 
 /***** SENDER RECEIVER *****/
 
