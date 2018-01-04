@@ -1,12 +1,21 @@
 import React, { Component } from 'react'
-// import classnames from 'classnames'
+import classnames from 'classnames'
 import imgPDF from '../../../img/pdf.jpg'
 // import imgExcel from '../img/excel.png'
 
 class File extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      activesidebar: false
+    }
+  }
+
+  handleClickSidebar = () => this.setState(prev => ({activesidebar: !prev.activesidebar}))
+
   render () {
     return (
-      <div className='wsFileFile__contentpage__visualizer'>
+      <div className={classnames('wsFileFile__contentpage__visualizer', {'activesidebar': this.state.activesidebar})}>
         <div className='wsFileFile__contentpage__visualizer__dloption'>
           <div className='wsFileFile__contentpage__visualizer__dloption__icon'>
             <i className='fa fa-download' />
@@ -29,7 +38,7 @@ class File extends Component {
             <i className='fa fa-chevron-right' />
           </div>
         </div>
-        <div className='wsFileFile__contentpage__visualizer__sidebar'>
+        <div className='wsFileFile__contentpage__visualizer__sidebar' onClick={this.handleClickSidebar}>
           <div className='wsFileFile__contentpage__visualizer__sidebar__visiblepart'>
             <div className='wsFileFile__contentpage__visualizer__sidebar__visiblepart__icon'>
               <i className='fa fa-gear' />
