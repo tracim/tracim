@@ -196,7 +196,7 @@ class MailFetcher(object):
         logger.info(self, 'Starting MailFetcher')
         while self._is_active:
             try:
-                imapc = IMAPClient(self.host, ssl=self.use_ssl)
+                imapc = IMAPClient(self.host, self.port, ssl=self.use_ssl)
                 imapc.login(self.user, self.password)
                 # select mailbox
                 logger.debug(self, 'Select folder {}'.format(
