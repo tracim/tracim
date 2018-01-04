@@ -6,6 +6,12 @@ const PopinFixedOption = props => {
   return (
     <div className='wsFileGeneric__option'>
       <div className='wsFileGeneric__option__menu'>
+
+        <div className='wsFileFile__option__menu__addversion btn mr-auto'>
+          Nouvelle version
+          <i className='fa fa-plus-circle' />
+        </div>
+
         <div className='wsFileGeneric__option__menu__status dropdown'>
           <button className='wsFileGeneric__option__menu__status__dropdownbtn check btn dropdown-toggle' type='button' id='dropdownMenu2' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
             Validé
@@ -13,6 +19,7 @@ const PopinFixedOption = props => {
               <i className='fa fa-check' />
             </div>
           </button>
+
           <div className='wsFileGeneric__option__menu__status__submenu dropdown-menu' aria-labelledby='dropdownMenu2'>
             <h6 className='dropdown-header'>Statut du fichier</h6>
             <div className='dropdown-divider' />
