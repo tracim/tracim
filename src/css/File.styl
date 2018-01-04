@@ -24,12 +24,12 @@
   &__contentpage
     display flex
     height 100%
-    &__visualizer
+    &__preview
       position relative
       margin 10px
       border-radius 10px
-      width 70%
-      height calc(100% - 150px)
+      width 60%
+      height calc(100% - 150px) // margin + height of header and option
       background-color off-white
       &__sidebar
         position absolute
@@ -37,13 +37,14 @@
         right 0
         width 50px
         height 100%
-        transition width 1s ease
-        &__visiblepart
+        background-color off-white
+        transition width 0.5s
+        &__button
           display flex
           flex-direction column
           align-items center
-          border-top-right-radius 10px
-          border-bottom-right-radius 10px
+          // border-top-right-radius 10px
+          // border-bottom-right-radius 10px
           width 50px
           height 100%
           background-color grey
@@ -58,93 +59,70 @@
             margin-top 45px
             color white
             transform rotate(-90deg)
-        &__propertydetail
+        &__property
           display none
+          &__detail
+            &__label
+              font-size 18px
+              text-decoration underline
+            &__info
+              margin 10px 0 25px 0
       &__dloption
         display flex
-        margin-left calc(50% - 50px) // 50px => width/2 of the div
+        justify-content center
         padding-top 10px
-        width 100px
         &__icon
           margin-right 20px
           font-size 20px
           cursor pointer
-      &__slidecontainer
+          &:hover , &:focus
+            font-size 25px
+            color fileColor
+      &__slider
         display flex
         align-items center
         width calc(100% - 50px) // 50px => width of sidebar
         height calc(100% - 40px) // 40px => height of dloption
         &__fileimg
           display flex
+          flex-direction column
+          justify-content center
           padding 30px
           width 100%
           height 100%
           & > img
             max-height 100%
             max-width 100%
-        &__chevron
+        &__icon
           margin 0 5px
           font-size 20px
           cursor pointer
     &__wrapper
-      margin 10px
-      border-radius 10px
-      width 45%
-      height calc(100% - 150px)
-      background-color off-white
+      width 40%
+      height calc(100% - 150px) // margin + height of header and option
       overflow-Y auto
       .timeline
-        &__header
-          border-top-left-radius 10px
-          border-top-right-radius 10px
-          padding 10px 0
-          text-align center
-          font-size 20px
-          color dark-grey
-          background-color grey-hover
         &__messagelist
           min-height 300px
-          &__item
-            &__content
-              color dark-grey
           &__version
-            margin-top 40px
-            background-color grey-hover
             &__btn
-              padding 5px 25px
-              border-radius 5px
-              width 145px
-              color white
-              font-size 17px
               background-color fileColor
-              & > i
-                margin-right 10px
-                color dark-grey
-                font-size 22px
-              &:hover
+              &:hover , &:focus
                 background-color lightFileColor
-              &:focus
-                background-color lightFileColor
-            &__date
-              color fontColor
-              font-size 17px
         &__texteditor
           &__simpletext
             &__input
               &:focus
-                color htmlColor
-                border-color htmlColor
+                color fileColor
+                border-color fileColor
           &__submit
             &__btn
-              border-color htmlColor
-              background-color htmlColor
+              border-color fileColor
+              background-color fileColor
               color white
-              &:hover
-                border-color htmlColor
-                background-color htmlColor
-              &:focus
-                border-color htmlColor
-                background-color htmlColor
+              &:hover , &:focus
+                border-color fileColor
+                background-color fileColor
 
 /***** SENDER RECEIVER *****/
 
@@ -155,28 +133,24 @@
 /***** ACTIVE SIDEBAR *****/
 
 .activesidebar
-  .wsFileFile__contentpage__visualizer
+  .wsFileFile__contentpage__preview
     &__sidebar
       display flex
-      border-top-right-radius 10px
-      border-bottom-right-radius 10px
+      border-radius 0 10px 10px 0
       width 500px
       background-color off-white
-      &__visiblepart
-        order 1
-        border-top-left-radius 10px
-        border-bottom-left-radius 10px
-        border-top-right-radius 0
-        border-bottom-right-radius 0
+      &__button
+        // border-radius 10px 0 0 10px
         background-color fileColor
-      &__propertydetail
+      &__property
         display flex
-        order 2
         padding 20px
         overflow-Y auto
         color fileColor
 
 /****** MEDIA QUERIES ********/
+
+// Regroup the common css rules mediaqueries into a single media to lighten the code
 
 @media (min-width: max-xs) and (max-width: max-lg)
 
@@ -184,24 +158,25 @@
     overflow-Y auto
     &__contentpage
       display block
-      &__visualizer
+      &__preview
         display flex
         flex-direction column
-        width calc(100% - 30px) // 20px => margin
-      .timeline
-        width calc(100% - 30px) // 20px => margin
-        &__texteditor
-          &__simpletext
-            display inline-flex
-            width 60%
-          &__submit
-            display inline-flex
-            margin 10px 0
-            &__btn
-              display flex
-              margin-left 35px
-              &__icon
-                margin-left 15px
+        width calc(100% - 30px) // 30px => margin
+      &__wrapper
+        width calc(100% - 30px) // 30px => margin
+        .timeline
+          &__texteditor
+            &__simpletext
+              display inline-flex
+              width 60%
+            &__submit
+              display inline-flex
+              margin 10px 0
+              &__btn
+                display flex
+                margin-left 35px
+                &__icon
+                  margin-left 15px
 
 /**** MEDIA 992px & 1199px ****/
 
@@ -229,7 +204,7 @@
   .wsFileFile
     top 69px
     width 100%
-    height calc(100% - 69px)
+    height calc(100% - 69px) // 69px => top rules
     overflow-Y scroll
 
 /******************************/
@@ -239,14 +214,14 @@
 @media (max-width: max-xs)
 
   .activesidebar
-    .wsFileFile__contentpage__visualizer
+    .wsFileFile__contentpage__preview
       &__sidebar
         width 350px
 
   .wsFileFile
     top 69px
     width 100%
-    height calc(100% - 69px)
+    height calc(100% - 69px) // 69px => top rules
     overflow-Y scroll
     &__option__menu__addversion
         padding 8px 5px
@@ -254,21 +229,22 @@
           display none
     &__contentpage
       display block
-      &__visualizer
+      &__preview
         display flex
         flex-direction column
-        width calc(100% - 30px) // 20px => margin
-      .timeline
-        width calc(100% - 30px) // 20px => margin
-        &__texteditor
-          &__simpletext
-            display inline-flex
-            width 60%
-          &__submit
-            display inline-flex
-            margin 10px 0
-            &__btn
-              display flex
-              margin-left 35px
-              &__icon
-                margin-left 15px
+        width calc(100% - 30px) // 30px => margin
+      &__wrapper
+        width calc(100% - 30px) // 30px => margin
+        .timeline
+          &__texteditor
+            &__simpletext
+              display inline-flex
+              width 60%
+            &__submit
+              display inline-flex
+              margin 10px 0
+              &__btn
+                display flex
+                margin-left 35px
+                &__icon
+                  margin-left 15px

@@ -125,6 +125,10 @@
       color white
       font-size 20px
       cursor pointer
+      &:hover , &:focus
+        border 1px solid off-white
+        padding 0 10px
+        border-radius 5px
     &__close
       border 1px solid white
       border-radius 5px
@@ -137,7 +141,6 @@
     border-bottom 1px solid grey
     padding 10px
     height 58px
-    text-align right
     background-color off-white
     & > i
       vertical-align middle
@@ -145,10 +148,9 @@
       font-size 25px
       cursor pointer
     &__menu
-      display inline-block
-      vertical-align middle
+      display flex
+      align-items center
       &__status
-        display inline-block
         margin-right 20px
         .current
           color blue
@@ -162,6 +164,7 @@
           border 1px solid grey
           width 150px
           background-color transparent
+          cursor pointer
           &::after
             color fontColor
           &:hover
@@ -174,13 +177,16 @@
             display flex
             justify-content space-between
             margin 5px 0
+            cursor pointer
             &:active
               background-color transparent
       &__action
-        display inline-block
         margin 5px 10px 0 0
         font-size 18px
         cursor pointer
+        &:hover , &:focus
+          font-size 22px
+          color blue
   &__wrapper
     display flex
     flex-direction column
