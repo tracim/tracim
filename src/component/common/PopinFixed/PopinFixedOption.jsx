@@ -15,7 +15,7 @@ const PopinFixedOption = props => {
           </button>
           <div className='wsFileGeneric__option__menu__status__submenu dropdown-menu' aria-labelledby='dropdownMenu2'>
             <h6 className='dropdown-header'>Statut du fichier</h6>
-            <div className='dropdown-divider'></div>
+            <div className='dropdown-divider' />
             <button className='wsFileGeneric__option__menu__status__submenu__item current  dropdown-item' type='button'>
               En cours
               <div className='wsFileGeneric__option__menu__status__submenu__item__icon'>

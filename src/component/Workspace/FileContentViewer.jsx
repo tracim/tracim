@@ -6,6 +6,7 @@ import PopinFixedOption from '../common/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from '../common/PopinFixed/PopinFixedContent.jsx'
 import PageHtml from './FileType/PageHtml.jsx'
 import Thread from './FileType/Thread.jsx'
+import Preview from './FileType/File.jsx'
 import Timeline from '../Timeline.jsx'
 import { FILE_TYPE } from '../../helper.js'
 
@@ -17,6 +18,11 @@ const FileContentViewer = props => {
       case FILE_TYPE[0].name: // pageHtml
         return [
           <PageHtml version={props.file.version} text={props.file.text} />,
+          <Timeline customClass={`${customClass}__contentpage`} />
+        ]
+      case FILE_TYPE[2].name: // file (preview)
+        return [
+          <Preview />,
           <Timeline customClass={`${customClass}__contentpage`} />
         ]
       case FILE_TYPE[3].name: // thread
