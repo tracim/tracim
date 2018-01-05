@@ -32,19 +32,15 @@
       height calc(100% - 150px) // margin + height of header and option
       background-color off-white
       &__sidebar
+        display flex
         position absolute
         top 0
         right 0
-        width 50px
         height 100%
-        background-color off-white
-        transition width 0.5s
         &__button
           display flex
           flex-direction column
           align-items center
-          // border-top-right-radius 10px
-          // border-bottom-right-radius 10px
           width 50px
           height 100%
           background-color grey
@@ -60,8 +56,13 @@
             color white
             transform rotate(-90deg)
         &__property
-          display none
+          width 0
+          overflow-X hidden
+          background-color off-white
+          transition width 0.5s
           &__detail
+            padding 20px
+            width 410px
             &__label
               font-size 18px
               text-decoration underline
@@ -135,16 +136,11 @@
 .activesidebar
   .wsFileFile__contentpage__preview
     &__sidebar
-      display flex
       border-radius 0 10px 10px 0
-      width 500px
-      background-color off-white
       &__button
-        // border-radius 10px 0 0 10px
         background-color fileColor
       &__property
-        display flex
-        padding 20px
+        width 450px
         overflow-Y auto
         color fileColor
 
@@ -216,7 +212,8 @@
   .activesidebar
     .wsFileFile__contentpage__preview
       &__sidebar
-        width 350px
+        &__property
+          width 300px
 
   .wsFileFile
     top 69px
@@ -240,11 +237,12 @@
             &__simpletext
               display inline-flex
               width 60%
+              margin-right 0
             &__submit
               display inline-flex
               margin 10px 0
               &__btn
                 display flex
-                margin-left 35px
+                margin-left 10px
                 &__icon
                   margin-left 15px
