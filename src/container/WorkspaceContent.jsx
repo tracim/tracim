@@ -7,7 +7,6 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
-import FileContentViewer from '../component/Workspace/FileContentViewer.jsx'
 import {
   getPluginList,
   getWorkspaceContent
@@ -70,12 +69,9 @@ class WorkspaceContent extends React.Component {
 
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
-          { activeFileContent.display &&
-            <FileContentViewer
-              file={activeFileContent}
-              onClose={this.handleClickCloseBtn}
-            />
-          }
+          <div id='pluginContainer'>
+
+          </div>
         </PageContent>
 
       </PageWrapper>
