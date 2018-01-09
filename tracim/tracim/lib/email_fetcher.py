@@ -25,9 +25,15 @@ CONTENT_TYPE_TEXT_HTML = 'text/html'
 
 IMAP_SEEN_FLAG = SEEN
 IMAP_CHECKED_FLAG = FLAGGED
+
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
-MAIL_FETCHER_CONNECTION_TIMEOUT = 60*9
-IDLE_MODE = True
+MAIL_FETCHER_CONNECTION_TIMEOUT = 60*3
+MAIL_FETCHER_CONNECTION_MAX_LIFETIME = 60*10
+MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT = 60*9   # this should be not more
+# that 29 minutes according to rfc2177.(server wait 30min by default)
+
+IDLE_MODE = False
+
 
 class MessageContainer(object):
     def __init__(self, message: Message, uid: int) -> None:
@@ -195,27 +201,49 @@ class MailFetcher(object):
     def run(self) -> None:
         logger.info(self, 'Starting MailFetcher')
         while self._is_active:
+
+            # login/connection
             try:
-                imapc = IMAPClient(self.host, self.port, ssl=self.use_ssl)
+                imapc = IMAPClient(self.host,
+                                   self.port,
+                                   ssl=self.use_ssl,
+                                   timeout=MAIL_FETCHER_CONNECTION_TIMEOUT)
                 imapc.login(self.user, self.password)
-                # select mailbox
+            except Exception as e:
+                log = 'Fail to connect to IMAP {}'
+                logger.error(self, log.format(e.__str__()))
+                logger.debug(self, 'sleep for {}'.format(self.delay))
+                time.sleep(self.delay)
+                continue
+
+            # fetching
+            try:
+                # select folder
                 logger.debug(self, 'Select folder {}'.format(
                     self.folder,
                 ))
-                deadline = time.time() + MAIL_FETCHER_CONNECTION_TIMEOUT
+                imapc.select_folder(self.folder)
+
+                # force renew connection when deadline is reached
+                deadline = time.time() + MAIL_FETCHER_CONNECTION_MAX_LIFETIME
                 while time.time() < deadline:
+                    # check for new mails
                     self._check_mail(imapc)
 
                     if IDLE_MODE and imapc.has_capability('IDLE'):
+                        # IDLE_mode: wait until event from server
                         logger.debug(self, 'wail for event(IDLE)')
                         imapc.idle()
                         imapc.idle_check(
-                            timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
+                            timeout=MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT
                         )
                         imapc.idle_done()
                     else:
+                        # normal polling mode : sleep a define duration
                         logger.debug(self, 'sleep for {}'.format(self.delay))
                         time.sleep(self.delay)
+
+                logger.debug(self,"Lifetime limit excess, Renew connection")
             except filelock.Timeout as e:
                 log = 'Mail Fetcher Lock Timeout {}'
                 logger.warning(self, log.format(e.__str__()))
@@ -223,7 +251,20 @@ class MailFetcher(object):
                 log = 'Mail Fetcher error {}'
                 logger.error(self, log.format(e.__str__()))
             finally:
-                imapc.logout()
+                # INFO - G.M - 2018-01-09 - Connection closing
+                # Properly close connection according to
+                # https://github.com/mjs/imapclient/pull/279/commits/043e4bd0c5c775c5a08cb5f1baa93876a46732ee
+                # TODO : Use __exit__ method instead when imapclient stable will
+                # be 2.0+ .
+                logger.debug(self, 'Try logout')
+                try:
+                    imapc.logout()
+                except Exception:
+                    try:
+                        imapc.shutdown()
+                    except Exception as e:
+                        log = "Can't logout, connection broken ? {}"
+                        logger.error(self, log.format(e.__str__()))
 
     def _check_mail(self, imapc: IMAPClient) -> None:
         with self.lock.acquire(
@@ -244,7 +285,6 @@ class MailFetcher(object):
         """
         messages = []
 
-        imapc.select_folder(self.folder)
         logger.debug(self, 'Fetch unseen messages')
         uids = imapc.search(['UNSEEN'])
         logger.debug(self, 'Found {} unseen mails'.format(
