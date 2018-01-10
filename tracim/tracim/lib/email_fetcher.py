@@ -245,6 +245,10 @@ class MailFetcher(object):
                         )
                         imapc.idle_done()
                     else:
+                        if self.use_idle and not imapc.has_capability('IDLE'):
+                            log = 'IDLE mode activated but server do not' \
+                                  'support it, use polling instead.'
+                            logger.warning(self, log)
                         # normal polling mode : sleep a define duration
                         logger.debug(self, 'sleep for {}'.format(self.delay))
                         time.sleep(self.delay)
