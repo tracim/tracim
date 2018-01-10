@@ -161,7 +161,7 @@ class MailFetcher(object):
         folder: str,
         use_idle: bool,
         connection_max_lifetime: int,
-        delay: int,
+        heartbeat: int,
         endpoint: str,
         token: str,
         use_html_parsing: bool,
@@ -179,7 +179,7 @@ class MailFetcher(object):
         :param use_ssl: use imap over ssl connection
         :param folder: mail folder where new mail are fetched
         :param use_idle: use IMAP IDLE(server notification) when available
-        :param delay: seconds to wait before fetching new mail again
+        :param heartbeat: seconds to wait before fetching new mail again
         :param connection_max_lifetime: maximum duration allowed for a connection.
            connection is automatically renew when his lifetime excess this value
         :param endpoint: tracim http endpoint where decoded mail are send.
@@ -193,7 +193,7 @@ class MailFetcher(object):
         self.password = password
         self.use_ssl = use_ssl
         self.folder = folder
-        self.delay = delay
+        self.heartbeat = heartbeat
         self.use_idle = use_idle
         self.connection_max_lifetime = connection_max_lifetime
         self.endpoint = endpoint
@@ -217,8 +217,8 @@ class MailFetcher(object):
             except Exception as e:
                 log = 'Fail to connect to IMAP {}'
                 logger.error(self, log.format(e.__str__()))
-                logger.debug(self, 'sleep for {}'.format(self.delay))
-                time.sleep(self.delay)
+                logger.debug(self, 'sleep for {}'.format(self.heartbeat))
+                time.sleep(self.heartbeat)
                 continue
 
             # fetching
@@ -250,8 +250,8 @@ class MailFetcher(object):
                                   'support it, use polling instead.'
                             logger.warning(self, log)
                         # normal polling mode : sleep a define duration
-                        logger.debug(self, 'sleep for {}'.format(self.delay))
-                        time.sleep(self.delay)
+                        logger.debug(self, 'sleep for {}'.format(self.heartbeat))
+                        time.sleep(self.heartbeat)
 
                 logger.debug(self,"Lifetime limit excess, Renew connection")
             except filelock.Timeout as e:
