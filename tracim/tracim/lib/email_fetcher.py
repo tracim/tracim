@@ -28,11 +28,9 @@ IMAP_CHECKED_FLAG = FLAGGED
 
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
 MAIL_FETCHER_CONNECTION_TIMEOUT = 60*3
-MAIL_FETCHER_CONNECTION_MAX_LIFETIME = 60*10
 MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT = 60*9   # this should be not more
 # that 29 minutes according to rfc2177.(server wait 30min by default)
 
-IDLE_MODE = False
 
 
 class MessageContainer(object):
@@ -161,6 +159,8 @@ class MailFetcher(object):
         password: str,
         use_ssl: bool,
         folder: str,
+        use_idle: bool,
+        connection_max_lifetime: int,
         delay: int,
         endpoint: str,
         token: str,
@@ -178,7 +178,10 @@ class MailFetcher(object):
         :param password: user password of mailbox
         :param use_ssl: use imap over ssl connection
         :param folder: mail folder where new mail are fetched
+        :param use_idle: use IMAP IDLE(server notification) when available
         :param delay: seconds to wait before fetching new mail again
+        :param connection_max_lifetime: maximum duration allowed for a connection.
+           connection is automatically renew when his lifetime excess this value
         :param endpoint: tracim http endpoint where decoded mail are send.
         :param token: token to authenticate http connexion
         :param use_html_parsing: parse html mail
@@ -191,6 +194,8 @@ class MailFetcher(object):
         self.use_ssl = use_ssl
         self.folder = folder
         self.delay = delay
+        self.use_idle = use_idle
+        self.connection_max_lifetime = connection_max_lifetime
         self.endpoint = endpoint
         self.token = token
         self.use_html_parsing = use_html_parsing
@@ -225,12 +230,13 @@ class MailFetcher(object):
                 imapc.select_folder(self.folder)
 
                 # force renew connection when deadline is reached
-                deadline = time.time() + MAIL_FETCHER_CONNECTION_MAX_LIFETIME
+                deadline = time.time() + self.connection_max_lifetime
                 while time.time() < deadline:
                     # check for new mails
                     self._check_mail(imapc)
 
-                    if IDLE_MODE and imapc.has_capability('IDLE'):
+
+                    if self.use_idle and imapc.has_capability('IDLE'):
                         # IDLE_mode: wait until event from server
                         logger.debug(self, 'wail for event(IDLE)')
                         imapc.idle()

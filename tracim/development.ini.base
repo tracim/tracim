@@ -222,6 +222,9 @@ email.reply.imap.user = your_imap_user
 email.reply.imap.password = your_imap_password
 email.reply.imap.folder = INBOX
 email.reply.imap.use_ssl = true
+email.reply.imap.use_idle = true
+# Re-new connection each 10 minutes
+email.reply.connection.max_lifetime = 600
 # Token for communication between mail fetcher and tracim controller
 email.reply.token = mysecuretoken
 # Delay in seconds between each check
