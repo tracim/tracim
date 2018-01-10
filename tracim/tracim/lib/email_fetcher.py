@@ -3,6 +3,9 @@
 import time
 import json
 import typing
+import socket
+import ssl
+
 from email import message_from_bytes
 from email.header import decode_header
 from email.header import make_header
@@ -12,7 +15,7 @@ from email.utils import parseaddr
 import filelock
 import markdown
 import requests
-from imapclient import IMAPClient, FLAGGED, SEEN
+import imapclient
 
 from email_reply_parser import EmailReplyParser
 from tracim.lib.base import logger
@@ -23,14 +26,13 @@ TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
-IMAP_SEEN_FLAG = SEEN
-IMAP_CHECKED_FLAG = FLAGGED
+IMAP_SEEN_FLAG = imapclient.SEEN
+IMAP_CHECKED_FLAG = imapclient.FLAGGED
 
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
 MAIL_FETCHER_CONNECTION_TIMEOUT = 60*3
 MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT = 60*9   # this should be not more
 # that 29 minutes according to rfc2177.(server wait 30min by default)
-
 
 
 class MessageContainer(object):
@@ -180,8 +182,9 @@ class MailFetcher(object):
         :param folder: mail folder where new mail are fetched
         :param use_idle: use IMAP IDLE(server notification) when available
         :param heartbeat: seconds to wait before fetching new mail again
-        :param connection_max_lifetime: maximum duration allowed for a connection.
-           connection is automatically renew when his lifetime excess this value
+        :param connection_max_lifetime: maximum duration allowed for a
+             connection . connection are automatically renew when their
+             lifetime excess this duration.
         :param endpoint: tracim http endpoint where decoded mail are send.
         :param token: token to authenticate http connexion
         :param use_html_parsing: parse html mail
@@ -206,24 +209,17 @@ class MailFetcher(object):
     def run(self) -> None:
         logger.info(self, 'Starting MailFetcher')
         while self._is_active:
-
-            # login/connection
+            imapc = None
+            sleep_after_connection = True
             try:
-                imapc = IMAPClient(self.host,
-                                   self.port,
-                                   ssl=self.use_ssl,
-                                   timeout=MAIL_FETCHER_CONNECTION_TIMEOUT)
+                imapc = imapclient.IMAPClient(
+                    self.host,
+                    self.port,
+                    ssl=self.use_ssl,
+                    timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
+                )
                 imapc.login(self.user, self.password)
-            except Exception as e:
-                log = 'Fail to connect to IMAP {}'
-                logger.error(self, log.format(e.__str__()))
-                logger.debug(self, 'sleep for {}'.format(self.heartbeat))
-                time.sleep(self.heartbeat)
-                continue
 
-            # fetching
-            try:
-                # select folder
                 logger.debug(self, 'Select folder {}'.format(
                     self.folder,
                 ))
@@ -231,13 +227,25 @@ class MailFetcher(object):
 
                 # force renew connection when deadline is reached
                 deadline = time.time() + self.connection_max_lifetime
-                while time.time() < deadline:
+                while True:
+                    if not self._is_active:
+                        logger.warning(self, 'Mail Fetcher process aborted')
+                        sleep_after_connection = False
+                        break
+
+                    if time.time() > deadline:
+                        logger.debug(
+                            self,
+                            "MailFetcher Connection Lifetime limit excess"
+                            ", Try Re-new connection")
+                        sleep_after_connection = False
+                        break
+
                     # check for new mails
                     self._check_mail(imapc)
 
-
                     if self.use_idle and imapc.has_capability('IDLE'):
-                        # IDLE_mode: wait until event from server
+                        # IDLE_mode wait until event from server
                         logger.debug(self, 'wail for event(IDLE)')
                         imapc.idle()
                         imapc.idle_check(
@@ -250,33 +258,69 @@ class MailFetcher(object):
                                   'support it, use polling instead.'
                             logger.warning(self, log)
                         # normal polling mode : sleep a define duration
-                        logger.debug(self, 'sleep for {}'.format(self.heartbeat))
+                        logger.debug(self,
+                                     'sleep for {}'.format(self.heartbeat))
                         time.sleep(self.heartbeat)
 
-                logger.debug(self,"Lifetime limit excess, Renew connection")
+            # Socket
+            except (socket.error,
+                    socket.gaierror,
+                    socket.herror) as e:
+                log = 'Socket fail with IMAP connection {}'
+                logger.error(self, log.format(e.__str__()))
+
+            except socket.timeout as e:
+                log = 'Socket timeout on IMAP connection {}'
+                logger.error(self, log.format(e.__str__()))
+
+            # SSL
+            except ssl.SSLError as e:
+                log = 'SSL error on IMAP connection'
+                logger.error(self, log.format(e.__str__()))
+
+            except ssl.CertificateError as e:
+                log = 'SSL Certificate verification failed on IMAP connection'
+                logger.error(self, log.format(e.__str__()))
+
+            # Filelock
             except filelock.Timeout as e:
                 log = 'Mail Fetcher Lock Timeout {}'
                 logger.warning(self, log.format(e.__str__()))
+
+            # IMAP
+            # TODO - G.M - 10-01-2017 - Support imapclient exceptions
+            # when Imapclient stable will be 2.0+
+
+            # Others
             except Exception as e:
                 log = 'Mail Fetcher error {}'
                 logger.error(self, log.format(e.__str__()))
+
             finally:
                 # INFO - G.M - 2018-01-09 - Connection closing
                 # Properly close connection according to
                 # https://github.com/mjs/imapclient/pull/279/commits/043e4bd0c5c775c5a08cb5f1baa93876a46732ee
                 # TODO : Use __exit__ method instead when imapclient stable will
                 # be 2.0+ .
-                logger.debug(self, 'Try logout')
-                try:
-                    imapc.logout()
-                except Exception:
+                if imapc:
+                    logger.debug(self, 'Try logout')
                     try:
-                        imapc.shutdown()
-                    except Exception as e:
-                        log = "Can't logout, connection broken ? {}"
-                        logger.error(self, log.format(e.__str__()))
+                        imapc.logout()
+                    except Exception:
+                        try:
+                            imapc.shutdown()
+                        except Exception as e:
+                            log = "Can't logout, connection broken ? {}"
+                            logger.error(self, log.format(e.__str__()))
 
-    def _check_mail(self, imapc: IMAPClient) -> None:
+            if sleep_after_connection:
+                logger.debug(self, 'sleep for {}'.format(self.heartbeat))
+                time.sleep(self.heartbeat)
+
+        log = 'Mail Fetcher stopped'
+        logger.debug(self, log)
+
+    def _check_mail(self, imapc: imapclient.IMAPClient) -> None:
         with self.lock.acquire(
                 timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
         ):
@@ -288,7 +332,8 @@ class MailFetcher(object):
     def stop(self) -> None:
         self._is_active = False
 
-    def _fetch(self, imapc: IMAPClient) -> typing.List[MessageContainer]:
+    def _fetch(self, imapc: imapclient.IMAPClient) \
+            -> typing.List[MessageContainer]:
         """
         Get news message from mailbox
         :return: list of new mails
@@ -320,7 +365,7 @@ class MailFetcher(object):
     def _notify_tracim(
         self,
         mails: typing.List[DecodedMail],
-        imapc: IMAPClient
+        imapc: imapclient.IMAPClient
     ) -> None:
         """
         Send http request to tracim endpoint
