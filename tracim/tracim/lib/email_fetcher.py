@@ -332,8 +332,10 @@ class MailFetcher(object):
     def stop(self) -> None:
         self._is_active = False
 
-    def _fetch(self, imapc: imapclient.IMAPClient) \
-            -> typing.List[MessageContainer]:
+    def _fetch(
+        self, 
+        imapc: imapclient.IMAPClient,
+    ) -> typing.List[MessageContainer]:
         """
         Get news message from mailbox
         :return: list of new mails
