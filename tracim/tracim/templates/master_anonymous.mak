@@ -11,6 +11,7 @@
         <meta name="author" content="">
         <link rel="icon" href="/favicon.ico">
 
+        <link href="${tg.url('/assets/css/bootstrap.css')}" rel="stylesheet">
         <link href="${tg.url('/assets/dist/all.css')}" rel="stylesheet">
 
         <script>
