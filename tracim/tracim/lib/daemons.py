@@ -173,7 +173,9 @@ class MailFetcherDaemon(Daemon):
             password=cfg.EMAIL_REPLY_IMAP_PASSWORD,
             use_ssl=cfg.EMAIL_REPLY_IMAP_USE_SSL,
             folder=cfg.EMAIL_REPLY_IMAP_FOLDER,
-            delay=cfg.EMAIL_REPLY_CHECK_HEARTBEAT,
+            heartbeat=cfg.EMAIL_REPLY_CHECK_HEARTBEAT,
+            use_idle=cfg.EMAIL_REPLY_IMAP_USE_IDLE,
+            connection_max_lifetime=cfg.EMAIL_REPLY_CONNECTION_MAX_LIFETIME,
             # FIXME - G.M - 2017-11-15 - proper tracim url formatting
             endpoint=cfg.WEBSITE_BASE_URL + "/events",
             token=cfg.EMAIL_REPLY_TOKEN,

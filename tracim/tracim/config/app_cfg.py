@@ -384,6 +384,14 @@ class CFG(object):
         self.EMAIL_REPLY_IMAP_USE_SSL = asbool(tg.config.get(
             'email.reply.imap.use_ssl',
         ))
+        self.EMAIL_REPLY_IMAP_USE_IDLE = asbool(tg.config.get(
+            'email.reply.imap.use_idle',
+            True,
+        ))
+        self.EMAIL_REPLY_CONNECTION_MAX_LIFETIME = int(tg.config.get(
+            'email.reply.connection.max_lifetime',
+            600, # 10 minutes
+        ))
         self.EMAIL_REPLY_USE_HTML_PARSING = asbool(tg.config.get(
             'email.reply.use_html_parsing',
             True,
