@@ -22,6 +22,7 @@ from tracim.controllers.help import HelpController
 from tracim.controllers.previews import PreviewsController
 from tracim.controllers.user import UserRestController
 from tracim.controllers.workspace import UserWorkspaceRestController
+from tracim.controllers.events import EventRestController
 from tracim.lib import CST
 from tracim.lib.base import logger
 from tracim.lib.content import ContentApi
@@ -61,7 +62,7 @@ class RootController(StandardController):
     previews = PreviewsController()
 
     content = ContentController()
-
+    events = EventRestController()
     # api
     api = APIController()
 
@@ -153,19 +154,6 @@ class RootController(StandardController):
         items = ContentApi(user).get_all_without_exception(ContentType.Any, None)[:4]
         fake_api.favorites = Context(CTX.CONTENT_LIST).toDict(items, 'contents', 'nb')
         return DictLikeClass(fake_api=fake_api)
-
-        # user_id = tmpl_context.current_user.user_id
-        #
-        # current_user = tmpl_context.current_user
-        # assert user_id==current_user.user_id
-        # api = UserApi(current_user)
-        # current_user = api.get_one(current_user.user_id)
-        # dictified_user = Context(CTX.USER).toDict(current_user, 'user')
-        # current_user_content = Context(CTX.CURRENT_USER).toDict(tmpl_context.current_user)
-        # fake_api_content = DictLikeClass(current_user=current_user_content)
-        # fake_api = Context(CTX.WORKSPACE).toDict(fake_api_content)
-        #
-        # return DictLikeClass(result = dictified_user, fake_api=fake_api)
 
     @require(predicates.not_anonymous())
     @expose('tracim.templates.search.display')

@@ -66,14 +66,14 @@
     <div class="alert alert-info" role="alert">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            ${_('Vous consultez <b>une version archivée</b> de la page courante.')|n}
+            ${_('You are looking at an <b>archived file</b>.')|n}
         </p>
     </div>
     % elif (result.file.is_deleted) :
     <div class="alert alert-info" role="alert">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            ${_('Vous consultez <b>une version supprimée</b> de la page courante.')|n}
+            ${_('You are looking at a <b>deleted file</b>.')|n}
         </p>
     </div>
     % endif
@@ -124,7 +124,7 @@
                     selectedRevision: '${result.file.selected_revision}',
                     weight: '${h.user_friendly_file_size(result.file.file.size)}',
                     height: '300',
-                    modifiedAt: '${h.format_short(created_localized)|n}',
+                    modifiedAt: '${h.format_short(updated_localized)|n}',
                     owner: '${result.file.owner.name}',
                     sourceLink: '${download_url}',
                     pdfAvailable: ${pdf_available}

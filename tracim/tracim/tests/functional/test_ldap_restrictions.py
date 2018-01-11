@@ -26,7 +26,7 @@ class TestAuthentication(LDAPTest, TracimTestController):
         home = self.app.get('/home/',)
 
         # HTML button is not here
-        eq_(None, BeautifulSoup(home.body).find(attrs={'class': 'change-password-btn'}))
+        eq_(None, BeautifulSoup(home.body, 'html.parser').find(attrs={'class': 'change-password-btn'}))
 
         # If we force passwd update, we got 403
         try_post_passwd = self.app.post(
@@ -51,12 +51,12 @@ class TestAuthentication(LDAPTest, TracimTestController):
         edit = self.app.get('/user/5/edit')
 
         # email input field is disabled
-        email_input = BeautifulSoup(edit.body).find(attrs={'id': 'email'})
+        email_input = BeautifulSoup(edit.body, 'html.parser').find(attrs={'id': 'email'})
         ok_('readonly' in email_input.attrs)
         eq_(email_input.attrs['readonly'], "readonly")
 
         # Name is not (see attributes configuration of LDAP fixtures)
-        name_input = BeautifulSoup(edit.body).find(attrs={'id': 'name'})
+        name_input = BeautifulSoup(edit.body, 'html.parser').find(attrs={'id': 'name'})
         ok_('readonly' not in name_input.attrs)
 
         # If we force edit of user, "email" field will be not updated

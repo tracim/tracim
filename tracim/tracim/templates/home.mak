@@ -137,7 +137,9 @@
                             </tr>
                         </thead>
                         % for role in fake_api.current_user.roles:
-                            ${TABLE_ROW.USER_ROLE_IN_WORKSPACE(fake_api.current_user, role, show_id=False, enable_link='/user/me/workspaces/{workspace}/enable_notifications?next_url=/home', disable_link='/user/me/workspaces/{workspace}/disable_notifications?next_url=/home', base_link='/workspaces/{workspace}')}
+                            % if not role.workspace.is_deleted:
+                                ${TABLE_ROW.USER_ROLE_IN_WORKSPACE(fake_api.current_user, role, show_id=False, enable_link='/user/me/workspaces/{workspace}/enable_notifications?next_url=/home', disable_link='/user/me/workspaces/{workspace}/disable_notifications?next_url=/home', base_link='/workspaces/{workspace}')}
+                            % endif
                         % endfor
                     </table>
                 % endif

@@ -64,14 +64,14 @@
     <div class="alert alert-info" role="alert">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            ${_('You are viewing <b>an archived version</b> of the current page.')|n}
+            ${_('You are looking at an <b>archived page</b>.')|n}
         </p>
     </div>
     % elif (result.page.is_deleted) :
     <div class="alert alert-info" role="alert">
         <p>
             <span class="pull-left"><i class="fa fa-fw fa-2x fa-warning" alt="" title=""></i></span>
-            ${_('You are viewing <b>a deleted version</b> of the current page.')|n}
+            ${_('You are looking at a <b>deleted page</b>.')|n}
         </p>
     </div>
     % endif

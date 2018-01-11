@@ -222,7 +222,7 @@ class ContentApi(object):
             result = result.filter(Content.type.in_(self.DISPLAYABLE_CONTENTS))
 
         if workspace:
-            result = result.filter(Content.workspace_id==workspace.workspace_id)
+            result = result.filter(Content.workspace_id == workspace.workspace_id)
 
         # Security layer: if user provided, filter
         # with user workspaces privileges
@@ -735,7 +735,10 @@ class ContentApi(object):
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
 
-        resultset = self._base_query(workspace).order_by(desc(Content.updated))
+        resultset = self._base_query(workspace) \
+            .filter(Content.workspace_id == Workspace.workspace_id) \
+            .filter(Workspace.is_deleted.is_(False)) \
+            .order_by(desc(Content.updated))
 
         if content_type!=ContentType.Any:
             resultset = resultset.filter(Content.type==content_type)
@@ -773,6 +776,8 @@ class ContentApi(object):
 
         not_read_revisions = self._revisions_base_query(workspace) \
             .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
+            .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
+            .filter(Workspace.is_deleted.is_(False)) \
             .subquery()
 
         not_read_content_ids_query = DBSession.query(

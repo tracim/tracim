@@ -14,7 +14,7 @@
                 <input name="label" type="text" class="form-control" id="file-title" placeholder="${_('Title')}" value="${file.label}">
             </div>
             <div class="form-group">
-                <label for="file-content">${_('Content')}</label>
+                <label for="file-content">${_('Description')}</label>
                 <textarea id="file-content-textarea" name="comment" class="form-control pod-rich-textarea" id="file-content" placeholder="${_('Write here the file content')}">${file.content}</textarea>
             </div>
         </div>

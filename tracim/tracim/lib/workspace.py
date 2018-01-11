@@ -34,8 +34,8 @@ class WorkspaceApi(object):
 
         return DBSession.query(Workspace).\
             join(Workspace.roles).\
-            filter(UserRoleInWorkspace.user_id==self._user.user_id).\
-            filter(Workspace.is_deleted==False)
+            filter(UserRoleInWorkspace.user_id == self._user.user_id).\
+            filter(Workspace.is_deleted == False)
 
     def create_workspace(
             self,

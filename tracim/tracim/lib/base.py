@@ -125,8 +125,8 @@ class Logger(object):
     def debug(self, instance_or_class, message):
         self._logger.debug(Logger.TPL.format(cls=self._txt(instance_or_class), msg=message))
 
-    def error(self, instance_or_class, message):
-        self._logger.error(Logger.TPL.format(cls=self._txt(instance_or_class), msg=message))
+    def error(self, instance_or_class, message, exc_info=0):
+        self._logger.error(Logger.TPL.format(cls=self._txt(instance_or_class), msg=message, exc_info=exc_info))
 
     def info(self, instance_or_class, message):
         self._logger.info(Logger.TPL.format(cls=self._txt(instance_or_class), msg=message))

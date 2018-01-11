@@ -173,9 +173,10 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
                    )
     histHTML += '</table>'
 
-    file = '''
+    page = '''
 <html>
 <head>
+	<meta charset="utf-8" />
 	<title>%s</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
@@ -233,7 +234,7 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
                content_revision.description,
                histHTML)
 
-    return file
+    return page
 
 def designThread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
         hist = content.get_history()
@@ -291,9 +292,10 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                                # t.ref_object.label) if t.type.id in ['revision', 'creation', 'edition'] else '')
                            )
 
-        page = '''
+        thread = '''
 <html>
 <head>
+	<meta charset="utf-8" />
 	<title>%s</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -379,4 +381,4 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                content_revision.description,
                disc)
 
-        return page
+        return thread
