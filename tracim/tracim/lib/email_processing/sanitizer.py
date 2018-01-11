@@ -1,15 +1,10 @@
 import typing
 from bs4 import BeautifulSoup, Tag
-from tracim.lib.email_processing.sanitizer_config.attrs_whitelist import \
-    ATTRS_WHITELIST
-from tracim.lib.email_processing.sanitizer_config.class_blacklist import \
-    CLASS_BLACKLIST
-from tracim.lib.email_processing.sanitizer_config.id_blacklist import \
-    ID_BLACKLIST
-from tracim.lib.email_processing.sanitizer_config.tag_blacklist import \
-    TAG_BLACKLIST
-from tracim.lib.email_processing.sanitizer_config.tag_whitelist import \
-    TAG_WHITELIST
+from tracim.lib.email_processing.sanitizer_config.attrs_whitelist import ATTRS_WHITELIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.class_blacklist import CLASS_BLACKLIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.id_blacklist import ID_BLACKLIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.tag_blacklist import TAG_BLACKLIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.tag_whitelist import TAG_WHITELIST  # nopep8
 
 class HtmlSanitizerConfig(object):
     # whitelist : keep tag and content
