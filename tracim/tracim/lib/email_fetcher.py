@@ -332,8 +332,9 @@ class MailFetcher(object):
         while mails:
             mail = mails.pop()
             body =  mail.get_body(
-                           use_html_parsing=self.use_html_parsing,
-                           use_txt_parsing=self.use_txt_parsing)
+                use_html_parsing=self.use_html_parsing,
+                use_txt_parsing=self.use_txt_parsing,
+            )
             from_address = mail.get_from_address()
 
             # don't create element for 'empty' mail
