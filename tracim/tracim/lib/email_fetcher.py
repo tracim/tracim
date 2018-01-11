@@ -331,13 +331,27 @@ class MailFetcher(object):
         #  if no from address for example) and catch it here
         while mails:
             mail = mails.pop()
+            body =  mail.get_body(
+                use_html_parsing=self.use_html_parsing,
+                use_txt_parsing=self.use_txt_parsing,
+            )
+            from_address = mail.get_from_address()
+
+            # don't create element for 'empty' mail
+            if not body:
+                logger.warning(
+                    self,
+                    'Mail from {} has not valable content'.format(
+                        from_address
+                    ),
+                )
+                continue
+
             msg = {'token': self.token,
-                   'user_mail': mail.get_from_address(),
+                   'user_mail': from_address,
                    'content_id': mail.get_key(),
                    'payload': {
-                       'content': mail.get_body(
-                           use_html_parsing=self.use_html_parsing,
-                           use_txt_parsing=self.use_txt_parsing),
+                       'content': body,
                    }}
             try:
                 logger.debug(

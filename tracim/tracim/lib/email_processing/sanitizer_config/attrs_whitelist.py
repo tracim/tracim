@@ -1,0 +1,1 @@
+ATTRS_WHITELIST = ['href']
