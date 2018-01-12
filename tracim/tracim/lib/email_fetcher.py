@@ -26,7 +26,6 @@ TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
-IMAP_SEEN_FLAG = imapclient.SEEN
 IMAP_CHECKED_FLAG = imapclient.FLAGGED
 
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
@@ -342,13 +341,9 @@ class MailFetcher(object):
         """
         messages = []
 
-        logger.debug(self, 'Fetch unseen messages')
-        uids = imapc.search(['UNSEEN'])
-        logger.debug(self, 'Found {} unseen mails'.format(
-            len(uids),
-        ))
-        imapc.add_flags(uids, IMAP_SEEN_FLAG)
-        logger.debug(self, 'Temporary Flag {} mails as seen'.format(
+        logger.debug(self, 'Fetch unflagged messages')
+        uids = imapc.search(['UNFLAGGED'])
+        logger.debug(self, 'Found {} unflagged mails'.format(
             len(uids),
         ))
         for msgid, data in imapc.fetch(uids, ['BODY.PEEK[]']).items():
@@ -421,17 +416,13 @@ class MailFetcher(object):
                         str(r.status_code),
                         details,
                     ))
-                # Flag all correctly checked mail, unseen the others
+                # Flag all correctly checked mail
                 if r.status_code in [200, 204, 400]:
                     imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
-                else:
-                    imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
