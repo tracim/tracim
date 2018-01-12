@@ -151,6 +151,10 @@ class DecodedMail(object):
         return None
 
 
+class BadIMAPFetchResponse(Exception):
+    pass
+
+
 class MailFetcher(object):
     def __init__(
         self,
@@ -290,6 +294,10 @@ class MailFetcher(object):
             # TODO - G.M - 10-01-2017 - Support imapclient exceptions
             # when Imapclient stable will be 2.0+
 
+            except BadIMAPFetchResponse as e:
+                log = 'Imap Fetch command return bad response.' \
+                      'Is someone else connected to the mailbox ?'
+                logger.error(self, log.format(e.__str__()))
             # Others
             except Exception as e:
                 log = 'Mail Fetcher error {}'
@@ -354,9 +362,21 @@ class MailFetcher(object):
             logger.debug(self, 'Fetch mail "{}"'.format(
                 msgid,
             ))
-            msg = message_from_bytes(data[b'BODY[]'])
+
+            try:
+                msg = message_from_bytes(data[b'BODY[]'])
+            except KeyError as e:
+                # INFO - G.M - 12-01-2018 - Fetch may return events response
+                # In some specific case, fetch command may return events
+                # response unrelated to fetch request.
+                # This should happen only when someone-else use the mailbox
+                # at the same time of the fetcher.
+                # see https://github.com/mjs/imapclient/issues/334
+                raise BadIMAPFetchResponse from e
+
             msg_container = MessageContainer(msg, msgid)
             messages.append(msg_container)
+
         return messages
 
     def _notify_tracim(
