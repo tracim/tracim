@@ -296,7 +296,8 @@ class MailFetcher(object):
 
             except BadIMAPFetchResponse as e:
                 log = 'Imap Fetch command return bad response.' \
-                      'Is someone else connected to the mailbox ?'
+                      'Is someone else connected to the mailbox ?: ' \
+                      '{}'
                 logger.error(self, log.format(e.__str__()))
             # Others
             except Exception as e:
@@ -372,7 +373,8 @@ class MailFetcher(object):
                 # This should happen only when someone-else use the mailbox
                 # at the same time of the fetcher.
                 # see https://github.com/mjs/imapclient/issues/334
-                raise BadIMAPFetchResponse from e
+                except_msg = 'fetch response : {}'.format(str(data))
+                raise BadIMAPFetchResponse(except_msg) from e
 
             msg_container = MessageContainer(msg, msgid)
             messages.append(msg_container)
@@ -398,7 +400,7 @@ class MailFetcher(object):
         #  if no from address for example) and catch it here
         while mails:
             mail = mails.pop()
-            body =  mail.get_body(
+            body = mail.get_body(
                 use_html_parsing=self.use_html_parsing,
                 use_txt_parsing=self.use_txt_parsing,
             )
