@@ -109,7 +109,8 @@ class HtmlBodyMailParts(BodyMailParts):
         if len(self._list) > 0:
             txt = BeautifulSoup(value.text, 'html.parser').get_text()
             txt = txt.replace('\n', '').strip()
-            if not txt:
+            img = BeautifulSoup(value.text, 'html.parser').find('img')
+            if not txt and not img:
                 value.part_type = self._list[-1].part_type
         BodyMailParts._check_value(value)
         BodyMailParts._append(self, value)

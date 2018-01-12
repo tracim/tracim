@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import time
-import imaplib
 import json
 import typing
+import socket
+import ssl
+
 from email import message_from_bytes
 from email.header import decode_header
 from email.header import make_header
@@ -13,6 +15,8 @@ from email.utils import parseaddr
 import filelock
 import markdown
 import requests
+import imapclient
+
 from email_reply_parser import EmailReplyParser
 from tracim.lib.base import logger
 from tracim.lib.email_processing.parser import ParsedHTMLMail
@@ -22,9 +26,13 @@ TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
-IMAP_SEEN_FLAG = '\\Seen'
-IMAP_CHECKED_FLAG = '\\Flagged'
+IMAP_SEEN_FLAG = imapclient.SEEN
+IMAP_CHECKED_FLAG = imapclient.FLAGGED
+
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
+MAIL_FETCHER_CONNECTION_TIMEOUT = 60*3
+MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT = 60*9   # this should be not more
+# that 29 minutes according to rfc2177.(server wait 30min by default)
 
 
 class MessageContainer(object):
@@ -153,7 +161,9 @@ class MailFetcher(object):
         password: str,
         use_ssl: bool,
         folder: str,
-        delay: int,
+        use_idle: bool,
+        connection_max_lifetime: int,
+        heartbeat: int,
         endpoint: str,
         token: str,
         use_html_parsing: bool,
@@ -170,20 +180,25 @@ class MailFetcher(object):
         :param password: user password of mailbox
         :param use_ssl: use imap over ssl connection
         :param folder: mail folder where new mail are fetched
-        :param delay: seconds to wait before fetching new mail again
+        :param use_idle: use IMAP IDLE(server notification) when available
+        :param heartbeat: seconds to wait before fetching new mail again
+        :param connection_max_lifetime: maximum duration allowed for a
+             connection . connection are automatically renew when their
+             lifetime excess this duration.
         :param endpoint: tracim http endpoint where decoded mail are send.
         :param token: token to authenticate http connexion
         :param use_html_parsing: parse html mail
         :param use_txt_parsing: parse txt mail
         """
-        self._connection = None
         self.host = host
         self.port = port
         self.user = user
         self.password = password
         self.use_ssl = use_ssl
         self.folder = folder
-        self.delay = delay
+        self.heartbeat = heartbeat
+        self.use_idle = use_idle
+        self.connection_max_lifetime = connection_max_lifetime
         self.endpoint = endpoint
         self.token = token
         self.use_html_parsing = use_html_parsing
@@ -194,150 +209,201 @@ class MailFetcher(object):
     def run(self) -> None:
         logger.info(self, 'Starting MailFetcher')
         while self._is_active:
-            logger.debug(self, 'sleep for {}'.format(self.delay))
-            time.sleep(self.delay)
+            imapc = None
+            sleep_after_connection = True
             try:
-                self._connect()
-                with self.lock.acquire(
-                        timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
-                ):
-                    messages = self._fetch()
-                cleaned_mails = [DecodedMail(m.message, m.uid)
-                                 for m in messages]
-                self._notify_tracim(cleaned_mails)
-                self._disconnect()
+                imapc = imapclient.IMAPClient(
+                    self.host,
+                    self.port,
+                    ssl=self.use_ssl,
+                    timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
+                )
+                imapc.login(self.user, self.password)
+
+                logger.debug(self, 'Select folder {}'.format(
+                    self.folder,
+                ))
+                imapc.select_folder(self.folder)
+
+                # force renew connection when deadline is reached
+                deadline = time.time() + self.connection_max_lifetime
+                while True:
+                    if not self._is_active:
+                        logger.warning(self, 'Mail Fetcher process aborted')
+                        sleep_after_connection = False
+                        break
+
+                    if time.time() > deadline:
+                        logger.debug(
+                            self,
+                            "MailFetcher Connection Lifetime limit excess"
+                            ", Try Re-new connection")
+                        sleep_after_connection = False
+                        break
+
+                    # check for new mails
+                    self._check_mail(imapc)
+
+                    if self.use_idle and imapc.has_capability('IDLE'):
+                        # IDLE_mode wait until event from server
+                        logger.debug(self, 'wail for event(IDLE)')
+                        imapc.idle()
+                        imapc.idle_check(
+                            timeout=MAIL_FETCHER_IDLE_RESPONSE_TIMEOUT
+                        )
+                        imapc.idle_done()
+                    else:
+                        if self.use_idle and not imapc.has_capability('IDLE'):
+                            log = 'IDLE mode activated but server do not' \
+                                  'support it, use polling instead.'
+                            logger.warning(self, log)
+                        # normal polling mode : sleep a define duration
+                        logger.debug(self,
+                                     'sleep for {}'.format(self.heartbeat))
+                        time.sleep(self.heartbeat)
+
+            # Socket
+            except (socket.error,
+                    socket.gaierror,
+                    socket.herror) as e:
+                log = 'Socket fail with IMAP connection {}'
+                logger.error(self, log.format(e.__str__()))
+
+            except socket.timeout as e:
+                log = 'Socket timeout on IMAP connection {}'
+                logger.error(self, log.format(e.__str__()))
+
+            # SSL
+            except ssl.SSLError as e:
+                log = 'SSL error on IMAP connection'
+                logger.error(self, log.format(e.__str__()))
+
+            except ssl.CertificateError as e:
+                log = 'SSL Certificate verification failed on IMAP connection'
+                logger.error(self, log.format(e.__str__()))
+
+            # Filelock
             except filelock.Timeout as e:
                 log = 'Mail Fetcher Lock Timeout {}'
                 logger.warning(self, log.format(e.__str__()))
+
+            # IMAP
+            # TODO - G.M - 10-01-2017 - Support imapclient exceptions
+            # when Imapclient stable will be 2.0+
+
+            # Others
             except Exception as e:
-                # TODO - G.M - 2017-11-23 - Identify possible exceptions
-                log = 'IMAP error: {}'
-                logger.warning(self, log.format(e.__str__()))
+                log = 'Mail Fetcher error {}'
+                logger.error(self, log.format(e.__str__()))
+
+            finally:
+                # INFO - G.M - 2018-01-09 - Connection closing
+                # Properly close connection according to
+                # https://github.com/mjs/imapclient/pull/279/commits/043e4bd0c5c775c5a08cb5f1baa93876a46732ee
+                # TODO : Use __exit__ method instead when imapclient stable will
+                # be 2.0+ .
+                if imapc:
+                    logger.debug(self, 'Try logout')
+                    try:
+                        imapc.logout()
+                    except Exception:
+                        try:
+                            imapc.shutdown()
+                        except Exception as e:
+                            log = "Can't logout, connection broken ? {}"
+                            logger.error(self, log.format(e.__str__()))
+
+            if sleep_after_connection:
+                logger.debug(self, 'sleep for {}'.format(self.heartbeat))
+                time.sleep(self.heartbeat)
+
+        log = 'Mail Fetcher stopped'
+        logger.debug(self, log)
+
+    def _check_mail(self, imapc: imapclient.IMAPClient) -> None:
+        with self.lock.acquire(
+                timeout=MAIL_FETCHER_FILELOCK_TIMEOUT
+        ):
+            messages = self._fetch(imapc)
+            cleaned_mails = [DecodedMail(m.message, m.uid)
+                             for m in messages]
+            self._notify_tracim(cleaned_mails, imapc)
 
     def stop(self) -> None:
         self._is_active = False
 
-    def _connect(self) -> None:
-        # TODO - G.M - 2017-11-15 Verify connection/disconnection
-        # Are old connexion properly close this way ?
-        if self._connection:
-            logger.debug(self, 'Disconnect from IMAP')
-            self._disconnect()
-        # TODO - G.M - 2017-11-23 Support for predefined SSLContext ?
-        # without ssl_context param, tracim use default security configuration
-        # which is great in most case.
-        if self.use_ssl:
-            logger.debug(self, 'Connect IMAP {}:{} using SSL'.format(
-                self.host,
-                self.port,
-            ))
-            self._connection = imaplib.IMAP4_SSL(self.host, self.port)
-        else:
-            logger.debug(self, 'Connect IMAP {}:{}'.format(
-                self.host,
-                self.port,
-            ))
-            self._connection = imaplib.IMAP4(self.host, self.port)
-
-        try:
-            logger.debug(self, 'Login IMAP with login {}'.format(
-                self.user,
-            ))
-            self._connection.login(self.user, self.password)
-        except Exception as e:
-            log = 'Error during execution: {}'
-            logger.error(self, log.format(e.__str__()), exc_info=1)
-
-    def _disconnect(self) -> None:
-        if self._connection:
-            self._connection.close()
-            self._connection.logout()
-            self._connection = None
-
-    def _fetch(self) -> typing.List[MessageContainer]:
+    def _fetch(
+        self, 
+        imapc: imapclient.IMAPClient,
+    ) -> typing.List[MessageContainer]:
         """
         Get news message from mailbox
         :return: list of new mails
         """
         messages = []
-        # select mailbox
-        logger.debug(self, 'Fetch messages from folder {}'.format(
-            self.folder,
-        ))
-        rv, data = self._connection.select(self.folder)
-        logger.debug(self, 'Response status {}'.format(
-            rv,
-        ))
-        if rv == 'OK':
-            # get mails
-            # TODO - G.M -  2017-11-15 Which files to select as new file ?
-            # Unseen file or All file from a directory (old one should be
-            #  moved/ deleted from mailbox during this process) ?
-            logger.debug(self, 'Fetch unseen messages')
 
-            rv, data = self._connection.search(None, "(UNSEEN)")
-            logger.debug(self, 'Response status {}'.format(
-                rv,
+        logger.debug(self, 'Fetch unseen messages')
+        uids = imapc.search(['UNSEEN'])
+        logger.debug(self, 'Found {} unseen mails'.format(
+            len(uids),
+        ))
+        imapc.add_flags(uids, IMAP_SEEN_FLAG)
+        logger.debug(self, 'Temporary Flag {} mails as seen'.format(
+            len(uids),
+        ))
+        for msgid, data in imapc.fetch(uids, ['BODY.PEEK[]']).items():
+            # INFO - G.M - 2017-12-08 - Fetch BODY.PEEK[]
+            # Retrieve all mail(body and header) but don't set mail
+            # as seen because of PEEK
+            # see rfc3501
+            logger.debug(self, 'Fetch mail "{}"'.format(
+                msgid,
             ))
-            if rv == 'OK':
-                # get mail content
-                logger.debug(self, 'Found {} unseen mails'.format(
-                    len(data[0].split()),
-                ))
-                for uid in data[0].split():
-                    # INFO - G.M - 2017-12-08 - Fetch BODY.PEEK[]
-                    # Retrieve all mail(body and header) but don't set mail
-                    # as seen because of PEEK
-                    # see rfc3501
-                    logger.debug(self, 'Fetch mail "{}"'.format(
-                        uid,
-                    ))
-                    rv, data = self._connection.fetch(uid, 'BODY.PEEK[]')
-                    logger.debug(self, 'Response status {}'.format(
-                        rv,
-                    ))
-                    if rv == 'OK':
-                        msg = message_from_bytes(data[0][1])
-                        msg_container = MessageContainer(msg, uid)
-                        messages.append(msg_container)
-                        self._set_flag(uid, IMAP_SEEN_FLAG)
-                    else:
-                        log = 'IMAP : Unable to get mail : {}'
-                        logger.error(self, log.format(str(rv)))
-            else:
-                log = 'IMAP : Unable to get unseen mail : {}'
-                logger.error(self, log.format(str(rv)))
-        else:
-            log = 'IMAP : Unable to open mailbox : {}'
-            logger.error(self, log.format(str(rv)))
+            msg = message_from_bytes(data[b'BODY[]'])
+            msg_container = MessageContainer(msg, msgid)
+            messages.append(msg_container)
         return messages
 
     def _notify_tracim(
         self,
         mails: typing.List[DecodedMail],
+        imapc: imapclient.IMAPClient
     ) -> None:
         """
         Send http request to tracim endpoint
         :param mails: list of mails to send
-        :return: unsended mails
+        :return: none
         """
         logger.debug(self, 'Notify tracim about {} new responses'.format(
             len(mails),
         ))
-        unsended_mails = []
         # TODO BS 20171124: Look around mail.get_from_address(), mail.get_key()
         # , mail.get_body() etc ... for raise InvalidEmailError if missing
         #  required informations (actually get_from_address raise IndexError
         #  if no from address for example) and catch it here
         while mails:
             mail = mails.pop()
+            body =  mail.get_body(
+                use_html_parsing=self.use_html_parsing,
+                use_txt_parsing=self.use_txt_parsing,
+            )
+            from_address = mail.get_from_address()
+
+            # don't create element for 'empty' mail
+            if not body:
+                logger.warning(
+                    self,
+                    'Mail from {} has not valable content'.format(
+                        from_address
+                    ),
+                )
+                continue
+
             msg = {'token': self.token,
-                   'user_mail': mail.get_from_address(),
+                   'user_mail': from_address,
                    'content_id': mail.get_key(),
                    'payload': {
-                       'content': mail.get_body(
-                           use_html_parsing=self.use_html_parsing,
-                           use_txt_parsing=self.use_txt_parsing),
+                       'content': body,
                    }}
             try:
                 logger.debug(
@@ -357,64 +423,15 @@ class MailFetcher(object):
                     ))
                 # Flag all correctly checked mail, unseen the others
                 if r.status_code in [200, 204, 400]:
-                    self._set_flag(mail.uid, IMAP_CHECKED_FLAG)
+                    imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
                 else:
-                    self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
+                    imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                unsended_mails.append(mail)
-                self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
+                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                self._unset_flag(mail.uid, IMAP_SEEN_FLAG)
-
-    def _set_flag(
-            self,
-            uid: int,
-            flag: str,
-            ) -> None:
-        assert uid is not None
-
-        rv, data = self._connection.store(
-            uid,
-            '+FLAGS',
-            flag,
-        )
-        if rv == 'OK':
-            log = 'Message {uid} set as {flag}.'.format(
-                uid=uid,
-                flag=flag)
-            logger.debug(self, log)
-        else:
-            log = 'Can not set Message {uid} as {flag} : {rv}'.format(
-                uid=uid,
-                flag=flag,
-                rv=rv)
-            logger.error(self, log)
-
-    def _unset_flag(
-            self,
-            uid: int,
-            flag: str,
-            ) -> None:
-        assert uid is not None
-
-        rv, data = self._connection.store(
-            uid,
-            '-FLAGS',
-            flag,
-        )
-        if rv == 'OK':
-            log = 'Message {uid} unset as {flag}.'.format(
-                uid=uid,
-                flag=flag)
-            logger.debug(self, log)
-        else:
-            log = 'Can not unset Message {uid} as {flag} : {rv}'.format(
-                uid=uid,
-                flag=flag,
-                rv=rv)
-            logger.error(self, log)
+                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
