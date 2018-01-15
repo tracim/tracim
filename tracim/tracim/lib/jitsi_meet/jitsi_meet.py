@@ -22,13 +22,14 @@ def _generate_token(room:str)->str:
     exp = now+datetime.timedelta(seconds=JWT_DURATION)
     data = {
         "iss":JWT_APP_ID, #Issuer
-        "room": room, # Custom-param for jitsi-meet
+        "room": room, # Custom-param for jitsi_meet
         "aud": "*", # TODO: Understood this param
         "exp": exp, # Expiration date
         "nbf": now, # NotBefore
         "iat": now  # IssuedAt
     }
-    jwttoken=jwt.encode(data,
+    jwt
+    jwttoken= jwt.encode(data,
                         JWT_SECRET,
                         algorithm=JWT_ALG)
     return jwttoken.decode("utf-8")
