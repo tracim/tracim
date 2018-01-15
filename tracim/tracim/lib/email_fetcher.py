@@ -27,6 +27,7 @@ CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
 IMAP_CHECKED_FLAG = imapclient.FLAGGED
+IMAP_SEEN_FLAG = imapclient.SEEN
 
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
 MAIL_FETCHER_CONNECTION_TIMEOUT = 60*3
@@ -441,6 +442,7 @@ class MailFetcher(object):
                 # Flag all correctly checked mail
                 if r.status_code in [200, 204, 400]:
                     imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
+                    imapc.add_flags((mail.uid,), IMAP_SEEN_FLAG)
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
