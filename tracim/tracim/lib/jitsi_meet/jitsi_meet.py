@@ -87,4 +87,5 @@ JitsiMeetRoom = JitsiMeetRoomHandler(
     token_config= defaultTokenConfig
 )
 
-print(JitsiMeetRoom.generate_url('test'))
+if __name__ == '__main__' :
+    print(JitsiMeetRoom.generate_url('test'))
