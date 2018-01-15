@@ -44,8 +44,8 @@
         var options = {
 	    // jitsi-meet support now(10-2017) only one way to auto-auth, token,
 	    // which is anonymous BOSH auth with specific url (with token value in params of the url).
-	    jwt:"INSERTTOKENHERE",
-            roomName : "test",
+            jwt: '${token}',
+            roomName : '${room}',
             parentNode: document.querySelector('#jitsi'),
 	    // has external API use iframe, height is a problem
             height: 800,
@@ -83,7 +83,7 @@
         // when others clients use resource part of the Jabber id to do it.
         // That's why displayName compat with others XMPP client is not optimal.
         // check this : https://github.com/jitsi/jitsi-meet/pull/2068
-        api.executeCommand('displayName', 'Bidule');
+        api.executeCommand('displayName', '${fake_api.current_user.name}');
         // We can override also avatar.
         api.executeCommand('avatarUrl', 'https://avatars0.githubusercontent.com/u/3671647');
     </script>

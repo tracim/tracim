@@ -32,6 +32,7 @@ from tracim.model.data import ContentType
 from tracim.model.serializers import Context
 from tracim.model.serializers import CTX
 from tracim.model.serializers import DictLikeClass
+from tracim.lib.jitsi_meet.jitsi_meet import JitsiMeetRoom
 
 
 class RootController(StandardController):
@@ -185,5 +186,9 @@ class RootController(StandardController):
         user = tmpl_context.current_user
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
+        room = 'test'
+        token = JitsiMeetRoom.generate_token(room)
 
-        return DictLikeClass(fake_api=fake_api)
+        return DictLikeClass(fake_api=fake_api,
+                             token=token,
+                             room=room)
