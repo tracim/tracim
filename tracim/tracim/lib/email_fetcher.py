@@ -26,8 +26,8 @@ TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
 CONTENT_TYPE_TEXT_HTML = 'text/html'
 
-IMAP_SEEN_FLAG = imapclient.SEEN
 IMAP_CHECKED_FLAG = imapclient.FLAGGED
+IMAP_SEEN_FLAG = imapclient.SEEN
 
 MAIL_FETCHER_FILELOCK_TIMEOUT = 10
 MAIL_FETCHER_CONNECTION_TIMEOUT = 60*3
@@ -150,6 +150,10 @@ class DecodedMail(object):
         if len(username_data) == 2:
             return username_data[1]
         return None
+
+
+class BadIMAPFetchResponse(Exception):
+    pass
 
 
 class MailFetcher(object):
@@ -291,6 +295,11 @@ class MailFetcher(object):
             # TODO - G.M - 10-01-2017 - Support imapclient exceptions
             # when Imapclient stable will be 2.0+
 
+            except BadIMAPFetchResponse as e:
+                log = 'Imap Fetch command return bad response.' \
+                      'Is someone else connected to the mailbox ?: ' \
+                      '{}'
+                logger.error(self, log.format(e.__str__()))
             # Others
             except Exception as e:
                 log = 'Mail Fetcher error {}'
@@ -342,13 +351,9 @@ class MailFetcher(object):
         """
         messages = []
 
-        logger.debug(self, 'Fetch unseen messages')
-        uids = imapc.search(['UNSEEN'])
-        logger.debug(self, 'Found {} unseen mails'.format(
-            len(uids),
-        ))
-        imapc.add_flags(uids, IMAP_SEEN_FLAG)
-        logger.debug(self, 'Temporary Flag {} mails as seen'.format(
+        logger.debug(self, 'Fetch unflagged messages')
+        uids = imapc.search(['UNFLAGGED'])
+        logger.debug(self, 'Found {} unflagged mails'.format(
             len(uids),
         ))
         for msgid, data in imapc.fetch(uids, ['BODY.PEEK[]']).items():
@@ -359,9 +364,22 @@ class MailFetcher(object):
             logger.debug(self, 'Fetch mail "{}"'.format(
                 msgid,
             ))
-            msg = message_from_bytes(data[b'BODY[]'])
+
+            try:
+                msg = message_from_bytes(data[b'BODY[]'])
+            except KeyError as e:
+                # INFO - G.M - 12-01-2018 - Fetch may return events response
+                # In some specific case, fetch command may return events
+                # response unrelated to fetch request.
+                # This should happen only when someone-else use the mailbox
+                # at the same time of the fetcher.
+                # see https://github.com/mjs/imapclient/issues/334
+                except_msg = 'fetch response : {}'.format(str(data))
+                raise BadIMAPFetchResponse(except_msg) from e
+
             msg_container = MessageContainer(msg, msgid)
             messages.append(msg_container)
+
         return messages
 
     def _notify_tracim(
@@ -383,7 +401,7 @@ class MailFetcher(object):
         #  if no from address for example) and catch it here
         while mails:
             mail = mails.pop()
-            body =  mail.get_body(
+            body = mail.get_body(
                 use_html_parsing=self.use_html_parsing,
                 use_txt_parsing=self.use_txt_parsing,
             )
@@ -421,17 +439,14 @@ class MailFetcher(object):
                         str(r.status_code),
                         details,
                     ))
-                # Flag all correctly checked mail, unseen the others
+                # Flag all correctly checked mail
                 if r.status_code in [200, 204, 400]:
                     imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
-                else:
-                    imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
+                    imapc.add_flags((mail.uid,), IMAP_SEEN_FLAG)
             # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
-                imapc.remove_flags((mail.uid,), IMAP_SEEN_FLAG)
