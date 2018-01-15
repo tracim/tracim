@@ -34,13 +34,12 @@
 <div class="content__home">
     <div id="jitsi">
     </div>
-    // This example use jitsi-external API. Using lib-jitsi-meet is also a possibility.
-    // It support alls jitsi-meet features.
-    /* About support for "private (1-to-1) text message into room", check this :
-       https://github.com/jitsi/lib-jitsi-meet/pull/616
-    */
     <script src="https://prosody/libs/external_api.min.js"></script>
     <script>
+        //This example use jitsi-external API. Using lib-jitsi-meet is also a possibility.
+        // It support alls jitsi-meet features.
+        // About support for "private (1-to-1) text message into room", check this :
+        // https://github.com/jitsi/lib-jitsi-meet/pull/616
         var domain = "prosody";
         var options = {
 	    // jitsi-meet support now(10-2017) only one way to auto-auth, token,
@@ -54,17 +53,16 @@
             configOverwrite: {
                  enableWelcomePage: false,
                  enableUserRolesBasedOnToken: true,
-		 /*
-		  Example of how it can be possible to use others auths.
-		  This solution has some security issue.
-		  see this rejected PR : https://github.com/jitsi/jitsi-meet/pull/2109
-		  roomPassword: "plop",
-                  userJid: "john@auth.prosody",
-                  userPassword: "j",
-		 */
+                // Example of how it can be possible to use others auths.
+                // This solution has some security issue.
+                // see this rejected PR : https://github.com/jitsi/jitsi-meet/pull/2109
+                // roomPassword: "plop",
+                // userJid: "john@auth.prosody",
+                // userPassword: "j",
+
             },
             interfaceConfigOverwrite: {
-                ##DEFAULT_BACKGROUND: '#FFFFFF',
+                // DEFAULT_BACKGROUND: '#FFFFFF',
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_POWERED_BY: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
@@ -89,12 +87,5 @@
         // We can override also avatar.
         api.executeCommand('avatarUrl', 'https://avatars0.githubusercontent.com/u/3671647');
     </script>
-   /*  Candy chat iframe, just for some test
-       https://github.com/candy-chat/candy
-       <iframe src="/assets/candy/index.html"
-        width=100%
-        height=300px>
-      </iframe> 
-  */
 </div>
 
