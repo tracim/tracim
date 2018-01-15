@@ -3,7 +3,7 @@ import typing
 
 import jwt
 
-JITSI_URL = "https://prosody"
+JITSI_DOMAIN = "prosody"
 JWT_APP_ID = "test"
 JWT_SECRET = "secret"
 JWT_ALG = 'HS256'
@@ -28,10 +28,10 @@ class JitsiTokenConfig:
 class JitsiMeetRoomHandler:
 
     def __init__(self,
-                 base_url: str,
+                 domain: str,
                  token_config: typing.Optional[JitsiTokenConfig],
                  ) -> None:
-        self.base_url = base_url
+        self.domain = domain
         self.token_config = token_config
 
     def generate_token(self, room: str)->str:
@@ -64,13 +64,13 @@ class JitsiMeetRoomHandler:
         """
         if self.token_config:
             token = self.generate_token(room)
-            url = "{}/{}?jwt={}".format(JITSI_URL,
+            url = "{}/{}?jwt={}".format(self.domain,
                                         room,
                                         token,)
         else:
-            url = "{}/{}".format(JITSI_URL,
+            url = "{}/{}".format(self.domain,
                                  room,)
-        return url
+        return "https://{}".format(url)
 
 if JITSI_USE_TOKEN:
     defaultTokenConfig = JitsiTokenConfig(
@@ -83,7 +83,7 @@ else:
     defaultTokenConfig = None
 
 JitsiMeetRoom = JitsiMeetRoomHandler(
-    base_url=JITSI_URL,
+    domain=JITSI_DOMAIN,
     token_config= defaultTokenConfig
 )
 

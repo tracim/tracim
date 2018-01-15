@@ -40,7 +40,7 @@
         // It support alls jitsi-meet features.
         // About support for "private (1-to-1) text message into room", check this :
         // https://github.com/jitsi/lib-jitsi-meet/pull/616
-        var domain = "prosody";
+        var domain = '${domain}';
         var options = {
 	    // jitsi-meet support now(10-2017) only one way to auto-auth, token,
 	    // which is anonymous BOSH auth with specific url (with token value in params of the url).

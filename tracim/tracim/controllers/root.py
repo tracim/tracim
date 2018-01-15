@@ -188,7 +188,9 @@ class RootController(StandardController):
         fake_api = Context(CTX.CURRENT_USER).toDict({'current_user': current_user_content})
         room = 'test'
         token = JitsiMeetRoom.generate_token(room)
+        domain = JitsiMeetRoom.domain
 
         return DictLikeClass(fake_api=fake_api,
                              token=token,
-                             room=room)
+                             room=room,
+                             domain=domain)
