@@ -235,6 +235,16 @@ email.reply.use_txt_parsing = true
 # it's just an empty file use to prevent concurrent access to imap unseen mail
 email.reply.lockfile_path = %(here)s/email_fetcher.lock
 
+## Jitsi_meet_integration
+jitsi_meet.activated = False
+jitsi_meet.domain = your_jitsi_meet_instance
+jitsi_meet.use_token = False
+jitsi_meet.token_generator = local
+jitsi_meet.token_generator.local.app_id = tracim
+jitsi_meet.token_generator.local.secret = my_secret
+jitsi_meet.token_generator.local.algo = HS256
+jitsi_meet.token_generator.local.duration = 60
+
 ## Radical (CalDav server) configuration
 # radicale.server.host = 0.0.0.0
 # radicale.server.port = 5232

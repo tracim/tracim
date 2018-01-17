@@ -436,6 +436,36 @@ class CFG(object):
             # ContentType.Folder -- Folder is skipped
         ]
 
+        self.JITSI_MEET_ACTIVATED = asbool(tg.config.get(
+            'jitsi_meet.activated',
+            False,
+        ))
+        self.JITSI_MEET_DOMAIN = tg.config.get(
+            'jitsi_meet.domain'
+        )
+        self.JITSI_MEET_USE_TOKEN = asbool(tg.config.get(
+            'jitsi_meet.use_token',
+            False,
+        ))
+        self.JITSI_MEET_TOKEN_GENERATOR = tg.config.get(
+            'jitsi_meet.token_generator',
+            'local'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID = tg.config.get(
+            'jitsi_meet.token_generator.local.app_id'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET = tg.config.get(
+            'jitsi_meet.token_generator.local.secret'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALG = tg.config.get(
+            'jitsi_meet.token_generator.local.alg',
+            'HS256'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION = int(tg.config.get(
+            'jitsi_meet.token_generator.local.duration',
+            60
+        ))
+
         self.RADICALE_SERVER_HOST = tg.config.get(
             'radicale.server.host',
             '127.0.0.1',

@@ -40,12 +40,14 @@
         // It support alls jitsi-meet features.
         // About support for "private (1-to-1) text message into room", check this :
         // https://github.com/jitsi/lib-jitsi-meet/pull/616
-        var domain = '${domain}';
+        var domain = '${jitsi_meet_room.domain}';
         var options = {
 	    // jitsi-meet support now(10-2017) only one way to auto-auth, token,
 	    // which is anonymous BOSH auth with specific url (with token value in params of the url).
-            jwt: '${token}',
-            roomName : '${room}',
+            %if jitsi_meet_room.token_config:
+                jwt: '${jitsi_meet_room.generate_token()}',
+            %endif
+            roomName : '${jitsi_meet_room.room}',
             parentNode: document.querySelector('#jitsi'),
 	    // has external API use iframe, height is a problem
             height: 800,
@@ -87,5 +89,6 @@
         // We can override also avatar.
         api.executeCommand('avatarUrl', 'https://avatars0.githubusercontent.com/u/3671647');
     </script>
+    ${jitsi_meet_room.generate_url()}
 </div>
 
