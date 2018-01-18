@@ -4,31 +4,33 @@
 <%namespace name="TABLE_ROW" file="tracim.templates.widgets.table_row"/>
 <%namespace name="LEFT_MENU" file="tracim.templates.widgets.left_menu"/>
 <%namespace name="P" file="tracim.templates.widgets.paragraph"/>
-<%namespace name="TOOLBAR" file="tracim.templates.user_toolbars"/>
+<%namespace name="TOOLBAR" file="tracim.templates.videoconf.toolbar"/>
 
 <%def name="title()">
     ${_('VideoConf')}
 </%def>
 
 <%def name="TITLE_ROW()">
-    ##<div class="content__title">
-    ##    ${ROW.TITLE_ROW(_('My Dashboard'), 'fa-home', 'content__title__subtitle-home-hidden-xs', 't-user-color', _('Welcome to your home, {username}.').format(username=fake_api.current_user.name))}
-    ##</div>
+    <div class="content__title">
+    ${ROW.TITLE_ROW(
+    _('Video conference'),
+    'fa-video-camera', 'content__title__subtitle-home-hidden-xs',
+    't-user-color', _('Welcome to video conference of {workspace}, {username}.').format(workspace=
+    result.workspace.label,
+    username=fake_api.current_user.name))}
+    </div>
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
-   ## ${TOOLBAR.USER_ME(fake_api.current_user)}
+    ${TOOLBAR.JITSIMEETROOM(fake_api.current_user, result.workspace, jitsi_meet_room)}
 </%def>
 
 
 <%def name="SIDEBAR_LEFT_CONTENT()">
-    ## This is the default left sidebar implementation
-    ##${LEFT_MENU.TREEVIEW('sidebar-left-menu', '__')}
+    ${LEFT_MENU.TREEVIEW('sidebar-left-menu', 'workspace_{}__'.format(result.workspace.id))}
 </%def>
 
 <%def name="REQUIRED_DIALOGS()">
-    ${TIM.MODAL_DIALOG('user-edit-modal-dialog')}
-    ${TIM.MODAL_DIALOG('user-edit-password-modal-dialog')}
 </%def>
 
 <div class="content__home">
@@ -50,7 +52,7 @@
             roomName : '${jitsi_meet_room.room}',
             parentNode: document.querySelector('#jitsi'),
 	    // has external API use iframe, height is a problem
-            height: 800,
+            height: 700,
             no_SSL: true,
             configOverwrite: {
                  enableWelcomePage: false,
@@ -89,6 +91,5 @@
         // We can override also avatar.
         api.executeCommand('avatarUrl', 'https://avatars0.githubusercontent.com/u/3671647');
     </script>
-    ${jitsi_meet_room.generate_url()}
 </div>
 

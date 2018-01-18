@@ -26,7 +26,7 @@ class JitsiMeetController(TIMRestController):
             abort(404)
 
     @tg.require(current_user_is_reader())
-    @expose('tracim.templates.videoconf')
+    @expose('tracim.templates.videoconf.jitsi_meet')
     def get(self):
         cfg = CFG.get_instance()
         if not cfg.JITSI_MEET_ACTIVATED:
@@ -36,9 +36,11 @@ class JitsiMeetController(TIMRestController):
         current_user_content = Context(CTX.CURRENT_USER).toDict(user)
         fake_api = Context(CTX.CURRENT_USER).toDict(
             {'current_user': current_user_content,
-             'workspace': workspace,
              }
         )
+        dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace,
+                                                            'workspace')
+
         label = unidecode(workspace.label)
         parsed_label = ''.join(e for e in label if e.isalnum())
         # TODO - G.M - 18-01-2017 -
@@ -64,4 +66,5 @@ class JitsiMeetController(TIMRestController):
             token_config=token)
 
         return DictLikeClass(fake_api=fake_api,
+                             result=dictified_workspace,
                              jitsi_meet_room=jitsi_meet_room)
