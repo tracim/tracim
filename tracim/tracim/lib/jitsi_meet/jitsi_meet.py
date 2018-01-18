@@ -3,6 +3,8 @@ import typing
 
 import jwt
 
+class NoTokenConfigError(Exception):
+    pass
 
 class JitsiTokenConfig(object):
 
@@ -48,7 +50,8 @@ class JitsiMeetRoom(object):
         see https://github.com/jitsi/lib-jitsi-meet/blob/master/doc/tokens.md
         :return: jwt encoded token as string
         """
-        assert self.token_config
+        if not self.token_config:
+            raise NoTokenConfigError
         now = datetime.datetime.utcnow()
         exp = now+datetime.timedelta(seconds=self.token_config.duration)
         data = {
