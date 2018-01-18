@@ -8,7 +8,6 @@ from tg import request
 from tg import require
 from tg import tmpl_context
 from tg import url
-from tg import abort
 from tg.i18n import ugettext as _
 
 from tracim.controllers import StandardController
@@ -33,9 +32,6 @@ from tracim.model.data import ContentType
 from tracim.model.serializers import Context
 from tracim.model.serializers import CTX
 from tracim.model.serializers import DictLikeClass
-from tracim.lib.jitsi_meet.jitsi_meet import JitsiMeetRoom
-from tracim.lib.jitsi_meet.jitsi_meet import JitsiTokenConfig
-from tracim.config.app_cfg import CFG
 
 class RootController(StandardController):
     """
@@ -181,37 +177,3 @@ class RootController(StandardController):
         search_results.keywords = keyword_list
 
         return DictLikeClass(fake_api=fake_api, search=search_results)
-
-    @require(predicates.not_anonymous())
-    @expose('tracim.templates.videoconf')
-    def videoconf(self):
-        cfg = CFG.get_instance()
-        if not cfg.JITSI_MEET_ACTIVATED:
-            abort(404)
-        user = tmpl_context.current_user
-        current_user_content = Context(CTX.CURRENT_USER).toDict(user)
-        fake_api = Context(CTX.CURRENT_USER).toDict(
-            {'current_user': current_user_content}
-        )
-
-        room = 'test'
-
-        token = None
-        if cfg.JITSI_MEET_USE_TOKEN:
-            if cfg.JITSI_MEET_TOKEN_GENERATOR == 'local':
-                token = JitsiTokenConfig(
-                    app_id=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID,
-                    secret=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET,
-                    alg=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALG,
-                    duration=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION,
-                )
-            else:
-                abort(400)
-
-        jitsi_meet_room = JitsiMeetRoom(
-            room=room,
-            domain=cfg.JITSI_MEET_DOMAIN,
-            token_config=token)
-
-        return DictLikeClass(fake_api=fake_api,
-                             jitsi_meet_room=jitsi_meet_room)

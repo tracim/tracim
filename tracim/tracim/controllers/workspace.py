@@ -9,6 +9,7 @@ from tracim.config.app_cfg import CFG
 
 from tracim.controllers import TIMRestController
 from tracim.controllers.content import UserWorkspaceFolderRestController
+from tracim.controllers.jitsi_meet import JitsiMeetController
 
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.content import ContentApi
@@ -28,6 +29,7 @@ class UserWorkspaceRestController(TIMRestController):
     allow_only = not_anonymous()
 
     folders = UserWorkspaceFolderRestController()
+    videoconf = JitsiMeetController()
 
     @property
     def _base_url(self):
