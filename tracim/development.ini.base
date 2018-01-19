@@ -35,6 +35,8 @@ full_stack = true
 # Fallback language if browser and tracim can't find one they agree on.
 i18n.lang = en
 
+tracim_instance.uuid = 79160afe-e324-473a-9aef-7b93f69c1c1b
+
 cache_dir = %(here)s/data
 # preview generator cache directory
 preview_cache_dir = /tmp/tracim/preview/

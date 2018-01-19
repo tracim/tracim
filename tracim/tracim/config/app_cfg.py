@@ -217,6 +217,9 @@ class CFG(object):
         """Parse configuration file."""
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
+        self.TRACIM_INSTANCE_UUID = tg.config.get(
+            'tracim_instance.uuid',
+        )
         self.DEPOT_STORAGE_DIR = tg.config.get(
             'depot_storage_dir',
         )
