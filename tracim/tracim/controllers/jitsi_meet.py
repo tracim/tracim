@@ -6,7 +6,7 @@ from tg.predicates import not_anonymous
 from tracim.lib.predicates import current_user_is_reader
 from sqlalchemy.orm.exc import NoResultFound
 
-from unidecode import unidecode
+from tracim.lib.utils import str_as_alpha_num_str
 from tracim.lib.jitsi_meet.jitsi_meet import JitsiMeetRoom
 from tracim.lib.jitsi_meet.jitsi_meet import JitsiTokenConfig
 from tracim.config.app_cfg import CFG
@@ -41,12 +41,15 @@ class JitsiMeetController(TIMRestController):
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace,
                                                             'workspace')
 
-        label = unidecode(workspace.label)
-        parsed_label = ''.join(e for e in label if e.isalnum())
         # TODO - G.M - 18-01-2017 -
         # allow to set specific room name from workspace object ?
-        room = "{id}{label}".format(id=workspace.workspace_id,
-                                    label=parsed_label)
+        room = "{uuid}{workspace_id}{workspace_label}".format(
+            uuid=cfg.TRACIM_INSTANCE_UUID,
+            workspace_id=workspace.workspace_id,
+            workspace_label=workspace.label)
+
+        # Jitsi-Meet doesn't like specials_characters
+        room = str_as_alpha_num_str(room)
 
         token = None
         if cfg.JITSI_MEET_USE_TOKEN:
