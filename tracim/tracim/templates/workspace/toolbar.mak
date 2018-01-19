@@ -19,6 +19,19 @@
                 <a title="${_('Delete current workspace')}" class="btn btn-default" href="${tg.url('/admin/workspaces/{}/delete'.format(result.workspace.id))}">${ICON.FA('fa-trash fa-fw t-less-visible')} ${_('Delete')}</a>
             </div>
         % endif
+            ${JITSI_MEET_BUTTON(current_user, workspace)}
     </div> <!-- # End of side bar right -->
     ## SIDEBAR RIGHT [END]
+</%def>
+
+<%def name="WORKSPACE_USER(current_user, workspace)">
+    <div>
+        ${JITSI_MEET_BUTTON(current_user, workspace)}
+    </div> <!-- # End of side bar right -->
+</%def>
+
+<%def name="JITSI_MEET_BUTTON(current_user, workspace)">
+    <div class="btn-group btn-group-vertical">
+        <a title="${_('Video conference')}" class="btn btn-default" href="${tg.url('/workspaces/{}/videoconf'.format(result.workspace.id))}">${ICON.FA('fa-video-camera fa-fw t-less-visible')} ${_('Video Conference')}</a>
+    </div>
 </%def>

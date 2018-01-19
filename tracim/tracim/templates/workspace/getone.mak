@@ -20,7 +20,7 @@
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
-##    {TOOLBAR.SECURED_FOLDER(fake_api.current_user, result.folder.workspace, result.folder)}
+ ${TOOLBAR.WORKSPACE_USER(fake_api.current_user, result.workspace)}
 </%def>
 
 <%def name="REQUIRED_DIALOGS()">
