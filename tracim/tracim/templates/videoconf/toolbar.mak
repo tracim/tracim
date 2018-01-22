@@ -7,7 +7,7 @@
     ## SIDEBAR RIGHT
     <div>
         <div class="btn-group btn-group-vertical">
-            <a title="${_('Full-size')}" class="btn btn-default" href="${jitsi_meet_room.generate_url()}" >${ICON.FA('fa-arrows-alt fa-fw t-less-visible')} ${_('Full-size')}</a>
+            <a title="${_('Invite by sharing a link')}" class="btn btn-default" data-toggle="modal" data-target="#videoconf-invite-modal-dialog" data-remote="${tg.url('/workspaces/{}/videoconf/invite'.format(result.workspace.id))}" >${ICON.FA('fa-share fa-fw t-less-visible')} ${_('Invite')}</a>
         </div>
         <p></p>
     </div> <!-- # End of side bar right -->

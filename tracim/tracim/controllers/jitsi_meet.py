@@ -25,9 +25,18 @@ class JitsiMeetController(TIMRestController):
         except NoResultFound:
             abort(404)
 
+
     @tg.require(current_user_is_reader())
     @expose('tracim.templates.videoconf.jitsi_meet')
     def get(self):
+        return self._process()
+
+    @tg.require(current_user_is_reader())
+    @expose('tracim.templates.videoconf.invite')
+    def invite(self):
+        return self._process()
+
+    def _process(self):
         cfg = CFG.get_instance()
         if not cfg.JITSI_MEET_ACTIVATED:
             abort(404)
