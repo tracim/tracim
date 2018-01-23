@@ -36,7 +36,7 @@
 <div class="content__home">
     <div id="jitsi">
     </div>
-    <script src="https://prosody/libs/external_api.min.js"></script>
+    <script src="https://${jitsi_meet_room.domain}/libs/external_api.min.js"></script>
     <script>
         //This example use jitsi-external API. Using lib-jitsi-meet is also a possibility.
         // It support alls jitsi-meet features.
