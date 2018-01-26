@@ -311,7 +311,7 @@ class User(DeclarativeBase):
         difference = now_seconds - auth_token_seconds
 
         if difference > validity_seconds:
-            self.auth_token = uuid.uuid4()
+            self.auth_token = str(uuid.uuid4())
             self.auth_token_created = datetime.utcnow()
             DBSession.flush()
 

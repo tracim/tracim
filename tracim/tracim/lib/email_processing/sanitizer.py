@@ -1,42 +1,19 @@
+import typing
 from bs4 import BeautifulSoup, Tag
-
+from tracim.lib.email_processing.sanitizer_config.attrs_whitelist import ATTRS_WHITELIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.class_blacklist import CLASS_BLACKLIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.id_blacklist import ID_BLACKLIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.tag_blacklist import TAG_BLACKLIST  # nopep8
+from tracim.lib.email_processing.sanitizer_config.tag_whitelist import TAG_WHITELIST  # nopep8
 
 class HtmlSanitizerConfig(object):
-    # some Default_html_tags type
-    HTML_Heading_tag = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-    HTML_Text_parts_tag = ['p',
-                           'br', 'hr',
-                           'pre', 'code', 'samp',  # preformatted content
-                           'q', 'blockquote',  # quotes
-                           ]
-    HTML_Text_format_tag = ['b', 'i', 'u', 'small', 'sub', 'sup', ]
-    HTML_Text_semantic_tag = ['strong', 'em',
-                              'mark', 'cite', 'dfn',
-                              'del', 'ins', ]
-    HTML_Table_tag = ['table',
-                      'thead', 'tfoot', 'tbody',
-                      'tr', 'td', 'caption', ]
-
-    HTML_List_tag = ['ul', 'li', 'ol',  # simple list
-                     'dl', 'dt', 'dd', ]  # definition list
-
-    # Rules
-    Tag_whitelist = HTML_Heading_tag \
-                    + HTML_Text_parts_tag \
-                    + HTML_Text_format_tag \
-                    + HTML_Text_semantic_tag \
-                    + HTML_Table_tag \
-                    + HTML_List_tag
-
-    Tag_blacklist = ['script', 'style']
-
-    # TODO - G.M - 2017-12-01 - Think about removing class/id Blacklist
-    # These elements are no longer required.
-    Class_blacklist = []
-    Id_blacklist = []
-
-    Attrs_whitelist = ['href']
-
+    # whitelist : keep tag and content
+    Tag_whitelist = TAG_WHITELIST
+    Attrs_whitelist = ATTRS_WHITELIST
+    # blacklist : remove content
+    Tag_blacklist = TAG_BLACKLIST
+    Class_blacklist = CLASS_BLACKLIST
+    Id_blacklist = ID_BLACKLIST
 
 class HtmlSanitizer(object):
     """
@@ -50,7 +27,7 @@ class HtmlSanitizer(object):
     """
 
     @classmethod
-    def sanitize(cls, html_body: str) -> str:
+    def sanitize(cls, html_body: str) -> typing.Optional[str]:
         soup = BeautifulSoup(html_body, 'html.parser')
         for tag in soup.findAll():
             if cls._tag_to_extract(tag):
@@ -62,7 +39,17 @@ class HtmlSanitizer(object):
                         del tag.attrs[attr]
             else:
                 tag.unwrap()
-        return str(soup)
+
+        if cls._is_content_empty(soup):
+            return None
+        else:
+            return str(soup)
+
+    @classmethod
+    def _is_content_empty(cls, soup):
+        img = soup.find('img')
+        txt = soup.get_text().replace('\n', '').strip()
+        return (not img and not txt)
 
     @classmethod
     def _tag_to_extract(cls, tag: Tag) -> bool:
