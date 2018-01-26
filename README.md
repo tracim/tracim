@@ -100,10 +100,21 @@ If you want your own dedicated instance but do not want to manage it by yourself
 
 ## Docker ##
 
-In case you prefer using Docker:
+**Important:** docker images is for local usage. If you want to use Tracim from network device, its necessary to change some lines in Development.ini file and build new image.
+
+
+* For windows:
+
+Install [docker toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/)
+
+
+* For linux:
 
 You need to install docker on your server first.
+Example on Debian: `sudo apt-get install docker docker-compose`
+
 Make sure `docker.service` is started correctly.
+exemple on Debian: `sudo systemctl status docker`
 
 **If you want to use the latest stable image: **
 
@@ -119,22 +130,29 @@ Make sure `docker.service` is started correctly.
                -p 80:80 -p 3030:3030 -p 5232:5232 \
                -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim:<$tag>
 
+Description of versioning:
 
-* You can use `algoo/tracim:unstable` image:
+* algoo/`tracim:latest` is latest stable image from branch master
+* algoo/`tracim:<$tag>` is a stable tag image from branch master
+* algoo/`tracim_testing:latest` is a latest image from branch develop
+* algoo/`tracim:unstable` is a latest unstable image from branch develop
 
-        sudo docker run -e DATABASE_TYPE=sqlite \
-               -p 80:80 -p 3030:3030 -p 5232:5232 \
-               -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim:unstable
+More information about command:
 
+    sudo docker run \
+        -e DATABASE_TYPE=sqlite \   # define database: may be sqlite, mysql, postgresql
+        -p 80:80 \  # web server port mapping
+        -p 3030:3030 \  # webdav interface port mapping
+        -p 5232:5232 \  # caldav interface port mapping
+        -v /var/tracim/etc:/etc/tracim \ # config file storage path
+        -v /var/tracim/var:/var/tracim \  # file storage path
+        algoo/tracim:unstable  # docker image: tracim:unstable for development version, tracim_test:latest for nightly builds
 
-* You can use `algoo/tracim_testing:latest` image:
-
-        sudo docker run -e DATABASE_TYPE=sqlite \
-               -p 80:80 -p 3030:3030 -p 5232:5232 \
-               -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim_testing
 
 
 All docker images are available here : https://hub.docker.com/u/algoo/
+More information about build docker image: https://github.com/tracim/docker_tracim
+
 
 ----
 
