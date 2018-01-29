@@ -1,0 +1,427 @@
+.dashboard
+  margin-left 50px
+  &__title
+    margin 20px 0
+    font-size 35px
+  &__wkscontainer
+    display flex
+    flex-wrap wrap
+  &__workspace
+    margin-right 20px
+    width calc(65% - 20px) //20px => margin-right
+    &__title
+      margin-bottom 20px
+      font-size 40px
+      font-weight 500
+      color darkBlue
+    &__detail
+      margin-bottom 20px
+      font-size 18px
+  &__userstatut
+    width 35%
+    &__role
+      display flex
+      flex-wrap wrap
+      margin 20px 0
+      font-size 18px
+      &__text
+        margin-right 15px
+      &__rank
+        display flex
+        &__icon
+          margin-right 15px
+          color gestionnaire
+    &__notification
+      font-size 18px
+      &__btn
+        margin 20px 0
+        border 1px solid blue
+        padding 10px 15px
+        color blue
+        cursor pointer
+        &:hover , focus
+          background-color blue
+          color white
+      &__subscribe
+        display none
+        &__btn
+          margin 20px 0
+          border 1px solid blue
+          padding 10px 25px
+          background-color transparent
+          color blue
+          &:hover,&:focus
+            background-color blue
+            color white
+        &__submenu
+          padding 0
+          &__item
+            padding 10px
+            &:hover,&:focus
+              background-color blue
+              color white
+  &__calltoaction
+    display flex
+    flex-wrap wrap
+    margin 50px 0
+    &__button
+      display flex
+      flex-direction column
+      justify-content center
+      margin 20px 30px 20px 0
+      border-radius 10px
+      padding 15px
+      width 250px
+      height 200px
+      box-shadow shadow-all
+      text-align center
+      cursor pointer
+      &:active
+        box-shadow inset 0px 0px 5px 2px #656565
+      &__text
+        &__icon
+          font-size 30px
+          .fa-comments-o, .fa-paperclip, .fa-calendar, .fa-file-text-o, .fa-folder-open-o
+              color white
+        &__title
+          font-size 18px
+          color white
+    .thread
+      background-color blue
+    .writefile
+      background-color writefile
+    .importfile
+      background-color importfile
+    .calendar
+      background-color calendar
+    .explore
+      background-color explore
+  &__wksinfo
+    display flex
+    flex-wrap wrap
+  &__activity
+    margin 0 35px 50px 0
+    width 60%
+    &__header
+      display flex
+      margin-bottom 20px
+      &__title
+        font-size 20px
+        &__underline
+          border-radius 10px
+          width 150px
+          height 3px
+          background-color blue
+      &__allread
+        border 1px solid blue
+        padding 10px 25px
+        color blue
+        font-size 18px
+        cursor pointer
+        &:hover, &:focus
+          background-color blue
+          color white
+    &__wrapper
+      border 1px solid grey
+      height 480px
+    &__workspace
+      display flex
+      align-items center
+      border-bottom 1px solid grey
+      padding 15px
+      cursor pointer
+      &:hover
+        background-color folder-hover
+      &__icon
+        margin 0 25px
+        font-size 25px
+      &__name
+        font-size 18px
+        font-weight 500
+        span
+          font-weight 400
+    &__more
+      &__btn
+        margin 15px
+        border 1px solid blue
+        padding 10px 25px
+        color blue
+        cursor pointer
+        &:hover, &:focus
+          background-color blue
+          color white
+  &__memberlist
+    margin 0 0 50px 0
+    width 35%
+    &__title
+      margin-bottom 31px
+      font-size 20px
+      &__underline
+        border-radius 10px
+        width 150px
+        height 3px
+        background-color blue
+    &__wrapper
+      position relative
+      border 1px solid grey
+      height 480px
+    &__list
+      margin 0
+      padding 0
+      list-style none
+      height 400px
+      overflow-Y scroll
+      &__item
+        display flex
+        border-bottom 1px solid grey
+        padding 10px 15px
+        &__avatar
+          margin-right 20px
+          width 50px
+          height 50px
+        &__info
+          &__name
+            font-size 20px
+          &__role
+            font-size 18px
+    &__btnadd
+      border-top 1px solid grey
+      padding 15px
+      &__button
+        display flex
+        align-items center
+        &__avatar
+          margin-right 20px
+          cursor pointer
+          img
+            width 50px
+            height 50px
+        &__text
+          font-size 18px
+          color blue
+          cursor pointer
+    &__addmember
+      position absolute
+      top 0
+      display none
+      flex-direction column
+      justify-content center
+      align-items center
+      height 100%
+      width 100%
+      background-color #FDFDFD
+      &__name
+        margin-bottom 20px
+        border 1px solid grey
+        border-radius 10px
+        padding 10px 25px
+      &__role
+        margin-bottom 20px
+        &__dropdown
+          &__button
+            border 1px solid blue
+            border-radius 10px
+            padding 10px 25px
+            background-color transparent
+            color blue
+            &:hover,&:focus
+              background-color blue
+              color white
+          &__submenu
+            padding 0
+            &__item
+              display flex
+              padding 10px
+              &:hover,&:focus
+                background-color blue
+                color white
+              &__icon
+                margin-right 15px
+      &__submitbtn
+        border 1px solid blue
+        border-radius 5px
+        padding 5px 35px
+        background-color transparent
+        color blue
+        cursor pointer
+        &:hover, &:focus
+          background-color blue
+          color white
+  &__webdav
+    margin-bottom 100px
+    &__btn
+      display flex
+      margin-bottom 30px
+      border 1px solid blue
+      border-radius 10px
+      padding 15px 25px
+      width 350px
+      color blue
+      cursor pointer
+      &:hover, &:focus
+        background-color blue
+        color white
+      &__icon
+        margin-right 20px
+        font-size 30px
+    &__information
+      display none
+      border 1px solid grey
+      border-radius 10px
+      padding 15px 25px
+      width 600px
+      &__text
+        margin-bottom 35px
+      &__link
+        margin-bottom 15px
+        border 1px solid grey
+        border-radius 10px
+        padding 15px 25px
+        width 300px
+
+/****** CLASS ACTIVE *******/
+
+/*** active dropdown subscribe ***/
+
+.activebtnsubs
+  .dashboard__wksinfo__notification
+    &__btn
+      display none
+    &__subscribe
+      display flex
+
+/*** active form on list member ***/
+
+.activeform
+  .dashboard__memberlist__addmember
+    display flex
+
+/*** active webdav ***/
+
+.activewebdav
+  .dashboard__webdav__information
+    display block
+
+/******************************/
+
+/**** MEDIAQUERIES *****/
+
+/**** MEDIA 576px & 1199px ****/
+
+// Regroup the common rules
+
+@media (min-width min-sm) and (max-width: max-lg)
+
+  .dashboard
+    &__workspace
+      width auto
+    &__userstatut
+      width auto
+    &__calltoaction
+      justify-content center
+    &__activity
+      width 100%
+    &__memberlist
+      width 50%
+
+/**** MEDIA 992px & 1199px ****/
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .dashboard
+    margin-left 15px
+
+/******************************/
+
+/**** MEDIA 768px & 991px ****/
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .dashboard
+    margin-left 0
+    &__title
+      margin-left 15px
+    &__workspace
+      margin-left 15px
+    &__userstatut
+      margin-left 15px
+    &__activity
+      margin 25px 0
+      &__header
+        margin 0 15px 20px 15px
+    &__memberlist
+      margin-left 15px
+    &__webdav
+      margin-left 15px
+
+/******************************/
+
+/**** MEDIA 576px & 767px ****/
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .dashboard
+    margin-left 0
+    &__title
+      margin-left 15px
+    &__workspace
+      margin-left 15px
+    &__userstatut
+      margin-left 15px
+    &__activity
+      margin 25px 0
+      &__header
+        margin 0 15px 20px 15px
+    &__memberlist
+      margin 50px 0
+      width 90%
+      &__title
+        margin-left 15px
+    &__webdav
+      margin-left 15px
+      &__information
+        width 525px
+
+/******************************/
+
+/**** MEDIA 575px ****/
+
+@media (max-width: max-xs)
+
+  .dashboard
+    margin-left 0
+    &__title
+      margin-left 10px
+    &__workspace
+      margin-left 10px
+      width auto
+    &__userstatut
+      margin-left 15px
+      width auto
+    &__calltoaction
+      justify-content center
+    &__activity
+      width 100%
+      margin 25px 0
+      &__header
+        display block
+        height auto
+        margin 0 15px 20px 15px
+        &__title
+          margin-bottom 20px
+    &__memberlist
+      margin 50px 0
+      width 100%
+      &__title
+        margin-left 10px
+      &__wrapper
+        height auto
+      &__list
+        height auto
+        overflow-Y visible
+      &__btnadd
+        border-top 0
+    &__webdav
+      margin-left 10px
+      &__information
+        width 350px

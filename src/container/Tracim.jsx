@@ -4,6 +4,7 @@ import Footer from '../component/Footer.jsx'
 import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
 import Login from './Login.jsx'
+import Dashboard from './Dashboard.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import {
   Route,
@@ -43,7 +44,7 @@ class Tracim extends React.Component {
 
               <SidebarWrapper locationPath={location.pathname}>
 
-                <PrivateRoute exact path='/' component={WorkspaceContent} />
+                <PrivateRoute exact path='/' component={Dashboard} />
 
               </SidebarWrapper>
 
