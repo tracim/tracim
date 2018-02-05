@@ -1,0 +1,317 @@
+.nopadding
+  padding 0
+
+.nomarginlabel
+  margin-bottom 0
+
+settingTitle()
+  margin 15px 0 15px 15px
+  font-size 20px
+  font-weight 500
+  color blue
+
+settingText()
+  margin 15px 0 15px 15px
+  font-size 18px
+
+.account
+  &__title
+    margin 20px 0
+    font-size 35px
+  &__userinformation
+    display flex
+    justify-content center
+    align-items center
+    flex-wrap wrap
+    border 1px solid grey
+    padding 25px
+    font-size 18px
+    &__wrapper
+      flex-direction column
+    &__avatar
+      margin-right 50px
+      img
+        width 150px
+        height 150px
+    &__name
+      font-size 22px
+    &__email
+      color blue
+    &__company
+      font-size 20px
+      color blue
+  &__delimiteur
+    position relative
+    top 3px
+    left calc(50% - 250px) // 250px => width / 2
+    border-radius 10px
+    width 500px
+    height 5px
+    background-color blue
+  &__userpreference
+    display flex
+    padding 25px
+    width 100%
+    background-color lightGrey
+    &__menu
+      margin-right 30px
+      border-radius 10px
+      padding 0
+      width 20%
+      min-height 600px
+      background-color off-white
+      &__responsive
+        &__burger
+          margin-bottom 3px
+          border-radius 10px
+          width 35px
+          height 4px
+          background-color blue
+          cursor pointer
+      &__list
+        width 100%
+        margin-bottom 20px
+        &__close
+          display none
+          justify-content flex-end
+          margin 10px 0 15px 0
+          font-size 20px
+          cursor pointer
+        &__disabled
+          margin 10px 0 0 15px
+          color grey
+          font-size 18px
+        &__item
+          margin-top 10px
+          font-weight 500
+          font-size 18px
+          cursor pointer
+          &:hover
+            background-color blue
+            color white
+    &__setting
+      border-radius 10px
+      width 80%
+      min-height 600px
+      background-color off-white
+      &__personaldata
+        &__title
+          settingTitle()
+        &__text
+          settingText()
+        &__changeinfo
+          margin 25px 0 25px 15px
+          &__subtitle
+            margin-bottom 15px
+            font-size 18px
+          &__txtinput
+            margin 0 15px 15px 0
+            border 1px solid blue
+            border-radius 10px
+            padding 8px 15px
+          &__button
+            vertical-align top
+            border 1px solid blue
+            border-radius 10px
+            padding 10px 25px
+            &:hover, &:focus
+              background-color blue
+              color white
+      &__calendar
+        &__title
+          settingTitle()
+        &__text
+          settingText()
+        &__subtitle
+          margin 15px 0 15px 15px
+          font-size 18px
+        &__link
+          margin-left 15px
+          border 1px solid grey
+          border-radius 10px
+          width 400px
+          padding 10px 25px
+        &__timezone
+          margin 15px 0 30px 15px
+          &__btn
+            border 1px solid blue
+            border-radius 10px
+            padding 10px 35px
+            color blue
+            background-color transparent
+            &::after
+              margin-left 10px
+            &:hover, &:focus
+              background-color blue
+              color white
+          &__submenu
+            max-height 300px
+            overflow-Y auto
+            &__item
+              &:hover, &:focus
+                background-color blue
+                color white
+      &__notification
+        margin 15px 15px 35px 15px
+        &__title
+          settingTitle()
+        &__text
+          settingText()
+          margin-bottom 30px
+        &__table
+          border 1px solid grey
+          &__header
+            border-bottom 1px solid grey
+            padding 10px 20px
+          &__line
+            border-bottom 1px solid grey
+            padding 10px 20px
+          &__workspace
+            font-size 18px
+            white-space nowrap
+            overflow hidden
+            text-overflow ellipsis
+          &__role
+            display flex
+            font-size 18px
+            &__icon
+              margin-right 10px
+              color gestionnaire
+          &__btnswitch
+            &__switcher
+              display flex
+              &__text
+                margin 5px 0 0 15px
+
+.account__userpreference__setting__notification__table__line:nth-last-child(1)
+  border-bottom 0
+
+
+/***** MEDIAQUERIES *****/
+
+
+/**** MEDIA 576px & 1199px ****/
+
+// Regroup the common rules
+
+@media (min-width: min-sm) and (max-width: max-md)
+
+  .account
+    &__userpreference
+      display block
+      position relative
+      &__menu
+        justify-content center
+        margin-bottom 25px
+        border-radius 30px
+        width 60px
+        min-height 60px
+        &__responsive
+          align-self center
+        &__list
+          display none
+      &__setting
+        padding 10px
+        width 100%
+
+  .activemenu
+    .account
+      &__userpreference
+        &__menu
+          justify-content start
+          position absolute
+          top 0
+          left 0
+          border-radius 10px
+          width 100%
+          height 100%
+          z-index 2
+          background-color rgbGrey
+          &__responsive
+            display none
+          &__list
+            display block
+            border-radius 10px
+            height 100%
+            background-color off-white
+            width 300px
+            &__close
+              display flex
+
+/***** MEDIA LG *****/
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .account
+    &__userpreference
+      padding 25px 10px
+      &__menu
+        margin-right 15px
+        width 25%
+
+/***** MEDIA XS *****/
+
+@media (max-width: max-xs)
+
+  .account
+    &__userinformation
+      &__avatar
+        margin 0 0 20px 0
+      &__wrapper
+        text-align center
+    &__userpreference
+      display block
+      position relative
+      padding 25px 0
+      &__menu
+        justify-content center
+        margin 0 0 25px 15px
+        border-radius 30px
+        width 60px
+        min-height 60px
+        &__responsive
+          align-self center
+        &__list
+          display none
+      &__setting
+        border-radius 0
+        padding 10px 0
+        width 100%
+        &__calendar
+          &__link
+            padding 10px 15px
+            width 345px
+        &__notification
+          &__table
+            &__header
+              display none
+            &__workspace
+              margin-bottom 20px
+            &__role
+              margin-bottom 20px
+            &__btnswitch
+              margin-bottom 20px
+
+  .activemenu
+    .account
+      &__userpreference
+        &__menu
+          justify-content start
+          position absolute
+          top 0
+          left 0
+          border-radius 10px
+          width 100%
+          height 100%
+          z-index 2
+          background-color rgbGrey
+          &__responsive
+            display none
+          &__list
+            display block
+            border-radius 10px
+            height 100%
+            background-color off-white
+            width 300px
+            &__close
+              display flex
