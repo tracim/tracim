@@ -129,7 +129,7 @@
             <div class="col-md-6">
                 <div class="input-group">
                     <span class="input-group-addon" style="width: 8em;"><i class="fa fa-fw fa-windows"></i> Windows</span>
-                    <div class="form-control webdavconfig__input">http://${webdav_url}</div>
+                    <div class="form-control webdavconfig__input">${website_protocol}://${webdav_url}</div>
                 </div>
                 <p></p>
                 <div class="input-group">

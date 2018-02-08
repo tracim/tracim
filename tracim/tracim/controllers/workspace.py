@@ -22,6 +22,7 @@ from tracim.model.data import Workspace
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
 
+from urllib.parse import urlparse
 
 class UserWorkspaceRestController(TIMRestController):
 
@@ -101,11 +102,13 @@ class UserWorkspaceRestController(TIMRestController):
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
         webdav_url = CFG.get_instance().WSGIDAV_CLIENT_BASE_URL
+        website_protocol = urlparse(CFG.get_instance().WEBSITE_BASE_URL).scheme
 
         return DictLikeClass(
             result=dictified_workspace,
             fake_api=fake_api,
             webdav_url=webdav_url,
+            website_protocol = website_protocol,
             show_deleted=show_deleted,
             show_archived=show_archived,
         )
