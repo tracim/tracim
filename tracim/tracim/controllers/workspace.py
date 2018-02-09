@@ -29,7 +29,7 @@ class UserWorkspaceRestController(TIMRestController):
     allow_only = not_anonymous()
 
     folders = UserWorkspaceFolderRestController()
-    videoconf = JitsiMeetController()
+    videoconference = JitsiMeetController()
 
     @property
     def _base_url(self):

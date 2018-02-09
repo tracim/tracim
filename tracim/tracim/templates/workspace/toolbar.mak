@@ -34,6 +34,6 @@
 
 <%def name="JITSI_MEET_BUTTON(current_user, workspace)">
     <div class="btn-group btn-group-vertical">
-        <a title="${_('Video conference')}" class="btn btn-default" href="${tg.url('/workspaces/{}/videoconf'.format(result.workspace.id))}">${ICON.FA('fa-video-camera fa-fw t-less-visible')} ${_('Video Conference')}</a>
+        <a title="${_('Video conference')}" class="btn btn-default" href="${tg.url('/workspaces/{}/videoconference'.format(result.workspace.id))}">${ICON.FA('fa-video-camera fa-fw t-less-visible')} ${_('Video Conference')}</a>
     </div>
 </%def>
