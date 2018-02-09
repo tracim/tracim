@@ -7,13 +7,13 @@
 <%namespace name="TOOLBAR" file="tracim.templates.videoconf.toolbar"/>
 
 <%def name="title()">
-    ${_('VideoConf')}
+    ${_('Video conference: {workspace}').format(workspace=result.workspace.label)}
 </%def>
 
 <%def name="TITLE_ROW()">
     <div class="content__title">
     ${ROW.TITLE_ROW(
-    _('Video conference'),
+    _('Video conference: {workspace}').format(workspace=result.workspace.label),
     'fa-video-camera', 'content__title__subtitle-home-hidden-xs',
     't-user-color', _('Welcome to video conference of {workspace}, {username}.').format(workspace=
     result.workspace.label,
