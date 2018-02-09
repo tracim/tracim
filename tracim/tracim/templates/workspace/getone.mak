@@ -20,7 +20,7 @@
 </%def>
 
 <%def name="SIDEBAR_RIGHT_CONTENT()">
- ${TOOLBAR.WORKSPACE_USER(fake_api.current_user, result.workspace)}
+ ${TOOLBAR.WORKSPACE_USER(fake_api.current_user, result.workspace, videoconf_enabled)}
 </%def>
 
 <%def name="REQUIRED_DIALOGS()">

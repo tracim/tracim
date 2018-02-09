@@ -100,6 +100,7 @@ class UserWorkspaceRestController(TIMRestController):
                 show_archived=show_archived,
             )
         )
+        videoconf_enabled = CFG.get_instance().JITSI_MEET_ACTIVATED
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
         webdav_url = CFG.get_instance().WSGIDAV_CLIENT_BASE_URL
@@ -108,6 +109,7 @@ class UserWorkspaceRestController(TIMRestController):
             result=dictified_workspace,
             fake_api=fake_api,
             webdav_url=webdav_url,
+            videoconf_enabled=videoconf_enabled,
             show_deleted=show_deleted,
             show_archived=show_archived,
         )

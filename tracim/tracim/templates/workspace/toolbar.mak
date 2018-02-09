@@ -24,9 +24,11 @@
     ## SIDEBAR RIGHT [END]
 </%def>
 
-<%def name="WORKSPACE_USER(current_user, workspace)">
+<%def name="WORKSPACE_USER(current_user, workspace, videoconf_enabled)">
     <div>
+        % if videoconf_enabled:
         ${JITSI_MEET_BUTTON(current_user, workspace)}
+       % endif
     </div> <!-- # End of side bar right -->
 </%def>
 
