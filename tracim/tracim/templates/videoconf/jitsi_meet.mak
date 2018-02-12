@@ -46,7 +46,7 @@
         var options = {
 	    // jitsi-meet support now(10-2017) only one way to auto-auth, token,
 	    // which is anonymous BOSH auth with specific url (with token value in params of the url).
-            %if jitsi_meet_room.token_config:
+            %if jitsi_meet_room.use_token:
                 jwt: '${jitsi_meet_room.generate_token()}',
             %endif
             roomName : '${jitsi_meet_room.room}',
@@ -87,12 +87,17 @@
         // when others clients use resource part of the Jabber id to do it.
         // That's why displayName compat with others XMPP client is not optimal.
         // check this : https://github.com/jitsi/jitsi-meet/pull/2068
-        api.executeCommand('displayName', '${fake_api.current_user.name}');
-        // We can override also avatar.
-        api.executeCommand('avatarUrl', 'https://avatars0.githubusercontent.com/u/3671647');
+        % if jitsi_meet_room.context and jitsi_meet_room.context.user:
+            %if jitsi_meet_room.context.user.name:
+            api.executeCommand('displayName', '${jitsi_meet_room.context.user.name}');
+            %endif
+            // We can override also avatar.
+            %if jitsi_meet_room.context.user.avatar_url:
+            api.executeCommand('avatarUrl', '${jitsi_meet_room.context.user.avatar_url}');
+            %endif
+        % endif
     </script>
 </div>
-
 <div id="videoconf-invite-modal-dialog" class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

@@ -1,3 +1,4 @@
+import typing
 import tg
 from tg import abort
 from tg import expose
@@ -6,11 +7,11 @@ from tg.predicates import not_anonymous
 from tracim.lib.predicates import current_user_is_reader
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim.lib.utils import str_as_alpha_num_str
-from tracim.lib.jitsi_meet.jitsi_meet import JitsiMeetRoom
-from tracim.lib.jitsi_meet.jitsi_meet import JitsiTokenConfig
+from tracim.lib.jitsi_meet.room import JitsiMeetRoom
+from tracim.lib.jitsi_meet.token import JitsiMeetUser
 from tracim.config.app_cfg import CFG
 
+from tracim.model.data import User
 from tracim.model.serializers import Context, CTX, DictLikeClass
 from tracim.controllers import TIMRestController, TIMRestPathContextSetup
 
@@ -25,18 +26,22 @@ class JitsiMeetController(TIMRestController):
         except NoResultFound:
             abort(404)
 
-
     @tg.require(current_user_is_reader())
     @expose('tracim.templates.videoconf.jitsi_meet')
     def get(self):
-        return self._process()
+        user = tmpl_context.current_user
+        return self._jitsi_room(jitsi_user=user)
 
     @tg.require(current_user_is_reader())
     @expose('tracim.templates.videoconf.invite')
     def invite(self):
-        return self._process()
+        return self._jitsi_room()
 
-    def _process(self):
+    @classmethod
+    def _jitsi_room(
+            cls,
+            jitsi_user: typing.Union[JitsiMeetUser, User, None]=None,
+    ):
         cfg = CFG.get_instance()
         if not cfg.JITSI_MEET_ACTIVATED:
             abort(404)
@@ -50,32 +55,10 @@ class JitsiMeetController(TIMRestController):
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace,
                                                             'workspace')
 
-        # TODO - G.M - 18-01-2017 -
-        # allow to set specific room name from workspace object ?
-        room = "{uuid}{workspace_id}{workspace_label}".format(
-            uuid=cfg.TRACIM_INSTANCE_UUID,
-            workspace_id=workspace.workspace_id,
-            workspace_label=workspace.label)
-
-        # Jitsi-Meet doesn't like specials_characters
-        room = str_as_alpha_num_str(room)
-
-        token = None
-        if cfg.JITSI_MEET_USE_TOKEN:
-            if cfg.JITSI_MEET_TOKEN_GENERATOR == 'local':
-                token = JitsiTokenConfig(
-                    app_id=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID,
-                    secret=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET,
-                    alg=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALG,
-                    duration=cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION,
-                )
-            else:
-                abort(400)
-
         jitsi_meet_room = JitsiMeetRoom(
-            room=room,
-            domain=cfg.JITSI_MEET_DOMAIN,
-            token_config=token)
+            issuer=jitsi_user,
+            receivers=workspace,
+        )
 
         return DictLikeClass(fake_api=fake_api,
                              result=dictified_workspace,

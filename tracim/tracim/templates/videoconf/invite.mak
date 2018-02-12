@@ -11,7 +11,7 @@
         <p>
         ${_('To invite someone from outside of tracim into this conference, share this link. This link is available for 5 minutes.')}
         </p>
-        <textarea readonly=readonly wrap="off" style="width: 100%;">${jitsi_meet_room.generate_url()}</textarea>
+        <textarea readonly=readonly wrap="off" style="width: 100%;">${jitsi_meet_room.generate_url(jitsi_meet_room.generate_token())}</textarea>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">${_('Close')}</button>
