@@ -1,23 +1,11 @@
-.nopadding
-  padding 0
-
 .nomarginlabel
   margin-bottom 0
 
-settingTitle()
-  margin 15px 0 15px 15px
-  font-size 20px
-  font-weight 500
-  color blue
-
 settingText()
-  margin 15px 0 15px 15px
+  margin 15px 0
   font-size 18px
 
 .account
-  &__title
-    margin 20px 0
-    font-size 35px
   &__userinformation
     display flex
     justify-content center
@@ -40,14 +28,11 @@ settingText()
     &__company
       font-size 20px
       color blue
-  &__delimiteur
+  &__delimiter
     position relative
     top 3px
-    left calc(50% - 250px) // 250px => width / 2
-    border-radius 10px
-    width 500px
-    height 5px
-    background-color blue
+    margin auto
+    z-index 3
   &__userpreference
     display flex
     padding 25px
@@ -58,16 +43,9 @@ settingText()
       border-radius 10px
       padding 0
       width 20%
-      min-height 600px
       background-color off-white
       &__responsive
-        &__burger
-          margin-bottom 3px
-          border-radius 10px
-          width 35px
-          height 4px
-          background-color blue
-          cursor pointer
+        font-size 20px
       &__list
         width 100%
         margin-bottom 20px
@@ -78,11 +56,12 @@ settingText()
           font-size 20px
           cursor pointer
         &__disabled
-          margin 10px 0 0 15px
+          padding 25px 20px 20px 20px
           color grey
           font-size 18px
         &__item
           margin-top 10px
+          padding-left 5px
           font-weight 500
           font-size 18px
           cursor pointer
@@ -91,20 +70,21 @@ settingText()
             color white
     &__setting
       border-radius 10px
+      padding 20px
       width 80%
-      min-height 600px
       background-color off-white
       &__personaldata
-        &__title
-          settingTitle()
         &__text
           settingText()
         &__changeinfo
-          margin 25px 0 25px 15px
-          &__subtitle
+          margin 25px 0
+          &__infotitle
             margin-bottom 15px
             font-size 18px
           &__txtinput
+            display inline-flex
+            display ms-inline-flex
+            width auto
             margin 0 15px 15px 0
             border 1px solid blue
             border-radius 10px
@@ -113,7 +93,10 @@ settingText()
             vertical-align top
             border 1px solid blue
             border-radius 10px
-            padding 10px 25px
+            padding 8px 25px
+            background-color transparent
+            color blue
+            cursor pointer
             &:hover, &:focus
               background-color blue
               color white
@@ -122,17 +105,16 @@ settingText()
           settingTitle()
         &__text
           settingText()
-        &__subtitle
-          margin 15px 0 15px 15px
+        &__infotitle
+          margin 15px 0
           font-size 18px
         &__link
-          margin-left 15px
+          display inline-block
           border 1px solid grey
           border-radius 10px
-          width 400px
           padding 10px 25px
         &__timezone
-          margin 15px 0 30px 15px
+          margin 15px 0 30px 0
           &__btn
             border 1px solid blue
             border-radius 10px
@@ -145,6 +127,7 @@ settingText()
               background-color blue
               color white
           &__submenu
+            width 203px
             max-height 300px
             overflow-Y auto
             &__item
@@ -152,36 +135,27 @@ settingText()
                 background-color blue
                 color white
       &__notification
-        margin 15px 15px 35px 15px
         &__title
           settingTitle()
         &__text
           settingText()
           margin-bottom 30px
-        &__table
-          border 1px solid grey
-          &__header
-            border-bottom 1px solid grey
-            padding 10px 20px
-          &__line
-            border-bottom 1px solid grey
-            padding 10px 20px
-          &__workspace
-            font-size 18px
-            white-space nowrap
-            overflow hidden
-            text-overflow ellipsis
+        &__tableau
+          border 1px solid lightGrey
           &__role
             display flex
-            font-size 18px
+            align-items center
             &__icon
               margin-right 10px
-              color gestionnaire
-          &__btnswitch
-            &__switcher
-              display flex
-              &__text
-                margin 5px 0 0 15px
+              .fa-graduation-cap
+                color gestionnaire
+              .fa-pencil
+                color contributeur
+              .fa-gavel
+                color responsable
+              .fa-eye
+                color lecteur
+
 
 .account__userpreference__setting__notification__table__line:nth-last-child(1)
   border-bottom 0
@@ -237,6 +211,8 @@ settingText()
             width 300px
             &__close
               display flex
+            &__disabled
+              padding 0 20px
 
 /***** MEDIA LG *****/
 
@@ -248,6 +224,22 @@ settingText()
       &__menu
         margin-right 15px
         width 25%
+
+/**** MEDIA SM ****/
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .account
+    &__userpreference
+      padding 25px 0
+      &__menu
+        margin-left 15px
+      &__setting
+        padding 30px 15px
+
+  .activemenu
+    .account__userpreference__menu
+      margin-left 0
 
 /***** MEDIA XS *****/
 
@@ -280,17 +272,16 @@ settingText()
         &__calendar
           &__link
             padding 10px 15px
-            width 345px
         &__notification
-          &__table
-            &__header
-              display none
-            &__workspace
-              margin-bottom 20px
-            &__role
-              margin-bottom 20px
-            &__btnswitch
-              margin-bottom 20px
+          &__tableau
+            &__wksname
+              text-overflow ellipsis
+              white-space nowrap
+              overflow hidden
+              width 100px
+              &:focus
+                overflow visible
+                width auto
 
   .activemenu
     .account
@@ -300,6 +291,7 @@ settingText()
           position absolute
           top 0
           left 0
+          margin-left 0
           border-radius 10px
           width 100%
           height 100%
@@ -315,3 +307,5 @@ settingText()
             width 300px
             &__close
               display flex
+            &__disabled
+              padding 0 20px

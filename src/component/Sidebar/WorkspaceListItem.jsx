@@ -29,16 +29,21 @@ const WorkspaceListItem = props => {
       className='sidebar__navigation__workspace__item nav-item dropdown'
       onClick={handleClickTitle}
     >
-      <div className='sidebar__navigation__workspace__item__number'>
-        {pad(props.number)}
-      </div>
 
-      <div className='sidebar__navigation__workspace__item__name' title={props.name}>
-        {props.name}
-      </div>
+      <div className='sidebar__navigation__workspace__item__wrapper'>
 
-      <div className='sidebar__navigation__workspace__item__icon'>
-        <i className='fa fa-chevron-down' />
+        <div className='sidebar__navigation__workspace__item__number'>
+          {pad(props.number)}
+        </div>
+
+        <div className='sidebar__navigation__workspace__item__name' title={props.name}>
+          {props.name}
+        </div>
+
+        <div className='sidebar__navigation__workspace__item__icon'>
+          <i className='fa fa-chevron-down' />
+        </div>
+
       </div>
 
       <ul

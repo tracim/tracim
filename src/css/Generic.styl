@@ -1,7 +1,13 @@
+/*** SIDEBAR ***/
+
 .sidebarpagecontainer
   display flex
   min-height calc(100% - 50px)
   padding-top 85px
+
+/********************/
+
+/*** ELEMENTS ON ALL PAGE ***/
 
 .pageWrapperGeneric
   width 100%
@@ -38,6 +44,8 @@
     &__content
       margin 0
 
+.nopadding
+  padding 0
 
 .pageTitleGeneric
   display flex
@@ -53,7 +61,6 @@
 
 .pageContentGeneric
   margin 10px 10px 120px 10px
-
 
 .dropdownCreateBtn
   &__label
@@ -73,7 +80,6 @@
     .setting__link
       padding 5px 65px 5px 10px
 
-
 .fa-file-image-o
   color previewColor
 
@@ -92,6 +98,33 @@
 .fa-ticket
   color issueColor
 
+.subTitle
+  font-size 20px
+  font-weight 500
+  color blue
+
+.GenericDelimiter
+  border-radius 10px
+  width 50%
+  height 5px
+  background-color blue
+
+.btnaction
+  display flex
+  flex-direction column
+  justify-content center
+  margin 20px 30px 20px 0
+  border-radius 10px
+  padding 15px
+  width 250px
+  height 200px
+  box-shadow shadow-all
+  text-align center
+  cursor pointer
+
+/********************/
+
+/*** PAGE FILE, THREAD, HTML, MARKDOWN, ISSUE ***/
 
 .wsFileGeneric
   position fixed
