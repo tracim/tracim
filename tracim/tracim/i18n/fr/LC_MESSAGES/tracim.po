@@ -1403,7 +1403,7 @@ msgstr "Activer le calendrier associé"
 
 #: tracim/templates/admin/workspace_getall.mak:48
 msgid "<u>Note</u>: members will be added during next step."
-msgstr "<u>Note</u> : les membres seront ajoutées à la prochaine étape."
+msgstr "<u>Note</u> : les membres seront ajouté(e)s à la prochaine étape."
 
 #: tracim/templates/admin/workspace_getall.mak:75
 msgid "User Nb"
@@ -1433,7 +1433,7 @@ msgid ""
 "This workspace offers a calendar that you can configure in your software:"
 " Outlook, Thunderbird, etc."
 msgstr ""
-"Cet espace de travaille propose un calendrier que vous pouvez configurer "
+"Cet espace de travail propose un calendrier que vous pouvez configurer "
 "dans votre logiciel : Outlook, Thunderbird, etc."
 
 #: tracim/templates/admin/workspace_getone.mak:46
