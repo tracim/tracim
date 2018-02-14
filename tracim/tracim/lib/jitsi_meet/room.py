@@ -22,6 +22,7 @@ class JitsiMeetRoom(object):
         :param receivers: User or Room who can talk with sender. Now, only
         Workspace are supported.
         """
+        self.tracim_cfg = CFG.get_instance()
         self._set_domain()
         self._set_token_params()
         self._set_context(
@@ -35,22 +36,20 @@ class JitsiMeetRoom(object):
         Set domain according to config
         :return:
         """
-        cfg = CFG.get_instance()
-        self.domain = cfg.JITSI_MEET_DOMAIN
+        self.domain = self.tracim_cfg.JITSI_MEET_DOMAIN
 
     def _set_token_params(self) -> None:
         """
         Set params related to token according to config.
         :return: nothing
         """
-        cfg = CFG.get_instance()
-        self.use_token = cfg.JITSI_MEET_USE_TOKEN
+        self.use_token = self.tracim_cfg.JITSI_MEET_USE_TOKEN
         if self.use_token:
-            if cfg.JITSI_MEET_TOKEN_GENERATOR == 'local':
-                self.token_app_id = cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID  # nopep8
-                self.token_secret = cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET  # nopep8
-                self.token_alg = cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALG
-                self.token_duration = cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION  # nopep8
+            if self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR == 'local':
+                self.token_app_id = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID  # nopep8
+                self.token_secret = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET  # nopep8
+                self.token_alg = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALG   # nopep8
+                self.token_duration = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION  # nopep8
             else:
                 raise JitsiMeetNoTokenGenerator
 
@@ -92,8 +91,7 @@ class JitsiMeetRoom(object):
             group=group,
         )
 
-    @classmethod
-    def _generate_room_name(cls, workspace: Workspace) -> str:
+    def _generate_room_name(self, workspace: Workspace) -> str:
         """
         Generate Jitsi-Meet room name related to workspace
         that should be unique, always the same for same workspace in same Tracim
@@ -101,9 +99,8 @@ class JitsiMeetRoom(object):
         :param workspace: Tracim Workspace
         :return: room name as str.
         """
-        cfg = CFG.get_instance()
         room = "{uuid}{workspace_id}{workspace_label}".format(
-            uuid=cfg.TRACIM_INSTANCE_UUID,
+            uuid=self.tracim_cfg.TRACIM_INSTANCE_UUID,
             workspace_id=workspace.workspace_id,
             workspace_label=workspace.label)
 
@@ -143,6 +140,7 @@ class JitsiMeetRoom(object):
                                  self.room,
                                  )
         return "https://{}".format(url)
+
 
 class JitsiMeetNoTokenGenerator(Exception):
     pass
