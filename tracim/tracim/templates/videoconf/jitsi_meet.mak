@@ -53,28 +53,10 @@
             // TODO - G.M - 14-02-2018 - Find a solution to height trouble.
             // height should be related to page size
             height: 700,
-            no_SSL: true,
-            configOverwrite: {
-                 enableWelcomePage: false,
-                 enableUserRolesBasedOnToken: true,
-            },
-            interfaceConfigOverwrite: {
-                SHOW_JITSI_WATERMARK: false,
-                SHOW_POWERED_BY: false,
-                SHOW_WATERMARK_FOR_GUESTS: false,
-                LANG_DETECTION: true,
-                USE_ID_AS_DEFAULT_DISPLAY_NAME: true,
-                TOOLBAR_BUTTONS: [
-                    //main toolbar
-                    'microphone', 'camera', 'desktop', 'fullscreen', 'fodeviceselection', // jshint ignore:line
-                    //extended toolbar
-                    'contacts', 'settings', 'raisehand', 'videoquality','hangup','chat'], // jshint ignore:line
-                MAIN_TOOLBAR_BUTTONS: ['microphone', 'camera', 'desktop', 'fullscreen', 'fodeviceselection',
-                    'contacts', 'info', 'settings', 'raisehand', 'videoquality','hangup'] // jshint ignore:line
-            }
-
+            // TODO - G.M - 14-02-2018 Check 'no_SSL' params
         };
         let api = new JitsiMeetExternalAPI(domain, options);
+        // INFO - G.M - 14-02-2018 - About Display Name
         // Display name in jitsi-meet use XEP-0172 for MUC, which is discouraged,
         // when others clients use resource part of the Jabber id to do it.
         // That's why displayName compat with others XMPP client is not optimal.
