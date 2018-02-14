@@ -42,8 +42,8 @@
         // It support alls jitsi-meet features.
         // About support for "private (1-to-1) text message into room", check this :
         // https://github.com/jitsi/lib-jitsi-meet/pull/616
-        var domain = '${jitsi_meet_room.domain}';
-        var options = {
+        let domain = '${jitsi_meet_room.domain}';
+        let options = {
 	    // jitsi-meet support now(10-2017) only one way to auto-auth, token,
 	    // which is anonymous BOSH auth with specific url (with token value in params of the url).
             %if jitsi_meet_room.use_token:
@@ -51,7 +51,7 @@
             %endif
             roomName : '${jitsi_meet_room.room}',
             parentNode: document.querySelector('#jitsi'),
-	    // has external API use iframe, height is a problem
+            // has external API use iframe, height is a problem
             height: 700,
             no_SSL: true,
             configOverwrite: {
@@ -82,7 +82,7 @@
             }
 
         };
-        var api = new JitsiMeetExternalAPI(domain, options);
+        let api = new JitsiMeetExternalAPI(domain, options);
         // Display name in jitsi-meet use XEP-0172 for MUC, which is discouraged,
         // when others clients use resource part of the Jabber id to do it.
         // That's why displayName compat with others XMPP client is not optimal.
