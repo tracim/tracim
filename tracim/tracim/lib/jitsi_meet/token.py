@@ -107,20 +107,21 @@ class JitsiMeetToken(object):
         self.duration = duration
         self.context = context
 
-    def generate(self) -> str:
+    def generate(self, issue_date: typing.Optional[datetime.datetime] = None) -> str:
         """
         Generate JWT token
         :return: JWT token as str
         """
-        now = datetime.datetime.utcnow()
-        exp = now+datetime.timedelta(seconds=self.duration)
+        if not issue_date:
+            issue_date = datetime.datetime.utcnow()
+        exp = issue_date+datetime.timedelta(seconds=self.duration)
         data = {
             "iss": self.app_id,  # Issuer
             "room": self.room,  # Custom-param for jitsi_meet
             "aud": "*",  # TODO: Understood this param
             "exp": exp,  # Expiration date
-            "nbf": now,  # NotBefore
-            "iat": now,   # IssuedAt
+            "nbf": issue_date,  # NotBefore
+            "iat": issue_date,   # IssuedAt
         }
         if self.context:
             data['context'] = self.context.as_dict()
