@@ -38,35 +38,27 @@
     </div>
     <script src="https://${jitsi_meet_room.domain}/libs/external_api.min.js"></script>
     <script>
-        //This example use jitsi-external API. Using lib-jitsi-meet is also a possibility.
-        // It support alls jitsi-meet features.
-        // About support for "private (1-to-1) text message into room", check this :
-        // https://github.com/jitsi/lib-jitsi-meet/pull/616
         let domain = '${jitsi_meet_room.domain}';
         let options = {
-	    // jitsi-meet support now(10-2017) only one way to auto-auth, token,
-	    // which is anonymous BOSH auth with specific url (with token value in params of the url).
+	    // INFO - G.M - 14-02-2018 jitsi-meet external API
+        // support only one way to auto-auth due to security concern : token,
+	    // which is anonymous BOSH auth with specific url
+        // for another way to deal with auto-auth :
+        // see this rejected PR : https://github.com/jitsi/jitsi-meet/pull/2109
             %if jitsi_meet_room.use_token:
                 jwt: '${jitsi_meet_room.generate_token()}',
             %endif
             roomName : '${jitsi_meet_room.room}',
             parentNode: document.querySelector('#jitsi'),
-            // has external API use iframe, height is a problem
+            // TODO - G.M - 14-02-2018 - Find a solution to height trouble.
+            // height should be related to page size
             height: 700,
             no_SSL: true,
             configOverwrite: {
                  enableWelcomePage: false,
                  enableUserRolesBasedOnToken: true,
-                // Example of how it can be possible to use others auths.
-                // This solution has some security issue.
-                // see this rejected PR : https://github.com/jitsi/jitsi-meet/pull/2109
-                // roomPassword: "plop",
-                // userJid: "john@auth.prosody",
-                // userPassword: "j",
-
             },
             interfaceConfigOverwrite: {
-                // DEFAULT_BACKGROUND: '#FFFFFF',
                 SHOW_JITSI_WATERMARK: false,
                 SHOW_POWERED_BY: false,
                 SHOW_WATERMARK_FOR_GUESTS: false,
