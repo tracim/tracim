@@ -9,14 +9,6 @@ from tracim.model.data import User
 import uuid
 
 
-class JitsiMeetNoTokenGenerator(Exception):
-    pass
-
-
-class JitsiMeetTokenNotActivated(Exception):
-    pass
-
-
 class JitsiMeetRoom(object):
     def __init__(
             self,
@@ -38,11 +30,19 @@ class JitsiMeetRoom(object):
         )
         self.room = self._generate_room_name(receivers)
 
-    def _set_domain(self):
+    def _set_domain(self) -> None:
+        """
+        Set domain according to config
+        :return:
+        """
         cfg = CFG.get_instance()
         self.domain = cfg.JITSI_MEET_DOMAIN
 
-    def _set_token_params(self):
+    def _set_token_params(self) -> None:
+        """
+        Set params related to token according to config.
+        :return: nothing
+        """
         cfg = CFG.get_instance()
         self.use_token = cfg.JITSI_MEET_USE_TOKEN
         if self.use_token:
@@ -58,9 +58,18 @@ class JitsiMeetRoom(object):
             self,
             receivers: Workspace,
             issuer: typing.Union[User, JitsiMeetUser, None],
-    ):
+    ) -> None:
+        """
+        Set context of JWT token for Jitsi Meet
+        :param issuer: user who initiated Jitsi Meet talk
+        if None, default user is created. Can be both Tracim User or
+        JitsiMeetUser.
+        :param receivers: User or Room who can talk with sender. Now, only
+        Workspace are supported.
+        :return: nothing.
+        """
 
-        # User
+        # INFO - G.M - 13-02-2018 - Convert all issuers values as JitsiMeetUser
         if isinstance(issuer, JitsiMeetUser):
             user = issuer
         elif isinstance(issuer, User):
@@ -71,10 +80,11 @@ class JitsiMeetRoom(object):
             )
         else:
             user = JitsiMeetUser(
+                # INFO - G.M - 13-02-2018 - create unique id for anonymous user
                 jitsi_meet_user_id=str(uuid.uuid4()),
             )
 
-        # Group
+        # INFO - G.M - 13-02-2018 - Associate
         group = receivers.label
 
         self.context = JitsiMeetContext(
@@ -83,7 +93,14 @@ class JitsiMeetRoom(object):
         )
 
     @classmethod
-    def _generate_room_name(cls, workspace: Workspace):
+    def _generate_room_name(cls, workspace: Workspace) -> str:
+        """
+        Generate Jitsi-Meet room name related to workspace
+        that should be unique, always the same for same workspace in same Tracim
+        instance but should also no contains any special characters
+        :param workspace: Tracim Workspace
+        :return: room name as str.
+        """
         cfg = CFG.get_instance()
         room = "{uuid}{workspace_id}{workspace_label}".format(
             uuid=cfg.TRACIM_INSTANCE_UUID,
@@ -94,6 +111,10 @@ class JitsiMeetRoom(object):
         return str_as_alpha_num_str(room)
 
     def generate_token(self) -> str:
+        """
+        Generate Jitsi-Meet related JWT token
+        :return: JWT token as str
+        """
         if not self.use_token:
             raise JitsiMeetTokenNotActivated
 
@@ -110,7 +131,7 @@ class JitsiMeetRoom(object):
 
     def generate_url(self, token=None) -> str:
         """
-        Generate url with or without token
+        Generate Jitsi-Meet url with or without token
         :return: url as string
         """
         if token:
@@ -122,3 +143,10 @@ class JitsiMeetRoom(object):
                                  self.room,
                                  )
         return "https://{}".format(url)
+
+class JitsiMeetNoTokenGenerator(Exception):
+    pass
+
+
+class JitsiMeetTokenNotActivated(Exception):
+    pass

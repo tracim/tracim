@@ -19,7 +19,7 @@ class JitsiMeetController(TIMRestController):
 
     allow_only = not_anonymous()
 
-    def _before(self, *args, **kw):
+    def _before(self, *args, **kw) -> None:
         TIMRestPathContextSetup.current_user()
         try:
             TIMRestPathContextSetup.current_workspace()
@@ -28,20 +28,34 @@ class JitsiMeetController(TIMRestController):
 
     @tg.require(current_user_is_reader())
     @expose('tracim.templates.videoconf.jitsi_meet')
-    def get(self):
+    def get(self) -> DictLikeClass:
+        """
+        Jitsi-Meet Room page
+        """
         user = tmpl_context.current_user
         return self._jitsi_room(jitsi_user=user)
 
     @tg.require(current_user_is_reader())
     @expose('tracim.templates.videoconf.invite')
-    def invite(self):
+    def invite(self) -> DictLikeClass:
+        """
+        Modal windows : Invitation to Jitsi-Meet room
+        """
+        # TODO - G.M - 14-02-2017 - Allow to invite not Anonymous user ?
+        # Jitsi-Meet allow to set user info through token
+        # invite already "named" user should be possible
         return self._jitsi_room()
 
     @classmethod
     def _jitsi_room(
             cls,
             jitsi_user: typing.Union[JitsiMeetUser, User, None]=None,
-    ):
+    )-> DictLikeClass:
+        """
+        Get all infos to generate DictLikeClass usable for JitsiMeetRoom
+        Templates.
+        :param jitsi_user: User who access to room
+        """
         cfg = CFG.get_instance()
         if not cfg.JITSI_MEET_ACTIVATED:
             abort(404)
