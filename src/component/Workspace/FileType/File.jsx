@@ -49,32 +49,20 @@ class File extends Component {
           </div>
           <div className='wsFileFile__contentpage__preview__sidebar__property'>
             <div className='wsFileFile__contentpage__preview__sidebar__property__detail'>
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__label'>
-                  Fichier :
+              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__size'>
+                Taille : 500Ko
               </div>
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__info'>
-                  Planning Intégration de Tracim
-              </div>
-
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__label'>
+              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__description'>
+                <label>
                   Description :
+                </label>
+                <form className='wsFileFile__contentpage__preview__sidebar__property__detail__description__editiondesc'>
+                  <textarea />
+                  <input type='submit' className='wsFileFile__contentpage__preview__sidebar__property__detail__description__editiondesc__validate form-control' />
+                </form>
               </div>
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__info'>
-                  Fichier excel et pdf du planning
-              </div>
-
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__label'>
-                  Taille :
-              </div>
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__info'>
-                  500ko
-              </div>
-
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__label'>
-                  Equipe :
-              </div>
-              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__info'>
-                  Bastien, Côme, Damien, Philippe.
+              <div className='wsFileFile__contentpage__preview__sidebar__property__detail__btndesc btn btn-primary'>
+                Changer la Description
               </div>
             </div>
           </div>
