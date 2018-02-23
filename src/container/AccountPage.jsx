@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import imgProfil from '../img/imgProfil.png'
-import BtnSwitch from '../component/common/input/BtnSwitch.jsx'
+import BtnSwitch from '../component/common/Input/BtnSwitch.jsx'
 
 class AccountPage extends Component {
   render () {
