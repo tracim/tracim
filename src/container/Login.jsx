@@ -1,112 +1,113 @@
 import React from 'react'
 import { connect } from 'react-redux'
-// import { ConnectionForm } from '../component/ConnectionForm.jsx'
+import { Redirect } from 'react-router'
+import LoginLogo from '../component/Login/LoginLogo.jsx'
+import LoginLogoImg from '../img/logoTracimWhite.svg'
 import { userLogin } from '../action-creator.async.js'
+import Card from '../component/common/Card/Card.jsx'
+import CardHeader from '../component/common/Card/CardHeader.jsx'
+import CardBody from '../component/common/Card/CardBody.jsx'
+import InputGroupText from '../component/common/Input/InputGroupText.jsx'
+import InputCheckbox from '../component/common/Input/InputCheckbox.jsx'
+import Button from '../component/common/Input/Button.jsx'
+import LoginBtnForgotPw from '../component/Login/LoginBtnForgotPw.jsx'
 
 class Login extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       inputLogin: '',
-      inputPassword: ''
+      inputPassword: '',
+      inputRememberMe: false
     }
   }
 
   handleChangeLogin = e => this.setState({inputLogin: e.target.value})
   handleChangePassword = e => this.setState({inputPassword: e.target.value})
+  handleChangeRememberMe = () => this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
 
-  handleClickSubmit = () => this.props.dispatch(userLogin(this.state.inputLogin, this.state.inputPassword))
+  handleClickSubmit = async () => {
+    const { history, dispatch } = this.props
+    const { inputLogin, inputPassword, inputRememberMe } = this.state
+
+    await dispatch(userLogin(inputLogin, inputPassword, inputRememberMe))
+    history.push('/')
+  }
 
   render () {
-    // const { user } = this.props
-    // return (
-    //   <div>
-    //     <ConnectionForm
-    //       user={user}
-    //       onChangeLogin={this.handleChangeLogin}
-    //       onChangePassword={this.handleChangePassword}
-    //       onClickSubmit={this.handleClickSubmit}
-    //     />
-    //   </div>
-    // )
-    return (
-      <div>{/*
-        <div className='loginpage'>
+    if (this.props.user.isLoggedIn) return <Redirect to={{pathname: '/'}} />
+    else {
+      return (
+        <section className='loginpage'>
+          <div className='container-fluid'>
 
-          <section className='loginpage__content'>
-            <div className='sidebar'>
-              sidebar
-            </div>
-            <div className='container-fluid contentbody'>
-              <div className='loginpage__content__logo'>
-                <img src={logoAccueil} />
-              </div>
+            <LoginLogo customClass='loginpage__logo' logoSrc={LoginLogoImg} />
 
-              <div className='row justify-content-center'>
-                <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-5'>
-                  <div className='loginpage__content__connection card'>
-                    <div className='connection__header card-header text-center'>
-                      Connexion
+            <div className='row justify-content-center'>
+              <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-5'>
+
+                <Card customClass='loginpage__connection'>
+                  <CardHeader customClass='connection__header text-center'>{'Connexion'}</CardHeader>
+
+                  <CardBody formClass='connection__form'>
+                    <InputGroupText
+                      parentClassName='connection__form__groupemail'
+                      customClass='mb-3 mt-4'
+                      icon='fa-envelope-open-o'
+                      type='email'
+                      placeHolder='Adresse Email'
+                      invalidMsg='Email invalide.'
+                      value={this.state.inputLogin}
+                      onChange={this.handleChangeLogin}
+                    />
+
+                    <InputGroupText
+                      parentClassName='connection__form__groupepw'
+                      customClass=''
+                      icon='fa-lock'
+                      type='password'
+                      placeHolder='Mot de passe'
+                      invalidMsg='Mot de passe invalide.'
+                      value={this.state.inputPassword}
+                      onChange={this.handleChangePassword}
+                    />
+
+                    <div className='row mt-4 mb-4'>
+                      <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                        <InputCheckbox
+                          parentClassName='connection__form__rememberme'
+                          customClass=''
+                          label='Se souvenir de moi'
+                          checked={this.state.inputRememberMe}
+                          onChange={this.handleChangeRememberMe}
+                        />
+                      </div>
+
+                      <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-sm-right'>
+                        <LoginBtnForgotPw
+                          customClass='connection__form__pwforgot'
+                          label='Mot de passe oublié ?'
+                        />
+                      </div>
                     </div>
 
-                    <div className='card-body'>
-                      <form className='connection__form'>
-                        <div className='connection__form__groupemail form-group mb-3 mt-4'>
-                          <div className='connection__form__groupemail__icon'>
-                            <i className='fa fa-fw fa-envelope-open-o' />
-                          </div>
-                          <input type='email' className='connection__form__groupemail__input form-control' placeholder='Adresse Email' />
-                          <div className='connection__form__groupemail__msgerror invalid-feedback'>
-                            Invalid email.
-                          </div>
-                        </div>
+                    <Button
+                      htmlType='button'
+                      bootstrapType='primary'
+                      customClass='connection__form__btnsubmit'
+                      label='Connexion'
+                      onClick={this.handleClickSubmit}
+                    />
+                  </CardBody>
+                </Card>
 
-                        <div className='connection__form__groupepw form-group'>
-                          <div className='connection__form__groupepw__icon'>
-                            <i className='fa fa-fw fa-lock' />
-                          </div>
-                          <input type='password' className='connection__form__groupepw__pw form-control' id='password-co' placeholder='Mot de passe' />
-                          <div className='connection__form__groupepw__msgerror invalid-feedback'>
-                            Invalid password.
-                          </div>
-                        </div>
-
-                        <div className='row mt-4 mb-4'>
-                          <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
-                            <div className='connection__form__rememberme form-check'>
-                              <label className='connection__form__rememberme__label form-check-label'>
-                                <input type='checkbox' className='connection__form__rememberme__label__checkbox form-check-input' />
-                                Se souvenir de moi
-                              </label>
-                            </div>
-                          </div>
-
-                          <div className='col-12 col-sm-6 col-md-6 col-lg-6 text-sm-right'>
-                            <div className='connection__form__pwforgot'>
-                              Mot de passe oublié ?
-                            </div>
-                          </div>
-                        </div>
-
-                        <button type='submit' className='connection__form__btnsubmit btn btn-primary'>Connexion</button>
-                      </form>
-
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
-          </section>
 
-          <footer className='footer text-right'>
-            <div className='footer__text'>
-              Créer votre propre espace de travail collaboratif sur trac.im - Copyright 2013 - 2017
-            </div>
-            <img className='footer__logo' src={logoFooter} />
-          </footer>
-        </div> */}
-      </div>
-    )
+          </div>
+        </section>
+      )
+    }
   }
 }
 

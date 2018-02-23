@@ -1,0 +1,34 @@
+.file
+  display flex
+  border-bottom 0
+  &:hover
+    background-color files-hover
+  &__type
+    font-size 30px
+    text-align center
+  &__name
+    display flex
+    justify-content space-between
+    padding 15px 5px
+    cursor pointer
+    &__text
+      font-size 17px
+    &__icons
+      &__download
+        display inline-block
+        margin-right 10px
+      &__archive
+        display inline-block
+        margin-right 10px
+      &__delete
+        display inline-block
+        margin-right 10px
+  &__status
+    font-size 30px
+    text-align center
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .file
+    border-right 1px solid grey
+    &__name__icons
+        margin-top 5px

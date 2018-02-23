@@ -6,6 +6,8 @@
   "scripts": {
     "mockapi": "node jsonserver/server.js",
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
+    "servdevwindoz": "webpack-dev-server --watch --colors --inline --hot --progress",
+    "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -- webpack-dev-server --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -43,6 +45,7 @@
   },
   "devDependencies": {
     "json-server": "^0.12.0",
+    "webpack-dashboard": "^1.0.2",
     "webpack-dev-server": "^2.9.2"
   },
   "standard": {

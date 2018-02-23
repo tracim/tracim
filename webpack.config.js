@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
+const dashboardPlugin = require('webpack-dashboard/plugin')
 
 module.exports = {
   entry: {
@@ -70,7 +71,7 @@ module.exports = {
       test: /\.(jpg|png|svg)$/,
       loader: 'url-loader',
       options: {
-        limit: 25000
+        limit: 2000
       }
     }]
   },
@@ -83,6 +84,7 @@ module.exports = {
         name: 'vendor',
         filename: 'tracim.vendor.bundle.js'
       })
+      // new dashboardPlugin()
     ],
     ...(isProduction
       ? [ // production specific plugins

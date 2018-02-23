@@ -4,7 +4,9 @@ import {
   USER_DATA,
   USER_CONNECTED,
   updateUserConnected,
-  updateUserData
+  updateUserData,
+  WORKSPACE,
+  updateWorkspaceData
 } from './action-creator.sync.js'
 
 /*
@@ -53,19 +55,29 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
   return fetchResult
 }
 
-export const userLogin = (login, password) => async dispatch => {
+export const userLogin = (login, password, rememberMe) => async dispatch => {
+  const jsonBody = JSON.stringify({
+    login,
+    password,
+    remember_me: rememberMe
+  })
+
   const fetchUserLogin = await fetchWrapper({
     url: 'http://localhost:3001/user/login',
-    param: {...FETCH_CONFIG, method: 'POST', body: JSON.stringify({login, password})},
+    param: {
+      ...FETCH_CONFIG,
+      method: 'POST',
+      body: jsonBody
+    },
     actionName: USER_LOGIN,
     dispatch
   })
   if (fetchUserLogin.status === 200) dispatch(updateUserConnected(fetchUserLogin.json))
 }
 
-export const getUserConnected = () => async dispatch => {
+export const getIsUserConnected = () => async dispatch => {
   const fetchUserLogged = await fetchWrapper({
-    url: 'http://localhost:3001/user_logged',
+    url: 'http://localhost:3001/user/is_logged_in',
     param: {...FETCH_CONFIG, method: 'GET'},
     actionName: USER_CONNECTED,
     dispatch
@@ -92,3 +104,13 @@ export const updateUserLang = newLang => async dispatch => {
 //   })
 //   console.log('jsonResponseNoData', fetchResponseNoData)
 // }
+
+export const getWorkspaceContent = workspaceId => async dispatch => {
+  const fetchGetWorkspaceContent = await fetchWrapper({
+    url: `http://localhost:3001/workspace/${workspaceId}`,
+    param: {...FETCH_CONFIG, method: 'GET'},
+    actionName: WORKSPACE,
+    dispatch
+  })
+  if (fetchGetWorkspaceContent.status === 200) dispatch(updateWorkspaceData(fetchGetWorkspaceContent.json))
+}

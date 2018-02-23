@@ -1,0 +1,120 @@
+// -----------------------------------------------------
+// border management for Workspace container
+border-style = 1px solid darkBlue
+.folder__header
+  border border-style
+.file
+  border border-style
+.folder + .file, .file + .file
+  border-bottom 0
+.folder__content > .file, .folder__content > .folder
+  border-bottom 0
+// @TODO the very last line of file or folder has to be added a border bottom in js
+// -----------------------------------------------------
+
+folderclose()
+  height 0
+  visibility hidden
+  opacity 0
+
+folderopen()
+  height 100%
+  opacity 1
+  visibility visible
+  transition opacity 1s
+
+.folder
+  padding-left 30px
+  & > .folder__header
+    folderopen()
+  & > .folder__content
+    folderclose()
+    & > .file, > .folder
+      folderclose()
+  &.active
+    & > .folder__header
+      .folder__header__triangleborder
+        display block
+        &__triangle
+          display block
+    & > .folder__content
+      folderopen()
+      & > .file, > .folder
+        folderopen()
+
+  &__header
+    position relative
+    display flex
+    justify-content space-between
+    margin-left -30px
+    border-bottom 0
+    background-color lightGrey
+    cursor pointer
+    &:hover
+      background-color folder-hover
+      .folder__header__triangleborder__triangle
+        border-color hover-folder transparent transparent transparent
+    &__triangleborder
+      display none
+      position absolute
+      top 62px
+      left -1px
+      border-style solid
+      border-width 25px 30px 0 30px
+      border-color darkBlue transparent transparent transparent
+      z-index 1
+      &__triangle
+        display none
+        position absolute
+        top -26px
+        left -30px
+        border-style solid
+        border-width 25px 30px 0 30px
+        border-color lightGrey transparent transparent transparent
+    &__name
+      display flex
+      padding-left 5px
+      &__icon
+        margin auto 15px
+        font-size 25px
+        color darkBlue
+      &__text
+        margin auto 15px
+        font-size 17px
+        color darkBlue
+      &__addbtn
+        margin auto 0
+        cursor pointer
+        &:hover > .folder__header__name__addbtn__text
+          color white
+        &__text
+          border 1px solid darkBlue
+          background-color transparent
+          color darkBlue
+          font-size 17px
+    &__contenttype
+      display flex
+      &__text
+        padding 18px 15px
+        font-size 17px
+        color darkBlue
+      &__icon
+        padding 18px 5px
+        font-size 17px
+        color darkBlue
+        & > i
+          margin-right 15px
+
+@media (max-width: max-xs)
+  .folder
+    &__header
+      &__triangleborder
+        top 59px
+      &__name
+        &__icon
+          padding 14px 15px
+          font-size 20px
+        &__text
+          font-size 15px
+      &__contenttype
+        display none

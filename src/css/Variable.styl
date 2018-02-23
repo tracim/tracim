@@ -1,30 +1,69 @@
 /**** VARIABLES ****/
 /*** COULEURS ****/
-dark-blue = #215E8E // #215E8E dark-blue
-hover-blue = #205AED // #205AED color blue use in hover rules
-blue = #2571FE // #2571FE blue
-light-blue = #569EDE // #569EDE light-blue
-opacity-blue = #82B2CC // #82B2CC  blue with light opacity
-off-white = #FDFDFD // #FDFDFD off-white
-dark-grey = #252525 // #252525 dark-grey
-hover = #9BC1EB // #9BC1EB hover on folder
-hover-files = rgba(155,193,235,0.2) // hover on files
-grey = #ABABAB // #ABABAB grey
-light-grey = #f0f0f0 // #f0f0f0 light grey
-hover-grey = #E0E0E0 // #E0E0E0 color for hover files
-green = #28a745 // #28a745 green
-dark-green = #65A833 // #65A833 dark-green
-purple = #7E36A0 // color icon on the sidebar menu workspace
-orange = #D95620 // color icon on the sidebar menu workspace
-red = #D9352B // color icon on the sidebar menu workspace
+
+mainColor = #fdfdfd // Bg header
+secondColor = #215e8e // bg sidebar
+thirdColor = #2571fe // bg workspace name
+fourthColor = #82b2cc // bg filter sidebar
+
+fontColor = #252525
+
+darkGrey = #252525
+rgbGrey = rgba(25,25,25,0.3)
+grey = #ababab
+lightGrey = #f0f0f0
+grey-hover = #e0e0e0
+
+folder-hover = #9BC1eb
+files-hover = rgba(155,193,235,0.2)
+
+off-white = #fdfdfd
+
+darkBlue = #215e8e
+blue = #2571fe
+lightBlue = #569EDE
+
+red = #f63434
+
+// c2a btn color in general context ; meaning every context but specific one related to file type (file, pageHtml, issues, threads ...)
+btnCallAction = #28a745
+btnCallAction-hover = darken(btnCallAction, 15%)
+
+threadColor = #2674d3
+
+htmlColor = #65c7f2
+darkHtmlColor = darken(htmlColor, 15%)
+
+markdownColor = #e0082b
+
+fileColor = #263462
+lightFileColor = lighten(fileColor, 15%)
+
+taskColor = #2d5a88
+
+issueColor = #a4835e
+
+/** Role Color  **/
+gestionnaire = #f2af2d
+lecteur = #15D948
+contributeur = #3145F7
+responsable = #ED0007
+
+/** Btn call to action dashboard **/
+writefile = #a738ed
+importfile = #ff8400
+calendar = red
+explore = #87d04c
+
 
 /*************************/
 /**** BOX SHADOW ****/
 shadow-bottom = 0px 0px 5px 1px #606060
 shadow-right = 2px 2px 5px 0px #404040
-shadow-all = 1px 1px 5px 2px #ABABAB
-shadow-all-side-blue = 0px 0px 1px 1px light-blue
+shadow-all = 1px 1px 5px 2px #ababab
+shadow-all-side-blue = 0px 0px 1px 1px lightBlue
 shadow-all-side-green = 0 0 1px 2px green
+shadow-all-btn = 0 0 3px 3px lightBlue
 
 /***********************/
 /**** MEDIA QUERIES ****/
@@ -41,4 +80,4 @@ min-lg = 992px
 max-lg = 1199px
 
 min-xl = 1200px
-/***********************/
+

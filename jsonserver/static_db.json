@@ -1,10 +1,75 @@
 {
-  "login": true,
   "user_logged": {
-    "id": 5,
-    "username": "Smoi",
-    "firstname": "Côme",
-    "lastname": "Stoilenom",
-    "email": "osef@algoo.fr"
+    "logged": true,
+    "user": {
+      "id": 5,
+      "username": "Smoi",
+      "firstname": "Côme",
+      "lastname": "Stoilenom",
+      "email": "osef@algoo.fr"
+    }
+  },
+  "workspace_detail": {
+    "id": 1,
+    "title": "Mission interne - développement",
+    "owner_id": 5,
+    "content": [
+      {
+        "id": 1,
+        "title": "La programmation fonctionnelle",
+        "type": "pageHtml",
+        "status": "validated",
+        "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle"
+      },
+      {
+        "id": 2,
+        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "type": "thread",
+        "status": "current"
+      },
+      {
+        "id": 6,
+        "title": "Une photo moche",
+        "type": "file",
+        "status": "current"
+      },
+      {
+        "id": 10,
+        "title": "le README.md d'un random repo github",
+        "type": "pageMarkdown",
+        "status": "current"
+      },
+      {
+        "id": 7,
+        "title": "Une liste de truc à faire que je ferai jamais",
+        "type": "task",
+        "status": "current"
+      },
+      {
+        "id": 8,
+        "title": "Ça, ça marche pas. Merci de le fix",
+        "type": "issue",
+        "status": "current"
+      },
+      {
+        "id": 3,
+        "title": "Programmation objet",
+        "type": "folder",
+        "content": [
+          {
+            "id": 4,
+            "title": "des trucs de backend",
+            "type": "file",
+            "status": "outdated"
+          },
+          {
+            "id": 5,
+            "title": "on s'emmerde",
+            "type": "pageHtml",
+            "status": "outdated"
+          }
+        ]
+      }
+    ]
   }
 }

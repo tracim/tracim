@@ -1,0 +1,265 @@
+/*** SIDEBAR ***/
+
+.sidebarpagecontainer
+  display flex
+  min-height calc(100% - 50px)
+  padding-top 85px
+
+/********************/
+
+/*** ELEMENTS ON ALL PAGE ***/
+
+.pageWrapperGeneric
+  width 100%
+  &__header
+    display flex
+  &__content
+    margin 10px 10px 120px 10px
+@media (min-width: min-md) and (max-width: max-md)
+  .pageWrapperGeneric
+    display block
+    padding-top 87px
+    &__header
+      margin 95px 0 5px 30px
+    &__content
+      margin 0
+@media (min-width: min-sm) and (max-width: max-sm)
+  .pageWrapperGeneric
+    display block
+    padding-top 87px
+    &__header
+      margin 95px 0 35px 0
+      &__title
+        display inline-block
+        margin-left 0
+    &__content
+      margin 0
+@media (max-width: max-xs)
+  .pageWrapperGeneric
+    display block
+    padding-top 87px
+    &__header
+      display block
+      margin-top 60px
+    &__content
+      margin 0
+
+.nopadding
+  padding 0
+
+.pageTitleGeneric
+  display flex
+  margin 45px 0
+  &__title
+    margin-left 10px
+    font-size 30px
+    color darkGrey
+@media (max-width: max-xs)
+  .pageTitleGeneric
+    display block
+
+
+.pageContentGeneric
+  margin 10px 10px 120px 10px
+
+.dropdownCreateBtn
+  &__label
+    padding 10px 65px
+    background-color green
+    cursor pointer
+    &__text
+      display inline-block
+      color white
+    &::after //bootstrap override
+      display inline-block
+      margin-left 30px
+      color white
+  &__setting
+    padding 0
+    cursor pointer
+    .setting__link
+      padding 5px 65px 5px 10px
+
+.fa-file-image-o
+  color previewColor
+
+.fa-comments-o
+  color threadColor
+
+.fa-list-ul
+  color taskColor
+
+.fa-file-code-o
+  color markdownColor
+
+.fa-file-word-o
+  color htmlColor
+
+.fa-ticket
+  color issueColor
+
+.fa-graduation-cap
+  color gestionnaire
+
+.fa-pencil
+  color contributeur
+
+.fa-gavel
+  color responsable
+
+.fa-eye
+  color lecteur
+
+.subTitle
+  font-size 20px
+  font-weight 500
+  color blue
+
+.GenericDelimiter
+  border-radius 10px
+  width 50%
+  height 5px
+  background-color blue
+
+.btnaction
+  display flex
+  flex-direction column
+  justify-content center
+  margin 20px 30px 20px 0
+  border-radius 10px
+  padding 15px
+  width 250px
+  height 200px
+  box-shadow shadow-all
+  text-align center
+  cursor pointer
+
+.genericWebdav
+  &__btn
+    display flex
+    margin-bottom 30px
+    border 1px solid blue
+    border-radius 10px
+    padding 15px 25px
+    color blue
+    cursor pointer
+    &:hover, &:focus
+      background-color blue
+      color white
+    &__icon
+      margin-right 20px
+      font-size 30px
+  &__info
+    border 1px solid grey
+    border-radius 10px
+    padding 15px 25px
+    &__text
+      margin-bottom 35px
+    &__link
+      display inline-block
+      margin-bottom 15px
+      border 1px solid grey
+      border-radius 10px
+      padding 15px 25px
+
+/********************/
+
+/*** PAGE FILE, THREAD, HTML, MARKDOWN, ISSUE ***/
+
+.wsFileGeneric
+  position fixed
+  top 85px
+  right 0
+  border 1px solid grey
+  height 100%
+  background-color lightGrey
+  box-shadow shadow-page
+  visibility hidden
+  z-index 1
+  &.visible
+    visibility visible
+  &__header
+    display flex
+    align-items center
+    padding 15px
+    height 64px
+    &__icon
+      margin-right 15px
+      font-size 22px
+      color white
+    &__title
+      margin-right 15px
+      color white
+      text-overflow ellipsis
+      overflow hidden
+      white-space nowrap
+    &__edittitle
+      margin 0 15px
+      color white
+      font-size 20px
+      cursor pointer
+      &:hover , &:focus
+        border 1px solid off-white
+        padding 0 10px
+        border-radius 5px
+    &__close
+      border 1px solid white
+      border-radius 5px
+      padding 2px 5px
+      cursor pointer
+      & > i
+        color white
+        font-size 20px
+  &__option
+    border-bottom 1px solid grey
+    padding 10px
+    height 58px
+    background-color off-white
+    & > i
+      vertical-align middle
+      margin-right 15px
+      font-size 25px
+      cursor pointer
+    &__menu
+      display flex
+      align-items center
+      &__status
+        margin-right 20px
+        .current
+          color blue
+        .check
+          color green
+        .invalid
+          color red
+        .ban
+          color grey
+        &__dropdownbtn
+          border 1px solid grey
+          width 150px
+          background-color transparent
+          cursor pointer
+          &::after
+            color fontColor
+          &:hover
+            background-color transparent
+          &__icon
+            display inline-block
+            margin 0 15px
+        &__submenu
+          &__item
+            display flex
+            justify-content space-between
+            margin 5px 0
+            cursor pointer
+            &:active
+              background-color transparent
+      &__action
+        margin 5px 10px 0 0
+        font-size 18px
+        cursor pointer
+        &:hover , &:focus
+          font-size 22px
+          color blue
+  &__wrapper
+    display flex
+    flex-direction column

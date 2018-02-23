@@ -1,0 +1,277 @@
+.wsFilePreview
+  width 1200px
+  height calc(100% - 85px)
+  &__header
+    background-color previewColor
+    .fa-file-image-o
+      color white
+  &__option
+    &__menu
+      display flex
+      &__addversion
+        padding 8px 15px
+        border 1px solid previewColor
+        border-radius 5px
+        background-color transparent
+        color previewColor
+        cursor pointer
+        & > i
+          margin-left 10px
+        &:hover
+          background-color previewColor
+          border none
+          color white
+  &__contentpage
+    display flex
+    height 100%
+    &__visualizer
+      position relative
+      margin 10px
+      border-radius 10px
+      width 70%
+      height calc(100% - 150px)
+      background-color off-white
+      &__sidebar
+        position absolute
+        top 0
+        right 0
+        width 50px
+        height 100%
+        transition width 1s ease
+        &__visiblepart
+          display flex
+          flex-direction column
+          align-items center
+          border-top-right-radius 10px
+          border-bottom-right-radius 10px
+          width 50px
+          height 100%
+          background-color grey
+          cursor pointer
+          &:hover
+            background-color previewColor
+          &__icon
+            justify-content flex-start
+            font-size 30px
+            color white
+          &__title
+            margin-top 45px
+            color white
+            transform rotate(-90deg)
+        &__propertydetail
+          display none
+      &__dloption
+        display flex
+        margin-left calc(50% - 50px) // 50px => width/2 of the div
+        padding-top 10px
+        width 100px
+        &__icon
+          margin-right 20px
+          font-size 20px
+          cursor pointer
+      &__slidecontainer
+        display flex
+        align-items center
+        width calc(100% - 50px) // 50px => width of sidebar
+        height calc(100% - 40px) // 40px => height of dloption
+        &__fileimg
+          display flex
+          padding 30px
+          width 100%
+          height 100%
+          & > img
+            max-height 100%
+            max-width 100%
+        &__chevron
+          margin 0 5px
+          font-size 20px
+          cursor pointer
+    .timeline
+      margin 10px
+      border-radius 10px
+      width 45%
+      height calc(100% - 150px)
+      background-color off-white
+      overflow scroll
+      &__header
+        border-top-left-radius 10px
+        border-top-right-radius 10px
+        padding 10px 0
+        text-align center
+        font-size 20px
+        color dark-grey
+        background-color grey-hover
+      &__messagelist
+        min-height 300px
+        &__item
+          &__content
+            color dark-grey
+        &__version
+          margin-top 40px
+          background-color grey-hover
+          &__btn
+            padding 5px 25px
+            border-radius 5px
+            width 145px
+            color white
+            font-size 17px
+            background-color previewColor
+            & > i
+              margin-right 10px
+              color dark-grey
+              font-size 22px
+            &:hover
+              background-color lightPreviewColor
+            &:focus
+              background-color lightPreviewColor
+          &__date
+            color fontColor
+            font-size 17px
+      &__texteditor
+        &__simpletext
+          &__input
+            &:focus
+              color htmlColor
+              border-color htmlColor
+        &__submit
+          &__btn
+            border-color htmlColor
+            background-color htmlColor
+            color white
+            &:hover
+              border-color htmlColor
+              background-color htmlColor
+            &:focus
+              border-color htmlColor
+              background-color htmlColor
+
+/***** SENDER RECEIVER *****/
+
+.received
+  .wsFilePreview__contentpage__messagelist__item__content
+      background-color previewColor
+
+/***** ACTIVE SIDEBAR *****/
+
+.activesidebar
+  .wsFilePreview__contentpage__visualizer
+    &__sidebar
+      display flex
+      border-top-right-radius 10px
+      border-bottom-right-radius 10px
+      width 500px
+      background-color off-white
+      &__visiblepart
+        order 1
+        border-top-left-radius 10px
+        border-bottom-left-radius 10px
+        border-top-right-radius 0
+        border-bottom-right-radius 0
+        background-color previewColor
+      &__propertydetail
+        display flex
+        order 2
+        padding 20px
+        overflow-Y auto
+        color previewColor
+
+/****** MEDIA QUERIES ********/
+
+@media (min-width: max-xs) and (max-width: max-lg)
+
+  .wsFilePreview
+    overflow-Y auto
+    &__contentpage
+      display block
+      &__visualizer
+        display flex
+        flex-direction column
+        width calc(100% - 30px) // 20px => margin
+      .timeline
+        width calc(100% - 30px) // 20px => margin
+        &__texteditor
+          &__simpletext
+            display inline-flex
+            display ms-inline-flex
+            width 60%
+          &__submit
+            display inline-flex
+            display ms-inline-flex
+            margin 10px 0
+            &__btn
+              display flex
+              margin-left 35px
+              &__icon
+                margin-left 15px
+
+/**** MEDIA 992px & 1199px ****/
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .wsFilePreview
+    width 900px
+    overflow-Y auto
+
+/******************************/
+
+/**** MEDIA 768px & 991px ****/
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .wsFilePreview
+    width 100%
+
+/******************************/
+
+/**** MEDIA 576px & 767px ****/
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .wsFilePreview
+    top 69px
+    width 100%
+    height calc(100% - 69px)
+    overflow-Y scroll
+
+/******************************/
+
+/**** MEDIA 575px ****/
+
+@media (max-width: max-xs)
+
+  .activesidebar
+    .wsFilePreview__contentpage__visualizer
+      &__sidebar
+        width 350px
+
+  .wsFilePreview
+    top 69px
+    width 100%
+    height calc(100% - 69px)
+    overflow-Y scroll
+    &__option__menu__addversion
+        padding 8px 5px
+        & > i
+          display none
+    &__contentpage
+      display block
+      &__visualizer
+        display flex
+        flex-direction column
+        width calc(100% - 30px) // 20px => margin
+      .timeline
+        width calc(100% - 30px) // 20px => margin
+        &__texteditor
+          &__simpletext
+            display inline-flex
+            display ms-inline-flex
+            width 60%
+          &__submit
+            display inline-flex
+            display ms-inline-flex
+            margin 10px 0
+            &__btn
+              display flex
+              margin-left 35px
+              &__icon
+                margin-left 15px
