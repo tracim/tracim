@@ -1,7 +1,7 @@
 {
   "name": "tracim_lib",
   "version": "1.0.0",
-  "main": "dist/tracimLib",
+  "main": "dist/tracim_lib.js",
   "scripts": {
     "mockapi": "node jsonserver/server.js",
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
