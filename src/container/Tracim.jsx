@@ -45,7 +45,9 @@ class Tracim extends React.Component {
 
               <SidebarWrapper locationPath={location.pathname}>
 
-                <PrivateRoute exact path='/' component={AccountPage} />
+                <PrivateRoute exact path='/' component={WorkspaceContent} />
+                <PrivateRoute exact path='/account' component={AccountPage} />
+                <PrivateRoute exact path='/dashboard' component={Dashboard} />
 
               </SidebarWrapper>
 
