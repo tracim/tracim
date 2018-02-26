@@ -1,23 +1,22 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-// import PageHtml from '../../../plugin/ContentType/PageHtml/PageHtml.jsx'
-// import Thread from '../../../plugin/ContentType/Thread/Thread.jsx'
-// import Timeline from '../../Timeline.jsx'
 
 const PopinFixedContent = props => {
   return props.children.length === 2
     ? (
-      <div className={classnames('wsFileGeneric__contentpage', `${props.customClass}`)}>
-        {props.children[0]}
+      <div className={classnames('wsFileGeneric__content', `${props.customClass}__content`)}>
+        <div className={classnames('wsFileGeneric__content__left', `${props.customClass}__content__left`)}>
+          {props.children[0]}
+        </div>
 
-        <div className={classnames('wsFileGeneric__wrapper', `${props.customClass}__wrapper`)}>
+        <div className={classnames('wsFileGeneric__content__right', `${props.customClass}__content__right`)}>
           {props.children[1]}
         </div>
       </div>
     )
     : (
-      <div className={classnames('wsFileGeneric__contentpage', `${props.customClass}`)}>
+      <div className={classnames('wsFileGeneric__content', `${props.customClass}__content`)}>
         { props.children }
       </div>
     )
@@ -26,18 +25,8 @@ const PopinFixedContent = props => {
 export default PopinFixedContent
 
 PopinFixedContent.propTypes = {
-  customClass: PropTypes.string
-
-  // from http://www.mattzabriskie.com/blog/react-validating-children
-  // children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
-  //   if (
-  //     (Array.isArray(children.length) && (
-  //       children.length > 2 ||
-  //       (children.length === 2 && children.some(c => ![PageHtml, Thread, Timeline].includes(c.type)))
-  //     )) ||
-  //     (children.type === Timeline)
-  //   ) {
-  //     return new Error(`PropType Error: childrens of ${componentName} must be one of [PageHtml, Thread, Timeline, undefined].`)
-  //   }
-  // }).isRequired
+  customClass: PropTypes.string,
+  children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) =>
+    children.length !== 2 && new Error(`PropType Error: ${componentName} must have 2 children.`)
+  ).isRequired
 }

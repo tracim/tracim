@@ -1,11 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import { FILE_TYPE } from '../../helper.js'
 
 const FileItem = props => {
-  const iconType = (FILE_TYPE.find(f => f.name === props.type) || {icon: ''}).icon
-
   const iconStatus = (() => {
     switch (props.status) {
       case 'current':
@@ -23,7 +20,7 @@ const FileItem = props => {
     <div className={classnames('file', 'align-items-center', props.customClass)} onClick={props.onClickItem}>
       <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
         <div className='file__type'>
-          <i className={iconType} />
+          <i className={props.icon} />
         </div>
       </div>
       <div className='col-8 col-sm-8 col-md-8 col-lg-8 col-xl-10'>

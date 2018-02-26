@@ -1,7 +1,9 @@
 import { combineReducers } from 'redux'
-import pageHtml from '../plugin/ContentType/PageHtml/pageHtml.js'
-import thread from '../plugin/ContentType/Thread/thread.js'
+import pluginDatabase from '../plugin/index.js'
+
+const reducerList = {}
+pluginDatabase.forEach(p => (reducerList[p.name] = p.reducer))
 
 export default combineReducers({
-  pageHtml, thread
+  ...reducerList
 })

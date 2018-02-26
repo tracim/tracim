@@ -7,16 +7,12 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
+import pluginDatabase from '../plugin/index.js'
 import {
   getPluginList,
   getWorkspaceContent
 } from '../action-creator.async.js'
-import { setActiveFileContent, hideActiveFileContent } from '../action-creator.sync.js'
-import PopinFixed from '../component/common/PopinFixed/PopinFixed.jsx'
-import PopinFixedHeader from '../component/common/PopinFixed/PopinFixedHeader.jsx'
-import PopinFixedOption from '../component/common/PopinFixed/PopinFixedOption.jsx'
-import PopinFixedContent from '../component/common/PopinFixed/PopinFixedContent.jsx'
-import PluginContentType from '../component/PluginContentType.jsx'
+import { setActiveFileContent } from '../action-creator.sync.js'
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -32,39 +28,13 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickFileItem = file => {
-    console.log(file)
     this.props.dispatch(setActiveFileContent(file))
-  }
-
-  handleClickCloseBtn = () => {
-    this.props.dispatch(hideActiveFileContent())
   }
 
   render () {
     const { workspace, activeFileContent, plugin } = this.props
 
-    const pluginContent = (() => {
-      switch (activeFileContent.type) {
-        case 'PageHtml':
-          return <PopinFixed customClass={`${plugin.pageHtml.customClass}`}>
-            <PopinFixedHeader
-              customClass={`${plugin.pageHtml.customClass}`}
-              icon={plugin.pageHtml.icon}
-              name={activeFileContent.title}
-              onClickCloseBtn={this.handleClickCloseBtn}
-            />
-
-            <PopinFixedOption customClass={`${plugin.pageHtml.customClass}`} />
-
-            <PopinFixedContent customClass={`${plugin.pageHtml.customClass}__contentpage`}>
-              <PluginContentType
-                file={activeFileContent}
-                customClass={`${plugin.pageHtml.customClass}`}
-              />
-            </PopinFixedContent>
-          </PopinFixed>
-      }
-    })()
+    const PluginContainer = (pluginDatabase.find(p => p.name === activeFileContent.type) || {container: '<div>unknow</div>'}).container
 
     return (
       <PageWrapper customeClass='workspace'>
@@ -82,11 +52,12 @@ class WorkspaceContent extends React.Component {
             <FileItemHeader />
 
             { workspace.content.map(c => c.type === 'folder'
-              ? <Folder folderData={c} key={c.id} />
+              ? <Folder plugin={plugin} folderData={c} key={c.id} />
               : (
                 <FileItem
                   name={c.title}
                   type={c.type}
+                  icon={(plugin[c.type] || {icon: ''}).icon}
                   status={c.status}
                   onClickItem={() => this.handleClickFileItem(c)}
                   key={c.id}
@@ -98,7 +69,7 @@ class WorkspaceContent extends React.Component {
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
           <div id='pluginContainer'>
-            { activeFileContent.display && pluginContent }
+            { activeFileContent.display && <PluginContainer /> }
           </div>
         </PageContent>
 

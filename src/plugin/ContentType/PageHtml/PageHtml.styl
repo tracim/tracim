@@ -1,3 +1,5 @@
+@import '../../../css/Variable.styl'
+
 .wsFilePageHtml
   width 1200px
   height calc(100% - 85px)
@@ -8,13 +10,10 @@
       .fa-file-word-o
         color white
   &__contentpage
-    display flex
-    overflow-Y auto
     &__textnote
       margin 10px
       border-radius 10px
       padding 25px
-      width 55%
       height 100%
       background-color off-white
       &__latestversion
@@ -22,19 +21,11 @@
         opacity 0.7
       &__text
         font-size 14px
-    &__header
-      border-top-left-radius 10px
-      border-top-right-radius 10px
-      padding 10px 0
-      text-align center
-      font-size 20px
-      color dark-grey
-      background-color grey-hover
     &__messagelist
       min-height 300px
       &__item
         &__content
-          color dark-grey
+          color darkGrey
       &__version
         margin-top 40px
         background-color grey-hover
@@ -47,7 +38,7 @@
           background-color htmlColor
           & > i
             margin-right 10px
-            color dark-grey
+            color darkGrey
             font-size 22px
           &:hover
             background-color darkHtmlColor

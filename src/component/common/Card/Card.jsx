@@ -22,7 +22,7 @@ Card.propTypes = {
       children[1].type !== CardBody
       // children.some(p => p.type !== CardHeader && p.type !== CardBody)
     ) {
-      return new Error(`PropType Error: childrens of ${componentName} must be: 1 CardHeader and 1 CardBody.`)
+      return new Error(`PropType Error: children of ${componentName} must be: 1 CardHeader and 1 CardBody.`)
     }
   }).isRequired,
   customClass: PropTypes.string

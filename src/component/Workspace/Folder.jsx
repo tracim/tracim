@@ -21,7 +21,7 @@ class Folder extends Component {
   }
 
   render () {
-    const { title, content } = this.props.folderData
+    const { plugin, folderData: { title, content } } = this.props
     return (
       <div className={classnames('folder', {'active': this.state.open})}>
         <div className='folder__header' onClick={this.handleClickToggleFolder}>
@@ -57,6 +57,7 @@ class Folder extends Component {
           { content.map(c => c.type === 'folder'
             ? <Folder folderData={c} key={c.id} />
             : <FileItem
+              icon={(plugin[c.type] || {icon: ''}).icon}
               name={c.title}
               type={c.type}
               status={c.status}
@@ -76,5 +77,6 @@ Folder.propTypes = {
   folderData: PropTypes.shape({
     title: PropTypes.string.isRequired,
     content: PropTypes.array
-  })
+  }),
+  plugin: PropTypes.object
 }

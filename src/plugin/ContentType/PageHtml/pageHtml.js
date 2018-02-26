@@ -2,7 +2,8 @@ import { PLUGIN_LIST } from '../../../action-creator.sync.js'
 
 export default function pageHtml (state = {
   title: '',
-  version: 0
+  version: 0,
+  icon: ''
 }, action) {
   switch (action.type) {
     case `Set/${PLUGIN_LIST}`:
