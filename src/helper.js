@@ -9,36 +9,36 @@ export const FILE_TYPE = [{
   name: 'PageHtml',
   componentLeft: 'PageHtml',
   componentRight: 'Timeline',
-  customClass: 'wsContentPageHtml',
+  customClass: 'wsFilePageHtml',
   icon: 'fa fa-file-word-o'
 }, {
   name: 'PageMarkdown',
   componentLeft: 'PageMarkdown',
   componentRight: 'undefined',
-  customClass: 'wsContentPageMarkdown',
+  customClass: 'wsFilePageMarkdown',
   icon: 'fa fa-file-code-o'
 }, {
   name: 'File',
   componentLeft: 'File',
   componentRight: 'undefined',
-  customClass: 'wsContentFile',
+  customClass: 'wsFileFile',
   icon: 'fa fa-file-text-o'
 }, {
   name: 'Thread',
   componentLeft: 'Thread',
   componentRight: 'undefined',
-  customClass: 'wsContentThread',
+  customClass: 'wsFileThread',
   icon: 'fa fa-comments-o'
 }, {
   name: 'Task',
   componentLeft: 'Task',
   componentRight: 'undefined',
-  customClass: 'wsContentTask',
+  customClass: 'wsFileTask',
   icon: 'fa fa-list-ul'
 }, {
   name: 'Issue',
   componentLeft: 'Issue',
   componentRight: 'undefined',
-  customClass: 'wsContentIssue',
+  customClass: 'wsFileIssue',
   icon: 'fa fa-ticket'
 }]

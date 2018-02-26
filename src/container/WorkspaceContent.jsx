@@ -12,6 +12,11 @@ import {
   getWorkspaceContent
 } from '../action-creator.async.js'
 import { setActiveFileContent, hideActiveFileContent } from '../action-creator.sync.js'
+import PopinFixed from '../component/common/PopinFixed/PopinFixed.jsx'
+import PopinFixedHeader from '../component/common/PopinFixed/PopinFixedHeader.jsx'
+import PopinFixedOption from '../component/common/PopinFixed/PopinFixedOption.jsx'
+import PopinFixedContent from '../component/common/PopinFixed/PopinFixedContent.jsx'
+import PluginContentType from '../component/PluginContentType.jsx'
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -36,7 +41,30 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { workspace, activeFileContent } = this.props
+    const { workspace, activeFileContent, plugin } = this.props
+
+    const pluginContent = (() => {
+      switch (activeFileContent.type) {
+        case 'PageHtml':
+          return <PopinFixed customClass={`${plugin.pageHtml.customClass}`}>
+            <PopinFixedHeader
+              customClass={`${plugin.pageHtml.customClass}`}
+              icon={plugin.pageHtml.icon}
+              name={activeFileContent.title}
+              onClickCloseBtn={this.handleClickCloseBtn}
+            />
+
+            <PopinFixedOption customClass={`${plugin.pageHtml.customClass}`} />
+
+            <PopinFixedContent customClass={`${plugin.pageHtml.customClass}__contentpage`}>
+              <PluginContentType
+                file={activeFileContent}
+                customClass={`${plugin.pageHtml.customClass}`}
+              />
+            </PopinFixedContent>
+          </PopinFixed>
+      }
+    })()
 
     return (
       <PageWrapper customeClass='workspace'>
@@ -70,7 +98,7 @@ class WorkspaceContent extends React.Component {
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
           <div id='pluginContainer'>
-
+            { activeFileContent.display && pluginContent }
           </div>
         </PageContent>
 
@@ -79,5 +107,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspace, activeFileContent }) => ({ workspace, activeFileContent })
+const mapStateToProps = ({ workspace, activeFileContent, plugin }) => ({ workspace, activeFileContent, plugin })
 export default connect(mapStateToProps)(WorkspaceContent)
