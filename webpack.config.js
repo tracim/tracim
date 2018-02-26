@@ -9,7 +9,8 @@ module.exports = {
     filename: 'tracim_lib.js',
     pathinfo: !isProduction,
     library: 'tracim_lib',
-    libraryTarget: 'var'
+    libraryTarget: 'umd',
+    umdNamedDefined: true
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
