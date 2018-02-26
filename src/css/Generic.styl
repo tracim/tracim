@@ -1,7 +1,13 @@
+/*** SIDEBAR ***/
+
 .sidebarpagecontainer
   display flex
   min-height calc(100% - 50px)
   padding-top 85px
+
+/********************/
+
+/*** ELEMENTS ON ALL PAGE ***/
 
 .pageWrapperGeneric
   width 100%
@@ -38,6 +44,8 @@
     &__content
       margin 0
 
+.nopadding
+  padding 0
 
 .pageTitleGeneric
   display flex
@@ -53,7 +61,6 @@
 
 .pageContentGeneric
   margin 10px 10px 120px 10px
-
 
 .dropdownCreateBtn
   &__label
@@ -73,9 +80,8 @@
     .setting__link
       padding 5px 65px 5px 10px
 
-
-.fa-file-text-o
-  color fileColor
+.fa-file-image-o
+  color previewColor
 
 .fa-comments-o
   color threadColor
@@ -92,6 +98,73 @@
 .fa-ticket
   color issueColor
 
+.fa-graduation-cap
+  color gestionnaire
+
+.fa-pencil
+  color contributeur
+
+.fa-gavel
+  color responsable
+
+.fa-eye
+  color lecteur
+
+.subTitle
+  font-size 20px
+  font-weight 500
+  color blue
+
+.GenericDelimiter
+  border-radius 10px
+  width 50%
+  height 5px
+  background-color blue
+
+.btnaction
+  display flex
+  flex-direction column
+  justify-content center
+  margin 20px 30px 20px 0
+  border-radius 10px
+  padding 15px
+  width 250px
+  height 200px
+  box-shadow shadow-all
+  text-align center
+  cursor pointer
+
+.genericWebdav
+  &__btn
+    display flex
+    margin-bottom 30px
+    border 1px solid blue
+    border-radius 10px
+    padding 15px 25px
+    color blue
+    cursor pointer
+    &:hover, &:focus
+      background-color blue
+      color white
+    &__icon
+      margin-right 20px
+      font-size 30px
+  &__info
+    border 1px solid grey
+    border-radius 10px
+    padding 15px 25px
+    &__text
+      margin-bottom 35px
+    &__link
+      display inline-block
+      margin-bottom 15px
+      border 1px solid grey
+      border-radius 10px
+      padding 15px 25px
+
+/********************/
+
+/*** PAGE FILE, THREAD, HTML, MARKDOWN, ISSUE ***/
 
 .wsFileGeneric
   position fixed
@@ -102,6 +175,7 @@
   background-color lightGrey
   box-shadow shadow-page
   visibility hidden
+  z-index 1
   &.visible
     visibility visible
   &__header
@@ -124,6 +198,10 @@
       color white
       font-size 20px
       cursor pointer
+      &:hover , &:focus
+        border 1px solid off-white
+        padding 0 10px
+        border-radius 5px
     &__close
       border 1px solid white
       border-radius 5px
@@ -134,9 +212,8 @@
         font-size 20px
   &__option
     border-bottom 1px solid grey
-    padding 15px
+    padding 10px
     height 58px
-    text-align right
     background-color off-white
     & > i
       vertical-align middle
@@ -144,14 +221,45 @@
       font-size 25px
       cursor pointer
     &__menu
-      display inline-block
-      vertical-align middle
+      display flex
+      align-items center
+      &__status
+        margin-right 20px
+        .current
+          color blue
+        .check
+          color green
+        .invalid
+          color red
+        .ban
+          color grey
+        &__dropdownbtn
+          border 1px solid grey
+          width 150px
+          background-color transparent
+          cursor pointer
+          &::after
+            color fontColor
+          &:hover
+            background-color transparent
+          &__icon
+            display inline-block
+            margin 0 15px
+        &__submenu
+          &__item
+            display flex
+            justify-content space-between
+            margin 5px 0
+            cursor pointer
+            &:active
+              background-color transparent
       &__action
-        display inline-block
-        margin-right 10px
+        margin 5px 10px 0 0
         font-size 18px
         cursor pointer
+        &:hover , &:focus
+          font-size 22px
+          color blue
   &__wrapper
     display flex
     flex-direction column
-

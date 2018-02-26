@@ -22,7 +22,7 @@ export const FILE_TYPE = [{
   componentLeft: 'File',
   componentRight: 'undefined',
   customClass: 'wsFileFile',
-  icon: 'fa fa-file-text-o'
+  icon: 'fa fa-file-image-o'
 }, {
   name: 'Thread',
   componentLeft: 'Thread',

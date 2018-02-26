@@ -25,6 +25,12 @@ sidebar-width = 300px
   .sidebar-expandbar
     left sidebar-width
 
+leftside()
+  flex-grow 0
+  height 100%
+  font-size 18px
+  background-color rgba(253,253,253,0.3)
+
 .sidebar
   &__btnnewworkspace
     margin-top 40px
@@ -37,82 +43,56 @@ sidebar-width = 300px
   &__navigation
     padding 0
     &__workspace
-      flex-direction column
       &__item
-        position relative
-        margin-top 2px
         width sidebar-width
-        background-color thirdColor
-        cursor pointer
+        &__wrapper
+          display flex
+          align-items center
+          border-bottom 1px solid darkBlue
+          width 100%
+          height 100%
+          background-color blue
+          cursor pointer
         &__number
-          display inline-block
-          padding 10px 0
-          width 50px
-          font-size 20px
+          leftside()
+          padding 12px
+          min-width 50px
           letter-spacing 2px
-          text-align center
-          background-color rgba(253,253,253,0.3)
         &__name
-          display inline-block
-          vertical-align top
-          padding 10px 5px
-          width 220px
+          flex-grow 2
+          padding 10px
           font-size 20px
-          color white
+          color off-white
           white-space nowrap
           overflow hidden
           text-overflow ellipsis
         &__icon
-          display inline-block
+          flex-grow 0
+          padding 10px
           color white
         &__submenu
-          margin-bottom 0
-          padding-left 0
-          height 0 // height is handled is js
-          list-style none
+          margin 0
+          padding 0
+          width 100%
           background-color fourthColor
+          height 0 // height is handled is js
           overflow hidden
           transition height 0.5s
           &__dropdown
+            display flex
+            align-items center
             border-top 1px solid darkBlue
+            &:nth-last-child(1)
+              border-bottom 1px solid darkBlue
             &:hover
               background-color lightBlue
             &__showdropdown
-              display inline-block
-              padding 10px 15px
+              display flex
+              justify-content space-between
+              align-items center
+              padding 0 10px
+              width 100%
             .dropdown__icon
-              display inline-block
               padding 10px 15px
-              width 50px
-              text-align center
-              background-color rgba(253,253,253,0.3)
-              font-size 20px
-            .dropdown__title
-              position relative
-              display inline-block
-              font-size 18px
-              font-weight 400
-              color darkGrey
-              cursor pointer
-              &::after //bootstrap override
-                position absolute
-                top 10px
-                left 100%
-              &__text
-                display inline-block
-                width 200px
-            .dropdown__subdropdown
-              margin 0
-              border-radius 0
-              padding 0
-              .alignname
-                display inline-block
-                font-size 18px
-              &__item
-                cursor pointer
-                border-top 1px solid darkBlue
-                padding 13px 0
-                &__iconfile
-                  padding-left 18px
-                &__textfile
-                  margin-left 38px
+              min-width 50px
+              leftside()

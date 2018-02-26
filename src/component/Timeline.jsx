@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
-import imgProfilOrange from '../img/imgProfil_orange.png'
-import imgProfilReverse from '../img/imgProfil_reverse.png'
+import imgProfil from '../img/imgProfil.png'
+import imgProfilReverse from '../img/imgProfil-reverse.png'
 
 const Timeline = props => {
   return (
@@ -14,7 +14,7 @@ const Timeline = props => {
 
         <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item sended')}>
           <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__messagelist__item__avatar')}>
-            <img src={imgProfilOrange} alt='avatar' />
+            <img src={imgProfil} alt='avatar' />
           </div>
           <div
             className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__messagelist__item__createhour')}>
@@ -56,7 +56,7 @@ const Timeline = props => {
 
         <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item sended')}>
           <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__messagelist__item__avatar')}>
-            <img src={imgProfilOrange} alt='avatar' />
+            <img src={imgProfil} alt='avatar' />
           </div>
           <div
             className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__messagelist__item__createhour')}>

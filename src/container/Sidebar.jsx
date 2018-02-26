@@ -32,30 +32,35 @@ class Sidebar extends React.Component {
             />
 
             <li className='sidebar__navigation__workspace__item nav-item dropdown'>
-              <div className='sidebar__navigation__workspace__item__number'>
-                02
-              </div>
-              <div className='sidebar__navigation__workspace__item__name'>
-                Workspace 2
-              </div>
+              <div className='sidebar__navigation__workspace__item__wrapper'>
+                <div className='sidebar__navigation__workspace__item__number'>
+                  02
+                </div>
+                <div className='sidebar__navigation__workspace__item__name'>
+                  Workspace 2
+                </div>
 
-              <div className='sidebar__navigation__workspace__item__icon'>
-                <i className='fa fa-chevron-down' />
+                <div className='sidebar__navigation__workspace__item__icon'>
+                  <i className='fa fa-chevron-down' />
+                </div>
               </div>
             </li>
 
             <li className='sidebar__navigation__workspace__item nav-item dropdown'>
-              <div className='sidebar__navigation__workspace__item__number'>
-                03
-              </div>
-              <div className='sidebar__navigation__workspace__item__name'>
-                Workspace 3
-              </div>
+              <div className='sidebar__navigation__workspace__item__wrapper'>
+                <div className='sidebar__navigation__workspace__item__number'>
+                  03
+                </div>
+                <div className='sidebar__navigation__workspace__item__name'>
+                  Workspace 3
+                </div>
 
-              <div className='sidebar__navigation__workspace__item__icon'>
-                <i className='fa fa-chevron-down' />
+                <div className='sidebar__navigation__workspace__item__icon'>
+                  <i className='fa fa-chevron-down' />
+                </div>
               </div>
             </li>
+
           </ul>
         </nav>
 
