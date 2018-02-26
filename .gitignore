@@ -2,4 +2,3 @@
 .idea/
 .git/
 node_modules/
-/dist/tracimLib.js

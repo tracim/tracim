@@ -6,9 +6,9 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'tracimLib.js',
+    filename: 'tracim_lib.js',
     pathinfo: !isProduction,
-    library: 'tracimLib',
+    library: 'tracim_lib',
     libraryTarget: 'var'
   },
   devServer: {
