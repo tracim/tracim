@@ -19,7 +19,7 @@ module.exports = {
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
-    port: 8071,
+    port: 8070,
     hot: true,
     noInfo: true,
     overlay: {
