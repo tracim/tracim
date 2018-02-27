@@ -1,7 +1,7 @@
-import libPopinFixed from './Component/PopinFixed/PopinFixed.jsx'
-import libPopinFixedHeader from './Component/PopinFixed/PopinFixedHeader.jsx'
-import libPopinFixedOption from './Component/PopinFixed/PopinFixedOption.jsx'
-import libPopinFixedContent from './Component/PopinFixed/PopinFixedContent.jsx'
+import libPopinFixed from './component/PopinFixed/PopinFixed.jsx'
+import libPopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
+import libPopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
+import libPopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
 export const PopinFixed = libPopinFixed
 export const PopinFixedHeader = libPopinFixedHeader
