@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>Plugin PageHtml</title>
+    <link rel='shortcut icon' href='favicon.ico'>
+  </head>
+  <body>
+    <div id='content'></div>
+
+    <script src='pageHtml.plugin.dev.js'></script>
+
+    <script type='text/javascript'>
+      GLOBAL_renderPlugin = pluginName => {
+        if (pluginName === 'PageHtml') {
+          pluginPageHtml.renderPlugin('pluginContainer')
+          console.log('plugin pagehtml rendered')
+        }
+      }
+
+      GLOBAL_dispatchEvent = (data) => {
+        var event = new CustomEvent('pluginCustomEvent', {detail: data})
+        document.dispatchEvent(event)
+      }
+
+      GLOBAL_unmountPlugin = () => {
+        console.log('btn close clicked')
+        pluginPageHtml.hidePlugin('pluginContainer')
+      }
+
+      // only usefull if plugin doesn't handle fileContent himself
+      GLOBAL_handleRequireRedraw = () => {
+        var rez = pluginA.destroyPlugin('plugin')
+        if (rez) GLOBAL_drawPlugin('redraw')
+        else console.log('Erreur, failed at destroying plugin')
+      }
+    </script>
+
+    <script type='text/javascript'>
+      // pluginPageHtml.renderPlugin('content')
+    </script>
+  </body>
+</html>
