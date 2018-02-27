@@ -12,6 +12,14 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
+  externals: {
+    react: {
+      commonjs: 'react',
+      commonjs2: 'react',
+      amd: 'react',
+      root: '_'
+    }
+  },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     port: 8071,
