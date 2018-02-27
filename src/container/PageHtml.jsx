@@ -4,7 +4,8 @@ import {
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
-  PopinFixedContent
+  PopinFixedContent,
+  Timeline
 } from 'tracim_lib'
 
 class pageHtml extends React.Component {
@@ -65,14 +66,10 @@ class pageHtml extends React.Component {
             key={'PageHtml'}
           />
 
-          <div>Timeline</div>
-
-          {/*
           <Timeline
-            customClass={`${PageHtml.customClass}__contentpage`}
+            customClass={`${pluginData.customClass}__contentpage`}
             key={'pageHtml__timeline'}
           />
-          */}
         </PopinFixedContent>
       </PopinFixed>
     )
