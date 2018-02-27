@@ -32,10 +32,9 @@
     <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
 
     <script type='text/javascript'>
-      GLOBAL_renderPlugin = pluginName => {
-        if (pluginName === 'PageHtml') {
-          pluginPageHtml.renderPlugin('pluginContainer')
-          console.log('plugin pagehtml rendered')
+      GLOBAL_renderPlugin = data => {
+        if (data.file.type === 'PageHtml') {
+          pluginPageHtml.renderPlugin('pluginContainer', data)
         }
       }
 

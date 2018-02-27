@@ -16,6 +16,6 @@ const Help = props => {
 }
 export default Help
 
-Help.PropTypes = {
+Help.propTypes = {
   onClickHelp: PropTypes.func.isRequired
 }

@@ -14,7 +14,7 @@ const CardBody = props => {
 
 export default CardBody
 
-CardBody.PropTypes = {
+CardBody.propTypes = {
   children: PropTypes.element.isRequired,
   formClass: PropTypes.string
 }

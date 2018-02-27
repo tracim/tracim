@@ -1,11 +1,11 @@
 import reducer from './pageHtml.js'
-import container from './PageHtmlContainer.jsx'
-import component from './PageHtmlComponent.jsx'
+// import container from './PageHtmlContainer.jsx'
+// import component from './PageHtmlComponent.jsx'
 
 const PageHtml = {
   name: 'PageHtml',
-  container,
-  component,
+  // container,
+  // component,
   reducer
 }
 

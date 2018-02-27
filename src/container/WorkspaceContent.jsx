@@ -7,13 +7,11 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
-// import pluginDatabase from '../plugin/index.js'
 import {
   getPluginList,
   getWorkspaceContent
 } from '../action-creator.async.js'
-import { setActiveFileContent } from '../action-creator.sync.js'
-import { bonjour } from 'tracim_lib'
+// import pluginDatabase from '../plugin/index.js'
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -29,17 +27,10 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickFileItem = file => {
-    // this.props.dispatch(setActiveFileContent(file))
-    GLOBAL_renderPlugin(file.type)
-  }
-
-  handleDummyBtn = () => {
-    // GLOBAL_dispatchEvent({
-    //   source: 'Tracim',
-    //   type: 'PageHtml_showMsg',
-    //   content: 'Bonjour ?'
-    // })
-    bonjour()
+    GLOBAL_renderPlugin({
+      file,
+      pluginData: this.props.plugin[file.type]
+    })
   }
 
   render () {
@@ -58,8 +49,6 @@ class WorkspaceContent extends React.Component {
         </PageTitle>
 
         <PageContent parentClass='workspace__content'>
-          <button onClick={this.handleDummyBtn}>Click Me</button>
-
           <div className='workspace__content__fileandfolder folder__content active'>
             <FileItemHeader />
 

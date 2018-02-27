@@ -25,7 +25,7 @@ const Search = props => {
 }
 export default Search
 
-Search.PropTypes = {
+Search.propTypes = {
   onChangeInput: PropTypes.func.isRequired,
   onClickSubmit: PropTypes.func.isRequired
 }

@@ -1,7 +1,12 @@
 import reducer from './thread.js'
-import component from './Thread.jsx'
-import style from './Thread.styl'
+// import container from './ThreadContainer.jsx'
+// import component from './ThreadComponent.jsx'
 
-const Thread = { name: 'Thread', component, reducer, style }
+const Thread = {
+  name: 'Thread',
+  // container,
+  // component,
+  reducer
+}
 
 export default Thread

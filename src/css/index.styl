@@ -3,7 +3,9 @@ body
 html, body, #content, #content > div
   height 100%
 
-@import 'Variable.styl'
+// @TODO Côme - 2018/02/27 - do not manually import from node_module relative path
+@import '../../node_modules/tracim_lib/src/css/Variable.styl'
+
 @import 'Generic.styl'
 
 @import 'Sidebar.styl'

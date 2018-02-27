@@ -30,7 +30,7 @@ const DropdownLang = props => {
 }
 export default DropdownLang
 
-DropdownLang.PropTypes = {
+DropdownLang.propTypes = {
   langList: PropTypes.array.isRequired,
   onChangeLang: PropTypes.func.isRequired
 }

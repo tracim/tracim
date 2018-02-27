@@ -1,9 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import PopinFixed from '../../../component/common/PopinFixed/PopinFixed.jsx'
-import PopinFixedHeader from '../../../component/common/PopinFixed/PopinFixedHeader.jsx'
-import PopinFixedOption from '../../../component/common/PopinFixed/PopinFixedOption.jsx'
-import PopinFixedContent from '../../../component/common/PopinFixed/PopinFixedContent.jsx'
+// import PopinFixed from '../../../component/common/PopinFixed/PopinFixed.jsx'
+// import PopinFixedHeader from '../../../component/common/PopinFixed/PopinFixedHeader.jsx'
+// import PopinFixedOption from '../../../component/common/PopinFixed/PopinFixedOption.jsx'
+// import PopinFixedContent from '../../../component/common/PopinFixed/PopinFixedContent.jsx'
+import {
+  PopinFixed,
+  PopinFixedHeader,
+  PopinFixedOption,
+  PopinFixedContent
+} from 'tracim_lib'
 import PageHtmlComponent from './PageHtmlComponent.jsx'
 import Timeline from '../../../component/Timeline.jsx'
 import { hideActiveFileContent } from '../../../action-creator.sync.js'

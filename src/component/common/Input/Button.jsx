@@ -16,7 +16,7 @@ const Button = props => {
 
 export default Button
 
-Button.PropTypes = {
+Button.propTypes = {
   htmlType: PropTypes.oneOf(['button', 'submit', 'reset']).isRequired,
   bootstrapType: PropTypes.oneOf(
     ['primary', 'default', 'default', 'success', 'danger', 'warning', 'info', 'light', 'dark']

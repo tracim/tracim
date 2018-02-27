@@ -24,7 +24,7 @@ const MenuProfil = props => {
 }
 export default MenuProfil
 
-MenuProfil.PropTypes = {
+MenuProfil.propTypes = {
   user: PropTypes.object.isRequired,
   onClickMyProfil: PropTypes.func.isRequired,
   onClickLogout: PropTypes.func.isRequired
