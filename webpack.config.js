@@ -10,7 +10,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'pageHtml.plugin.js' : 'pageHtml.plugin.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'tracim_lib' : undefined,
+    library: isProduction ? 'tracim_plugin_pagehtml' : undefined,
     libraryTarget: isProduction ? 'umd' : undefined,
     umdNamedDefine: isProduction
   },
