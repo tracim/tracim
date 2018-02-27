@@ -15,16 +15,16 @@ class pageHtml extends React.Component {
       data: props.data
         ? props.data
         : { // for debugg purpose
-          PageHtml: {
+          file: {
+            version: '3',
+            text: 'Bonjour ?'
+          },
+          pluginData: {
             name: 'PageHtml',
             componentLeft: 'PageHtml',
             componentRight: 'Timeline',
             customClass: 'wsFilePageHtml',
             icon: 'fa fa-file-word-o'
-          },
-          activeFileContent: {
-            version: '3',
-            text: 'Bonjour ?'
           }
         }
     }
@@ -45,23 +45,23 @@ class pageHtml extends React.Component {
   }
 
   render () {
-    const { PageHtml, activeFileContent } = this.state.data
+    const { file, pluginData } = this.state.data
 
     return (
-      <PopinFixed customClass={`${PageHtml.customClass}`}>
+      <PopinFixed customClass={`${pluginData.customClass}`}>
         <PopinFixedHeader
-          customClass={`${PageHtml.customClass}`}
-          icon={PageHtml.icon}
-          name={activeFileContent.title}
+          customClass={`${pluginData.customClass}`}
+          icon={pluginData.icon}
+          name={file.title}
           onClickCloseBtn={this.handleClickBtnClosePlugin}
         />
 
-        <PopinFixedOption customClass={`${PageHtml.customClass}`} />
+        <PopinFixedOption customClass={`${pluginData.customClass}`} />
 
-        <PopinFixedContent customClass={`${PageHtml.customClass}__contentpage`}>
+        <PopinFixedContent customClass={`${pluginData.customClass}__contentpage`}>
           <PageHtmlComponent
-            version={activeFileContent.version}
-            text={activeFileContent.text}
+            version={file.version}
+            text={file.text}
             key={'PageHtml'}
           />
 

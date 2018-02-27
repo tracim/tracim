@@ -5,9 +5,9 @@ import PageHtml from './container/PageHtml.jsx'
 require('./css/index.styl')
 
 const pluginInterface = {
-  renderPlugin: domId => {
+  renderPlugin: (domId, data) => {
     return ReactDOM.render(
-      <PageHtml />
+      <PageHtml file={data} />
       , document.getElementById(domId)
     )
   },

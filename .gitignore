@@ -2,4 +2,5 @@
 .idea/
 .git/
 node_modules/
+dist/pageHtml.plugin.js
 dist/pageHtml.plugin.js.map
