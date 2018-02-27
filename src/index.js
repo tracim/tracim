@@ -1,4 +1,3 @@
-import React from 'react'
 import libPopinFixed from './Component/PopinFixed/PopinFixed.jsx'
 import libPopinFixedHeader from './Component/PopinFixed/PopinFixedHeader.jsx'
 import libPopinFixedOption from './Component/PopinFixed/PopinFixedOption.jsx'
