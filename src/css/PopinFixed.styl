@@ -1,0 +1,100 @@
+.wsFileGeneric
+  position fixed
+  top 85px
+  right 0
+  border 1px solid grey
+  height 100%
+  background-color lightGrey
+  box-shadow shadow-page
+  visibility hidden
+  z-index 1
+  &.visible
+    visibility visible
+  &__header
+    display flex
+    align-items center
+    padding 15px
+    height 64px
+    &__icon
+      margin-right 15px
+      font-size 22px
+      color white
+    &__title
+      margin-right 15px
+      color white
+      text-overflow ellipsis
+      overflow hidden
+      white-space nowrap
+    &__edittitle
+      margin 0 15px
+      color white
+      font-size 20px
+      cursor pointer
+      &:hover , &:focus
+        border 1px solid off-white
+        padding 0 10px
+        border-radius 5px
+    &__close
+      border 1px solid white
+      border-radius 5px
+      padding 2px 5px
+      cursor pointer
+      & > i
+        color white
+        font-size 20px
+  &__option
+    border-bottom 1px solid grey
+    padding 10px
+    height 58px
+    background-color off-white
+    & > i
+      vertical-align middle
+      margin-right 15px
+      font-size 25px
+      cursor pointer
+    &__menu
+      display flex
+      align-items center
+      &__status
+        margin-right 20px
+        .current
+          color blue
+        .check
+          color green
+        .invalid
+          color red
+        .ban
+          color grey
+        &__dropdownbtn
+          border 1px solid grey
+          width 150px
+          background-color transparent
+          cursor pointer
+          &::after
+            color fontColor
+          &:hover
+            background-color transparent
+          &__icon
+            display inline-block
+            margin 0 15px
+        &__submenu
+          &__item
+            display flex
+            justify-content space-between
+            margin 5px 0
+            cursor pointer
+            &:active
+              background-color transparent
+      &__action
+        margin 5px 10px 0 0
+        font-size 18px
+        cursor pointer
+        &:hover , &:focus
+          font-size 22px
+          color blue
+  &__content
+    display flex
+    &__left
+      width 55%
+    &__right
+      width 45%

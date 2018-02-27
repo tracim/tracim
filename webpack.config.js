@@ -13,12 +13,9 @@ module.exports = {
     umdNamedDefine: true
   },
   externals: {
-    react: {
-      commonjs: 'react',
-      commonjs2: 'react',
-      amd: 'react',
-      root: '_'
-    }
+    react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
+    classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
+    'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'}
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),

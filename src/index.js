@@ -1,26 +1,10 @@
 import React from 'react'
+import libPopinFixed from './Component/PopinFixed/PopinFixed.jsx'
+import libPopinFixedHeader from './Component/PopinFixed/PopinFixedHeader.jsx'
+import libPopinFixedOption from './Component/PopinFixed/PopinFixedOption.jsx'
+import libPopinFixedContent from './Component/PopinFixed/PopinFixedContent.jsx'
 
-export function bonjour () {
-  console.log('bonjour ?!')
-}
-
-export const Woot = props => (
-  <div>woot</div>
-)
-
-export class reactClass extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      id: 'ok'
-    }
-  }
-  render () {
-    return (
-      <div>
-        <Woot />
-        <span>{this.state.id}</span>
-      </div>
-    )
-  }
-}
+export const PopinFixed = libPopinFixed
+export const PopinFixedHeader = libPopinFixedHeader
+export const PopinFixedOption = libPopinFixedOption
+export const PopinFixedContent = libPopinFixedContent
