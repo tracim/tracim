@@ -4,3 +4,5 @@
 node_modules/
 dist/pageHtml.plugin.js
 dist/pageHtml.plugin.js.map
+dist/pageHtml.plugin.dev.js
+dist/pageHtml.plugin.dev.js.map

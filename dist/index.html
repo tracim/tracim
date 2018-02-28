@@ -1,44 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8' />
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-    <title>Plugin PageHtml</title>
-    <link rel='shortcut icon' href='favicon.ico'>
-  </head>
-  <body>
-    <div id='content'></div>
+<head>
+  <meta charset='utf-8' />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <title>Tracim Lib</title>
+  <link rel='shortcut icon' href='favicon.ico'>
 
-    <script src='pageHtml.plugin.dev.js'></script>
+  <link rel="stylesheet" type="text/css" href="./font/font-awesome-4.7.0/css/font-awesome.css">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./dev/bootstrap-4.0.0-beta.css">
+</head>
+<body>
+  <script src="./dev/jquery-3.2.1.js"></script>
+  <script src="./dev/popper-1.12.3.js"></script>
+  <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
 
-    <script type='text/javascript'>
-      GLOBAL_renderPlugin = pluginName => {
-        if (pluginName === 'PageHtml') {
-          pluginPageHtml.renderPlugin('pluginContainer')
-          console.log('plugin pagehtml rendered')
-        }
+  <div id='content'></div>
+
+  <script src='./pageHtml.plugin.dev.js'></script>
+
+  <script type='text/javascript'>
+    GLOBAL_renderPlugin = pluginName => {
+      if (pluginName === 'PageHtml') {
+        pluginPageHtml.renderPlugin('pluginContainer')
+        console.log('plugin pagehtml rendered')
       }
+    }
 
-      GLOBAL_dispatchEvent = (data) => {
-        var event = new CustomEvent('pluginCustomEvent', {detail: data})
-        document.dispatchEvent(event)
-      }
+    GLOBAL_dispatchEvent = (data) => {
+      var event = new CustomEvent('pluginCustomEvent', {detail: data})
+      document.dispatchEvent(event)
+    }
 
-      GLOBAL_unmountPlugin = () => {
-        console.log('btn close clicked')
-        pluginPageHtml.hidePlugin('pluginContainer')
-      }
+    GLOBAL_unmountPlugin = () => {
+      console.log('btn close clicked')
+      pluginPageHtml.hidePlugin('pluginContainer')
+    }
 
-      // only usefull if plugin doesn't handle fileContent himself
-      GLOBAL_handleRequireRedraw = () => {
-        var rez = pluginA.destroyPlugin('plugin')
-        if (rez) GLOBAL_drawPlugin('redraw')
-        else console.log('Erreur, failed at destroying plugin')
-      }
-    </script>
+    // only usefull if plugin doesn't handle fileContent himself
+    GLOBAL_handleRequireRedraw = () => {
+      var rez = pluginA.destroyPlugin('plugin')
+      if (rez) GLOBAL_drawPlugin('redraw')
+      else console.log('Erreur, failed at destroying plugin')
+    }
+  </script>
 
-    <script type='text/javascript'>
-      // pluginPageHtml.renderPlugin('content')
-    </script>
-  </body>
+  <script type='text/javascript'>
+    // pluginPageHtml.renderPlugin('content')
+  </script>
+</body>
 </html>
