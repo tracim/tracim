@@ -6,7 +6,8 @@ import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
-import TextAreaPlugin from './component/Input/TextAreaPlugin.jsx'
+import TextAreaPlugin from './component/Input/TextAreaPlugin/TextAreaPlugin.jsx'
+import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 
@@ -18,6 +19,8 @@ ReactDOM.render(
       name={'test exemple'}
       onClickCloseBtn={() => {}}
     />
+
+    <BtnSwitch />
 
     <PopinFixedOption customClass={`${'randomClass'}`} />
 
