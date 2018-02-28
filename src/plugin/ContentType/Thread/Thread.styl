@@ -3,6 +3,11 @@
   &__header
     color white
     background-color threadColor
+    &__editionmode
+      display none
+    &__icon
+      .fa-comments-o
+        color white
   &__wrapper
     height calc(100% - 209px) /* height of chat__header + height of option + top of chat */
   &__messagelist
@@ -24,6 +29,14 @@
   .wsContentThread__messagelist__item__content
       background-color darkBlue
       color white
+
+.activeEditionTitle
+  .wsFileThread
+    &__header
+      &__editionmode
+        display block
+      &__title
+        display none
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .wsContentThread

@@ -69,33 +69,33 @@ class AccountPage extends Component {
             <div className='account__userpreference__setting'>
 
               <div className='account__userpreference__setting__personaldata d-none'>
-                <div className='account__userpreference__setting__personaldata__title subTitle ml-2 ml-sm-0'>
+                <div className='personaldata__title subTitle ml-2 ml-sm-0'>
                   Mes informations personnelles
                 </div>
 
-                <div className='account__userpreference__setting__personaldata__text ml-2 ml-sm-0'>
+                <div className='personaldata__text ml-2 ml-sm-0'>
                   Ut consectetur dolor et sunt nisi officia ut magna. Ut consectetur dolor et sunt nisi officia ut magna.
                   Ut consectetur dolor et sunt nisi officia ut magna.
                 </div>
 
-                <div className='account__userpreference__setting__personaldata__changeinfo'>
-                  <div className='account__userpreference__setting__personaldata__changeinfo__infotitle'>
+                <div className='personaldata__form'>
+                  <div className='personaldata__form__title'>
                     Changer le mot de passe :
                   </div>
-                  <input className='account__userpreference__setting__personaldata__changeinfo__txtinput form-control' type='password' placeholder='Ancien mot de passe' />
-                  <input className='account__userpreference__setting__personaldata__changeinfo__txtinput form-control' type='password' placeholder='Nouveau mot de passe' />
-                  <div className='account__userpreference__setting__personaldata__changeinfo__button btn btn-primary'>
+                  <input className='personaldata__form__txtinput form-control' type='password' placeholder='Ancien mot de passe' />
+                  <input className='personaldata__form__txtinput form-control' type='password' placeholder='Nouveau mot de passe' />
+                  <div className='personaldata__form__button btn btn-primary'>
                     Envoyer
                   </div>
                 </div>
 
-                <div className='account__userpreference__setting__personaldata__changeinfo'>
-                  <div className='account__userpreference__setting__personaldata__changeinfo__infotitle'>
+                <div className='personaldata__form'>
+                  <div className='personaldata__form__title'>
                     Changer d'adresse mail :
                   </div>
-                  <input className='account__userpreference__setting__personaldata__changeinfo__txtinput form-control' type='email' placeholder='Ancienne adresse mail' />
-                  <input className='account__userpreference__setting__personaldata__changeinfo__txtinput form-control' type='email' placeholder='Nouvelle adresse mail' />
-                  <div className='account__userpreference__setting__personaldata__changeinfo__button btn btn-primary'>
+                  <input className='personaldata__form__txtinput form-control' type='email' placeholder='Ancienne adresse mail' />
+                  <input className='personaldata__form__txtinput form-control' type='email' placeholder='Nouvelle adresse mail' />
+                  <div className='personaldata__form__button btn btn-primary'>
                     Envoyer
                   </div>
                 </div>
@@ -103,34 +103,34 @@ class AccountPage extends Component {
 
               <div className='account__userpreference__setting__calendar d-none'>
 
-                <div className='account__userpreference__setting__calendar__title subTitle ml-2 ml-sm-0'>
+                <div className='calendar__title subTitle ml-2 ml-sm-0'>
                   Calendrier
                 </div>
 
-                <div className='account__userpreference__setting__calendar__text ml-2 ml-sm-0'>
+                <div className='calendar__text ml-2 ml-sm-0'>
                   Ut consectetur dolor et sunt nisi officia ut magna. Ut consectetur dolor et sunt nisi officia ut magna.
                   Ut consectetur dolor et sunt nisi officia ut magna.
                 </div>
 
-                <div className='account__userpreference__setting__calendar__infotitle'>
+                <div className='calendar__title ml-2 ml-sm-0'>
                   Accèder à votre Calendrier personnel
                 </div>
-                <div className='account__userpreference__setting__calendar__link'>
+                <div className='calendar__link ml-2 ml-sm-0'>
                   http://algoo.trac.im/caldav/user/262.ics/
                 </div>
 
-                <div className='account__userpreference__setting__calendar__infotitle'>
+                <div className='calendar__title ml-2 ml-sm-0'>
                   Changer de Fuseau Horaire :
                 </div>
 
-                <div className='account__userpreference__setting__calendar__timezone dropdown'>
-                  <button className='account__userpreference__setting__calendar__timezone__btn btn dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                <div className='calendar__timezone ml-2 ml-sm-0 dropdown'>
+                  <button className='calendar__timezone__btn btn dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                     Fuseau Horaire
                   </button>
-                  <div className='account__userpreference__setting__calendar__timezone__submenu dropdown-menu'>
-                    <div className='account__userpreference__setting__calendar__timezone__submenu__item dropdown-item'> Paris GMT +1
+                  <div className='calendar__timezone__submenu dropdown-menu'>
+                    <div className='calendar__timezone__submenu__item dropdown-item'> Paris GMT +1
                     </div>
-                    <div className='account__userpreference__setting__calendar__timezone__submenu__item dropdown-item dropdown-item'> Londres GMT +0
+                    <div className='calendar__timezone__submenu__item dropdown-item dropdown-item'> Londres GMT +0
                     </div>
                   </div>
                 </div>
@@ -138,16 +138,16 @@ class AccountPage extends Component {
 
               <div className='account__userpreference__setting__notification'>
 
-                <div className='account__userpreference__setting__notification__title subTitle ml-2 ml-sm-0'>
+                <div className='notification__title subTitle ml-2 ml-sm-0'>
                   Mes Espaces de Travail
                 </div>
 
-                <div className='account__userpreference__setting__notification__text ml-2 ml-sm-0'>
+                <div className='notification__text ml-2 ml-sm-0'>
                   Ut consectetur dolor et sunt nisi officia ut magna. Ut consectetur dolor et sunt nisi officia ut magna.
                   Ut consectetur dolor et sunt nisi officia ut magna.
                 </div>
 
-                <div className='account__userpreference__setting__notification__tableau'>
+                <div className='notification__table'>
                   <table className='table'>
                     <thead>
                       <tr>
@@ -159,154 +159,154 @@ class AccountPage extends Component {
                     <tbody>
                       <tr>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__wksname'>
+                          <div className='notification__table__wksname'>
                             Nouvelle ligne directrice du nouveau design de Tracim v2 en date du 10 Octobre 2017
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__role'>
-                            <div className='account__userpreference__setting__notification__tableau__role__icon'>
+                          <div className='notification__table__role'>
+                            <div className='notification__table__role__icon'>
                               <i className='fa fa-graduation-cap' />
                             </div>
-                            <div className='account__userpreference__setting__notification__tableau__role__text'>
+                            <div className='notification__table__role__text d-none d-sm-flex'>
                               Gestionnaire de Contenu
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__btnswitch'>
+                          <div className='notification__table__btnswitch'>
                             <BtnSwitch />
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__wksname'>
+                          <div className='notification__table__wksname'>
                             Nouvelle ligne directrice du nouveau design de Tracim v2 en date du 10 Octobre 2017
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__role'>
-                            <div className='account__userpreference__setting__notification__tableau__role__icon'>
+                          <div className='notification__table__role'>
+                            <div className='notification__table__role__icon'>
                               <i className='fa fa-eye' />
                             </div>
-                            <div className='account__userpreference__setting__notification__tableau__role__text'>
+                            <div className='notification__table__role__text d-none d-sm-flex'>
                               Lecteur
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__btnswitch'>
+                          <div className='notification__table__btnswitch'>
                             <BtnSwitch />
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__wksname'>
+                          <div className='notification__table__wksname'>
                             Nouvelle ligne directrice du nouveau design de Tracim v2 en date du 10 Octobre 2017
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__role'>
-                            <div className='account__userpreference__setting__notification__tableau__role__icon'>
+                          <div className='notification__table__role'>
+                            <div className='notification__table__role__icon'>
                               <i className='fa fa-pencil' />
                             </div>
-                            <div className='account__userpreference__setting__notification__tableau__role__text'>
+                            <div className='notification__table__role__text d-none d-sm-flex'>
                               Contributeur
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__btnswitch'>
+                          <div className='notification__table__btnswitch'>
                             <BtnSwitch />
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__wksname'>
+                          <div className='notification__table__wksname'>
                             Nouvelle ligne directrice du nouveau design de Tracim v2 en date du 10 Octobre 2017
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__role'>
-                            <div className='account__userpreference__setting__notification__tableau__role__icon'>
+                          <div className='notification__table__role'>
+                            <div className='notification__table__role__icon'>
                               <i className='fa fa-gavel' />
                             </div>
-                            <div className='account__userpreference__setting__notification__tableau__role__text'>
+                            <div className='notification__table__role__text d-none d-sm-flex'>
                               Responsable
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__btnswitch'>
+                          <div className='notification__table__btnswitch'>
                             <BtnSwitch />
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__wksname'>
+                          <div className='notification__table__wksname'>
                             Nouvelle ligne directrice du nouveau design de Tracim v2 en date du 10 Octobre 2017
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__role'>
-                            <div className='account__userpreference__setting__notification__tableau__role__icon'>
+                          <div className='notification__table__role'>
+                            <div className='notification__table__role__icon'>
                               <i className='fa fa-graduation-cap' />
                             </div>
-                            <div className='account__userpreference__setting__notification__tableau__role__text'>
+                            <div className='notification__table__role__text d-none d-sm-flex'>
                               Gestionnaire de Contenu
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__btnswitch'>
+                          <div className='notification__table__btnswitch'>
                             <BtnSwitch />
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__wksname'>
+                          <div className='notification__table__wksname'>
                             Nouvelle ligne directrice du nouveau design de Tracim v2 en date du 10 Octobre 2017
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__role'>
-                            <div className='account__userpreference__setting__notification__tableau__role__icon'>
+                          <div className='notification__table__role'>
+                            <div className='notification__table__role__icon'>
                               <i className='fa fa-graduation-cap' />
                             </div>
-                            <div className='account__userpreference__setting__notification__tableau__role__text'>
+                            <div className='notification__table__role__text d-none d-sm-flex'>
                               Gestionnaire de Contenu
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__btnswitch'>
+                          <div className='notification__table__btnswitch'>
                             <BtnSwitch />
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__wksname'>
+                          <div className='notification__table__wksname'>
                             Nouvelle ligne directrice du nouveau design de Tracim v2 en date du 10 Octobre 2017
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__role'>
-                            <div className='account__userpreference__setting__notification__tableau__role__icon'>
+                          <div className='notification__table__role'>
+                            <div className='notification__table__role__icon'>
                               <i className='fa fa-graduation-cap' />
                             </div>
-                            <div className='account__userpreference__setting__notification__tableau__role__text'>
+                            <div className='notification__table__role__text d-none d-sm-flex'>
                               Gestionnaire de Contenu
                             </div>
                           </div>
                         </td>
                         <td>
-                          <div className='account__userpreference__setting__notification__tableau__btnswitch'>
+                          <div className='notification__table__btnswitch'>
                             <BtnSwitch />
                           </div>
                         </td>

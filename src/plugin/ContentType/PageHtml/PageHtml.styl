@@ -6,6 +6,8 @@
   overflow-Y auto
   &__header
     background-color htmlColor
+    &__editionmode
+      display none
     &__icon
       .fa-file-word-o
         color white
@@ -21,6 +23,8 @@
         opacity 0.7
       &__text
         font-size 14px
+      &__edition
+        display none
     &__messagelist
       min-height 300px
       &__item
@@ -72,7 +76,22 @@
 
 .received
   .wsFilePageHtml__contentpage__messagelist__item__content
-      background-color htmlColor
+    background-color htmlColor
+
+.activeEditionTitle
+  .wsFilePageHtml
+    &__header
+      &__editionmode
+        display block
+      &__title
+        display none
+
+.activeEditionText
+  .wsFilePageHtml__contentpage__textnote
+    &__edition
+      display flex
+    &__text
+      display none
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .wsFilePageHtml
