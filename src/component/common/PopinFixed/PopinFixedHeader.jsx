@@ -13,6 +13,10 @@ const PopinFixedHeader = props => {
         {props.name}
       </div>
 
+      <div className={classnames('editiontitle mr-auto', `${props.customClass}__header__editionmode`)}>
+        <input className='editiontitle__input form-control' placeholder='Titre du fichier' />
+      </div>
+
       <div className={classnames('wsFileGeneric__header__edittitle', `${props.customClass}__header__changetitle`)}>
         <i className='fa fa-pencil' />
       </div>

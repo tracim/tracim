@@ -162,6 +162,32 @@
       border-radius 10px
       padding 15px 25px
 
+
+/***** EDITION MODE  ******/
+
+.editiontitle
+  width 60%
+
+.editionmode
+  display flex
+  flex-direction column
+  align-items center
+  &__text
+    margin-bottom 25px
+    width 100%
+    height 400px
+  &__submit
+    border 1px solid blue
+    box-shadow none
+    border-radius 10px
+    padding 8px 45px
+    background-color transparent
+    color blue
+    &:hover, &:focus
+      background-color blue
+      color off-white
+
+
 /********************/
 
 /*** PAGE FILE, THREAD, HTML, MARKDOWN, ISSUE ***/
@@ -258,7 +284,6 @@
         font-size 18px
         cursor pointer
         &:hover , &:focus
-          font-size 22px
           color blue
   &__wrapper
     display flex
