@@ -3,20 +3,22 @@ const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
-  entry: './src/index.js',
+  entry: isProduction ? './src/index.js' : './src/index.dev.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'tracim_lib.js',
+    filename: isProduction ? 'tracim_lib.js' : 'tracim_lib.dev.js',
     pathinfo: !isProduction,
-    library: 'tracim_lib',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    library: isProduction ? 'tracim_lib' : undefined,
+    libraryTarget: isProduction ? 'umd' : undefined,
+    umdNamedDefine: isProduction ? true : undefined
   },
-  externals: {
-    react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
-    classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
-    'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'}
-  },
+  externals: isProduction
+    ? {
+      react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
+      classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
+      'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'}
+    }
+    : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     port: 8070,

@@ -3,6 +3,8 @@ import classnames from 'classnames'
 import imgProfil from '../img/imgProfil.png'
 import imgProfilReverse from '../img/imgProfil-reverse.png'
 
+require('../css/Timeline.styl')
+
 const Timeline = props => {
   return (
     <div className='timeline'>

@@ -2,3 +2,5 @@
 .idea/
 .git/
 node_modules/
+dist/tracim_lib.dev.js
+dist/tracim_lib.dev.js.map
