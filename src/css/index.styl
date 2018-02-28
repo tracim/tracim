@@ -1,11 +1,10 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
 .wsFilePageHtml
-  width 1200px
-  height calc(100% - 85px)
-  overflow-Y auto
   &__header
     background-color htmlColor
+    &__editionmode
+      display none
     &__icon
       .fa-file-word-o
         color white
@@ -21,6 +20,8 @@
         opacity 0.7
       &__text
         font-size 14px
+      &__edition
+        display none
     &__messagelist
       min-height 300px
       &__item

@@ -36,7 +36,7 @@
     "url-loader": "^0.6.2",
     "webpack": "^3.8.1",
     "whatwg-fetch": "^2.0.3",
-    "tracim_lib": "git://github.com/Skylsmoi/tracim_lib.git"
+    "tracim_lib": "git://github.com/tracim/tracim_lib.git"
   },
   "devDependencies": {
     "webpack-dashboard": "^1.1.1",
