@@ -1,9 +1,9 @@
 import React from 'react'
 import classnames from 'classnames'
-import imgProfil from '../img/imgProfil.png'
-import imgProfilReverse from '../img/imgProfil-reverse.png'
+import imgProfil from '../../img/imgProfil.png'
+import imgProfilReverse from '../../img/imgProfil-reverse.png'
 
-require('../css/Timeline.styl')
+require('./Timeline.styl')
 
 const Timeline = props => {
   return (

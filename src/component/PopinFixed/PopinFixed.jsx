@@ -5,7 +5,7 @@ import PopinFixedHeader from './PopinFixedHeader.jsx'
 import PopinFixedOption from './PopinFixedOption.jsx'
 import PopinFixedContent from './PopinFixedContent.jsx'
 
-require('../../css/PopinFixed.styl')
+require('./PopinFixed.styl')
 
 const PopinFixed = props => {
   return (
