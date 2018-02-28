@@ -5,6 +5,12 @@ settingText()
   margin 15px 0
   font-size 18px
 
+.table td
+  vertical-align middle
+
+.table tr:nth-child(even)
+  background-color grey-hover
+
 .account
   &__userinformation
     display flex
@@ -76,14 +82,13 @@ settingText()
       &__personaldata
         &__text
           settingText()
-        &__changeinfo
+        &__form
           margin 25px 0
-          &__infotitle
+          &__title
             margin-bottom 15px
             font-size 18px
           &__txtinput
             display inline-flex
-            display ms-inline-flex
             width auto
             margin 0 15px 15px 0
             border 1px solid blue
@@ -101,11 +106,9 @@ settingText()
               background-color blue
               color white
       &__calendar
-        &__title
-          settingTitle()
         &__text
           settingText()
-        &__infotitle
+        &__title
           margin 15px 0
           font-size 18px
         &__link
@@ -135,12 +138,10 @@ settingText()
                 background-color blue
                 color white
       &__notification
-        &__title
-          settingTitle()
         &__text
           settingText()
           margin-bottom 30px
-        &__tableau
+        &__table
           border 1px solid lightGrey
           &__role
             display flex
@@ -148,12 +149,7 @@ settingText()
             &__icon
               margin-right 10px
 
-.account__userpreference__setting__notification__table__line:nth-last-child(1)
-  border-bottom 0
-
-
 /***** MEDIAQUERIES *****/
-
 
 /**** MEDIA 576px & 1199px ****/
 
@@ -264,7 +260,7 @@ settingText()
           &__link
             padding 10px 15px
         &__notification
-          &__tableau
+          &__table
             &__wksname
               text-overflow ellipsis
               white-space nowrap
