@@ -20,7 +20,7 @@ class PageHtmlContainer extends React.Component {
   handleClickBtnClose = () => this.props.dispatch(hideActiveFileContent())
 
   render () {
-    const { activeFileContent, plugin: { PageHtml } } = this.props
+    const { activeFileContent, app: { PageHtml } } = this.props
 
     return (
       <PopinFixed customClass={`${PageHtml.customClass}`}>
@@ -50,5 +50,5 @@ class PageHtmlContainer extends React.Component {
   }
 }
 
-const mapStateToProps = ({ activeFileContent, plugin }) => ({ activeFileContent, plugin })
+const mapStateToProps = ({ activeFileContent, app }) => ({ activeFileContent, app })
 export default connect(mapStateToProps)(PageHtmlContainer)

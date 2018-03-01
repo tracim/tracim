@@ -76,7 +76,7 @@ module.exports = {
     }]
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.styl']
+    extensions: ['.js', '.jsx']
   },
   plugins:[
     ...[ // generic plugins always present

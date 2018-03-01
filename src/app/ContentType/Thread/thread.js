@@ -1,4 +1,4 @@
-import { PLUGIN_LIST } from '../../../action-creator.sync.js'
+import { APP_LIST } from '../../../action-creator.sync.js'
 
 export default function thread (state = {
   title: '',
@@ -6,8 +6,8 @@ export default function thread (state = {
   icon: ''
 }, action) {
   switch (action.type) {
-    case `Set/${PLUGIN_LIST}`:
-      return action.pluginList.find(p => p.name === 'Thread')
+    case `Set/${APP_LIST}`:
+      return action.appList.find(p => p.name === 'Thread')
 
     default:
       return state

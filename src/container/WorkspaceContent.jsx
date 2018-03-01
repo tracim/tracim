@@ -8,10 +8,10 @@ import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import {
-  getPluginList,
+  getAppList,
   getWorkspaceContent
 } from '../action-creator.async.js'
-// import pluginDatabase from '../plugin/index.js'
+// import appDatabase from '../app/index.js'
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -23,20 +23,20 @@ class WorkspaceContent extends React.Component {
 
   componentDidMount () {
     this.props.dispatch(getWorkspaceContent(/* this.props.workspace.id */1))
-    this.props.dispatch(getPluginList())
+    this.props.dispatch(getAppList())
   }
 
   handleClickFileItem = file => {
-    GLOBAL_renderPlugin({
+    GLOBAL_renderApp({
       file,
-      pluginData: this.props.plugin[file.type]
+      appData: this.props.app[file.type]
     })
   }
 
   render () {
-    const { workspace, plugin } = this.props
+    const { workspace, app } = this.props
 
-    // const PluginContainer = (pluginDatabase.find(p => p.name === activeFileContent.type) || {container: '<div>unknow</div>'}).container
+    // const AppContainer = (appDatabase.find(p => p.name === activeFileContent.type) || {container: '<div>unknow</div>'}).container
 
     return (
       <PageWrapper customeClass='workspace'>
@@ -53,12 +53,12 @@ class WorkspaceContent extends React.Component {
             <FileItemHeader />
 
             { workspace.content.map(c => c.type === 'folder'
-              ? <Folder plugin={plugin} folderData={c} key={c.id} />
+              ? <Folder app={app} folderData={c} key={c.id} />
               : (
                 <FileItem
                   name={c.title}
                   type={c.type}
-                  icon={(plugin[c.type] || {icon: ''}).icon}
+                  icon={(app[c.type] || {icon: ''}).icon}
                   status={c.status}
                   onClickItem={() => this.handleClickFileItem(c)}
                   key={c.id}
@@ -69,8 +69,8 @@ class WorkspaceContent extends React.Component {
 
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
-          <div id='pluginContainer'>
-            {/* activeFileContent.display && <PluginContainer /> */}
+          <div id='appContainer'>
+            {/* activeFileContent.display && <AppContainer /> */}
           </div>
         </PageContent>
 
@@ -79,5 +79,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspace, activeFileContent, plugin }) => ({ workspace, activeFileContent, plugin })
+const mapStateToProps = ({ workspace, activeFileContent, app }) => ({ workspace, activeFileContent, app })
 export default connect(mapStateToProps)(WorkspaceContent)

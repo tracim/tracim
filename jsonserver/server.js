@@ -25,7 +25,7 @@ server.post('/user/login', (req, res) => {
   else return res.jsonp('error')
 })
 
-server.get('/plugin/file_content', (req, res) => res.jsonp(jsonDb.file_content))
+server.get('/app/file_content', (req, res) => res.jsonp(jsonDb.file_content))
 
 server.get('/user/is_logged_in', (req, res) => res.jsonp(jsonDb.user_logged))
 
