@@ -49,7 +49,7 @@ class Dashboard extends Component {
                 </div>
 
                 <div className='dashboard__userstatut__notification__subscribe dropdown'>
-                  <button className='dashboard__userstatut__notification__subscribe__btn btn btn-secondary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                  <button className='dashboard__userstatut__notification__subscribe__btn btn btn-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                     Abonné(e)
                   </button>
                   <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
@@ -127,7 +127,7 @@ class Dashboard extends Component {
                   Activité récente
                 </div>
 
-                <div className='dashboard__activity__header__allread btn'>
+                <div className='dashboard__activity__header__allread btn btn-primary'>
                   Tout marquer comme lu
                 </div>
               </div>
@@ -187,7 +187,7 @@ class Dashboard extends Component {
                 </div>
 
                 <div className='dashboard__activity__more d-flex flex-row-reverse'>
-                  <div className='dashboard__activity__more__btn btn'>
+                  <div className='dashboard__activity__more__btn btn btn-primary'>
                     Voir plus
                   </div>
                 </div>
@@ -302,7 +302,7 @@ class Dashboard extends Component {
                   <input type='text' className='dashboard__memberlist__addmember__name form-control' placeholder='Name' />
                   <div className='dashboard__memberlist__addmember__role'>
                     <div className='dashboard__memberlist__addmember__role__dropdown dropdown'>
-                      <button className='dashboard__memberlist__addmember__role__dropdown__button btn dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                      <button className='dashboard__memberlist__addmember__role__dropdown__button btn btn-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                         Rôle du membre
                       </button>
                       <div className='dashboard__memberlist__addmember__role__dropdown__submenu dropdown-menu'>
