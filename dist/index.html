@@ -26,15 +26,19 @@
     -->
 
     <script src='./app/pageHtml.app.js'></script>
+    <script src='./app/thread.app.js'></script>
 
     <script src="./dev/jquery-3.2.1.js"></script>
     <script src="./dev/popper-1.12.3.js"></script>
     <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
 
     <script type='text/javascript'>
-      GLOBAL_renderApp = data => {
-        if (data.file.type === 'PageHtml') {
-          appPageHtml.renderApp('appContainer', data)
+      GLOBAL_renderApp = app => {
+        switch (app.appData.name) {
+          case 'PageHtml':
+            appPageHtml.renderApp('appContainer'); break
+          case 'Thread':
+            appThread.renderApp('appContainer'); break
         }
       }
 
@@ -43,8 +47,13 @@
         document.dispatchEvent(event)
       }
 
-      GLOBAL_unmountApp = () => {
-        appPageHtml.hideApp('appContainer')
+      GLOBAL_unmountApp = appName => {
+        switch (appName) {
+          case 'PageHtml':
+            appPageHtml.hideApp('appContainer'); break
+          case 'Thread':
+            appThread.hideApp('appContainer'); break
+        }
       }
 
       // only usefull if plugin doesn't handle fileContent himself

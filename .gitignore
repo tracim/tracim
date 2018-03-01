@@ -4,3 +4,4 @@
 node_modules/
 /dist/tracim.app.entry.js
 /dist/tracim.vendor.bundle.js
+/dist/app/*
