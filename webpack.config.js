@@ -11,17 +11,17 @@ module.exports = {
     filename: isProduction ? 'pageHtml.app.js' : 'pageHtml.app.dev.js',
     pathinfo: !isProduction,
     library: isProduction ? 'appPageHtml' : undefined,
-    libraryTarget: isProduction ? 'var' : undefined,
+    libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},
-    // isProduction ? { // Côme - since plugins are imported through <script>, cannot externalize libraries
-    //   react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
-    //   'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
-    //   classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
-    //   'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
-    //   tracim_lib: {commonjs: 'tracim_lib', commonjs2: 'tracim_lib', amd: 'tracim_lib', root: '_'}
-    // }
-    // : {},
+  // isProduction ? { // Côme - since plugins are imported through <script>, cannot externalize libraries
+  //   react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
+  //   'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
+  //   classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
+  //   'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
+  //   tracim_lib: {commonjs: 'tracim_lib', commonjs2: 'tracim_lib', amd: 'tracim_lib', root: '_'}
+  // }
+  // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
     port: 8071,
@@ -68,7 +68,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx']
   },
-  plugins:[
+  plugins: [
     ...[], // generic plugins always present
     ...(isProduction
       ? [ // production specific plugins

@@ -1,10 +1,9 @@
 {
-  "name": "tracim_plugin_pagehtml",
+  "name": "tracim_app_pagehtml",
   "version": "1.1.2",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "mockapi": "node jsonserver/server.js",
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9871 -- webpack-dev-server --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack -p",
