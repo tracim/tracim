@@ -20,13 +20,12 @@ ReactDOM.render(
       onClickCloseBtn={() => {}}
     />
 
-    <BtnSwitch />
-
     <PopinFixedOption customClass={`${'randomClass'}`} />
 
     <PopinFixedContent customClass={`${'randomClass'}__contentpage`}>
       <div>
         <span>Here will be the app content. Style is handled by the app (obviously)</span>
+        <BtnSwitch />
         <TextAreaApp customClass={'randomClass'} />
       </div>
 
