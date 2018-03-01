@@ -12,7 +12,6 @@ const appInterface = {
     )
   },
   hideApp: domId => {
-    // TODO: should be a display none
     return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   }
 }

@@ -35,7 +35,7 @@ class pageHtml extends React.Component {
 
   customEventReducer = ({detail}) => {
     switch (detail.type) {
-      case 'PageHtml_showMsg':
+      case 'PageHtml_showMsg': // unused for now, for testing purpose
         this.setState({inputText: detail.content})
         break
     }
