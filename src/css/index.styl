@@ -1,161 +1,71 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
-.wsFilePageHtml
+.wsContentThread
+  width 550px
   &__header
-    background-color htmlColor
+    color white
+    background-color threadColor
     &__editionmode
       display none
     &__icon
-      .fa-file-word-o
+      .fa-comments-o
         color white
-  &__contentpage
-    &__textnote
-      margin 10px
-      border-radius 10px
-      padding 25px
-      height 100%
-      background-color off-white
-      &__latestversion
-        text-align right
-        opacity 0.7
-      &__text
-        font-size 14px
-      &__edition
-        display none
-    &__messagelist
-      min-height 300px
-      &__item
-        &__content
-          color darkGrey
-      &__version
-        margin-top 40px
-        background-color grey-hover
-        &__btn
-          padding 5px 25px
-          border-radius 5px
-          width 145px
-          color white
-          font-size 17px
-          background-color htmlColor
-          & > i
-            margin-right 10px
-            color darkGrey
-            font-size 22px
-          &:hover
-            background-color darkHtmlColor
-          &:focus
-            background-color darkHtmlColor
-        &__date
-          color fontColor
-          font-size 17px
-    &__texteditor
-      &__simpletext
-        &__input
-          &:focus
-            color htmlColor
-            border-color htmlColor
-      &__submit
-        &__btn
-          border-color htmlColor
-          background-color htmlColor
-          color white
-          &:hover
-            border-color htmlColor
-            background-color htmlColor
-          &:focus
-            border-color htmlColor
-            background-color htmlColor
-
-.messagelistOpen
-  .wsFilePageHtml__contentpage__messagelist
-    flex 0
-    min-height 0
+  &__wrapper
+    height calc(100% - 209px) /* height of chat__header + height of option + top of chat */
+  &__messagelist
+    padding 15px 35px
+    &__item
+      &__content
+        color darkBlue
+  &__texteditor
+    &__simpletext
+      &__input
+        &:focus
+          color darkBlue
+          border-color darkBlue
+    &__submit
+      &__btn
+        color darkBlue
 
 .received
-  .wsFilePageHtml__contentpage__messagelist__item__content
-    background-color htmlColor
+  .wsContentThread__messagelist__item__content
+    background-color darkBlue
+    color white
+
+.activeEditionTitle
+  .wsFileThread
+    &__header
+      &__editionmode
+        display block
+      &__title
+        display none
 
 @media (min-width: max-xs) and (max-width: max-lg)
-  .wsFilePageHtml
-    &__contentpage
-      display block
-      overflow-Y scroll
-      &__textnote
-        margin-right 10px
-        padding 10px 20px
-        width auto
-        overflow-Y hidden
-        &__latestversion
-          padding-top 10px
-      &__wrapper
-        width auto
-      &__texteditor
-        &__simpletext
-          display inline-flex
-          width 60%
-        &__submit
-          display inline-flex
-          margin 10px 0
-          &__btn
-            display flex
-            margin-left 35px
-            &__icon
-              margin-left 15px
-
-@media (min-width: min-lg) and (max-width: max-lg)
-  .wsFilePageHtml
-    width 692px
-    &__contentpage__texteditor__simpletext
-      margin-left 15px
-
-@media (min-width: min-md) and (max-width: max-md)
-  .wsFilePageHtml
-    width 768px
-    &__contentpage__texteditor__simpletext
-      margin-left 25px
+  .wsContentThread
+    &__texteditor
+      padding 7px
+      &__simpletext
+        display inline-flex
+      &__submit
+        display inline-flex
+        width 80px
 
 @media (min-width: min-sm) and (max-width: max-sm)
-  .wsFilePageHtml
+  .wsContentThread
     top 69px
-    width 576px
-    height calc(100% - 69px)
-    &__contentpage__texteditor__simpletext
-      margin-left 10px
 
 @media (max-width: max-xs)
-  .wsFilePageHtml
-    top 70px
-    height calc(100% - 70px)
+  .wsContentThread
+    top 69px
     width 100%
     box-shadow none
-    &__contentpage
-      display block
-      overflow-Y scroll
-      &__textnote
-        margin-right 10px
-        width auto
-        overflow-Y hidden
-        font-size 15px
-      &__wrapper
-        width auto
-      &__messagelist
-        &__item
-          padding 0 35px 20px 30px
-        &__version
-          &__btn
-            font-size 17px
-            vertical-align middle
-          &__dateversion
-            font-size 15px
-      &__texteditor
-        &__simpletext
-          margin 10px 0
-          display flex
-          width 95%
-          margin-left 10px
-        &__submit
-          &__btn
-            display flex
-            margin 0 auto
-            &__icon
-              margin-left 10px
+    z-index 1
+    &__texteditor
+      padding 7px
+      &__simpletext
+        display inline-flex
+        margin-right 15px
+        width 62%
+      &__submit
+        display inline-flex
+        width 80px

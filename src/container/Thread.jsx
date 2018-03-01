@@ -1,5 +1,5 @@
 import React from 'react'
-import PageHtmlComponent from '../component/Thread.jsx'
+import ThreadComponent from '../component/Thread.jsx'
 import {
   PopinFixed,
   PopinFixedHeader,
@@ -12,7 +12,7 @@ class pageHtml extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'PageHtml',
+      appName: 'Thread',
       data: props.data
         ? props.data
         : { // for debugg purpose
@@ -21,11 +21,11 @@ class pageHtml extends React.Component {
             text: 'Bonjour ?'
           },
           appData: {
-            name: 'PageHtml',
-            componentLeft: 'PageHtml',
-            componentRight: 'Timeline',
-            customClass: 'wsFilePageHtml',
-            icon: 'fa fa-file-word-o'
+            name: 'Thread',
+            componentLeft: 'Thread',
+            componentRight: undefined,
+            customClass: 'wsFileThread',
+            icon: 'fa fa-comments-o'
           }
         }
     }
@@ -35,7 +35,7 @@ class pageHtml extends React.Component {
 
   customEventReducer = ({detail}) => {
     switch (detail.type) {
-      case 'PageHtml_showMsg': // unused for now, for testing purpose
+      case 'Thread_showMsg': // unused for now, for testing purpose
         this.setState({inputText: detail.content})
         break
     }
@@ -60,9 +60,9 @@ class pageHtml extends React.Component {
         <PopinFixedOption customClass={`${appData.customClass}`} />
 
         <PopinFixedContent customClass={`${appData.customClass}__contentpage`}>
-          <PageHtmlComponent
-            version={file.version}
-            text={file.text}
+          <ThreadComponent
+            // version={file.version}
+            // text={file.text}
             key={'PageHtml'}
           />
 
