@@ -5,7 +5,7 @@ import libPopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
 import libTimeline from './component/Timeline/Timeline.jsx'
 
-import libTextAreaPlugin from './component/Input/TextAreaPlugin/TextAreaPlugin.jsx'
+import libTextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import libBtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 
 export const PopinFixed = libPopinFixed
@@ -15,5 +15,5 @@ export const PopinFixedContent = libPopinFixedContent
 
 export const Timeline = libTimeline
 
-export const TextAreaPlugin = libTextAreaPlugin
+export const TextAreaApp = libTextAreaApp
 export const BtnSwitch = libBtnSwitch

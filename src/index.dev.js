@@ -6,7 +6,7 @@ import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
-import TextAreaPlugin from './component/Input/TextAreaPlugin/TextAreaPlugin.jsx'
+import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
@@ -26,8 +26,8 @@ ReactDOM.render(
 
     <PopinFixedContent customClass={`${'randomClass'}__contentpage`}>
       <div>
-        <span>Here will be the plugin content. Style is handled by the plugin (obviously)</span>
-        <TextAreaPlugin customClass={'randomClass'} />
+        <span>Here will be the app content. Style is handled by the app (obviously)</span>
+        <TextAreaApp customClass={'randomClass'} />
       </div>
 
       <Timeline
