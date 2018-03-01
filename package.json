@@ -52,7 +52,9 @@
   "standard": {
     "globals": [
       "fetch",
-      "history"
+      "history",
+      "GLOBAL_renderApp",
+      "GLOBAL_unmountApp"
     ],
     "parser": "babel-eslint",
     "ignore": []

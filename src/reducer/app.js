@@ -1,9 +1,19 @@
-import { combineReducers } from 'redux'
-import appDatabase from '../app/index.js'
+import { APP_LIST } from '../action-creator.sync.js'
 
-const reducerList = {}
-appDatabase.forEach(p => (reducerList[p.name] = p.reducer))
+export default function app (state = {
+  name: '',
+  componentLeft: '',
+  componentRight: '',
+  customClass: '',
+  icon: ''
+}, action) {
+  switch (action.type) {
+    case `Set/${APP_LIST}`:
+      const rez = {}
+      action.appList.forEach(app => (rez[app.name] = app))
+      return rez
 
-export default combineReducers({
-  ...reducerList
-})
+    default:
+      return state
+  }
+}

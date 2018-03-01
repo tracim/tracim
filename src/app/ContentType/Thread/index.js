@@ -1,4 +1,4 @@
-import reducer from './thread.js'
+import reducer from '../../../reducer/app/thread.js'
 // import container from './ThreadContainer.jsx'
 // import component from './ThreadComponent.jsx'
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 
+// Côme - 2018/03/01 - DEPRECATED - this component has been added to tracim_lib
 class BtnSwitch extends Component {
   render () {
     return (
