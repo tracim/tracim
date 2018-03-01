@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <title>Tracim App PageHtml</title>
+  <link rel='shortcut icon' href='favicon.ico'>
+
+  <link rel="stylesheet" type="text/css" href="./font/font-awesome-4.7.0/css/font-awesome.css">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./dev/bootstrap-4.0.0-beta.css">
+</head>
+<body>
+  <script src="./dev/jquery-3.2.1.js"></script>
+  <script src="./dev/popper-1.12.3.js"></script>
+  <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
+
+  <div id='content'></div>
+
+  <script src='./pageHtml.app.dev.js'></script>
+
+  <script type='text/javascript'>
+    GLOBAL_renderApp = appName => {
+      if (appName === 'PageHtml') {
+        appPageHtml.renderApp('appContainer')
+        console.log('app pagehtml rendered')
+      }
+    }
+
+    GLOBAL_dispatchEvent = (data) => {
+      var event = new CustomEvent('appCustomEvent', {detail: data})
+      document.dispatchEvent(event)
+    }
+
+    GLOBAL_unmountApp = () => {
+      console.log('btn close clicked')
+      appPageHtml.hideApp('appContainer')
+    }
+
+    // only usefull if app doesn't handle fileContent himself
+    GLOBAL_handleRequireRedraw = () => {
+      var rez = appA.destroyApp('app')
+      if (rez) GLOBAL_drawApp('redraw')
+      else console.log('Erreur, failed at destroying app')
+    }
+  </script>
+
+  <script type='text/javascript'>
+    // appPageHtml.renderApp('content')
+  </script>
+</body>
+</html>
