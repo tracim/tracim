@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextAreaPlugin } from 'tracim_lib'
+import { TextAreaApp } from 'tracim_lib'
 
 const PageHtml = props => {
   return (
@@ -7,7 +7,7 @@ const PageHtml = props => {
       <div className='wsFilePageHtml__contentpage__textnote__latestversion' dangerouslySetInnerHTML={{__html: props.version}} />
       <div className='wsFilePageHtml__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.text}} />
 
-      <TextAreaPlugin customClass={'wsFilePageHtml'} />
+      <TextAreaApp customClass={'wsFilePageHtml'} />
     </div>
   )
 }

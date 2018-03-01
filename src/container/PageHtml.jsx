@@ -12,7 +12,7 @@ class pageHtml extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      pluginName: 'PageHtml',
+      appName: 'PageHtml',
       data: props.data
         ? props.data
         : { // for debugg purpose
@@ -20,7 +20,7 @@ class pageHtml extends React.Component {
             version: '3',
             text: 'Bonjour ?'
           },
-          pluginData: {
+          appData: {
             name: 'PageHtml',
             componentLeft: 'PageHtml',
             componentRight: 'Timeline',
@@ -30,7 +30,7 @@ class pageHtml extends React.Component {
         }
     }
 
-    document.addEventListener('pluginCustomEvent', this.customEventReducer, false)
+    document.addEventListener('appCustomEvent', this.customEventReducer, false)
   }
 
   customEventReducer = ({detail}) => {
@@ -41,25 +41,25 @@ class pageHtml extends React.Component {
     }
   }
 
-  handleClickBtnClosePlugin = () => {
-    GLOBAL_unmountPlugin(this.state.pluginName)
+  handleClickBtnCloseApp = () => {
+    GLOBAL_unmountApp(this.state.appName)
   }
 
   render () {
-    const { file, pluginData } = this.state.data
+    const { file, appData } = this.state.data
 
     return (
-      <PopinFixed customClass={`${pluginData.customClass}`}>
+      <PopinFixed customClass={`${appData.customClass}`}>
         <PopinFixedHeader
-          customClass={`${pluginData.customClass}`}
-          icon={pluginData.icon}
+          customClass={`${appData.customClass}`}
+          icon={appData.icon}
           name={file.title}
-          onClickCloseBtn={this.handleClickBtnClosePlugin}
+          onClickCloseBtn={this.handleClickBtnCloseApp}
         />
 
-        <PopinFixedOption customClass={`${pluginData.customClass}`} />
+        <PopinFixedOption customClass={`${appData.customClass}`} />
 
-        <PopinFixedContent customClass={`${pluginData.customClass}__contentpage`}>
+        <PopinFixedContent customClass={`${appData.customClass}__contentpage`}>
           <PageHtmlComponent
             version={file.version}
             text={file.text}
@@ -67,7 +67,7 @@ class pageHtml extends React.Component {
           />
 
           <Timeline
-            customClass={`${pluginData.customClass}__contentpage`}
+            customClass={`${appData.customClass}__contentpage`}
             key={'pageHtml__timeline'}
           />
         </PopinFixedContent>

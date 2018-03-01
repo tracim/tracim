@@ -8,9 +8,9 @@ module.exports = {
   entry: isProduction ? './src/index.js' : './src/index.dev.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'pageHtml.plugin.js' : 'pageHtml.plugin.dev.js',
+    filename: isProduction ? 'pageHtml.app.js' : 'pageHtml.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'pluginPageHtml' : undefined,
+    library: isProduction ? 'appPageHtml' : undefined,
     libraryTarget: isProduction ? 'var' : undefined,
   },
   externals: {},

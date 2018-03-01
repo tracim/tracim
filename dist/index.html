@@ -3,7 +3,7 @@
 <head>
   <meta charset='utf-8' />
   <meta name="viewport" content="width=device-width, user-scalable=no" />
-  <title>Tracim Lib</title>
+  <title>Tracim App PageHtml</title>
   <link rel='shortcut icon' href='favicon.ico'>
 
   <link rel="stylesheet" type="text/css" href="./font/font-awesome-4.7.0/css/font-awesome.css">
@@ -17,36 +17,36 @@
 
   <div id='content'></div>
 
-  <script src='./pageHtml.plugin.dev.js'></script>
+  <script src='./pageHtml.app.dev.js'></script>
 
   <script type='text/javascript'>
-    GLOBAL_renderPlugin = pluginName => {
-      if (pluginName === 'PageHtml') {
-        pluginPageHtml.renderPlugin('pluginContainer')
-        console.log('plugin pagehtml rendered')
+    GLOBAL_renderApp = appName => {
+      if (appName === 'PageHtml') {
+        appPageHtml.renderApp('appContainer')
+        console.log('app pagehtml rendered')
       }
     }
 
     GLOBAL_dispatchEvent = (data) => {
-      var event = new CustomEvent('pluginCustomEvent', {detail: data})
+      var event = new CustomEvent('appCustomEvent', {detail: data})
       document.dispatchEvent(event)
     }
 
-    GLOBAL_unmountPlugin = () => {
+    GLOBAL_unmountApp = () => {
       console.log('btn close clicked')
-      pluginPageHtml.hidePlugin('pluginContainer')
+      appPageHtml.hideApp('appContainer')
     }
 
-    // only usefull if plugin doesn't handle fileContent himself
+    // only usefull if app doesn't handle fileContent himself
     GLOBAL_handleRequireRedraw = () => {
-      var rez = pluginA.destroyPlugin('plugin')
-      if (rez) GLOBAL_drawPlugin('redraw')
-      else console.log('Erreur, failed at destroying plugin')
+      var rez = appA.destroyApp('app')
+      if (rez) GLOBAL_drawApp('redraw')
+      else console.log('Erreur, failed at destroying app')
     }
   </script>
 
   <script type='text/javascript'>
-    // pluginPageHtml.renderPlugin('content')
+    // appPageHtml.renderApp('content')
   </script>
 </body>
 </html>
