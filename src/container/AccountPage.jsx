@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import imgProfil from '../img/imgProfil.png'
-import BtnSwitch from '../component/common/Input/BtnSwitch.jsx'
+import { BtnSwitch } from 'tracim_lib'
 
 class AccountPage extends Component {
   render () {
@@ -174,9 +174,7 @@ class AccountPage extends Component {
                           </div>
                         </td>
                         <td>
-                          <div className='notification__table__btnswitch'>
-                            <BtnSwitch />
-                          </div>
+                          <BtnSwitch />
                         </td>
                       </tr>
                       <tr>
@@ -196,9 +194,7 @@ class AccountPage extends Component {
                           </div>
                         </td>
                         <td>
-                          <div className='notification__table__btnswitch'>
-                            <BtnSwitch />
-                          </div>
+                          <BtnSwitch />
                         </td>
                       </tr>
                       <tr>
@@ -218,9 +214,7 @@ class AccountPage extends Component {
                           </div>
                         </td>
                         <td>
-                          <div className='notification__table__btnswitch'>
-                            <BtnSwitch />
-                          </div>
+                          <BtnSwitch />
                         </td>
                       </tr>
                       <tr>
@@ -240,9 +234,7 @@ class AccountPage extends Component {
                           </div>
                         </td>
                         <td>
-                          <div className='notification__table__btnswitch'>
-                            <BtnSwitch />
-                          </div>
+                          <BtnSwitch />
                         </td>
                       </tr>
                       <tr>
@@ -262,9 +254,7 @@ class AccountPage extends Component {
                           </div>
                         </td>
                         <td>
-                          <div className='notification__table__btnswitch'>
-                            <BtnSwitch />
-                          </div>
+                          <BtnSwitch />
                         </td>
                       </tr>
                       <tr>
@@ -284,9 +274,7 @@ class AccountPage extends Component {
                           </div>
                         </td>
                         <td>
-                          <div className='notification__table__btnswitch'>
-                            <BtnSwitch />
-                          </div>
+                          <BtnSwitch />
                         </td>
                       </tr>
                       <tr>
@@ -306,9 +294,7 @@ class AccountPage extends Component {
                           </div>
                         </td>
                         <td>
-                          <div className='notification__table__btnswitch'>
-                            <BtnSwitch />
-                          </div>
+                          <BtnSwitch />
                         </td>
                       </tr>
                     </tbody>
