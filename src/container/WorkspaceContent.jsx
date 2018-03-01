@@ -7,9 +7,11 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
-import FileContentViewer from '../component/Workspace/FileContentViewer.jsx'
-import { getWorkspaceContent } from '../action-creator.async.js'
-import { setActiveFileContent, hideActiveFileContent } from '../action-creator.sync.js'
+import {
+  getPluginList,
+  getWorkspaceContent
+} from '../action-creator.async.js'
+// import pluginDatabase from '../plugin/index.js'
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -21,18 +23,20 @@ class WorkspaceContent extends React.Component {
 
   componentDidMount () {
     this.props.dispatch(getWorkspaceContent(/* this.props.workspace.id */1))
+    this.props.dispatch(getPluginList())
   }
 
   handleClickFileItem = file => {
-    this.props.dispatch(setActiveFileContent(file))
-  }
-
-  handleClickCloseBtn = () => {
-    this.props.dispatch(hideActiveFileContent())
+    GLOBAL_renderPlugin({
+      file,
+      pluginData: this.props.plugin[file.type]
+    })
   }
 
   render () {
-    const { workspace, activeFileContent } = this.props
+    const { workspace, plugin } = this.props
+
+    // const PluginContainer = (pluginDatabase.find(p => p.name === activeFileContent.type) || {container: '<div>unknow</div>'}).container
 
     return (
       <PageWrapper customeClass='workspace'>
@@ -45,16 +49,16 @@ class WorkspaceContent extends React.Component {
         </PageTitle>
 
         <PageContent parentClass='workspace__content'>
-
           <div className='workspace__content__fileandfolder folder__content active'>
             <FileItemHeader />
 
             { workspace.content.map(c => c.type === 'folder'
-              ? <Folder folderData={c} key={c.id} />
+              ? <Folder plugin={plugin} folderData={c} key={c.id} />
               : (
                 <FileItem
                   name={c.title}
                   type={c.type}
+                  icon={(plugin[c.type] || {icon: ''}).icon}
                   status={c.status}
                   onClickItem={() => this.handleClickFileItem(c)}
                   key={c.id}
@@ -65,12 +69,9 @@ class WorkspaceContent extends React.Component {
 
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
-          { activeFileContent.display &&
-            <FileContentViewer
-              file={activeFileContent}
-              onClose={this.handleClickCloseBtn}
-            />
-          }
+          <div id='pluginContainer'>
+            {/* activeFileContent.display && <PluginContainer /> */}
+          </div>
         </PageContent>
 
       </PageWrapper>
@@ -78,5 +79,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspace, activeFileContent }) => ({ workspace, activeFileContent })
+const mapStateToProps = ({ workspace, activeFileContent, plugin }) => ({ workspace, activeFileContent, plugin })
 export default connect(mapStateToProps)(WorkspaceContent)

@@ -18,7 +18,7 @@ const MenuLinkList = props => {
 }
 export default MenuLinkList
 
-MenuLinkList.PropTypes = {
+MenuLinkList.propTypes = {
   onClickFeature: PropTypes.func.isRequired,
   onClickExplore: PropTypes.func.isRequired,
   onClickAbout: PropTypes.func.isRequired

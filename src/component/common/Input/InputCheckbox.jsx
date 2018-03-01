@@ -21,7 +21,7 @@ const InputGroupText = props => {
 
 export default InputGroupText
 
-InputGroupText.PropTypes = {
+InputGroupText.propTypes = {
   parentClassName: PropTypes.string.isRequired,
   checked: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,

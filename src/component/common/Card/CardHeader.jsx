@@ -12,7 +12,7 @@ const CardHeader = props => {
 
 export default CardHeader
 
-CardHeader.PropTypes = {
+CardHeader.propTypes = {
   children: PropTypes.element.isRequired,
   customClass: PropTypes.string
 }

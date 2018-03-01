@@ -17,10 +17,8 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 const mapStateToProps = ({ user }) => ({ user })
 export default withRouter(connect(mapStateToProps)(PrivateRoute))
 
-PrivateRoute.PropTypes = {
-  component: PropTypes.shape({
-    Component: PropTypes.object.isRequired
-  }),
+PrivateRoute.propTypes = {
+  component: PropTypes.func.isRequired,
   user: PropTypes.shape({ // user is get with redux connect
     isLoggedIn: PropTypes.bool.isRequired
   })

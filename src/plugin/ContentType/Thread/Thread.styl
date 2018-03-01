@@ -1,8 +1,13 @@
-.wsFileThread
+.wsContentThread
   width 550px
   &__header
     color white
     background-color threadColor
+    &__editionmode
+      display none
+    &__icon
+      .fa-comments-o
+        color white
   &__wrapper
     height calc(100% - 209px) /* height of chat__header + height of option + top of chat */
   &__messagelist
@@ -21,12 +26,20 @@
         color darkBlue
 
 .received
-  .wsFileThread__messagelist__item__content
+  .wsContentThread__messagelist__item__content
       background-color darkBlue
       color white
 
-@media (min-width: max-xs) and (max-width: max-lg)
+.activeEditionTitle
   .wsFileThread
+    &__header
+      &__editionmode
+        display block
+      &__title
+        display none
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .wsContentThread
     &__texteditor
       padding 7px
       &__simpletext
@@ -36,11 +49,11 @@
         width 80px
 
 @media (min-width: min-sm) and (max-width: max-sm)
-  .wsFileThread
+  .wsContentThread
     top 69px
 
 @media (max-width: max-xs)
-  .wsFileThread
+  .wsContentThread
     top 69px
     width 100%
     box-shadow none

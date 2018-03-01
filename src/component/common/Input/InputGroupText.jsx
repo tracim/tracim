@@ -24,7 +24,7 @@ const InputGroupText = props => {
 
 export default InputGroupText
 
-InputGroupText.PropTypes = {
+InputGroupText.propTypes = {
   parentClassName: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   type: PropTypes.oneOf(['text', 'email', 'password', 'tel']).isRequired,

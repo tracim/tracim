@@ -24,11 +24,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
     -->
+
+    <script src='./plugin/pageHtml.plugin.js'></script>
+
     <script src="./dev/jquery-3.2.1.js"></script>
     <script src="./dev/popper-1.12.3.js"></script>
     <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
 
-    <script type="text/javascript">
+    <script type='text/javascript'>
+      GLOBAL_renderPlugin = data => {
+        if (data.file.type === 'PageHtml') {
+          pluginPageHtml.renderPlugin('pluginContainer', data)
+        }
+      }
+
+      GLOBAL_dispatchEvent = (data) => {
+        var event = new CustomEvent('pluginCustomEvent', {detail: data})
+        document.dispatchEvent(event)
+      }
+
+      GLOBAL_unmountPlugin = () => {
+        console.log('btn close clicked')
+        pluginPageHtml.hidePlugin('pluginContainer')
+      }
+
+      // only usefull if plugin doesn't handle fileContent himself
+      GLOBAL_handleRequireRedraw = () => {
+        var rez = pluginA.destroyPlugin('plugin')
+        if (rez) GLOBAL_drawPlugin('redraw')
+        else console.log('Erreur, failed at destroying plugin')
+      }
+    </script>
+
+    <script type='text/javascript'>
       if (window.matchMedia("(min-width:1200px)").matches) {
 
         var jsScript = document.createElement("script");
