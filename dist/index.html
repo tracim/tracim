@@ -33,24 +33,33 @@
     <script src="./dev/bootstrap-4.0.0-beta.2.js"></script>
 
     <script type='text/javascript'>
+      const pageHtml = new appPageHtml()
+
+      /*
+        app: {
+          content: {id, type, title, status}, // version and/or text are useless for Tracim, only useful for app
+          appConfig: {name, componentLeft, componentRight, customClass, icon}
+        }
+      */
       GLOBAL_renderApp = app => {
-        switch (app.appData.name) {
+        switch (app.appConfig.name) {
           case 'PageHtml':
-            appPageHtml.renderApp('appContainer'); break
+            pageHtml.renderApp('appContainer', app); break
           case 'Thread':
-            appThread.renderApp('appContainer'); break
+            appThread.renderApp('appContainer', app); break
         }
       }
 
-      GLOBAL_dispatchEvent = (data) => {
-        var event = new CustomEvent('appCustomEvent', {detail: data})
+      GLOBAL_dispatchEvent = (type, data) => {
+        var event = new CustomEvent('appCustomEvent', {type, data})
         document.dispatchEvent(event)
       }
 
       GLOBAL_unmountApp = appName => {
         switch (appName) {
           case 'PageHtml':
-            appPageHtml.hideApp('appContainer'); break
+            // pageHtml.hideApp('appContainer'); break
+            GLOBAL_dispatchEvent('PageHtml_hideApp', {})
           case 'Thread':
             appThread.hideApp('appContainer'); break
         }

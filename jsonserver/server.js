@@ -25,11 +25,13 @@ server.post('/user/login', (req, res) => {
   else return res.jsonp('error')
 })
 
-server.get('/app/file_content', (req, res) => res.jsonp(jsonDb.file_content))
+server.get('/app/config', (req, res) => res.jsonp(jsonDb.app_config))
 
 server.get('/user/is_logged_in', (req, res) => res.jsonp(jsonDb.user_logged))
 
 server.get('/workspace/:id', (req, res) => res.jsonp(jsonDb.workspace_detail))
+
+server.get('/workspace/:idws/content/:idc', (req, res) => res.jsonp(jsonDb.content_data))
 
 server.use(router)
 server.listen(GLOBAL_PORT, () => {

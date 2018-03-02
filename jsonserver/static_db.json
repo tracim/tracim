@@ -9,7 +9,7 @@
       "email": "osef@algoo.fr"
     }
   },
-  "file_content": [{
+  "app_config": [{
     "name": "PageHtml",
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
@@ -55,13 +55,11 @@
         "id": 1,
         "title": "La programmation fonctionnelle",
         "type": "PageHtml",
-        "status": "validated",
-        "version": "3",
-        "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle"
+        "status": "validated"
       },
       {
         "id": 2,
-        "title": "La prommation fonctionnelle est-elle vraiment utile ?",
+        "title": "La programmation fonctionnelle est-elle vraiment utile ?",
         "type": "Thread",
         "status": "current"
       },
@@ -109,5 +107,13 @@
         ]
       }
     ]
+  },
+  "content_data": {
+    "id": "1",
+    "type": "pageHtml",
+    "title": "La programmation fonctionnelle",
+    "status": "validated",
+    "version": "3",
+    "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle"
   }
 }

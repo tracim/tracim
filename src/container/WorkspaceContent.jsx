@@ -26,10 +26,18 @@ class WorkspaceContent extends React.Component {
     this.props.dispatch(getAppList())
   }
 
-  handleClickFileItem = file => {
+  handleClickContentItem = content => {
+    const { workspace } = this.props
     GLOBAL_renderApp({
-      file,
-      appData: this.props.app[file.type]
+      workspace: {
+        id: workspace.id,
+        title: workspace.title
+      },
+      content,
+      appConfig: {
+        ...this.props.app[content.type],
+        apiUrl: 'http://localhost:3001'
+      }
     })
   }
 
@@ -60,7 +68,7 @@ class WorkspaceContent extends React.Component {
                   type={c.type}
                   icon={(app[c.type] || {icon: ''}).icon}
                   status={c.status}
-                  onClickItem={() => this.handleClickFileItem(c)}
+                  onClickItem={() => this.handleClickContentItem(c)}
                   key={c.id}
                 />
               )

@@ -119,7 +119,7 @@ export const getWorkspaceContent = workspaceId => async dispatch => {
 
 export const getAppList = () => async dispatch => {
   const fetchGetAppList = await fetchWrapper({
-    url: `http://localhost:3001/app/file_content`,
+    url: `http://localhost:3001/app/config`,
     param: {...FETCH_CONFIG, method: 'GET'},
     actionName: APP_LIST,
     dispatch
