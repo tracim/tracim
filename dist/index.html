@@ -20,10 +20,12 @@
   <script src='./pageHtml.app.dev.js'></script>
 
   <script type='text/javascript'>
-    GLOBAL_renderApp = appName => {
-      if (appName === 'PageHtml') {
-        appPageHtml.renderApp('appContainer')
-        console.log('app pagehtml rendered')
+    GLOBAL_renderApp = app => {
+      switch (app.appData.name) {
+        case 'PageHtml':
+          appPageHtml.renderApp('appContainer'); break
+        case 'Thread':
+          appThread.renderApp('appContainer'); break
       }
     }
 
@@ -33,8 +35,12 @@
     }
 
     GLOBAL_unmountApp = () => {
-      console.log('btn close clicked')
-      appPageHtml.hideApp('appContainer')
+      switch (appName) {
+        case 'PageHtml':
+          appPageHtml.hideApp('appContainer'); break
+        case 'Thread':
+          appThread.hideApp('appContainer'); break
+      }
     }
 
     // only usefull if app doesn't handle fileContent himself

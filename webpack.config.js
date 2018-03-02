@@ -5,7 +5,9 @@ const isProduction = process.env.NODE_ENV === 'production'
 console.log('isProduction : ', isProduction)
 
 module.exports = {
-  entry: isProduction ? './src/index.js' : './src/index.dev.js',
+  entry: isProduction
+    ? './src/index.js' // only one instance of babel-polyfill is allowed
+    : ['babel-polyfill', './src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'pageHtml.app.js' : 'pageHtml.app.dev.js',
