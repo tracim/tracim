@@ -12,6 +12,7 @@ import {
   withRouter
 } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute.jsx'
+import { PAGE_NAME } from '../helper.js'
 import { getIsUserConnected } from '../action-creator.async.js'
 
 class Tracim extends React.Component {
@@ -22,16 +23,14 @@ class Tracim extends React.Component {
   render () {
     const { user, location } = this.props
 
-    const SidebarWrapper = props => {
-      if (props.locationPath !== '/login') {
-        return (
-          <div className='sidebarpagecontainer'>
-            <Sidebar />
-            {props.children}
-          </div>
-        )
-      } else return props.children
-    }
+    const SidebarWrapper = props => props.locationPath !== '/login'
+      ? (
+        <div className='sidebarpagecontainer'>
+          <Sidebar />
+          {props.children}
+        </div>
+      )
+      : props.children
 
     return (
       <div>
@@ -41,13 +40,13 @@ class Tracim extends React.Component {
           ? (<div />) // while we dont know if user is connected, display nothing but the header @TODO show loader
           : (
             <div>
-              <Route path='/login' component={Login} />
+              <Route path={PAGE_NAME.LOGIN} component={Login} />
 
               <SidebarWrapper locationPath={location.pathname}>
 
-                <PrivateRoute exact path='/' component={WorkspaceContent} />
-                <PrivateRoute exact path='/account' component={AccountPage} />
-                <PrivateRoute exact path='/dashboard' component={Dashboard} />
+                <PrivateRoute exact path={PAGE_NAME.HOME} component={WorkspaceContent} />
+                <PrivateRoute exact path={PAGE_NAME.ACCOUNT} component={AccountPage} />
+                <PrivateRoute exact path={PAGE_NAME.DASHBOARD} component={Dashboard} />
 
               </SidebarWrapper>
 

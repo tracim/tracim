@@ -7,6 +7,7 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
+import { FETCH_CONFIG } from '../helper.js'
 import {
   getAppList,
   getWorkspaceContent
@@ -27,17 +28,18 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickContentItem = content => {
-    const { workspace } = this.props
+    const { user, workspace } = this.props
     GLOBAL_renderApp({
       workspace: {
         id: workspace.id,
         title: workspace.title
       },
-      content,
       appConfig: {
         ...this.props.app[content.type],
-        apiUrl: 'http://localhost:3001'
-      }
+        apiUrl: FETCH_CONFIG.apiUrl
+      },
+      loggedUser: user.isLoggedIn ? user : {},
+      content,
     })
   }
 
@@ -87,5 +89,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspace, activeFileContent, app }) => ({ workspace, activeFileContent, app })
+const mapStateToProps = ({ user, workspace, activeFileContent, app }) => ({ user, workspace, activeFileContent, app })
 export default connect(mapStateToProps)(WorkspaceContent)

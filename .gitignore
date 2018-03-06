@@ -3,5 +3,7 @@
 .git/
 node_modules/
 /dist/tracim.app.entry.js
+/dist/tracim.app.entry.js.map
 /dist/tracim.vendor.bundle.js
+/dist/tracim.vendor.bundle.js.map
 /dist/app/*
