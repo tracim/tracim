@@ -20,8 +20,8 @@
   <script src='./thread.app.dev.js'></script>
 
   <script type='text/javascript'>
-    GLOBAL_renderApp = appName => {
-      switch (appName) {
+    GLOBAL_renderApp = app => {
+      switch (app.appData.name) {
         case 'PageHtml':
           appPageHtml.renderApp('appContainer'); break
         case 'Thread':

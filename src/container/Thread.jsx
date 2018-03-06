@@ -1,36 +1,73 @@
 import React from 'react'
 import ThreadComponent from '../component/Thread.jsx'
 import {
+  handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
-  PopinFixedContent,
-  Timeline
+  PopinFixedContent
 } from 'tracim_lib'
+import { listMessageDebugData } from '../listMessageDebugData.js'
+import { FETCH_CONFIG } from '../helper.js'
 
-class pageHtml extends React.Component {
+const debug = {
+  loggedUser: {
+    id: 5,
+    username: 'Stoi',
+    firstname: 'John',
+    lastname: 'Doe',
+    email: 'osef@algoo.fr',
+    avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+  },
+  workspace: {
+    id: 1,
+    title: 'Test debug workspace'
+  },
+  content: {
+    id: 2,
+    type: 'thread',
+    status: 'validated',
+    title: 'test debug title'
+  },
+  listMessage: listMessageDebugData,
+  appConfig: {
+    name: 'Thread',
+    customClass: 'wsContentThread',
+    icon: 'fa fa-comments-o',
+    apiUrl: 'http://localhost:3001'
+  }
+}
+
+class Thread extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       appName: 'Thread',
-      data: props.data
-        ? props.data
-        : { // for debugg purpose
-          file: {
-            version: '3',
-            text: 'Bonjour ?'
-          },
-          appData: {
-            name: 'Thread',
-            componentLeft: 'Thread',
-            componentRight: undefined,
-            customClass: 'wsFileThread',
-            icon: 'fa fa-comments-o'
-          }
-        }
+      isVisible: true,
+      loggedUser: props.app ? props.app.loggedUser : debug.loggedUser,
+      workspace: props.app ? props.app.workspace : debug.workspace,
+      content: props.app ? props.app.content : debug.content,
+      listMessage: props.app ? props.app.content.message_list : debug.listMessage,
+      appConfig: props.app ? props.app.appConfig : debug.appConfig
     }
 
-    document.addEventListener('appCustomEvent', this.customEventReducer, false)
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  async componentDidMount () {
+    const { workspace, content, appConfig } = this.state
+    if (content.id === '-1') return // debug case
+
+    const fetchResultThread = await fetch(`${appConfig.apiUrl}/workspace/${workspace.id}/content/${content.id}`, {
+      ...FETCH_CONFIG,
+      method: 'GET'
+    })
+
+    fetchResultThread.json = await handleFetchResult(fetchResultThread)
+
+    this.setState({
+      content: fetchResultThread.json
+    })
   }
 
   customEventReducer = ({detail}) => {
@@ -42,33 +79,30 @@ class pageHtml extends React.Component {
   }
 
   handleClickBtnCloseApp = () => {
-    GLOBAL_unmountApp(this.state.appName)
+    this.setState({ isVisible: false })
   }
 
   render () {
-    const { file, appData } = this.state.data
+    const { isVisible, loggedUser, content, listMessage, appConfig } = this.state
+
+    if (!isVisible) return null
 
     return (
-      <PopinFixed customClass={`${appData.customClass}`}>
+      <PopinFixed customClass={`${appConfig.customClass}`}>
         <PopinFixedHeader
-          customClass={`${appData.customClass}`}
-          icon={appData.icon}
-          name={file.title}
+          customClass={`${appConfig.customClass}`}
+          icon={appConfig.icon}
+          name={content.title}
           onClickCloseBtn={this.handleClickBtnCloseApp}
         />
 
-        <PopinFixedOption customClass={`${appData.customClass}`} />
+        <PopinFixedOption customClass={`${appConfig.customClass}`} />
 
-        <PopinFixedContent customClass={`${appData.customClass}__contentpage`}>
+        <PopinFixedContent customClass={`${appConfig.customClass}__contentpage`}>
           <ThreadComponent
-            // version={file.version}
-            // text={file.text}
-            key={'PageHtml'}
-          />
-
-          <Timeline
-            customClass={`${appData.customClass}__contentpage`}
-            key={'pageHtml__timeline'}
+            title={content.title}
+            listMessage={listMessage}
+            loggedUser={loggedUser}
           />
         </PopinFixedContent>
       </PopinFixed>
@@ -76,4 +110,4 @@ class pageHtml extends React.Component {
   }
 }
 
-export default pageHtml
+export default Thread
