@@ -31,7 +31,23 @@ server.get('/user/is_logged_in', (req, res) => res.jsonp(jsonDb.user_logged))
 
 server.get('/workspace/:id', (req, res) => res.jsonp(jsonDb.workspace_detail))
 
-server.get('/workspace/:idws/content/:idc', (req, res) => res.jsonp(jsonDb.content_data))
+server.get('/workspace/:idws/content/:idc', (req, res) => {
+  switch (req.params.idc) {
+    case '1': // pageHtml
+      return res.jsonp(jsonDb.content_data_pageHtml)
+    case '2':
+      return res.jsonp(jsonDb.content_data_thread)
+  }
+})
+
+server.get('/workspace/:idws/content/:idc/timeline', (req, res) => {
+  switch (req.params.idc) {
+    case '1': // pageHtml
+      return res.jsonp(jsonDb.timeline)
+    case '2':
+      return res.jsonp([])
+  }
+})
 
 server.use(router)
 server.listen(GLOBAL_PORT, () => {
