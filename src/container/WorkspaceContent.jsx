@@ -62,8 +62,8 @@ class WorkspaceContent extends React.Component {
           <div className='workspace__content__fileandfolder folder__content active'>
             <FileItemHeader />
 
-            { workspace.content.map(c => c.type === 'folder'
-              ? <Folder app={app} folderData={c} key={c.id} />
+            { workspace.content.map((c, i) => c.type === 'folder'
+              ? <Folder app={app} folderData={c} key={c.id} isLast={i === workspace.content.length - 1} />
               : (
                 <FileItem
                   name={c.title}
@@ -71,6 +71,7 @@ class WorkspaceContent extends React.Component {
                   icon={(app[c.type] || {icon: ''}).icon}
                   status={c.status}
                   onClickItem={() => this.handleClickContentItem(c)}
+                  isLast={i === workspace.content.length - 1}
                   key={c.id}
                 />
               )

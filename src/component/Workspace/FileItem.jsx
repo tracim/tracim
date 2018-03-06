@@ -17,7 +17,7 @@ const FileItem = props => {
   })()
 
   return (
-    <div className={classnames('file', 'align-items-center', props.customClass)} onClick={props.onClickItem}>
+    <div className={classnames('file', 'align-items-center', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
       <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
         <div className='file__type'>
           <i className={props.icon} />

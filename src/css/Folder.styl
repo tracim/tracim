@@ -3,12 +3,16 @@
 border-style = 1px solid darkBlue
 .folder__header
   border border-style
-.file
-  border border-style
 .folder + .file, .file + .file
   border-bottom 0
 .folder__content > .file, .folder__content > .folder
   border-bottom 0
+.folder:not(.active).item-last
+  border-bottom border-style
+.file
+  border border-style
+  &.item-last
+    border-bottom border-style
 // @TODO the very last line of file or folder has to be added a border bottom in js
 // -----------------------------------------------------
 

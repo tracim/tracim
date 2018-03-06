@@ -21,9 +21,9 @@ class Folder extends Component {
   }
 
   render () {
-    const { app, folderData: { title, content } } = this.props
+    const { app, folderData: { title, content }, isLast } = this.props
     return (
-      <div className={classnames('folder', {'active': this.state.open})}>
+      <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
         <div className='folder__header' onClick={this.handleClickToggleFolder}>
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
@@ -54,14 +54,15 @@ class Folder extends Component {
         </div>
 
         <div className='folder__content'>
-          { content.map(c => c.type === 'folder'
-            ? <Folder folderData={c} key={c.id} />
+          { content.map((c, i) => c.type === 'folder'
+            ? <Folder folderData={c} key={c.id} isLast={i === content.length - 1} />
             : <FileItem
               icon={(app[c.type] || {icon: ''}).icon}
               name={c.title}
               type={c.type}
               status={c.status}
               onClickItem={() => {}}
+              isLast={i === content.length - 1}
               key={c.id}
             />
           )}
