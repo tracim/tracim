@@ -19,6 +19,7 @@ from tracim.lib.base import logger
 from tracim.lib.exceptions import AlreadyRunningDaemon
 
 from tracim.lib.utils import get_rq_queue
+from tracim.lib.utils import TracimEnforceHTTPS
 from tracim.lib.email_fetcher import MailFetcher
 
 
@@ -394,6 +395,7 @@ class WsgiDavDaemon(Daemon):
         from tracim.lib.webdav.utils import TracimWsgiDavDebugFilter
 
         config['middleware_stack'] = [
+            TracimEnforceHTTPS,
             WsgiDavDirBrowser,
             TracimHTTPAuthenticator,
             ErrorPrinter,
