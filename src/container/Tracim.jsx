@@ -6,6 +6,7 @@ import Sidebar from './Sidebar.jsx'
 import Login from './Login.jsx'
 import Dashboard from './Dashboard.jsx'
 import AccountPage from './AccountPage.jsx'
+import FlashMessage from './FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import {
   Route,
