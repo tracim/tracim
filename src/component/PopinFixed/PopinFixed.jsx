@@ -18,11 +18,6 @@ const PopinFixed = props => {
 export default PopinFixed
 
 PopinFixed.propTypes = {
-  customClass: PropTypes.string,
-  visible: PropTypes.bool
-}
-
-PopinFixed.propTypes = {
   // from http://www.mattzabriskie.com/blog/react-validating-children
   children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
     if (

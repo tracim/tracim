@@ -26,7 +26,11 @@ export default PopinFixedContent
 
 PopinFixedContent.propTypes = {
   customClass: PropTypes.string,
-  children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) =>
-    children.length !== 2 && new Error(`PropType Error: ${componentName} must have 2 children.`)
-  ).isRequired
+  children: (props, propName, componentName) => {
+    if (Array.isArray(props) && props.length !== 2) {
+      return new Error(`PropType Error: ${componentName} must have 1 or 2 children.`)
+    } else if (typeof props !== 'object') {
+      return new Error(`PropType Error: childrens of ${componentName} must have 1 or 2 children.`)
+    }
+  }
 }

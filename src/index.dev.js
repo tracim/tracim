@@ -10,6 +10,7 @@ import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
+import TimelineDebugData from './component/Timeline/debugData.js'
 
 ReactDOM.render(
   <PopinFixed customClass={`${'randomClass'}`}>
@@ -31,7 +32,12 @@ ReactDOM.render(
 
       <Timeline
         customClass={`${'randomClass'}__contentpage`}
-        key={'pageHtml__timeline'}
+        loggedUser={{
+          id: '1',
+          name: 'smoi',
+          avatar: 'https://www.algoo.fr/static/images/algoo_images/algoo-logo.jpg'
+        }}
+        timelineData={TimelineDebugData}
       />
     </PopinFixedContent>
   </PopinFixed>

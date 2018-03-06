@@ -1,9 +1,43 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import imgProfil from '../../img/imgProfil.png'
-import imgProfilReverse from '../../img/imgProfil-reverse.png'
 
 require('./Timeline.styl')
+
+const Message = props => (
+  <li className={classnames(
+    `${props.customClass}__messagelist__item`,
+    'timeline__messagelist__item',
+    {
+      'sended': props.fromMe,
+      'received': !props.fromMe
+    }
+  )}>
+    <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__messagelist__item__avatar')}>
+      <img src={props.avatar} alt='avatar' />
+    </div>
+    <div
+      className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__messagelist__item__createhour')}>
+      {props.createdAt.day} à {props.createdAt.hour}
+    </div>
+    <div
+      className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__messagelist__item__content')}>
+      {props.text}
+    </div>
+  </li>
+)
+
+const Version = props => (
+  <li className={classnames(`${props.customClass}__messagelist__version`, 'timeline__messagelist__version')}>
+    <div className={classnames(`${props.customClass}__messagelist__version__btn`, 'timeline__messagelist__version__btn btn')}>
+      <i className='fa fa-code-fork' />
+      version {props.number}
+    </div>
+    <div className={classnames(`${props.customClass}__messagelist__version__date`, 'timeline__messagelist__version__date')}>
+      Créer le {props.createdAt.day}
+    </div>
+  </li>
+)
 
 const Timeline = props => {
   return (
@@ -13,82 +47,29 @@ const Timeline = props => {
       </div>
 
       <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
+        { props.timelineData.map(content => {
+          switch (content.type) {
+            case 'message':
+              return <Message
+                customClass={props.customClass}
+                avatar={content.author.avatar}
+                createdAt={content.createdAt}
+                text={content.text}
+                fromMe={props.loggedUser.id === content.author.id}
+                key={content.id}
+              />
 
-        <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item sended')}>
-          <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__messagelist__item__avatar')}>
-            <img src={imgProfil} alt='avatar' />
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__messagelist__item__createhour')}>
-            27/11/17 à 11h45
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__messagelist__item__content')}>
-            Proident esse laboris in sed officia exercitation ut anim ea.
-          </div>
-        </li>
-
-        <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item received')}>
-          <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__messagelist__item__avatar')}>
-            <img src={imgProfilReverse} alt='avatar' />
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__messagelist__item__createhour')}>
-            27/11/17 à 11h47
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__messagelist__item__content')}>
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-          </div>
-        </li>
-
-        <li className={classnames(`${props.customClass}__messagelist__version`, 'timeline__messagelist__version')}>
-          <div className={classnames(`${props.customClass}__messagelist__version__btn`, 'timeline__messagelist__version__btn btn')}>
-            <i className='fa fa-code-fork' />
-            version 3
-          </div>
-          <div className={classnames(`${props.customClass}__messagelist__version__date`, 'timeline__messagelist__version__date')}>
-            Créer le 22/11/17
-          </div>
-        </li>
-
-        <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item sended')}>
-          <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__messagelist__item__avatar')}>
-            <img src={imgProfil} alt='avatar' />
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__messagelist__item__createhour')}>
-            27/11/17 à 11h45
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__messagelist__item__content')}>
-            Proident esse laboris in sed officia exercitation ut anim ea.
-          </div>
-        </li>
-
-        <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item received')}>
-          <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__messagelist__item__avatar')}>
-            <img src={imgProfilReverse} alt='avatar' />
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__messagelist__item__createhour')}>
-            27/11/17 à 11h47
-          </div>
-          <div
-            className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__messagelist__item__content')}>
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-            Proident esse laboris in sed officia exercitation ut anim ea.
-          </div>
-        </li>
-
+            case 'version':
+              return <Version
+                customClass={props.customClas}
+                createdAt={content.createdAt}
+                number={content.number}
+                key={content.id}
+              />
+          }
+        })}
       </ul>
+
       <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
         <div
           className={classnames(`${props.customClass}__texteditor__simpletext`, 'timeline__texteditor__simpletext input-group')}>
@@ -122,3 +103,19 @@ const Timeline = props => {
 }
 
 export default Timeline
+
+Timeline.propTypes = {
+  customClass: PropTypes.string,
+  loggedUser: PropTypes.object,
+  timelineData: PropTypes.array
+}
+
+Timeline.defaultProps = {
+  customClass: '',
+  loggedUser: {
+    id: '',
+    name: '',
+    avatar: ''
+  },
+  timelineData: []
+}
