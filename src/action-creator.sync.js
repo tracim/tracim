@@ -8,6 +8,10 @@ export const updateUserData = userData => ({ type: `Update/${USER_DATA}`, data: 
 export const WORKSPACE = 'Workspace'
 export const updateWorkspaceData = workspace => ({ type: `Update/${WORKSPACE}`, workspace })
 
+export const WORKSPACE_LIST = 'WorkspaceList'
+export const updateWorkspaceListData = workspaceList => ({ type: `Update/${WORKSPACE_LIST}`, workspaceList })
+export const updateWorkspaceListIsOpen = (workspaceId, isOpen) => ({ type: `Update/${WORKSPACE_LIST}/isOpen`, workspaceId, isOpen })
+
 export const FILE_CONTENT = 'FileContent'
 export const setActiveFileContent = file => ({ type: `Set/${FILE_CONTENT}/Active`, file })
 export const hideActiveFileContent = () => ({ type: `Set/${FILE_CONTENT}/Hide` })

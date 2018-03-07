@@ -12,7 +12,6 @@ import {
   getAppList,
   getWorkspaceContent
 } from '../action-creator.async.js'
-// import appDatabase from '../app/index.js'
 
 class WorkspaceContent extends React.Component {
   constructor (props) {
@@ -23,8 +22,22 @@ class WorkspaceContent extends React.Component {
   }
 
   componentDidMount () {
-    this.props.dispatch(getWorkspaceContent(/* this.props.workspace.id */1))
-    this.props.dispatch(getAppList())
+    const { workspaceList, app, match, dispatch } = this.props
+
+    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws))
+    else if (workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id)) // load first ws if none specified
+
+    Object.keys(app).length === 0 && dispatch(getAppList())
+  }
+
+  componentDidUpdate (prevProps) {
+    const { workspaceList, match, dispatch } = this.props
+
+    if (prevProps.match.params.idws === match.params.idws) return
+
+    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws))
+    // else load first ws if none specified
+    else if (match.params.idws === undefined && workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id))
   }
 
   handleClickContentItem = content => {
@@ -39,14 +52,12 @@ class WorkspaceContent extends React.Component {
         apiUrl: FETCH_CONFIG.apiUrl
       },
       loggedUser: user.isLoggedIn ? user : {},
-      content,
+      content
     })
   }
 
   render () {
     const { workspace, app } = this.props
-
-    // const AppContainer = (appDatabase.find(p => p.name === activeFileContent.type) || {container: '<div>unknow</div>'}).container
 
     return (
       <PageWrapper customeClass='workspace'>
@@ -80,9 +91,7 @@ class WorkspaceContent extends React.Component {
 
           <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
-          <div id='appContainer'>
-            {/* activeFileContent.display && <AppContainer /> */}
-          </div>
+          <div id='appContainer' />
         </PageContent>
 
       </PageWrapper>
@@ -90,5 +99,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspace, activeFileContent, app }) => ({ user, workspace, activeFileContent, app })
+const mapStateToProps = ({ user, workspace, workspaceList, activeFileContent, app }) => ({ user, workspace, workspaceList, activeFileContent, app })
 export default connect(mapStateToProps)(WorkspaceContent)

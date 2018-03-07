@@ -7,6 +7,8 @@ import {
   updateUserData,
   WORKSPACE,
   updateWorkspaceData,
+  WORKSPACE_LIST,
+  updateWorkspaceListData,
   APP_LIST,
   setAppList
 } from './action-creator.sync.js'
@@ -58,18 +60,16 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
 }
 
 export const userLogin = (login, password, rememberMe) => async dispatch => {
-  const jsonBody = JSON.stringify({
-    login,
-    password,
-    remember_me: rememberMe
-  })
-
   const fetchUserLogin = await fetchWrapper({
-    url: 'http://localhost:3001/user/login',
+    url: `${FETCH_CONFIG.apiUrl}/user/login`,
     param: {
-      ...FETCH_CONFIG,
+      ...FETCH_CONFIG.header,
       method: 'POST',
-      body: jsonBody
+      body: JSON.stringify({
+        login,
+        password,
+        remember_me: rememberMe
+      })
     },
     actionName: USER_LOGIN,
     dispatch
@@ -79,8 +79,8 @@ export const userLogin = (login, password, rememberMe) => async dispatch => {
 
 export const getIsUserConnected = () => async dispatch => {
   const fetchUserLogged = await fetchWrapper({
-    url: 'http://localhost:3001/user/is_logged_in',
-    param: {...FETCH_CONFIG, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/user/is_logged_in`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: USER_CONNECTED,
     dispatch
   })
@@ -89,8 +89,8 @@ export const getIsUserConnected = () => async dispatch => {
 
 export const updateUserLang = newLang => async dispatch => {
   const fetchUpdateUserLang = await fetchWrapper({
-    url: 'http://localhost:3001/user',
-    param: {...FETCH_CONFIG, method: 'PATCH', body: JSON.stringify({lang: newLang})},
+    url: `${FETCH_CONFIG.apiUrl}/user`,
+    param: {...FETCH_CONFIG.header, method: 'PATCH', body: JSON.stringify({lang: newLang})},
     actionName: USER_DATA,
     dispatch
   })
@@ -100,17 +100,27 @@ export const updateUserLang = newLang => async dispatch => {
 // export const testResponseNoData = () => async dispatch => {
 //   const fetchResponseNoData = await fetchWrapper({
 //     url: 'http://localhost:3001/deletenodata',
-//     param: {...FETCH_CONFIG, method: 'DELETE'},
+//     param: {...FETCH_CONFIG.header, method: 'DELETE'},
 //     actionName: 'TestNoData',
 //     dispatch
 //   })
 //   console.log('jsonResponseNoData', fetchResponseNoData)
 // }
 
+export const getWorkspaceList = userId => async dispatch => {
+  const fetchGetWorkspaceList = await fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/user/${userId}/workspace`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
+    actionName: WORKSPACE_LIST,
+    dispatch
+  })
+  if (fetchGetWorkspaceList.status === 200) dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+}
+
 export const getWorkspaceContent = workspaceId => async dispatch => {
   const fetchGetWorkspaceContent = await fetchWrapper({
-    url: `http://localhost:3001/workspace/${workspaceId}`,
-    param: {...FETCH_CONFIG, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/workspace/${workspaceId}`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: WORKSPACE,
     dispatch
   })
@@ -119,8 +129,8 @@ export const getWorkspaceContent = workspaceId => async dispatch => {
 
 export const getAppList = () => async dispatch => {
   const fetchGetAppList = await fetchWrapper({
-    url: `http://localhost:3001/app/config`,
-    param: {...FETCH_CONFIG, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/app/config`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: APP_LIST,
     dispatch
   })

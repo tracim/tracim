@@ -1,12 +1,6 @@
 import { APP_LIST } from '../action-creator.sync.js'
 
-export default function app (state = {
-  name: '',
-  componentLeft: '',
-  componentRight: '',
-  customClass: '',
-  icon: ''
-}, action) {
+export default function app (state = {}, action) {
   switch (action.type) {
     case `Set/${APP_LIST}`:
       const rez = {}

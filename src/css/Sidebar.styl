@@ -43,6 +43,8 @@ leftside()
   &__navigation
     padding 0
     &__workspace
+      padding-left 0
+      list-style none
       &__item
         width sidebar-width
         &__wrapper
@@ -75,13 +77,12 @@ leftside()
           padding 0
           width 100%
           background-color fourthColor
-          height 0 // height is handled is js
           overflow hidden
-          transition height 0.5s
           &__dropdown
             display flex
             align-items center
             border-top 1px solid darkBlue
+            cursor pointer
             &:nth-last-child(1)
               border-bottom 1px solid darkBlue
             &:hover

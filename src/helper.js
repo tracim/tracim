@@ -1,5 +1,5 @@
 export const FETCH_CONFIG = {
-  headers: {
+  header: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
@@ -8,7 +8,7 @@ export const FETCH_CONFIG = {
 
 export const PAGE_NAME = {
   HOME: '/',
-  WS_CONTENT: '/',
+  WS_CONTENT: '/workspace',
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   ACCOUNT: '/account'

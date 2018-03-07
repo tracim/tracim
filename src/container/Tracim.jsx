@@ -6,7 +6,7 @@ import Sidebar from './Sidebar.jsx'
 import Login from './Login.jsx'
 import Dashboard from './Dashboard.jsx'
 import AccountPage from './AccountPage.jsx'
-import FlashMessage from './FlashMessage.jsx'
+// import FlashMessage from './FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import {
   Route,
@@ -46,6 +46,7 @@ class Tracim extends React.Component {
               <SidebarWrapper locationPath={location.pathname}>
 
                 <PrivateRoute exact path={PAGE_NAME.HOME} component={WorkspaceContent} />
+                <PrivateRoute path={`${PAGE_NAME.WS_CONTENT}/:idws`} component={WorkspaceContent} />
                 <PrivateRoute exact path={PAGE_NAME.ACCOUNT} component={AccountPage} />
                 <PrivateRoute exact path={PAGE_NAME.DASHBOARD} component={Dashboard} />
 

@@ -259,5 +259,24 @@
         "hour": "09h59"
       }
     }]
-  }
+  },
+  "workspace_list": [{
+    "id": 0,
+    "title": "Ressources humaine"
+  }, {
+    "id": 1,
+    "title": "Marketing"
+  }, {
+    "id": 2,
+    "title": "Missions externes"
+  }, {
+    "id": 3,
+    "title": "Recherche et développement"
+  }, {
+    "id": 4,
+    "title": "Commercialisation"
+  }, {
+    "id": 5,
+    "title": "Évolutions"
+  }]
 }

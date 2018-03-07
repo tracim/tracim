@@ -1,6 +1,10 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
+import { getWorkspaceList } from '../action-creator.async.js'
+import { updateWorkspaceListIsOpen } from '../action-creator.sync.js'
+import { PAGE_NAME } from '../helper.js'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -10,57 +14,40 @@ class Sidebar extends React.Component {
     }
   }
 
-  handleClickWorkspace = wsId => {
-    // console.log('sidebar handleClickWs')
-    this.setState(prev => ({firstWsOpen: !prev.firstWsOpen})) // delete this, purpose is only to test transition on click
-    // console.log('sidebar firstwsOpen toggled')
+  componentDidMount () {
+    const { user, workspaceList, dispatch } = this.props
+    user.id !== 0 && workspaceList.length === 0 && dispatch(getWorkspaceList(user.id))
+  }
+
+  componentDidUpdate (prevProps) {
+    const { user, dispatch } = this.props
+    user.id !== 0 && prevProps.user.id !== user.id && dispatch(getWorkspaceList(user.id))
+  }
+
+  handleClickWorkspace = (wsId, newIsOpen) => this.props.dispatch(updateWorkspaceListIsOpen(wsId, newIsOpen))
+
+  handleClickAllContent = wsId => {
+    this.props.history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}`)
   }
 
   render () {
-    // <div className='sidebar-expandbar'>
-    //   <i className='fa fa-minus-square-o sidebar-expandbar__icon' />
-    // </div>
+    const { workspaceList } = this.props
+
     return (
       <div className='sidebar d-none d-lg-table-cell'>
-        <nav className='sidebar__navigation navbar navbar-light'>
-          <ul className='sidebar__navigation__workspace navbar-nav collapse navbar-collapse'>
-            <WorkspaceListItem
-              number={1}
-              name='workspace 1 sympa'
-              isOpen={this.state.firstWsOpen}
-              onClickTitle={() => this.handleClickWorkspace(1)}
-            />
-
-            <li className='sidebar__navigation__workspace__item nav-item dropdown'>
-              <div className='sidebar__navigation__workspace__item__wrapper'>
-                <div className='sidebar__navigation__workspace__item__number'>
-                  02
-                </div>
-                <div className='sidebar__navigation__workspace__item__name'>
-                  Workspace 2
-                </div>
-
-                <div className='sidebar__navigation__workspace__item__icon'>
-                  <i className='fa fa-chevron-down' />
-                </div>
-              </div>
-            </li>
-
-            <li className='sidebar__navigation__workspace__item nav-item dropdown'>
-              <div className='sidebar__navigation__workspace__item__wrapper'>
-                <div className='sidebar__navigation__workspace__item__number'>
-                  03
-                </div>
-                <div className='sidebar__navigation__workspace__item__name'>
-                  Workspace 3
-                </div>
-
-                <div className='sidebar__navigation__workspace__item__icon'>
-                  <i className='fa fa-chevron-down' />
-                </div>
-              </div>
-            </li>
-
+        <nav className='sidebar__navigation'>
+          <ul className='sidebar__navigation__workspace'>
+            { workspaceList.map((ws, i) =>
+              <WorkspaceListItem
+                number={++i}
+                wsId={ws.id}
+                name={ws.title}
+                isOpen={ws.isOpen}
+                onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpen)}
+                onClickAllContent={this.handleClickAllContent}
+                key={ws.id}
+              />
+            )}
           </ul>
         </nav>
 
@@ -74,5 +61,5 @@ class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({user}) => ({user})
-export default connect(mapStateToProps)(Sidebar)
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
+export default withRouter(connect(mapStateToProps)(Sidebar))
