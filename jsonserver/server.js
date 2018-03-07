@@ -5,6 +5,25 @@ const router = jsonServer.router() // for persistance : jsonServer.router('stati
 const middlewares = jsonServer.defaults()
 const GLOBAL_PORT = 3001
 
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 server.use(middlewares)
 server.use(jsonServer.bodyParser)
 
@@ -31,7 +50,10 @@ server.get('/user/is_logged_in', (req, res) => res.jsonp(jsonDb.user_logged))
 
 server.get('/user/:id/workspace', (req, res) => res.jsonp(jsonDb.workspace_list))
 
-server.get('/workspace/:id', (req, res) => res.jsonp(jsonDb.workspace_detail))
+server.get('/workspace/:id', (req, res) => res.jsonp(
+  // {...jsonDb.workspace_detail, content: shuffle(jsonDb.workspace_detail.content)})
+  Object.assign({}, jsonDb.workspace_detail, {content: shuffle(jsonDb.workspace_detail.content)})
+))
 
 server.get('/workspace/:idws/content/:idc', (req, res) => {
   switch (req.params.idc) {
