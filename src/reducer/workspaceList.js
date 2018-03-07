@@ -10,7 +10,7 @@ export function workspaceList (state = [], action) {
         isOpen: false
       }))
 
-    case `Update/${WORKSPACE_LIST}/isOpen`:
+    case `Set/${WORKSPACE_LIST}/isOpen`:
       return state.map(ws => ws.id === action.workspaceId
         ? {...ws, isOpen: action.isOpen}
         : ws

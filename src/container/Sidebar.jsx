@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { getWorkspaceList } from '../action-creator.async.js'
-import { updateWorkspaceListIsOpen } from '../action-creator.sync.js'
+import { setWorkspaceListIsOpen } from '../action-creator.sync.js'
 import { PAGE_NAME } from '../helper.js'
 
 class Sidebar extends React.Component {
@@ -24,7 +24,7 @@ class Sidebar extends React.Component {
     user.id !== 0 && prevProps.user.id !== user.id && dispatch(getWorkspaceList(user.id))
   }
 
-  handleClickWorkspace = (wsId, newIsOpen) => this.props.dispatch(updateWorkspaceListIsOpen(wsId, newIsOpen))
+  handleClickWorkspace = (wsId, newIsOpen) => this.props.dispatch(setWorkspaceListIsOpen(wsId, newIsOpen))
 
   handleClickAllContent = wsId => {
     this.props.history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}`)

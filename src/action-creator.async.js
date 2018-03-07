@@ -1,5 +1,7 @@
 import { FETCH_CONFIG } from './helper.js'
 import {
+  LANG,
+  updateLangList,
   USER_LOGIN,
   USER_DATA,
   USER_CONNECTED,
@@ -59,6 +61,16 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
   return fetchResult
 }
 
+export const getLangList = () => async dispatch => {
+  const fetchGetLangList = await fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/lang`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
+    actionName: LANG,
+    dispatch
+  })
+  if (fetchGetLangList.status === 200) dispatch(updateLangList(fetchGetLangList.json))
+}
+
 export const userLogin = (login, password, rememberMe) => async dispatch => {
   const fetchUserLogin = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/user/login`,
@@ -87,7 +99,7 @@ export const getIsUserConnected = () => async dispatch => {
   if (fetchUserLogged.status === 200) dispatch(updateUserConnected(fetchUserLogged.json))
 }
 
-export const updateUserLang = newLang => async dispatch => {
+export const updateUserLang = newLang => async dispatch => { // unused
   const fetchUpdateUserLang = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/user`,
     param: {...FETCH_CONFIG.header, method: 'PATCH', body: JSON.stringify({lang: newLang})},

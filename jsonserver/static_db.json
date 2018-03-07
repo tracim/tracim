@@ -1,4 +1,15 @@
 {
+  "lang": [{
+    "id": "fr",
+    "name": "Français",
+    "src": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg",
+    "active": true
+  }, {
+    "id": "en",
+    "name": "English",
+    "src": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Flag_of_the_United_Kingdom.svg",
+    "active": false
+  }],
   "user_logged": {
     "logged": true,
     "user": {

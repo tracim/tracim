@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import i18n from '../i18n.js'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import MenuLinkList from '../component/Header/MenuLinkList.jsx'
@@ -9,14 +10,9 @@ import MenuActionListItemDropdownLang from '../component/Header/MenuActionListIt
 import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import logoHeader from '../img/logoHeader.svg'
-import flagFr from '../img/flagFr.png'
-import flagEn from '../img/flagEn.png'
-// import { updateUserLang } from '../action-creator.async.js'
+import { setLangActive } from '../action-creator.sync.js'
 
 class Header extends React.Component {
-  // handleChangeLang = newLang => this.props.dispatch(updateUserLang(newLang))
-  // handleSubmitSearch = search => console.log('search submited : ', search)
-
   handleClickLogo = () => {}
 
   handleClickFeature = () => {}
@@ -26,7 +22,10 @@ class Header extends React.Component {
   handleChangeInput = e => this.setState({inputSearchValue: e.target.value})
   handleClickSubmit = () => {}
 
-  handleChangeLang = langId => {}
+  handleChangeLang = langId => {
+    this.props.dispatch(setLangActive(langId))
+    i18n.changeLanguage(langId)
+  }
 
   handleClickHelp = () => {}
 
@@ -34,28 +33,12 @@ class Header extends React.Component {
   handleClickLogout = () => {}
 
   render () {
-    const { user } = this.props
-    const langList = [{ // @TODO this should come from API
-      id: 'fr',
-      name: 'Français',
-      src: flagFr,
-      active: true
-    }, {
-      id: 'en',
-      name: 'English',
-      src: flagEn,
-      active: false
-    }]
-    // const userLogged = {
-    //   name: 'MrLapin',
-    //   avatar: 'https://photos-5.dropbox.com/t/2/AABmH38-9J0wawQdkSbEd757WfRA411L4h1eGtK0MLbWhA/' +
-    //   '12/14775898/png/32x32/1/_/1/2/avatar.png/ELyA_woY8SUgBygH/f3VzTEnU5OWqjkWwGyHOrJA2vYQKb3j' +
-    //   'S_zkvxpAJO0g?size=800x600&size_mode=3'
-    // }
+    const { lang, user } = this.props
 
     const HeaderWrapper = props => <header><nav className='header navbar navbar-expand-md navbar-light bg-light'>{props.children}</nav></header>
     const HeaderMenuRightWrapper = props => <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>{props.children}</div>
     const MenuActionListWrapper = props => <ul className='header__menu__rightside'>{ props.children }</ul>
+
     return (
       <HeaderWrapper>
         <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
@@ -73,7 +56,7 @@ class Header extends React.Component {
               onClickSubmit={this.handleClickSubmit}
             />
             <MenuActionListItemDropdownLang
-              langList={langList}
+              langList={lang}
               onChangeLang={this.handleChangeLang}
             />
             <MenuActionListItemHelp
@@ -90,4 +73,6 @@ class Header extends React.Component {
     )
   }
 }
-export default connect(({ user }) => ({ user }))(Header)
+
+const mapStateToProps = ({ lang, user }) => ({ lang, user })
+export default connect(mapStateToProps)(Header)

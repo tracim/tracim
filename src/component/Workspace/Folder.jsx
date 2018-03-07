@@ -1,27 +1,28 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import FileItem from './FileItem.jsx'
 
 // @TODO set Folder as a component, state open will come from parent container (which will come from redux) // update: or not ?
 
-class Folder extends Component {
+class Folder extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       open: false
     }
-    this.handleClickToggleFolder = this.handleClickToggleFolder.bind(this)
   }
 
   handleClickToggleFolder = () => this.setState({open: !this.state.open})
+
   handleClickNewFile = e => {
     e.stopPropagation() // because we have a link inside a link (togler and newFile)
     console.log('new file') // @TODO
   }
 
   render () {
-    const { app, folderData: { title, content }, isLast } = this.props
+    const { app, folderData: { title, content }, isLast, t } = this.props
     return (
       <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
         <div className='folder__header' onClick={this.handleClickToggleFolder}>
@@ -37,7 +38,7 @@ class Folder extends Component {
             </div>
             <div className='folder__header__name__addbtn' onClick={this.handleClickNewFile}>
               <div className='folder__header__name__addbtn__text btn btn-primary'>
-                créer ...
+                {t('Folder.create')} ...
               </div>
             </div>
           </div>
@@ -72,7 +73,7 @@ class Folder extends Component {
   }
 }
 
-export default Folder
+export default translate()(Folder)
 
 Folder.propTypes = {
   folderData: PropTypes.shape({

@@ -39,6 +39,8 @@ server.patch('/user', (req, res) => res.jsonp({lang: 'fr'}))
 //   res.jsonp('gg')
 // })
 
+server.get('/lang', (req, res) => res.jsonp(jsonDb.lang))
+
 server.post('/user/login', (req, res) => {
   if (req.body.login !== '' && req.body.password !== '') return res.jsonp(jsonDb.user_logged)
   else return res.jsonp('error')

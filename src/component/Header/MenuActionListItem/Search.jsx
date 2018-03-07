@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
 
 const Search = props => {
   return (
@@ -8,7 +9,7 @@ const Search = props => {
         <input
           type='text'
           className='search__input form-control'
-          placeholder='Rechercher un dossier ..'
+          placeholder={`${props.t('Header.Search')}...`}
           aria-describedby='headerInputSearch'
           onChange={props.onChangeInput}
         />
@@ -23,7 +24,7 @@ const Search = props => {
     </li>
   )
 }
-export default Search
+export default translate()(Search)
 
 Search.propTypes = {
   onChangeInput: PropTypes.func.isRequired,

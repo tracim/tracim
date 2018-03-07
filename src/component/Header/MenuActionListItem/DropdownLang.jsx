@@ -1,9 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import flagFr from '../../../img/flagFr.png' // for default lang
 
 const DropdownLang = props => {
-  const activeLang = props.langList.find(l => l.active) || {id: 'fr', name: 'Français', src: flagFr, active: true}
+  const activeLang = props.langList.find(l => l.active) || {id: 'fr', name: 'Français', src: '', active: true}
   return (
     <li className='header__menu__rightside__itemlanguage'>
       <div className='header__menu__rightside__itemlanguage__languagedropdown dropdown'>

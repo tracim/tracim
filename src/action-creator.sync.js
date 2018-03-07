@@ -10,7 +10,7 @@ export const updateWorkspaceData = workspace => ({ type: `Update/${WORKSPACE}`, 
 
 export const WORKSPACE_LIST = 'WorkspaceList'
 export const updateWorkspaceListData = workspaceList => ({ type: `Update/${WORKSPACE_LIST}`, workspaceList })
-export const updateWorkspaceListIsOpen = (workspaceId, isOpen) => ({ type: `Update/${WORKSPACE_LIST}/isOpen`, workspaceId, isOpen })
+export const setWorkspaceListIsOpen = (workspaceId, isOpen) => ({ type: `Set/${WORKSPACE_LIST}/isOpen`, workspaceId, isOpen })
 
 export const FILE_CONTENT = 'FileContent'
 export const setActiveFileContent = file => ({ type: `Set/${FILE_CONTENT}/Active`, file })
@@ -18,3 +18,7 @@ export const hideActiveFileContent = () => ({ type: `Set/${FILE_CONTENT}/Hide` }
 
 export const APP_LIST = 'App/List'
 export const setAppList = appList => ({ type: `Set/${APP_LIST}`, appList })
+
+export const LANG = 'Lang'
+export const updateLangList = langList => ({ type: `Update/${LANG}`, langList })
+export const setLangActive = langId => ({ type: `Set/${LANG}/Active`, langId })
