@@ -47,7 +47,7 @@ class Thread extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       workspace: props.data ? props.data.workspace : debug.workspace,
       content: props.data ? props.data.content : debug.content,
-      listMessage: props.data ? props.data.content.message_list : debug.listMessage,
+      listMessage: props.data ? [] : debug.listMessage,
       appConfig: props.data ? props.data.appConfig : debug.appConfig
     }
 
@@ -77,7 +77,13 @@ class Thread extends React.Component {
     fetchResultThread.json = await handleFetchResult(fetchResultThread)
 
     this.setState({
-      content: fetchResultThread.json
+      content: {
+        id: fetchResultThread.json.id,
+        status: fetchResultThread.json.status,
+        title: fetchResultThread.json.title,
+        type: fetchResultThread.json.type
+      },
+      listMessage: fetchResultThread.json.message_list
     })
   }
 
