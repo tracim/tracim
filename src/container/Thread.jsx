@@ -44,11 +44,11 @@ class Thread extends React.Component {
     this.state = {
       appName: 'Thread',
       isVisible: true,
-      loggedUser: props.app ? props.app.loggedUser : debug.loggedUser,
-      workspace: props.app ? props.app.workspace : debug.workspace,
-      content: props.app ? props.app.content : debug.content,
-      listMessage: props.app ? props.app.content.message_list : debug.listMessage,
-      appConfig: props.app ? props.app.appConfig : debug.appConfig
+      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
+      workspace: props.data ? props.data.workspace : debug.workspace,
+      content: props.data ? props.data.content : debug.content,
+      listMessage: props.data ? props.data.content.message_list : debug.listMessage,
+      appConfig: props.data ? props.data.appConfig : debug.appConfig
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)

@@ -9,7 +9,7 @@ const appInterface = {
   isRendered: false,
   renderApp: (domId, data) => {
     return ReactDOM.render(
-      <Thread file={data} />
+      <Thread data={data} />
       , document.getElementById(domId)
     )
   },
