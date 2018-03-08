@@ -8,7 +8,7 @@ const serializeWorkspace = data => ({
 })
 
 export default function user (state = {
-  id: 0,
+  id: -1,
   title: '',
   ownerId: '',
   content: []

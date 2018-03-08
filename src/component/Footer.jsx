@@ -1,14 +1,15 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import logoFooter from '../img/logoFooter.svg'
 
-const Footer = props => {
+const Footer = ({ t }) => {
   return (
     <footer className='footer text-right'>
       <div className='footer__text'>
-        Créer votre propre espace de travail collaboratif sur trac.im - Copyright 2013 - 2017
+        {t('Footer.marketing_msg')} - {t('Footer.copyright')}
       </div>
       <img className='footer__logo' src={logoFooter} />
     </footer>
   )
 }
-export default Footer
+export default translate()(Footer)

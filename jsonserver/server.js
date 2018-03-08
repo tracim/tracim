@@ -1,7 +1,7 @@
 const jsonServer = require('json-server')
 const jsonDb = require('./static_db.json')
 const server = jsonServer.create()
-const router = jsonServer.router() // for persistance : jsonServer.router('static_db.json')
+const router = jsonServer.router() // for persistence : jsonServer.router('static_db.json')
 const middlewares = jsonServer.defaults()
 const GLOBAL_PORT = 3001
 

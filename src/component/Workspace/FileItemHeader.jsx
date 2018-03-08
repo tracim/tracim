@@ -6,7 +6,7 @@ const FileItemHeader = props => {
     <div className='file__header'>
       <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
         <div className='file__header__type'>
-          Type
+          {props.t('FileItemHeader.type')}
         </div>
       </div>
       <div className='col-8 col-sm-8 col-md-8 col-lg-8 col-xl-10'>

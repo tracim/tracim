@@ -44,7 +44,7 @@ class Folder extends React.Component {
           </div>
           <div className='folder__header__contenttype'>
             <div className='folder__header__contenttype__text'>
-              Type de Contenu :
+              {t('Folder.content_type')} :
             </div>
             <div className='folder__header__contenttype__icon'>
               <i className='fa fa-list-ul' />

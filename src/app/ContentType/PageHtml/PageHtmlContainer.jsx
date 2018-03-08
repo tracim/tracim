@@ -12,12 +12,12 @@ import {
 } from 'tracim_lib'
 import PageHtmlComponent from './PageHtmlComponent.jsx'
 import Timeline from '../../../component/Timeline.jsx'
-import { hideActiveFileContent } from '../../../action-creator.sync.js'
+import { setActiveFileContentHide } from '../../../action-creator.sync.js'
 
 require('./PageHtml.styl')
 
 class PageHtmlContainer extends React.Component {
-  handleClickBtnClose = () => this.props.dispatch(hideActiveFileContent())
+  handleClickBtnClose = () => this.props.dispatch(setActiveFileContentHide())
 
   render () {
     const { activeFileContent, app: { PageHtml } } = this.props

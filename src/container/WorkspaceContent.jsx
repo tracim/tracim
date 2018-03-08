@@ -8,6 +8,7 @@ import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import { FETCH_CONFIG } from '../helper.js'
+import { setActiveFileContentActive } from '../action-creator.sync.js'
 import {
   getAppList,
   getWorkspaceContent
@@ -31,17 +32,20 @@ class WorkspaceContent extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { workspaceList, match, dispatch } = this.props
+    const { workspace, workspaceList, match, dispatch } = this.props
 
-    if (prevProps.match.params.idws === match.params.idws) return
+    // if a workspace is already loaded and the idws in url hasn't changed, do nothing
+    if (workspace.id !== -1 && prevProps.match.params.idws === match.params.idws) return
 
+    // if the idws in url has changed, load the new workspace
     if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws))
-    // else load first ws if none specified
-    else if (match.params.idws === undefined && workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id))
+    // else bellow is for loading url PAGE_NAME.HOME (without an idws), when workspaceList is loaded, load the first workspace
+    else if (match.params.idws === undefined && workspace.id === -1 && workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id))
   }
 
   handleClickContentItem = content => {
-    const { user, workspace } = this.props
+    const { user, workspace, dispatch } = this.props
+
     GLOBAL_renderApp({
       workspace: {
         id: workspace.id,
@@ -54,6 +58,8 @@ class WorkspaceContent extends React.Component {
       loggedUser: user.isLoggedIn ? user : {},
       content
     })
+
+    dispatch(setActiveFileContentActive(content))
   }
 
   render () {
@@ -99,5 +105,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspace, workspaceList, activeFileContent, app }) => ({ user, workspace, workspaceList, activeFileContent, app })
+const mapStateToProps = ({ user, workspace, workspaceList, app }) => ({ user, workspace, workspaceList, app })
 export default connect(mapStateToProps)(WorkspaceContent)

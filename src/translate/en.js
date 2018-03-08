@@ -3,12 +3,18 @@ const en = {
     Header: {
       Search: 'Search'
     },
+    Footer: {
+      marketing_msg: 'Create your own collaborative workspaces on trac.im',
+      copyright: 'Copyright 2013 - 2017'
+    },
     FileItemHeader: {
+      type: 'Type',
       document_name: "Document's name",
       status: 'Status'
     },
     Folder: {
-      create: 'Create'
+      create: 'Create',
+      content_type: 'Content type'
     }
   }
 }

@@ -8,10 +8,7 @@ export default function activeFileContent (state = {
 }, action) {
   switch (action.type) {
     case `Set/${FILE_CONTENT}/Active`:
-      return {
-        display: true,
-        ...action.file
-      }
+      return {...action.file, display: true}
 
     case `Set/${FILE_CONTENT}/Hide`:
       return {...state, display: false}
