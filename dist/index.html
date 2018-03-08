@@ -33,43 +33,47 @@
     <script src="/dev/bootstrap-4.0.0-beta.2.js"></script>
 
     <script type='text/javascript'>
-      const pageHtml = new appPageHtml()
-
+      let prevSelectedApp = {name: ''} // default value
       /*
-        app: {
-          content: {id, type, title, status}, // version and/or text are useless for Tracim, only useful for app
-          appConfig: {name, componentLeft, componentRight, customClass, icon}
+        app : {
+          loggedUser: {id, isLoggedIn, username, firstname, lastname, email, avatar}
+          workspace: {id, title},
+          appConfig: {name, componentLeft, componentRight, customClass, icon},
+          content: {id, title, type, status}
         }
       */
       GLOBAL_renderApp = app => {
-        switch (app.appConfig.name) {
-          case 'PageHtml':
-            pageHtml.renderApp('appContainer', app); break
-          case 'Thread':
-            appThread.renderApp('appContainer', app); break
+        const selectedApp = (() => {
+          switch (app.appConfig.name) {
+            case 'PageHtml':
+              return appPageHtml
+            case 'Thread':
+              return appThread
+          }
+        })()
+
+        if (selectedApp.isRendered) {
+          GLOBAL_dispatchEvent(`${app.appConfig.name}_showApp`, app)
+        } else {
+          selectedApp.renderApp('appContainer', app)
+          selectedApp.isRendered = true
+          prevSelectedApp.isRendered = false
+          prevSelectedApp = selectedApp
         }
       }
 
       GLOBAL_dispatchEvent = (type, data) => {
-        var event = new CustomEvent('appCustomEvent', {type, data})
+        var event = new CustomEvent('appCustomEvent', {detail: {type, data}})
         document.dispatchEvent(event)
       }
 
-      GLOBAL_unmountApp = appName => {
+      GLOBAL_hideApp = appName => {
         switch (appName) {
           case 'PageHtml':
-            // pageHtml.hideApp('appContainer'); break
-            GLOBAL_dispatchEvent('PageHtml_hideApp', {})
+            GLOBAL_dispatchEvent('PageHtml_hideApp', {}); break
           case 'Thread':
-            appThread.hideApp('appContainer'); break
+            GLOBAL_dispatchEvent('Thread_hideApp', {}); break
         }
-      }
-
-      // only usefull if plugin doesn't handle fileContent himself
-      GLOBAL_handleRequireRedraw = () => {
-        var rez = pluginA.destroyPlugin('plugin')
-        if (rez) GLOBAL_drawPlugin('redraw')
-        else console.log('Erreur, failed at destroying plugin')
       }
     </script>
 
