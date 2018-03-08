@@ -860,6 +860,47 @@ class ContentApi(object):
 
         item.revision_type = ActionDescription.MOVE
 
+    def copy(
+        self,
+        item: Content,
+        new_parent: Content=None,
+        new_label: str=None,
+        do_save: bool=True,
+    ) -> None:
+        if not new_parent and not new_label:
+            # TODO - G.M - 08-03-2018 - Use something else than value error
+            raise ValueError("You can't copy file into itself")
+        if new_parent:
+            workspace = new_parent.workspace
+            parent = new_parent
+        else:
+            workspace = item.workspace
+            parent = item.parent
+
+        if new_label:
+            label = new_label
+        else:
+            label = item.label
+
+        with DBSession.no_autoflush:
+            file = self.create(
+                content_type=item.type,
+                workspace=workspace,
+                parent=parent,
+                label=label,
+                do_save=False,
+            )
+            file.description = item.description
+            if item.depot_file:
+                self.update_file_data(
+                    file,
+                    item.file_name,
+                    item.file_mimetype,
+                    item.depot_file.file
+                )
+        if do_save:
+            self.save(file, ActionDescription.CREATION, do_notify=True)
+
     def move_recursively(self, item: Content,
                          new_parent: Content, new_workspace: Workspace):
         self.move(item, new_parent, False, new_workspace)
