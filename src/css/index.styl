@@ -1,6 +1,6 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
-.wsFilePageHtml
+.wsContentPageHtml
   &__header
     background-color htmlColor
     &__editionmode
@@ -67,16 +67,16 @@
             background-color htmlColor
 
 .messagelistOpen
-  .wsFilePageHtml__contentpage__messagelist
+  .wsContentPageHtml__contentpage__messagelist
     flex 0
     min-height 0
 
 .received
-  .wsFilePageHtml__contentpage__messagelist__item__content
+  .wsContentPageHtml__contentpage__messagelist__item__content
     background-color htmlColor
 
 @media (min-width: max-xs) and (max-width: max-lg)
-  .wsFilePageHtml
+  .wsContentPageHtml
     &__contentpage
       display block
       overflow-Y scroll
@@ -103,19 +103,19 @@
               margin-left 15px
 
 @media (min-width: min-lg) and (max-width: max-lg)
-  .wsFilePageHtml
+  .wsContentPageHtml
     width 692px
     &__contentpage__texteditor__simpletext
       margin-left 15px
 
 @media (min-width: min-md) and (max-width: max-md)
-  .wsFilePageHtml
+  .wsContentPageHtml
     width 768px
     &__contentpage__texteditor__simpletext
       margin-left 25px
 
 @media (min-width: min-sm) and (max-width: max-sm)
-  .wsFilePageHtml
+  .wsContentPageHtml
     top 69px
     width 576px
     height calc(100% - 69px)
@@ -123,7 +123,7 @@
       margin-left 10px
 
 @media (max-width: max-xs)
-  .wsFilePageHtml
+  .wsContentPageHtml
     top 70px
     height calc(100% - 70px)
     width 100%

@@ -3,11 +3,11 @@ import { TextAreaApp } from 'tracim_lib'
 
 const PageHtml = props => {
   return (
-    <div className='wsFilePageHtml__contentpage__textnote'>
-      <div className='wsFilePageHtml__contentpage__textnote__latestversion' dangerouslySetInnerHTML={{__html: props.version}} />
-      <div className='wsFilePageHtml__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.text}} />
+    <div className='wsContentPageHtml__contentpage__textnote'>
+      <div className='wsContentPageHtml__contentpage__textnote__latestversion' dangerouslySetInnerHTML={{__html: props.version}} />
+      <div className='wsContentPageHtml__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.text}} />
 
-      <TextAreaApp customClass={'wsFilePageHtml'} />
+      <TextAreaApp customClass={'wsContentPageHtml'} />
     </div>
   )
 }

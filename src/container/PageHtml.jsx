@@ -18,7 +18,7 @@ const debug = {
   },
   appConfig: {
     name: 'PageHtml',
-    customClass: 'wsFilePageHtml',
+    customClass: 'wsContentPageHtml',
     icon: 'fa fa-file-word-o',
     apiUrl: 'http://localhost:3001'
   },
