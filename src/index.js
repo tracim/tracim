@@ -5,6 +5,8 @@ import Thread from './container/Thread.jsx'
 require('./css/index.styl')
 
 const appInterface = {
+  name: 'Thread',
+  isRendered: false,
   renderApp: (domId, data) => {
     return ReactDOM.render(
       <Thread file={data} />

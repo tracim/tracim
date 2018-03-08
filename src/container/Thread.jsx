@@ -54,6 +54,17 @@ class Thread extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
+  customEventReducer = ({ detail: action }) => { // action: { type: '', data: {} }
+    switch (action.type) {
+      case 'Thread_showApp':
+        this.setState({isVisible: true})
+        break
+      case 'Thread_hideApp':
+        this.setState({isVisible: false})
+        break
+    }
+  }
+
   async componentDidMount () {
     const { workspace, content, appConfig } = this.state
     if (content.id === '-1') return // debug case
@@ -68,14 +79,6 @@ class Thread extends React.Component {
     this.setState({
       content: fetchResultThread.json
     })
-  }
-
-  customEventReducer = ({detail}) => {
-    switch (detail.type) {
-      case 'Thread_showMsg': // unused for now, for testing purpose
-        this.setState({inputText: detail.content})
-        break
-    }
   }
 
   handleClickBtnCloseApp = () => {
