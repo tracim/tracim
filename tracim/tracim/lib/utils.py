@@ -17,6 +17,7 @@ from tg.util import lazify
 from redis import Redis
 from rq import Queue
 
+from wsgidav.middleware import BaseMiddleware
 from tracim.lib.base import logger
 from webob import Response
 from webob.exc import WSGIHTTPException
@@ -180,3 +181,22 @@ def get_rq_queue(queue_name: str= 'default') -> Queue:
         port=cfg.EMAIL_SENDER_REDIS_PORT,
         db=cfg.EMAIL_SENDER_REDIS_DB,
     ))
+
+
+class TracimEnforceHTTPS(BaseMiddleware):
+
+    def __init__(self, application, config):
+        super().__init__(application, config)
+        self._application = application
+        self._config = config
+
+    def __call__(self, environ, start_response):
+        # TODO - G.M - 06-03-2018 - Check protocol from http header first
+        # see http://www.bortzmeyer.org/7239.html
+        # if this params doesn't exist, rely on tracim config
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        if cfg.WEBSITE_BASE_URL.startswith('https'):
+            environ['wsgi.url_scheme'] = 'https'
+        return self._application(environ, start_response)
