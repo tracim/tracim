@@ -15,6 +15,9 @@ const en = {
     Folder: {
       create: 'Create',
       content_type: 'Content type'
+    },
+    Sidebar: {
+      create_new_workspace: 'Create new workspace'
     }
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
+import { translate } from 'react-i18next'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { getWorkspaceList } from '../action-creator.async.js'
 import { setWorkspaceListIsOpen } from '../action-creator.sync.js'
@@ -31,7 +32,7 @@ class Sidebar extends React.Component {
   }
 
   render () {
-    const { workspaceList } = this.props
+    const { workspaceList, t } = this.props
 
     return (
       <div className='sidebar d-none d-lg-table-cell'>
@@ -53,7 +54,7 @@ class Sidebar extends React.Component {
 
         <div className='sidebar__btnnewworkspace'>
           <button className='sidebar__btnnewworkspace__btn btn btn-success'>
-            Créer un workspace
+            {t('Sidebar.create_new_workspace')}
           </button>
         </div>
       </div>
@@ -62,4 +63,4 @@ class Sidebar extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
-export default withRouter(connect(mapStateToProps)(Sidebar))
+export default withRouter(connect(mapStateToProps)(translate()(Sidebar)))

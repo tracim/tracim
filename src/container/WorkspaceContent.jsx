@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import appFactory from '../appFactory.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import FileItem from '../component/Workspace/FileItem.jsx'
 import FileItemHeader from '../component/Workspace/FileItemHeader.jsx'
@@ -7,8 +8,6 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
-import { FETCH_CONFIG } from '../helper.js'
-import { setActiveFileContentActive } from '../action-creator.sync.js'
 import {
   getAppList,
   getWorkspaceContent
@@ -44,22 +43,9 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickContentItem = content => {
-    const { user, workspace, dispatch } = this.props
-
-    GLOBAL_renderApp({
-      workspace: {
-        id: workspace.id,
-        title: workspace.title
-      },
-      appConfig: {
-        ...this.props.app[content.type],
-        apiUrl: FETCH_CONFIG.apiUrl
-      },
-      loggedUser: user.isLoggedIn ? user : {},
-      content
-    })
-
-    dispatch(setActiveFileContentActive(content))
+    this.props.renderApp(this.props.user, this.props.workspace, this.props.app, content)
+    // Côme - 2018/03/08 - line bellow is useless because we cannot call the reducer again when hiding app since the call comes from the app
+    // dispatch(setActiveFileContentActive(content))
   }
 
   render () {
@@ -106,4 +92,4 @@ class WorkspaceContent extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspace, workspaceList, app }) => ({ user, workspace, workspaceList, app })
-export default connect(mapStateToProps)(WorkspaceContent)
+export default connect(mapStateToProps)(appFactory(WorkspaceContent))
