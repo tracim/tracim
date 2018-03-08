@@ -9,7 +9,7 @@ const appInterface = {
   isRendered: false,
   renderApp: (domId, data) => {
     return ReactDOM.render(
-      <PageHtml app={data} />
+      <PageHtml data={data} />
       , document.getElementById(domId)
     )
   },
