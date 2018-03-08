@@ -970,6 +970,7 @@ class File(DAVNonCollection):
         parent = self.content.parent
 
         with new_revision(self.content):
+            # Rename
             if basename(destpath) != self.getDisplayName():
                 new_given_file_name = transform_to_bdd(basename(destpath))
                 new_file_name, new_file_extension = \
@@ -981,21 +982,24 @@ class File(DAVNonCollection):
                 )
                 self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
+
+            # Move
+            workspace_api = WorkspaceApi(self.user)
+            content_api = ContentApi(self.user)
+
+            destination_workspace = self.provider.get_workspace_from_path(
+                destpath,
+                workspace_api,
+            )
+            destination_parent = self.provider.get_parent_from_path(
+                destpath,
+                content_api,
+                destination_workspace,
+            )
+            if destination_parent == parent and destination_workspace == workspace:  # nopep8
+                # Do not move to same place
+                pass
             else:
-                workspace_api = WorkspaceApi(self.user)
-                content_api = ContentApi(self.user)
-
-                destination_workspace = self.provider.get_workspace_from_path(
-                    destpath,
-                    workspace_api,
-                )
-
-                destination_parent = self.provider.get_parent_from_path(
-                    destpath,
-                    content_api,
-                    destination_workspace,
-                )
-
                 self.content_api.move(
                     item=self.content,
                     new_parent=destination_parent,
