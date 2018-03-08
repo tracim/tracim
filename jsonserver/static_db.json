@@ -25,37 +25,37 @@
     "name": "PageHtml",
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
-    "customClass": "wsFilePageHtml",
+    "customClass": "wsContentPageHtml",
     "icon": "fa fa-file-word-o"
   }, {
     "name": "PageMarkdown",
     "componentLeft": "PageMarkdown",
     "componentRight": "undefined",
-    "customClass": "wsFilePageMarkdown",
+    "customClass": "wsContentPageMarkdown",
     "icon": "fa fa-file-code-o"
   }, {
     "name": "File",
     "componentLeft": "File",
     "componentRight": "undefined",
-    "customClass": "wsFileFile",
+    "customClass": "wsContentFile",
     "icon": "fa fa-file-text-o"
   }, {
     "name": "Thread",
     "componentLeft": "Thread",
     "componentRight": "undefined",
-    "customClass": "wsFileThread",
+    "customClass": "wsContentThread",
     "icon": "fa fa-comments-o"
   }, {
     "name": "Task",
     "componentLeft": "Task",
     "componentRight": "undefined",
-    "customClass": "wsFileTask",
+    "customClass": "wsContentTask",
     "icon": "fa fa-list-ul"
   }, {
     "name": "Issue",
     "componentLeft": "Issue",
     "componentRight": "undefined",
-    "customClass": "wsFileIssue",
+    "customClass": "wsContentIssue",
     "icon": "fa fa-ticket"
   }],
   "workspace_detail": {
@@ -188,7 +188,7 @@
     "message_list": [{
       "id": 0,
       "author": {
-        "id": 2,
+        "id": 5,
         "username": "Peter",
         "avatar": "https://avatars3.githubusercontent.com/u/1104637?s=460&v=4"
       },
@@ -212,7 +212,7 @@
     }, {
       "id": 2,
       "author": {
-        "id": 2,
+        "id": 5,
         "username": "Peter",
         "avatar": "https://avatars3.githubusercontent.com/u/1104637?s=460&v=4"
       },
@@ -236,7 +236,7 @@
     }, {
       "id": 4,
       "author": {
-        "id": 2,
+        "id": 5,
         "username": "Peter",
         "avatar": "https://avatars3.githubusercontent.com/u/1104637?s=460&v=4"
       },
