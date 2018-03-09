@@ -102,7 +102,8 @@ If you want your own dedicated instance but do not want to manage it by yourself
 
 In case you prefer using Docker:
 
-You need to install docker on your server first (see [here](https://docs.docker.com/install/linux/docker-ce/debian/))
+You need to install docker on your server first (see [here for debian](https://docs.docker.com/install/linux/docker-ce/debian/) or [here for windows]([docker toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/)))
+
 Make sure `docker.service` is started correctly.
 
     systemctl status docker.service
@@ -120,6 +121,14 @@ Then use image like following (adapt volume paths or ports as you want):
 
 
 All docker images are available here : https://hub.docker.com/u/algoo/
+More information about build docker image: https://github.com/tracim/docker_tracim
+
+Description of versioning:
+
+* algoo/`tracim:latest` is latest stable image from branch master
+* algoo/`tracim:<$tag>` is a stable tag image from branch master
+* algoo/`tracim_testing:latest` is a latest image from branch develop
+* algoo/`tracim:unstable` is a latest unstable image from branch develop
 
 ----
 
