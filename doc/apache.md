@@ -153,8 +153,6 @@ In case you have some permission problem, check if `www-data` can access to fold
 
 ## Documentation Links ##
 
-[Apache]()
-
-[TurboGears](http://turbogears.readthedocs.io/en/tg2.3.7/cookbook/deploy/mod_wsgi.html)
-
-[mod_wsgi](http://modwsgi.readthedocs.io/en/develop/index.html)
+* [Apache](https://httpd.apache.org/docs/2.4/fr/)
+* [TurboGears](http://turbogears.readthedocs.io/en/tg2.3.7/cookbook/deploy/mod_wsgi.html)
+* [mod_wsgi](http://modwsgi.readthedocs.io/en/develop/index.html)
