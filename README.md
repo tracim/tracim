@@ -100,35 +100,28 @@ If you want your own dedicated instance but do not want to manage it by yourself
 
 ## Docker ##
 
-**Important:** docker images is for local usage. If you want to use Tracim from network device, its necessary to change some lines in Development.ini file and build new image.
+In case you prefer using Docker:
 
-
-* For windows:
-
-Install [docker toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/)
-
-
-* For linux:
-
-You need to install docker on your server first.
-Example on Debian: `sudo apt-get install docker docker-compose`
+You need to install docker on your server first (see [here for debian](https://docs.docker.com/install/linux/docker-ce/debian/) or [here for windows]([docker toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/)))
 
 Make sure `docker.service` is started correctly.
-exemple on Debian: `sudo systemctl status docker`
 
-**If you want to use the latest stable image: **
+    systemctl status docker.service
 
-    sudo docker run -e DATABASE_TYPE=sqlite \
-               -p 80:80 -p 3030:3030 -p 5232:5232 \
-               -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+Then use image like following (adapt volume paths or ports as you want):
 
-**For another case, you can find exemple here:**
+    sudo docker run \
+        -e DATABASE_TYPE=sqlite \
+        -p 80:80 \
+        -p 3030:3030 \
+        -p 5232:5232 \
+        -v /var/tracim/etc:/etc/tracim \
+        -v /var/tracim/var:/var/tracim \
+        algoo/tracim  # docker image: tracim:unstable for development version, tracim_test:latest for nightly builds
 
-* You can use `algoo/tracim:<$tag>` stable image (replace `<$tag>` by the tag you want to use):
 
-        sudo docker run -e DATABASE_TYPE=sqlite \
-               -p 80:80 -p 3030:3030 -p 5232:5232 \
-               -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim:<$tag>
+All docker images are available here : https://hub.docker.com/u/algoo/
+More information about build docker image: https://github.com/tracim/docker_tracim
 
 Description of versioning:
 
@@ -136,23 +129,6 @@ Description of versioning:
 * algoo/`tracim:<$tag>` is a stable tag image from branch master
 * algoo/`tracim_testing:latest` is a latest image from branch develop
 * algoo/`tracim:unstable` is a latest unstable image from branch develop
-
-More information about command:
-
-    sudo docker run \
-        -e DATABASE_TYPE=sqlite \   # define database: may be sqlite, mysql, postgresql
-        -p 80:80 \  # web server port mapping
-        -p 3030:3030 \  # webdav interface port mapping
-        -p 5232:5232 \  # caldav interface port mapping
-        -v /var/tracim/etc:/etc/tracim \ # config file storage path
-        -v /var/tracim/var:/var/tracim \  # file storage path
-        algoo/tracim:unstable  # docker image: tracim:unstable for development version, tracim_test:latest for nightly builds
-
-
-
-All docker images are available here : https://hub.docker.com/u/algoo/
-More information about build docker image: https://github.com/tracim/docker_tracim
-
 
 ----
 
