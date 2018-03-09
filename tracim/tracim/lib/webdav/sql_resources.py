@@ -89,7 +89,7 @@ class ManageActions(object):
             new_name = re.sub(r'(\.[^.]+)$', '', new_name)
 
         if self._type in [ActionDescription.ARCHIVING, ActionDescription.DELETION]:
-            new_name += ' - %s the %s' % (self._to_name[self._type], datetime.now().strftime('%d-%m-%Y at %H:%M'))
+            new_name += ' - %s the %s' % (self._to_name[self._type], datetime.now().strftime('%d-%m-%Y at %H_%M'))
         else:
             new_name = re.sub(
                 r'( - (%s|%s) the .*)$' % (self._to_name[ActionDescription.DELETION], self._to_name[ActionDescription.ARCHIVING]),
