@@ -1,4 +1,6 @@
 import { libHandleFetchResult } from './helper.js'
+import fr from './translate/fr.js'
+import en from './translate/en.js'
 
 import libPopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import libPopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -9,6 +11,9 @@ import libTimeline from './component/Timeline/Timeline.jsx'
 
 import libTextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import libBtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
+
+export const langFr = fr
+export const langEn = en
 
 export const handleFetchResult = libHandleFetchResult
 
