@@ -10,6 +10,7 @@ import {
 } from 'tracim_lib'
 import { timelineDebugData } from '../timelineDebugData.js'
 import { FETCH_CONFIG } from '../helper.js'
+import i18n from '../i18n.js'
 
 const debug = {
   workspace: {
@@ -108,7 +109,7 @@ class pageHtml extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
         />
 
-        <PopinFixedOption customClass={`${appConfig.customClass}`} />
+        <PopinFixedOption customClass={`${appConfig.customClass}`} i18n={i18n} />
 
         <PopinFixedContent customClass={`${appConfig.customClass}__contentpage`}>
           <PageHtmlComponent
