@@ -102,8 +102,10 @@ If you want your own dedicated instance but do not want to manage it by yourself
 
 In case you prefer using Docker:
 
-You need to install docker on your server first.
+You need to install docker on your server first (see [https://docs.docker.com/install/linux/docker-ce/debian/](here))
 Make sure `docker.service` is started correctly.
+
+    systemctl status docker.service
 
 **If you want to use the latest stable image: **
 
