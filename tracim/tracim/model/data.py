@@ -1234,11 +1234,24 @@ class Content(DeclarativeBase):
 
         return ContentType.sorted(types)
 
-    def get_history(self) -> '[VirtualEvent]':
+    def get_history(self, drop_empty_revision=False) -> '[VirtualEvent]':
         events = []
         for comment in self.get_comments():
             events.append(VirtualEvent.create_from_content(comment))
-        for revision in self.revisions:
+
+        revisions = sorted(self.revisions, key=lambda rev: rev.revision_id)
+        for revision in revisions:
+            # INFO - G.M - 09-03-2018 - Do not show file revision with empty
+            # file to have a more clear view of revision.
+            # Some webdav client create empty file before uploading, we must
+            # have possibility to not show the related revision
+            if drop_empty_revision:
+                if revision.depot_file and revision.depot_file.file.content_length == 0:  # nopep8
+                    # INFO - G.M - 12-03-2018 -Always show the last and
+                    # first revision.
+                    if revision != revisions[-1] and revision != revisions[0]:
+                        continue
+
             events.append(VirtualEvent.create_from_content_revision(revision))
 
         sorted_events = sorted(events,
