@@ -22,7 +22,7 @@ class Folder extends React.Component {
   }
 
   render () {
-    const { app, folderData: { title, content }, isLast, t } = this.props
+    const { app, folderData: { title, content }, onClickItem, isLast, t } = this.props
     return (
       <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
         <div className='folder__header' onClick={this.handleClickToggleFolder}>
@@ -56,14 +56,19 @@ class Folder extends React.Component {
 
         <div className='folder__content'>
           { content.map((c, i) => c.type === 'folder'
-            ? <Folder folderData={c} key={c.id} isLast={i === content.length - 1} />
+            ? <Folder
+              folderData={c}
+              onClickItem={onClickItem}
+              isLast={isLast}
+              key={c.id}
+            />
             : <FileItem
               icon={(app[c.type] || {icon: ''}).icon}
               name={c.title}
               type={c.type}
               status={c.status}
-              onClickItem={() => {}}
-              isLast={i === content.length - 1}
+              onClickItem={() => onClickItem(c)}
+              isLast={isLast && i === content.length - 1}
               key={c.id}
             />
           )}

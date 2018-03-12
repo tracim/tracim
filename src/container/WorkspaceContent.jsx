@@ -66,7 +66,15 @@ class WorkspaceContent extends React.Component {
             <FileItemHeader />
 
             { workspace.content.map((c, i) => c.type === 'folder'
-              ? <Folder app={app} folderData={c} key={c.id} isLast={i === workspace.content.length - 1} />
+              ? (
+                <Folder
+                  app={app}
+                  folderData={c}
+                  onClickItem={this.handleClickContentItem}
+                  isLast={i === workspace.content.length - 1}
+                  key={c.id}
+                />
+              )
               : (
                 <FileItem
                   name={c.title}
