@@ -866,8 +866,9 @@ class ContentApi(object):
         new_parent: Content=None,
         new_label: str=None,
         do_save: bool=True,
+        do_notify: bool=True,
     ) -> None:
-        if not new_parent and not new_label:
+        if (not new_parent and not new_label) or (new_parent == item.parent and new_label == item.label):  # nopep8
             # TODO - G.M - 08-03-2018 - Use something else than value error
             raise ValueError("You can't copy file into itself")
         if new_parent:
@@ -899,7 +900,7 @@ class ContentApi(object):
                     item.depot_file.file
                 )
         if do_save:
-            self.save(file, ActionDescription.CREATION, do_notify=True)
+            self.save(file, ActionDescription.CREATION, do_notify=do_notify)
 
     def move_recursively(self, item: Content,
                          new_parent: Content, new_workspace: Workspace):
