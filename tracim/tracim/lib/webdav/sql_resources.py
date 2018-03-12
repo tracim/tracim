@@ -964,13 +964,25 @@ class File(DAVNonCollection):
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
 
-    def move_file(self, destpath):
+    def move_file(self, destpath: str) -> None:
+        """
+        Move file mean changing the path to access to a file. This can mean
+        simple renaming(1), moving file from a directory to one another(2)
+        but also renaming + moving file from a directory to one another at
+        the same time (3).
+
+        (1): move /dir1/file1 -> /dir1/file2
+        (2): move /dir1/file1 -> /dir2/file1
+        (3): move /dir1/file1 -> /dir2/file2
+        :param destpath: destination path of webdav move
+        :return: nothing
+        """
 
         workspace = self.content.workspace
         parent = self.content.parent
 
         with new_revision(self.content):
-            # Rename
+            # INFO - G.M - 2018-03-09 - First, renaming file if needed
             if basename(destpath) != self.getDisplayName():
                 new_given_file_name = transform_to_bdd(basename(destpath))
                 new_file_name, new_file_extension = \
@@ -983,7 +995,7 @@ class File(DAVNonCollection):
                 self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
 
-            # Move
+            # INFO - G.M - 2018-03-09 - Moving file if needed
             workspace_api = WorkspaceApi(self.user)
             content_api = ContentApi(self.user)
 
@@ -996,10 +1008,9 @@ class File(DAVNonCollection):
                 content_api,
                 destination_workspace,
             )
-            if destination_parent == parent and destination_workspace == workspace:  # nopep8
-                # Do not move to same place
-                pass
-            else:
+            if destination_parent != parent or destination_workspace != workspace:  # nopep8
+                #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
+                #  if the request does not result in a real move.
                 self.content_api.move(
                     item=self.content,
                     new_parent=destination_parent,
