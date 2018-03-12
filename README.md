@@ -102,9 +102,35 @@ If you want your own dedicated instance but do not want to manage it by yourself
 
 In case you prefer using Docker:
 
-    sudo docker run -e DATABASE_TYPE=sqlite \
-               -p 80:80 -p 3030:3030 -p 5232:5232 \
-               -v /var/tracim/etc:/etc/tracim -v /var/tracim/var:/var/tracim algoo/tracim
+You need to install docker on your server first (see [here for debian](https://docs.docker.com/install/linux/docker-ce/debian/) or [here for windows]([docker toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/)))
+
+Make sure `docker.service` is started correctly.
+
+    systemctl status docker.service
+
+Then use image like following (adapt volume paths or ports as you want):
+
+    sudo docker run \
+        -e DATABASE_TYPE=sqlite \
+        -p 80:80 \
+        -p 3030:3030 \
+        -p 5232:5232 \
+        -v /var/tracim/etc:/etc/tracim \
+        -v /var/tracim/var:/var/tracim \
+        algoo/tracim  # docker image: tracim:unstable for development version, tracim_test:latest for nightly builds
+
+
+All docker images are available here : https://hub.docker.com/u/algoo/
+More information about build docker image: https://github.com/tracim/docker_tracim
+
+Description of versioning:
+
+* algoo/`tracim:latest` is latest stable image from branch master
+* algoo/`tracim:<$tag>` is a stable tag image from branch master
+* algoo/`tracim_testing:latest` is a latest image from branch develop
+* algoo/`tracim:unstable` is a latest unstable image from branch develop
+
+----
 
 ## Install Tracim on your server ##
 
