@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import os
 import time
 import signal
@@ -180,3 +181,12 @@ def get_rq_queue(queue_name: str= 'default') -> Queue:
         port=cfg.EMAIL_SENDER_REDIS_PORT,
         db=cfg.EMAIL_SENDER_REDIS_DB,
     ))
+
+
+def current_date_for_filename() -> str:
+    """
+    ISO8601 current date, adapted to be used in filename (for
+    webdav feature for example), with trouble-free characters.
+    :return: current date as string
+    """
+    return datetime.datetime.now().isoformat().replace(':', '.')

@@ -29,6 +29,7 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib import cmp_to_key
 from tracim.lib.notifications import NotifierFactory
 from tracim.lib.utils import SameValueError
+from tracim.lib.utils import current_date_for_filename
 from tracim.model import DBSession
 from tracim.model import new_revision
 from tracim.model.auth import User
@@ -894,6 +895,14 @@ class ContentApi(object):
     def archive(self, content: Content):
         content.owner = self._user
         content.is_archived = True
+        # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
+        # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
+        # un-archiving file.
+        content.label = '{label}-{action}-{date}'.format(
+            label=content.label,
+            action='archived',
+            date=current_date_for_filename()
+        )
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
@@ -904,6 +913,14 @@ class ContentApi(object):
     def delete(self, content: Content):
         content.owner = self._user
         content.is_deleted = True
+        # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
+        # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
+        # un-deleting file.
+        content.label = '{label}-{action}-{date}'.format(
+            label=content.label,
+            action='deleted',
+            date=current_date_for_filename()
+        )
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
