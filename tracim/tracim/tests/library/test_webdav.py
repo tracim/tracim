@@ -481,6 +481,50 @@ class TestWebDav(TestStandard):
             )
         )
 
+    def test_unit__move_and_rename_content__ok(self):
+        provider = self._get_provider()
+        environ = self._get_environ(
+            provider,
+            'bob@fsf.local',
+        )
+        w1f1d1 = provider.getResourceInst(
+            '/w1/w1f1/w1f1d1.txt',
+            environ,
+        )
+
+        content_w1f1d1 = DBSession.query(ContentRevisionRO) \
+            .filter(Content.label == 'w1f1d1') \
+            .one()  # It must exist only one revision, cf fixtures
+        ok_(content_w1f1d1, msg='w1f1d1 should be exist')
+        content_w1f1d1_id = content_w1f1d1.content_id
+        content_w1f1d1_parent = content_w1f1d1.parent
+        eq_(
+            content_w1f1d1_parent.label,
+            'w1f1',
+            msg='field parent should be w1f1',
+        )
+
+        w1f1d1.moveRecursive('/w1/w1f2/w1f1d1_RENAMED.txt')
+
+        # Database content is moved
+        content_w1f1d1 = DBSession.query(ContentRevisionRO) \
+            .filter(ContentRevisionRO.content_id == content_w1f1d1_id) \
+            .order_by(ContentRevisionRO.revision_id.desc()) \
+            .first()
+        ok_(
+            content_w1f1d1.parent.label != content_w1f1d1_parent.label,
+            msg='file should be moved in w1f2 but is in {0}'.format(
+                content_w1f1d1.parent.label
+            )
+        )
+        eq_(
+            'w1f1d1_RENAMED',
+            content_w1f1d1.label,
+            msg='File should be labeled w1f1d1_RENAMED, not {0}'.format(
+                content_w1f1d1.label
+            )
+        )
+
     def test_unit__move_content__ok__another_workspace(self):
         provider = self._get_provider()
         environ = self._get_environ(
