@@ -1007,6 +1007,14 @@ class File(DAVNonCollection):
 
     def copyMoveSingle(self, destpath, isMove):
         if isMove:
+            # INFO - G.M - 12-03-2018 - This case should not happen
+            # As far as moveRecursive method exist, all move should not go
+            # through this method. If such case appear, try replace this to :
+            ####
+            # self.move_file(destpath)
+            # return
+            ####
+
             raise NotImplemented
 
         new_file_name = None
