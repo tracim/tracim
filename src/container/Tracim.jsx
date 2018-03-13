@@ -38,13 +38,13 @@ class Tracim extends React.Component {
       : props.children
 
     return (
-      <div>
+      <div className='tracim'>
         <Header />
 
         { user.isLoggedIn === undefined
           ? (<div />) // while we dont know if user is connected, display nothing but the header @TODO show loader
           : (
-            <div>
+            <div className='tracim__content'>
               <Route path={PAGE_NAME.LOGIN} component={Login} />
 
               <SidebarWrapper locationPath={location.pathname}>

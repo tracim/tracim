@@ -29,47 +29,46 @@ class Header extends React.Component {
 
   handleClickHelp = () => {}
 
-  handleClickMyProfil = () => {}
   handleClickLogout = () => {}
 
   render () {
     const { lang, user } = this.props
 
-    const HeaderWrapper = props => <header><nav className='header navbar navbar-expand-md navbar-light bg-light'>{props.children}</nav></header>
-    const HeaderMenuRightWrapper = props => <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>{props.children}</div>
-    const MenuActionListWrapper = props => <ul className='header__menu__rightside'>{ props.children }</ul>
-
     return (
-      <HeaderWrapper>
-        <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
-        <NavbarToggler />
+      <header>
+        <nav className='header navbar navbar-expand-md navbar-light bg-light'>
+          <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
-        <HeaderMenuRightWrapper>
-          <MenuLinkList
-            onClickFeature={this.handleClickFeature}
-            onClickExplore={this.handleClickExplore}
-            onClickAbout={this.handleClickAbout}
-          />
-          <MenuActionListWrapper>
-            <MenuActionListItemSearch
-              onChangeInput={this.handleChangeInput}
-              onClickSubmit={this.handleClickSubmit}
+          <NavbarToggler />
+
+          <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
+            <MenuLinkList
+              onClickFeature={this.handleClickFeature}
+              onClickExplore={this.handleClickExplore}
+              onClickAbout={this.handleClickAbout}
             />
-            <MenuActionListItemDropdownLang
-              langList={lang}
-              onChangeLang={this.handleChangeLang}
-            />
-            <MenuActionListItemHelp
-              onClickHelp={this.handleClickHelp}
-            />
-            <MenuActionListItemMenuProfil
-              user={user}
-              onClickMyProfil={this.handleClickMyProfil}
-              onClickLogout={this.handleClickLogout}
-            />
-          </MenuActionListWrapper>
-        </HeaderMenuRightWrapper>
-      </HeaderWrapper>
+
+            <ul className='header__menu__rightside'>
+              <MenuActionListItemSearch
+                onChangeInput={this.handleChangeInput}
+                onClickSubmit={this.handleClickSubmit}
+              />
+              <MenuActionListItemDropdownLang
+                langList={lang}
+                onChangeLang={this.handleChangeLang}
+              />
+              <MenuActionListItemHelp
+                onClickHelp={this.handleClickHelp}
+              />
+              <MenuActionListItemMenuProfil
+                user={user}
+                onClickLogout={this.handleClickLogout}
+              />
+            </ul>
+
+          </div>
+        </nav>
+      </header>
     )
   }
 }

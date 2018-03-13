@@ -35,7 +35,7 @@ class Sidebar extends React.Component {
     const { workspaceList, t } = this.props
 
     return (
-      <div className='sidebar d-none d-lg-table-cell'>
+      <div className='sidebar d-none d-lg-block'>
         <nav className='sidebar__navigation'>
           <ul className='sidebar__navigation__workspace'>
             { workspaceList.map((ws, i) =>

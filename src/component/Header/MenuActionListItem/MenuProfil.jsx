@@ -1,8 +1,10 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { PAGE_NAME } from '../../../helper.js'
 
 const MenuProfil = props => {
-  return props.user.isLoggedin
+  return props.user.isLoggedIn
     ? (
       <li className='header__menu__rightside__itemprofil'>
         <div className='header__menu__rightside__itemprofil__profilgroup dropdown'>
@@ -13,7 +15,7 @@ const MenuProfil = props => {
             </div>
           </button>
           <div className='profilgroup__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
-            <div className='setting__link dropdown-item' onClick={props.onClickMyProfil}>Mon compte</div>
+            <Link className='setting__link dropdown-item' to={PAGE_NAME.ACCOUNT}>Mon compte</Link>
             {/* <div className='setting__link dropdown-item'>Mot de passe</div> */}
             <div className='setting__link dropdown-item' onClick={props.onClickLogout}>Se déconnecter</div>
           </div>
@@ -26,6 +28,5 @@ export default MenuProfil
 
 MenuProfil.propTypes = {
   user: PropTypes.object.isRequired,
-  onClickMyProfil: PropTypes.func.isRequired,
   onClickLogout: PropTypes.func.isRequired
 }
