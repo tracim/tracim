@@ -1,5 +1,6 @@
 const jsonServer = require('json-server')
 const jsonDb = require('./static_db.json')
+const timezoneDb = require('./timezone.json')
 const server = jsonServer.create()
 const router = jsonServer.router() // for persistence : jsonServer.router('static_db.json')
 const middlewares = jsonServer.defaults()
@@ -54,6 +55,10 @@ server.get('/workspace/:id', (req, res) => res.jsonp(
   // {...jsonDb.workspace_detail, content: shuffle(jsonDb.workspace_detail.content)})
   Object.assign({}, jsonDb.workspace_detail, {content: shuffle(jsonDb.workspace_detail.content)})
 ))
+
+server.get('/user/:id/roles', (req, res) => res.jsonp(jsonDb.user_role))
+
+server.get('/timezone', (req, res) => res.jsonp(timezoneDb.timezone))
 
 server.get('/workspace/:idws/content/:idc', (req, res) => {
   switch (req.params.idc) {

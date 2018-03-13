@@ -4,7 +4,7 @@ import { withRouter } from 'react-router'
 import { translate } from 'react-i18next'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { getWorkspaceList } from '../action-creator.async.js'
-import { setWorkspaceListIsOpen } from '../action-creator.sync.js'
+import { setWorkspaceListisOpenInSidebar } from '../action-creator.sync.js'
 import { PAGE_NAME } from '../helper.js'
 
 class Sidebar extends React.Component {
@@ -17,15 +17,15 @@ class Sidebar extends React.Component {
 
   componentDidMount () {
     const { user, workspaceList, dispatch } = this.props
-    user.id !== 0 && workspaceList.length === 0 && dispatch(getWorkspaceList(user.id))
+    user.id !== -1 && workspaceList.length === 0 && dispatch(getWorkspaceList(user.id))
   }
 
   componentDidUpdate (prevProps) {
     const { user, dispatch } = this.props
-    user.id !== 0 && prevProps.user.id !== user.id && dispatch(getWorkspaceList(user.id))
+    user.id !== -1 && prevProps.user.id !== user.id && dispatch(getWorkspaceList(user.id))
   }
 
-  handleClickWorkspace = (wsId, newIsOpen) => this.props.dispatch(setWorkspaceListIsOpen(wsId, newIsOpen))
+  handleClickWorkspace = (wsId, newisOpenInSidebar) => this.props.dispatch(setWorkspaceListisOpenInSidebar(wsId, newisOpenInSidebar))
 
   handleClickAllContent = wsId => {
     this.props.history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}`)
@@ -43,8 +43,8 @@ class Sidebar extends React.Component {
                 number={++i}
                 wsId={ws.id}
                 name={ws.title}
-                isOpen={ws.isOpen}
-                onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpen)}
+                isOpenInSidebar={ws.isOpenInSidebar}
+                onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
                 onClickAllContent={this.handleClickAllContent}
                 key={ws.id}
               />

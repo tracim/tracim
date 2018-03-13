@@ -18,6 +18,15 @@ const en = {
     },
     Sidebar: {
       create_new_workspace: 'Create new workspace'
+    },
+    Account: {
+      title: 'My account'
+    },
+    role: {
+      reader: 'Reader',
+      contributor: 'Contributor',
+      content_manager: 'Content manager',
+      manager: 'Manager'
     }
   }
 }

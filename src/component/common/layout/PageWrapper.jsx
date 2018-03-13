@@ -8,7 +8,9 @@ const PageWrapper = props => {
   return (
     <div className={classnames(props.customeClass, 'pageWrapperGeneric')}>
       <div className='container-fluid'>
-        {props.children}
+        <div className='row'>
+          {props.children}
+        </div>
       </div>
     </div>
   )

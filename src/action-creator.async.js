@@ -1,12 +1,16 @@
 import { FETCH_CONFIG } from './helper.js'
 import {
+  TIMEZONE,
+  setTimezone,
   LANG,
   updateLangList,
   USER_LOGIN,
   USER_DATA,
+  USER_ROLE,
   USER_CONNECTED,
-  updateUserConnected,
+  setUserConnected,
   updateUserData,
+  setUserRole,
   WORKSPACE,
   updateWorkspaceData,
   WORKSPACE_LIST,
@@ -71,6 +75,16 @@ export const getLangList = () => async dispatch => {
   if (fetchGetLangList.status === 200) dispatch(updateLangList(fetchGetLangList.json))
 }
 
+export const getTimezone = () => async dispatch => {
+  const fetchGetTimezone = await fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/timezone`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
+    actionName: TIMEZONE,
+    dispatch
+  })
+  if (fetchGetTimezone.status === 200) dispatch(setTimezone(fetchGetTimezone.json))
+}
+
 export const userLogin = (login, password, rememberMe) => async dispatch => {
   const fetchUserLogin = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/user/login`,
@@ -86,7 +100,7 @@ export const userLogin = (login, password, rememberMe) => async dispatch => {
     actionName: USER_LOGIN,
     dispatch
   })
-  if (fetchUserLogin.status === 200) dispatch(updateUserConnected(fetchUserLogin.json))
+  if (fetchUserLogin.status === 200) dispatch(setUserConnected(fetchUserLogin.json))
 }
 
 export const getIsUserConnected = () => async dispatch => {
@@ -96,7 +110,17 @@ export const getIsUserConnected = () => async dispatch => {
     actionName: USER_CONNECTED,
     dispatch
   })
-  if (fetchUserLogged.status === 200) dispatch(updateUserConnected(fetchUserLogged.json))
+  if (fetchUserLogged.status === 200) dispatch(setUserConnected(fetchUserLogged.json))
+}
+
+export const getUserRole = user => async dispatch => {
+  const fetchGetUserRole = await fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/user/${user.id}/roles`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
+    actionName: USER_ROLE,
+    dispatch
+  })
+  if (fetchGetUserRole.status === 200) dispatch(setUserRole(fetchGetUserRole.json))
 }
 
 export const updateUserLang = newLang => async dispatch => { // unused

@@ -18,6 +18,15 @@ const fr = {
     },
     Sidebar: {
       create_new_workspace: 'Créer un workspace'
+    },
+    Account: {
+      title: 'Mon compte'
+    },
+    role: {
+      reader: 'Lecteur',
+      contributor: 'Contributeur',
+      content_manager: 'Gestionnaire de contenu',
+      manager: 'Responsable'
     }
   }
 }

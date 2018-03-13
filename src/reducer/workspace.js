@@ -3,7 +3,9 @@ import {
 } from '../action-creator.sync.js'
 
 const serializeWorkspace = data => ({
-  ...data,
+  id: data.id,
+  title: data.title,
+  content: data.content,
   ownerId: data.owner_id
 })
 

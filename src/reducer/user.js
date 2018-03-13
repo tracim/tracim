@@ -10,11 +10,15 @@ const serializeUser = data => ({
   firstname: data.user.firstname,
   lastname: data.user.lastname,
   email: data.user.email,
-  avatar: data.user.avatar
+  avatar: data.user.avatar,
+  role: data.user.role,
+  job: data.user.job,
+  company: data.user.company,
+  caldavUrl: data.user.caldav_url
 })
 
 export default function user (state = {
-  id: 0,
+  id: -1,
   isLoggedIn: undefined,
   username: '',
   firstname: '',
@@ -23,7 +27,7 @@ export default function user (state = {
   avatar: ''
 }, action) {
   switch (action.type) {
-    case `Update/${USER_CONNECTED}`:
+    case `Set/${USER_CONNECTED}`:
       return serializeUser(action.user)
 
     case `Update/${USER_DATA}`:

@@ -18,7 +18,11 @@
       "firstname": "Côme",
       "lastname": "Stoilenom",
       "email": "osef@algoo.fr",
-      "avatar": "https://avatars3.githubusercontent.com/u/11177014?s=460&v=4"
+      "avatar": "https://avatars3.githubusercontent.com/u/11177014?s=460&v=4",
+      "role": "Utilisateur",
+      "job": "Integrateur | Webdesigner",
+      "company": "Algoo",
+      "caldav_url": "http://algoo.trac.im/caldav/user/5.ics/"
     }
   },
   "app_config": [{
@@ -289,5 +293,48 @@
   }, {
     "id": 5,
     "title": "Évolutions"
+  }],
+  "user_role": [{
+    "workspace": {
+      "id": 0,
+      "title": "Ressources humaine"
+    },
+    "role": "reader",
+    "subscribed_to_notif": true
+  }, {
+    "workspace": {
+      "id": 1,
+      "title": "Marketing"
+    },
+    "role": "manager",
+    "subscribed_to_notif": true
+  }, {
+    "workspace": {
+      "id": 2,
+      "title": "Missions externes"
+    },
+    "role": "contributor",
+    "subscribed_to_notif": false
+  }, {
+    "workspace": {
+      "id": 3,
+      "title": "Recherche et développement"
+    },
+    "role": "content_manager",
+    "subscribed_to_notif": true
+  }, {
+    "workspace": {
+      "id": 4,
+      "title": "Commercialisation"
+    },
+    "role": "reader",
+    "subscribed_to_notif": false
+  }, {
+    "workspace": {
+      "id": 5,
+      "title": "Évolutions"
+    },
+    "role": "content_manager",
+    "subscribed_to_notif": true
   }]
 }

@@ -25,7 +25,7 @@ const WorkspaceListItem = props => {
         </div>
       </div>
 
-      <AnimateHeight duration={500} height={props.isOpen ? 'auto' : 0}>
+      <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
         <ul
           className='sidebar__navigation__workspace__item__submenu'
           id={`sidebarSubMenu_${props.number}`}
@@ -174,11 +174,11 @@ WorkspaceListItem.propTypes = {
   name: PropTypes.string.isRequired,
   onClickTitle: PropTypes.func,
   onClickAllContent: PropTypes.func,
-  isOpen: PropTypes.bool
+  isOpenInSidebar: PropTypes.bool
 }
 
 WorkspaceListItem.defaultProps = {
   onClickTitle: () => {},
   onClickAllContent: () => {},
-  isOpen: false
+  isOpenInSidebar: false
 }
