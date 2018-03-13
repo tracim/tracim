@@ -13,6 +13,16 @@ class TracimDomainController(object):
     def getDomainRealm(self, inputURL, environ):
         return '/'
 
+    def getRealmUserPassword(self, realmname, username, environ):
+        """
+        Warning ! This return hashed version of password !
+        """
+        try:
+            user = self._api.get_one_by_email(username)
+            return user.password
+        except:
+            return False
+
     def requireAuthentication(self, realmname, environ):
         return True
 

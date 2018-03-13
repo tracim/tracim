@@ -1,156 +1,76 @@
-import os
-import re
-
 from wsgidav.http_authenticator import HTTPAuthenticator
 from wsgidav import util
-import cherrypy
-
-from tracim.lib.user import CurrentUserGetterApi
-from tracim.lib.user import CURRENT_USER_WSGIDAV
 
 _logger = util.getModuleLogger(__name__, True)
-HOTFIX_WINXP_AcceptRootShareLogin = True
 
 
 class TracimHTTPAuthenticator(HTTPAuthenticator):
-    def __init__(self, application, config):
-        super(TracimHTTPAuthenticator, self).__init__(application, config)
-        self._headerfixparser = re.compile(r'([\w]+)=("[^"]*,[^"]*"),')
+    def computeDigestResponse(
+            self,
+            username,
+            realm,
+            password,
+            method,
+            uri,
+            nonce,
+            cnonce,
+            qop,
+            nc
+    ):
+        """
+        Override standard computeDigestResponse : as user password is already
+        hashed in database, we need to use left_digest_response_hash
+        to have correctly hashed digest_response.
+        """
 
-    def authDigestAuthRequest(self, environ, start_response):
-        realmname = self._domaincontroller.getDomainRealm(environ["PATH_INFO"], environ)
-
-        isinvalidreq = False
-
-        authheaderdict = dict([])
-        authheaders = environ["HTTP_AUTHORIZATION"] + ","
-        if not authheaders.lower().strip().startswith("digest"):
-            isinvalidreq = True
-            # Hotfix for Windows file manager and OSX Finder:
-        # Some clients don't urlencode paths in auth header, so uri value may
-        # contain commas, which break the usual regex headerparser. Example:
-        # Digest username="user",realm="/",uri="a,b.txt",nc=00000001, ...
-        # -> [..., ('uri', '"a'), ('nc', '00000001'), ...]
-        # Override any such values with carefully extracted ones.
-        authheaderlist = self._headerparser.findall(authheaders)
-        authheaderfixlist = self._headerfixparser.findall(authheaders)
-        if authheaderfixlist:
-            _logger.info("Fixing authheader comma-parsing: extend %s with %s" \
-                         % (authheaderlist, authheaderfixlist))
-            authheaderlist += authheaderfixlist
-        for authheader in authheaderlist:
-            authheaderkey = authheader[0]
-            authheadervalue = authheader[1].strip().strip("\"")
-            authheaderdict[authheaderkey] = authheadervalue
-
-        _logger.debug("authDigestAuthRequest: %s" % environ["HTTP_AUTHORIZATION"])
-        _logger.debug("  -> %s" % authheaderdict)
-
-        if "username" in authheaderdict:
-            req_username = authheaderdict["username"]
-            req_username_org = req_username
-            # Hotfix for Windows XP:
-            #   net use W: http://127.0.0.1/dav /USER:DOMAIN\tester tester
-            # will send the name with double backslashes ('DOMAIN\\tester')
-            # but send the digest for the simple name ('DOMAIN\tester').
-            if r"\\" in req_username:
-                req_username = req_username.replace("\\\\", "\\")
-                _logger.info("Fixing Windows name with double backslash: '%s' --> '%s'" % (req_username_org, req_username))
-
-            if not self._domaincontroller.isRealmUser(realmname, req_username, environ):
-                isinvalidreq = True
+        # TODO - G.M - 13-03-2018 Check if environ is useful
+        # for get_left_digest_response. If true, find a solution
+        # to obtain it here without recopy-paste whole authDigestAuthRequest
+        # method.
+        left_digest_response_hash = self._domaincontroller.get_left_digest_response_hash(realm, username, None)  # nopep8
+        if left_digest_response_hash:
+            return self.tracim_compute_digest_response(
+                left_digest_response_hash=left_digest_response_hash,
+                method=method,
+                uri=uri,
+                nonce=nonce,
+                cnonce=cnonce,
+                qop=qop,
+                nc=nc,
+            )
         else:
-            isinvalidreq = True
+            return None
 
-            # TODO: Chun added this comments, but code was commented out
-            # Do not do realm checking - a hotfix for WinXP using some other realm's
-            # auth details for this realm - if user/password match
-
-        if 'realm' in authheaderdict:
-            if authheaderdict["realm"].upper() != realmname.upper():
-                if HOTFIX_WINXP_AcceptRootShareLogin:
-                    # Hotfix: also accept '/'
-                    if authheaderdict["realm"].upper() != "/":
-                        isinvalidreq = True
-                else:
-                    isinvalidreq = True
-
-        if "algorithm" in authheaderdict:
-            if authheaderdict["algorithm"].upper() != "MD5":
-                isinvalidreq = True  # only MD5 supported
-
-        if "uri" in authheaderdict:
-            req_uri = authheaderdict["uri"]
-
-        if "nonce" in authheaderdict:
-            req_nonce = authheaderdict["nonce"]
-        else:
-            isinvalidreq = True
-
-        req_hasqop = False
-        if "qop" in authheaderdict:
-            req_hasqop = True
-            req_qop = authheaderdict["qop"]
-            if req_qop.lower() != "auth":
-                isinvalidreq = True  # only auth supported, auth-int not supported
-        else:
-            req_qop = None
-
-        if "cnonce" in authheaderdict:
-            req_cnonce = authheaderdict["cnonce"]
-        else:
-            req_cnonce = None
-            if req_hasqop:
-                isinvalidreq = True
-
-        if "nc" in authheaderdict:  # is read but nonce-count checking not implemented
-            req_nc = authheaderdict["nc"]
-        else:
-            req_nc = None
-            if req_hasqop:
-                isinvalidreq = True
-
-        if "response" in authheaderdict:
-            req_response = authheaderdict["response"]
-        else:
-            isinvalidreq = True
-
-        if not isinvalidreq:
-            left_digest_response_hash = self._domaincontroller.get_left_digest_response_hash(realmname, req_username, environ)
-
-            req_method = environ["REQUEST_METHOD"]
-
-            required_digest = self.tracim_compute_digest_response(left_digest_response_hash, req_method, req_uri, req_nonce,
-                                                         req_cnonce, req_qop, req_nc)
-
-            if required_digest != req_response:
-                _logger.warning("computeDigestResponse('%s', '%s', ...): %s != %s" % (
-                realmname, req_username, required_digest, req_response))
-                isinvalidreq = True
-            else:
-                _logger.debug("digest succeeded for realm '%s', user '%s'" % (realmname, req_username))
-            pass
-
-        if isinvalidreq:
-            _logger.warning("Authentication failed for user '%s', realm '%s'" % (req_username, realmname))
-            return self.sendDigestAuthResponse(environ, start_response)
-
-        environ["http_authenticator.realm"] = realmname
-        environ["http_authenticator.username"] = req_username
-
-        # Set request current user email to be able to recognise him later
-        cherrypy.request.current_user_email = req_username
-        CurrentUserGetterApi.set_thread_local_getter(CURRENT_USER_WSGIDAV)
-
-        return self._application(environ, start_response)
-
-    def tracim_compute_digest_response(self, left_digest_response_hash, method, uri, nonce, cnonce, qop, nc):
-        # A1 : username:realm:password
-        A2 = method + ":" + uri
+    def tracim_compute_digest_response(
+            self,
+            left_digest_response_hash,
+            method,
+            uri,
+            nonce,
+            cnonce,
+            qop,
+            nc
+    ):
+        # TODO : Rename A to something more correct
+        A = "{method}:{uri}".format(method=method, uri=uri)
         if qop:
-            digestresp = self.md5kd(left_digest_response_hash, nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + self.md5h(A2))
+            right_digest_response_hash = "{nonce}:{nc}:{cnonce}:{qop}:{A}".format(  # nopep8
+                nonce=nonce,
+                nc=nc,
+                cnonce=cnonce,
+                qop=qop,
+                method=method,
+                uri=uri,
+                A=self.md5h(A),
+            )
         else:
-            digestresp = self.md5kd(left_digest_response_hash, nonce + ":" + self.md5h(A2))
-            # print(A1, A2)
-        # print(digestresp)
+            right_digest_response_hash = "{nonce}:{A}".format(
+                nonce=nonce,
+                A=self.md5h(A),
+            )
+        digestresp = self.md5kd(
+            left_digest_response_hash,
+            right_digest_response_hash,
+        )
+
         return digestresp
