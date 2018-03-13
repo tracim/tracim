@@ -884,6 +884,7 @@ class ContentApi(object):
             label = item.label
 
         with DBSession.no_autoflush:
+
             file = self.create(
                 content_type=item.type,
                 workspace=workspace,
@@ -898,6 +899,12 @@ class ContentApi(object):
                     item.file_name,
                     item.file_mimetype,
                     item.depot_file.file
+                )
+            for child in item.get_comments():
+                self.copy(child,
+                          new_parent=file,
+                          do_notify=False,
+                          do_save=False,
                 )
         if do_save:
             self.save(file, ActionDescription.CREATION, do_notify=do_notify)
