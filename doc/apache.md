@@ -109,6 +109,10 @@ Add `webdav` at `root_path` in the `[tracim_path]/tracim/wsgidav.conf`:
     
     root_path = ''
     
+    # Tracim doesn't support digest auth for webdav
+    acceptbasic = True
+    acceptdigest = False
+    defaultdigest = False
     #===============================================================================
     # Lock Manager
     #
