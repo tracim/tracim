@@ -1,5 +1,6 @@
 import React from 'react'
-// import classnames from 'classnames'
+import classnames from 'classnames'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 
@@ -72,7 +73,6 @@ const WorkspaceListItem = props => {
           </li>
 
           <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
-
             <div className='dropdown__icon'>
               <i className='fa fa-signal dashboard-color' />
             </div>
@@ -86,61 +86,26 @@ const WorkspaceListItem = props => {
             </div>
           </li>
 
-          <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
-
-            <div className='dropdown__icon'>
-              <i className='fa fa-list-ul task-color' />
-            </div>
-
-            <div className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'>
-
-              <div className='dropdown__title' id='navbarDropdown'>
-                <div className='dropdown__title__text'>
-                  Liste de tâches
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
-
-            <div className='dropdown__icon'>
-              <i className='fa fa-folder-o docandfile-color' />
-            </div>
-
-            <div
-              className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'
-              aria-haspopup='true'
-              aria-expanded='false'
+          { Object.keys(props.app).map(a =>
+            <li
+              className={classnames('sidebar__navigation__workspace__item__submenu__dropdown', {'activeFilter': props.activeFilterList.includes(a)})}
+              onClick={() => props.onClickContentFilter(props.wsId, a)}
+              key={a}
             >
+              <div className='dropdown__icon'>
+                <i className={classnames(props.app[a].icon)} style={{backgroudColor: props.app[a].color}} />
+              </div>
 
-              <div className='dropdown__title' id='navbarDropdown'>
-                <div className='dropdown__title__text'>
-                  Documents & fichiers
+              <div className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'>
+
+                <div className='dropdown__title' id='navbarDropdown'>
+                  <div className='dropdown__title__text'>
+                    { props.app[a].label[props.lang.id] }
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-
-          <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
-
-            <div className='dropdown__icon'>
-              <i className='fa fa-comments talk-color' />
-            </div>
-
-            <div
-              className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'
-              aria-haspopup='true'
-              aria-expanded='false'
-            >
-
-              <div className='dropdown__title' id='navbarDropdown'>
-                <div className='dropdown__title__text'>
-                  Discussions
-                </div>
-              </div>
-            </div>
-          </li>
+            </li>
+          )}
 
           <li className='sidebar__navigation__workspace__item__submenu__dropdown'>
 
@@ -148,13 +113,8 @@ const WorkspaceListItem = props => {
               <i className='fa fa-calendar calendar-color' />
             </div>
 
-            <div
-              className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'
-              aria-haspopup='true'
-              aria-expanded='false'
-            >
-
-              <div className='dropdown__title' id='navbarDropdown'>
+            <div className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'>
+              <div className='dropdown__title'>
                 <div className='dropdown__title__text'>
                   Calendrier
                 </div>
@@ -167,11 +127,12 @@ const WorkspaceListItem = props => {
   )
 }
 
-export default WorkspaceListItem
+export default translate()(WorkspaceListItem)
 
 WorkspaceListItem.propTypes = {
   number: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
+  app: PropTypes.object,
   onClickTitle: PropTypes.func,
   onClickAllContent: PropTypes.func,
   isOpenInSidebar: PropTypes.bool

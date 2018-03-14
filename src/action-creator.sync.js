@@ -12,11 +12,12 @@ export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNo
   ({ type: `Update/${USER_ROLE}/SubscriptionNotif`, workspaceId, subscriptionNotif })
 
 export const WORKSPACE = 'Workspace'
-export const updateWorkspaceData = workspace => ({ type: `Update/${WORKSPACE}`, workspace })
+export const setWorkspaceData = (workspace, filterStr = '') => ({ type: `Set/${WORKSPACE}`, workspace, filterStr })
+export const updateWorkspaceFilter = filterList => ({ type: `Update/${WORKSPACE}/Filter`, filterList })
 
 export const WORKSPACE_LIST = 'WorkspaceList'
 export const updateWorkspaceListData = workspaceList => ({ type: `Update/${WORKSPACE_LIST}`, workspaceList })
-export const setWorkspaceListisOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `Set/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
+export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `Set/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
 
 export const FILE_CONTENT = 'FileContent'
 export const setActiveFileContentActive = file => ({ type: `Set/${FILE_CONTENT}/Active`, file })

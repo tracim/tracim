@@ -13,11 +13,18 @@ export default function user (state = {
   id: -1,
   title: '',
   ownerId: '',
-  content: []
+  content: [],
+  filter: []
 }, action) {
   switch (action.type) {
-    case `Update/${WORKSPACE}`:
-      return serializeWorkspace(action.workspace)
+    case `Set/${WORKSPACE}`:
+      return {
+        ...serializeWorkspace(action.workspace),
+        filter: action.filterStr ? action.filterStr.split(';') : []
+      }
+
+    case `Update/${WORKSPACE}/Filter`:
+      return {...state, filter: action.filterList}
 
     default:
       return state

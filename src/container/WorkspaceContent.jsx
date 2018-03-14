@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import appFactory from '../appFactory.js'
+import Sidebar from './Sidebar.jsx'
 import Folder from '../component/Workspace/Folder.jsx'
 import FileItem from '../component/Workspace/FileItem.jsx'
 import FileItemHeader from '../component/Workspace/FileItemHeader.jsx'
@@ -24,22 +25,23 @@ class WorkspaceContent extends React.Component {
   componentDidMount () {
     const { workspaceList, app, match, dispatch } = this.props
 
-    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws))
-    else if (workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id)) // load first ws if none specified
+    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws, match.params.filter))
+    else if (workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id, match.params.filter)) // load first ws if none specified
 
-    Object.keys(app).length === 0 && dispatch(getAppList())
+    if (Object.keys(app).length === 0) dispatch(getAppList())
   }
 
   componentDidUpdate (prevProps) {
     const { workspace, workspaceList, match, dispatch } = this.props
+    console.log('workspaceContent update', prevProps, this.props)
 
     // if a workspace is already loaded and the idws in url hasn't changed, do nothing
     if (workspace.id !== -1 && prevProps.match.params.idws === match.params.idws) return
 
     // if the idws in url has changed, load the new workspace
-    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws))
+    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws, match.params.filter))
     // else bellow is for loading url PAGE_NAME.HOME (without an idws), when workspaceList is loaded, load the first workspace
-    else if (match.params.idws === undefined && workspace.id === -1 && workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id))
+    else if (workspace.id === -1 && workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id))
   }
 
   handleClickContentItem = content => {
@@ -48,53 +50,65 @@ class WorkspaceContent extends React.Component {
     // dispatch(setActiveFileContentActive(content))
   }
 
+  filterWorkspaceContent = (contentList, filter) => filter.length === 0
+    ? contentList
+    : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
+      .map(c => c.type !== 'folder' ? c : {...c, content: this.filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
+      .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder
+
   render () {
     const { workspace, app } = this.props
 
+    const filteredWorkspaceContent = this.filterWorkspaceContent(workspace.content, workspace.filter)
+
     return (
-      <PageWrapper customeClass='workspace'>
-        <PageTitle
-          parentClass='workspace__header'
-          customClass='justify-content-between'
-          title={workspace.title}
-        >
-          <DropdownCreateButton parentClass='workspace__header__btnaddworkspace' />
-        </PageTitle>
+      <div className='sidebarpagecontainer'>
+        <Sidebar />
 
-        <PageContent parentClass='workspace__content'>
-          <div className='workspace__content__fileandfolder folder__content active'>
-            <FileItemHeader />
+        <PageWrapper customeClass='workspace'>
+          <PageTitle
+            parentClass='workspace__header'
+            customClass='justify-content-between'
+            title={workspace.title}
+          >
+            <DropdownCreateButton parentClass='workspace__header__btnaddworkspace' />
+          </PageTitle>
 
-            { workspace.content.map((c, i) => c.type === 'folder'
-              ? (
-                <Folder
-                  app={app}
-                  folderData={c}
-                  onClickItem={this.handleClickContentItem}
-                  isLast={i === workspace.content.length - 1}
-                  key={c.id}
-                />
-              )
-              : (
-                <FileItem
-                  name={c.title}
-                  type={c.type}
-                  icon={(app[c.type] || {icon: ''}).icon}
-                  status={c.status}
-                  onClickItem={() => this.handleClickContentItem(c)}
-                  isLast={i === workspace.content.length - 1}
-                  key={c.id}
-                />
-              )
-            )}
-          </div>
+          <PageContent parentClass='workspace__content'>
+            <div className='workspace__content__fileandfolder folder__content active'>
+              <FileItemHeader />
 
-          <DropdownCreateButton customClass='workspace__content__button mb-5' />
+              { filteredWorkspaceContent.map((c, i) => c.type === 'folder'
+                ? (
+                  <Folder
+                    app={app}
+                    folderData={c}
+                    onClickItem={this.handleClickContentItem}
+                    isLast={i === filteredWorkspaceContent.length - 1}
+                    key={c.id}
+                  />
+                )
+                : (
+                  <FileItem
+                    name={c.title}
+                    type={c.type}
+                    icon={(app[c.type] || {icon: ''}).icon}
+                    status={c.status}
+                    onClickItem={() => this.handleClickContentItem(c)}
+                    isLast={i === filteredWorkspaceContent.length - 1}
+                    key={c.id}
+                  />
+                )
+              )}
+            </div>
 
-          <div id='appContainer' />
-        </PageContent>
+            <DropdownCreateButton customClass='workspace__content__button mb-5' />
 
-      </PageWrapper>
+            <div id='appContainer' />
+          </PageContent>
+
+        </PageWrapper>
+      </div>
     )
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import Sidebar from './Sidebar.jsx'
 import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
@@ -73,27 +74,31 @@ class Account extends React.Component {
     })()
 
     return (
-      <PageWrapper customClass='account'>
-        <PageTitle
-          parentClass={'account'}
-          title={'Mon Compte'}
-        />
+      <div className='sidebarpagecontainer'>
+        <Sidebar />
 
-        <PageContent parentClass='account'>
-          <UserInfo user={this.props.user} />
+        <PageWrapper customClass='account'>
+          <PageTitle
+            parentClass={'account'}
+            title={'Mon Compte'}
+          />
 
-          <Delimiter customClass={'account__delimiter'} />
+          <PageContent parentClass='account'>
+            <UserInfo user={this.props.user} />
 
-          <div className='account__userpreference'>
-            <MenuSubComponent subMenuList={this.state.subComponentMenu} onClickMenuItem={this.handleClickSubComponentMenuItem} />
+            <Delimiter customClass={'account__delimiter'} />
 
-            <div className='account__userpreference__setting'>
-              { subComponent }
+            <div className='account__userpreference'>
+              <MenuSubComponent subMenuList={this.state.subComponentMenu} onClickMenuItem={this.handleClickSubComponentMenuItem} />
+
+              <div className='account__userpreference__setting'>
+                { subComponent }
+              </div>
             </div>
-          </div>
 
-        </PageContent>
-      </PageWrapper>
+          </PageContent>
+        </PageWrapper>
+      </div>
     )
   }
 }

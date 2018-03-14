@@ -12,11 +12,11 @@ import {
   updateUserData,
   setUserRole,
   WORKSPACE,
-  updateWorkspaceData,
+  setWorkspaceData,
   WORKSPACE_LIST,
   updateWorkspaceListData,
   APP_LIST,
-  setAppList
+  setAppList, setWorkspaceListIsOpenInSidebar
 } from './action-creator.sync.js'
 
 /*
@@ -143,24 +143,27 @@ export const updateUserLang = newLang => async dispatch => { // unused
 //   console.log('jsonResponseNoData', fetchResponseNoData)
 // }
 
-export const getWorkspaceList = userId => async dispatch => {
+export const getWorkspaceList = (userId, workspaceIdToOpen) => async dispatch => {
   const fetchGetWorkspaceList = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/user/${userId}/workspace`,
     param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: WORKSPACE_LIST,
     dispatch
   })
-  if (fetchGetWorkspaceList.status === 200) dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+  if (fetchGetWorkspaceList.status === 200) {
+    dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+    dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdToOpen, true))
+  }
 }
 
-export const getWorkspaceContent = workspaceId => async dispatch => {
+export const getWorkspaceContent = (workspaceId, filterStr) => async dispatch => {
   const fetchGetWorkspaceContent = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspace/${workspaceId}`,
     param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: WORKSPACE,
     dispatch
   })
-  if (fetchGetWorkspaceContent.status === 200) dispatch(updateWorkspaceData(fetchGetWorkspaceContent.json))
+  if (fetchGetWorkspaceContent.status === 200) dispatch(setWorkspaceData(fetchGetWorkspaceContent.json, filterStr))
 }
 
 export const getAppList = () => async dispatch => {
