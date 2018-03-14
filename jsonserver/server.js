@@ -53,7 +53,7 @@ server.get('/user/:id/workspace', (req, res) => res.jsonp(jsonDb.workspace_list)
 
 server.get('/workspace/:id', (req, res) => res.jsonp(
   // {...jsonDb.workspace_detail, content: shuffle(jsonDb.workspace_detail.content)})
-  Object.assign({}, jsonDb.workspace_detail, {content: shuffle(jsonDb.workspace_detail.content)})
+  Object.assign({}, jsonDb.workspace_detail, {content: shuffle(jsonDb.workspace_detail.content)}, {id: req.params.id})
 ))
 
 server.get('/user/:id/roles', (req, res) => res.jsonp(jsonDb.user_role))

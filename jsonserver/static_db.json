@@ -27,40 +27,70 @@
   },
   "app_config": [{
     "name": "PageHtml",
+    "label": {
+      "fr": "Page Html",
+      "en": "Html page"
+    },
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
     "customClass": "wsContentPageHtml",
-    "icon": "fa fa-file-word-o"
+    "icon": "fa fa-fw fa-file-word-o",
+    "color": "#65c7f2"
   }, {
     "name": "PageMarkdown",
+    "label": {
+      "fr": "Page Markdown",
+      "en": "Markdown page"
+    },
     "componentLeft": "PageMarkdown",
     "componentRight": "undefined",
     "customClass": "wsContentPageMarkdown",
-    "icon": "fa fa-file-code-o"
+    "icon": "fa fa-fw fa-file-code-o",
+    "color": "#e0082b"
   }, {
     "name": "File",
+    "label": {
+      "fr": "Fichier",
+      "en": "File"
+    },
     "componentLeft": "File",
     "componentRight": "undefined",
     "customClass": "wsContentFile",
-    "icon": "fa fa-file-text-o"
+    "icon": "fa fa-fw fa-file-text-o",
+    "color": "#263462"
   }, {
     "name": "Thread",
+    "label": {
+      "fr": "Discussion",
+      "en": "Thread"
+    },
     "componentLeft": "Thread",
     "componentRight": "undefined",
     "customClass": "wsContentThread",
-    "icon": "fa fa-comments-o"
+    "icon": "fa fa-fw fa-comments-o",
+    "color": "#2674d3"
   }, {
     "name": "Task",
+    "label": {
+      "fr": "Tâche",
+      "en": "Task"
+    },
     "componentLeft": "Task",
     "componentRight": "undefined",
     "customClass": "wsContentTask",
-    "icon": "fa fa-list-ul"
+    "icon": "fa fa-fw fa-list-ul",
+    "color": "#2d5a88"
   }, {
     "name": "Issue",
+    "label": {
+      "fr": "Ticket",
+      "en": "Issue"
+    },
     "componentLeft": "Issue",
     "componentRight": "undefined",
     "customClass": "wsContentIssue",
-    "icon": "fa fa-ticket"
+    "icon": "fa fa-fw fa-ticket",
+    "color": "#a4835e"
   }],
   "workspace_detail": {
     "id": 1,
