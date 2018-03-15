@@ -120,7 +120,8 @@ _LABELS = {
     'unarchiving': 'Item unarchived',
     'undeletion': 'Item undeleted',
     'move': 'Item moved',
-    'comment': 'Comment'
+    'comment': 'Comment',
+    'copy' : 'Item copied',
 }
 
 
