@@ -20,9 +20,6 @@
   z-index 1
 
 sidebar-width = 300px
-.sidebar-visible
-  .sidebar-expandbar
-    left sidebar-width
 
 leftside()
   flex-grow 0
@@ -36,9 +33,9 @@ leftside()
   width 300px
   &.sidebarclose
     width 0
-    transform translateX(-300px)
+    transform translateX("-%s" % sidebar-width)
     .sidebar__expand
-      right -339px
+      right "calc(-%s - 39px)" % sidebar-width
   &__expand
     position absolute
     top 0
