@@ -1293,6 +1293,13 @@ class Content(DeclarativeBase):
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
 
+    def copy(self, parent):
+        cpy_content = Content()
+        for rev in self.revisions:
+            cpy_rev = ContentRevisionRO.copy(rev, parent)
+            cpy_content.revisions.append(cpy_rev)
+        return cpy_content
+
 
 class RevisionReadStatus(DeclarativeBase):
 

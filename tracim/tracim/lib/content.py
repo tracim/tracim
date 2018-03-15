@@ -892,12 +892,7 @@ class ContentApi(object):
         else:
             label = item.label
 
-        content = Content()
-        # INFO - G.M - 15-03-2018 - Add all revisions (history)
-        for rev in item.revisions:
-            cpy_rev = ContentRevisionRO.copy(rev, parent)
-            content.revisions.append(cpy_rev)
-
+        content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         content.new_revision()
         content.parent = parent
