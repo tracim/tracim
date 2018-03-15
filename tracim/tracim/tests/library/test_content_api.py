@@ -425,15 +425,17 @@ class TestContentApi(BaseTest, TestStandard):
         )
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
-        assert text_file_copy.workspace == workspace2
-        assert text_file_copy.depot_file != text_file.depot_file
+        assert text_file_copy.workspace_id == workspace2.workspace_id
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
+        assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == 'test_file_copy'
         assert text_file_copy.type == text_file.type
-        assert text_file_copy.parent == folderb
-        assert text_file_copy.owner == user2
+        assert text_file_copy.parent.content_id == folderb.content_id
+        assert text_file_copy.owner.user_id == user.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
+        assert text_file_copy.revision_type == ActionDescription.COPY
 
     def test_unit_copy_file__same_label_different_parent_ok(self):
         uapi = UserApi(None)
@@ -506,15 +508,17 @@ class TestContentApi(BaseTest, TestStandard):
         text_file_copy = api2.get_one_by_label_and_parent('test_file', folderb)
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
-        assert text_file_copy.workspace == workspace2
-        assert text_file_copy.depot_file != text_file.depot_file
+        assert text_file_copy.workspace_id == workspace2.workspace_id
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
+        assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == text_file.label
         assert text_file_copy.type == text_file.type
-        assert text_file_copy.parent == folderb
-        assert text_file_copy.owner == user2
+        assert text_file_copy.parent.content_id == folderb.content_id
+        assert text_file_copy.owner.user_id == user.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
+        assert text_file_copy.revision_type == ActionDescription.COPY
 
     def test_unit_copy_file_different_label_same_parent_ok(self):
         uapi = UserApi(None)
@@ -583,15 +587,17 @@ class TestContentApi(BaseTest, TestStandard):
         )
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
-        assert text_file_copy.workspace == workspace
-        assert text_file_copy.depot_file != text_file.depot_file
+        assert text_file_copy.workspace_id == workspace.workspace_id
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
+        assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == 'test_file_copy'
         assert text_file_copy.type == text_file.type
-        assert text_file_copy.parent == foldera
-        assert text_file_copy.owner == user2
+        assert text_file_copy.parent.content_id == foldera.content_id
+        assert text_file_copy.owner.user_id == user.user_id
         assert text_file_copy.description == text_file.description
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
+        assert text_file_copy.revision_type == ActionDescription.COPY
 
     def test_mark_read__workspace(self):
         uapi = UserApi(None)
