@@ -866,7 +866,7 @@ class ContentApi(object):
         new_parent: Content=None,
         new_label: str=None,
         do_notify: bool=True,
-    ) -> None:
+    ) -> Content:
         if (not new_parent and not new_label) or (new_parent == item.parent and new_label == item.label):  # nopep8
             # TODO - G.M - 08-03-2018 - Use something else than value error
             raise ValueError("You can't copy file into itself")
@@ -897,11 +897,6 @@ class ContentApi(object):
             content.revisions.append(cpy_rev)
             DBSession.add(content)
 
-        # TODO - G.M - 15-03-2018 - Child copy broken !
-        # INFO - G.M - 15-03-2018 - copy childrens (comments and others things)
-        # for child in item.children:
-        #    self.copy(child, content)
-
         # INFO - GM - 15-03-2018 - add "copy" revision
         content.new_revision()
         content.parent = parent
@@ -914,6 +909,11 @@ class ContentApi(object):
         }
         DBSession.add(content)
         self.save(content, ActionDescription.COPY, do_notify=do_notify)
+        return content
+
+    def copy_children(self, origin_content:Content, new_content: Content):
+        for child in origin_content.children:
+            self.copy(child, new_content)
 
     def move_recursively(self, item: Content,
                          new_parent: Content, new_workspace: Workspace):

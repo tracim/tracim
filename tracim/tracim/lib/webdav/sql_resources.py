@@ -1039,12 +1039,12 @@ class File(DAVNonCollection):
         )
         workspace = self.content.workspace
         parent = self.content.parent
-        self.content_api.copy(
+        new_content = self.content_api.copy(
             item=self.content,
             new_label=new_file_name,
             new_parent=destination_parent,
         )
-
+        self.content_api.copy_children(self.content, new_content)
         transaction.commit()
 
     def supportRecursiveMove(self, destPath):
