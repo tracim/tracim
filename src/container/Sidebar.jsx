@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { getWorkspaceList } from '../action-creator.async.js'
@@ -14,6 +15,7 @@ class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      sidebarClose: false,
       workspaceIdInUrl: parseInt(props.match.params.idws)
     }
   }
@@ -55,12 +57,18 @@ class Sidebar extends React.Component {
     history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}/${filterList.join(';')}`) // workspace.filter gets updated on react redraw from match.params
   }
 
+  handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
+
   render () {
-    const { workspaceIdInUrl } = this.state
+    const { sidebarClose, workspaceIdInUrl } = this.state
     const { activeLang, workspace, workspaceList, app, t } = this.props
 
     return (
-      <div className='sidebar d-none d-lg-block'>
+      <div className={classnames('sidebar d-none d-lg-block', {'sidebarclose': sidebarClose})}>
+        <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
+          <i className={classnames('fa fa-fw', {'fa-plus-square-o': sidebarClose, 'fa-minus-square-o': !sidebarClose})} />
+        </div>
+
         <nav className='sidebar__navigation'>
           <ul className='sidebar__navigation__workspace'>
             { workspaceList.map((ws, i) =>

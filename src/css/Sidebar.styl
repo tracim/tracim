@@ -31,6 +31,25 @@ leftside()
   background-color rgba(253, 253, 253, 0.3)
 
 .sidebar
+  position relative
+  transition all 0.5s
+  width 300px
+  &.sidebarclose
+    width 0
+    transform translateX(-300px)
+    .sidebar__expand
+      right -339px
+  &__expand
+    position absolute
+    top 0
+    right -39px
+    padding 5px 8px
+    border 1px solid white
+    border-bottom-right-radius 15px
+    cursor pointer
+    background-color blue
+    color white
+    transition all 0.5s
   &__btnnewworkspace
     margin-top 40px
     padding 10px
