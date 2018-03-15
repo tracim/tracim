@@ -865,6 +865,7 @@ class ContentApi(object):
         item: Content,
         new_parent: Content=None,
         new_label: str=None,
+        do_save: bool=True,
         do_notify: bool=True,
     ) -> Content:
         """
@@ -891,20 +892,11 @@ class ContentApi(object):
         else:
             label = item.label
 
-        # INFO - G.M - 15-03-2018 - Copy content with first_revision
-        # to have consistent content
         content = Content()
-        cpy_rev = ContentRevisionRO.copy(item.first_revision, parent)
-        content.revisions.append(cpy_rev)
-        DBSession.add(content)
-
-        # INFO - G.M - 15-03-2018 - Add all older revision (history)
+        # INFO - G.M - 15-03-2018 - Add all revisions (history)
         for rev in item.revisions:
-            if rev == item.first_revision:
-                continue
             cpy_rev = ContentRevisionRO.copy(rev, parent)
             content.revisions.append(cpy_rev)
-            DBSession.add(content)
 
         # INFO - GM - 15-03-2018 - add "copy" revision
         content.new_revision()
@@ -916,8 +908,8 @@ class ContentApi(object):
             'content': item.id,
             'revision': item.last_revision.revision_id,
         }
-        DBSession.add(content)
-        self.save(content, ActionDescription.COPY, do_notify=do_notify)
+        if do_save:
+            self.save(content, ActionDescription.COPY, do_notify=do_notify)
         return content
 
     def copy_children(self, origin_content: Content, new_content: Content):
