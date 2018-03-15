@@ -867,6 +867,15 @@ class ContentApi(object):
         new_label: str=None,
         do_notify: bool=True,
     ) -> Content:
+        """
+        Copy nearly all content, revision included. Children not included, see
+        "copy_children" for this.
+        :param item: Item to copy
+        :param new_parent: new parent of the new copied item
+        :param new_label: new label of the new copied item
+        :param do_notify: notify copy or not
+        :return: Newly copied item
+        """
         if (not new_parent and not new_label) or (new_parent == item.parent and new_label == item.label):  # nopep8
             # TODO - G.M - 08-03-2018 - Use something else than value error
             raise ValueError("You can't copy file into itself")
@@ -905,13 +914,13 @@ class ContentApi(object):
         content.revision_type = ActionDescription.COPY
         content.properties['origin'] = {
             'content': item.id,
-            'revision' : item.last_revision.revision_id,
+            'revision': item.last_revision.revision_id,
         }
         DBSession.add(content)
         self.save(content, ActionDescription.COPY, do_notify=do_notify)
         return content
 
-    def copy_children(self, origin_content:Content, new_content: Content):
+    def copy_children(self, origin_content: Content, new_content: Content):
         for child in origin_content.children:
             self.copy(child, new_content)
 
