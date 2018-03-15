@@ -865,7 +865,6 @@ class ContentApi(object):
         item: Content,
         new_parent: Content=None,
         new_label: str=None,
-        do_save: bool=True,
         do_notify: bool=True,
     ) -> None:
         if (not new_parent and not new_label) or (new_parent == item.parent and new_label == item.label):  # nopep8
@@ -883,31 +882,33 @@ class ContentApi(object):
         else:
             label = item.label
 
-        with DBSession.no_autoflush:
+        # INFO - G.M - 15-03-2018 - Copy content with first_revision
+        # to have consistent content
+        content = Content()
+        cpy_rev = ContentRevisionRO.copy(item.first_revision, parent)
+        content.revisions.append(cpy_rev)
+        DBSession.add(content)
 
-            file = self.create(
-                content_type=item.type,
-                workspace=workspace,
-                parent=parent,
-                label=label,
-                do_save=False,
-            )
-            file.description = item.description
-            if item.depot_file:
-                self.update_file_data(
-                    file,
-                    item.file_name,
-                    item.file_mimetype,
-                    item.depot_file.file
-                )
-            for child in item.get_comments():
-                self.copy(child,
-                          new_parent=file,
-                          do_notify=False,
-                          do_save=False,
-                )
-        if do_save:
-            self.save(file, ActionDescription.CREATION, do_notify=do_notify)
+        # INFO - G.M - 15-03-2018 - Add all older revision (history)
+        for rev in item.revisions:
+            if rev == item.first_revision:
+                continue
+            cpy_rev = ContentRevisionRO.copy(rev, parent)
+            content.revisions.append(cpy_rev)
+            DBSession.add(content)
+
+        # INFO - G.M - 15-03-2018 - copy childrens (comments and others things)
+        for child in item.children:
+            self.copy(child, content)
+
+        # INFO - GM - 15-03-2018 - add "copy" revision
+        content.new_revision()
+        content.parent = parent
+        content.workspace = workspace
+        content.label = label
+        content.revision_type = ActionDescription.MOVE
+        DBSession.add(content)
+        self.save(content, ActionDescription.MOVE, do_notify=do_notify)
 
     def move_recursively(self, item: Content,
                          new_parent: Content, new_workspace: Workspace):

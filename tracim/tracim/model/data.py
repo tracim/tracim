@@ -640,6 +640,36 @@ class ContentRevisionRO(DeclarativeBase):
 
         return new_rev
 
+    @classmethod
+    def copy(
+            cls,
+            revision: 'ContentRevisionRO',
+            parent: 'Content'
+    ) -> 'ContentRevisionRO':
+
+        copy_rev = cls()
+        import copy
+        copy_columns = cls._cloned_columns
+        for column_name in copy_columns:
+            # INFO - G-M - 15-03-2018 - set correct parent
+            if column_name == 'parent_id':
+                column_value = copy.copy(parent.id)
+            elif column_name == 'parent':
+                column_value = copy.copy(parent)
+            else:
+                column_value = copy.copy(getattr(revision, column_name))
+            setattr(copy_rev, column_name, column_value)
+
+        # copy attached_file
+        if revision.depot_file:
+            copy_rev.depot_file = FileIntent(
+                revision.depot_file.file.read(),
+                revision.file_name,
+                revision.file_mimetype,
+            )
+        return copy_rev
+
+
     def __setattr__(self, key: str, value: 'mixed'):
         """
         ContentRevisionUpdateError is raised if tried to update column and revision own identity
