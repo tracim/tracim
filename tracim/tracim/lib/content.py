@@ -906,9 +906,13 @@ class ContentApi(object):
         content.parent = parent
         content.workspace = workspace
         content.label = label
-        content.revision_type = ActionDescription.MOVE
+        content.revision_type = ActionDescription.COPY
+        content.properties['origin'] = {
+            'content': item.id,
+            'revision' : item.last_revision.revision_id,
+        }
         DBSession.add(content)
-        self.save(content, ActionDescription.MOVE, do_notify=do_notify)
+        self.save(content, ActionDescription.COPY, do_notify=do_notify)
 
     def move_recursively(self, item: Content,
                          new_parent: Content, new_workspace: Workspace):

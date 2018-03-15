@@ -204,6 +204,7 @@ class ActionDescription(object):
     - closed-deprecated
     """
 
+    COPY = 'copy'
     ARCHIVING = 'archiving'
     COMMENT = 'content-comment'
     CREATION = 'creation'
@@ -225,7 +226,8 @@ class ActionDescription(object):
         'status-update': 'fa-random',
         'unarchiving': 'fa-file-archive-o',
         'undeletion': 'fa-trash-o',
-        'move': 'fa-arrows'
+        'move': 'fa-arrows',
+        'copy': 'fa-files-o',
     }
 
     _LABELS = {
@@ -238,7 +240,8 @@ class ActionDescription(object):
         'status-update': l_('New status'),
         'unarchiving': l_('Item unarchived'),
         'undeletion': l_('Item undeleted'),
-        'move': l_('Item moved')
+        'move': l_('Item moved'),
+        'copy': l_('Item copied'),
     }
 
     def __init__(self, id):
@@ -259,7 +262,9 @@ class ActionDescription(object):
                 cls.STATUS_UPDATE,
                 cls.UNARCHIVING,
                 cls.UNDELETION,
-                cls.MOVE]
+                cls.MOVE,
+                cls.COPY,
+                ]
 
 
 class ContentStatus(object):
@@ -514,6 +519,11 @@ class ContentChecker(object):
                 return False
             return True
 
+        # TODO - G.M - 15-03-2018 - Choose only correct Content-type for origin
+        # Only content who can be copied need this
+        if item.type == ContentType.Any:
+            if 'origin' in properties.keys():
+                return True
         raise NotImplementedError
 
     @classmethod
