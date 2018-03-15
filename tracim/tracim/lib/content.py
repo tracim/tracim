@@ -897,9 +897,10 @@ class ContentApi(object):
             content.revisions.append(cpy_rev)
             DBSession.add(content)
 
+        # TODO - G.M - 15-03-2018 - Child copy broken !
         # INFO - G.M - 15-03-2018 - copy childrens (comments and others things)
-        for child in item.children:
-            self.copy(child, content)
+        # for child in item.children:
+        #    self.copy(child, content)
 
         # INFO - GM - 15-03-2018 - add "copy" revision
         content.new_revision()
