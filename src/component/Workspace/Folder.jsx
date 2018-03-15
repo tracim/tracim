@@ -57,9 +57,11 @@ class Folder extends React.Component {
         <div className='folder__content'>
           { content.map((c, i) => c.type === 'folder'
             ? <Folder
+              app={app}
               folderData={c}
               onClickItem={onClickItem}
               isLast={isLast}
+              t={t}
               key={c.id}
             />
             : <FileItem

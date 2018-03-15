@@ -15,13 +15,6 @@ import {
 } from '../action-creator.async.js'
 
 class WorkspaceContent extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      activeFileType: ''
-    }
-  }
-
   componentDidMount () {
     const { workspaceList, app, match, dispatch } = this.props
 
@@ -33,7 +26,6 @@ class WorkspaceContent extends React.Component {
 
   componentDidUpdate (prevProps) {
     const { workspace, workspaceList, match, dispatch } = this.props
-    console.log('workspaceContent update', prevProps, this.props)
 
     // if a workspace is already loaded and the idws in url hasn't changed, do nothing
     if (workspace.id !== -1 && prevProps.match.params.idws === match.params.idws) return

@@ -14,7 +14,6 @@ class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      firstWsOpen: false,
       workspaceIdInUrl: parseInt(props.match.params.idws)
     }
   }
