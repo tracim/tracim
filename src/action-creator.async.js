@@ -15,8 +15,11 @@ import {
   setWorkspaceData,
   WORKSPACE_LIST,
   updateWorkspaceListData,
+  FOLDER,
+  setFolderData,
   APP_LIST,
-  setAppList, setWorkspaceListIsOpenInSidebar
+  setAppList,
+  setWorkspaceListIsOpenInSidebar
 } from './action-creator.sync.js'
 
 /*
@@ -164,6 +167,16 @@ export const getWorkspaceContent = (workspaceId, filterStr) => async dispatch =>
     dispatch
   })
   if (fetchGetWorkspaceContent.status === 200) dispatch(setWorkspaceData(fetchGetWorkspaceContent.json, filterStr))
+}
+
+export const getFolderContent = (workspaceId, folderId) => async dispatch => {
+  const fetchGetFolderContent = await fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspace/${workspaceId}/folder/${folderId}`,
+    param: {...FETCH_CONFIG.header, method: 'GET'},
+    actionName: `${WORKSPACE}/${FOLDER}`,
+    dispatch
+  })
+  if (fetchGetFolderContent.status === 200) dispatch(setFolderData(folderId, fetchGetFolderContent.json))
 }
 
 export const getAppList = () => async dispatch => {

@@ -11,7 +11,8 @@ import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import {
   getAppList,
-  getWorkspaceContent
+  getWorkspaceContent,
+  getFolderContent
 } from '../action-creator.async.js'
 
 class WorkspaceContent extends React.Component {
@@ -40,6 +41,10 @@ class WorkspaceContent extends React.Component {
     this.props.renderApp(this.props.user, this.props.workspace, this.props.app, content)
     // Côme - 2018/03/08 - line bellow is useless because we cannot call the reducer again when hiding app since the call comes from the app
     // dispatch(setActiveFileContentActive(content))
+  }
+
+  handleClickFolder = folderId => {
+    this.props.dispatch(getFolderContent(this.props.workspace.id, folderId))
   }
 
   filterWorkspaceContent = (contentList, filter) => filter.length === 0
@@ -76,6 +81,7 @@ class WorkspaceContent extends React.Component {
                     app={app}
                     folderData={c}
                     onClickItem={this.handleClickContentItem}
+                    onClickFolder={this.handleClickFolder}
                     isLast={i === filteredWorkspaceContent.length - 1}
                     key={c.id}
                   />

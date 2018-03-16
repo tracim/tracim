@@ -14,7 +14,10 @@ class Folder extends React.Component {
     }
   }
 
-  handleClickToggleFolder = () => this.setState({open: !this.state.open})
+  handleClickToggleFolder = () => {
+    !this.state.open && this.props.folderData.content.length === 0 && this.props.onClickFolder(this.props.folderData.id)
+    this.setState({open: !this.state.open})
+  }
 
   handleClickNewFile = e => {
     e.stopPropagation() // because we have a link inside a link (togler and newFile)
@@ -22,7 +25,8 @@ class Folder extends React.Component {
   }
 
   render () {
-    const { app, folderData: { title, content }, onClickItem, isLast, t } = this.props
+    const { app, folderData: { title, content }, onClickItem, onClickFolder, isLast, t } = this.props
+
     return (
       <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
         <div className='folder__header' onClick={this.handleClickToggleFolder}>
@@ -60,6 +64,7 @@ class Folder extends React.Component {
               app={app}
               folderData={c}
               onClickItem={onClickItem}
+              onClickFolder={onClickFolder}
               isLast={isLast}
               t={t}
               key={c.id}
@@ -87,5 +92,8 @@ Folder.propTypes = {
     title: PropTypes.string.isRequired,
     content: PropTypes.array
   }),
-  app: PropTypes.object
+  app: PropTypes.object,
+  onClickItem: PropTypes.func.isRequired,
+  onClickFolder: PropTypes.func.isRequired,
+  isLast: PropTypes.bool.isRequired
 }

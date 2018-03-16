@@ -56,6 +56,15 @@ server.get('/workspace/:id', (req, res) => res.jsonp(
   Object.assign({}, jsonDb.workspace_detail, {content: shuffle(jsonDb.workspace_detail.content)}, {id: req.params.id})
 ))
 
+server.get('/workspace/:idws/folder/:idf', (req, res) => {
+  switch (req.params.idf) {
+    case '3':
+      return res.jsonp(jsonDb.folder_content_3)
+    case '11':
+      return res.jsonp(jsonDb.folder_content_11)
+  }
+})
+
 server.get('/user/:id/roles', (req, res) => res.jsonp(jsonDb.user_role))
 
 server.get('/timezone', (req, res) => res.jsonp(timezoneDb.timezone))

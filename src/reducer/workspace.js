@@ -1,5 +1,6 @@
 import {
-  WORKSPACE
+  WORKSPACE,
+  FOLDER
 } from '../action-creator.sync.js'
 
 const serializeWorkspace = data => ({
@@ -25,6 +26,20 @@ export default function user (state = {
 
     case `Update/${WORKSPACE}/Filter`:
       return {...state, filter: action.filterList}
+
+    case `Set/${WORKSPACE}/${FOLDER}/Content`:
+      const setFolderContent = (contentItem, action) => {
+        if (contentItem.id === action.folderId) return {...contentItem, content: action.content}
+
+        if (contentItem.type === 'folder') return {...contentItem, content: contentItem.content.map(c => setFolderContent(c, action))}
+
+        return contentItem
+      }
+
+      return {
+        ...state,
+        content: state.content.map(c => setFolderContent(c, action))
+      }
 
     default:
       return state

@@ -151,52 +151,54 @@
         "workspace_id": 1,
         "title": "Programmation objet",
         "type": "folder",
-        "content": [
-          {
-            "id": 4,
-            "parent_id": 3,
-            "workspace_id": 1,
-            "title": "des trucs de backend",
-            "type": "File",
-            "status": "outdated"
-          },
-          {
-            "id": 5,
-            "parent_id": 3,
-            "workspace_id": 1,
-            "title": "on s'emmerde",
-            "type": "PageHtml",
-            "status": "outdated"
-          },
-          {
-            "id": 11,
-            "parent_id": 3,
-            "workspace_id": 1,
-            "title": "Hidden features",
-            "type": "folder",
-            "content": [
-              {
-                "id": 12,
-                "parent_id": 11,
-                "workspace_id": 1,
-                "title": "flatMap",
-                "type": "PageHtml",
-                "status": "current"
-              },
-              {
-                "id": 13,
-                "parent_id": 11,
-                "workspace_id": 1,
-                "title": "c'est tout pété",
-                "type": "Issue",
-                "status": "current"
-              }
-            ]
-          }
-        ]
+        "content": []
       }
     ]
   },
+  "folder_content_3": [
+    {
+      "id": 4,
+      "parent_id": 3,
+      "workspace_id": 1,
+      "title": "des trucs de backend",
+      "type": "File",
+      "status": "outdated"
+    },
+    {
+      "id": 5,
+      "parent_id": 3,
+      "workspace_id": 1,
+      "title": "on s'emmerde",
+      "type": "PageHtml",
+      "status": "outdated"
+    },
+    {
+      "id": 11,
+      "parent_id": 3,
+      "workspace_id": 1,
+      "title": "Hidden features",
+      "type": "folder",
+      "content": []
+    }
+  ],
+  "folder_content_11": [
+    {
+      "id": 12,
+      "parent_id": 11,
+      "workspace_id": 1,
+      "title": "flatMap",
+      "type": "PageHtml",
+      "status": "current"
+    },
+    {
+      "id": 13,
+      "parent_id": 11,
+      "workspace_id": 1,
+      "title": "c'est tout pété",
+      "type": "Issue",
+      "status": "current"
+    }
+  ],
   "timeline": [{
     "id": 0,
     "type": "message",

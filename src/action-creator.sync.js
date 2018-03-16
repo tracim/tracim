@@ -15,6 +15,9 @@ export const WORKSPACE = 'Workspace'
 export const setWorkspaceData = (workspace, filterStr = '') => ({ type: `Set/${WORKSPACE}`, workspace, filterStr })
 export const updateWorkspaceFilter = filterList => ({ type: `Update/${WORKSPACE}/Filter`, filterList })
 
+export const FOLDER = 'Folder'
+export const setFolderData = (folderId, content) => ({ type: `Set/${WORKSPACE}/${FOLDER}/Content`, folderId, content })
+
 export const WORKSPACE_LIST = 'WorkspaceList'
 export const updateWorkspaceListData = workspaceList => ({ type: `Update/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `Set/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
