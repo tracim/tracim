@@ -20,6 +20,7 @@
   z-index 1
 
 sidebar-width = 300px
+sidebar-animate-speed = 0.5s
 
 leftside()
   flex-grow 0
@@ -29,16 +30,15 @@ leftside()
 
 .sidebar
   position relative
-  transition all 0.5s
-  width 300px
+  transition all sidebar-animate-speed
+  width sidebar-width
   &.sidebarclose
     width 0
-    transform translateX("-%s" % sidebar-width)
     .sidebar__expand
-      right "calc(-%s - 39px)" % sidebar-width
+      border-bottom-right-radius 0
   &__expand
     position absolute
-    top 0
+    top -1px
     right -39px
     padding 5px 8px
     border 1px solid white
@@ -46,22 +46,21 @@ leftside()
     cursor pointer
     background-color blue
     color white
-    transition all 0.5s
+    transition all sidebar-animate-speed
   &__btnnewworkspace
-    margin-top 40px
-    padding 10px
-    width 100%
+    margin-top 50px
+    overflow hidden
     &__btn
       display block
       margin 0 auto
       padding 15px 30px
   &__navigation
     padding 0
+    overflow hidden
     &__workspace
       padding-left 0
       list-style none
       &__item
-        width sidebar-width
         &__wrapper
           display flex
           align-items center

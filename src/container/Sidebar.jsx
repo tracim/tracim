@@ -16,18 +16,21 @@ class Sidebar extends React.Component {
     super(props)
     this.state = {
       sidebarClose: false,
-      workspaceIdInUrl: parseInt(props.match.params.idws)
+      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
     }
   }
 
   componentDidMount () {
     const { workspaceIdInUrl } = this.state
     const { user, workspaceList, dispatch } = this.props
+
     user.id !== -1 && workspaceList.length === 0 && dispatch(getWorkspaceList(user.id, workspaceIdInUrl))
   }
 
   componentDidUpdate (prevProps, prevState) {
     const { user, match, dispatch } = this.props
+
+    if (this.state.workspaceIdInUrl === null) return
 
     const newWorkspaceId = parseInt(match.params.idws)
     prevState.workspaceIdInUrl !== newWorkspaceId && this.setState({workspaceIdInUrl: newWorkspaceId})

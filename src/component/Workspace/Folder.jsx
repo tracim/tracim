@@ -31,7 +31,7 @@ class Folder extends React.Component {
           </div>
           <div className='folder__header__name'>
             <div className='folder__header__name__icon'>
-              <i className='fa fa-folder-open-o' />
+              <i className={classnames('fa', {'fa-folder-open-o': this.state.open, 'fa-folder-o': !this.state.open})} />
             </div>
             <div className='folder__header__name__text'>
               { title }

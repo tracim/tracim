@@ -46,6 +46,7 @@ class Account extends React.Component {
 
   componentDidUpdate () {
     const { user, workspaceList, dispatch } = this.props
+
     if (user.id !== -1 && workspaceList.length > 0 && workspaceList.some(ws => ws.role === undefined)) dispatch(getUserRole(user))
   }
 
