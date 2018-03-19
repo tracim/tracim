@@ -908,7 +908,7 @@ class ContentApi(object):
         return content
 
     def copy_children(self, origin_content: Content, new_content: Content):
-       for child in origin_content.children:
+        for child in origin_content.children:
             self.copy(child, new_content)
 
     def move_recursively(self, item: Content,

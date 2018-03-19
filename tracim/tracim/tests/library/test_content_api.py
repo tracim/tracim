@@ -428,7 +428,7 @@ class TestContentApi(BaseTest, TestStandard):
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace2.workspace_id
-        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()   # nopep8
         assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == 'test_file_copy'
         assert text_file_copy.type == text_file.type
@@ -516,7 +516,7 @@ class TestContentApi(BaseTest, TestStandard):
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace2.workspace_id
-        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()  # nopep8
         assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == text_file.label
         assert text_file_copy.type == text_file.type
@@ -598,7 +598,7 @@ class TestContentApi(BaseTest, TestStandard):
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace.workspace_id
-        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()  # nopep8
         assert text_file_copy.depot_file.path != text_file.depot_file.path
         assert text_file_copy.label == 'test_file_copy'
         assert text_file_copy.type == text_file.type
