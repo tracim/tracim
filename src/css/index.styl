@@ -2,10 +2,6 @@
 
 .wsContentThread
   width 550px
-  flex-grow 1
-  margin-bottom 0
-  border-bottom 1px solid grey
-  overflow-Y auto
   &__header
     color white
     background-color threadColor
@@ -14,58 +10,57 @@
     &__icon
       .fa-comments-o
         color white
-  &__wrapper
-    height calc(100% - 209px) /* height of chat__header + height of option + top of chat */
-  &__messagelist
-    padding 15px 35px
-    list-style none
-    &__item
-      &__avatar
-        position relative
-        top 43px
-        left -25px
-        & > img
-          width 45px
-          height 45px
-          border-radius 30px
-      &__createhour
-        margin-left 30px
-        opacity 0.7
-        font-size 14px
-      &__content
-        border 1px solid grey
-        border-radius 5px
-        padding 15px
-        background-color off-white
-        font-size 15px
-        z-index -1
-        color darkBlue
-
-  &__texteditor
-    &__simpletext
-      &__input
-        &:focus
+  &__app
+    display flex
+    flex-flow column
+    width 100%
+    &__messagelist
+      flex 1 1 auto
+      padding 15px 35px
+      list-style none
+      overflow-y auto
+      &__item
+        &__avatar
+          position relative
+          top 40px
+          left -20px
+          & > img
+            width 45px
+            height 45px
+            border-radius 25px
+        &__createhour
+          margin-left 35px
+          opacity 0.7
+          font-size 14px
+        &__content
+          display inline-block
+          border 1px solid grey
+          border-radius 5px
+          padding 15px
+          background-color off-white
+          font-size 15px
+    &__texteditor
+      flex 0 1 auto
+      &__simpletext
+        &__input
+          &:focus
+            color darkBlue
+            border-color darkBlue
+      &__submit
+        &__btn
           color darkBlue
-          border-color darkBlue
-    &__submit
-      &__btn
-        color darkBlue
-
-.sended
-  .wsFileGeneric__messagelist__item__content
-    margin-right 25%
 
 .received
-  .wsFileGeneric__messagelist__item
+  text-align right
+  .wsContentGeneric__messagelist__item
     &__avatar
-      left 93%
+      left 20px
     &__createhour
-      text-align right
-      margin-right 50px
+      margin-left 0
+      margin-right 35px
     &__content
-      margin-left 25%
-      background-color darkBlue
       color white
+      background-color darkBlue
 
 .activeEditionTitle
   .wsContentThread

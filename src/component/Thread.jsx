@@ -3,45 +3,45 @@ import classnames from 'classnames'
 
 const Thread = props => {
   return (
-    <div className='wsContentThread'>
-      <ul className='wsContentThread__messagelist wsFileGeneric__messagelist'>
+    <div className='wsContentThread__app'>
+      <ul className='wsContentThread__app__messagelist wsContentGeneric__messagelist'>
         { props.listMessage.map(msg =>
-          <li className={classnames('wsContentThread__messagelist__item', 'wsFileGeneric__messagelist__item', {
+          <li className={classnames('wsContentThread__app__messagelist__item', 'wsContentGeneric__messagelist__item', {
             'sended': props.loggedUser.id === msg.author.id,
             'received': !(props.loggedUser.id === msg.author.id)
           })} key={msg.id}>
-            <div className='wsContentThread__messagelist__item__avatar wsFileGeneric__messagelist__item__avatar'>
+            <div className='wsContentThread__app__messagelist__item__avatar wsContentGeneric__messagelist__item__avatar'>
               <img src={msg.author.avatar} alt='avatar' />
             </div>
 
-            <div className='wsContentThread__messagelist__item__createhour wsFileGeneric__messagelist__item__createhour'>
+            <div className='wsContentThread__app__messagelist__item__createhour wsContentGeneric__messagelist__item__createhour'>
               {msg.createdAt.day} à {msg.createdAt.hour}
             </div>
 
-            <div className='wsContentThread__messagelist__item__content wsFileGeneric__messagelist__item__content'>
+            <div className='wsContentThread__app__messagelist__item__content wsContentGeneric__messagelist__item__content'>
               {msg.text}
             </div>
           </li>
         )}
       </ul>
 
-      <form className='wsContentThread__texteditor wsFileGeneric__texteditor'>
-        <div className='wsContentThread__texteditor__simpletext wsFileGeneric__texteditor__simpletext input-group'>
-          <input type='text' className='wsContentThread__texteditor__simpletext__input wsFileGeneric__texteditor__simpletext__input form-control' placeholder='...' />
+      <form className='wsContentThread__app__texteditor wsContentGeneric__texteditor'>
+        <div className='wsContentThread__app__texteditor__simpletext wsContentGeneric__texteditor__simpletext input-group'>
+          <input type='text' className='wsContentThread__app__texteditor__simpletext__input wsContentGeneric__texteditor__simpletext__input form-control' placeholder='...' />
 
-          <div className='wsContentThread__texteditor__simpletext__icon wsFileGeneric__texteditor__simpletext__icon input-group-addon'>
+          <div className='wsContentThread__app__texteditor__simpletext__icon wsContentGeneric__texteditor__simpletext__icon input-group-addon'>
             <i className='fa fa-font' />
           </div>
         </div>
 
-        <div className='wsFileGeneric__texteditor__wysiwyg d-none d-xl-block'>
+        <div className='wsContentGeneric__texteditor__wysiwyg d-none d-xl-block'>
           <textarea />
         </div>
 
-        <div className='wsContentThread__texteditor__submit wsFileGeneric__texteditor__submit d-xl-flex justify-content-xl-center'>
-          <button type='submit' className='wsContentThread__texteditor__submit__btn wsFileGeneric__texteditor__submit__btn btn btn-primary'>
+        <div className='wsContentThread__app__texteditor__submit wsContentGeneric__texteditor__submit d-xl-flex justify-content-xl-center'>
+          <button type='submit' className='wsContentThread__app__texteditor__submit__btn wsContentGeneric__texteditor__submit__btn btn btn-primary'>
             Envoyer
-            <div className='wsContentThread__texteditor__submit__btn__icon wsFileGeneric__texteditor__submit__btn__icon'>
+            <div className='wsContentThread__app__texteditor__submit__btn__icon wsContentGeneric__texteditor__submit__btn__icon'>
               <i className='fa fa-paper-plane-o' />
             </div>
           </button>
