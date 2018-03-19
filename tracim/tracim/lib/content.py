@@ -894,21 +894,21 @@ class ContentApi(object):
 
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
-        content.new_revision()
-        content.parent = parent
-        content.workspace = workspace
-        content.label = label
-        content.revision_type = ActionDescription.COPY
-        content.properties['origin'] = {
-            'content': item.id,
-            'revision': item.last_revision.revision_id,
-        }
+        with new_revision(content, force_create_new_revision=True) as rev:
+            rev.parent = parent
+            rev.workspace = workspace
+            rev.label = label
+            rev.revision_type = ActionDescription.COPY
+            rev.properties['origin'] = {
+                'content': item.id,
+                'revision': item.last_revision.revision_id,
+            }
         if do_save:
             self.save(content, ActionDescription.COPY, do_notify=do_notify)
         return content
 
     def copy_children(self, origin_content: Content, new_content: Content):
-        for child in origin_content.children:
+       for child in origin_content.children:
             self.copy(child, new_content)
 
     def move_recursively(self, item: Content,

@@ -1117,7 +1117,7 @@ class Content(DeclarativeBase):
         revisions = sorted(self.revisions, key=lambda revision: revision.revision_id)
         return revisions[-1]
 
-    def new_revision(self) -> None:
+    def new_revision(self) -> ContentRevisionRO:
         """
         Return and assign to this content a new revision.
         If it's a new content, revision is totally new.
