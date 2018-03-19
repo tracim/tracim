@@ -5,18 +5,18 @@ import PropTypes from 'prop-types'
 const PopinFixedContent = props => {
   return props.children.length === 2
     ? (
-      <div className={classnames('wsFileGeneric__content', `${props.customClass}__content`)}>
-        <div className={classnames('wsFileGeneric__content__left', `${props.customClass}__content__left`)}>
+      <div className={classnames('wsContentGeneric__content', `${props.customClass}__content`)}>
+        <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
           {props.children[0]}
         </div>
 
-        <div className={classnames('wsFileGeneric__content__right', `${props.customClass}__content__right`)}>
+        <div className={classnames('wsContentGeneric__content__right', `${props.customClass}__content__right`)}>
           {props.children[1]}
         </div>
       </div>
     )
     : (
-      <div className={classnames('wsFileGeneric__content', `${props.customClass}__content`)}>
+      <div className={classnames('wsContentGeneric__content', `${props.customClass}__content`)}>
         { props.children }
       </div>
     )

@@ -12,6 +12,8 @@ import libTimeline from './component/Timeline/Timeline.jsx'
 import libTextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import libBtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 
+import libDelimiter from './component/Delimiter/Delimiter.jsx'
+
 export const langFr = fr
 export const langEn = en
 
@@ -26,3 +28,5 @@ export const Timeline = libTimeline
 
 export const TextAreaApp = libTextAreaApp
 export const BtnSwitch = libBtnSwitch
+
+export const Delimiter = libDelimiter

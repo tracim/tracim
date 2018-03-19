@@ -9,8 +9,8 @@ const PopinFixedOption = props => {
   translate.setI18n(props.i18n ? props.i18n : i18n) // mandatory to allow Apps to overrides trad
 
   return (
-    <div className='wsFileGeneric__option'>
-      <div className='wsFileGeneric__option__menu'>
+    <div className='wsContentGeneric__option'>
+      <div className='wsContentGeneric__option__menu'>
 
         <div className='wsFileFile__option__menu__addversion btn mr-auto'>
           {props.t('PopinFixedOption.new_version')}
@@ -19,10 +19,10 @@ const PopinFixedOption = props => {
 
         <SelectStatus />
 
-        <div className='wsFileGeneric__option__menu__action'>
+        <div className='wsContentGeneric__option__menu__action'>
           <i className='fa fa-archive' />
         </div>
-        <div className='wsFileGeneric__option__menu__action'>
+        <div className='wsContentGeneric__option__menu__action'>
           <i className='fa fa-trash' />
         </div>
       </div>

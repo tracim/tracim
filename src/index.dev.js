@@ -12,6 +12,8 @@ import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Timeline from './component/Timeline/Timeline.jsx'
 import TimelineDebugData from './component/Timeline/debugData.js'
 
+import Delimiter from './component/Delimiter/Delimiter.jsx'
+
 ReactDOM.render(
   <PopinFixed customClass={`${'randomClass'}`}>
     <PopinFixedHeader
@@ -25,6 +27,7 @@ ReactDOM.render(
 
     <PopinFixedContent customClass={`${'randomClass'}__contentpage`}>
       <div>
+        <Delimiter />
         <span>Here will be the app content. Style is handled by the app (obviously)</span>
         <BtnSwitch />
         <TextAreaApp customClass={'randomClass'} />
