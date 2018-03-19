@@ -419,10 +419,12 @@ class TestContentApi(BaseTest, TestStandard):
             new_label='test_file_copy'
         )
 
+        transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent(
             'test_file_copy',
-            folderb
+            folderb,
         )
+
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace2.workspace_id
@@ -436,6 +438,7 @@ class TestContentApi(BaseTest, TestStandard):
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
         assert text_file_copy.revision_type == ActionDescription.COPY
+        assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
     def test_unit_copy_file__same_label_different_parent_ok(self):
         uapi = UserApi(None)
@@ -499,13 +502,17 @@ class TestContentApi(BaseTest, TestStandard):
             'folder b',
             True
         )
-
         api2.copy(
             item=text_file,
             new_parent=folderb,
         )
 
-        text_file_copy = api2.get_one_by_label_and_parent('test_file', folderb)
+        transaction.commit()
+        text_file_copy = api2.get_one_by_label_and_parent(
+            'test_file',
+            folderb,
+        )
+
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace2.workspace_id
@@ -519,6 +526,7 @@ class TestContentApi(BaseTest, TestStandard):
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
         assert text_file_copy.revision_type == ActionDescription.COPY
+        assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
     def test_unit_copy_file_different_label_same_parent_ok(self):
         uapi = UserApi(None)
@@ -581,10 +589,12 @@ class TestContentApi(BaseTest, TestStandard):
             new_label='test_file_copy'
         )
 
+        transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent(
             'test_file_copy',
-            foldera
+            foldera,
         )
+
         assert text_file != text_file_copy
         assert text_file_copy.content_id != text_file.content_id
         assert text_file_copy.workspace_id == workspace.workspace_id
@@ -598,6 +608,7 @@ class TestContentApi(BaseTest, TestStandard):
         assert text_file_copy.file_extension == text_file.file_extension
         assert text_file_copy.file_mimetype == text_file.file_mimetype
         assert text_file_copy.revision_type == ActionDescription.COPY
+        assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
     def test_mark_read__workspace(self):
         uapi = UserApi(None)
