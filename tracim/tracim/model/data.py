@@ -590,7 +590,6 @@ class ContentRevisionRO(DeclarativeBase):
         'is_archived',
         'is_deleted',
         'label',
-        'node',
         'owner',
         'owner_id',
         'parent',
