@@ -16,7 +16,14 @@
 
 ### Map Network drive Windows:
 
-- Enter the address of webdav (you can find it in each workspace, under workspace details).
+Webdav Windows addresses are similar to:
+
+```
+https://<yourinstance>/webdav/ (secure)
+http://<yourinstance>/webdav/ (unsecure)
+```
+
+- Enter the address of webdav (you can find it in each workspace, under workspace details)
 - Check "Reconnect at sign-in" and "Connect using different credentials".
 - Click "Finish".
 - Your login/password will be ask. Use your Tracim credentials.
@@ -33,12 +40,26 @@ To enable it:
 
 ## OSX
 
+Webdav OSX addresses are similar to:
+
+```
+https://<yourinstance>/webdav/ (secure)
+http://<yourinstance>/webdav/ (unsecure)
+```
+
 - In the Finder, choose "Go > Connect to Server".
 - Enter the address of webdav (you can find it in each workspace, under workspace details). Click Connect.
 - Your login/password will be ask. Use your Tracim credentials.
 - After that, your webdav access should be mounted.
 
 ## Linux
+
+Webdav Linux addresses are similar to:
+
+```
+davs://<yourinstance>/webdav/ (secure)
+dav://<yourinstance>/webdav/ (unsecure)
+```
 
 ### Gnome3 (nautilus)
 
