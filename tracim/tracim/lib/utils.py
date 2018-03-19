@@ -190,7 +190,7 @@ def current_date_for_filename() -> str:
 
     :return: current date as string
     """
-    # INFO - G.M - 19-03-2018 - As ':' is in transform_to_do_bdd method in
+    # INFO - G.M - 19-03-2018 - As ':' is in transform_to_bdd method in
     # webdav utils, it may cause trouble. So, it should be replaced to
     # a character which will not change in bdd.
     return datetime.datetime.now().isoformat().replace(':', '.')
