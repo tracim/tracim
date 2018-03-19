@@ -886,11 +886,7 @@ class ContentApi(object):
         else:
             workspace = item.workspace
             parent = item.parent
-
-        if new_label:
-            label = new_label
-        else:
-            label = item.label
+        label = new_label or item.label
 
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
