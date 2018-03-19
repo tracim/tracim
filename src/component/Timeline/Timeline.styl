@@ -7,6 +7,7 @@
   border-radius 10px
   height 100%
   &__header
+    flex 0 1 auto
     border-radius 10px 10px 0 0
     padding 15px
     text-align center
@@ -14,7 +15,8 @@
     color darkGrey
     background-color grey-hover
   &__messagelist
-    flex 1 1 0
+    flex 1 1 auto
+    // flex 1 1 0
     margin-bottom 0
     padding-left 0
     border-bottom 1px solid grey
@@ -25,23 +27,23 @@
       padding 0 25px 20px 35px
       &__avatar
         position relative
-        top 43px
-        left -25px
+        top 40px
+        left -20px
         & > img
           width 45px
           height 45px
           border-radius 25px
       &__createhour
-        margin-left 30px
+        margin-left 35px
         opacity 0.7
         font-size 14px
       &__content
+        display inline-block
         border 1px solid grey
         border-radius 5px
         padding 15px
         background-color off-white
         font-size 15px
-        z-index -1
     &__version
       display flex
       justify-content space-between
@@ -64,6 +66,7 @@
         font-size 17px
         margin auto 0
   &__texteditor
+    flex 0 1 auto
     padding 2px
     &__simpletext
       display none
@@ -86,19 +89,15 @@
         &__icon
           margin-left 10px
 
-.sended
-  .timeline__messagelist__item__content
-    margin-right 25%
-
 .received
+  text-align right
   .timeline__messagelist__item
     &__avatar
-      left 93%
+      left 20px
     &__createhour
-      text-align right
-      margin-right 50px
+      margin-left 0
+      margin-right 35px
     &__content
-      margin-left 25%
       color white
 
 /**** MEDIA 992px & 1199px ****/

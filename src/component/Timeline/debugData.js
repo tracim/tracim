@@ -7,10 +7,10 @@ export const TimelineDebugData = [{
     avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
   },
   createdAt: {
-    day: '27/11/17',
+    day: '28/11/17',
     hour: '11h45'
   },
-  text: 'Proident esse laboris in sed officia exercitation ut anim ea.'
+  text: "Ajout du paragraphe 3"
 }, {
   id: 1,
   type: 'message',
@@ -21,11 +21,24 @@ export const TimelineDebugData = [{
   },
   createdAt: {
     day: '27/11/16',
-    hour: '10h30'
+    hour: '15h30'
   },
-  text: 'Proident esse laboris in sed officia exercitation ut anim ea. in sed officia exercitation ut'
+  text: 'correction des fautes en tous genre'
 }, {
   id: 2,
+  type: 'version',
+  author: {
+    id: 1,
+    name: 'smoi',
+    avatar: 'https://www.algoo.fr/static/images/algoo_images/algoo-logo.jpg'
+  },
+  createdAt: {
+    day: '27/11/11',
+    hour: '10h50'
+  },
+  number: '5'
+}, {
+  id: 3,
   type: 'message',
   author: {
     id: 1,
@@ -36,9 +49,9 @@ export const TimelineDebugData = [{
     day: '27/11/15',
     hour: '10h30'
   },
-  text: 'Proident esse laboris in sed officia exercitation ut anim ea. Proident esse laboris in sed officia exercitation ut anim ea. Proident esse laboris in sed officia exercitation ut anim ea.'
+  text: 'Déplacement de la partie 2 pour une meilleur lisibilité du contenu. Tout le contenu est maintenant dans l\'ordre chronologique. Également, développement de la conclusion sur un ton plus léger.'
 }, {
-  id: 3,
+  id: 4,
   type: 'version',
   author: {
     id: 1,
@@ -46,9 +59,23 @@ export const TimelineDebugData = [{
     avatar: 'https://www.algoo.fr/static/images/algoo_images/algoo-logo.jpg'
   },
   createdAt: {
-    day: '27/11/11'
+    day: '27/11/11',
+    hour: '8h30'
   },
   number: '5'
+}, {
+  id: 5,
+  type: 'message',
+  author: {
+    id: 5,
+    name: 'MrLapin',
+    avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+  },
+  createdAt: {
+    day: '26/11/15',
+    hour: '10h30'
+  },
+  text: 'premiere version'
 }]
 
 export default TimelineDebugData

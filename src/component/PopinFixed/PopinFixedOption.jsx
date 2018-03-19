@@ -17,7 +17,7 @@ const PopinFixedOption = props => {
           <i className='fa fa-plus-circle' />
         </div>
 
-        <SelectStatus />
+        {/* <SelectStatus /> */}
 
         <div className='wsContentGeneric__option__menu__action'>
           <i className='fa fa-archive' />

@@ -36,7 +36,7 @@ ReactDOM.render(
       <Timeline
         customClass={`${'randomClass'}__contentpage`}
         loggedUser={{
-          id: '1',
+          id: 1,
           name: 'smoi',
           avatar: 'https://www.algoo.fr/static/images/algoo_images/algoo-logo.jpg'
         }}
