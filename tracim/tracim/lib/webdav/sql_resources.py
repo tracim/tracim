@@ -36,7 +36,8 @@ logger = logging.getLogger()
 
 class ManageActions(object):
     """
-    This object is used to encapsulate all Deletion/Archiving related method as to not duplicate too much code
+    This object is used to encapsulate all Deletion/Archiving related
+    method as to not duplicate too much code
     """
     def __init__(self, action_type: str, api: ContentApi, content: Content):
         self.content_api = api
@@ -49,57 +50,14 @@ class ManageActions(object):
             ActionDescription.UNDELETION: self.content_api.undelete
         }
 
-        self._to_name = {
-            ActionDescription.ARCHIVING: 'archived',
-            ActionDescription.DELETION: 'deleted'
-        }
-
         self._type = action_type
-        self._new_name = self.make_name()
 
     def action(self):
-        try:
-            # When undeleting/unarchiving we except a content with the new name to not exist, thus if we
-            # don't get an error and the database request send back a result, we stop the action
-            self.content_api.get_one_by_label_and_parent(self._new_name, self.content.parent)
-            raise DAVError(HTTP_FORBIDDEN)
-        except NoResultFound:
-            with new_revision(self.content):
-                self.content_api.update_content(self.content, self._new_name)
-                self._actions[self._type](self.content)
-                self.content_api.save(self.content, self._type)
+        with new_revision(self.content):
+            self._actions[self._type](self.content)
+            self.content_api.save(self.content, self._type)
 
-            transaction.commit()
-
-    def make_name(self) -> str:
-        """
-        Will create the new name, either by adding '- deleted the [date]' after the name when archiving/deleting or
-        removing this string when undeleting/unarchiving
-        """
-        new_name = self.content.get_label_as_file()
-        extension = ''
-
-        # if the content has no label, the last .ext is important
-        # thus we want to rename a file from 'file.txt' to 'file - deleted... .txt' and not 'file.txt - deleted...'
-        is_file_name = self.content.label == ''
-        if is_file_name:
-            search = re.search(r'(\.[^.]+)$', new_name)
-            if search:
-                extension = search.group(0)
-            new_name = re.sub(r'(\.[^.]+)$', '', new_name)
-
-        if self._type in [ActionDescription.ARCHIVING, ActionDescription.DELETION]:
-            new_name += ' - %s the %s' % (self._to_name[self._type], datetime.now().strftime('%d-%m-%Y at %H:%M'))
-        else:
-            new_name = re.sub(
-                r'( - (%s|%s) the .*)$' % (self._to_name[ActionDescription.DELETION], self._to_name[ActionDescription.ARCHIVING]),
-                '',
-                new_name
-            )
-
-        new_name += extension
-
-        return new_name
+        transaction.commit()
 
 
 class Root(DAVCollection):
@@ -964,12 +922,25 @@ class File(DAVNonCollection):
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
 
-    def move_file(self, destpath):
+    def move_file(self, destpath: str) -> None:
+        """
+        Move file mean changing the path to access to a file. This can mean
+        simple renaming(1), moving file from a directory to one another(2)
+        but also renaming + moving file from a directory to one another at
+        the same time (3).
+
+        (1): move /dir1/file1 -> /dir1/file2
+        (2): move /dir1/file1 -> /dir2/file1
+        (3): move /dir1/file1 -> /dir2/file2
+        :param destpath: destination path of webdav move
+        :return: nothing
+        """
 
         workspace = self.content.workspace
         parent = self.content.parent
 
         with new_revision(self.content):
+            # INFO - G.M - 2018-03-09 - First, renaming file if needed
             if basename(destpath) != self.getDisplayName():
                 new_given_file_name = transform_to_bdd(basename(destpath))
                 new_file_name, new_file_extension = \
@@ -981,21 +952,23 @@ class File(DAVNonCollection):
                 )
                 self.content.file_extension = new_file_extension
                 self.content_api.save(self.content)
-            else:
-                workspace_api = WorkspaceApi(self.user)
-                content_api = ContentApi(self.user)
 
-                destination_workspace = self.provider.get_workspace_from_path(
-                    destpath,
-                    workspace_api,
-                )
+            # INFO - G.M - 2018-03-09 - Moving file if needed
+            workspace_api = WorkspaceApi(self.user)
+            content_api = ContentApi(self.user)
 
-                destination_parent = self.provider.get_parent_from_path(
-                    destpath,
-                    content_api,
-                    destination_workspace,
-                )
-
+            destination_workspace = self.provider.get_workspace_from_path(
+                destpath,
+                workspace_api,
+            )
+            destination_parent = self.provider.get_parent_from_path(
+                destpath,
+                content_api,
+                destination_workspace,
+            )
+            if destination_parent != parent or destination_workspace != workspace:  # nopep8
+                #  INFO - G.M - 12-03-2018 - Avoid moving the file "at the same place"  # nopep8
+                #  if the request does not result in a real move.
                 self.content_api.move(
                     item=self.content,
                     new_parent=destination_parent,

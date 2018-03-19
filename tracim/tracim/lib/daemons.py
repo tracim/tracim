@@ -390,14 +390,14 @@ class WsgiDavDaemon(Daemon):
             print(
                 "WARNING: Could not import lxml: using xml instead (slower). Consider installing lxml from http://codespeak.net/lxml/.")
         from wsgidav.dir_browser import WsgiDavDirBrowser
-        from tracim.lib.webdav.tracim_http_authenticator import TracimHTTPAuthenticator
+        from wsgidav.http_authenticator import HTTPAuthenticator
         from wsgidav.error_printer import ErrorPrinter
         from tracim.lib.webdav.utils import TracimWsgiDavDebugFilter
 
         config['middleware_stack'] = [
             TracimEnforceHTTPS,
             WsgiDavDirBrowser,
-            TracimHTTPAuthenticator,
+            HTTPAuthenticator,
             ErrorPrinter,
             TracimWsgiDavDebugFilter,
         ]

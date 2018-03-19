@@ -128,7 +128,6 @@ class User(DeclarativeBase):
     is_active = Column(Boolean, default=True, nullable=False)
     imported_from = Column(Unicode(32), nullable=True)
     timezone = Column(Unicode(255), nullable=False, server_default='')
-    _webdav_left_digest_response_hash = Column('webdav_left_digest_response_hash', Unicode(128))
     auth_token = Column(Unicode(255))
     auth_token_created = Column(DateTime)
 
@@ -202,10 +201,8 @@ class User(DeclarativeBase):
 
         Hash cleartext password on the fly,
         Store its ciphertext version,
-        Update the WebDAV hash as well.
         """
         self._password = self._hash_password(cleartext_password)
-        self.update_webdav_digest_auth(cleartext_password)
 
     def _get_password(self) -> str:
         """Return the hashed version of the password."""
@@ -214,26 +211,6 @@ class User(DeclarativeBase):
     password = synonym('_password', descriptor=property(_get_password,
                                                         _set_password))
 
-    @classmethod
-    def _hash_digest(cls, digest):
-        return md5(bytes(digest, 'utf-8')).hexdigest()
-
-    def _set_hash_digest(self, digest):
-        self._webdav_left_digest_response_hash = self._hash_digest(digest)
-
-    def _get_hash_digest(self):
-        return self._webdav_left_digest_response_hash
-
-    webdav_left_digest_response_hash = synonym('_webdav_left_digest_response_hash',
-                                               descriptor=property(_get_hash_digest,
-                                                                   _set_hash_digest))
-
-    def update_webdav_digest_auth(self, cleartext_password: str) -> None:
-        self.webdav_left_digest_response_hash \
-            = '{username}:/:{cleartext_password}'.format(
-                username=self.email,
-                cleartext_password=cleartext_password,
-            )
 
     def validate_password(self, cleartext_password: str) -> bool:
         """
@@ -252,8 +229,6 @@ class User(DeclarativeBase):
             hash = sha256()
             hash.update((cleartext_password + self.password[:64]).encode('utf-8'))
             result = self.password[64:] == hash.hexdigest()
-            if result and not self.webdav_left_digest_response_hash:
-                self.update_webdav_digest_auth(cleartext_password)
         return result
 
     def get_display_name(self, remove_email_part: bool=False) -> str:
