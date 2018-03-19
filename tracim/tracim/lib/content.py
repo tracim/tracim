@@ -861,6 +861,53 @@ class ContentApi(object):
 
         item.revision_type = ActionDescription.MOVE
 
+    def copy(
+        self,
+        item: Content,
+        new_parent: Content=None,
+        new_label: str=None,
+        do_save: bool=True,
+        do_notify: bool=True,
+    ) -> Content:
+        """
+        Copy nearly all content, revision included. Children not included, see
+        "copy_children" for this.
+        :param item: Item to copy
+        :param new_parent: new parent of the new copied item
+        :param new_label: new label of the new copied item
+        :param do_notify: notify copy or not
+        :return: Newly copied item
+        """
+        if (not new_parent and not new_label) or (new_parent == item.parent and new_label == item.label):  # nopep8
+            # TODO - G.M - 08-03-2018 - Use something else than value error
+            raise ValueError("You can't copy file into itself")
+        if new_parent:
+            workspace = new_parent.workspace
+            parent = new_parent
+        else:
+            workspace = item.workspace
+            parent = item.parent
+        label = new_label or item.label
+
+        content = item.copy(parent)
+        # INFO - GM - 15-03-2018 - add "copy" revision
+        with new_revision(content, force_create_new_revision=True) as rev:
+            rev.parent = parent
+            rev.workspace = workspace
+            rev.label = label
+            rev.revision_type = ActionDescription.COPY
+            rev.properties['origin'] = {
+                'content': item.id,
+                'revision': item.last_revision.revision_id,
+            }
+        if do_save:
+            self.save(content, ActionDescription.COPY, do_notify=do_notify)
+        return content
+
+    def copy_children(self, origin_content: Content, new_content: Content):
+        for child in origin_content.children:
+            self.copy(child, new_content)
+
     def move_recursively(self, item: Content,
                          new_parent: Content, new_workspace: Workspace):
         self.move(item, new_parent, False, new_workspace)

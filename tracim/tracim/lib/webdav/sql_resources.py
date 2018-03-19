@@ -978,6 +978,48 @@ class File(DAVNonCollection):
 
         transaction.commit()
 
+    def copyMoveSingle(self, destpath, isMove):
+        if isMove:
+            # INFO - G.M - 12-03-2018 - This case should not happen
+            # As far as moveRecursive method exist, all move should not go
+            # through this method. If such case appear, try replace this to :
+            ####
+            # self.move_file(destpath)
+            # return
+            ####
+
+            raise NotImplemented
+
+        new_file_name = None
+        new_file_extension = None
+
+        # Inspect destpath
+        if basename(destpath) != self.getDisplayName():
+            new_given_file_name = transform_to_bdd(basename(destpath))
+            new_file_name, new_file_extension = \
+                os.path.splitext(new_given_file_name)
+
+        workspace_api = WorkspaceApi(self.user)
+        content_api = ContentApi(self.user)
+        destination_workspace = self.provider.get_workspace_from_path(
+            destpath,
+            workspace_api,
+        )
+        destination_parent = self.provider.get_parent_from_path(
+            destpath,
+            content_api,
+            destination_workspace,
+        )
+        workspace = self.content.workspace
+        parent = self.content.parent
+        new_content = self.content_api.copy(
+            item=self.content,
+            new_label=new_file_name,
+            new_parent=destination_parent,
+        )
+        self.content_api.copy_children(self.content, new_content)
+        transaction.commit()
+
     def supportRecursiveMove(self, destPath):
         return True
 

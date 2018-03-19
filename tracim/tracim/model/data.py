@@ -204,6 +204,7 @@ class ActionDescription(object):
     - closed-deprecated
     """
 
+    COPY = 'copy'
     ARCHIVING = 'archiving'
     COMMENT = 'content-comment'
     CREATION = 'creation'
@@ -225,7 +226,8 @@ class ActionDescription(object):
         'status-update': 'fa-random',
         'unarchiving': 'fa-file-archive-o',
         'undeletion': 'fa-trash-o',
-        'move': 'fa-arrows'
+        'move': 'fa-arrows',
+        'copy': 'fa-files-o',
     }
 
     _LABELS = {
@@ -238,7 +240,8 @@ class ActionDescription(object):
         'status-update': l_('New status'),
         'unarchiving': l_('Item unarchived'),
         'undeletion': l_('Item undeleted'),
-        'move': l_('Item moved')
+        'move': l_('Item moved'),
+        'copy': l_('Item copied'),
     }
 
     def __init__(self, id):
@@ -259,7 +262,9 @@ class ActionDescription(object):
                 cls.STATUS_UPDATE,
                 cls.UNARCHIVING,
                 cls.UNDELETION,
-                cls.MOVE]
+                cls.MOVE,
+                cls.COPY,
+                ]
 
 
 class ContentStatus(object):
@@ -514,6 +519,11 @@ class ContentChecker(object):
                 return False
             return True
 
+        # TODO - G.M - 15-03-2018 - Choose only correct Content-type for origin
+        # Only content who can be copied need this
+        if item.type == ContentType.Any:
+            if 'origin' in properties.keys():
+                return True
         raise NotImplementedError
 
     @classmethod
@@ -580,7 +590,6 @@ class ContentRevisionRO(DeclarativeBase):
         'is_archived',
         'is_deleted',
         'label',
-        'node',
         'owner',
         'owner_id',
         'parent',
@@ -639,6 +648,36 @@ class ContentRevisionRO(DeclarativeBase):
             )
 
         return new_rev
+
+    @classmethod
+    def copy(
+            cls,
+            revision: 'ContentRevisionRO',
+            parent: 'Content'
+    ) -> 'ContentRevisionRO':
+
+        copy_rev = cls()
+        import copy
+        copy_columns = cls._cloned_columns
+        for column_name in copy_columns:
+            # INFO - G-M - 15-03-2018 - set correct parent
+            if column_name == 'parent_id':
+                column_value = copy.copy(parent.id)
+            elif column_name == 'parent':
+                column_value = copy.copy(parent)
+            else:
+                column_value = copy.copy(getattr(revision, column_name))
+            setattr(copy_rev, column_name, column_value)
+
+        # copy attached_file
+        if revision.depot_file:
+            copy_rev.depot_file = FileIntent(
+                revision.depot_file.file.read(),
+                revision.file_name,
+                revision.file_mimetype,
+            )
+        return copy_rev
+
 
     def __setattr__(self, key: str, value: 'mixed'):
         """
@@ -1077,7 +1116,7 @@ class Content(DeclarativeBase):
         revisions = sorted(self.revisions, key=lambda revision: revision.revision_id)
         return revisions[-1]
 
-    def new_revision(self) -> None:
+    def new_revision(self) -> ContentRevisionRO:
         """
         Return and assign to this content a new revision.
         If it's a new content, revision is totally new.
@@ -1265,6 +1304,13 @@ class Content(DeclarativeBase):
         ctype = content.type
         cid = content.content_id
         return url_template.format(wid=wid, fid=fid, ctype=ctype, cid=cid)
+
+    def copy(self, parent):
+        cpy_content = Content()
+        for rev in self.revisions:
+            cpy_rev = ContentRevisionRO.copy(rev, parent)
+            cpy_content.revisions.append(cpy_rev)
+        return cpy_content
 
 
 class RevisionReadStatus(DeclarativeBase):
