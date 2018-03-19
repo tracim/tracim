@@ -10,7 +10,7 @@ export const TimelineDebugData = [{
     day: '28/11/17',
     hour: '11h45'
   },
-  text: "Ajout du paragraphe 3"
+  text: 'Ajout du paragraphe 3'
 }, {
   id: 1,
   type: 'message',

@@ -1,5 +1,5 @@
 import React from 'react'
-// import classnames from 'classnames'
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
@@ -9,20 +9,19 @@ const PopinFixedOption = props => {
   translate.setI18n(props.i18n ? props.i18n : i18n) // mandatory to allow Apps to overrides trad
 
   return (
-    <div className='wsContentGeneric__option'>
-      <div className='wsContentGeneric__option__menu'>
-
-        <div className='wsFileFile__option__menu__addversion btn mr-auto'>
+    <div className={classnames('wsContentGeneric__option', `${props.customClass}__option`)}>
+      <div className={classnames('wsContentGeneric__option__menu', `${props.customClass}__option__menu`)}>
+        <div className='wsContentGeneric__option__menu__addversion btn mr-auto'>
           {props.t('PopinFixedOption.new_version')}
           <i className='fa fa-plus-circle' />
         </div>
 
-        {/* <SelectStatus /> */}
+        <SelectStatus />
 
-        <div className='wsContentGeneric__option__menu__action'>
+        <div className={classnames('wsContentGeneric__option__menu__action', `${props.customClass}__option__menu__action`)}>
           <i className='fa fa-archive' />
         </div>
-        <div className='wsContentGeneric__option__menu__action'>
+        <div className={classnames('wsContentGeneric__option__menu__action', `${props.customClass}__option__menu__action`)}>
           <i className='fa fa-trash' />
         </div>
       </div>
