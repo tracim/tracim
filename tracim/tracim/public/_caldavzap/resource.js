@@ -489,11 +489,13 @@ function ResourceCalDAVList()
 			newElement.addClass('r_operate');
 
     var uniqueIdForLabel = inputResource.displayvalue.replace('.', '') // remove the point so jquery doesn't consider it as 2 differents classes when used in a selector
+    // Côme - 2018/03/19 - added custom style to avoid the '...' for long workspace name that hide the entire name
+		var customStyle = 'display: inline-block;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;vertical-align: top;width: 80%;'
 		newElement.html("\
       <div class='resourceCalDAVColor' style='background:"+inputResource.ecolor+"'></div>\
       <input type='text' class='colorPicker'/>\
       <input type='checkbox' name="+inputResource.uid+" />\
-      <div class='"+uniqueIdForLabel+"' style='display:inline-block'>"+inputResource.displayvalue+"</div>");
+      <div class='"+uniqueIdForLabel+"' style='"+customStyle+"'>"+inputResource.displayvalue+"</div>");
 
     // +$('<div/>').text(inputResource.displayvalue).html()); // legacy code
     $.ajax({

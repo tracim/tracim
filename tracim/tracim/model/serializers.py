@@ -398,7 +398,7 @@ def serialize_node_for_page(content: Content, context: Context):
             links=[],
             revision_nb = len(content.revisions),
             selected_revision='latest' if content.revision_to_serialize<=0 else content.revision_to_serialize,
-            history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history()),
+            history=Context(CTX.CONTENT_HISTORY).toDict(content.get_history(drop_empty_revision=True)),  # nopep8
             is_editable=content.is_editable,
             is_deleted=content.is_deleted,
             is_archived=content.is_archived,
@@ -475,7 +475,7 @@ def serialize_node_for_thread(item: Content, context: Context):
             workspace = context.toDict(item.workspace),
             comments = reversed(context.toDict(item.get_comments())),
             is_new=item.has_new_information_for(context.get_user()),
-            history = Context(CTX.CONTENT_HISTORY).toDict(item.get_history()),
+            history = Context(CTX.CONTENT_HISTORY).toDict(item.get_history(drop_empty_revision=True)),  # nopep8
             is_editable=item.is_editable,
             is_deleted=item.is_deleted,
             is_archived=item.is_archived,

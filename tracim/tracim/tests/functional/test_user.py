@@ -22,7 +22,6 @@ class TestAuthentication(TracimTestController):
 
         user = DBSession.query(User) \
             .filter(User.email == 'lawrence-not-real-email@fsf.local').one()
-        webdav_digest = user.webdav_left_digest_response_hash
 
         try_post_user = self.app.post(
             '/user/{user_id}/password?_method=PUT'.format(
@@ -40,7 +39,3 @@ class TestAuthentication(TracimTestController):
         user = DBSession.query(User) \
             .filter(User.email == 'lawrence-not-real-email@fsf.local').one()
         ok_(user.validate_password('new-password'))
-        ok_(
-            webdav_digest != user.webdav_left_digest_response_hash,
-            msg='Webdav digest should be updated',
-        )

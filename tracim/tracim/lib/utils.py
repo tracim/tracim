@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import os
 import time
 import signal
@@ -18,6 +19,7 @@ from redis import Redis
 from rq import Queue
 from unidecode import unidecode
 
+from wsgidav.middleware import BaseMiddleware
 from tracim.lib.base import logger
 from webob import Response
 from webob.exc import WSGIHTTPException
@@ -193,3 +195,32 @@ def get_rq_queue(queue_name: str= 'default') -> Queue:
         port=cfg.EMAIL_SENDER_REDIS_PORT,
         db=cfg.EMAIL_SENDER_REDIS_DB,
     ))
+
+def current_date_for_filename() -> str:
+    """
+    ISO8601 current date, adapted to be used in filename (for
+    webdav feature for example), with trouble-free characters.
+    :return: current date as string like "2018-03-19T15.49.27.246592"
+    """
+    # INFO - G.M - 19-03-2018 - As ':' is in transform_to_bdd method in
+    # webdav utils, it may cause trouble. So, it should be replaced to
+    # a character which will not change in bdd.
+    return datetime.datetime.now().isoformat().replace(':', '.')
+
+class TracimEnforceHTTPS(BaseMiddleware):
+
+    def __init__(self, application, config):
+        super().__init__(application, config)
+        self._application = application
+        self._config = config
+
+    def __call__(self, environ, start_response):
+        # TODO - G.M - 06-03-2018 - Check protocol from http header first
+        # see http://www.bortzmeyer.org/7239.html
+        # if this params doesn't exist, rely on tracim config
+        from tracim.config.app_cfg import CFG
+        cfg = CFG.get_instance()
+
+        if cfg.WEBSITE_BASE_URL.startswith('https'):
+            environ['wsgi.url_scheme'] = 'https'
+        return self._application(environ, start_response)

@@ -120,7 +120,8 @@ _LABELS = {
     'unarchiving': 'Item unarchived',
     'undeletion': 'Item undeleted',
     'move': 'Item moved',
-    'comment': 'Comment'
+    'comment': 'Comment',
+    'copy' : 'Item copied',
 }
 
 
@@ -148,7 +149,7 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
     return aff
 
 def designPage(content: data.Content, content_revision: data.ContentRevisionRO) -> str:
-    hist = content.get_history()
+    hist = content.get_history(drop_empty_revision=False)
     histHTML = '<table class="table table-striped table-hover">'
     for event in hist:
         if isinstance(event, VirtualEvent):
@@ -237,7 +238,7 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
     return page
 
 def designThread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
-        hist = content.get_history()
+        hist = content.get_history(drop_empty_revision=False)
 
         allT = []
         allT += comments

@@ -2,6 +2,9 @@
 
 from tracim.lib.user import UserApi
 
+class DigestAuthNotImplemented(Exception):
+    pass
+
 class TracimDomainController(object):
     """
     The domain controller is used by http_authenticator to authenticate the user every time a request is
@@ -12,6 +15,14 @@ class TracimDomainController(object):
 
     def getDomainRealm(self, inputURL, environ):
         return '/'
+
+    def getRealmUserPassword(self, realmname, username, environ):
+        """
+        This method is normally only use for digest auth. wsgidav need
+        plain password to deal with it. as we didn't
+        provide support for this kind of auth, this method raise an exception.
+        """
+        raise DigestAuthNotImplemented
 
     def requireAuthentication(self, realmname, environ):
         return True
@@ -26,17 +37,6 @@ class TracimDomainController(object):
             return True
         except:
             return False
-
-    def get_left_digest_response_hash(self, realmname, username, environ):
-        """
-        Called by our http_authenticator to get the hashed md5 digest for the current user that is also sent by
-        the webdav client
-        """
-        try:
-            user = self._api.get_one_by_email(username)
-            return user.webdav_left_digest_response_hash
-        except:
-            return None
 
     def authDomainUser(self, realmname, username, password, environ):
         """

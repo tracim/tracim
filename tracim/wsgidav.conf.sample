@@ -25,6 +25,10 @@ manager_locks = True
 
 root_path = ''
 
+# Tracim doesn't support digest auth for webdav
+acceptbasic = True
+acceptdigest = False
+defaultdigest = False
 #===============================================================================
 # Lock Manager
 #

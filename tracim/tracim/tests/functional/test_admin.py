@@ -43,9 +43,6 @@ class TestAuthentication(TracimTestController):
         ok_(user, msg="User should exist now")
         ok_(user.validate_password('password'))
 
-        # User must have webdav digest
-        ok_(user.webdav_left_digest_response_hash)
-
     def test_update_user_password(self):
         self._connect_user(
             'admin@admin.admin',
@@ -67,7 +64,6 @@ class TestAuthentication(TracimTestController):
 
         user = DBSession.query(User) \
             .filter(User.email == 'an-other-email@test.local').one()
-        webdav_digest = user.webdav_left_digest_response_hash
 
         self.app.post(
             '/admin/users/{user_id}/password?_method=PUT'.format(
@@ -82,7 +78,3 @@ class TestAuthentication(TracimTestController):
         user = DBSession.query(User) \
             .filter(User.email == 'an-other-email@test.local').one()
         ok_(user.validate_password('new-password'))
-        ok_(
-            webdav_digest != user.webdav_left_digest_response_hash,
-            msg='Webdav digest should be updated',
-        )

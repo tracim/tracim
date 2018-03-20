@@ -4,6 +4,7 @@ import datetime
 from nose.tools import eq_, ok_
 from nose.tools import raises
 
+from depot.io.utils import FileIntent
 import transaction
 
 from tracim.lib.content import compare_content_for_sorting_by_type_and_name
@@ -347,6 +348,267 @@ class TestContentApi(BaseTest, TestStandard):
         eq_('', c.label)
         eq_(ActionDescription.COMMENT, c.revision_type)
 
+    def test_unit_copy_file_different_label_different_parent_ok(self):
+        uapi = UserApi(None)
+        groups = [
+            GroupApi(None).get_one(Group.TIM_USER),
+            GroupApi(None).get_one(Group.TIM_MANAGER),
+            GroupApi(None).get_one(Group.TIM_ADMIN)
+        ]
+
+        user = uapi.create_user(
+            email='user1@user',
+            groups=groups,
+            save_now=True
+        )
+        user2 = uapi.create_user(
+            email='user2@user',
+            groups=groups,
+            save_now=True
+        )
+        workspace = WorkspaceApi(user).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        RoleApi(user).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            with_notif=False
+        )
+        api = ContentApi(user)
+        foldera = api.create(
+            ContentType.Folder,
+            workspace,
+            None,
+            'folder a',
+            True
+        )
+        with DBSession.no_autoflush:
+            text_file = api.create(
+                content_type=ContentType.File,
+                workspace=workspace,
+                parent=foldera,
+                label='test_file',
+                do_save=False,
+            )
+            api.update_file_data(
+                text_file,
+                'test_file',
+                'text/plain',
+                b'test_content'
+            )
+
+        api.save(text_file, ActionDescription.CREATION)
+        api2 = ContentApi(user2)
+        workspace2 = WorkspaceApi(user2).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+        folderb = api2.create(
+            ContentType.Folder,
+            workspace2,
+            None,
+            'folder b',
+            True
+        )
+
+        api2.copy(
+            item=text_file,
+            new_parent=folderb,
+            new_label='test_file_copy'
+        )
+
+        transaction.commit()
+        text_file_copy = api2.get_one_by_label_and_parent(
+            'test_file_copy',
+            folderb,
+        )
+
+        assert text_file != text_file_copy
+        assert text_file_copy.content_id != text_file.content_id
+        assert text_file_copy.workspace_id == workspace2.workspace_id
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()   # nopep8
+        assert text_file_copy.depot_file.path != text_file.depot_file.path
+        assert text_file_copy.label == 'test_file_copy'
+        assert text_file_copy.type == text_file.type
+        assert text_file_copy.parent.content_id == folderb.content_id
+        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.description == text_file.description
+        assert text_file_copy.file_extension == text_file.file_extension
+        assert text_file_copy.file_mimetype == text_file.file_mimetype
+        assert text_file_copy.revision_type == ActionDescription.COPY
+        assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
+
+    def test_unit_copy_file__same_label_different_parent_ok(self):
+        uapi = UserApi(None)
+        groups = [GroupApi(None).get_one(Group.TIM_USER),
+                  GroupApi(None).get_one(Group.TIM_MANAGER),
+                  GroupApi(None).get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_user(
+            email='user1@user',
+            groups=groups,
+            save_now=True
+        )
+        user2 = uapi.create_user(
+            email='user2@user',
+            groups=groups,
+            save_now=True
+        )
+        workspace = WorkspaceApi(user).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        RoleApi(user).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            with_notif=False
+        )
+        api = ContentApi(user)
+        foldera = api.create(
+            ContentType.Folder,
+            workspace,
+            None,
+            'folder a',
+            True
+        )
+        with DBSession.no_autoflush:
+            text_file = api.create(
+                content_type=ContentType.File,
+                workspace=workspace,
+                parent=foldera,
+                label='test_file',
+                do_save=False,
+            )
+            api.update_file_data(
+                text_file,
+                'test_file',
+                'text/plain',
+                b'test_content'
+            )
+
+        api.save(text_file, ActionDescription.CREATION)
+        api2 = ContentApi(user2)
+        workspace2 = WorkspaceApi(user2).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+        folderb = api2.create(
+            ContentType.Folder,
+            workspace2,
+            None,
+            'folder b',
+            True
+        )
+        api2.copy(
+            item=text_file,
+            new_parent=folderb,
+        )
+
+        transaction.commit()
+        text_file_copy = api2.get_one_by_label_and_parent(
+            'test_file',
+            folderb,
+        )
+
+        assert text_file != text_file_copy
+        assert text_file_copy.content_id != text_file.content_id
+        assert text_file_copy.workspace_id == workspace2.workspace_id
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()  # nopep8
+        assert text_file_copy.depot_file.path != text_file.depot_file.path
+        assert text_file_copy.label == text_file.label
+        assert text_file_copy.type == text_file.type
+        assert text_file_copy.parent.content_id == folderb.content_id
+        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.description == text_file.description
+        assert text_file_copy.file_extension == text_file.file_extension
+        assert text_file_copy.file_mimetype == text_file.file_mimetype
+        assert text_file_copy.revision_type == ActionDescription.COPY
+        assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
+
+    def test_unit_copy_file_different_label_same_parent_ok(self):
+        uapi = UserApi(None)
+        groups = [
+            GroupApi(None).get_one(Group.TIM_USER),
+            GroupApi(None).get_one(Group.TIM_MANAGER),
+            GroupApi(None).get_one(Group.TIM_ADMIN),
+        ]
+
+        user = uapi.create_user(
+            email='user1@user',
+            groups=groups,
+            save_now=True,
+        )
+        user2 = uapi.create_user(
+            email='user2@user',
+            groups=groups,
+            save_now=True
+        )
+        workspace = WorkspaceApi(user).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        RoleApi(user).create_one(
+            user2, workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            with_notif=False
+        )
+        api = ContentApi(user)
+        foldera = api.create(
+            ContentType.Folder,
+            workspace,
+            None,
+            'folder a',
+            True
+        )
+        with DBSession.no_autoflush:
+            text_file = api.create(
+                content_type=ContentType.File,
+                workspace=workspace,
+                parent=foldera,
+                label='test_file',
+                do_save=False,
+            )
+            api.update_file_data(
+                text_file,
+                'test_file',
+                'text/plain',
+                b'test_content'
+            )
+
+        api.save(
+            text_file,
+            ActionDescription.CREATION
+        )
+        api2 = ContentApi(user2)
+
+        api2.copy(
+            item=text_file,
+            new_label='test_file_copy'
+        )
+
+        transaction.commit()
+        text_file_copy = api2.get_one_by_label_and_parent(
+            'test_file_copy',
+            foldera,
+        )
+
+        assert text_file != text_file_copy
+        assert text_file_copy.content_id != text_file.content_id
+        assert text_file_copy.workspace_id == workspace.workspace_id
+        assert text_file_copy.depot_file.file.read() == text_file.depot_file.file.read()  # nopep8
+        assert text_file_copy.depot_file.path != text_file.depot_file.path
+        assert text_file_copy.label == 'test_file_copy'
+        assert text_file_copy.type == text_file.type
+        assert text_file_copy.parent.content_id == foldera.content_id
+        assert text_file_copy.owner.user_id == user.user_id
+        assert text_file_copy.description == text_file.description
+        assert text_file_copy.file_extension == text_file.file_extension
+        assert text_file_copy.file_mimetype == text_file.file_mimetype
+        assert text_file_copy.revision_type == ActionDescription.COPY
+        assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
     def test_mark_read__workspace(self):
         uapi = UserApi(None)

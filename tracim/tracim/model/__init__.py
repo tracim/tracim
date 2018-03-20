@@ -120,7 +120,10 @@ def prevent_content_revision_delete(session: Session, flush_context: UOWTransact
 
 
 @contextmanager
-def new_revision(content: Content) -> Content:
+def new_revision(
+        content: Content,
+        force_create_new_revision: bool=False,
+) -> Content:
     """
     Prepare context to update a Content. It will add a new updatable revision to the content.
     :param content: Content instance to update
@@ -128,7 +131,8 @@ def new_revision(content: Content) -> Content:
     """
     with DBSession.no_autoflush:
         try:
-            if inspect(content.revision).has_identity:
+            if force_create_new_revision \
+                    or inspect(content.revision).has_identity:
                 content.new_revision()
             RevisionsIntegrity.add_to_updatable(content.revision)
             yield content

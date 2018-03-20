@@ -23,6 +23,7 @@ from tracim.model.data import Workspace
 
 from tracim.model.serializers import Context, CTX, DictLikeClass
 
+from urllib.parse import urlparse
 
 class UserWorkspaceRestController(TIMRestController):
 
@@ -103,13 +104,20 @@ class UserWorkspaceRestController(TIMRestController):
         videoconf_enabled = CFG.get_instance().JITSI_MEET_ACTIVATED
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
+
         webdav_url = CFG.get_instance().WSGIDAV_CLIENT_BASE_URL
+        website_protocol = urlparse(CFG.get_instance().WEBSITE_BASE_URL).scheme
+        dav_protocol = 'dav'
+        if website_protocol == "https":
+            dav_protocol = 'davs'
 
         return DictLikeClass(
             result=dictified_workspace,
             fake_api=fake_api,
             webdav_url=webdav_url,
             videoconf_enabled=videoconf_enabled,
+            website_protocol = website_protocol,
+            dav_protocol = dav_protocol,
             show_deleted=show_deleted,
             show_archived=show_archived,
         )
