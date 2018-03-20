@@ -8,7 +8,8 @@ from sqlalchemy.orm.unitofwork import UOWTransaction
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from tracim.lib.exception import ContentRevisionUpdateError, ContentRevisionDeleteError
-
+from tracim.lib.utils import SameValueError
+import transaction
 
 class RevisionsIntegrity(object):
     """
@@ -136,5 +137,12 @@ def new_revision(
                 content.new_revision()
             RevisionsIntegrity.add_to_updatable(content.revision)
             yield content
+        except SameValueError or ValueError as e:
+            # INFO - 20-03-2018 - renew transaction when error happened
+            # This avoid bad session data like new "temporary" revision
+            # to be add when problem happen.
+            transaction.abort()
+            transaction.begin()
+            raise e
         finally:
             RevisionsIntegrity.remove_from_updatable(content.revision)

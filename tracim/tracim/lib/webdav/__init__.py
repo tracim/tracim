@@ -5,11 +5,13 @@ from wsgidav import util
 from wsgidav import compat
 
 from tracim.lib.content import ContentApi
+from tracim.lib.utils import SameValueError
 from tracim.model import new_revision
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 from tracim.model.data import Content
 from tracim.model.data import Workspace
+from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN, HTTP_NOT_MODIFIED
 
 
 class HistoryType(object):
@@ -96,12 +98,20 @@ class FakeFileStream(object):
 
         self._file_stream.seek(0)
 
-        if self._content is None:
-            self.create_file()
-        else:
-            self.update_file()
-
-        transaction.commit()
+        try:
+            if self._content is None:
+                self.create_file()
+            else:
+                self.update_file()
+            transaction.commit()
+        except SameValueError:
+            transaction.abort()
+            transaction.begin()
+            raise DAVError(HTTP_NOT_MODIFIED)
+        except ValueError:
+            transaction.abort()
+            transaction.begin()
+            raise DAVError(HTTP_FORBIDDEN)
 
     def create_file(self):
         """
@@ -138,5 +148,4 @@ class FakeFileStream(object):
                 util.guessMimeType(self._content.file_name),
                 self._file_stream.read()
             )
-
             self._api.save(self._content, ActionDescription.REVISION)

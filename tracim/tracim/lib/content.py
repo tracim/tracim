@@ -920,7 +920,9 @@ class ContentApi(object):
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
         if item.label==new_label and item.description==new_content:
-            raise SameValueError(_('The content did not changed'))
+            # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
+            # Internatization disabled in libcontent for now.
+            raise SameValueError('The content did not changed')
         item.owner = self._user
         item.label = new_label
         item.description = new_content if new_content else item.description # TODO: convert urls into links
@@ -928,6 +930,9 @@ class ContentApi(object):
         return item
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
+        if new_mimetype == item.file_mimetype and \
+                new_content == item.depot_file.file.read():
+            raise SameValueError('The content did not changed')
         item.owner = self._user
         item.file_name = new_filename
         item.file_mimetype = new_mimetype

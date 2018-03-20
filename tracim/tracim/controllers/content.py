@@ -174,7 +174,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
 
     @property
     def _err_url(self):
-        return tg.url('/dashboard/workspaces/{}/folders/{}/file/{}')
+        return tg.url('/workspaces/{}/folders/{}/files/{}')
 
     @property
     def _item_type(self):
@@ -376,19 +376,13 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
         try:
             api = ContentApi(tmpl_context.current_user)
             item = api.get_one(int(item_id), self._item_type, workspace)
-            label_changed = False
-            if label is not None and label != item.label:
-                label_changed = True
-
-            if label is None:
-                label = ''
-
-            # TODO - D.A. - 2015-03-19
-            # refactor this method in order to make code easier to understand
 
             with new_revision(item):
+                if label:
+                    # This case is the default "file title and description
+                    # update" In this case the file itself is not revisionned
 
-                if (comment and label) or (not comment and label_changed):
+                    # Update description and label
                     updated_item = api.update_content(
                         item, label if label else item.label,
                         comment if comment else ''
@@ -401,31 +395,21 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                         return render_invalid_integrity_chosen_path(
                             updated_item.get_label_as_file(),
                         )
-
                     api.save(updated_item, ActionDescription.EDITION)
-
-                    # This case is the default "file title and description
-                    # update" In this case the file itself is not revisionned
-
                 else:
                     # So, now we may have a comment and/or a file revision
-                    if comment and '' == label:
-                        comment_item = api.create_comment(workspace,
-                                                          item, comment,
-                                                          do_save=False)
+                    comment_item = None
+                    file_revision = None
 
-                        if not isinstance(file_data, FieldStorage):
-                            api.save(comment_item, ActionDescription.COMMENT)
-                        else:
-                            # The notification is only sent
-                            # if the file is NOT updated
-                            #
-                            # If the file is also updated,
-                            # then a 'file revision' notification will be sent.
-                            api.save(comment_item,
-                                     ActionDescription.COMMENT,
-                                     do_notify=False)
-
+                    # INFO - G.M - 20/03/2018 - Add new comment
+                    if comment:
+                        comment_item = api.create_comment(
+                            workspace,
+                            item,
+                            comment,
+                            do_save=False
+                        )
+                    # INFO - G.M - 20/03/2018 - Add new file-revision
                     if isinstance(file_data, FieldStorage):
                         api.update_file_data(item,
                                              file_data.filename,
@@ -440,14 +424,34 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
                             return render_invalid_integrity_chosen_path(
                                 item.get_label_as_file(),
                             )
+                        file_revision = True
 
+                    # INFO - G.M - 20/03/2018 - Save revision/comment
+                    if comment_item and file_revision:
+                        api.save(
+                            comment_item,
+                            ActionDescription.COMMENT,
+                            do_notify= False
+                        )
                         api.save(item, ActionDescription.REVISION)
+                    elif file_revision:
+                        api.save(item, ActionDescription.REVISION)
+                    elif comment_item:
+                        api.save(comment_item, ActionDescription.COMMENT)
 
             msg = _('{} updated').format(self._item_type_label)
             tg.flash(msg, CST.STATUS_OK)
             tg.redirect(self._std_url.format(tmpl_context.workspace_id,
                                              tmpl_context.folder_id,
                                              item.content_id))
+
+        except SameValueError:
+            not_updated = '{} not updated: the content did not change'
+            msg = _(not_updated).format(self._item_type_label)
+            tg.flash(msg, CST.STATUS_WARNING)
+            tg.redirect(self._err_url.format(tmpl_context.workspace_id,
+                                             tmpl_context.folder_id,
+                                             item_id))
 
         except ValueError as e:
             error = '{} not updated - error: {}'
@@ -457,6 +461,7 @@ class UserWorkspaceFolderFileRestController(TIMWorkspaceContentRestController):
             tg.redirect(self._err_url.format(tmpl_context.workspace_id,
                                              tmpl_context.folder_id,
                                              item_id))
+
 
 
 class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
@@ -606,7 +611,7 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
             tg.redirect(self._std_url.format(tmpl_context.workspace_id,
                                              tmpl_context.folder_id,
                                              item.content_id))
-        except SameValueError as e:
+        except SameValueError:
             not_updated = '{} not updated: the content did not change'
             msg = _(not_updated).format(self._item_type_label)
             tg.flash(msg, CST.STATUS_WARNING)
@@ -620,7 +625,6 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
             tg.redirect(self._err_url.format(tmpl_context.workspace_id,
                                              tmpl_context.folder_id,
                                              item_id))
-
 
 class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController):
     """
