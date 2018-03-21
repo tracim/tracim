@@ -215,14 +215,24 @@ class Workspace(DAVCollection):
         if resource:
             content = resource.content
 
-        return FakeFileStream(
-            file_name=file_name,
-            content_api=self.content_api,
-            workspace=self.workspace,
-            content=content,
-            parent=self.content,
-            path=self.path + '/' + file_name
-        )
+        if not content:
+            # INFO - G.M - 21-03-2018 create new empty file and commit it.
+            new_empty_file = FakeFileStream(
+                file_name=file_name,
+                content_api=self.content_api,
+                workspace=self.workspace,
+                content=content,
+                parent=self.content,
+                path=path,
+            )
+            new_empty_file.close()
+
+        # INFO - G.M - 21-03-2018 - Obtain true davFile from provider
+        resource = self.provider.getResourceInst(path, self.environ)
+        if not resource:
+            raise DAVError(HTTP_FORBIDDEN)
+        content = resource.content
+        return File(path=path, content=content,environ=self.environ)
 
     def createCollection(self, label: str) -> 'Folder':
         """
