@@ -6,6 +6,7 @@ from wsgidav import compat
 
 from tracim.lib.content import ContentApi
 from tracim.lib.utils import SameValueError
+from tracim.lib.base import logger
 from tracim.model import new_revision
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
@@ -105,10 +106,23 @@ class FakeFileStream(object):
                 self.update_file()
             transaction.commit()
         except SameValueError:
+            # INFO - G.M - 21-03-2018 - Do nothing, file as not change.
+            msg = 'File {filename} modified through webdav did not change, transaction aborted.'  # nopep8
+            logger.debug(
+                self,
+                msg.format(filename=self._file_name)
+            )
             transaction.abort()
             transaction.begin()
-            raise DAVError(HTTP_NOT_MODIFIED)
-        except ValueError:
+        except ValueError as e:
+            msg = 'File {filename} modified through webdav can\'t be updated: {exception}'  # nopep8
+            logger.debug(
+                self,
+                msg.format(
+                    filename=self._file_name,
+                    e=e.__str__,
+                )
+            )
             transaction.abort()
             transaction.begin()
             raise DAVError(HTTP_FORBIDDEN)
