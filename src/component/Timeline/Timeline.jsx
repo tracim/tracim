@@ -61,7 +61,7 @@ const Timeline = props => {
 
             case 'version':
               return <Version
-                customClass={props.customClas}
+                customClass={props.customClass}
                 createdAt={content.createdAt}
                 number={content.number}
                 key={content.id}
