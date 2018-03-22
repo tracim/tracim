@@ -11,6 +11,7 @@ from tracim.lib.content import compare_content_for_sorting_by_type_and_name
 from tracim.lib.content import ContentApi
 from tracim.lib.group import GroupApi
 from tracim.lib.user import UserApi
+from tracim.lib.utils import SameValueError
 from tracim.lib.workspace import RoleApi
 from tracim.lib.workspace import WorkspaceApi
 from tracim.model import DBSession, new_revision, User
@@ -829,6 +830,60 @@ class TestContentApi(BaseTest, TestStandard):
         eq_('new content', updated.description)
         eq_(ActionDescription.EDITION, updated.revision_type)
 
+    @raises(SameValueError)
+    def test_update_no_change(self):
+        uapi = UserApi(None)
+        groups = [
+            GroupApi(None).get_one(Group.TIM_USER),
+            GroupApi(None).get_one(Group.TIM_MANAGER),
+            GroupApi(None).get_one(Group.TIM_ADMIN)
+        ]
+
+        user1 = uapi.create_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True,
+        )
+
+        workspace = WorkspaceApi(user1).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+
+        user2 = uapi.create_user()
+        user2.email = 'this.is@another.user'
+        uapi.save(user2)
+
+        RoleApi(user1).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+            flush=True
+        )
+        api = ContentApi(user1)
+        with DBSession.no_autoflush:
+            page = api.create(
+                content_type=ContentType.Page,
+                workspace=workspace,
+                label="same_content",
+                do_save=False
+            )
+            page.description = "Same_content_here"
+        api.save(page, ActionDescription.CREATION, do_notify=True)
+        transaction.commit()
+
+        api2 = ContentApi(user2)
+        content2 = api2.get_one(page.content_id, ContentType.Any, workspace)
+        with new_revision(content2):
+            api2.update_content(
+                item=content2,
+                new_label='same_content',
+                new_content='Same_content_here'
+            )
+        api2.save(content2)
+        transaction.commit()
+
     def test_update_file_data(self):
         uapi = UserApi(None)
         groups = [GroupApi(None).get_one(Group.TIM_USER),
@@ -895,6 +950,67 @@ class TestContentApi(BaseTest, TestStandard):
         eq_('text/html', updated.file_mimetype)
         eq_(b'<html>hello world</html>', updated.depot_file.file.read())
         eq_(ActionDescription.REVISION, updated.revision_type)
+
+    @raises(SameValueError)
+    def test_update_no_change(self):
+        uapi = UserApi(None)
+        groups = [
+            GroupApi(None).get_one(Group.TIM_USER),
+            GroupApi(None).get_one(Group.TIM_MANAGER),
+            GroupApi(None).get_one(Group.TIM_ADMIN)
+        ]
+
+        user1 = uapi.create_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True,
+        )
+
+        workspace = WorkspaceApi(user1).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+
+        user2 = uapi.create_user()
+        user2.email = 'this.is@another.user'
+        uapi.save(user2)
+
+        RoleApi(user1).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+            flush=True
+        )
+        api = ContentApi(user1)
+        with DBSession.no_autoflush:
+            page = api.create(
+                content_type=ContentType.Page,
+                workspace=workspace,
+                label="same_content",
+                do_save=False
+            )
+            api.update_file_data(
+                page,
+                'index.html',
+                'text/html',
+                b'<html>Same Content Here</html>'
+            )
+        api.save(page, ActionDescription.CREATION, do_notify=True)
+        transaction.commit()
+
+        api2 = ContentApi(user2)
+        content2 = api2.get_one(page.content_id, ContentType.Any, workspace)
+        with new_revision(content2):
+            api2.update_file_data(
+                page,
+                'index.html',
+                'text/html',
+                b'<html>Same Content Here</html>'
+            )
+        api2.save(content2)
+        transaction.commit()
+
 
     def test_archive_unarchive(self):
         uapi = UserApi(None)
