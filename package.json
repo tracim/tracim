@@ -5,7 +5,9 @@
   "scripts": {
     "mockapi": "node jsonserver/server.js",
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
+    "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9870 -- webpack-dev-server --watch --colors --inline --hot --progress",
+    "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build": "NODE_ENV=production webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
