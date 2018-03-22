@@ -12,7 +12,7 @@ from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 from tracim.model.data import Content
 from tracim.model.data import Workspace
-from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN, HTTP_NOT_MODIFIED
+from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
 
 
 class HistoryType(object):

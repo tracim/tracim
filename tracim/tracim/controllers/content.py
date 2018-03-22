@@ -582,9 +582,11 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
 
         tg.flash(_('Page created'), CST.STATUS_OK)
         redirect = '/workspaces/{}/folders/{}/pages/{}'
-        tg.redirect(tg.url(redirect).format(tmpl_context.workspace_id,
-                                            tmpl_context.folder_id,
-                                            page.content_id))
+        tg.redirect(tg.url(redirect).format(
+            tmpl_context.workspace_id,
+            tmpl_context.folder_id,
+            page.content_id)
+        )
 
     @tg.require(current_user_is_contributor())
     @tg.expose()
@@ -615,16 +617,24 @@ class UserWorkspaceFolderPageRestController(TIMWorkspaceContentRestController):
             not_updated = '{} not updated: the content did not change'
             msg = _(not_updated).format(self._item_type_label)
             tg.flash(msg, CST.STATUS_WARNING)
-            tg.redirect(self._err_url.format(tmpl_context.workspace_id,
-                                             tmpl_context.folder_id,
-                                             item_id))
+            tg.redirect(
+                self._err_url.format(
+                    tmpl_context.workspace_id,
+                    tmpl_context.folder_id,
+                    item_id
+                )
+            )
         except ValueError as e:
             not_updated = '{} not updated - error: {}'
             msg = _(not_updated).format(self._item_type_label, str(e))
             tg.flash(msg, CST.STATUS_ERROR)
-            tg.redirect(self._err_url.format(tmpl_context.workspace_id,
-                                             tmpl_context.folder_id,
-                                             item_id))
+            tg.redirect(
+                self._err_url.format(
+                    tmpl_context.workspace_id,
+                    tmpl_context.folder_id,
+                    item_id
+                )
+            )
 
 class UserWorkspaceFolderThreadRestController(TIMWorkspaceContentRestController):
     """
