@@ -5,11 +5,15 @@ from wsgidav import util
 from wsgidav import compat
 
 from tracim.lib.content import ContentApi
+from tracim.lib.utils import SameValueError
+from tracim.lib.base import logger
 from tracim.model import new_revision
 from tracim.model.data import ActionDescription
 from tracim.model.data import ContentType
 from tracim.model.data import Content
 from tracim.model.data import Workspace
+from wsgidav.dav_error import DAVError
+from wsgidav.dav_error import HTTP_FORBIDDEN
 
 
 class HistoryType(object):
@@ -96,12 +100,33 @@ class FakeFileStream(object):
 
         self._file_stream.seek(0)
 
-        if self._content is None:
-            self.create_file()
-        else:
-            self.update_file()
-
-        transaction.commit()
+        try:
+            if self._content is None:
+                self.create_file()
+            else:
+                self.update_file()
+            transaction.commit()
+        except SameValueError:
+            # INFO - G.M - 21-03-2018 - Do nothing, file as not change.
+            msg = 'File {filename} modified through webdav did not change, transaction aborted.'  # nopep8
+            logger.debug(
+                self,
+                msg.format(filename=self._file_name)
+            )
+            transaction.abort()
+            transaction.begin()
+        except ValueError as e:
+            msg = 'File {filename} modified through webdav can\'t be updated: {exception}'  # nopep8
+            logger.debug(
+                self,
+                msg.format(
+                    filename=self._file_name,
+                    e=e.__str__,
+                )
+            )
+            transaction.abort()
+            transaction.begin()
+            raise DAVError(HTTP_FORBIDDEN)
 
     def create_file(self):
         """
@@ -138,5 +163,4 @@ class FakeFileStream(object):
                 util.guessMimeType(self._content.file_name),
                 self._file_stream.read()
             )
-
             self._api.save(self._content, ActionDescription.REVISION)
