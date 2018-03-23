@@ -339,9 +339,14 @@ class TestWebDav(TestStandard):
             new_file
         ))
 
+        nb_rev = DBSession.query(ContentRevisionRO) \
+            .filter(Content.label == 'new_file')\
+            .order_by(Content.revision_id.desc()).count()
+        eq_(nb_rev, 2, "It must exist only be 2 revision.")
+
         content_new_file = DBSession.query(ContentRevisionRO) \
-            .filter(Content.label == 'new_file') \
-            .one()  # It must exist only one revision
+            .filter(Content.label == 'new_file').order_by(ContentRevisionRO.revision_id)\
+            .order_by(Content.revision_id.desc()).first()
         eq_(
             False,
             content_new_file.is_deleted,
