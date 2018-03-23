@@ -162,6 +162,10 @@ class Workspace(DAVCollection):
 
         self._file_count = 0
 
+        # FIXME : Remove this regex when tracim become
+        # able to deal with file at root of workspace
+        self._subfolder_regex = re.compile('^{}[^/]*$'.format(environ['http_authenticator.realm']))  # nopep8
+
     def __repr__(self) -> str:
         return "<DAVCollection: Workspace (%d)>" % self.workspace.workspace_id
 
@@ -216,6 +220,11 @@ class Workspace(DAVCollection):
         resource = self.provider.getResourceInst(path, self.environ)
         if resource:
             content = resource.content
+
+        # FIXME : Remove this regex when tracim become
+        # able to deal with file at root of workspace
+        if self._subfolder_regex.match(dirname(path)):
+            raise DAVError(HTTP_FORBIDDEN)
 
         if not content:
             # INFO - G.M - 21-03-2018 create new empty file and commit it.
@@ -410,6 +419,7 @@ class Folder(Workspace):
             invalid_path = any(x in destpath for x in ['.deleted', '.archived'])
             invalid_path = invalid_path or any(x in self.path for x in ['.deleted', '.archived'])
             invalid_path = invalid_path or dirname(destpath) == self.environ['http_authenticator.realm']
+
 
             if not invalid_path:
                 self.move_folder(destpath)
@@ -845,6 +855,9 @@ class File(DAVNonCollection):
         self.content = content
         self.user = UserApi(None).get_one_by_email(environ['http_authenticator.username'])
         self.content_api = ContentApi(self.user)
+        # FIXME : Remove this regex when tracim become
+        # able to deal with file at root of workspace
+        self._subfolder_regex = re.compile('^{}[^/]*$'.format(environ['http_authenticator.realm']))  # nopep8
 
         # this is the property that windows client except to check if the file is read-write or read-only,
         # but i wasn't able to set this property so you'll have to look into it >.>
@@ -927,6 +940,9 @@ class File(DAVNonCollection):
             invalid_path = any(x in destpath for x in ['.deleted', '.archived'])
             invalid_path = invalid_path or any(x in self.path for x in ['.deleted', '.archived'])
             invalid_path = invalid_path or dirname(destpath) == self.environ['http_authenticator.realm']
+            # FIXME : Remove this regex when tracim become
+            # able to deal with file at root of workspace
+            invalid_path = invalid_path or self._subfolder_regex.match(dirname(destpath))
 
             if not invalid_path:
                 self.move_file(destpath)
