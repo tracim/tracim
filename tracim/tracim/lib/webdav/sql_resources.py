@@ -24,7 +24,9 @@ from tracim.model.data import ContentType
 from tracim.lib.webdav.design import designThread, designPage
 
 from wsgidav import compat
-from wsgidav.dav_error import DAVError, HTTP_FORBIDDEN
+from wsgidav.dav_error import DAVError
+from wsgidav.dav_error import HTTP_FORBIDDEN
+from wsgidav.dav_error import HTTP_NOT_FOUND
 from wsgidav.dav_provider import DAVCollection, DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
 from tracim.lib.webdav.utils import normpath
@@ -224,15 +226,24 @@ class Workspace(DAVCollection):
         if self._subfolder_regex.match(dirname(path)):
             raise DAVError(HTTP_FORBIDDEN)
 
+        if not content:
+            # INFO - G.M - 21-03-2018 create new empty file and commit it.
+            new_empty_file = FakeFileStream(
+                file_name=file_name,
+                content_api=self.content_api,
+                workspace=self.workspace,
+                content=content,
+                parent=self.content,
+                path=path,
+            )
+            new_empty_file.close()
 
-        return FakeFileStream(
-            file_name=file_name,
-            content_api=self.content_api,
-            workspace=self.workspace,
-            content=content,
-            parent=self.content,
-            path=self.path + '/' + file_name
-        )
+        # INFO - G.M - 21-03-2018 - Obtain true davFile from provider
+        resource = self.provider.getResourceInst(path, self.environ)
+        if not resource:
+            raise DAVError(HTTP_NOT_FOUND)
+        content = resource.content
+        return File(path=path, content=content, environ=self.environ)
 
     def createCollection(self, label: str) -> 'Folder':
         """
