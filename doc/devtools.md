@@ -1,5 +1,11 @@
 # Devtools
 
+# Make request in CLI
+
+## upload a file
+
+    http --timeout 99999999999999 -f POST  http://127.0.0.1:8080/workspaces/1/folders/2/files label='test3' file_data@~/Téléchargements/fr_windows_8_1_x86_dvd_2707457.iso 'Cookie: authtkt="ec5249770f9709d6c5aec5caf458c0875ab8eeefadmin%40admin.admin!"'
+
 # Check third party licences
 
 Install `yolk3k` pip package:
