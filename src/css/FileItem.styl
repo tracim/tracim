@@ -1,3 +1,8 @@
+iconrules()
+  display inline-block
+  margin-right 10px
+  font-size 20px
+
 .file
   display flex
   border-bottom 0
@@ -15,14 +20,17 @@
       font-size 17px
     &__icons
       &__download
-        display inline-block
-        margin-right 10px
+        iconrules()
+        &:hover, &:focus
+          color blue
       &__archive
-        display inline-block
-        margin-right 10px
+        iconrules()
+        &:hover, &:focus
+          color blue
       &__delete
-        display inline-block
-        margin-right 10px
+        iconrules()
+        &:hover, &:focus
+          color blue
   &__status
     font-size 30px
     text-align center
