@@ -48,7 +48,9 @@
             border-color darkBlue
       &__submit
         &__btn
-          color darkBlue
+          display flex
+          color off-white
+          background-color darkBlue
 
 .received
   text-align right
@@ -70,15 +72,17 @@
       &__title
         display none
 
-@media (min-width: max-xs) and (max-width: max-lg)
+@media (min-width: max-xs) and (max-width: max-md)
   .wsContentThread
-    &__texteditor
-      padding 7px
-      &__simpletext
-        display inline-flex
-      &__submit
-        display inline-flex
-        width 80px
+    &__app
+      &__texteditor
+        padding 7px
+        &__simpletext
+          display inline-flex
+          width 70%
+        &__submit
+          display inline-flex
+          margin-left 30px
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .wsContentThread
@@ -90,12 +94,12 @@
     width 100%
     box-shadow none
     z-index 1
-    &__texteditor
-      padding 7px
-      &__simpletext
-        display inline-flex
-        margin-right 15px
-        width 62%
-      &__submit
-        display inline-flex
-        width 80px
+    &__app
+      &__texteditor
+        padding 7px
+        &__simpletext
+          display inline-flex
+          margin-right 15px
+          width 62%
+        &__submit
+          display inline-flex

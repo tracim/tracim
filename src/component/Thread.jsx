@@ -26,7 +26,7 @@ const Thread = props => {
       </ul>
 
       <form className='wsContentThread__app__texteditor wsContentGeneric__texteditor'>
-        <div className='wsContentThread__app__texteditor__simpletext wsContentGeneric__texteditor__simpletext input-group'>
+        <div className='wsContentThread__app__texteditor__simpletext wsContentGeneric__texteditor__simpletext input-group d-inline-flex d-sm-inline-flex d-md-inline-flex d-lg-none'>
           <input type='text' className='wsContentThread__app__texteditor__simpletext__input wsContentGeneric__texteditor__simpletext__input form-control' placeholder='...' />
 
           <div className='wsContentThread__app__texteditor__simpletext__icon wsContentGeneric__texteditor__simpletext__icon input-group-addon'>
@@ -34,14 +34,14 @@ const Thread = props => {
           </div>
         </div>
 
-        <div className='wsContentGeneric__texteditor__wysiwyg d-none d-xl-block'>
-          <textarea />
+        <div className='wsContentGeneric__texteditor__wysiwyg d-none d-lg-block'>
+          <textarea className='form-control' />
         </div>
 
-        <div className='wsContentThread__app__texteditor__submit wsContentGeneric__texteditor__submit d-xl-flex justify-content-xl-center'>
+        <div className='wsContentThread__app__texteditor__submit wsContentGeneric__texteditor__submit d-lg-flex justify-content-lg-center my-3'>
           <button type='submit' className='wsContentThread__app__texteditor__submit__btn wsContentGeneric__texteditor__submit__btn btn btn-primary'>
             Envoyer
-            <div className='wsContentThread__app__texteditor__submit__btn__icon wsContentGeneric__texteditor__submit__btn__icon'>
+            <div className='wsContentThread__app__texteditor__submit__btn__icon wsContentGeneric__texteditor__submit__btn__icon ml-3'>
               <i className='fa fa-paper-plane-o' />
             </div>
           </button>
