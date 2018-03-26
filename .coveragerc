@@ -1,0 +1,3 @@
+[run]
+source = tracim
+omit = tracim/test*
