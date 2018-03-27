@@ -43,3 +43,5 @@ def main(argv=sys.argv):
 
         model = MyModel(name='one', value=1)
         dbsession.add(model)
+
+        ### Add global manager data, just for test
