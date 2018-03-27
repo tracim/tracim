@@ -72,7 +72,7 @@ const Timeline = props => {
 
       <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
         <div
-          className={classnames(`${props.customClass}__texteditor__simpletext`, 'timeline__texteditor__simpletext input-group')}>
+          className={classnames(`${props.customClass}__texteditor__simpletext`, 'timeline__texteditor__simpletext input-group d-inline-flex d-sm-inline-flex d-md-inline-flex d-lg-none')}>
           <input
             type='text'
             className={classnames(`${props.customClass}__texteditor__simpletext__input`, 'timeline__texteditor__simpletext__input form-control')}
@@ -83,10 +83,10 @@ const Timeline = props => {
             <i className='fa fa-font' />
           </div>
         </div>
-        <div className={classnames(`${props.customClass}__texteditor__wysiwyg`, 'timeline__texteditor__wysiwyg d-none d-xl-block')}>
+        <div className={classnames(`${props.customClass}__texteditor__wysiwyg`, 'timeline__texteditor__wysiwyg d-none d-lg-block')}>
           <textarea />
         </div>
-        <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit d-xl-flex justify-content-xl-center')}>
+        <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit d-inline-flex d-lg-flex justify-content-lg-center')}>
           <button
             type='submit'
             className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__texteditor__submit__btn btn')}

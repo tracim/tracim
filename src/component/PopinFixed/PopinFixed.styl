@@ -31,10 +31,8 @@
       color white
       font-size 20px
       cursor pointer
-      &:hover, &:focus
-        border 1px solid off-white
-        padding 0 10px
-        border-radius 5px
+      .fa-pencil
+        color off-white
     &__close
       border 1px solid white
       border-radius 5px
@@ -56,19 +54,48 @@
     &__menu
       display flex
       align-items center
+      &__addversion
+        display flex
+        align-items center
       &__action
         margin 5px 10px 0 0
         font-size 18px
         cursor pointer
         &:hover , &:focus
-          font-size 22px
           color blue
   &__content
     display flex
-    flex-flow row
+    flex-wrap wrap
     // 209 = wsContentGeneric:top wsContentGeneric__header:height - wsContentGeneric__option:height
     height calc(100% - 209px)
     &__left
       width 55%
     &__right
       width 45%
+
+@media (min-width: min-sm) and (max-width: max-lg)
+
+  .wsContentGeneric__content
+    overflow-Y auto
+    &__left
+      width 100%
+      margin-bottom 50px
+    &__right
+      width 100%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .wsContentGeneric
+    top 70px
+
+@media (max-width: max-xs)
+
+  .wsContentGeneric
+    top 70px
+    &__content
+      overflow-Y auto
+      &__left
+        width 100%
+        margin-bottom 50px
+      &__right
+        width 100%

@@ -70,7 +70,6 @@
     &__simpletext
       display none
       width 70%
-      margin-right 35px
       &__icon
         cursor pointer
     &__wysiwyg
@@ -106,22 +105,12 @@
   .timeline__messagelist__item
     margin-right 55px
 
-  .received
-    .timeline__messagelist__item
-      &__avatar
-        left 96%
-
 /**** MEDIA 768px & 991px ****/
 
 @media (min-width: min-md) and (max-width: max-md)
 
   .timeline__messagelist__item
     margin-right 55px
-
-  .received
-    .timeline__messagelist__item
-      &__avatar
-        left 96%
 
 /**** MEDIA 576px & 767px ****/
 
@@ -130,16 +119,13 @@
   .timeline__messagelist__item
     margin-right 35px
 
-  .received
-    .timeline__messagelist__item
-      &__avatar
-        left 94%
-
 /**** MEDIA 575px ****/
 
 @media (max-width: max-xs)
 
-  .received
-    .timeline__messagelist__item
-      &__avatar
-        left 90%
+  .timeline__texteditor
+    &__simpletext
+      margin-left 0
+      width 65%
+    &__submit
+      margin-left 10px

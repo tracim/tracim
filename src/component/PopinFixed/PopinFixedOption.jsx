@@ -11,17 +11,17 @@ const PopinFixedOption = props => {
   return (
     <div className={classnames('wsContentGeneric__option', `${props.customClass}__option`)}>
       <div className={classnames('wsContentGeneric__option__menu', `${props.customClass}__option__menu`)}>
-        <div className='wsContentGeneric__option__menu__addversion btn mr-auto'>
+        <div className='wsContentGeneric__option__menu__addversion btn btn-outline-primary mr-auto'>
           {props.t('PopinFixedOption.new_version')}
-          <i className='fa fa-plus-circle' />
+          <i className='fa fa-plus-circle ml-3' />
         </div>
 
         <SelectStatus />
 
-        <div className={classnames('wsContentGeneric__option__menu__action', `${props.customClass}__option__menu__action`)}>
+        <div className={classnames('wsContentGeneric__option__menu__action d-none d-sm-block', `${props.customClass}__option__menu__action`)}>
           <i className='fa fa-archive' />
         </div>
-        <div className={classnames('wsContentGeneric__option__menu__action', `${props.customClass}__option__menu__action`)}>
+        <div className={classnames('wsContentGeneric__option__menu__action d-none d-sm-block', `${props.customClass}__option__menu__action`)}>
           <i className='fa fa-trash' />
         </div>
       </div>
