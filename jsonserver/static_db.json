@@ -101,7 +101,7 @@
         "id": 1,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "La programmation fonctionnelle",
+        "title": "Design v2",
         "type": "PageHtml",
         "status": "validated"
       },
@@ -117,7 +117,7 @@
         "id": 6,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Une photo moche",
+        "title": "Une photo",
         "type": "File",
         "status": "current"
       },
@@ -125,7 +125,7 @@
         "id": 10,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "le README.md d'un random repo github",
+        "title": "README.md de tracim_lib",
         "type": "PageMarkdown",
         "status": "current"
       },
@@ -133,7 +133,7 @@
         "id": 7,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Une liste de truc à faire que je ferai jamais",
+        "title": "Etape d'installation de Tracim",
         "type": "Task",
         "status": "current"
       },
@@ -141,7 +141,7 @@
         "id": 8,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Ça, ça marche pas. Merci de le fix",
+        "title": "Fixe du fichier css",
         "type": "Issue",
         "status": "current"
       },
@@ -160,7 +160,7 @@
       "id": 4,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "des trucs de backend",
+      "title": "Backend appli n°578",
       "type": "File",
       "status": "outdated"
     },
@@ -168,7 +168,7 @@
       "id": 5,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "on s'emmerde",
+      "title": "La programmation fonctionnelle",
       "type": "PageHtml",
       "status": "outdated"
     },
@@ -176,7 +176,7 @@
       "id": 11,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "Hidden features",
+      "title": "ticket à fixe",
       "type": "folder",
       "content": []
     }
@@ -186,7 +186,7 @@
       "id": 12,
       "parent_id": 11,
       "workspace_id": 1,
-      "title": "flatMap",
+      "title": "ticket à fixe",
       "type": "PageHtml",
       "status": "current"
     },
@@ -194,7 +194,7 @@
       "id": 13,
       "parent_id": 11,
       "workspace_id": 1,
-      "title": "c'est tout pété",
+      "title": "issue n°555",
       "type": "Issue",
       "status": "current"
     }
