@@ -1,10 +1,8 @@
 from paste.deploy.converters import asbool
 from urllib.parse import urlparse
-import logging
+from tracim.logger import logger
 
 from pyramid.request import Request
-
-logger = logging.getLogger(__name__)
 
 
 class RequestWithCFG(Request):
@@ -33,16 +31,18 @@ class CFG(object):
             # we do not show URL because At the time of configuration setup,
             # it can't be evaluated
             # We do not show CONTENT in order not to pollute log files
-            logger.info('CONFIG: [ {} | {} ]'.format(key, value))
+            logger.info(self, 'CONFIG: [ {} | {} ]'.format(key, value))
         else:
-            logger.info('CONFIG: [ {} | <value not shown> ]'.format(key))
+            logger.info(self, 'CONFIG: [ {} | <value not shown> ]'.format(key))
 
         self.__dict__[key] = value
 
     def __init__(self, settings):
         """Parse configuration file."""
 
-        ### General
+        ###
+        # General
+        ###
 
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
@@ -107,6 +107,7 @@ class CFG(object):
         if not self.WEBSITE_SERVER_NAME:
             self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
             logger.warning(
+                self,
                 'NOTE: Generated website.server_name parameter from '
                 'website.base_url parameter -> {0}'
                 .format(self.WEBSITE_SERVER_NAME)
@@ -331,7 +332,7 @@ class CFG(object):
         #             self.WEBSITE_SERVER_NAME,
         #             self.WSGIDAV_PORT,
         #         )
-        #     logger.warning(
+        #     logger.warning(self,
         #         'NOTE: Generated wsgidav.client.base_url parameter with '
         #         'followings parameters: website.server_name and '
         #         'wsgidav.conf port'.format(
@@ -372,7 +373,7 @@ class CFG(object):
         # )
         # if not self.RADICALE_SERVER_ALLOW_ORIGIN:
         #     self.RADICALE_SERVER_ALLOW_ORIGIN = self.WEBSITE_BASE_URL
-        #     logger.warning(
+        #     logger.warning(self,
         #         'NOTE: Generated radicale.server.allow_origin parameter with '
         #         'followings parameters: website.base_url ({0})'
         #         .format(self.WEBSITE_BASE_URL)
@@ -403,7 +404,7 @@ class CFG(object):
         #         = '/' + self.RADICALE_CLIENT_BASE_URL_PREFIX
         #
         # if not self.RADICALE_CLIENT_BASE_URL_HOST:
-        #     logger.warning(
+        #     logger.warning(self,
         #         'Generated radicale.client.base_url.host parameter with '
         #         'followings parameters: website.server_name -> {}'
         #         .format(self.WEBSITE_SERVER_NAME)
@@ -414,7 +415,6 @@ class CFG(object):
         #     self.RADICALE_CLIENT_BASE_URL_HOST,
         #     self.RADICALE_CLIENT_BASE_URL_PREFIX,
         # )
-
 
     class CST(object):
         ASYNC = 'ASYNC'

@@ -8,6 +8,7 @@ from ..models import MyModel
 
 @view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
 def my_view(request):
+    request.config()
     try:
         query = request.dbsession.query(MyModel)
         one = query.filter(MyModel.name == 'one').first()
