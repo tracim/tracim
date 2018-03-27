@@ -1,5 +1,5 @@
-from tracim.model import User
-from tracim.model.data import UserRoleInWorkspace
+from tracim.models import User
+from tracim.models.data import UserRoleInWorkspace
 
 
 CALENDAR_PERMISSION_READ = 'r'

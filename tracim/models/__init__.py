@@ -1,11 +1,15 @@
 from sqlalchemy import engine_from_config
+from sqlalchemy.event import listen
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import configure_mappers
 import zope.sqlalchemy
-
+from .meta import DeclarativeBase
+from .revision_protection import prevent_content_revision_delete
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
 from .mymodel import MyModel  # flake8: noqa
+from .auth import User, Group, Permission
+from .data import Content, ContentRevisionRO
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
@@ -46,6 +50,7 @@ def get_tm_session(session_factory, transaction_manager):
     dbsession = session_factory()
     zope.sqlalchemy.register(
         dbsession, transaction_manager=transaction_manager)
+    listen(dbsession, 'before_flush', prevent_content_revision_delete)
     return dbsession
 
 

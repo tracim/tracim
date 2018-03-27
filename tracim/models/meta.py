@@ -1,5 +1,8 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import MetaData
+from sqlalchemy import inspect
+
+from tracim.exceptions import ContentRevisionUpdateError
 
 # Recommended naming convention used by Alembic, as various different database
 # providers will autogenerate vastly different names making migrations more
@@ -13,4 +16,4 @@ NAMING_CONVENTION = {
 }
 
 metadata = MetaData(naming_convention=NAMING_CONVENTION)
-Base = declarative_base(metadata=metadata)
+DeclarativeBase = declarative_base(metadata=metadata)

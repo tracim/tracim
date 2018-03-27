@@ -29,13 +29,12 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
 
-from tracim.lib.utils import lazy_ugettext as l_
-from tracim.model import DBSession
-from tracim.model import DeclarativeBase
-from tracim.model import metadata
+from tracim.translation import fake_translator as l_
+from tracim.models.meta import DeclarativeBase
+from tracim.models.meta import metadata
 if TYPE_CHECKING:
-    from tracim.model.data import Workspace
-
+    from tracim.models.data import Workspace
+    from tracim.models.data import UserRoleInWorkspace
 __all__ = ['User', 'Group', 'Permission']
 
 # This is the association table for the many-to-many relationship between
@@ -85,9 +84,9 @@ class Group(DeclarativeBase):
         return self.group_name
 
     @classmethod
-    def by_group_name(cls, group_name):
+    def by_group_name(cls, group_name, dbsession):
         """Return the user object whose email address is ``email``."""
-        return DBSession.query(cls).filter_by(group_name=group_name).first()
+        return dbsession.query(cls).filter_by(group_name=group_name).first()
 
 
 class Profile(object):
@@ -157,23 +156,24 @@ class User(DeclarativeBase):
             profile_id = max(group.group_id for group in self.groups)
         return Profile(profile_id)
 
-    @property
-    def calendar_url(self) -> str:
-        # TODO - 20160531 - Bastien: Cyclic import if import in top of file
-        from tracim.lib.calendar import CalendarManager
-        calendar_manager = CalendarManager(None)
-
-        return calendar_manager.get_user_calendar_url(self.user_id)
+    # TODO - G-M - 27-03-2018 - Check about calendar code
+    # @property
+    # def calendar_url(self) -> str:
+    #     # TODO - 20160531 - Bastien: Cyclic import if import in top of file
+    #     from tracim.lib.calendar import CalendarManager
+    #     calendar_manager = CalendarManager(None)
+    #
+    #     return calendar_manager.get_user_calendar_url(self.user_id)
 
     @classmethod
-    def by_email_address(cls, email):
+    def by_email_address(cls, email, dbsession):
         """Return the user object whose email address is ``email``."""
-        return DBSession.query(cls).filter_by(email=email).first()
+        return dbsession.query(cls).filter_by(email=email).first()
 
     @classmethod
-    def by_user_name(cls, username):
+    def by_user_name(cls, username, dbsession):
         """Return the user object whose user name is ``username``."""
-        return DBSession.query(cls).filter_by(email=username).first()
+        return dbsession.query(cls).filter_by(email=username).first()
 
     @classmethod
     def _hash_password(cls, cleartext_password: str) -> str:
@@ -252,7 +252,6 @@ class User(DeclarativeBase):
             if role.workspace == workspace:
                 return role.role
 
-        from tracim.model.data import UserRoleInWorkspace
         return UserRoleInWorkspace.NOT_APPLICABLE
 
     def get_active_roles(self) -> ['UserRoleInWorkspace']:
@@ -265,20 +264,18 @@ class User(DeclarativeBase):
                 roles.append(role)
         return roles
 
-    def ensure_auth_token(self) -> None:
+    def ensure_auth_token(self, validity_seconds, dbsession) -> None:
         """
         Create auth_token if None, regenerate auth_token if too much old.
 
         auth_token validity is set in
         :return:
         """
-        from tracim.config.app_cfg import CFG
-        validity_seconds = CFG.get_instance().USER_AUTH_TOKEN_VALIDITY
 
         if not self.auth_token or not self.auth_token_created:
             self.auth_token = str(uuid.uuid4())
             self.auth_token_created = datetime.utcnow()
-            DBSession.flush()
+            dbsession.flush()
             return
 
         now_seconds = time.mktime(datetime.utcnow().timetuple())

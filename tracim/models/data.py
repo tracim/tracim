@@ -5,7 +5,6 @@ import json
 import os
 from datetime import datetime
 
-import tg
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
 from sqlalchemy import Column, inspect, Index
@@ -28,10 +27,10 @@ from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 
-from tracim.lib.utils import lazy_ugettext as l_
-from tracim.lib.exception import ContentRevisionUpdateError
-from tracim.model import DeclarativeBase, RevisionsIntegrity
-from tracim.model.auth import User
+from tracim.translation import fake_translator as l_
+from tracim.exceptions import ContentRevisionUpdateError
+from tracim.models.meta import DeclarativeBase
+from tracim.models.auth import User
 
 DEFAULT_PROPERTIES = dict(
     allowed_content=dict(
@@ -86,13 +85,14 @@ class Workspace(DeclarativeBase):
 
         return contents
 
-    @property
-    def calendar_url(self) -> str:
-        # TODO - 20160531 - Bastien: Cyclic import if import in top of file
-        from tracim.lib.calendar import CalendarManager
-        calendar_manager = CalendarManager(None)
-
-        return calendar_manager.get_workspace_calendar_url(self.workspace_id)
+    # TODO - G-M - 27-03-2018 - Check about calendar code
+    # @property
+    # def calendar_url(self) -> str:
+    #     # TODO - 20160531 - Bastien: Cyclic import if import in top of file
+    #     from tracim.lib.calendar import CalendarManager
+    #     calendar_manager = CalendarManager(None)
+    #
+    #     return calendar_manager.get_workspace_calendar_url(self.workspace_id)
 
     def get_user_role(self, user: User) -> int:
         for role in user.roles:
@@ -522,6 +522,7 @@ class ContentChecker(object):
         # TODO - G.M - 15-03-2018 - Choose only correct Content-type for origin
         # Only content who can be copied need this
         if item.type == ContentType.Any:
+            properties = item.properties
             if 'origin' in properties.keys():
                 return True
         raise NotImplementedError

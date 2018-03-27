@@ -5,10 +5,10 @@ from sqlalchemy import (
     Text,
 )
 
-from .meta import Base
+from .meta import DeclarativeBase
 
 
-class MyModel(Base):
+class MyModel(DeclarativeBase):
     __tablename__ = 'models'
     id = Column(Integer, primary_key=True)
     name = Column(Text)

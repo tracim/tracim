@@ -1,6 +1,6 @@
 from pyramid.config import Configurator
 
-from config import RequestWithCFG
+from tracim.config import RequestWithCFG
 
 
 def main(global_config, **settings):

@@ -9,7 +9,7 @@ from pyramid.paster import (
 
 from pyramid.scripts.common import parse_vars
 
-from ..models.meta import Base
+from ..models.meta import DeclarativeBase
 from ..models import (
     get_engine,
     get_session_factory,
@@ -34,7 +34,7 @@ def main(argv=sys.argv):
     settings = get_appsettings(config_uri, options=options)
 
     engine = get_engine(settings)
-    Base.metadata.create_all(engine)
+    DeclarativeBase.metadata.create_all(engine)
 
     session_factory = get_session_factory(engine)
 
