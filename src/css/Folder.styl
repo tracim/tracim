@@ -45,7 +45,6 @@ folderopen()
       folderopen()
       & > .file, > .folder
         folderopen()
-
   &__header
     position relative
     display flex
@@ -83,7 +82,7 @@ folderopen()
         font-size 25px
         color darkBlue
       &__text
-        margin auto 15px
+        margin auto 15px auto 5px
         font-size 17px
         color darkBlue
       &__addbtn
@@ -105,6 +104,16 @@ folderopen()
         color darkBlue
         & > i
           margin-right 15px
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .folder
+    &__header
+      padding 10px
+      &__triangleborder
+        top 59px
+      &__contenttype
+        display none
 
 @media (max-width: max-xs)
   .folder
