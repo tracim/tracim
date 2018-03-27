@@ -1,5 +1,7 @@
-tracim
-======
+tracim_backend
+==============
+
+Backend source code of tracim v2, using Pyramid Framework.
 
 Getting Started
 ---------------
