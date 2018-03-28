@@ -38,7 +38,7 @@ class WorkspaceContent extends React.Component {
   }
 
   handleClickContentItem = content => {
-    this.props.renderApp(this.props.user, this.props.workspace, this.props.app, content)
+    this.props.renderApp(this.props.app[content.type], this.props.user, {...content, workspace: this.props.workspace})
     // Côme - 2018/03/08 - line bellow is useless because we cannot call the reducer again when hiding app since the call comes from the app
     // dispatch(setActiveFileContentActive(content))
   }

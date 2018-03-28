@@ -44,7 +44,7 @@
       */
       GLOBAL_renderApp = app => {
         const selectedApp = (() => {
-          switch (app.appConfig.name) {
+          switch (app.config.name) {
             case 'PageHtml':
               return appPageHtml
             case 'Thread':
@@ -55,7 +55,7 @@
         if (selectedApp.isRendered) {
           GLOBAL_dispatchEvent(`${app.appConfig.name}_showApp`, app)
         } else {
-          selectedApp.renderApp('appContainer', app)
+          selectedApp.renderApp(app)
           selectedApp.isRendered = true
           prevSelectedApp.isRendered = false
           prevSelectedApp = selectedApp

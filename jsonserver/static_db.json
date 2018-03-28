@@ -35,7 +35,8 @@
     "componentRight": "Timeline",
     "customClass": "wsContentPageHtml",
     "icon": "fa fa-fw fa-file-word-o",
-    "color": "#65c7f2"
+    "color": "#65c7f2",
+    "domContainer": "appContainer"
   }, {
     "name": "PageMarkdown",
     "label": {
@@ -46,7 +47,8 @@
     "componentRight": "undefined",
     "customClass": "wsContentPageMarkdown",
     "icon": "fa fa-fw fa-file-code-o",
-    "color": "#e0082b"
+    "color": "#e0082b",
+    "domContainer": "appContainer"
   }, {
     "name": "File",
     "label": {
@@ -57,7 +59,8 @@
     "componentRight": "undefined",
     "customClass": "wsContentFile",
     "icon": "fa fa-fw fa-file-text-o",
-    "color": "#263462"
+    "color": "#263462",
+    "domContainer": "appContainer"
   }, {
     "name": "Thread",
     "label": {
@@ -68,7 +71,8 @@
     "componentRight": "undefined",
     "customClass": "wsContentThread",
     "icon": "fa fa-fw fa-comments-o",
-    "color": "#2674d3"
+    "color": "#2674d3",
+    "domContainer": "appContainer"
   }, {
     "name": "Task",
     "label": {
@@ -79,7 +83,8 @@
     "componentRight": "undefined",
     "customClass": "wsContentTask",
     "icon": "fa fa-fw fa-list-ul",
-    "color": "#2d5a88"
+    "color": "#2d5a88",
+    "domContainer": "appContainer"
   }, {
     "name": "Issue",
     "label": {
@@ -90,7 +95,8 @@
     "componentRight": "undefined",
     "customClass": "wsContentIssue",
     "icon": "fa fa-fw fa-ticket",
-    "color": "#a4835e"
+    "color": "#a4835e",
+    "domContainer": "appContainer"
   }],
   "workspace_detail": {
     "id": 1,
@@ -257,7 +263,12 @@
     "title": "La programmation fonctionnelle",
     "status": "validated",
     "version": "3",
-    "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle"
+    "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle",
+    "workspace": {
+      "id": 1,
+      "title": "Mission interne - développement",
+      "owner_id": 5
+    }
   },
   "content_data_thread": {
     "id": 2,

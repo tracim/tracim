@@ -4,8 +4,6 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import FileItem from './FileItem.jsx'
 
-// @TODO set Folder as a component, state open will come from parent container (which will come from redux) // update: or not ?
-
 class Folder extends React.Component {
   constructor (props) {
     super(props)
