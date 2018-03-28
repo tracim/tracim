@@ -15,15 +15,6 @@ def test_config(request):
         return Response(e, content_type='text/plain', status=500)
     return {'project': project}
 
-@view_config(route_name='test_model', renderer='../templates/mytemplate.jinja2')
-def test_model(request):
-    try:
-        # project = request.dbsession.query(MyModel)
-    except Exception as e:
-        return Response(e, content_type='text/plain', status=500)
-    return {'project': project}
-
-
 @view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
 def my_view(request):
     try:
