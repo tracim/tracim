@@ -13,10 +13,10 @@ class BaseTest(unittest.TestCase):
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:'
         })
-        self.config.include('.models')
+        self.config.include('tracim.models')
         settings = self.config.get_settings()
 
-        from .models import (
+        from tracim.models import (
             get_engine,
             get_session_factory,
             get_tm_session,
@@ -28,11 +28,11 @@ class BaseTest(unittest.TestCase):
         self.session = get_tm_session(session_factory, transaction.manager)
 
     def init_database(self):
-        from .models.meta import DeclarativeBase
+        from tracim.models.meta import DeclarativeBase
         DeclarativeBase.metadata.create_all(self.engine)
 
     def tearDown(self):
-        from .models.meta import DeclarativeBase
+        from tracim.models.meta import DeclarativeBase
 
         testing.tearDown()
         transaction.abort()
@@ -45,13 +45,13 @@ class TestMyViewSuccessCondition(BaseTest):
         super(TestMyViewSuccessCondition, self).setUp()
         self.init_database()
 
-        from .models import MyModel
+        from tracim.models import MyModel
 
         model = MyModel(name='one', value=55)
         self.session.add(model)
 
     def test_passing_view(self):
-        from .views.default import my_view
+        from tracim.views.default import my_view
         info = my_view(dummy_request(self.session))
         self.assertEqual(info['one'].name, 'one')
         self.assertEqual(info['project'], 'tracim')
@@ -60,6 +60,6 @@ class TestMyViewSuccessCondition(BaseTest):
 class TestMyViewFailureCondition(BaseTest):
 
     def test_failing_view(self):
-        from .views.default import my_view
+        from tracim.views.default import my_view
         info = my_view(dummy_request(self.session))
         self.assertEqual(info.status_int, 500)
