@@ -1,6 +1,7 @@
 from paste.deploy.converters import asbool
 from urllib.parse import urlparse
 from tracim.logger import logger
+from depot.manager import DepotManager
 
 from pyramid.request import Request
 
@@ -8,7 +9,9 @@ from pyramid.request import Request
 class RequestWithCFG(Request):
 
     def config(self):
-        return CFG(self.registry.settings)
+        cfg = CFG(self.registry.settings)
+        cfg.configure_filedepot()
+        return cfg
 
 
 
@@ -415,6 +418,15 @@ class CFG(object):
         #     self.RADICALE_CLIENT_BASE_URL_HOST,
         #     self.RADICALE_CLIENT_BASE_URL_PREFIX,
         # )
+
+    def configure_filedepot(self):
+        depot_storage_name = self.DEPOT_STORAGE_NAME
+        depot_storage_path = self.DEPOT_STORAGE_DIR
+        depot_storage_settings = {'depot.storage_path': depot_storage_path}
+        DepotManager.configure(
+            depot_storage_name,
+            depot_storage_settings,
+        )
 
     class CST(object):
         ASYNC = 'ASYNC'

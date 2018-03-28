@@ -1,5 +1,6 @@
 import unittest
 import transaction
+from depot.manager import DepotManager
 from pyramid import testing
 
 from tracim.models.data import Workspace
@@ -8,6 +9,7 @@ from tracim.logger import logger
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.config import CFG
+
 
 class BaseTest(unittest.TestCase):
     """
@@ -24,6 +26,11 @@ class BaseTest(unittest.TestCase):
 
         })
         self.config.include('tracim.models')
+        DepotManager._clear()
+        DepotManager.configure(
+            'test',
+             { 'depot.backend' : 'depot.io.memory.MemoryFileStorage' },
+        )
         settings = self.config.get_settings()
 
         from tracim.models import (
