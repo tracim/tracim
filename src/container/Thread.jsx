@@ -12,6 +12,20 @@ import { FETCH_CONFIG } from '../helper.js'
 import i18n from '../i18n.js'
 
 const debug = {
+  config: {
+    name: 'Thread',
+    label: {
+      fr: 'Discussion',
+      en: 'Thread'
+    },
+    componentLeft: 'Thread',
+    componentRight: 'undefined',
+    customClass: 'wsContentThread',
+    icon: 'fa fa-comments-o',
+    color: '#65c7f2',
+    domContainer: 'appContainer',
+    apiUrl: 'http://localhost:3001'
+  },
   loggedUser: {
     id: 5,
     username: 'Stoi',
@@ -20,23 +34,18 @@ const debug = {
     email: 'osef@algoo.fr',
     avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
   },
-  workspace: {
-    id: 1,
-    title: 'Test debug workspace'
-  },
   content: {
     id: 2,
     type: 'thread',
     status: 'validated',
-    title: 'test debug title'
+    title: 'test debug title',
+    workspace: {
+      id: 1,
+      title: 'Test debug workspace',
+      ownerId: 5
+    }
   },
-  listMessage: listMessageDebugData,
-  appConfig: {
-    name: 'Thread',
-    customClass: 'wsContentThread',
-    icon: 'fa fa-comments-o',
-    apiUrl: 'http://localhost:3001'
-  }
+  listMessage: listMessageDebugData
 }
 
 class Thread extends React.Component {
@@ -45,11 +54,10 @@ class Thread extends React.Component {
     this.state = {
       appName: 'Thread',
       isVisible: true,
+      config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      workspace: props.data ? props.data.workspace : debug.workspace,
       content: props.data ? props.data.content : debug.content,
-      listMessage: props.data ? [] : debug.listMessage,
-      appConfig: props.data ? props.data.appConfig : debug.appConfig
+      listMessage: props.data ? [] : debug.listMessage
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -67,10 +75,10 @@ class Thread extends React.Component {
   }
 
   async componentDidMount () {
-    const { workspace, content, appConfig } = this.state
+    const { content, config } = this.state
     if (content.id === '-1') return // debug case
 
-    const fetchResultThread = await fetch(`${appConfig.apiUrl}/workspace/${workspace.id}/content/${content.id}`, {
+    const fetchResultThread = await fetch(`${config.apiUrl}/workspace/${content.workspace.id}/content/${content.id}`, {
       ...FETCH_CONFIG,
       method: 'GET'
     })
@@ -93,22 +101,22 @@ class Thread extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, listMessage, appConfig } = this.state
+    const { isVisible, loggedUser, content, listMessage, config } = this.state
 
     if (!isVisible) return null
 
     return (
-      <PopinFixed customClass={`${appConfig.customClass}`}>
+      <PopinFixed customClass={`${config.customClass}`}>
         <PopinFixedHeader
-          customClass={`${appConfig.customClass}`}
-          icon={appConfig.icon}
+          customClass={`${config.customClass}`}
+          icon={config.icon}
           name={content.title}
           onClickCloseBtn={this.handleClickBtnCloseApp}
         />
 
-        <PopinFixedOption customClass={`${appConfig.customClass}`} i18n={i18n} />
+        <PopinFixedOption customClass={`${config.customClass}`} i18n={i18n} />
 
-        <PopinFixedContent customClass={`${appConfig.customClass}__contentpage`}>
+        <PopinFixedContent customClass={`${config.customClass}__contentpage`}>
           <ThreadComponent
             title={content.title}
             listMessage={listMessage}
