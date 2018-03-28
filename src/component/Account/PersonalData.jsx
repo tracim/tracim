@@ -13,18 +13,15 @@ export const PersonalData = props => {
 
       <div className='personaldata__form'>
         <div className='personaldata__form__title'>
-          Changer le mot de passe :
+          Mot de passe :
         </div>
         <input className='personaldata__form__txtinput form-control' type='password' placeholder='Ancien mot de passe' />
         <input className='personaldata__form__txtinput form-control' type='password' placeholder='Nouveau mot de passe' />
-        <div className='personaldata__form__button btn btn-primary'>
-          Envoyer
-        </div>
       </div>
 
       <div className='personaldata__form'>
         <div className='personaldata__form__title'>
-          Changer d'adresse mail :
+          Adresse mail :
         </div>
         <input className='personaldata__form__txtinput form-control' type='email' placeholder='Ancienne adresse mail' />
         <input className='personaldata__form__txtinput form-control' type='email' placeholder='Nouvelle adresse mail' />

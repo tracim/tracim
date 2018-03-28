@@ -3,14 +3,10 @@ import { FETCH_CONFIG } from './helper.js'
 
 export function appFactory (WrappedComponent) {
   return class AppFactory extends React.Component {
-    renderApp = (user, workspace, app, content) => GLOBAL_renderApp({
+    renderApp = (appConfig, user, content) => GLOBAL_renderApp({
       loggedUser: user.isLoggedIn ? user : {},
-      workspace: {
-        id: workspace.id,
-        title: workspace.title
-      },
-      appConfig: {
-        ...app[content.type],
+      config: {
+        ...appConfig,
         apiUrl: FETCH_CONFIG.apiUrl
       },
       content
