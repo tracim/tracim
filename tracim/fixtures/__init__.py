@@ -1,5 +1,6 @@
 import transaction
 
+
 class Fixture(object):
 
     """ Fixture classes (list) required for this fixtures"""

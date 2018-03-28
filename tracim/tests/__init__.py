@@ -19,7 +19,7 @@ class BaseTest(unittest.TestCase):
         logger.debug(self, 'Setup Test...')
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:',
-            'user.auth_token.validity':'604800',
+            'user.auth_token.validity': '604800',
             'depot_storage_dir': '/tmp/test/depot',
             'depot_storage_name': 'test',
             'preview_cache_dir': '/tmp/test/preview_cache',
@@ -28,8 +28,7 @@ class BaseTest(unittest.TestCase):
         self.config.include('tracim.models')
         DepotManager._clear()
         DepotManager.configure(
-            'test',
-             { 'depot.backend' : 'depot.io.memory.MemoryFileStorage' },
+            'test', {'depot.backend': 'depot.io.memory.MemoryFileStorage'}
         )
         settings = self.config.get_settings()
 

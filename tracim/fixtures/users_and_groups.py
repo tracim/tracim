@@ -45,7 +45,8 @@ class Test(Fixture):
     require = [Base, ]
 
     def insert(self):
-        g2 = self._session.query(models.Group).filter(models.Group.group_name == 'managers').one()
+        g2 = self._session.query(models.Group).\
+            filter(models.Group.group_name == 'managers').one()
 
         lawrence = models.User()
         lawrence.display_name = 'Lawrence L.'

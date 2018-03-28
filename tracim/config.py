@@ -14,7 +14,6 @@ class RequestWithCFG(Request):
         return cfg
 
 
-
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
@@ -87,7 +86,7 @@ class CFG(object):
             '',
         )
 
-        # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,
+        # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,  # nopep8
         # Verify this
         #
         # self.WEBSITE_HOME_TITLE_COLOR = settings.get(

@@ -4,8 +4,10 @@
 class TracimError(Exception):
     pass
 
+
 class TracimException(Exception):
     pass
+
 
 class RunTimeError(TracimError):
     pass
@@ -34,6 +36,7 @@ class CommandError(TracimError):
 class CommandAbortedError(CommandError):
     pass
 
+
 class DaemonException(TracimException):
     pass
 
@@ -52,6 +55,7 @@ class UnknownCalendarType(CalendarException):
 
 class NotFound(TracimException):
     pass
+
 
 class SameValueError(ValueError):
     pass
