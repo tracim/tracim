@@ -86,7 +86,7 @@ class Workspace(DeclarativeBase):
 
         return contents
 
-    # TODO - G-M - 27-03-2018 - Check about calendar code
+    # TODO - G-M - 27-03-2018 - [Calendar] Check about calendar code
     # @property
     # def calendar_url(self) -> str:
     #     # TODO - 20160531 - Bastien: Cyclic import if import in top of file
@@ -1365,7 +1365,7 @@ class VirtualEvent(object):
 
         label = content.get_label()
         if content.type==ContentType.Comment:
-            # todo :voir le _('.... si le _ est utile
+            # TODO :  28-03-2018 [i18n] Internationalize this ?
             label = ('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
 
         return VirtualEvent(id=content.content_id,
@@ -1397,7 +1397,6 @@ class VirtualEvent(object):
         self.content = content
         self.ref_object = ref_object
 
-        # todo moi ? print(type)
         assert hasattr(type, 'id')
         assert hasattr(type, 'css')
         assert hasattr(type, 'icon')

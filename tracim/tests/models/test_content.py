@@ -27,7 +27,7 @@ class TestContent(StandardTest):
         content1 = self.test_create()
         content1.description = 'FOO'  # Raise ContentRevisionUpdateError because revision can't be updated
 
-    # TODO - G.M - 28-03-2018 - Reenable this test when libContent is available
+    # TODO - G.M - 28-03-2018 - [libContent] Reenable this test when libContent is available
     # def test_query(self):
     #     content1 = self.test_create()
     #     with new_revision(content1):

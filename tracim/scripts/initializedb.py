@@ -37,7 +37,7 @@ def main(argv=sys.argv):
     DeclarativeBase.metadata.create_all(engine)
 
     session_factory = get_session_factory(engine)
-
+    # TODO - G.M - 28-03-2018 - [Cleanup] Remove code related to example
     with transaction.manager:
         dbsession = get_tm_session(session_factory, transaction.manager)
 

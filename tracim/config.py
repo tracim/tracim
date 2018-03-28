@@ -87,7 +87,7 @@ class CFG(object):
             '',
         )
 
-        # TODO - G.M - 26-03-2018 - These params seems deprecated for tracimv2,
+        # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,
         # Verify this
         #
         # self.WEBSITE_HOME_TITLE_COLOR = settings.get(
@@ -138,7 +138,7 @@ class CFG(object):
             '604800',
         ))
 
-        # TODO - G.M - 27-03-2018 - Restore email config
+        # TODO - G.M - 27-03-2018 - [Email] Restore email config
         ###
         # EMAIL related stuff (notification, reply)
         ###
@@ -312,7 +312,7 @@ class CFG(object):
         # WSGIDAV (Webdav server)
         ###
 
-        # TODO - G.M - 27-03-2018 - Restore wsgidav config
+        # TODO - G.M - 27-03-2018 - [WebDav] Restore wsgidav config
         #self.WSGIDAV_CONFIG_PATH = settings.get(
         #    'wsgidav.config_path',
         #    'wsgidav.conf',
@@ -346,7 +346,7 @@ class CFG(object):
         # if not self.WSGIDAV_CLIENT_BASE_URL.endswith('/'):
         #     self.WSGIDAV_CLIENT_BASE_URL += '/'
 
-        # TODO - G.M - 27-03-2018 - Restore radicale config
+        # TODO - G.M - 27-03-2018 - [Caldav] Restore radicale config
         ###
         # RADICALE (Caldav server)
         ###

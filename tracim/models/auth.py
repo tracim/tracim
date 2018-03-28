@@ -156,7 +156,7 @@ class User(DeclarativeBase):
             profile_id = max(group.group_id for group in self.groups)
         return Profile(profile_id)
 
-    # TODO - G-M - 27-03-2018 - Check about calendar code
+    # TODO - G-M - 27-03-2018 - [Calendar] Check about calendar code
     # @property
     # def calendar_url(self) -> str:
     #     # TODO - 20160531 - Bastien: Cyclic import if import in top of file

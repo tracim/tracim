@@ -36,7 +36,7 @@ class TestContentRevision(BaseTest):
             dict_repr.pop(key_to_remove, None)
         return dict_repr
 
-    # TODO - G.M - 28-03-2018 - Reenable this test
+    # TODO - G.M - 28-03-2018 - [libContent] Reenable this test
     # def test_new_revision(self):
     #     admin = self._session.query(User).filter(User.email == 'admin@admin.admin').one()
     #     workspace = self._create_workspace_and_test(name='workspace_1', user=admin)

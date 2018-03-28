@@ -6,7 +6,7 @@ import typing as typing
 
 from tracim.models.auth import User
 
-# TODO - G.M -28-03-2018 - Check if "current user" stuff is always needed for tracimv2
+# TODO - G.M -28-03-2018 - [CurrentUser] Check if "current user" stuff is always needed for tracimv2
 # CURRENT_USER_WEB = 'WEB'
 # CURRENT_USER_WSGIDAV = 'WSGIDAV'
 
@@ -55,7 +55,7 @@ class UserApi(object):
         if email and self._user and user.user_id==self._user.user_id:
             pass
             # this is required for the _session to keep on being up-to-date
-            # TODO - G.M - 28-03-2018 - Check for pyramid equivalent
+            # TODO - G.M - 28-03-2018 - [CurrentUser] Check for pyramid equivalent
             # tg.request.identity['repoze.who.userid'] = email
             # tg.auth_force_login(email)
 
@@ -91,7 +91,7 @@ class UserApi(object):
         :return:
         """
         # NOTE: Cyclic import
-        # TODO - G.M - 28-03-2018 - Reenable Calendar stuff
+        # TODO - G.M - 28-03-2018 - [Calendar] Reenable Calendar stuff
         #from tracim.lib.calendar import CalendarManager
         #from tracim.model.organisational import UserCalendar
 
@@ -101,6 +101,7 @@ class UserApi(object):
         self._session.flush()
         transaction.commit()
 
+        # TODO - G.M - 28-03-2018 - [Calendar] Reenable Calendar stuff
         # calendar_manager = CalendarManager(created_user)
         # calendar_manager.create_then_remove_fake_event(
         #     calendar_class=UserCalendar,
@@ -108,6 +109,7 @@ class UserApi(object):
         # )
 
 
+# TODO - G.M - 28-03-2018 - [CurrentUser] Check for pyramid equivalent
 # class CurrentUserGetterInterface(object):
 #     def get_current_user(self) -> typing.Union[None, User]:
 #         raise NotImplementedError()
@@ -117,7 +119,7 @@ class UserApi(object):
 #     def __init__(self) -> None:
 #         self.api = UserApi(None)
 
-# TODO - G.M - 28-03-2018 - Check for pyramid equivalent
+
 # class WebCurrentUserGetter(BaseCurrentUserGetter):
 #     def get_current_user(self) -> typing.Union[None, User]:
 #         # HACK - D.A. - 2015-09-02
@@ -132,7 +134,7 @@ class UserApi(object):
 #
 #         return None
 
-# TODO - G.M - 28-03-2018 - Reenable Webdav stuff
+# TODO - G.M - 28-03-2018 - [Webdav] Reenable Webdav stuff
 # class WsgidavCurrentUserGetter(BaseCurrentUserGetter):
 #     def get_current_user(self) -> typing.Union[None, User]:
 #         if hasattr(cherrypy.request, 'current_user_email'):
