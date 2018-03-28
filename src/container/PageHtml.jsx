@@ -13,14 +13,18 @@ import { FETCH_CONFIG } from '../helper.js'
 import i18n from '../i18n.js'
 
 const debug = {
-  workspace: {
-    id: -1,
-    title: 'Test debug workspace'
-  },
-  appConfig: {
+  config: {
     name: 'PageHtml',
+    label: {
+      fr: 'Page Html',
+      en: 'Html page'
+    },
+    componentLeft: 'PageHtml',
+    componentRight: 'Timeline',
     customClass: 'wsContentPageHtml',
     icon: 'fa fa-file-word-o',
+    color: '#65c7f2',
+    domContainer: 'appContainer',
     apiUrl: 'http://localhost:3001'
   },
   loggedUser: {
@@ -37,7 +41,12 @@ const debug = {
     title: 'Test debug pageHtml',
     status: 'validated',
     version: '-1',
-    text: 'This is the default pageHtml content for debug purpose'
+    text: 'This is the default pageHtml content for debug purpose',
+    workspace: {
+      id: -1,
+      title: 'Test debug workspace',
+      ownerId: 5
+    }
   },
   timeline: timelineDebugData
 }
@@ -48,8 +57,7 @@ class pageHtml extends React.Component {
     this.state = {
       appName: 'PageHtml',
       isVisible: true,
-      workspace: props.data ? props.data.workspace : debug.workspace,
-      appConfig: props.data ? props.data.appConfig : debug.appConfig,
+      config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : debug.timeline
@@ -70,14 +78,14 @@ class pageHtml extends React.Component {
   }
 
   async componentDidMount () {
-    const { workspace, content, appConfig } = this.state
+    const { content, config } = this.state
     if (content.id === '-1') return // debug case
 
-    const fetchResultPageHtml = await fetch(`${appConfig.apiUrl}/workspace/${workspace.id}/content/${content.id}`, {
+    const fetchResultPageHtml = await fetch(`${config.apiUrl}/workspace/${content.workspace.id}/content/${content.id}`, {
       ...FETCH_CONFIG,
       method: 'GET'
     })
-    const fetchResultTimeline = await fetch(`${appConfig.apiUrl}/workspace/${workspace.id}/content/${content.id}/timeline`, {
+    const fetchResultTimeline = await fetch(`${config.apiUrl}/workspace/${content.workspace.id}/content/${content.id}/timeline`, {
       ...FETCH_CONFIG,
       method: 'GET'
     })
@@ -96,22 +104,22 @@ class pageHtml extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, appConfig } = this.state
+    const { isVisible, loggedUser, content, timeline, config } = this.state
 
     if (!isVisible) return null
 
     return (
-      <PopinFixed customClass={`${appConfig.customClass}`}>
+      <PopinFixed customClass={`${config.customClass}`}>
         <PopinFixedHeader
-          customClass={`${appConfig.customClass}`}
-          icon={appConfig.icon}
+          customClass={`${config.customClass}`}
+          icon={config.icon}
           name={content.title}
           onClickCloseBtn={this.handleClickBtnCloseApp}
         />
 
-        <PopinFixedOption customClass={`${appConfig.customClass}`} i18n={i18n} />
+        <PopinFixedOption customClass={`${config.customClass}`} i18n={i18n} />
 
-        <PopinFixedContent customClass={`${appConfig.customClass}__contentpage`}>
+        <PopinFixedContent customClass={`${config.customClass}__contentpage`}>
           <PageHtmlComponent
             version={content.version}
             text={content.text}
@@ -119,7 +127,7 @@ class pageHtml extends React.Component {
           />
 
           <Timeline
-            customClass={`${appConfig.customClass}__contentpage`}
+            customClass={`${config.customClass}__contentpage`}
             loggedUser={loggedUser}
             timelineData={timeline}
           />

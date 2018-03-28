@@ -7,10 +7,10 @@ require('./css/index.styl')
 const appInterface = {
   name: 'PageHtml',
   isRendered: false,
-  renderApp: (domId, data) => {
+  renderApp: data => {
     return ReactDOM.render(
       <PageHtml data={data} />
-      , document.getElementById(domId)
+      , document.getElementById(data.config.domContainer)
     )
   },
   hideApp: domId => {
