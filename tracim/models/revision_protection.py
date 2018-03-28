@@ -8,9 +8,9 @@ from tracim.exceptions import ContentRevisionDeleteError
 from tracim.exceptions import ContentRevisionUpdateError
 from tracim.exceptions import SameValueError
 
-from .data import ContentRevisionRO
-from .data import Content
-from .meta import DeclarativeBase
+from tracim.models.data import ContentRevisionRO
+from tracim.models.data import Content
+from tracim.models.meta import DeclarativeBase
 
 
 def prevent_content_revision_delete(
@@ -71,7 +71,7 @@ def new_revision(
     """
     Prepare context to update a Content. It will add a new updatable revision
     to the content.
-    :param dbsession: Database session
+    :param dbsession: Database _session
     :param tm: TransactionManager
     :param content: Content instance to update
     :param force_create_new_revision: Decide if new_rev should or should not
@@ -87,7 +87,7 @@ def new_revision(
             yield content
         except SameValueError or ValueError as e:
             # INFO - 20-03-2018 - renew transaction when error happened
-            # This avoid bad session data like new "temporary" revision
+            # This avoid bad _session data like new "temporary" revision
             # to be add when problem happen.
             tm.abort()
             tm.begin()

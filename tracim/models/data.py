@@ -4,6 +4,7 @@ import datetime as datetime_root
 import json
 import os
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
@@ -690,6 +691,8 @@ class ContentRevisionRO(DeclarativeBase):
         if key in ('_sa_instance_state', ):  # Prevent infinite loop from SQLAlchemy code and altered set
             return super().__setattr__(key, value)
 
+        # FIXME - G.M - 28-03-2018 - Cycling Import
+        from tracim.models.revision_protection import RevisionsIntegrity
         if inspect(self).has_identity \
                 and key in self._cloned_columns \
                 and not RevisionsIntegrity.is_updatable(self):
@@ -710,7 +713,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     def has_new_information_for(self, user: User) -> bool:
         """
-        :param user: the session current user
+        :param user: the _session current user
         :return: bool, True if there is new information for given user else False
                        False if the user is None
         """
@@ -1203,7 +1206,7 @@ class Content(DeclarativeBase):
 
     def has_new_information_for(self, user: User) -> bool:
         """
-        :param user: the session current user
+        :param user: the _session current user
         :return: bool, True if there is new information for given user else False
                        False if the user is None
         """

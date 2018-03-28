@@ -7,7 +7,7 @@ from tracim.models.data import Content
 from tracim.logger import logger
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
-
+from tracim.config import CFG
 
 class BaseTest(unittest.TestCase):
     """
@@ -16,7 +16,12 @@ class BaseTest(unittest.TestCase):
     def setUp(self):
         logger.debug(self, 'Setup Test...')
         self.config = testing.setUp(settings={
-            'sqlalchemy.url': 'sqlite:///:memory:'
+            'sqlalchemy.url': 'sqlite:///:memory:',
+            'user.auth_token.validity':'604800',
+            'depot_storage_dir': '/tmp/test/depot',
+            'depot_storage_name': 'test',
+            'preview_cache_dir': '/tmp/test/preview_cache',
+
         })
         self.config.include('tracim.models')
         settings = self.config.get_settings()
@@ -55,8 +60,8 @@ class BaseTest(unittest.TestCase):
 #         """
 #         WorkspaceApi(user).create_workspace(name, save_now=True)
 #
-#         eq_(1, self.session.query(Workspace).filter(Workspace.label == name).count())
-#         return self.session.query(Workspace).filter(Workspace.label == name).one()
+#         eq_(1, self._session.query(Workspace).filter(Workspace.label == name).count())
+#         return self._session.query(Workspace).filter(Workspace.label == name).one()
 #
 #     def _create_content_and_test(self, name, workspace, *args, **kwargs) -> Content:
 #         """
@@ -66,20 +71,22 @@ class BaseTest(unittest.TestCase):
 #         content = Content(*args, **kwargs)
 #         content.label = name
 #         content.workspace = workspace
-#         self.session.add(content)
-#         self.session.flush()
+#         self._session.add(content)
+#         self._session.flush()
 #
 #         eq_(1, ContentApi.get_canonical_query().filter(Content.label == name).count())
 #         return ContentApi.get_canonical_query().filter(Content.label == name).one()
-#
-#
-# class StandardTest(BaseTest):
-#     """
-#     BaseTest with default fixtures
-#     """
-#     fixtures = [BaseFixture]
-#
-#     def init_database(self):
-#         BaseTest.init_database(self)
-#         fixtures_loader = FixturesLoader([BaseFixture])
-#         fixtures_loader.loads(self.fixtures)
+
+
+class StandardTest(BaseTest):
+    """
+    BaseTest with default fixtures
+    """
+    fixtures = [BaseFixture]
+
+    def init_database(self):
+        BaseTest.init_database(self)
+        fixtures_loader = FixturesLoader(
+            session=self.session,
+            config=CFG(self.config.get_settings()))
+        fixtures_loader.loads(self.fixtures)

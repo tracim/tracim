@@ -7,9 +7,9 @@ from .meta import DeclarativeBase
 from .revision_protection import prevent_content_revision_delete
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
-from .mymodel import MyModel  # flake8: noqa
-from .auth import User, Group, Permission
-from .data import Content, ContentRevisionRO
+from tracim.models.mymodel import MyModel  # flake8: noqa
+from tracim.models.auth import User, Group, Permission
+from tracim.models.data import Content, ContentRevisionRO
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
@@ -30,13 +30,13 @@ def get_tm_session(session_factory, transaction_manager):
     """
     Get a ``sqlalchemy.orm.Session`` instance backed by a transaction.
 
-    This function will hook the session to the transaction manager which
+    This function will hook the _session to the transaction manager which
     will take care of committing any changes.
 
     - When using pyramid_tm it will automatically be committed or aborted
       depending on whether an exception is raised.
 
-    - When using scripts you should wrap the session in a manager yourself.
+    - When using scripts you should wrap the _session in a manager yourself.
       For example::
 
           import transaction

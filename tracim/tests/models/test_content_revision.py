@@ -38,7 +38,7 @@ class TestContentRevision(BaseTest):
 
     # TODO - G.M - 28-03-2018 - Reenable this test
     # def test_new_revision(self):
-    #     admin = self.session.query(User).filter(User.email == 'admin@admin.admin').one()
+    #     admin = self._session.query(User).filter(User.email == 'admin@admin.admin').one()
     #     workspace = self._create_workspace_and_test(name='workspace_1', user=admin)
     #     folder = self._create_content_and_test(name='folder_1', workspace=workspace, type=ContentType.Folder)
     #     page = self._create_content_and_test(
@@ -50,7 +50,7 @@ class TestContentRevision(BaseTest):
     #         owner=admin
     #     )
     #
-    #     self.session.flush()
+    #     self._session.flush()
     #
     #     # Model create a new instance with list of column
     #     new_revision_by_model = ContentRevisionRO.new_from(page.revision)

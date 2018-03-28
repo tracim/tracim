@@ -6,6 +6,7 @@ from nose.tools import ok_
 from nose.tools import raises
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.testing import eq_
+import transaction
 
 # from tracim.lib.content import ContentApi
 from tracim.exceptions import ContentRevisionUpdateError
@@ -16,10 +17,10 @@ from tracim.models.data import ActionDescription
 from tracim.models.data import ContentRevisionRO
 from tracim.models.data import ContentType
 from tracim.models.data import Workspace
-from tracim.tests import BaseTest
+from tracim.tests import StandardTest
 
 
-class TestContent(BaseTest):
+class TestContent(StandardTest):
 
     @raises(ContentRevisionUpdateError)
     def test_update_without_prepare(self):
@@ -74,7 +75,11 @@ class TestContent(BaseTest):
         content = self.session.query(Content).filter(Content.id == created_content.id).one()
         eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
 
-        with new_revision(content):
+        with new_revision(
+                dbsession=self.session,
+                tm=transaction.manager,
+                content=content
+        ):
             time.sleep(0.00001)
             content.description = 'TEST_CONTENT_DESCRIPTION_1_UPDATED'
         self.session.flush()
@@ -82,7 +87,11 @@ class TestContent(BaseTest):
         eq_(2, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
         eq_(1, self.session.query(Content).filter(Content.id == created_content.id).count())
 
-        with new_revision(content):
+        with new_revision(
+                dbsession=self.session,
+                tm=transaction.manager,
+                content=content
+        ):
             time.sleep(0.00001)
             content.description = 'TEST_CONTENT_DESCRIPTION_1_UPDATED_2'
             content.label = 'TEST_CONTENT_1_UPDATED_2'
