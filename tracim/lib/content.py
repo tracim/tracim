@@ -184,47 +184,6 @@ class ContentApi(object):
         content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
         return content_list
 
-    # TODO - G.M - 28-03-2018 - [cleanup] This look deprecated.
-    # def build_breadcrumb(self, workspace, item_id=None, skip_root=False) -> [BreadcrumbItem]:
-    #     """
-    #     TODO - Remove this and factorize it with other get_breadcrumb_xxx methods
-    #     :param item_id: an item id (item may be normal content or folder
-    #     :return:
-    #     """
-    #     workspace_id = workspace.workspace_id
-    #     breadcrumb = []
-    #
-    #     if not skip_root:
-    #         breadcrumb.append(BreadcrumbItem(ContentType.get_icon(ContentType.FAKE_Dashboard), _('Workspaces'), tg.url('/workspaces')))
-    #     breadcrumb.append(BreadcrumbItem(ContentType.get_icon(ContentType.FAKE_Workspace), workspace.label, tg.url('/workspaces/{}'.format(workspace.workspace_id))))
-    #
-    #     if item_id:
-    #         breadcrumb_folder_items = []
-    #         current_item = self.get_one(item_id, ContentType.Any, workspace)
-    #         is_active = True
-    #         if current_item.type==ContentType.Folder:
-    #             next_url = tg.url('/workspaces/{}/folders/{}'.format(workspace_id, current_item.content_id))
-    #         else:
-    #             next_url = tg.url('/workspaces/{}/folders/{}/{}s/{}'.format(workspace_id, current_item.parent_id, current_item.type, current_item.content_id))
-    #
-    #         while current_item:
-    #             breadcrumb_item = BreadcrumbItem(ContentType.get_icon(current_item.type),
-    #                                              current_item.label,
-    #                                              next_url,
-    #                                              is_active)
-    #             is_active = False # the first item is True, then all other are False => in the breadcrumb, only the last item is "active"
-    #             breadcrumb_folder_items.append(breadcrumb_item)
-    #             current_item = current_item.parent
-    #             if current_item:
-    #                 # In last iteration, the parent is None, and there is no more breadcrumb item to build
-    #                 next_url = tg.url('/workspaces/{}/folders/{}'.format(workspace_id, current_item.content_id))
-    #
-    #         for item in reversed(breadcrumb_folder_items):
-    #             breadcrumb.append(item)
-    #
-    #
-    #     return breadcrumb
-
     def __real_base_query(self, workspace: Workspace=None):
         result = self.get_canonical_query()
 

@@ -338,10 +338,6 @@ class ContentType(object):
     Page = 'page'
     Event = 'event'
 
-    # Fake types, used for breadcrumb only
-    FAKE_Dashboard = 'dashboard'
-    FAKE_Workspace = 'workspace'
-
     _STRING_LIST_SEPARATOR = ','
 
     _ICONS = {  # Deprecated
