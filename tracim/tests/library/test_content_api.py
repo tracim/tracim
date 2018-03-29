@@ -28,7 +28,7 @@ from tracim.models.data import Workspace
 from tracim.models.data import Content
 from tracim.models.data import ContentType
 from tracim.models.data import UserRoleInWorkspace
-from tracim.fixtures.users_and_groups import Test as TestFixture
+from tracim.fixtures.users_and_groups import Test as FixtureTest
 from tracim.tests import DefaultTest
 
 
@@ -1956,7 +1956,7 @@ class TestContentApi(DefaultTest):
 
 
 class TestContentApiSecurity(DefaultTest):
-    fixtures = [TestFixture, ]
+    fixtures = [FixtureTest, ]
 
     def test_unit__cant_get_non_access_content__ok__nominal_case(self):
         admin = self.session.query(User)\
