@@ -14,6 +14,19 @@
     &:hover
       color white
 
+/**** MENU HAMBURGER ON EXPAND BAR *****/
+
+.hamburger--spring .hamburger-inner
+  margin 2px 6px
+
+.hamburger--spring .hamburger-inner::before
+  top 8px
+
+.hamburger--spring .hamburger-inner::after
+  top 16px
+
+ /***************************************/
+
 .sidebar
   min-height 100%
   background-color secondColor
@@ -34,19 +47,42 @@ leftside()
   width sidebar-width
   &.sidebarclose
     width 0
-    .sidebar__expand
-      border-bottom-right-radius 0
+    .hamburger--spring
+      .hamburger-inner
+        transition-delay 0.22s
+        background-color transparent
+        &::before
+            top 0
+            transition top 0.1s 0.15s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
+            transform translate3d(0, 10px, 0) rotate(45deg)
+        &::after
+            top 0
+            transition top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
+            transform translate3d(0, 10px, 0) rotate(-45deg)
   &__expand
     position absolute
-    top 1px
-    right -44px
-    padding 5px 8px
-    border 3px solid transparent
+    top 0
+    right -49px
+    padding 4px
+    border-left 1px solid off-white
     border-bottom-right-radius 15px
     cursor pointer
     background-color blue
     color white
     transition all sidebar-animate-speed
+    &__btnHamburger
+      padding 0
+      &:focus
+        outline none
+      &__box
+        &__icon, &__icon::before, &__icon::after
+          width 25px
+          height 3px
+          background-color off-white
+        &__icon::before
+          top 8px
+        &__icon::after
+          top 16px
   &__btnnewworkspace
     margin 50px 0
     overflow hidden

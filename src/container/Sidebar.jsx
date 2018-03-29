@@ -69,7 +69,12 @@ class Sidebar extends React.Component {
     return (
       <div className={classnames('sidebar d-none d-lg-block', {'sidebarclose': sidebarClose})}>
         <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
-          <i className={classnames('fa fa-fw', {'fa-plus-square-o': sidebarClose, 'fa-minus-square-o': !sidebarClose})} />
+          { /* <i className={classnames('fa fa-fw', {'fa-plus-square-o': sidebarClose, 'fa-minus-square-o': !sidebarClose})} /> */ }
+          <button className='hamburger hamburger--spring sidebar__expand__btnHamburger' type='button'>
+            <span className='hamburger-box sidebar__expand__btnHamburger__box'>
+              <span className='hamburger-inner sidebar__expand__btnHamburger__box__icon' />
+            </span>
+          </button>
         </div>
 
         <nav className='sidebar__navigation'>
