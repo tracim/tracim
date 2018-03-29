@@ -41,23 +41,19 @@ class Sidebar extends React.Component {
   handleClickWorkspace = (wsId, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(wsId, newIsOpenInSidebar))
 
   handleClickAllContent = wsId => {
+    this.props.dispatch(updateWorkspaceFilter([]))
+
     this.props.history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}`)
   }
 
   handleClickContentFilter = (wsId, filter) => {
-    const { workspaceIdInUrl } = this.state
     const { workspace, history, dispatch } = this.props
 
-    const filterList = (() => {
-      if (wsId !== workspaceIdInUrl) return [filter] // load a different workspace => reset filters
+    const newFilter = workspace.filter.includes(filter) ? [] : [filter] // use an array to allow multiple filters (NYI)
 
-      if (workspace.filter.includes(filter)) return workspace.filter.filter(f => f !== filter) // remove the filter
-      else return [...workspace.filter, filter] // add the filter
-    })()
+    dispatch(updateWorkspaceFilter(newFilter))
 
-    dispatch(updateWorkspaceFilter(filterList))
-
-    history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}/${filterList.join(';')}`) // workspace.filter gets updated on react redraw from match.params
+    history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}/${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
   }
 
   handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
