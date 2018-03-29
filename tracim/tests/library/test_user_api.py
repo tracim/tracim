@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
 
-from tracim.lib.user import UserApi
+from tracim.lib.core.user import UserApi
 from tracim.tests import DefaultTest
 
 

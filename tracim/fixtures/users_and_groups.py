@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from tracim import models
 from tracim.fixtures import Fixture
-from tracim.lib.user import UserApi
+from tracim.lib.core.user import UserApi
 
 
 class Base(Fixture):

@@ -5,11 +5,11 @@ from depot.manager import DepotManager
 from pyramid import testing
 
 from nose.tools import eq_
-from tracim.lib.content import ContentApi
-from tracim.lib.workspace import WorkspaceApi
+from tracim.lib.core.content import ContentApi
+from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models.data import Workspace, ContentType
 from tracim.models.data import Content
-from tracim.logger import logger
+from tracim.lib.utils.logger import logger
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.config import CFG

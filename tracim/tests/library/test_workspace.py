@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from nose.tools import eq_
 
-from tracim.lib.content import ContentApi
-from tracim.lib.group import GroupApi
-from tracim.lib.user import UserApi
-from tracim.lib.userworkspace import RoleApi
-from tracim.lib.workspace import WorkspaceApi
+from tracim.lib.core.content import ContentApi
+from tracim.lib.core.group import GroupApi
+from tracim.lib.core.user import UserApi
+from tracim.lib.core.userworkspace import RoleApi
+from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models import Content
 from tracim.models import User
 from tracim.models.auth import Group

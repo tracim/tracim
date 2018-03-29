@@ -3,7 +3,6 @@ import datetime as datetime_root
 import json
 import os
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
@@ -13,22 +12,20 @@ from sqlalchemy import Sequence
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
-from sqlalchemy.orm import deferred
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
-from sqlalchemy.types import LargeBinary
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 
-from tracim.translation import fake_translator as l_
-from tracim.translation import get_locale
+from tracim.lib.utils.translation import fake_translator as l_
+from tracim.lib.utils.translation import get_locale
 from tracim.exceptions import ContentRevisionUpdateError
 from tracim.models.meta import DeclarativeBase
 from tracim.models.auth import User

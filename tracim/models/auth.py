@@ -12,7 +12,6 @@ import time
 import uuid
 
 from datetime import datetime
-from hashlib import md5
 from hashlib import sha256
 from typing import TYPE_CHECKING
 
@@ -29,7 +28,7 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
 
-from tracim.translation import fake_translator as l_
+from tracim.lib.utils.translation import fake_translator as l_
 from tracim.models.meta import DeclarativeBase
 from tracim.models.meta import metadata
 if TYPE_CHECKING:

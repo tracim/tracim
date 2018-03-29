@@ -15,7 +15,7 @@ import datetime
 import re
 import typing
 
-from tracim.translation import fake_translator as _
+from tracim.lib.utils.translation import fake_translator as _
 
 from depot.manager import DepotManager
 from depot.io.utils import FileIntent
@@ -29,10 +29,10 @@ from sqlalchemy import desc
 from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
-from tracim.lib.utils import cmp_to_key
+from tracim.lib.utils.utils import cmp_to_key
 # from tracim.lib.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
-from tracim.lib.utils import current_date_for_filename
+from tracim.lib.utils.utils import current_date_for_filename
 from tracim.models.revision_protection import new_revision
 from tracim.models.auth import User
 from tracim.models.data import ActionDescription

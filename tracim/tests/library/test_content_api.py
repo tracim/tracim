@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
-import datetime
 
 from nose.tools import eq_, ok_
 from nose.tools import raises
 
-from depot.io.utils import FileIntent
 import transaction
 
 from tracim.config import CFG
-from tracim.lib.content import compare_content_for_sorting_by_type_and_name
-from tracim.lib.content import ContentApi
+from tracim.lib.core.content import compare_content_for_sorting_by_type_and_name
+from tracim.lib.core.content import ContentApi
 # TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
-from tracim.lib.group import GroupApi
-from tracim.lib.user import UserApi
+from tracim.lib.core.group import GroupApi
+from tracim.lib.core.user import UserApi
 from tracim.exceptions import SameValueError
 # TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
-from tracim.lib.workspace import RoleApi
+from tracim.lib.core.workspace import RoleApi
 # TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
-from tracim.lib.workspace import WorkspaceApi
+from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models.revision_protection import new_revision
 from tracim.models.auth import User
 from tracim.models.auth import Group

@@ -10,7 +10,7 @@ import transaction
 
 # from tracim.lib.content import ContentApi
 from tracim.exceptions import ContentRevisionUpdateError
-from tracim.lib.content import ContentApi
+from tracim.lib.core.content import ContentApi
 from tracim.models import Content
 from tracim.models.revision_protection import new_revision
 from tracim.models import User

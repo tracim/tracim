@@ -4,9 +4,9 @@ from depot.io.utils import FileIntent
 from tracim import models
 from tracim.fixtures import Fixture
 from tracim.fixtures.users_and_groups import Test
-from tracim.lib.content import ContentApi
-from tracim.lib.userworkspace import RoleApi
-from tracim.lib.workspace import WorkspaceApi
+from tracim.lib.core.content import ContentApi
+from tracim.lib.core.userworkspace import RoleApi
+from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models.data import ContentType
 from tracim.models.data import UserRoleInWorkspace
 

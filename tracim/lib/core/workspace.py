@@ -3,9 +3,9 @@ import typing
 
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
-from tracim.translation import fake_translator as _
+from tracim.lib.utils.translation import fake_translator as _
 
-from tracim.lib.userworkspace import RoleApi
+from tracim.lib.core.userworkspace import RoleApi
 from tracim.models.auth import Group
 from tracim.models.auth import User
 from tracim.models.data import UserRoleInWorkspace
