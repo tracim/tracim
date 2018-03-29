@@ -43,31 +43,21 @@ DEFAULT_PROPERTIES = dict(
 )
 
 
-class BreadcrumbItem(object):
-
-    def __init__(self, icon_string: str, label: str, url: str, is_active: bool = False):
-        """
-            A BreadcrumbItem contains minimal information required to build a breadcrumb
-            icon_string: this is the Tango related id, eg 'places/remote-folder'
-        """
-        self.icon = icon_string
-        self.label = label
-        self.url = url
-        self.is_active =is_active
-
 class Workspace(DeclarativeBase):
 
     __tablename__ = 'workspaces'
 
     workspace_id = Column(Integer, Sequence('seq__workspaces__workspace_id'), autoincrement=True, primary_key=True)
 
-    label   = Column(Unicode(1024), unique=False, nullable=False, default='')
+    label = Column(Unicode(1024), unique=False, nullable=False, default='')
     description = Column(Text(), unique=False, nullable=False, default='')
     calendar_enabled = Column(Boolean, unique=False, nullable=False, default=False)
 
-    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
+    #  Default value datetime.utcnow,
+    # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
-    #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
+    #  Default value datetime.utcnow,
+    # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
@@ -122,6 +112,7 @@ class Workspace(DeclarativeBase):
                     and (show_archived or not child.is_archived):
                 if not content_types or child.type in content_types:
                     yield child
+
 
 class UserRoleInWorkspace(DeclarativeBase):
 
