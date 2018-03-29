@@ -13,6 +13,7 @@ __author__ = 'damien'
 
 import datetime
 import re
+import typing
 
 from tracim.translation import fake_translator as _
 
@@ -35,7 +36,6 @@ from tracim.lib.utils import current_date_for_filename
 from tracim.models.revision_protection import new_revision
 from tracim.models.auth import User
 from tracim.models.data import ActionDescription
-from tracim.models.data import BreadcrumbItem
 from tracim.models.data import ContentStatus
 from tracim.models.data import ContentRevisionRO
 from tracim.models.data import Content
@@ -45,8 +45,11 @@ from tracim.models.data import RevisionReadStatus
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 
-def compare_content_for_sorting_by_type_and_name(content1: Content,
-                                                 content2: Content):
+
+def compare_content_for_sorting_by_type_and_name(
+        content1: Content,
+        content2: Content
+):
     """
     :param content1:
     :param content2:
@@ -72,7 +75,11 @@ def compare_content_for_sorting_by_type_and_name(content1: Content,
         else:
             return 0
 
-def compare_tree_items_for_sorting_by_type_and_name(item1: NodeTreeItem, item2: NodeTreeItem):
+
+def compare_tree_items_for_sorting_by_type_and_name(
+        item1: NodeTreeItem,
+        item2: NodeTreeItem
+):
     return compare_content_for_sorting_by_type_and_name(item1.node, item2.node)
 
 
@@ -92,7 +99,7 @@ class ContentApi(object):
     def __init__(
             self,
             session: Session,
-            current_user: User,
+            current_user: typing.Optional[User],
             show_archived=False,
             show_deleted=False,
             show_temporary=False,

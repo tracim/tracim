@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import typing
 
 __author__ = 'damien'
 
@@ -9,7 +10,11 @@ from sqlalchemy.orm import Session
 
 class GroupApi(object):
 
-    def __init__(self, session: Session, current_user: User):
+    def __init__(
+            self,
+            session: Session,
+            current_user: typing.Optional[User],
+    ):
         self._user = current_user
         self._session = session
 

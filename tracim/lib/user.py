@@ -13,7 +13,7 @@ from tracim.models.auth import User
 
 class UserApi(object):
 
-    def __init__(self, current_user: User, session, config):
+    def __init__(self, current_user: typing.Optional[User], session, config):
         self._session = session
         self._user = current_user
         self._config = config

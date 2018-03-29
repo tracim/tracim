@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import typing
 
 __author__ = 'damien'
 
@@ -55,7 +56,7 @@ class RoleApi(object):
 
         return role
 
-    def __init__(self, session: Session, current_user: User):
+    def __init__(self, session: Session, current_user: typing.Optional[User]):
         self._session = session
         self._user = current_user
 

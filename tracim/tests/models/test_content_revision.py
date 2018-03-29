@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
-from nose.tools import eq_
 from sqlalchemy import inspect
 
 from tracim.models import ContentRevisionRO
@@ -20,7 +19,8 @@ class TestContentRevision(BaseTest):
             'node',
             'revision_read_statuses',
         )
-        revision_columns = [attr.key for attr in inspect(revision).attrs if not attr.key in excluded_columns]
+        revision_columns = [attr.key for attr in inspect(revision).attrs
+                            if attr.key not in excluded_columns]
         new_revision = ContentRevisionRO()
 
         for revision_column in revision_columns:
