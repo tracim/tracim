@@ -17,13 +17,13 @@
 /**** MENU HAMBURGER ON EXPAND BAR *****/
 
 .hamburger--spring .hamburger-inner
-  margin 2px 6px
+  margin 4px 8px
 
 .hamburger--spring .hamburger-inner::before
-  top 8px
+  top 7px
 
 .hamburger--spring .hamburger-inner::after
-  top 16px
+  top 14px
 
  /***************************************/
 
@@ -52,11 +52,11 @@ leftside()
         transition-delay 0.22s
         background-color transparent
         &::before
-            top 0
+            top -3px
             transition top 0.1s 0.15s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
             transform translate3d(0, 10px, 0) rotate(45deg)
         &::after
-            top 0
+            top -3px
             transition top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
             transform translate3d(0, 10px, 0) rotate(-45deg)
   &__expand
@@ -76,8 +76,8 @@ leftside()
         outline none
       &__box
         &__icon, &__icon::before, &__icon::after
-          width 25px
-          height 3px
+          width 20px
+          height 2px
           background-color off-white
         &__icon::before
           top 8px
