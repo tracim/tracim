@@ -23,6 +23,7 @@ const FileItem = props => {
           <i className={props.icon} />
         </div>
       </div>
+
       <div className='col-8 col-sm-8 col-md-8 col-lg-8 col-xl-10'>
         <div className='file__name'>
           <div className='file__name__text'>
@@ -41,6 +42,7 @@ const FileItem = props => {
           </div>
         </div>
       </div>
+
       <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
         <div className='file__status'>
           <i className={iconStatus} />

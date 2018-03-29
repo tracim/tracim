@@ -51,6 +51,7 @@ folderopen()
     justify-content space-between
     margin-left -30px
     border-bottom 0
+    padding 10px 0
     background-color lightGrey
     cursor pointer
     &:hover
@@ -60,7 +61,7 @@ folderopen()
     &__triangleborder
       display none
       position absolute
-      top 61px
+      bottom -25px
       left -1px
       border-style solid
       border-width 25px 30px 0 30px
@@ -76,13 +77,12 @@ folderopen()
         border-color lightGrey transparent transparent transparent
     &__name
       display flex
-      padding-left 5px
       &__icon
-        margin auto 15px
         font-size 25px
         color darkBlue
+        text-align center
       &__text
-        margin auto 15px auto 5px
+        margin 0 15px 0 0
         font-size 17px
         color darkBlue
       &__addbtn
@@ -94,32 +94,24 @@ folderopen()
           font-size 17px
     &__contenttype
       display flex
+      justify-content flex-end
       &__text
-        padding 18px 15px
         font-size 17px
         color darkBlue
       &__icon
-        padding 18px 5px
         font-size 17px
         color darkBlue
         & > i
-          margin-right 15px
+          margin-right 3px
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
   .folder
-    &__header
-      padding 10px
-      &__triangleborder
-        top 59px
       &__contenttype
         display none
 
 @media (max-width: max-xs)
   .folder
     &__header
-      &__triangleborder
-        top 59px
       &__name
         &__icon
           padding 14px 15px

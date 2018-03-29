@@ -157,6 +157,7 @@
         "workspace_id": 1,
         "title": "Programmation objet",
         "type": "folder",
+        "allowed_app": ["PageHtml", "Thread", "File", "PageMarkdown", "Task", "Issue"],
         "content": []
       }
     ]
@@ -184,6 +185,7 @@
       "workspace_id": 1,
       "title": "ticket à fixe",
       "type": "folder",
+      "allowed_app": ["PageHtml", "Thread", "File", "PageMarkdown", "Task", "Issue"],
       "content": []
     }
   ],

@@ -23,41 +23,48 @@ class Folder extends React.Component {
   }
 
   render () {
-    const { app, folderData: { title, content }, onClickItem, onClickFolder, isLast, t } = this.props
+    const { app, folderData, onClickItem, onClickFolder, isLast, t } = this.props
 
     return (
       <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
-        <div className='folder__header' onClick={this.handleClickToggleFolder}>
+        <div className='folder__header align-items-center' onClick={this.handleClickToggleFolder}>
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
           </div>
-          <div className='folder__header__name'>
+
+          <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
             <div className='folder__header__name__icon'>
               <i className={classnames('fa', {'fa-folder-open-o': this.state.open, 'fa-folder-o': !this.state.open})} />
             </div>
-            <div className='folder__header__name__text'>
-              { title }
-            </div>
-            <div className='folder__header__name__addbtn' onClick={this.handleClickNewFile}>
-              <div className='folder__header__name__addbtn__text btn btn-primary'>
-                {t('Folder.create')} ...
+          </div>
+
+          <div className='col-5 col-sm-5 col-md-5 col-lg-6 col-xl-8'>
+            <div className='folder__header__name align-items-center'>
+              <div className='folder__header__name__text'>
+                { folderData.title }
+              </div>
+              <div className='folder__header__name__addbtn' onClick={this.handleClickNewFile}>
+                <div className='folder__header__name__addbtn__text btn btn-primary'>
+                  {t('Folder.create')} ...
+                </div>
               </div>
             </div>
           </div>
-          <div className='folder__header__contenttype'>
-            <div className='folder__header__contenttype__text'>
-              {t('Folder.content_type')} :
-            </div>
-            <div className='folder__header__contenttype__icon'>
-              <i className='fa fa-list-ul' />
-              <i className='fa fa-file-text-o' />
-              <i className='fa fa-comments' />
+
+          <div className='col-5 col-sm-5 col-md-5 col-lg-4 col-xl-3'>
+            <div className='folder__header__contenttype'>
+              <div className='folder__header__contenttype__text'>
+                {t('Folder.content_type')} :
+              </div>
+              <div className='folder__header__contenttype__icon'>
+                { folderData.allowed_app.map(a => <i className={app[a].icon} key={`${folderData.id}_${a}`} />)}
+              </div>
             </div>
           </div>
         </div>
 
         <div className='folder__content'>
-          { content.map((c, i) => c.type === 'folder'
+          { folderData.content.map((c, i) => c.type === 'folder'
             ? <Folder
               app={app}
               folderData={c}
