@@ -6,7 +6,7 @@ from pyramid import testing
 from nose.tools import eq_
 from tracim.lib.content import ContentApi
 from tracim.lib.workspace import WorkspaceApi
-from tracim.models.data import Workspace
+from tracim.models.data import Workspace, ContentType
 from tracim.models.data import Content
 from tracim.logger import logger
 from tracim.fixtures import FixturesLoader
@@ -60,6 +60,7 @@ class BaseTest(unittest.TestCase):
         transaction.abort()
         DeclarativeBase.metadata.drop_all(self.engine)
 
+
 class StandardTest(BaseTest):
     """
     BaseTest with default fixtures
@@ -86,10 +87,23 @@ class DefaultTest(StandardTest):
             session=self.session,
         ).create_workspace(name, save_now=True)
 
-        eq_(1, self.session.query(Workspace).filter(Workspace.label == name).count())
-        return self.session.query(Workspace).filter(Workspace.label == name).one()
+        eq_(
+            1,
+            self.session.query(Workspace).filter(
+                Workspace.label == name
+            ).count()
+        )
+        return self.session.query(Workspace).filter(
+            Workspace.label == name
+        ).one()
 
-    def _create_content_and_test(self, name, workspace, *args, **kwargs) -> Content:
+    def _create_content_and_test(
+            self,
+            name,
+            workspace,
+            *args,
+            **kwargs
+    ) -> Content:
         """
         All extra parameters (*args, **kwargs) are for Content init
         :return: Created Content instance
@@ -104,5 +118,35 @@ class DefaultTest(StandardTest):
             current_user=None,
             session=self.session,
         )
-        eq_(1, content_api.get_canonical_query().filter(Content.label == name).count())
-        return content_api.get_canonical_query().filter(Content.label == name).one()
+        eq_(
+            1,
+            content_api.get_canonical_query().filter(
+                Content.label == name
+            ).count()
+        )
+        return content_api.get_canonical_query().filter(
+            Content.label == name
+        ).one()
+
+    def _create_thread_and_test(self,
+                                user,
+                                workspace_name='workspace_1',
+                                folder_name='folder_1',
+                                thread_name='thread_1') -> Content:
+        """
+        :return: Thread
+        """
+        workspace = self._create_workspace_and_test(workspace_name, user)
+        folder = self._create_content_and_test(
+            folder_name, workspace,
+            type=ContentType.Folder,
+            owner=user
+        )
+        thread = self._create_content_and_test(
+            thread_name,
+            workspace,
+            type=ContentType.Thread,
+            parent=folder,
+            owner=user
+        )
+        return thread
