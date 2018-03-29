@@ -25,9 +25,9 @@ export const PersonalData = props => {
         </div>
         <input className='personaldata__form__txtinput form-control' type='email' placeholder='Ancienne adresse mail' />
         <input className='personaldata__form__txtinput form-control' type='email' placeholder='Nouvelle adresse mail' />
-        <div className='personaldata__form__button btn btn-primary'>
-          Envoyer
-        </div>
+      </div>
+      <div className='personaldata__form__button btn btn-primary'>
+        Envoyer
       </div>
     </div>
   )
