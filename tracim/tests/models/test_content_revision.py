@@ -2,14 +2,15 @@
 from collections import OrderedDict
 
 from sqlalchemy import inspect
+from nose.tools import eq_
 
 from tracim.models import ContentRevisionRO
 from tracim.models import User
 from tracim.models.data import ContentType
-from tracim.tests import BaseTest
+from tracim.tests import DefaultTest
 
 
-class TestContentRevision(BaseTest):
+class TestContentRevision(DefaultTest):
 
     def _new_from(self, revision):
         excluded_columns = (
@@ -36,29 +37,42 @@ class TestContentRevision(BaseTest):
             dict_repr.pop(key_to_remove, None)
         return dict_repr
 
-    # TODO - G.M - 28-03-2018 - [libContent] Reenable this test
-    # def test_new_revision(self):
-    #     admin = self._session.query(User).filter(User.email == 'admin@admin.admin').one()
-    #     workspace = self._create_workspace_and_test(name='workspace_1', user=admin)
-    #     folder = self._create_content_and_test(name='folder_1', workspace=workspace, type=ContentType.Folder)
-    #     page = self._create_content_and_test(
-    #         workspace=workspace,
-    #         parent=folder,
-    #         name='file_1',
-    #         description='content of file_1',
-    #         type=ContentType.Page,
-    #         owner=admin
-    #     )
-    #
-    #     self._session.flush()
-    #
-    #     # Model create a new instance with list of column
-    #     new_revision_by_model = ContentRevisionRO.new_from(page.revision)
-    #     # Test create a new instance from dynamic listing of model columns mapping
-    #     new_revision_by_test = self._new_from(page.revision)
-    #
-    #     new_revision_by_model_dict = self._get_dict_representation(new_revision_by_model)
-    #     new_revision_by_test_dict = self._get_dict_representation(new_revision_by_test)
-    #
-    #     # They must be identical
-    #     eq_(new_revision_by_model_dict, new_revision_by_test_dict)
+    def test_new_revision(self):
+        admin = self.session.query(User).filter(
+            User.email == 'admin@admin.admin'
+        ).one()
+        workspace = self._create_workspace_and_test(
+            name='workspace_1',
+            user=admin
+        )
+        folder = self._create_content_and_test(
+            name='folder_1',
+            workspace=workspace,
+            type=ContentType.Folder
+        )
+        page = self._create_content_and_test(
+            workspace=workspace,
+            parent=folder,
+            name='file_1',
+            description='content of file_1',
+            type=ContentType.Page,
+            owner=admin
+        )
+
+        self.session.flush()
+
+        # Model create a new instance with list of column
+        new_revision_by_model = ContentRevisionRO.new_from(page.revision)
+        # Test create a new instance from dynamic listing of model
+        # columns mapping
+        new_revision_by_test = self._new_from(page.revision)
+
+        new_revision_by_model_dict = self._get_dict_representation(
+            new_revision_by_model
+        )
+        new_revision_by_test_dict = self._get_dict_representation(
+            new_revision_by_test
+        )
+
+        # They must be identical
+        eq_(new_revision_by_model_dict, new_revision_by_test_dict)

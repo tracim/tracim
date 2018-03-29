@@ -10,6 +10,7 @@ import transaction
 
 # from tracim.lib.content import ContentApi
 from tracim.exceptions import ContentRevisionUpdateError
+from tracim.lib.content import ContentApi
 from tracim.models import Content
 from tracim.models.revision_protection import new_revision
 from tracim.models import User
@@ -25,55 +26,82 @@ class TestContent(StandardTest):
     @raises(ContentRevisionUpdateError)
     def test_update_without_prepare(self):
         content1 = self.test_create()
-        content1.description = 'FOO'  # Raise ContentRevisionUpdateError because revision can't be updated
+        content1.description = 'FOO'
+        # Raise ContentRevisionUpdateError because revision can't be updated
 
-    # TODO - G.M - 28-03-2018 - [libContent] Reenable this test when libContent is available
-    # def test_query(self):
-    #     content1 = self.test_create()
-    #     with new_revision(content1):
-    #         content1.description = 'TEST_CONTENT_DESCRIPTION_1_UPDATED'
-    #     DBSession.flush()
-    #
-    #     content2 = self.test_create(key='2')
-    #     with new_revision(content2):
-    #         content2.description = 'TEST_CONTENT_DESCRIPTION_2_UPDATED'
-    #     DBSession.flush()
-    #
-    #     workspace1 = DBSession.query(Workspace).filter(Workspace.label == 'TEST_WORKSPACE_1').one()
-    #     workspace2 = DBSession.query(Workspace).filter(Workspace.label == 'TEST_WORKSPACE_2').one()
-    #
-    #     # To get Content in database we have to join Content and ContentRevisionRO with particular condition:
-    #     # Join have to be on most recent revision
-    #     join_sub_query = DBSession.query(ContentRevisionRO.revision_id)\
-    #         .filter(ContentRevisionRO.content_id == Content.id)\
-    #         .order_by(ContentRevisionRO.revision_id.desc())\
-    #         .limit(1)\
-    #         .correlate(Content)
-    #
-    #     base_query = DBSession.query(Content)\
-    #         .join(ContentRevisionRO, and_(Content.id == ContentRevisionRO.content_id,
-    #                                       ContentRevisionRO.revision_id == join_sub_query))
-    #
-    #     pattern = 'TEST_CONTENT_DESCRIPTION_%_UPDATED'
-    #     eq_(2, base_query.filter(Content.description.like(pattern)).count())
-    #
-    #     eq_(1, base_query.filter(Content.workspace == workspace1).count())
-    #     eq_(1, base_query.filter(Content.workspace == workspace2).count())
-    #
-    #     content1_from_query = base_query.filter(Content.workspace == workspace1).one()
-    #     eq_(content1.id, content1_from_query.id)
-    #     eq_('TEST_CONTENT_DESCRIPTION_1_UPDATED', content1_from_query.description)
-    #
-    #     user_admin = DBSession.query(User).filter(User.email == 'admin@admin.admin').one()
-    #
-    #     api = ContentApi(None)
-    #
-    #     content1_from_api = api.get_one(content1.id, ContentType.Page, workspace1)
+    def test_query(self):
+        content1 = self.test_create()
+        with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=content1,
+        ):
+            content1.description = 'TEST_CONTENT_DESCRIPTION_1_UPDATED'
+        self.session.flush()
+
+        content2 = self.test_create(key='2')
+        with new_revision(
+            session=self.session,
+            tm=transaction.manager,
+            content=content2,
+        ):
+            content2.description = 'TEST_CONTENT_DESCRIPTION_2_UPDATED'
+        self.session.flush()
+
+        workspace1 = self.session.query(Workspace)\
+            .filter(Workspace.label == 'TEST_WORKSPACE_1').one()
+        workspace2 = self.session.query(Workspace)\
+            .filter(Workspace.label == 'TEST_WORKSPACE_2').one()
+
+        # To get Content in database
+        # we have to join Content and ContentRevisionRO
+        # with particular condition:
+        # Join have to be on most recent revision
+        join_sub_query = self.session.query(ContentRevisionRO.revision_id)\
+            .filter(ContentRevisionRO.content_id == Content.id)\
+            .order_by(ContentRevisionRO.revision_id.desc())\
+            .limit(1)\
+            .correlate(Content)
+
+        base_query = self.session.query(Content).join(
+            ContentRevisionRO,
+            and_(
+                Content.id == ContentRevisionRO.content_id,
+                ContentRevisionRO.revision_id == join_sub_query
+            )
+        )
+
+        pattern = 'TEST_CONTENT_DESCRIPTION_%_UPDATED'
+        eq_(2, base_query.filter(Content.description.like(pattern)).count())
+
+        eq_(1, base_query.filter(Content.workspace == workspace1).count())
+        eq_(1, base_query.filter(Content.workspace == workspace2).count())
+
+        content1_from_query = base_query\
+            .filter(Content.workspace == workspace1).one()
+        eq_(content1.id, content1_from_query.id)
+        eq_(
+            'TEST_CONTENT_DESCRIPTION_1_UPDATED',
+            content1_from_query.description
+        )
+
+        user_admin = self.session.query(User)\
+            .filter(User.email == 'admin@admin.admin').one()
+
+        api = ContentApi(current_user=None, session=self.session)
+
+        content1_from_api = api.get_one(
+            content1.id,
+            ContentType.Page,
+            workspace1
+        )
 
     def test_update(self):
         created_content = self.test_create()
-        content = self.session.query(Content).filter(Content.id == created_content.id).one()
-        eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
+        content = self.session.query(Content)\
+            .filter(Content.id == created_content.id).one()
+        eq_(1, self.session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
 
         with new_revision(
                 session=self.session,
@@ -84,8 +112,18 @@ class TestContent(StandardTest):
             content.description = 'TEST_CONTENT_DESCRIPTION_1_UPDATED'
         self.session.flush()
 
-        eq_(2, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
-        eq_(1, self.session.query(Content).filter(Content.id == created_content.id).count())
+        eq_(
+            2,
+            self.session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.label == 'TEST_CONTENT_1'
+            ).count()
+        )
+        eq_(
+            1,
+            self.session.query(Content).filter(
+                Content.id == created_content.id
+            ).count()
+        )
 
         with new_revision(
                 session=self.session,
@@ -97,15 +135,28 @@ class TestContent(StandardTest):
             content.label = 'TEST_CONTENT_1_UPDATED_2'
         self.session.flush()
 
-        eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1_UPDATED_2').count())
-        eq_(1, self.session.query(Content).filter(Content.id == created_content.id).count())
+        eq_(
+            1,
+            self.session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.label == 'TEST_CONTENT_1_UPDATED_2'
+            ).count()
+        )
+        eq_(
+            1,
+            self.session.query(Content).filter(
+                Content.id == created_content.id
+            ).count()
+        )
 
-        revision_1 = self.session.query(ContentRevisionRO)\
-            .filter(ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1').one()
-        revision_2 = self.session.query(ContentRevisionRO)\
-            .filter(ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1_UPDATED').one()
-        revision_3 = self.session.query(ContentRevisionRO)\
-            .filter(ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1_UPDATED_2').one()
+        revision_1 = self.session.query(ContentRevisionRO).filter(
+            ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1'
+        ).one()
+        revision_2 = self.session.query(ContentRevisionRO).filter(
+            ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1_UPDATED'  # nopep8
+        ).one()
+        revision_3 = self.session.query(ContentRevisionRO).filter(
+            ContentRevisionRO.description == 'TEST_CONTENT_DESCRIPTION_1_UPDATED_2'  # nopep8
+        ).one()
 
         # Updated dates must be different
         ok_(revision_1.updated < revision_2.updated < revision_3.updated)
@@ -113,14 +164,31 @@ class TestContent(StandardTest):
         ok_(revision_1.created == revision_2.created == revision_3.created)
 
     def test_creates(self):
-        eq_(0, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
-        eq_(0, self.session.query(Workspace).filter(Workspace.label == 'TEST_WORKSPACE_1').count())
+        eq_(
+            0,
+            self.session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.label == 'TEST_CONTENT_1'
+            ).count()
+        )
+        eq_(
+            0,
+            self.session.query(Workspace).filter(
+                Workspace.label == 'TEST_WORKSPACE_1'
+            ).count()
+        )
 
-        user_admin = self.session.query(User).filter(User.email == 'admin@admin.admin').one()
+        user_admin = self.session.query(User).filter(
+            User.email == 'admin@admin.admin'
+        ).one()
         workspace = Workspace(label="TEST_WORKSPACE_1")
         self.session.add(workspace)
         self.session.flush()
-        eq_(1, self.session.query(Workspace).filter(Workspace.label == 'TEST_WORKSPACE_1').count())
+        eq_(
+            1,
+            self.session.query(Workspace).filter(
+                Workspace.label == 'TEST_WORKSPACE_1'
+            ).count()
+        )
 
         first_content = self._create_content(
             owner=user_admin,
@@ -133,9 +201,16 @@ class TestContent(StandardTest):
             is_archived=False,
         )
 
-        eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
+        eq_(
+            1,
+            self.session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.label == 'TEST_CONTENT_1'
+            ).count()
+        )
 
-        content = self.session.query(Content).filter(Content.id == first_content.id).one()
+        content = self.session.query(Content).filter(
+            Content.id == first_content.id
+        ).one()
         eq_('TEST_CONTENT_1', content.label)
         eq_('TEST_CONTENT_DESCRIPTION_1', content.description)
 
@@ -149,21 +224,43 @@ class TestContent(StandardTest):
             revision_type=ActionDescription.CREATION
         )
 
-        eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_2').count())
+        eq_(
+            1,
+            self.session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.label == 'TEST_CONTENT_2'
+            ).count()
+        )
 
-        content = self.session.query(Content).filter(Content.id == second_content.id).one()
+        content = self.session.query(Content).filter(
+            Content.id == second_content.id
+        ).one()
         eq_('TEST_CONTENT_2', content.label)
         eq_('TEST_CONTENT_DESCRIPTION_2', content.description)
 
     def test_create(self, key='1'):
-        eq_(0, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_%s' % key).count())
-        eq_(0, self.session.query(Workspace).filter(Workspace.label == 'TEST_WORKSPACE_%s' % key).count())
+        eq_(
+            0,
+            self.session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.label == 'TEST_CONTENT_%s' % key).count()
+        )
+        eq_(
+            0,
+            self.session.query(Workspace).filter(
+                Workspace.label == 'TEST_WORKSPACE_%s' % key).count()
+        )
 
-        user_admin = self.session.query(User).filter(User.email == 'admin@admin.admin').one()
+        user_admin = self.session.query(User).filter(
+            User.email == 'admin@admin.admin'
+        ).one()
         workspace = Workspace(label="TEST_WORKSPACE_%s" % key)
         self.session.add(workspace)
         self.session.flush()
-        eq_(1, self.session.query(Workspace).filter(Workspace.label == 'TEST_WORKSPACE_%s' % key).count())
+        eq_(
+            1,
+            self.session.query(Workspace).filter(
+                Workspace.label == 'TEST_WORKSPACE_%s' % key
+            ).count()
+        )
 
         created_content = self._create_content(
             owner=user_admin,
@@ -174,9 +271,16 @@ class TestContent(StandardTest):
             revision_type=ActionDescription.CREATION
         )
 
-        eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_%s' % key).count())
+        eq_(
+            1,
+            self.session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.label == 'TEST_CONTENT_%s' % key
+            ).count()
+        )
 
-        content = self.session.query(Content).filter(Content.id == created_content.id).one()
+        content = self.session.query(Content).filter(
+            Content.id == created_content.id
+        ).one()
         eq_('TEST_CONTENT_%s' % key, content.label)
         eq_('TEST_CONTENT_DESCRIPTION_%s' % key, content.description)
 
