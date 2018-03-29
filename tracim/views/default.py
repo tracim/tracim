@@ -4,12 +4,10 @@ from pyramid.response import Response
 from pyramid.view import view_config
 
 from sqlalchemy.exc import DBAPIError
-
-from ..models import MyModel
 from ..models import Content
 
 
-@view_config(route_name='test_config', renderer='../templates/mytemplate.jinja2')
+@view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
 def test_config(request):
     try:
         project = request.config().WEBSITE_TITLE
@@ -17,14 +15,14 @@ def test_config(request):
         return Response(e, content_type='text/plain', status=500)
     return {'project': project}
 
-@view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
-def my_view(request):
-    try:
-        query = request.dbsession.query(MyModel)
-        one = query.filter(MyModel.name == 'one').first()
-    except DBAPIError:
-        return Response(db_err_msg, content_type='text/plain', status=500)
-    return {'one': one, 'project': 'tracim'}
+# @view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
+# def my_view(request):
+#     try:
+#         query = request.dbsession.query(MyModel)
+#         one = query.filter(MyModel.name == 'one').first()
+#     except DBAPIError:
+#         return Response(db_err_msg, content_type='text/plain', status=500)
+#    return {'one': one, 'project': 'tracim'}
 
 
 db_err_msg = """\

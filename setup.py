@@ -21,6 +21,7 @@ requires = [
     'waitress',
     'filedepot',
     'babel',
+    'alembic',
 ]
 
 tests_require = [

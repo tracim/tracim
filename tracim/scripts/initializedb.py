@@ -16,7 +16,6 @@ from ..models import (
     get_session_factory,
     get_tm_session,
     )
-from ..models import MyModel
 
 
 def usage(argv):
@@ -40,9 +39,8 @@ def main(argv=sys.argv):
     session_factory = get_session_factory(engine)
     # TODO - G.M - 28-03-2018 - [Cleanup] Remove code related to example
     with transaction.manager:
-        dbsession = get_tm_session(session_factory, transaction.manager)
-
-        model = MyModel(name='one', value=1)
-        dbsession.add(model)
-
+        pass
+        # dbsession = get_tm_session(session_factory, transaction.manager)
+        # model = MyModel(name='one', value=1)
+        # dbsession.add(model)
         # Add global manager data, just for test

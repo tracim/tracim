@@ -7,7 +7,7 @@ from sqlalchemy.schema import MetaData
 # difficult. See: http://alembic.zzzcomputing.com/en/latest/naming.html
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
-    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "uq": "uq__%(table_name)s__%(column_0_name)s",  # Unique constrains
     # TODO - G.M - 28-03-2018 - [Database] Convert database to allow naming convention
     # for ck contraint.
     # "ck": "ck_%(table_name)s_%(constraint_name)s",
