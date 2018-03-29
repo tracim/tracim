@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from paste.deploy.converters import asbool
 from urllib.parse import urlparse
 from tracim.logger import logger

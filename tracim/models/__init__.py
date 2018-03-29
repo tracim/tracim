@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sqlalchemy import engine_from_config
 from sqlalchemy.event import listen
 from sqlalchemy.orm import sessionmaker

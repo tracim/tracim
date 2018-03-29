@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 from pyramid.config import Configurator
-
 from tracim.config import RequestWithCFG
 
 

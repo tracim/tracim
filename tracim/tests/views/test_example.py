@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# TODO - G.M - [Cleanup] Drop this file
 import unittest
 import transaction
 

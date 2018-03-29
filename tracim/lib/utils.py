@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import datetime
+
 
 def cmp_to_key(mycmp):
     """

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from tracim.models import User
 from tracim.models.data import UserRoleInWorkspace
 

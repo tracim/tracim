@@ -20,6 +20,7 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'filedepot',
+    'babel',
 ]
 
 tests_require = [

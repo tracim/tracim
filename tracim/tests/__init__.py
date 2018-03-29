@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 import transaction
 from depot.manager import DepotManager

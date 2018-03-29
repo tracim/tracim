@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sqlalchemy.orm import Session
 from sqlalchemy import inspect
 from sqlalchemy.orm.unitofwork import UOWTransaction

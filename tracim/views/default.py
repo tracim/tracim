@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# TODO - G.M - 29-03-2018 - [Cleanup] Drop this file
 from pyramid.response import Response
 from pyramid.view import view_config
 
