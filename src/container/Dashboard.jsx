@@ -294,7 +294,9 @@ class Dashboard extends Component {
                   <div className='dashboard__memberlist__btnadd'>
                     <div className='dashboard__memberlist__btnadd__button'>
                       <div className='dashboard__memberlist__btnadd__button__avatar'>
-                        <img src={listMemberBtn} alt='avatar' />
+                        <div className='dashboard__memberlist__btnadd__button__avatar__icon'>
+                          <i className='fa fa-plus' />
+                        </div>
                       </div>
                       <div className='dashboard__memberlist__btnadd__button__text'>
                          Ajouter un membre
@@ -303,7 +305,8 @@ class Dashboard extends Component {
                   </div>
 
                   <form className='dashboard__memberlist__addmember'>
-                    <input type='text' className='dashboard__memberlist__addmember__name form-control' placeholder='Name' />
+                    <label className='dashboard__memberlist__addmember__label' for='addmember'>Indiqué le nom de l'utilisateur</label>
+                    <input type='text' id='addmember' className='dashboard__memberlist__addmember__name form-control' placeholder='Name' />
                     <div className='dashboard__memberlist__addmember__role'>
                       <div className='dashboard__memberlist__addmember__role__dropdown dropdown'>
                         <button className='dashboard__memberlist__addmember__role__dropdown__button btn btn-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>

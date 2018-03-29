@@ -160,11 +160,18 @@ bgandcolor()
         display flex
         align-items center
         &__avatar
+          display flex
+          justify-content center
+          align-items center
           margin-right 20px
+          border 2px dashed grey
+          border-radius 50%
+          width 50px
+          height 50px
           cursor pointer
-          img
-            width 50px
-            height 50px
+          &__icon
+            color grey
+            font-size 25px
         &__text
           font-size 18px
           color blue
@@ -186,7 +193,7 @@ bgandcolor()
         padding 10px 25px
         width auto
       &__role
-        margin-bottom 20px
+        margin-bottom 90px
         &__dropdown
           &__button
             border 1px solid blue
@@ -309,7 +316,7 @@ bgandcolor()
     &__calltoaction
       justify-content center
       &__button
-        margin-right 0
+        margin 10px
     &__activity
       margin 25px 0
       width 100%
@@ -329,6 +336,8 @@ bgandcolor()
       &__list
         height auto
         overflow-Y visible
+        &__item:nth-last-child(1)
+          border-bottom 1px solid grey
       &__btnadd
         border-top 0
     &__webdav

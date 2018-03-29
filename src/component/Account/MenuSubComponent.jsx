@@ -6,7 +6,11 @@ export const Navbar = props => {
     <nav className='account__userpreference__menu navbar d-flex align-items-start'>
 
       <div className='account__userpreference__menu__responsive d-lg-none'>
-        <i className='fa fa-bars' />
+        <button className='hamburger hamburger--spring account__userpreference__menu__responsive__hamburger' type='button'>
+          <span className='hamburger-box account__userpreference__menu__responsive__hamburger__box'>
+            <span className='hamburger-inner account__userpreference__menu__responsive__hamburger__box__icon'></span>
+          </span>
+        </button>
       </div>
 
       <ul className='account__userpreference__menu__list nav flex-column'>
