@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Sidebar from './Sidebar.jsx'
-import listMemberBtn from '../img/listmemberbtn.png'
 import imgProfil from '../img/imgProfil.png'
 
 class Dashboard extends Component {
