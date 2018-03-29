@@ -29,6 +29,7 @@ from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 
 from tracim.translation import fake_translator as l_
+from tracim.translation import get_locale
 from tracim.exceptions import ContentRevisionUpdateError
 from tracim.models.meta import DeclarativeBase
 from tracim.models.auth import User
@@ -1146,14 +1147,14 @@ class Content(DeclarativeBase):
             delta_from_datetime = datetime.utcnow()
 
         return format_timedelta(delta_from_datetime - self.created,
-                                locale=tg.i18n.get_lang()[0])
+                                locale=get_locale())
 
     def datetime_as_delta(self, datetime_object,
                           delta_from_datetime:datetime=None):
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
         return format_timedelta(delta_from_datetime - datetime_object,
-                                locale=tg.i18n.get_lang()[0])
+                                locale=get_locale())
 
     def get_child_nb(self, content_type: ContentType, content_status = ''):
         child_nb = 0
@@ -1393,7 +1394,7 @@ class VirtualEvent(object):
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
         return format_timedelta(delta_from_datetime - self.created,
-                                locale=tg.i18n.get_lang()[0])
+                                locale=get_locale())
 
     def create_readable_date(self, delta_from_datetime:datetime=None):
         aff = ''
