@@ -95,7 +95,7 @@ class UserApi(object):
         #from tracim.lib.calendar import CalendarManager
         #from tracim.model.organisational import UserCalendar
 
-        created_user.ensure_auth_token(dbsession=self._session, validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY)
+        created_user.ensure_auth_token(session=self._session, validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY)
 
         # Ensure database is up-to-date
         self._session.flush()

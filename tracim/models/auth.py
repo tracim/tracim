@@ -264,7 +264,7 @@ class User(DeclarativeBase):
                 roles.append(role)
         return roles
 
-    def ensure_auth_token(self, validity_seconds, dbsession) -> None:
+    def ensure_auth_token(self, validity_seconds, session) -> None:
         """
         Create auth_token if None, regenerate auth_token if too much old.
 
@@ -275,7 +275,7 @@ class User(DeclarativeBase):
         if not self.auth_token or not self.auth_token_created:
             self.auth_token = str(uuid.uuid4())
             self.auth_token_created = datetime.utcnow()
-            dbsession.flush()
+            session.flush()
             return
 
         now_seconds = time.mktime(datetime.utcnow().timetuple())
@@ -285,7 +285,7 @@ class User(DeclarativeBase):
         if difference > validity_seconds:
             self.auth_token = str(uuid.uuid4())
             self.auth_token_created = datetime.utcnow()
-            DBSession.flush()
+            session.flush()
 
 
 class Permission(DeclarativeBase):
@@ -298,7 +298,12 @@ class Permission(DeclarativeBase):
 
     __tablename__ = 'permissions'
 
-    permission_id = Column(Integer, Sequence('seq__permissions__permission_id'), autoincrement=True, primary_key=True)
+    permission_id = Column(
+        Integer,
+        Sequence('seq__permissions__permission_id'),
+        autoincrement=True,
+        primary_key=True
+    )
     permission_name = Column(Unicode(63), unique=True, nullable=False)
     description = Column(Unicode(255))
 
