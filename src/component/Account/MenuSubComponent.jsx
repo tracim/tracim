@@ -8,7 +8,7 @@ export const Navbar = props => {
       <div className='account__userpreference__menu__responsive d-lg-none'>
         <button className='hamburger hamburger--spring account__userpreference__menu__responsive__hamburger' type='button'>
           <span className='hamburger-box account__userpreference__menu__responsive__hamburger__box'>
-            <span className='hamburger-inner account__userpreference__menu__responsive__hamburger__box__icon'></span>
+            <span className='hamburger-inner account__userpreference__menu__responsive__hamburger__box__icon' />
           </span>
         </button>
       </div>
