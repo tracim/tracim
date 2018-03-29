@@ -63,7 +63,7 @@ class RevisionsIntegrity(object):
 
 @contextmanager
 def new_revision(
-        dbsession: Session,
+        session: Session,
         tm: TransactionManager,
         content: Content,
         force_create_new_revision: bool=False,
@@ -71,14 +71,14 @@ def new_revision(
     """
     Prepare context to update a Content. It will add a new updatable revision
     to the content.
-    :param dbsession: Database _session
+    :param session: Database _session
     :param tm: TransactionManager
     :param content: Content instance to update
     :param force_create_new_revision: Decide if new_rev should or should not
     be forced.
     :return:
     """
-    with dbsession.no_autoflush:
+    with session.no_autoflush:
         try:
             if force_create_new_revision \
                     or inspect(content.revision).has_identity:

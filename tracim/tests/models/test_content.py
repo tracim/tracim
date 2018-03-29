@@ -76,7 +76,7 @@ class TestContent(StandardTest):
         eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'TEST_CONTENT_1').count())
 
         with new_revision(
-                dbsession=self.session,
+                session=self.session,
                 tm=transaction.manager,
                 content=content
         ):
@@ -88,7 +88,7 @@ class TestContent(StandardTest):
         eq_(1, self.session.query(Content).filter(Content.id == created_content.id).count())
 
         with new_revision(
-                dbsession=self.session,
+                session=self.session,
                 tm=transaction.manager,
                 content=content
         ):

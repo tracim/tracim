@@ -3,6 +3,9 @@ import transaction
 from depot.manager import DepotManager
 from pyramid import testing
 
+from nose.tools import eq_
+from tracim.lib.content import ContentApi
+from tracim.lib.workspace import WorkspaceApi
 from tracim.models.data import Workspace
 from tracim.models.data import Content
 from tracim.logger import logger
@@ -57,33 +60,6 @@ class BaseTest(unittest.TestCase):
         transaction.abort()
         DeclarativeBase.metadata.drop_all(self.engine)
 
-# class DefaultTest(object):
-#
-#     def _create_workspace_and_test(self, name, user) -> Workspace:
-#         """
-#         All extra parameters (*args, **kwargs) are for Workspace init
-#         :return: Created workspace instance
-#         """
-#         WorkspaceApi(user).create_workspace(name, save_now=True)
-#
-#         eq_(1, self._session.query(Workspace).filter(Workspace.label == name).count())
-#         return self._session.query(Workspace).filter(Workspace.label == name).one()
-#
-#     def _create_content_and_test(self, name, workspace, *args, **kwargs) -> Content:
-#         """
-#         All extra parameters (*args, **kwargs) are for Content init
-#         :return: Created Content instance
-#         """
-#         content = Content(*args, **kwargs)
-#         content.label = name
-#         content.workspace = workspace
-#         self._session.add(content)
-#         self._session.flush()
-#
-#         eq_(1, ContentApi.get_canonical_query().filter(Content.label == name).count())
-#         return ContentApi.get_canonical_query().filter(Content.label == name).one()
-
-
 class StandardTest(BaseTest):
     """
     BaseTest with default fixtures
@@ -96,3 +72,37 @@ class StandardTest(BaseTest):
             session=self.session,
             config=CFG(self.config.get_settings()))
         fixtures_loader.loads(self.fixtures)
+
+
+class DefaultTest(StandardTest):
+
+    def _create_workspace_and_test(self, name, user) -> Workspace:
+        """
+        All extra parameters (*args, **kwargs) are for Workspace init
+        :return: Created workspace instance
+        """
+        WorkspaceApi(
+            current_user=user,
+            session=self.session,
+        ).create_workspace(name, save_now=True)
+
+        eq_(1, self.session.query(Workspace).filter(Workspace.label == name).count())
+        return self.session.query(Workspace).filter(Workspace.label == name).one()
+
+    def _create_content_and_test(self, name, workspace, *args, **kwargs) -> Content:
+        """
+        All extra parameters (*args, **kwargs) are for Content init
+        :return: Created Content instance
+        """
+        content = Content(*args, **kwargs)
+        content.label = name
+        content.workspace = workspace
+        self.session.add(content)
+        self.session.flush()
+
+        content_api = ContentApi(
+            current_user=None,
+            session=self.session,
+        )
+        eq_(1, content_api.get_canonical_query().filter(Content.label == name).count())
+        return content_api.get_canonical_query().filter(Content.label == name).one()
