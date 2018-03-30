@@ -8,8 +8,11 @@ python:
 install:
   - pip install --upgrade pip setuptools
   - pip install -e ".[testing]"
+  - pip install pytest-cov
+  - pip install python-coveralls
 
-script: pytest
+script:
+ - py.test --cov tracim
 
 after_success:
   - coveralls
