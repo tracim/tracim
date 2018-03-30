@@ -29,6 +29,8 @@ tests_require = [
     'pytest',
     'pytest-cov',
     'nose',
+    'pep8',
+    'mypy',
 ]
 
 setup(

@@ -63,4 +63,4 @@ wsgidav.conf
 
 # binary translation files
 *.mo
-
+.mypy_cache/

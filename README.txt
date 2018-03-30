@@ -35,3 +35,11 @@ Getting Started
 - Run your project.
 
     env/bin/pserve development.ini
+
+- Run mypy checks
+
+    mypy --ignore-missing-imports --disallow-untyped-defs tracim
+
+- Run pep8 checks
+
+    pep8 tracim
