@@ -43,3 +43,10 @@ Getting Started
 - Run pep8 checks
 
     pep8 tracim
+
+CI
+---
+
+* Code quality: https://scrutinizer-ci.com/g/tracim/tracim_backend/
+* Test validation: https://travis-ci.org/tracim/tracim_backend
+* Code coverage: https://coveralls.io/github/tracim/tracim_backend
