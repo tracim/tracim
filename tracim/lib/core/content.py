@@ -49,7 +49,7 @@ from tracim.models.data import Workspace
 def compare_content_for_sorting_by_type_and_name(
         content1: Content,
         content2: Content
-):
+) -> int:
     """
     :param content1:
     :param content2:
@@ -58,7 +58,7 @@ def compare_content_for_sorting_by_type_and_name(
                 0 if content1 = content2
     """
 
-    if content1.type==content2.type:
+    if content1.type == content2.type:
         if content1.get_label().lower()>content2.get_label().lower():
             return 1
         elif content1.get_label().lower()<content2.get_label().lower():
@@ -66,11 +66,20 @@ def compare_content_for_sorting_by_type_and_name(
         return 0
     else:
         # TODO - D.A. - 2014-12-02 - Manage Content Types Dynamically
-        content_type_order = [ContentType.Folder, ContentType.Page, ContentType.Thread, ContentType.File]
-        result = content_type_order.index(content1.type)-content_type_order.index(content2.type)
-        if result<0:
+        content_type_order = [
+            ContentType.Folder,
+            ContentType.Page,
+            ContentType.Thread,
+            ContentType.File,
+        ]
+
+        content_1_type_index = content_type_order.index(content1.type)
+        content_2_type_index = content_type_order.index(content2.type)
+        result = content_1_type_index - content_2_type_index
+
+        if result < 0:
             return -1
-        elif result>0:
+        elif result > 0:
             return 1
         else:
             return 0
@@ -79,7 +88,7 @@ def compare_content_for_sorting_by_type_and_name(
 def compare_tree_items_for_sorting_by_type_and_name(
         item1: NodeTreeItem,
         item2: NodeTreeItem
-):
+) -> int:
     return compare_content_for_sorting_by_type_and_name(item1.node, item2.node)
 
 
@@ -100,13 +109,13 @@ class ContentApi(object):
             self,
             session: Session,
             current_user: typing.Optional[User],
-            show_archived=False,
-            show_deleted=False,
-            show_temporary=False,
-            all_content_in_treeview=True,
-            force_show_all_types=False,
-            disable_user_workspaces_filter=False,
-    ):
+            show_archived: bool = False,
+            show_deleted: bool = False,
+            show_temporary: bool = False,
+            all_content_in_treeview: bool = True,
+            force_show_all_types: bool = False,
+            disable_user_workspaces_filter: bool = False,
+    ) -> None:
         self._session = session
         self._user = current_user
         self._user_id = current_user.user_id if current_user else None
@@ -123,7 +132,7 @@ class ContentApi(object):
             show_archived: bool=False,
             show_deleted: bool=False,
             show_temporary: bool=False,
-    ):
+    ) -> typing.Generator['ContentApi', None, None]:
         """
         Use this method as context manager to update show_archived,
         show_deleted and show_temporary properties during context.
@@ -145,11 +154,10 @@ class ContentApi(object):
             self._show_deleted = previous_show_deleted
             self._show_temporary = previous_show_temporary
 
-    def get_revision_join(self):
+    def get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
         Return the Content/ContentRevision query join condition
         :return: Content/ContentRevision query join condition
-        :rtype sqlalchemy.sql.elements.BooleanClauseList
         """
         return and_(Content.id == ContentRevisionRO.content_id,
                     ContentRevisionRO.revision_id == self._session.query(
@@ -159,32 +167,41 @@ class ContentApi(object):
                     .limit(1)
                     .correlate(Content))
 
-
-    def get_canonical_query(self):
+    def get_canonical_query(self) -> Query:
         """
         Return the Content/ContentRevision base query who join these table on the last revision.
         :return: Content/ContentRevision Query
-        :rtype sqlalchemy.orm.query.Query
         """
-        return self._session.query(Content).join(ContentRevisionRO, self.get_revision_join())
+        return self._session.query(Content)\
+            .join(ContentRevisionRO, self.get_revision_join())
 
     @classmethod
-    def sort_tree_items(cls, content_list: [NodeTreeItem])-> [Content]:
+    def sort_tree_items(
+        cls,
+        content_list: typing.List[NodeTreeItem],
+    )-> typing.List[NodeTreeItem]:
         news = []
         for item in content_list:
             news.append(item)
 
-        content_list.sort(key=cmp_to_key(compare_tree_items_for_sorting_by_type_and_name))
+        content_list.sort(key=cmp_to_key(
+            compare_tree_items_for_sorting_by_type_and_name,
+        ))
 
         return content_list
 
-
     @classmethod
-    def sort_content(cls, content_list: [Content])-> [Content]:
+    def sort_content(
+        cls,
+        content_list: typing.List[Content],
+    ) -> typing.List[Content]:
         content_list.sort(key=cmp_to_key(compare_content_for_sorting_by_type_and_name))
         return content_list
 
-    def __real_base_query(self, workspace: Workspace=None):
+    def __real_base_query(
+        self,
+        workspace: Workspace = None,
+    ) -> Query:
         result = self.get_canonical_query()
 
         # Exclude non displayable types
@@ -212,7 +229,7 @@ class ContentApi(object):
 
         return result
 
-    def _base_query(self, workspace: Workspace=None):
+    def _base_query(self, workspace: Workspace=None) -> Query:
         result = self.__real_base_query(workspace)
 
         if not self._show_deleted:
@@ -226,7 +243,10 @@ class ContentApi(object):
 
         return result
 
-    def __revisions_real_base_query(self, workspace: Workspace=None):
+    def __revisions_real_base_query(
+        self,
+        workspace: Workspace=None,
+    ) -> Query:
         result = self._session.query(ContentRevisionRO)
 
         # Exclude non displayable types
@@ -245,7 +265,10 @@ class ContentApi(object):
 
         return result
 
-    def _revisions_base_query(self, workspace: Workspace=None):
+    def _revisions_base_query(
+        self,
+        workspace: Workspace=None,
+    ) -> Query:
         result = self.__revisions_real_base_query(workspace)
 
         if not self._show_deleted:
@@ -259,7 +282,10 @@ class ContentApi(object):
 
         return result
 
-    def _hard_filtered_base_query(self, workspace: Workspace=None):
+    def _hard_filtered_base_query(
+        self,
+        workspace: Workspace=None,
+    ) -> Query:
         """
         If set to True, then filterign on is_deleted and is_archived will also
         filter parent properties. This is required for search() function which
@@ -291,10 +317,13 @@ class ContentApi(object):
 
         return result
 
-    def get_base_query(self, workspace: Workspace) -> Query:
+    def get_base_query(
+        self,
+        workspace: Workspace,
+    ) -> Query:
         return self._base_query(workspace)
 
-    def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> [Content]:
+    def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> typing.List[Content]:
         """
         This method returns child items (folders or items) for left bar treeview.
 
@@ -306,6 +335,9 @@ class ContentApi(object):
                For example, if you want to move a Page from a folder to another, you should show only folders that accept pages
         :return:
         """
+        filter_by_allowed_content_types = filter_by_allowed_content_types or []  # FDV
+        removed_item_ids = removed_item_ids or []  # FDV
+
         if not allowed_node_types:
             allowed_node_types = [ContentType.Folder]
         elif allowed_node_types==ContentType.Any:
@@ -332,7 +364,11 @@ class ContentApi(object):
         result = []
         for folder in folders:
             for allowed_content_type in filter_by_allowed_content_types:
-                if folder.type==ContentType.Folder and folder.properties['allowed_content'][allowed_content_type]==True:
+
+                is_folder = folder.type == ContentType.Folder
+                content_type__allowed = folder.properties['allowed_content'][allowed_content_type] == True
+
+                if is_folder and content_type__allowed:
                     result.append(folder)
                     break
 
@@ -636,7 +672,7 @@ class ContentApi(object):
             ),
         ))
 
-    def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
+    def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -653,7 +689,7 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> [Content]:
+    def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
         """
         Return parent_id childs of given content_types
         :param parent_id: parent id
@@ -672,7 +708,7 @@ class ContentApi(object):
         return resultset.all()
 
     # TODO find an other name to filter on is_deleted / is_archived
-    def get_all_with_filter(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> [Content]:
+    def get_all_with_filter(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -690,7 +726,7 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> [Content]:
+    def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
         assert content_type is not None# DYN_REMOVE
 
         resultset = self._base_query(workspace)
@@ -700,7 +736,7 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> [Content]:
+    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -736,7 +772,7 @@ class ContentApi(object):
         return result
 
     def get_last_unread(self, parent_id: int, content_type: str,
-                        workspace: Workspace=None, limit=10) -> [Content]:
+                        workspace: Workspace=None, limit=10) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -1106,7 +1142,7 @@ class ContentApi(object):
 
         return keywords
 
-    def search(self, keywords: [str]) -> sqlalchemy.orm.query.Query:
+    def search(self, keywords: [str]) -> Query:
         """
         :return: a sorted list of Content items
         """
@@ -1123,7 +1159,7 @@ class ContentApi(object):
 
         return title_keyworded_items
 
-    def get_all_types(self) -> [ContentType]:
+    def get_all_types(self) -> typing.List[ContentType]:
         labels = ContentType.all()
         content_types = []
         for label in labels:
@@ -1131,7 +1167,10 @@ class ContentApi(object):
 
         return ContentType.sorted(content_types)
 
-    def exclude_unavailable(self, contents: [Content]) -> [Content]:
+    def exclude_unavailable(
+        self,
+        contents: typing.List[Content],
+    ) -> typing.List[Content]:
         """
         Update and return list with content under archived/deleted removed.
         :param contents: List of contents to parse
