@@ -9,8 +9,6 @@ const pad = number => {
   return number.length < 2 ? pad('0' + number, 2) : number
 }
 
-
-
 const WorkspaceListItem = props => {
   return (
     <li className='sidebar__navigation__workspace__item'>

@@ -57,7 +57,7 @@ class Folder extends React.Component {
                 {t('Folder.content_type')} :
               </div>
               <div className='folder__header__contenttype__icon'>
-                { folderData.allowed_app.map(a => <i className={app[a].icon} key={`${folderData.id}_${a}`} />)}
+                { folderData.allowed_app.map(a => <i className={(app[a] || {icon: ''}).icon} key={`${folderData.id}_${a}`} />)}
               </div>
             </div>
           </div>
