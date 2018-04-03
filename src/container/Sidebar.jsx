@@ -63,7 +63,7 @@ class Sidebar extends React.Component {
     const { activeLang, workspace, workspaceList, app, t } = this.props
 
     return (
-      <div className={classnames('sidebar d-none d-lg-block', {'sidebarclose': sidebarClose})}>
+      <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
         <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
           { /* <i className={classnames('fa fa-fw', {'fa-plus-square-o': sidebarClose, 'fa-minus-square-o': !sidebarClose})} /> */ }
           <button className='hamburger hamburger--spring sidebar__expand__btnHamburger' type='button'>
