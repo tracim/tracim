@@ -35,14 +35,7 @@
 
     <script type='text/javascript'>
       let prevSelectedApp = {name: ''} // default value
-      /*
-        app : {
-          loggedUser: {id, isLoggedIn, username, firstname, lastname, email, avatar}
-          workspace: {id, title},
-          appConfig: {name, componentLeft, componentRight, customClass, icon},
-          content: {id, title, type, status}
-        }
-      */
+
       GLOBAL_renderApp = app => {
         const selectedApp = (() => {
           switch (app.config.name) {
@@ -54,7 +47,7 @@
         })()
 
         if (selectedApp.isRendered) {
-          GLOBAL_dispatchEvent(`${app.appConfig.name}_showApp`, app)
+          GLOBAL_dispatchEvent(`${app.config.name}_showApp`, app)
         } else {
           selectedApp.renderApp(app)
           selectedApp.isRendered = true
