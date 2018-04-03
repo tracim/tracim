@@ -33,6 +33,7 @@ class TestThread(DefaultTest):
         content_api = ContentApi(
             session=self.session,
             current_user=admin,
+            config=self.app_config,
         )
         folder = content_api.get_canonical_query().filter(
             Content.label == 'folder_1'

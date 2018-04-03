@@ -105,7 +105,7 @@ class TestContentApi(DefaultTest):
     def test_delete(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None,session=self.session)
@@ -122,6 +122,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user,
             session=self.session,
+            config=self.app_config,
         )
         item = api.create(ContentType.Folder, workspace, None,
                           'not_deleted', True)
@@ -135,7 +136,11 @@ class TestContentApi(DefaultTest):
         user = uapi.get_one(uid)
         workspace_api = WorkspaceApi(current_user=user, session=self.session)
         workspace = workspace_api.get_one(wid)
-        api = ContentApi(current_user=user, session=self.session)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         items = api.get_all(None, ContentType.Any, workspace)
         eq_(2, len(items))
 
@@ -154,7 +159,8 @@ class TestContentApi(DefaultTest):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         items = api.get_all(None, ContentType.Any, workspace)
         eq_(1, len(items))
@@ -167,7 +173,8 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user,
             session=self.session,
-            show_deleted=True
+            config=self.app_config,
+            show_deleted=True,
         )
         items = api.get_all(None, ContentType.Any, workspace)
         eq_(2, len(items))
@@ -175,7 +182,7 @@ class TestContentApi(DefaultTest):
     def test_archive(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None, session=self.session)
@@ -193,6 +200,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user,
             session=self.session,
+            config=self.app_config,
         )
         item = api.create(ContentType.Folder, workspace, None,
                           'not_archived', True)
@@ -207,6 +215,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             session=self.session,
             current_user=user,
+            config=self.app_config,
         )
 
         items = api.get_all(None, ContentType.Any, workspace)
@@ -227,7 +236,8 @@ class TestContentApi(DefaultTest):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
 
         items = api.get_all(None, ContentType.Any, workspace)
@@ -240,14 +250,16 @@ class TestContentApi(DefaultTest):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
 
         # Test that the item is still available if "show deleted" is activated
         api = ContentApi(
             current_user=None,
             session=self.session,
-            show_archived=True
+            config=self.app_config,
+            show_archived=True,
         )
         items = api.get_all(None, ContentType.Any, workspace)
         eq_(2, len(items))
@@ -255,7 +267,7 @@ class TestContentApi(DefaultTest):
     def test_get_all_with_filter(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None, session=self.session)
@@ -279,6 +291,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user,
             session=self.session,
+            config=self.app_config,
         )
         item = api.create(ContentType.Folder, workspace, None,
                           'thefolder', True)
@@ -293,7 +306,8 @@ class TestContentApi(DefaultTest):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
 
         items = api.get_all(None, ContentType.Any, workspace)
@@ -310,7 +324,7 @@ class TestContentApi(DefaultTest):
     def test_get_all_with_parent_id(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None, session=self.session)
@@ -326,7 +340,8 @@ class TestContentApi(DefaultTest):
         ).create_workspace('test workspace', save_now=True)
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         item = api.create(
             ContentType.Folder,
@@ -361,7 +376,8 @@ class TestContentApi(DefaultTest):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
 
         items = api.get_all(None, ContentType.Any, workspace)
@@ -375,7 +391,7 @@ class TestContentApi(DefaultTest):
     def test_set_status_unknown_status(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -398,7 +414,8 @@ class TestContentApi(DefaultTest):
         )
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         c = api.create(ContentType.Folder, workspace, None, 'parent', True)
         with new_revision(
@@ -411,7 +428,7 @@ class TestContentApi(DefaultTest):
     def test_set_status_ok(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -433,8 +450,9 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
         api = ContentApi(
-            current_user=user, 
-            session=self.session
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
         )
         c = api.create(ContentType.Folder, workspace, None, 'parent', True)
         with new_revision(
@@ -452,7 +470,7 @@ class TestContentApi(DefaultTest):
     def test_create_comment_ok(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -476,7 +494,8 @@ class TestContentApi(DefaultTest):
 
         api = ContentApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         p = api.create(ContentType.Page, workspace, None, 'this_is_a_page')
         c = api.create_comment(workspace, p, 'this is the comment', True)
@@ -493,7 +512,7 @@ class TestContentApi(DefaultTest):
     def test_unit_copy_file_different_label_different_parent_ok(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -529,7 +548,8 @@ class TestContentApi(DefaultTest):
         )
         api = ContentApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         foldera = api.create(
             ContentType.Folder,
@@ -554,7 +574,11 @@ class TestContentApi(DefaultTest):
             )
 
         api.save(text_file, ActionDescription.CREATION)
-        api2 = ContentApi(current_user=user2, session=self.session)
+        api2 = ContentApi(
+            current_user=user2,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace2 = WorkspaceApi(
             current_user=user2,
             session=self.session,
@@ -600,7 +624,7 @@ class TestContentApi(DefaultTest):
     def test_unit_copy_file__same_label_different_parent_ok(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -636,7 +660,8 @@ class TestContentApi(DefaultTest):
         )
         api = ContentApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         foldera = api.create(
             ContentType.Folder,
@@ -664,6 +689,7 @@ class TestContentApi(DefaultTest):
         api2 = ContentApi(
             current_user=user2,
             session=self.session,
+            config=self.app_config,
         )
         workspace2 = WorkspaceApi(
             current_user=user2,
@@ -708,7 +734,7 @@ class TestContentApi(DefaultTest):
     def test_unit_copy_file_different_label_same_parent_ok(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -743,7 +769,8 @@ class TestContentApi(DefaultTest):
         )
         api = ContentApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         foldera = api.create(
             ContentType.Folder,
@@ -771,7 +798,11 @@ class TestContentApi(DefaultTest):
             text_file,
             ActionDescription.CREATION
         )
-        api2 = ContentApi(current_user=user2, session=self.session)
+        api2 = ContentApi(
+            current_user=user2,
+            session=self.session,
+            config=self.app_config,
+        )
 
         api2.copy(
             item=text_file,
@@ -802,7 +833,7 @@ class TestContentApi(DefaultTest):
     def test_mark_read__workspace(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -850,10 +881,12 @@ class TestContentApi(DefaultTest):
         cont_api_a = ContentApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         cont_api_b = ContentApi(
             current_user=user_b,
             session=self.session,
+            config=self.app_config,
         )
 
         # Creates page_1 & page_2 in workspace 1
@@ -903,7 +936,7 @@ class TestContentApi(DefaultTest):
     def test_mark_read(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -947,10 +980,12 @@ class TestContentApi(DefaultTest):
         cont_api_a = ContentApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         cont_api_b = ContentApi(
             current_user=user_b,
             session=self.session,
+            config=self.app_config,
         )
 
         page_1 = cont_api_a.create(ContentType.Page, workspace, None,
@@ -967,7 +1002,7 @@ class TestContentApi(DefaultTest):
     def test_mark_read__all(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None, session=self.session)
@@ -1007,10 +1042,12 @@ class TestContentApi(DefaultTest):
         cont_api_a = ContentApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         cont_api_b = ContentApi(
             current_user=user_b,
             session=self.session,
+            config=self.app_config,
         )
 
         page_2 = cont_api_a.create(
@@ -1058,7 +1095,7 @@ class TestContentApi(DefaultTest):
     def test_update(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None, session=self.session)
@@ -1100,6 +1137,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         )
 
         p = api.create(ContentType.Page, workspace, None,
@@ -1121,6 +1159,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         )
 
         content = api.get_one(pcid, ContentType.Any, workspace)
@@ -1129,12 +1168,13 @@ class TestContentApi(DefaultTest):
 
         u2 = UserApi(
             session=self.session,
-            config=self.config,
+            config=self.app_config,
             current_user=None,
         ).get_one(u2id)
         api2 = ContentApi(
             current_user=u2,
             session=self.session,
+            config=self.app_config,
         )
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
         with new_revision(
@@ -1159,6 +1199,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         )
 
         updated = api.get_one(pcid, ContentType.Any, workspace)
@@ -1173,7 +1214,7 @@ class TestContentApi(DefaultTest):
     def test_update_no_change(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -1214,7 +1255,8 @@ class TestContentApi(DefaultTest):
         )
         api = ContentApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         with self.session.no_autoflush:
             page = api.create(
@@ -1230,6 +1272,7 @@ class TestContentApi(DefaultTest):
         api2 = ContentApi(
             current_user=user2,
             session=self.session,
+            config=self.app_config,
         )
         content2 = api2.get_one(page.content_id, ContentType.Any, workspace)
         with new_revision(
@@ -1248,7 +1291,7 @@ class TestContentApi(DefaultTest):
     def test_update_file_data(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -1290,7 +1333,8 @@ class TestContentApi(DefaultTest):
         # Test starts here
         api = ContentApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         p = api.create(ContentType.File, workspace, None,
                        'this_is_a_page', True)
@@ -1307,7 +1351,11 @@ class TestContentApi(DefaultTest):
         user1 = uapi.get_one(u1id)
         workspace_api2 = WorkspaceApi(current_user=user1, session=self.session)
         workspace = workspace_api2.get_one(wid)
-        api = ContentApi(current_user=user1, session=self.session)
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
 
         content = api.get_one(pcid, ContentType.Any, workspace)
         eq_(u1id, content.owner_id)
@@ -1316,11 +1364,12 @@ class TestContentApi(DefaultTest):
         u2 = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         ).get_one(u2id)
         api2 = ContentApi(
             current_user=u2,
             session=self.session,
+            config=self.app_config,
         )
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
         with new_revision(
@@ -1353,7 +1402,7 @@ class TestContentApi(DefaultTest):
     def test_update_no_change(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -1390,7 +1439,11 @@ class TestContentApi(DefaultTest):
             with_notif=False,
             flush=True
         )
-        api = ContentApi(current_user=user1, session=self.session)
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
         with self.session.no_autoflush:
             page = api.create(
                 content_type=ContentType.Page,
@@ -1407,7 +1460,11 @@ class TestContentApi(DefaultTest):
         api.save(page, ActionDescription.CREATION, do_notify=True)
         transaction.commit()
 
-        api2 = ContentApi(current_user=user2, session=self.session)
+        api2 = ContentApi(
+            current_user=user2,
+            session=self.session,
+            config=self.app_config,
+        )
         content2 = api2.get_one(page.content_id, ContentType.Any, workspace)
         with new_revision(
             session=self.session,
@@ -1426,7 +1483,7 @@ class TestContentApi(DefaultTest):
     def test_archive_unarchive(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None, session=self.session)
@@ -1468,6 +1525,7 @@ class TestContentApi(DefaultTest):
             current_user=user1,
             session=self.session,
             show_archived=True,
+            config=self.app_config,
         )
         p = api.create(ContentType.File, workspace, None,
                        'this_is_a_page', True)
@@ -1484,7 +1542,7 @@ class TestContentApi(DefaultTest):
         # refresh after commit
         user1 = UserApi(
             current_user=None,
-            config=self.config,
+            config=self.app_config,
             session=self.session
         ).get_one(u1id)
         workspace = WorkspaceApi(
@@ -1498,14 +1556,15 @@ class TestContentApi(DefaultTest):
 
         u2api = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         u2 = u2api.get_one(u2id)
         api2 = ContentApi(
             current_user=u2,
             session=self.session,
-            show_archived=True
+            config=self.app_config,
+            show_archived=True,
         )
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
         with new_revision(
@@ -1521,7 +1580,7 @@ class TestContentApi(DefaultTest):
         user1 = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         ).get_one(u1id)
         workspace = WorkspaceApi(
             current_user=user1,
@@ -1530,16 +1589,18 @@ class TestContentApi(DefaultTest):
         u2 = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config
+            config=self.app_config,
         ).get_one(u2id)
         api = ContentApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
             show_archived=True,
         )
         api2 = ContentApi(
             current_user=u2,
             session=self.session,
+            config=self.app_config,
             show_archived=True,
         )
 
@@ -1568,7 +1629,7 @@ class TestContentApi(DefaultTest):
     def test_delete_undelete(self):
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -1612,6 +1673,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
             show_deleted=True,
         )
         p = api.create(ContentType.File, workspace, None,
@@ -1628,7 +1690,7 @@ class TestContentApi(DefaultTest):
         user1 = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         ).get_one(u1id)
         workspace = WorkspaceApi(
             current_user=user1,
@@ -1642,11 +1704,12 @@ class TestContentApi(DefaultTest):
         u2 = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         ).get_one(u2id)
         api2 = ContentApi(
             current_user=u2,
             session=self.session,
+            config=self.app_config,
             show_deleted=True,
         )
         content2 = api2.get_one(pcid, ContentType.Any, workspace)
@@ -1664,7 +1727,7 @@ class TestContentApi(DefaultTest):
         user1 = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         ).get_one(u1id)
         workspace = WorkspaceApi(
             current_user=user1,
@@ -1674,16 +1737,18 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
             show_deleted=True,
         )
         u2 = UserApi(
             current_user=None,
             session=self.session,
-            config=self.config,
+            config=self.app_config,
         ).get_one(u2id)
         api2 = ContentApi(
             current_user=u2,
             session=self.session,
+            config=self.app_config,
             show_deleted=True
         )
 
@@ -1714,7 +1779,7 @@ class TestContentApi(DefaultTest):
         # at root of a workspace (eg a folder)
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -1738,7 +1803,9 @@ class TestContentApi(DefaultTest):
 
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
+
         )
         a = api.create(ContentType.Folder, workspace, None,
                        'this is randomized folder', True)
@@ -1767,7 +1834,7 @@ class TestContentApi(DefaultTest):
 
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(
@@ -1791,7 +1858,8 @@ class TestContentApi(DefaultTest):
 
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         a = api.create(ContentType.Folder, workspace, None,
                        'this is randomized folder', True)
@@ -1820,7 +1888,7 @@ class TestContentApi(DefaultTest):
 
         uapi = UserApi(
             session=self.session,
-            config=CFG(self.config.get_settings()),
+            config=self.app_config,
             current_user=None,
         )
         group_api = GroupApi(current_user=None, session=self.session)
@@ -1838,7 +1906,8 @@ class TestContentApi(DefaultTest):
 
         api = ContentApi(
             current_user=user, 
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         a = api.create(ContentType.Folder, workspace, None,
                        'this is randomized folder', True)
@@ -1911,6 +1980,7 @@ class TestContentApi(DefaultTest):
         api = ContentApi(
             current_user=admin,
             session=self.session,
+            config=self.app_config,
         )
 
         foo_result = api.search(['foo']).all()
@@ -1979,7 +2049,8 @@ class TestContentApiSecurity(DefaultTest):
 
         bob_page = ContentApi(
             current_user=bob,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create(
             content_type=ContentType.Page,
             workspace=bob_workspace,
@@ -1989,7 +2060,8 @@ class TestContentApiSecurity(DefaultTest):
 
         admin_page = ContentApi(
             current_user=admin,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create(
             content_type=ContentType.Page,
             workspace=admin_workspace,
@@ -1999,7 +2071,8 @@ class TestContentApiSecurity(DefaultTest):
 
         bob_viewable = ContentApi(
             current_user=bob,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).get_all()
         eq_(1, len(bob_viewable), 'Bob should view only one content')
         eq_(

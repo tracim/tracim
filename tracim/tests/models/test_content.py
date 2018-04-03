@@ -88,7 +88,11 @@ class TestContent(StandardTest):
         user_admin = self.session.query(User)\
             .filter(User.email == 'admin@admin.admin').one()
 
-        api = ContentApi(current_user=None, session=self.session)
+        api = ContentApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
 
         content1_from_api = api.get_one(
             content1.id,

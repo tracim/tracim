@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from urllib.parse import urlparse
+from paste.deploy.converters import asbool
 from tracim.lib.utils.logger import logger
 from depot.manager import DepotManager
 
@@ -8,7 +9,7 @@ from pyramid.request import Request
 
 class RequestWithCFG(Request):
 
-    def config(self):
+    def app_config(self):
         cfg = CFG(self.registry.settings)
         cfg.configure_filedepot()
         return cfg
@@ -201,9 +202,9 @@ class CFG(object):
         #     'email.notification.processing_mode',
         # )
         #
-        # self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
-        #     'email.notification.activated',
-        # ))
+        self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
+            'email.notification.activated',
+        ))
         # self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
         #     'email.notification.smtp.server',
         # )

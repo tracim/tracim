@@ -35,7 +35,7 @@ class BaseTest(unittest.TestCase):
             'test', {'depot.backend': 'depot.io.memory.MemoryFileStorage'}
         )
         settings = self.config.get_settings()
-
+        self.app_config = CFG(settings)
         from tracim.models import (
             get_engine,
             get_session_factory,
@@ -118,6 +118,7 @@ class DefaultTest(StandardTest):
         content_api = ContentApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         eq_(
             1,

@@ -30,7 +30,7 @@ from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
-# from tracim.lib.notifications import NotifierFactory
+from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
 from tracim.lib.utils.utils import current_date_for_filename
 from tracim.models.revision_protection import new_revision
@@ -100,6 +100,7 @@ class ContentApi(object):
             self,
             session: Session,
             current_user: typing.Optional[User],
+            config,
             show_archived=False,
             show_deleted=False,
             show_temporary=False,
@@ -109,6 +110,7 @@ class ContentApi(object):
     ):
         self._session = session
         self._user = current_user
+        self._config = config
         self._user_id = current_user.user_id if current_user else None
         self._show_archived = show_archived
         self._show_deleted = show_deleted
@@ -1081,16 +1083,17 @@ class ContentApi(object):
         if do_notify:
             self.do_notify(content)
 
-    # TODO - G.M - 28-03-2018 - [Notification] Re-enable notification
     def do_notify(self, content: Content):
-         pass
-    #     """
-    #     Allow to force notification for a given content. By default, it is
-    #     called during the .save() operation
-    #     :param content:
-    #     :return:
-    #     """
-    #     NotifierFactory.create(self._user).notify_content_update(content)
+        """
+        Allow to force notification for a given content. By default, it is
+        called during the .save() operation
+        :param content:
+        :return:
+        """
+        NotifierFactory.create(
+            self._config,
+            self._user
+        ).notify_content_update(content)
 
     def get_keywords(self, search_string, search_string_separators=None) -> [str]:
         """
