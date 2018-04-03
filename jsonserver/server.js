@@ -55,8 +55,14 @@ server.get('/user/is_logged_in', (req, res) =>
 server.get('/user/:id/workspace', (req, res) => res.jsonp(jsonDb.workspace_list))
 
 server.get('/workspace/:id', (req, res) => res.jsonp(
-  // {...jsonDb.workspace_detail, content: shuffle(jsonDb.workspace_detail.content)})
-  Object.assign({}, jsonDb.workspace_detail, {content: shuffle(jsonDb.workspace_detail.content)}, {id: req.params.id})
+  Object.assign(
+    {},
+    jsonDb.workspace_detail,
+    {content: shuffle(jsonDb.workspace_detail.content.map(
+      c => Object.assign({}, c, {workspace_id: req.params.id})
+    ))},
+    {id: req.params.id}
+  )
 ))
 
 server.get('/workspace/:idws/folder/:idf', (req, res) => {
