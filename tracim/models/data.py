@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import typing
 import datetime as datetime_root
 import json
 import os
@@ -1327,13 +1328,20 @@ class RevisionReadStatus(DeclarativeBase):
 
 class NodeTreeItem(object):
     """
-        This class implements a model that allow to simply represents the left-panel menu items
-         This model is used by dbapi but is not directly related to sqlalchemy and database
+        This class implements a model that allow to simply represents
+        the left-panel menu items. This model is used by dbapi but
+        is not directly related to sqlalchemy and database
     """
-    def __init__(self, node: Content, children: list('NodeTreeItem'), is_selected = False):
+    def __init__(
+        self,
+        node: Content,
+        children: typing.List['NodeTreeItem'],
+        is_selected: bool = False,
+    ):
         self.node = node
         self.children = children
         self.is_selected = is_selected
+
 
 class VirtualEvent(object):
     @classmethod
