@@ -18,53 +18,53 @@ TODO
 
 ### Setup Python Virtualenv ###
 
-- Go to *tracim* subdirectory:
+Go to *tracim* subdirectory:
 
     cd tracim
 
-- Create a Python virtual environment:
+Create a Python virtual environment:
 
     python3 -m venv env
 
-- Activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**):
+Activate it in your terminal session (**all tracim command execution must be executed under this virtual environment**):
 
     source env/bin/activate
 
-- Upgrade packaging tools:
+Upgrade packaging tools:
 
     pip install --upgrade pip setuptools
 
-- Install the project in editable mode with its testing requirements:
+Install the project in editable mode with its testing requirements:
 
     pip install -e ".[testing]"
 
 ### Configure Tracim_backend ###
 
-- Create configuration files for a development environment:
+Create configuration files for a development environment:
 
     cp development.ini.base development.ini
 
-- Initialize the database.
+Initialize the database.
 
     initialize_tracim_db development.ini
 
 ### Run Tracim_backend ###
 
-- Run your project:
+Run your project:
 
     pserve development.ini
 
 ### Run Tests and others checks ###
 
-- Run your project's tests:
+Run your project's tests:
 
     pytest
 
-- Run mypy checks:
+Run mypy checks:
 
     mypy --ignore-missing-imports --disallow-untyped-defs tracim
 
-- Run pep8 checks:
+Run pep8 checks:
 
     pep8 tracim
 
