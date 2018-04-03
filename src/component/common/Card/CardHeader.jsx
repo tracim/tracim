@@ -13,7 +13,10 @@ const CardHeader = props => {
 export default CardHeader
 
 CardHeader.propTypes = {
-  children: PropTypes.element.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.string
+  ]).isRequired,
   customClass: PropTypes.string
 }
 

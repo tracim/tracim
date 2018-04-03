@@ -47,7 +47,10 @@ server.post('/user/login', (req, res) => {
 
 server.get('/app/config', (req, res) => res.jsonp(jsonDb.app_config))
 
-server.get('/user/is_logged_in', (req, res) => res.jsonp(jsonDb.user_logged))
+server.get('/user/is_logged_in', (req, res) =>
+  // res.jsonp({"logged": false})
+  res.jsonp(jsonDb.user_logged)
+)
 
 server.get('/user/:id/workspace', (req, res) => res.jsonp(jsonDb.workspace_list))
 

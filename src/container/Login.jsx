@@ -50,54 +50,56 @@ class Login extends React.Component {
                   <CardHeader customClass='connection__header text-center'>{'Connexion'}</CardHeader>
 
                   <CardBody formClass='connection__form'>
-                    <InputGroupText
-                      parentClassName='connection__form__groupemail'
-                      customClass='mb-3 mt-4'
-                      icon='fa-envelope-open-o'
-                      type='email'
-                      placeHolder='Adresse Email'
-                      invalidMsg='Email invalide.'
-                      value={this.state.inputLogin}
-                      onChange={this.handleChangeLogin}
-                    />
+                    <div>
+                      <InputGroupText
+                        parentClassName='connection__form__groupemail'
+                        customClass='mb-3 mt-4'
+                        icon='fa-envelope-open-o'
+                        type='email'
+                        placeHolder='Adresse Email'
+                        invalidMsg='Email invalide.'
+                        value={this.state.inputLogin}
+                        onChange={this.handleChangeLogin}
+                      />
 
-                    <InputGroupText
-                      parentClassName='connection__form__groupepw'
-                      customClass=''
-                      icon='fa-lock'
-                      type='password'
-                      placeHolder='Mot de passe'
-                      invalidMsg='Mot de passe invalide.'
-                      value={this.state.inputPassword}
-                      onChange={this.handleChangePassword}
-                    />
+                      <InputGroupText
+                        parentClassName='connection__form__groupepw'
+                        customClass=''
+                        icon='fa-lock'
+                        type='password'
+                        placeHolder='Mot de passe'
+                        invalidMsg='Mot de passe invalide.'
+                        value={this.state.inputPassword}
+                        onChange={this.handleChangePassword}
+                      />
 
-                    <div className='row mt-4 mb-4'>
-                      <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
-                        <InputCheckbox
-                          parentClassName='connection__form__rememberme'
-                          customClass=''
-                          label='Se souvenir de moi'
-                          checked={this.state.inputRememberMe}
-                          onChange={this.handleChangeRememberMe}
-                        />
+                      <div className='row mt-4 mb-4'>
+                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                          <InputCheckbox
+                            parentClassName='connection__form__rememberme'
+                            customClass=''
+                            label='Se souvenir de moi'
+                            checked={this.state.inputRememberMe}
+                            onChange={this.handleChangeRememberMe}
+                          />
+                        </div>
+
+                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-sm-right'>
+                          <LoginBtnForgotPw
+                            customClass='connection__form__pwforgot'
+                            label='Mot de passe oublié ?'
+                          />
+                        </div>
                       </div>
 
-                      <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-sm-right'>
-                        <LoginBtnForgotPw
-                          customClass='connection__form__pwforgot'
-                          label='Mot de passe oublié ?'
-                        />
-                      </div>
+                      <Button
+                        htmlType='button'
+                        bootstrapType='primary'
+                        customClass='connection__form__btnsubmit'
+                        label='Connexion'
+                        onClick={this.handleClickSubmit}
+                      />
                     </div>
-
-                    <Button
-                      htmlType='button'
-                      bootstrapType='primary'
-                      customClass='connection__form__btnsubmit'
-                      label='Connexion'
-                      onClick={this.handleClickSubmit}
-                    />
                   </CardBody>
                 </Card>
 

@@ -80,7 +80,7 @@ class Folder extends React.Component {
               type={c.type}
               status={c.status}
               onClickItem={() => onClickItem(c)}
-              isLast={isLast && i === content.length - 1}
+              isLast={isLast && i === folderData.content.length - 1}
               key={c.id}
             />
           )}

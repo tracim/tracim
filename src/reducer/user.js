@@ -17,18 +17,22 @@ const serializeUser = data => ({
   caldavUrl: data.user.caldav_url
 })
 
-export default function user (state = {
+const defaultUser = {
   id: -1,
-  isLoggedIn: undefined,
+  isLoggedIn: undefined, // undefined means the api (/is_logged_in) has not responded yet
   username: '',
   firstname: '',
   lastname: '',
   email: '',
   avatar: ''
-}, action) {
+}
+
+export default function user (state = defaultUser, action) {
   switch (action.type) {
     case `Set/${USER_CONNECTED}`:
-      return serializeUser(action.user)
+      return action.data.logged
+        ? serializeUser(action.data)
+        : {...defaultUser, isLoggedIn: false}
 
     case `Update/${USER_DATA}`:
       return {...state, ...action.data}

@@ -5,7 +5,7 @@ export const USER_LOGIN = 'User/Login'
 export const USER_DATA = 'User/Data'
 export const USER_ROLE = 'User/Role'
 export const USER_CONNECTED = 'User/Connected'
-export const setUserConnected = user => ({ type: `Set/${USER_CONNECTED}`, user })
+export const setUserConnected = data => ({ type: `Set/${USER_CONNECTED}`, data })
 export const updateUserData = userData => ({ type: `Update/${USER_DATA}`, data: userData })
 export const setUserRole = userRole => ({ type: `Set/${USER_ROLE}`, userRole }) // this actually update workspaceList state
 export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNotif) =>
