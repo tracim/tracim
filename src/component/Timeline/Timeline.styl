@@ -98,19 +98,17 @@
     &__content
       color white
 
-/**** MEDIA 992px & 1199px ****/
 
-@media (min-width: min-lg) and (max-width: max-lg)
+/**** MEDIA 576px & 1199px ****/
 
-  .timeline__messagelist__item
-    margin-right 55px
+@media (min-width: min-sm) and (max-width: max-lg)
 
-/**** MEDIA 768px & 991px ****/
-
-@media (min-width: min-md) and (max-width: max-md)
-
-  .timeline__messagelist__item
-    margin-right 55px
+  .timeline
+    &__messagelist
+      min-height 350px
+      max-height 700px
+      &__item
+        margin-right 55px
 
 /**** MEDIA 576px & 767px ****/
 
