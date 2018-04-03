@@ -13,13 +13,13 @@ const Search = props => {
           aria-describedby='headerInputSearch'
           onChange={props.onChangeInput}
         />
-        <span
+        <button
           className='search__addonsearch input-group-addon'
           id='headerInputSearch'
           onClick={props.onClickSubmit}
         >
           <i className='fa fa-search' />
-        </span>
+        </button>
       </div>
     </li>
   )

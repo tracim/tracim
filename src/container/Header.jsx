@@ -35,8 +35,8 @@ class Header extends React.Component {
     const { lang, user } = this.props
 
     return (
-      <header>
-        <nav className='header navbar navbar-expand-md navbar-light bg-light'>
+      <header className='header'>
+        <nav className='navbar navbar-expand-md navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
           <NavbarToggler />
