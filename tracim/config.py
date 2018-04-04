@@ -3,17 +3,14 @@ from urllib.parse import urlparse
 from paste.deploy.converters import asbool
 from tracim.lib.utils.logger import logger
 from depot.manager import DepotManager
-
 from pyramid.request import Request
-
 
 class RequestWithCFG(Request):
 
     def app_config(self):
         cfg = CFG(self.registry.settings)
-        cfg.configure_filedepot()
+        #cfg.configure_filedepot()
         return cfg
-
 
 class CFG(object):
     """Object used for easy access to config file parameters."""

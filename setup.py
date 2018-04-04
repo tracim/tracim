@@ -23,6 +23,8 @@ requires = [
     'filedepot',
     'babel',
     'alembic',
+    'hapic',
+    'marshmallow',
 ]
 
 tests_require = [
