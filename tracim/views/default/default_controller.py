@@ -15,7 +15,8 @@ class DefaultController(Controller):
     @classmethod
     def test_config(cls, request):
         try:
-            project = request.app_config().WEBSITE_TITLE
+            app_config = request.registry.settings['CFG']
+            project = app_config.WEBSITE_TITLE
         except Exception as e:
             return Response(e, content_type='text/plain', status=500)
         return {'project': project}

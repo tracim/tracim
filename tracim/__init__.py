@@ -6,7 +6,7 @@ from pyramid.config import Configurator
 from hapic.ext.pyramid import PyramidContext
 
 from tracim.extensions import hapic
-from tracim.config import RequestWithCFG
+from tracim.config import CFG
 from tracim.views.example_api.example_api_controller import ExampleApiController
 from tracim.views.default.default_controller import DefaultController
 
@@ -14,13 +14,15 @@ from tracim.views.default.default_controller import DefaultController
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
+    # set CFG object
+    app_config = CFG(settings)
+    app_config.configure_filedepot()
+    settings['CFG'] = app_config
     configurator = Configurator(settings=settings, autocommit=True)
     # Pyramids "plugin" include.
     configurator.include('pyramid_jinja2')
     # Add SqlAlchemy DB
     configurator.include('.models')
-    # Override default request
-    configurator.set_request_factory(RequestWithCFG)
     # set Hapic
     hapic.set_context(PyramidContext(configurator))
     # Add controllers
