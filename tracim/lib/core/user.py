@@ -6,7 +6,8 @@ import typing as typing
 
 from tracim.models.auth import User
 
-# TODO - G.M -28-03-2018 - [CurrentUser] Check if "current user" stuff is always needed for tracimv2
+# TODO - G.M -28-03-2018 - [CurrentUser][auth]
+#  Check if "current user" stuff is always needed for tracimv2
 # CURRENT_USER_WEB = 'WEB'
 # CURRENT_USER_WSGIDAV = 'WSGIDAV'
 
@@ -55,7 +56,8 @@ class UserApi(object):
         if email and self._user and user.user_id==self._user.user_id:
             pass
             # this is required for the _session to keep on being up-to-date
-            # TODO - G.M - 28-03-2018 - [CurrentUser] Check for pyramid equivalent
+            # TODO - G.M - 28-03-2018 -
+            # [CurrentUser] Check for pyramid equivalent
             # tg.request.identity['repoze.who.userid'] = email
             # tg.auth_force_login(email)
 
@@ -95,7 +97,13 @@ class UserApi(object):
         #from tracim.lib.calendar import CalendarManager
         #from tracim.model.organisational import UserCalendar
 
-        created_user.ensure_auth_token(session=self._session, validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY)
+        # TODO - G.M - 04-04-2018 - [auth]
+        # Check if this is already needed with
+        # new auth system
+        created_user.ensure_auth_token(
+            session=self._session,
+            validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY
+        )
 
         # Ensure database is up-to-date
         self._session.flush()
@@ -109,7 +117,7 @@ class UserApi(object):
         # )
 
 
-# TODO - G.M - 28-03-2018 - [CurrentUser] Check for pyramid equivalent
+# TODO - G.M - 28-03-2018 - [CurrentUser][auth] Check for pyramid equivalent
 # class CurrentUserGetterInterface(object):
 #     def get_current_user(self) -> typing.Union[None, User]:
 #         raise NotImplementedError()

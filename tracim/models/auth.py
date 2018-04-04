@@ -126,6 +126,8 @@ class User(DeclarativeBase):
     is_active = Column(Boolean, default=True, nullable=False)
     imported_from = Column(Unicode(32), nullable=True)
     timezone = Column(Unicode(255), nullable=False, server_default='')
+    # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
+    # with new auth system
     auth_token = Column(Unicode(255))
     auth_token_created = Column(DateTime)
 
@@ -263,6 +265,8 @@ class User(DeclarativeBase):
                 roles.append(role)
         return roles
 
+    # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
+    # with new auth system
     def ensure_auth_token(self, validity_seconds, session) -> None:
         """
         Create auth_token if None, regenerate auth_token if too much old.
