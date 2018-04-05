@@ -44,7 +44,7 @@ Create configuration files for a development environment:
 
     cp development.ini.base development.ini
 
-Initialize the database.
+Initialize the database using [tracimcli](doc/cli.md) tool
 
     tracimcli db init
 
