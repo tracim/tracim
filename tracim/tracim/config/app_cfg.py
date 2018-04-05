@@ -217,6 +217,9 @@ class CFG(object):
         """Parse configuration file."""
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
+        self.TRACIM_INSTANCE_UUID = tg.config.get(
+            'tracim_instance.uuid',
+        )
         self.DEPOT_STORAGE_DIR = tg.config.get(
             'depot_storage_dir',
         )
@@ -435,6 +438,36 @@ class CFG(object):
             ContentType.Comment,
             # ContentType.Folder -- Folder is skipped
         ]
+
+        self.JITSI_MEET_ACTIVATED = asbool(tg.config.get(
+            'jitsi_meet.activated',
+            False,
+        ))
+        self.JITSI_MEET_DOMAIN = tg.config.get(
+            'jitsi_meet.domain'
+        )
+        self.JITSI_MEET_USE_TOKEN = asbool(tg.config.get(
+            'jitsi_meet.use_token',
+            False,
+        ))
+        self.JITSI_MEET_TOKEN_GENERATOR = tg.config.get(
+            'jitsi_meet.token_generator',
+            'local'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID = tg.config.get(
+            'jitsi_meet.token_generator.local.app_id'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET = tg.config.get(
+            'jitsi_meet.token_generator.local.secret'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALGORITHM = tg.config.get(
+            'jitsi_meet.token_generator.local.algorithm',
+            'HS256'
+        )
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION = int(tg.config.get(
+            'jitsi_meet.token_generator.local.duration',
+            60
+        ))
 
         self.RADICALE_SERVER_HOST = tg.config.get(
             'radicale.server.host',

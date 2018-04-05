@@ -9,6 +9,7 @@ from tracim.config.app_cfg import CFG
 
 from tracim.controllers import TIMRestController
 from tracim.controllers.content import UserWorkspaceFolderRestController
+from tracim.controllers.jitsi_meet import JitsiMeetController
 
 from tracim.lib.helpers import convert_id_into_instances
 from tracim.lib.content import ContentApi
@@ -29,6 +30,7 @@ class UserWorkspaceRestController(TIMRestController):
     allow_only = not_anonymous()
 
     folders = UserWorkspaceFolderRestController()
+    videoconference = JitsiMeetController()
 
     @property
     def _base_url(self):
@@ -99,11 +101,10 @@ class UserWorkspaceRestController(TIMRestController):
                 show_archived=show_archived,
             )
         )
+        videoconf_enabled = CFG.get_instance().JITSI_MEET_ACTIVATED
 
         dictified_workspace = Context(CTX.WORKSPACE).toDict(workspace, 'workspace')
 
-        # INFO - G.M - 15-02-2018 - Deal with url scheme for dav link
-        # TODO - G.M - 15-02-2018 - Find better solution to deal with url ?
         webdav_url = CFG.get_instance().WSGIDAV_CLIENT_BASE_URL
         website_protocol = urlparse(CFG.get_instance().WEBSITE_BASE_URL).scheme
         dav_protocol = 'dav'
@@ -114,6 +115,7 @@ class UserWorkspaceRestController(TIMRestController):
             result=dictified_workspace,
             fake_api=fake_api,
             webdav_url=webdav_url,
+            videoconf_enabled=videoconf_enabled,
             website_protocol = website_protocol,
             dav_protocol = dav_protocol,
             show_deleted=show_deleted,

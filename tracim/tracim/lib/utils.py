@@ -17,6 +17,7 @@ from tg.util import LazyString as BaseLazyString
 from tg.util import lazify
 from redis import Redis
 from rq import Queue
+from unidecode import unidecode
 
 from wsgidav.middleware import BaseMiddleware
 from tracim.lib.base import logger
@@ -140,6 +141,18 @@ def str_as_bool(string: str) -> bool:
     if string == '0':
         return False
     return bool(string)
+
+
+def str_as_alpha_num_str(unicode_string: str) -> str:
+    """
+    convert unicode string to alpha_num-only string.
+    convert also accented character to ascii equivalent.
+    :param unicode_string:
+    :return:
+    """
+    ascii_string = unidecode(unicode_string)
+    alpha_num_string = ''.join(e for e in ascii_string if e.isalnum())
+    return alpha_num_string
 
 
 class LazyString(BaseLazyString):

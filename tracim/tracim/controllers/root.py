@@ -33,7 +33,6 @@ from tracim.model.serializers import Context
 from tracim.model.serializers import CTX
 from tracim.model.serializers import DictLikeClass
 
-
 class RootController(StandardController):
     """
     The root controller for the tracim application.

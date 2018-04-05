@@ -35,6 +35,8 @@ full_stack = true
 # Fallback language if browser and tracim can't find one they agree on.
 i18n.lang = en
 
+tracim_instance.uuid = 79160afe-e324-473a-9aef-7b93f69c1c1b
+
 cache_dir = %(here)s/data
 # preview generator cache directory
 preview_cache_dir = /tmp/tracim/preview/
@@ -234,6 +236,26 @@ email.reply.use_txt_parsing = true
 # Lockfile path is required for email_reply feature,
 # it's just an empty file use to prevent concurrent access to imap unseen mail
 email.reply.lockfile_path = %(here)s/email_fetcher.lock
+
+## Jitsi_meet_integration
+jitsi_meet.activated = False
+# Domain/IP where jitsi_meet is located, example: "meet.jit.si", "127.0.0.1"
+jitsi_meet.domain = your_jitsi_meet_instance
+# Choose between token and anonymous auth, anonymous is default one.
+# for token auth config, see : https://github.com/jitsi/lib-jitsi-meet/blob/52eb3decf6542413c739ce2209456fac728a89d5/doc/tokens.md
+jitsi_meet.use_token = False
+# If token mode is choosen, you need to provide a token generator.
+# "local" value mean that tracim himself will create token for jitsi-meet
+# Distant token generator are not yet implemented.
+jitsi_meet.token_generator = local
+# identifier share between jitsi_meet and local token_generator
+jitsi_meet.token_generator.local.app_id = tracim
+# Secret share between jitsi-meet and local token_generator
+jitsi_meet.token_generator.local.secret = my_secret
+# Algorithm used to sign JWT token
+jitsi_meet.token_generator.local.algorithm = HS256
+# Duration of token validity in second. 5 minutes (300) is a good choice.
+jitsi_meet.token_generator.local.duration = 300
 
 ## Radical (CalDav server) configuration
 # radicale.server.host = 0.0.0.0
