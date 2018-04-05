@@ -460,8 +460,8 @@ class CFG(object):
         self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET = tg.config.get(
             'jitsi_meet.token_generator.local.secret'
         )
-        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALG = tg.config.get(
-            'jitsi_meet.token_generator.local.alg',
+        self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALGORITHM = tg.config.get(
+            'jitsi_meet.token_generator.local.algorithm',
             'HS256'
         )
         self.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION = int(tg.config.get(

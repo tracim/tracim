@@ -16,6 +16,8 @@ class JitsiMeetRoom(object):
             issuer: typing.Union[User, JitsiMeetUser, None]=None,
     ) -> None:
         """
+        This class set all to create a JitsiMeetRoom according
+        to current config.
         :param issuer: user who initiated Jitsi Meet talk
         if None, default user is created. Can be both Tracim User or
         JitsiMeetUser.
@@ -26,7 +28,7 @@ class JitsiMeetRoom(object):
         self._set_domain()
         self._set_token_params()
         self._set_context(
-            receivers=receivers,
+            workspace=receivers,
             issuer=issuer,
         )
         self.room = self._generate_room_name(receivers)
@@ -45,17 +47,17 @@ class JitsiMeetRoom(object):
         """
         self.use_token = self.tracim_cfg.JITSI_MEET_USE_TOKEN
         if self.use_token:
-            if self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR == 'local':
-                self.token_app_id = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID  # nopep8
-                self.token_secret = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET  # nopep8
-                self.token_alg = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALG   # nopep8
-                self.token_duration = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION  # nopep8
-            else:
+            if self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR != 'local':
                 raise JitsiMeetNoTokenGenerator
+
+            self.token_app_id = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_APP_ID  # nopep8
+            self.token_secret = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_SECRET  # nopep8
+            self.token_alg = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_ALGORITHM   # nopep8
+            self.token_duration = self.tracim_cfg.JITSI_MEET_TOKEN_GENERATOR_LOCAL_DURATION  # nopep8
 
     def _set_context(
             self,
-            receivers: Workspace,
+            workspace: Workspace,
             issuer: typing.Union[User, JitsiMeetUser, None],
     ) -> None:
         """
@@ -63,7 +65,7 @@ class JitsiMeetRoom(object):
         :param issuer: user who initiated Jitsi Meet talk
         if None, default user is created. Can be both Tracim User or
         JitsiMeetUser.
-        :param receivers: User or Room who can talk with sender. Now, only
+        :param workspace: User or Room who can talk with sender. Now, only
         Workspace are supported.
         :return: nothing.
         """
@@ -84,7 +86,7 @@ class JitsiMeetRoom(object):
             )
 
         # INFO - G.M - 13-02-2018 - Associate
-        group = receivers.label
+        group = workspace.label
 
         self.context = JitsiMeetContext(
             user=user,
@@ -107,7 +109,7 @@ class JitsiMeetRoom(object):
         # Jitsi-Meet doesn't like specials_characters
         return str_as_alpha_num_str(room)
 
-    def generate_token(self) -> str:
+    def generate_jwt_token(self) -> str:
         """
         Generate Jitsi-Meet related JWT token
         :return: JWT token as str
@@ -129,6 +131,9 @@ class JitsiMeetRoom(object):
     def generate_url(self, token=None) -> str:
         """
         Generate Jitsi-Meet url with or without token
+        examples :
+         - https://myjitsiinstance/myroom
+         - https://mysecurejitsiinstance/myroom?jwt=[very_long_jwt_token]
         :return: url as string
         """
         if token:

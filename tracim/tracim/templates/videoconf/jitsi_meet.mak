@@ -46,7 +46,7 @@
         // for another way to deal with auto-auth :
         // see this rejected PR : https://github.com/jitsi/jitsi-meet/pull/2109
             %if jitsi_meet_room.use_token:
-                jwt: '${jitsi_meet_room.generate_token()}',
+                jwt: '${jitsi_meet_room.generate_jwt_token()}',
             %endif
             roomName : '${jitsi_meet_room.room}',
             parentNode: document.querySelector('#jitsi'),

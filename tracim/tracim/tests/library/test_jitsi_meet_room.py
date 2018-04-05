@@ -67,7 +67,7 @@ class TestJitsiMeetRoom(object):
                 receivers=Workspace()
             )
             jmr.use_token = False
-            jmr.generate_token()
+            jmr.generate_jwt_token()
 
     def test_unit__set_context_return_always_jitsi_meet_user(self):
         with patch.object(JitsiMeetRoom,
@@ -76,7 +76,7 @@ class TestJitsiMeetRoom(object):
             jmr = JitsiMeetRoom(
                 receivers=Workspace()
             )
-            jmr._set_context(issuer=None, receivers=Workspace())
+            jmr._set_context(issuer=None, workspace=Workspace())
             assert jmr.context
             assert hasattr(jmr.context, 'user')
             assert isinstance(jmr.context.user, JitsiMeetUser)
@@ -85,7 +85,7 @@ class TestJitsiMeetRoom(object):
                 receivers=Workspace()
             )
             jmr2._set_context(issuer=JitsiMeetUser(jitsi_meet_user_id='user'),
-                              receivers=Workspace())
+                              workspace=Workspace())
             assert jmr2.context
             assert hasattr(jmr2.context, 'user')
             assert isinstance(jmr2.context.user, JitsiMeetUser)
@@ -93,7 +93,7 @@ class TestJitsiMeetRoom(object):
             jmr3 = JitsiMeetRoom(
                 receivers=Workspace()
             )
-            jmr3._set_context(issuer=User(), receivers=Workspace())
+            jmr3._set_context(issuer=User(), workspace=Workspace())
             assert jmr3.context
             assert hasattr(jmr3.context, 'user')
             assert isinstance(jmr3.context.user, JitsiMeetUser)
