@@ -46,7 +46,7 @@ Create configuration files for a development environment:
 
 Initialize the database.
 
-    initialize_tracim_db development.ini
+    tracimcli db init
 
 ### Run Tracim_backend ###
 
