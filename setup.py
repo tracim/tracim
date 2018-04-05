@@ -25,6 +25,7 @@ requires = [
     'alembic',
     'hapic',
     'marshmallow',
+    'cliff',
 ]
 
 tests_require = [
@@ -75,7 +76,13 @@ setup(
             'main = tracim:main',
         ],
         'console_scripts': [
-            'initialize_tracim_db = tracim.scripts.initializedb:main',
+            'tracimcli = tracim.command:main',
         ],
+        'tracimcli': [
+            'test = tracim.command:TestTracimCommand',
+            'user_create = tracim.command.user:CreateUserCommand',
+            'user_update = tracim.command.user:UpdateUserCommand',
+            'db_init = tracim.command.initializedb:InitializeDBCommand',
+        ]
     },
 )
