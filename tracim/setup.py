@@ -24,6 +24,7 @@ testpkgs = [
     'nose',
     'coverage',
     'gearbox',
+    'mock',
 ]
 
 install_requires = [
