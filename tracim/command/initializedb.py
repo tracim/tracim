@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
 import transaction
-
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
     )
-from pyramid.scripts.common import parse_vars
 
+from tracim import CFG
+from tracim.fixtures import FixturesLoader
+from tracim.fixtures.users_and_groups import Base as BaseFixture
+from sqlalchemy.exc import IntegrityError
 from tracim.command import AppContextCommand
 from tracim.models.meta import DeclarativeBase
 from tracim.models import (
@@ -24,9 +24,6 @@ class InitializeDBCommand(AppContextCommand):
     def get_description(self):
         return "Initialize DB"
 
-    def get_epilog(self):
-        return "################"
-
     def get_parser(self, prog_name):
         parser = super().get_parser(prog_name)
         return parser
@@ -34,16 +31,34 @@ class InitializeDBCommand(AppContextCommand):
     def take_action(self, parsed_args):
         super(InitializeDBCommand, self).take_action(parsed_args)
         config_uri = parsed_args.config_file
-
         setup_logging(config_uri)
         settings = get_appsettings(config_uri)
+        self._create_schema(settings)
+        self._populate_database(settings)
+
+    @classmethod
+    def _create_schema(cls, settings):
+        print("- Create Schemas of databases -")
         engine = get_engine(settings)
         DeclarativeBase.metadata.create_all(engine)
-        session_factory = get_session_factory(engine)
 
+    @classmethod
+    def _populate_database(cls, settings):
+        engine = get_engine(settings)
+        session_factory = get_session_factory(engine)
+        app_config = CFG(settings)
+        print("- Populate database with default data -")
         with transaction.manager:
-            pass
-            # dbsession = get_tm_session(session_factory, transaction.manager)
-            # model = MyModel(name='one', value=1)
-            # dbsession.add(model)
-            # Add global manager data, just for test
+            dbsession = get_tm_session(session_factory, transaction.manager)
+            try:
+                fixtures_loader = FixturesLoader(dbsession, app_config)
+                fixtures_loader.loads([BaseFixture])
+                transaction.commit()
+                print("Database initialized.")
+            except IntegrityError:
+                print('Warning, there was a problem when adding default data'
+                      ', it may have already been added:')
+                import traceback
+                print(traceback.format_exc())
+                transaction.abort()
+                print('Database initialization failed')
