@@ -2,13 +2,12 @@
 from collections import OrderedDict
 
 from sqlalchemy import inspect
-from nose.tools import eq_
 
 from tracim.models import ContentRevisionRO
 from tracim.models import User
 from tracim.models.data import ContentType
 from tracim.tests import DefaultTest
-
+from tracim.tests import eq_
 
 class TestContentRevision(DefaultTest):
 

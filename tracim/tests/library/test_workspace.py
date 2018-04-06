@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from nose.tools import eq_
 
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.group import GroupApi
@@ -13,7 +12,7 @@ from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 #from tracim.tests import BaseTestThread
 from tracim.tests import DefaultTest
-
+from tracim.tests import eq_
 
 class TestThread(DefaultTest):
 

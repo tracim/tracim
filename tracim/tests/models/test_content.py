@@ -2,11 +2,10 @@
 import time
 
 from depot.fields.upload import UploadedFile
-from nose.tools import ok_
-from nose.tools import raises
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.testing import eq_
 import transaction
+import pytest
 
 # from tracim.lib.content import ContentApi
 from tracim.exceptions import ContentRevisionUpdateError
@@ -23,10 +22,10 @@ from tracim.tests import StandardTest
 
 class TestContent(StandardTest):
 
-    @raises(ContentRevisionUpdateError)
     def test_update_without_prepare(self):
         content1 = self.test_create()
-        content1.description = 'FOO'
+        with pytest.raises(ContentRevisionUpdateError):
+            content1.description = 'FOO'
         # Raise ContentRevisionUpdateError because revision can't be updated
 
     def test_query(self):
@@ -163,9 +162,9 @@ class TestContent(StandardTest):
         ).one()
 
         # Updated dates must be different
-        ok_(revision_1.updated < revision_2.updated < revision_3.updated)
+        assert revision_1.updated < revision_2.updated < revision_3.updated
         # Created dates must be equal
-        ok_(revision_1.created == revision_2.created == revision_3.created)
+        assert revision_1.created == revision_2.created == revision_3.created
 
     def test_creates(self):
         eq_(
@@ -325,7 +324,7 @@ class TestContent(StandardTest):
         # which is able to behave like a python file object
         content.depot_file = b'test'
         # tests initialized depot file
-        ok_(content.depot_file)
+        assert content.depot_file
         # tests type of initialized depot file
         eq_(type(content.depot_file), UploadedFile)
         # tests content of initialized depot file

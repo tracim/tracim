@@ -4,7 +4,7 @@ import transaction
 from depot.manager import DepotManager
 from pyramid import testing
 
-from nose.tools import eq_
+
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models.data import Workspace, ContentType
@@ -13,6 +13,11 @@ from tracim.lib.utils.logger import logger
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.config import CFG
+
+
+def eq_(a, b, msg=None):
+    # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
+    assert a == b, msg or "%r != %r" % (a, b)
 
 
 class BaseTest(unittest.TestCase):

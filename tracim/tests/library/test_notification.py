@@ -2,8 +2,6 @@
 import os
 import re
 
-from nose.tools import eq_
-from nose.tools import ok_
 
 from tracim.lib.core.notifications import DummyNotifier
 from tracim.lib.core.notifications import EmailNotifier
@@ -11,7 +9,7 @@ from tracim.lib.core.notifications import NotifierFactory
 from tracim.models.auth import User
 from tracim.models.data import Content
 from tracim.tests import DefaultTest
-
+from tracim.tests import eq_
 
 class TestDummyNotifier(DefaultTest):
 

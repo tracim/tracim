@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-
-from nose.tools import eq_
-from nose.tools import ok_
-from nose.tools import raises
-
+import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
 
 from tracim.lib.core.user import UserApi
 from tracim.tests import DefaultTest
+from tracim.tests import eq_
 
 
 class TestUserApi(DefaultTest):
@@ -24,7 +21,7 @@ class TestUserApi(DefaultTest):
         api.update(u, 'bob', 'bob@bob', True)
 
         nu = api.get_one_by_email('bob@bob')
-        ok_(nu != None)
+        assert nu != None
         eq_('bob@bob', nu.email)
         eq_('bob', nu.display_name)
 
@@ -54,14 +51,14 @@ class TestUserApi(DefaultTest):
 
         eq_(uid, api.get_one_by_email('bibi@bibi').user_id)
 
-    @raises(NoResultFound)
     def test_get_one_by_email_exception(self):
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
-        api.get_one_by_email('unknown')
+        with pytest.raises(NoResultFound):
+            api.get_one_by_email('unknown')
 
     def test_get_all(self):
         # TODO - G.M - 29-03-2018 Check why this method is not enabled

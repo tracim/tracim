@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import transaction
 
-from nose.tools import eq_
-from nose.tools import ok_
-
+from tracim.tests import eq_
 from tracim.tests import BaseTest
 
 from tracim.models.auth import User
