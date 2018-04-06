@@ -24,7 +24,7 @@ requires = [
     'babel',
     'alembic',
     'hapic',
-    'marshmallow',
+    'marshmallow <3.0.0a1,>2.0.0',
     'cliff',
 ]
 
