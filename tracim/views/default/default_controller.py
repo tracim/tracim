@@ -45,6 +45,15 @@ class DefaultController(Controller):
         return {'project': project}
 
     @classmethod
+    def test_manager_page(cls, request):
+        try:
+            app_config = request.registry.settings['CFG']
+            project = 'manager'
+        except Exception as e:
+            return Response(e, content_type='text/plain', status=500)
+        return {'project': project}
+
+    @classmethod
     def test_user_page(cls, request):
         try:
             app_config = request.registry.settings['CFG']
@@ -76,7 +85,13 @@ class DefaultController(Controller):
             renderer='tracim:templates/mytemplate.jinja2',
             permission='admin',
         )
-
+        configurator.add_route('test_manager', '/test_manager')
+        configurator.add_view(
+            self.test_user_page,
+            route_name='test_manager',
+            renderer='tracim:templates/mytemplate.jinja2',
+            permission='manager',
+        )
         configurator.add_route('test_user', '/test_user')
         configurator.add_view(
             self.test_user_page,
