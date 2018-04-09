@@ -44,15 +44,16 @@ def main(global_config, **settings):
     example_api_controllers = ExampleApiController()
     example_api_controllers.bind(configurator)
 
-    time.sleep(1)
-    s = json.dumps(
-        hapic.generate_doc(
-            title='Fake API',
-            description='just an example of hapic API'
-        )
-    )
-    time.sleep(1)
-    # print swagger doc
-    print(s)
-    time.sleep(1)
+    # TODO - G.M - 09-04-2018 - Enable swagger ui doc
+    # time.sleep(1)
+    # s = json.dumps(
+    #     hapic.generate_doc(
+    #         title='Fake API',
+    #         description='just an example of hapic API'
+    #     )
+    # )
+    # time.sleep(1)
+    # # print swagger doc
+    # print(s)
+    # time.sleep(1)
     return configurator.make_wsgi_app()
