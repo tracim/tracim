@@ -22,7 +22,7 @@ class UserSchema(marshmallow.Schema):
     id = marshmallow.fields.Int(required=True)
     username = marshmallow.fields.String(
         required=True,
-        validate = marshmallow.validate.Regexp(regex='[\w-]+'),
+        validate=marshmallow.validate.Regexp(regex='[\w-]+'),
     )
     email_address = marshmallow.fields.Email(required=True)
     first_name = marshmallow.fields.String(required=True)

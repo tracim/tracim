@@ -212,7 +212,6 @@ class User(DeclarativeBase):
     password = synonym('_password', descriptor=property(_get_password,
                                                         _set_password))
 
-
     def validate_password(self, cleartext_password: str) -> bool:
         """
         Check the password against existing credentials.

@@ -3,6 +3,9 @@ import logging
 
 
 class Logger(object):
+    """
+    Global logger
+    """
     TPL = '[{cls}] {msg}'
 
     def __init__(self, logger_name):

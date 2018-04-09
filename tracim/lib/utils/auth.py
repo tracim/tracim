@@ -21,16 +21,6 @@ from tracim.lib.core.userworkspace import RoleApi
 # based on this tutorial : https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/auth/basic.html  # nopep8
 BASIC_AUTH_WEBUI_REALM = "tracim"
 
-# Global Permissions
-ADMIN_PERM = 'admin'
-MANAGE_GLOBAL_PERM = 'manage_global'
-USER_PERM = 'user'
-# Workspace-specific permission
-READ_PERM = 'read'
-CONTRIBUTE_PERM = 'contribute'
-MANAGE_CONTENT_PERM = 'manage_content'
-MANAGE_WORKSPACE_PERM = 'manage_workspace'
-
 
 def get_user(request: Request) -> typing.Optional[User]:
     """
@@ -106,6 +96,17 @@ def check_credentials(
         permissions.append(role)
 
     return permissions
+
+
+# Global Permissions
+ADMIN_PERM = 'admin'
+MANAGE_GLOBAL_PERM = 'manage_global'
+USER_PERM = 'user'
+# Workspace-specific permission
+READ_PERM = 'read'
+CONTRIBUTE_PERM = 'contribute'
+MANAGE_CONTENT_PERM = 'manage_content'
+MANAGE_WORKSPACE_PERM = 'manage_workspace'
 
 
 class Root(object):
