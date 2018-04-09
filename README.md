@@ -2,7 +2,8 @@
 
 This project is the frontend part of Tracim.
 
-### Installation
+### Installation
+
 Install all dependencies
 `$ npm install`
 
@@ -11,7 +12,8 @@ Build the sources
 
 Load `dist/index.html` in your webserver.
 
-### Development
+### Development
+
 Install all dependencies
 `$ npm install`
 
@@ -25,13 +27,15 @@ Start mockapi server
 
 
 ### Apps
+
 Tracim is a skeleton that rely on apps to do stuffs. (like to manage Documents, Files, Threads ...)
 
 Apps all are independant React applications and have their own repositories and can be freely added or removed from Tracim without the needs for a rebuild.
 
 Apps acts like plugins.
 
-#### To add Apps to your Tracim instance
+#### To add Apps to your Tracim instance
+
 You need to separately get the built version of each apps and add them to `dist/app` folder. Apps file names should be of the form of '__appName__.app.js'.
 
 To do that
@@ -44,6 +48,7 @@ To do that
 By default, for development, tracim_front expects every apps but wont crash if one is missing (currenlt not all of them are exists anyway)
 
 ### Developing Apps
+
 Apps are independents React application so you can test them out on their own.
 
 /!\ Documentation on Apps interface is work in progress. /!\
