@@ -47,7 +47,7 @@ Install the project in editable mode with its testing requirements:
 
 ### Configure Tracim_backend ###
 
-Create configuration files for a development environment:
+Create [configuration file](doc/setting.md) for a development environment:
 
     cp development.ini.base development.ini
 
