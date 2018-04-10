@@ -14,7 +14,14 @@ Installation
 
 ### Distribution dependencies ###
 
-TODO
+on Debian Stretch (9) :
+
+    sudo apt install git
+    sudo apt install python3 python-virtualenv python3-dev python-pip
+
+### Get the source ###
+
+    git clone https://github.com/tracim/tracim_backend.git
 
 ### Setup Python Virtualenv ###
 
