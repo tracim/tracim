@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import typing
-
-from json.decoder import JSONDecodeError
+try:
+    from json.decoder import JSONDecodeError
+except ImportError:  # python3.4
+    JSONDecodeError = ValueError
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.request import Request
