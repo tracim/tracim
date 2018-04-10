@@ -34,6 +34,7 @@ class DefaultController(Controller):
             response = HTTPForbidden()
         return response
 
+    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
     @classmethod
     def test_config(cls, request):
         try:
@@ -43,6 +44,7 @@ class DefaultController(Controller):
             return Response(e, content_type='text/plain', status=500)
         return {'project': project}
 
+    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
     @classmethod
     def test_contributor_page(cls, request):
         try:
@@ -52,6 +54,7 @@ class DefaultController(Controller):
             return Response(e, content_type='text/plain', status=500)
         return {'project': project}
 
+    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
     @classmethod
     def test_admin_page(cls, request):
         try:
@@ -61,6 +64,7 @@ class DefaultController(Controller):
             return Response(e, content_type='text/plain', status=500)
         return {'project': project}
 
+    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
     @classmethod
     def test_manager_page(cls, request):
         try:
@@ -70,6 +74,7 @@ class DefaultController(Controller):
             return Response(e, content_type='text/plain', status=500)
         return {'project': project}
 
+    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
     @classmethod
     def test_user_page(cls, request):
         try:
@@ -80,13 +85,17 @@ class DefaultController(Controller):
         return {'project': project}
 
     def bind(self, configurator: Configurator):
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop static files
         configurator.add_static_view('static', 'static', cache_max_age=3600)
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Do not rely
+        # on static file for 404 view
         configurator.add_view(
             self.notfound_view,
             renderer='tracim:templates/404.jinja2',
             context=NotFound,
         )
 
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
         configurator.add_route('test_config', '/')
         configurator.add_view(
             self.test_config,
@@ -94,6 +103,7 @@ class DefaultController(Controller):
             renderer='tracim:templates/mytemplate.jinja2',
         )
 
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
         configurator.add_route('test_contributor', '/test_contributor')
         configurator.add_view(
             self.test_contributor_page,
@@ -101,6 +111,8 @@ class DefaultController(Controller):
             renderer='tracim:templates/mytemplate.jinja2',
             permission=CONTRIBUTE_PERM,
         )
+
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
         configurator.add_route('test_admin', '/test_admin')
         configurator.add_view(
             self.test_admin_page,
@@ -108,6 +120,8 @@ class DefaultController(Controller):
             renderer='tracim:templates/mytemplate.jinja2',
             permission=ADMIN_PERM,
         )
+
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
         configurator.add_route('test_manager', '/test_manager')
         configurator.add_view(
             self.test_user_page,
@@ -115,6 +129,8 @@ class DefaultController(Controller):
             renderer='tracim:templates/mytemplate.jinja2',
             permission=MANAGE_GLOBAL_PERM,
         )
+
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
         configurator.add_route('test_user', '/test_user')
         configurator.add_view(
             self.test_user_page,
@@ -122,4 +138,5 @@ class DefaultController(Controller):
             renderer='tracim:templates/mytemplate.jinja2',
             permission=USER_PERM,
         )
+
         configurator.add_forbidden_view(self.forbidden_view)
