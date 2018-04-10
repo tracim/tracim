@@ -8,13 +8,12 @@ from cliff.command import Command
 from cliff.commandmanager import CommandManager
 
 from pyramid.paster import bootstrap
+from pyramid.scripting import AppEnvironment
 from tracim.exceptions import CommandAbortedError
 
 
-
 class TracimCLI(App):
-
-    def __init__(self):
+    def __init__(self) -> None:
         super(TracimCLI, self).__init__(
             description='TracimCli',
             version='0.1',
@@ -22,13 +21,13 @@ class TracimCLI(App):
             deferred_help=True,
             )
 
-    def initialize_app(self, argv):
+    def initialize_app(self, argv) -> None:
         self.LOG.debug('initialize_app')
 
-    def prepare_to_run_command(self, cmd):
+    def prepare_to_run_command(self, cmd) -> None:
         self.LOG.debug('prepare_to_run_command %s', cmd.__class__.__name__)
 
-    def clean_up(self, cmd, result, err):
+    def clean_up(self, cmd, result, err) -> None:
         self.LOG.debug('clean_up %s', cmd.__class__.__name__)
         if err:
             self.LOG.debug('got an error: %s', err)
@@ -49,14 +48,14 @@ class AppContextCommand(Command):
     """
     auto_setup_context = True
 
-    def take_action(self, parsed_args):
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
         super(AppContextCommand, self).take_action(parsed_args)
         if self.auto_setup_context:
             with bootstrap(parsed_args.config_file) as app_context:
                 with app_context['request'].tm:
                     self.take_app_action(parsed_args, app_context)
 
-    def get_parser(self, prog_name):
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
 
         parser.add_argument(
@@ -73,9 +72,14 @@ class AppContextCommand(Command):
     #     transaction.commit()
 
 
+# TODO - G.M - 10-04-2018 - [Cleanup][tempExample] - Drop this
 class TestTracimCommand(AppContextCommand):
 
-    def take_app_action(self, parser, app_context):
+    def take_app_action(
+            self,
+            parser: argparse.ArgumentParser,
+            app_context: AppEnvironment
+    ) -> None:
         print('test')
 
 

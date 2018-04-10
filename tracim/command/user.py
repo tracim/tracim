@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import argparse
+from pyramid.scripting import AppEnvironment
 import transaction
 from sqlalchemy.exc import IntegrityError
 
@@ -14,6 +16,7 @@ from tracim.exceptions import CommandAbortedError
 from tracim.lib.core.group import GroupApi
 from tracim.lib.core.user import UserApi
 from tracim.models import User
+from tracim.models import Group
 
 
 class UserCommand(AppContextCommand):
@@ -23,10 +26,10 @@ class UserCommand(AppContextCommand):
 
     action = NotImplemented
 
-    def get_description(self):
+    def get_description(self) -> str:
         return '''Create or update user.'''
 
-    def get_parser(self, prog_name):
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
 
         parser.add_argument(
@@ -77,32 +80,42 @@ class UserCommand(AppContextCommand):
 
         return parser
 
-    def _user_exist(self, login):
+    def _user_exist(self, login: str) -> User:
         return self._user_api.user_with_email_exists(login)
 
-    def _get_group(self, name):
+    def _get_group(self, name: str) -> Group:
         return self._group_api.get_one_with_name(name)
 
-    def _add_user_to_named_group(self, user, group_name):
+    def _add_user_to_named_group(
+            self,
+            user: str,
+            group_name: str
+    ) -> None:
         group = self._get_group(group_name)
         if user not in group.users:
             group.users.append(user)
         self._session.flush()
 
-    def _remove_user_from_named_group(self, user, group_name):
+    def _remove_user_from_named_group(
+            self,
+            user: User,
+            group_name: str
+    ) -> None:
         group = self._get_group(group_name)
         if user in group.users:
             group.users.remove(user)
         self._session.flush()
 
-    def _create_user(self, login, password, **kwargs):
+    def _create_user(self, login: str, password: str, **kwargs) -> User:
         if not password:
             if self._password_required():
-                raise CommandAbortedError("You must provide -p/--password parameter")
+                raise CommandAbortedError(
+                    "You must provide -p/--password parameter"
+                )
             password = ''
 
         try:
-            user =self._user_api.create_user(email=login)
+            user = self._user_api.create_user(email=login)
             user.password = password
             self._user_api.save(user)
             # TODO - G.M - 04-04-2018 - [Caldav] Check this code
@@ -117,13 +130,17 @@ class UserCommand(AppContextCommand):
 
         return user
 
-    def _update_password_for_login(self, login, password):
+    def _update_password_for_login(self, login: str, password: str) -> None:
         user = self._user_api.get_one_by_email(login)
         user.password = password
         self._session.flush()
         transaction.commit()
 
-    def take_app_action(self, parsed_args, app_context):
+    def take_app_action(
+            self,
+            parsed_args: argparse.Namespace,
+            app_context: AppEnvironment
+    ) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context['request'].dbsession
@@ -142,7 +159,7 @@ class UserCommand(AppContextCommand):
 
         print("User created/updated")
 
-    def _proceed_user(self, parsed_args):
+    def _proceed_user(self, parsed_args: argparse.Namespace) -> User:
         self._check_context(parsed_args)
 
         if self.action == self.ACTION_CREATE:
@@ -171,7 +188,11 @@ class UserCommand(AppContextCommand):
 
         return user
 
-    def _proceed_groups(self, user, parsed_args):
+    def _proceed_groups(
+            self,
+            user: User,
+            parsed_args: argparse.Namespace
+    ) -> None:
         # User always in "users" group
         self._add_user_to_named_group(user, 'users')
 
@@ -181,13 +202,13 @@ class UserCommand(AppContextCommand):
         for group_name in parsed_args.remove_from_group:
             self._remove_user_from_named_group(user, group_name)
 
-    def _password_required(self):
+    def _password_required(self) -> bool:
         # TODO - G.M - 04-04-2018 - [LDAP] Check this code
         # if config.get('auth_type') == LDAPAuth.name:
         #     return False
         return True
 
-    def _check_context(self, parsed_args):
+    def _check_context(self, parsed_args: argparse.Namespace) -> None:
         # TODO - G.M - 04-04-2018 - [LDAP] Check this code
         # if config.get('auth_type') == LDAPAuth.name:
         #     auth_instance = config.get('auth_instance')

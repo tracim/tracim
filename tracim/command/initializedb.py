@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import argparse
+
+import plaster_pastedeploy
 import transaction
 from pyramid.paster import (
     get_appsettings,
@@ -21,14 +24,14 @@ from tracim.models import (
 class InitializeDBCommand(AppContextCommand):
     auto_setup_context = False
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "Initialize DB"
 
-    def get_parser(self, prog_name):
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         return parser
 
-    def take_action(self, parsed_args):
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
         super(InitializeDBCommand, self).take_action(parsed_args)
         config_uri = parsed_args.config_file
         setup_logging(config_uri)
@@ -37,13 +40,19 @@ class InitializeDBCommand(AppContextCommand):
         self._populate_database(settings)
 
     @classmethod
-    def _create_schema(cls, settings):
+    def _create_schema(
+            cls,
+            settings: plaster_pastedeploy.ConfigDict
+    ) -> None:
         print("- Create Schemas of databases -")
         engine = get_engine(settings)
         DeclarativeBase.metadata.create_all(engine)
 
     @classmethod
-    def _populate_database(cls, settings):
+    def _populate_database(
+            cls,
+            settings: plaster_pastedeploy.ConfigDict
+    ) -> None:
         engine = get_engine(settings)
         session_factory = get_session_factory(engine)
         app_config = CFG(settings)
