@@ -96,16 +96,18 @@ class Profile(object):
              Group.TIM_MANAGER_GROUPNAME,
              Group.TIM_ADMIN_GROUPNAME]
 
-    _LABEL = [l_('Nobody'),
-              l_('Users'),
-              l_('Global managers'),
-              l_('Administrators')]
+    # TODO - G.M - 18-04-2018 [Cleanup] Drop this
+    # _LABEL = [l_('Nobody'),
+    #           l_('Users'),
+    #           l_('Global managers'),
+    #           l_('Administrators')]
 
     def __init__(self, profile_id):
         assert isinstance(profile_id, int)
         self.id = profile_id
         self.name = Profile._NAME[profile_id]
-        self.label = Profile._LABEL[profile_id]
+        # TODO - G.M - 18-04-2018 [Cleanup] Drop this
+        # self.label = Profile._LABEL[profile_id]
 
 
 class User(DeclarativeBase):
