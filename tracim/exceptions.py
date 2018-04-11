@@ -59,3 +59,15 @@ class NotFound(TracimException):
 
 class SameValueError(ValueError):
     pass
+
+
+class NotAuthentificated(TracimException):
+    pass
+
+
+class WorkspaceNotFound(NotFound):
+    pass
+
+
+class InsufficientUserWorkspaceRole(TracimException):
+    pass

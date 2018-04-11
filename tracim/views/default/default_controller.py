@@ -1,30 +1,25 @@
 # coding=utf-8
+from pyramid.request import Request
+
+from tracim.models.data import UserRoleInWorkspace
 from tracim.views.controllers import Controller
 from pyramid.config import Configurator
 from pyramid.response import Response
 from pyramid.exceptions import NotFound
 from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.security import forget
+from pyramid.security import forget, authenticated_userid
 
-from tracim.lib.utils.auth import MANAGE_CONTENT_PERM
-from tracim.lib.utils.auth import MANAGE_WORKSPACE_PERM
-from tracim.lib.utils.auth import MANAGE_GLOBAL_PERM
-from tracim.lib.utils.auth import READ_PERM
-from tracim.lib.utils.auth import CONTRIBUTE_PERM
-from tracim.lib.utils.auth import ADMIN_PERM
-from tracim.lib.utils.auth import USER_PERM
+from tracim.lib.utils.auth import require_workspace_role
 
 
 class DefaultController(Controller):
 
-    @classmethod
-    def notfound_view(cls, request):
+    def notfound_view(self, request):
         request.response.status = 404
         return {}
 
-    @classmethod
-    def forbidden_view(cls, request):
+    def forbidden_view(self, request):
         if request.authenticated_userid is None:
             response = HTTPUnauthorized()
             response.headers.update(forget(request))
@@ -35,8 +30,8 @@ class DefaultController(Controller):
         return response
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    @classmethod
-    def test_config(cls, request):
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    def test_config(self, request: Request):
         try:
             app_config = request.registry.settings['CFG']
             project = app_config.WEBSITE_TITLE
@@ -45,8 +40,8 @@ class DefaultController(Controller):
         return {'project': project}
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    @classmethod
-    def test_contributor_page(cls, request):
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    def test_contributor_page(self, request):
         try:
             app_config = request.registry.settings['CFG']
             project = 'contributor'
@@ -55,8 +50,7 @@ class DefaultController(Controller):
         return {'project': project}
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    @classmethod
-    def test_admin_page(cls, request):
+    def test_admin_page(self, request):
         try:
             app_config = request.registry.settings['CFG']
             project = 'admin'
@@ -65,8 +59,7 @@ class DefaultController(Controller):
         return {'project': project}
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    @classmethod
-    def test_manager_page(cls, request):
+    def test_manager_page(self, request):
         try:
             app_config = request.registry.settings['CFG']
             project = 'manager'
@@ -75,8 +68,7 @@ class DefaultController(Controller):
         return {'project': project}
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    @classmethod
-    def test_user_page(cls, request):
+    def test_user_page(self, request):
         try:
             app_config = request.registry.settings['CFG']
             project = 'user'
@@ -109,7 +101,6 @@ class DefaultController(Controller):
             self.test_contributor_page,
             route_name='test_contributor',
             renderer='tracim:templates/mytemplate.jinja2',
-            permission=CONTRIBUTE_PERM,
         )
 
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
@@ -118,7 +109,6 @@ class DefaultController(Controller):
             self.test_admin_page,
             route_name='test_admin',
             renderer='tracim:templates/mytemplate.jinja2',
-            permission=ADMIN_PERM,
         )
 
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
@@ -127,7 +117,6 @@ class DefaultController(Controller):
             self.test_user_page,
             route_name='test_manager',
             renderer='tracim:templates/mytemplate.jinja2',
-            permission=MANAGE_GLOBAL_PERM,
         )
 
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
@@ -136,7 +125,6 @@ class DefaultController(Controller):
             self.test_user_page,
             route_name='test_user',
             renderer='tracim:templates/mytemplate.jinja2',
-            permission=USER_PERM,
         )
 
         configurator.add_forbidden_view(self.forbidden_view)

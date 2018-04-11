@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import typing
+
+from pyramid.interfaces import IAuthorizationPolicy
+from zope.interface import implementer
+
 try:
     from json.decoder import JSONDecodeError
 except ImportError:  # python3.4
@@ -7,112 +11,136 @@ except ImportError:  # python3.4
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.request import Request
-from pyramid.security import ALL_PERMISSIONS
-from pyramid.security import Allow
-from pyramid.security import unauthenticated_userid
 
-from tracim.models.auth import Group
 from tracim.models.auth import User
 from tracim.models.data import Workspace
-from tracim.models.data import UserRoleInWorkspace
 from tracim.lib.core.user import UserApi
 from tracim.lib.core.workspace import WorkspaceApi
-from tracim.lib.core.userworkspace import RoleApi
 
-# INFO - G.M - 06-04-2018 - Auth for pyramid
-# based on this tutorial : https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/auth/basic.html  # nopep8
+from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import WorkspaceNotFound
+from tracim.exceptions import InsufficientUserWorkspaceRole
 BASIC_AUTH_WEBUI_REALM = "tracim"
+TRACIM_DEFAULT_PERM = 'tracim'
 
 
-def get_user(request: Request) -> typing.Optional[User]:
+def get_safe_user(
+        request: Request,
+) -> User:
     """
-    Get current pyramid user from request
+    Get current pyramid authenticated user from request
     :param request: pyramid request
-    :return:
+    :return: current authenticated user
     """
     app_config = request.registry.settings['CFG']
     uapi = UserApi(None, session=request.dbsession, config=app_config)
     user = None
     try:
-        login = unauthenticated_userid(request)
+        login = request.authenticated_userid
+        if not login:
+            raise NotAuthentificated('not authenticated user_id,'
+                                     'Failed Authentification ?')
         user = uapi.get_one_by_email(login)
     except NoResultFound:
-        pass
+        raise NotAuthentificated('User not found')
     return user
 
 
-def get_workspace(request: Request) -> typing.Optional[Workspace]:
+def get_workspace(user: User, request: Request) -> typing.Optional[Workspace]:
     """
     Get current workspace from request
+    :param user: User who want to check the workspace
     :param request: pyramid request
     :return:
     """
-    workspace = None
+    workspace_id = ''
     try:
         if 'workspace_id' not in request.json_body:
             return None
         workspace_id = request.json_body['workspace_id']
-        wapi = WorkspaceApi(current_user=None, session=request.dbsession)
+        wapi = WorkspaceApi(current_user=user, session=request.dbsession)
         workspace = wapi.get_one(workspace_id)
     except JSONDecodeError:
-        pass
+        raise WorkspaceNotFound('Bad json body')
     except NoResultFound:
-        pass
+        raise WorkspaceNotFound(
+            'Workspace {} does not exist '
+            'or is not visible for this user'.format(workspace_id)
+        )
     return workspace
 
+###
+# BASIC AUTH
+###
 
-def check_credentials(
+
+def basic_auth_check_credentials(
         login: str,
         cleartext_password: str,
-        request: Request
+        request: 'TracimRequest'
 ) -> typing.Optional[list]:
     """
-    Check credential for pyramid basic_auth, checks also for
-    global and Workspace related permissions.
+    Check credential for pyramid basic_auth
     :param login: login of user
     :param cleartext_password: user password in cleartext
     :param request: Pyramid request
     :return: None if auth failed, list of permissions if auth succeed
     """
-    user = get_user(request)
 
     # Do not accept invalid user
+    user = _get_basic_auth_unsafe_user(request)
     if not user \
             or user.email != login \
             or not user.validate_password(cleartext_password):
         return None
-    permissions = []
-
-    # Global groups
-    for group in user.groups:
-        permissions.append(group.group_id)
-
-    # Current workspace related group
-    workspace = get_workspace(request)
-    if workspace:
-        roleapi = RoleApi(current_user=user, session=request.dbsession)
-        role = roleapi.get_one(
-            user_id=user.user_id,
-            workspace_id=workspace.workspace_id,
-        )
-        permissions.append(role)
-
-    return permissions
+    return []
 
 
-# Global Permissions
-ADMIN_PERM = 'admin'
-MANAGE_GLOBAL_PERM = 'manage_global'
-USER_PERM = 'user'
-# Workspace-specific permission
-READ_PERM = 'read'
-CONTRIBUTE_PERM = 'contribute'
-MANAGE_CONTENT_PERM = 'manage_content'
-MANAGE_WORKSPACE_PERM = 'manage_workspace'
-
-
-class Root(object):
+def _get_basic_auth_unsafe_user(
+    request: Request,
+) -> typing.Optional[User]:
     """
-    Root of all Pyramid requests, used to store global acl
+    :param request: pyramid request
+    :return: User or None
     """
-    __acl__ = ()
+    app_config = request.registry.settings['CFG']
+    uapi = UserApi(None, session=request.dbsession, config=app_config)
+    try:
+        login = request.unauthenticated_userid
+        if not login:
+            return None
+        user = uapi.get_one_by_email(login)
+    except NoResultFound:
+        return None
+    return user
+
+####
+
+
+def require_workspace_role(minimal_required_role):
+    def decorator(func):
+
+        def wrapper(self, request: 'TracimRequest'):
+            user = request.current_user
+            workspace = request.current_workspace
+            if workspace.get_user_role(user) >= minimal_required_role:
+                return func(self, request)
+            raise InsufficientUserWorkspaceRole()
+
+        return wrapper
+    return decorator
+
+###
+
+
+@implementer(IAuthorizationPolicy)
+class AcceptAllAuthorizationPolicy(object):
+    """
+    Simple AuthorizationPolicy to avoid trouble with pyramid.
+    Acceot any request.
+    """
+    def permits(self, context, principals, permision):
+        return True
+
+    def principals_allowed_by_permission(self, context, permission):
+        raise NotImplementedError()
