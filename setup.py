@@ -36,6 +36,13 @@ tests_require = [
     'mypy',
 ]
 
+mysql_require = [
+    'PyMySQL'
+]
+
+postgresql_require = [
+    'psycopg2',
+]
 # Python version adaptations
 if sys.version_info < (3, 5):
     requires.append('typing')
@@ -68,6 +75,8 @@ setup(
     zip_safe=False,
     extras_require={
         'testing': tests_require,
+        'mysql': mysql_require,
+        'postgresql': postgresql_require,
     },
     install_requires=requires,
     entry_points={

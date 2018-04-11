@@ -41,9 +41,24 @@ Upgrade packaging tools:
 
     pip install --upgrade pip setuptools
 
-Install the project in editable mode with its testing requirements:
+Install the project in editable mode with its testing requirements :
 
     pip install -e ".[testing]"
+
+If you want to use postgresql, mysql or other databases
+than the default one: sqlite, you need to install python driver for those databases
+that are supported by sqlalchemy.
+
+For postgreSQL and mySQL, those are shortcuts to install Tracim with test and
+specific driver.
+
+For PostgreSQL:
+
+    pip install -e ".[testing,postgresql]"
+
+For mySQL:
+
+    pip install -e ".[testing,mysql]"
 
 ### Configure Tracim_backend ###
 
