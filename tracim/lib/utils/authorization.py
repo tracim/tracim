@@ -53,10 +53,10 @@ def require_profile(group):
     :return:
     """
     def decorator(func):
-        def wrapper(self, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest'):
             user = request.current_user
             if user.profile.id >= group:
-                return func(self, request)
+                return func(self, context, request)
             raise InsufficientUserProfile()
         return wrapper
     return decorator
@@ -72,11 +72,11 @@ def require_workspace_role(minimal_required_role):
     """
     def decorator(func):
 
-        def wrapper(self, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest'):
             user = request.current_user
             workspace = request.current_workspace
             if workspace.get_user_role(user) >= minimal_required_role:
-                return func(self, request)
+                return func(self, context, request)
             raise InsufficientUserWorkspaceRole()
 
         return wrapper

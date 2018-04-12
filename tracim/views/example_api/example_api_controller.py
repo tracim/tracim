@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this file
 from datetime import datetime
+from http import HTTPStatus
 
 from pyramid.config import Configurator
 
 from hapic.data import HapicData
 
+from tracim.exceptions import InsufficientUserWorkspaceRole, NotAuthentificated
 from tracim.extensions import hapic
+from tracim.lib.utils.authorization import require_workspace_role
+from tracim.models.data import UserRoleInWorkspace
 from tracim.views.controllers import Controller
 from tracim.views.example_api.schema import *
 
@@ -24,8 +28,13 @@ class ExampleApiController(Controller):
             'datetime': datetime(2017, 12, 7, 10, 55, 8, 488996),
         }
 
+    @hapic.handle_exception(
+        NotAuthentificated,
+        http_code=HTTPStatus.BAD_REQUEST
+    )
     @hapic.with_api_doc()
     @hapic.output_body(ListsUserSchema())
+    @require_workspace_role(UserRoleInWorkspace.READER)
     def get_users(self, context, request):
         """
         Obtain users list.
