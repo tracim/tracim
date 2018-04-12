@@ -1,6 +1,7 @@
 # coding=utf-8
 from pyramid.request import Request
 
+from tracim import TracimRequest
 from tracim.models.data import UserRoleInWorkspace
 from tracim.views.controllers import Controller
 from pyramid.config import Configurator
@@ -10,7 +11,7 @@ from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import forget, authenticated_userid
 
-from tracim.lib.utils.auth import require_workspace_role
+from tracim.lib.utils.authorization import require_workspace_role
 
 
 class DefaultController(Controller):
@@ -31,12 +32,10 @@ class DefaultController(Controller):
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
     @require_workspace_role(UserRoleInWorkspace.READER)
-    def test_config(self, request: Request):
-        try:
-            app_config = request.registry.settings['CFG']
-            project = app_config.WEBSITE_TITLE
-        except Exception as e:
-            return Response(e, content_type='text/plain', status=500)
+    def test_config(self, request: TracimRequest):
+        app_config = request.registry.settings['CFG']
+        project = app_config.WEBSITE_TITLE
+        request.current_user = "lapin"
         return {'project': project}
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method

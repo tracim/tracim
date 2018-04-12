@@ -8,11 +8,11 @@ from hapic.ext.pyramid import PyramidContext
 
 from tracim.extensions import hapic
 from tracim.config import CFG
-from tracim.lib.utils.auth import basic_auth_check_credentials
 from tracim.lib.utils.request import TracimRequest
-from tracim.lib.utils.auth import AcceptAllAuthorizationPolicy
-from tracim.lib.utils.auth import BASIC_AUTH_WEBUI_REALM
-from tracim.lib.utils.auth import TRACIM_DEFAULT_PERM
+from tracim.lib.utils.authentification import basic_auth_check_credentials
+from tracim.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
+from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
+from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.views.example_api.example_api_controller import ExampleApiController
 from tracim.views.default.default_controller import DefaultController
 

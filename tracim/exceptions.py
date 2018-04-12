@@ -71,3 +71,7 @@ class WorkspaceNotFound(NotFound):
 
 class InsufficientUserWorkspaceRole(TracimException):
     pass
+
+
+class ImmutableAttribute(TracimException):
+    pass
