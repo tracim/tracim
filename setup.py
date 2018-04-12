@@ -10,22 +10,27 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    # pyramid
     'plaster_pastedeploy',
     'pyramid >= 1.9a',
     'pyramid_debugtoolbar',
     'pyramid_jinja2',
     'pyramid_retry',
+    'waitress',
+    # Database
     'pyramid_tm',
     'SQLAlchemy',
     'transaction',
     'zope.sqlalchemy',
-    'waitress',
-    'filedepot',
-    'babel',
     'alembic',
+    # API
     'hapic',
     'marshmallow <3.0.0a1,>2.0.0',
+    # CLI
     'cliff',
+    # others
+    'filedepot',
+    'babel',
 ]
 
 tests_require = [
