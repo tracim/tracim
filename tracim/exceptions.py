@@ -73,5 +73,9 @@ class InsufficientUserWorkspaceRole(TracimException):
     pass
 
 
+class InsufficientUserProfile(TracimException):
+    pass
+
+
 class ImmutableAttribute(TracimException):
     pass

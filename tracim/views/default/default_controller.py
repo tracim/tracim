@@ -2,6 +2,7 @@
 from pyramid.request import Request
 
 from tracim import TracimRequest
+from tracim.models import Group
 from tracim.models.data import UserRoleInWorkspace
 from tracim.views.controllers import Controller
 from pyramid.config import Configurator
@@ -11,7 +12,8 @@ from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import forget, authenticated_userid
 
-from tracim.lib.utils.authorization import require_workspace_role
+from tracim.lib.utils.authorization import require_workspace_role, \
+    require_profile
 
 
 class DefaultController(Controller):
@@ -30,50 +32,34 @@ class DefaultController(Controller):
             response = HTTPForbidden()
         return response
 
-    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    @require_workspace_role(UserRoleInWorkspace.READER)
-    def test_config(self, request: TracimRequest):
+    def home(self, request: TracimRequest):
         app_config = request.registry.settings['CFG']
         project = app_config.WEBSITE_TITLE
-        request.current_user = "lapin"
         return {'project': project}
+
+    @require_profile(Group.TIM_USER)
+    def user(self, request: TracimRequest):
+        return self.home(request)
+
+    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    def test_reader(self, request: TracimRequest):
+        return self.home(request)
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    def test_contributor_page(self, request):
-        try:
-            app_config = request.registry.settings['CFG']
-            project = 'contributor'
-        except Exception as e:
-            return Response(e, content_type='text/plain', status=500)
-        return {'project': project}
+    def test_contributor(self, request):
+        return self.home(request)
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    def test_admin_page(self, request):
-        try:
-            app_config = request.registry.settings['CFG']
-            project = 'admin'
-        except Exception as e:
-            return Response(e, content_type='text/plain', status=500)
-        return {'project': project}
+    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    def test_workspace_manager(self, request):
+        return self.home(request)
 
     # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    def test_manager_page(self, request):
-        try:
-            app_config = request.registry.settings['CFG']
-            project = 'manager'
-        except Exception as e:
-            return Response(e, content_type='text/plain', status=500)
-        return {'project': project}
-
-    # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-    def test_user_page(self, request):
-        try:
-            app_config = request.registry.settings['CFG']
-            project = 'user'
-        except Exception as e:
-            return Response(e, content_type='text/plain', status=500)
-        return {'project': project}
+    @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
+    def test_content_manager(self, request):
+        return self.home(request)
 
     def bind(self, configurator: Configurator):
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop static files
@@ -87,43 +73,53 @@ class DefaultController(Controller):
         )
 
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-        configurator.add_route('test_config', '/')
+        configurator.add_route('home', '/')
         configurator.add_view(
-            self.test_config,
-            route_name='test_config',
+            self.home,
+            route_name='home',
+            renderer='tracim:templates/mytemplate.jinja2',
+        )
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
+        configurator.add_route('user', '/user')
+        configurator.add_view(
+            self.user,
+            route_name='user',
             renderer='tracim:templates/mytemplate.jinja2',
         )
 
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
         configurator.add_route('test_contributor', '/test_contributor')
         configurator.add_view(
-            self.test_contributor_page,
+            self.test_contributor,
             route_name='test_contributor',
             renderer='tracim:templates/mytemplate.jinja2',
         )
-
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-        configurator.add_route('test_admin', '/test_admin')
+        configurator.add_route('test_reader', '/test_reader')
         configurator.add_view(
-            self.test_admin_page,
-            route_name='test_admin',
+            self.test_contributor,
+            route_name='test_reader',
+            renderer='tracim:templates/mytemplate.jinja2',
+        )
+        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
+        configurator.add_route(
+            'test_workspace_manager',
+            '/test_workspace_manager'
+        )
+        configurator.add_view(
+            self.test_workspace_manager,
+            route_name='test_workspace_manager',
             renderer='tracim:templates/mytemplate.jinja2',
         )
 
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-        configurator.add_route('test_manager', '/test_manager')
+        configurator.add_route(
+            'test_content_manager',
+            '/test_content_manager'
+        )
         configurator.add_view(
-            self.test_user_page,
-            route_name='test_manager',
+            self.test_content_manager,
+            route_name='test_content_manager',
             renderer='tracim:templates/mytemplate.jinja2',
         )
-
-        # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-        configurator.add_route('test_user', '/test_user')
-        configurator.add_view(
-            self.test_user_page,
-            route_name='test_user',
-            renderer='tracim:templates/mytemplate.jinja2',
-        )
-
         configurator.add_forbidden_view(self.forbidden_view)

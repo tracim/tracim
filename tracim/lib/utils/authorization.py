@@ -8,7 +8,9 @@ try:
 except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
-from tracim.exceptions import InsufficientUserWorkspaceRole
+from tracim.exceptions import InsufficientUserWorkspaceRole, \
+    InsufficientUserProfile
+
 if TYPE_CHECKING:
     from tracim import TracimRequest
 ###
@@ -42,12 +44,31 @@ class AcceptAllAuthorizationPolicy(object):
 # We prefer to use decorators
 
 
+def require_profile(group):
+    """
+    Decorator for view to restrict access of tracim request if profile is
+    not high enough
+    :param group: value from Group Object
+    like Group.TIM_USER or Group.TIM_MANAGER
+    :return:
+    """
+    def decorator(func):
+        def wrapper(self, request: 'TracimRequest'):
+            user = request.current_user
+            if user.profile.id >= group:
+                return func(self, request)
+            raise InsufficientUserProfile()
+        return wrapper
+    return decorator
+
+
 def require_workspace_role(minimal_required_role):
     """
     Decorator for view to restrict access of tracim request if role
     is not high enough
-    :param minimal_required_role:
-    :return:
+    :param minimal_required_role: value from UserInWorkspace Object like
+    UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
+    :return: decorator
     """
     def decorator(func):
 
