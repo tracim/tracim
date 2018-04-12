@@ -80,7 +80,7 @@ class DefaultController(Controller):
             renderer='tracim:templates/mytemplate.jinja2',
         )
         # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this method
-        configurator.add_route('user', '/user')
+        configurator.add_route('user', '/test_user')
         configurator.add_view(
             self.user,
             route_name='user',
