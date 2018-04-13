@@ -22,7 +22,7 @@ class Globals(object):
         """Do nothing, by default."""
         pass
 
-    VERSION_NUMBER = '1.0.5'
+    VERSION_NUMBER = '1.1.0'
     SHORT_DATE_FORMAT = l_('%B %d at %I:%M%p')
 
 
