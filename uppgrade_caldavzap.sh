@@ -8,5 +8,6 @@ then
     rm -r tracim/tracim/public/caldavzap
 fi
 
+# Update the code
 git clone https://github.com/algoo/caldavzap.git tracim/tracim/public/caldavzap
 rm -rf tracim/tracim/public/caldavzap/.git
