@@ -46,7 +46,7 @@ install_requires = [
 
 setup(
     name='tracim',
-    version='1.0.0',
+    version='1.0.5',
     description=(
         'Tracim is a plateform software designed to improve '
         'traceability and productivity in collaborative work.'
