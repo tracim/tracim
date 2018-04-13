@@ -5,7 +5,7 @@ class Homepage extends Component {
   render () {
     return (
       <section className='homepage'>
-        <div className='container-fluid'>
+        <div className='container-fluid nopadding'>
           <HomepageCard />
         </div>
       </section>
