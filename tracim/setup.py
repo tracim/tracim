@@ -59,6 +59,9 @@ setup(
     include_package_data=True,
     test_suite='nose.collector',
     tests_require=testpkgs,
+    extras_require={
+        'test': testpkgs,
+    },
     package_data={
         'tracim': [
             'i18n/*/LC_MESSAGES/*.mo',
