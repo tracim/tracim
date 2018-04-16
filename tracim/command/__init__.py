@@ -10,6 +10,7 @@ from cliff.commandmanager import CommandManager
 from pyramid.paster import bootstrap
 from pyramid.scripting import AppEnvironment
 from tracim.exceptions import CommandAbortedError
+from tracim.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 
 
 class TracimCLI(App):
@@ -61,9 +62,11 @@ class AppContextCommand(Command):
         parser.add_argument(
             "-c",
             "--config",
-            help='application config file to read (default: development.ini)',
+            help='application config file to read (default: {})'.format(
+                DEFAULT_TRACIM_CONFIG_FILE
+            ),
             dest='config_file',
-            default="development.ini"
+            default=DEFAULT_TRACIM_CONFIG_FILE,
         )
         return parser
 

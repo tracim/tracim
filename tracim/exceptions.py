@@ -79,3 +79,7 @@ class InsufficientUserProfile(TracimException):
 
 class ImmutableAttribute(TracimException):
     pass
+
+
+class DigestAuthNotImplemented(Exception):
+    pass

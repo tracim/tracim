@@ -28,6 +28,9 @@ requires = [
     'marshmallow <3.0.0a1,>2.0.0',
     # CLI
     'cliff',
+    # Webdav
+    'wsgidav',
+    'PyYAML',
     # others
     'filedepot',
     'babel',
@@ -96,6 +99,7 @@ setup(
             'user_create = tracim.command.user:CreateUserCommand',
             'user_update = tracim.command.user:UpdateUserCommand',
             'db_init = tracim.command.initializedb:InitializeDBCommand',
+            'webdav start = tracim.command.webdav:WebdavRunnerCommand',
         ]
     },
 )

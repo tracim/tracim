@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
 
+DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
+DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
+
 
 def cmp_to_key(mycmp):
     """
