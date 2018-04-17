@@ -26,4 +26,4 @@ class WebdavRunnerCommand(AppContextCommand):
             tracim_config_file_path=tracim_config,
         )
         app = app_factory.get_wsgi_app()
-        serve(app)
+        serve(app, port=app.config['port'], host=app.config['host'])
