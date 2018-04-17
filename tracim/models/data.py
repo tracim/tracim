@@ -211,19 +211,19 @@ class ActionDescription(object):
     MOVE = 'move'
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    # _ICONS = {
-    #     'archiving': 'fa fa-archive',
-    #     'content-comment': 'fa-comment-o',
-    #     'creation': 'fa-magic',
-    #     'deletion': 'fa-trash',
-    #     'edition': 'fa-edit',
-    #     'revision': 'fa-history',
-    #     'status-update': 'fa-random',
-    #     'unarchiving': 'fa-file-archive-o',
-    #     'undeletion': 'fa-trash-o',
-    #     'move': 'fa-arrows',
-    #     'copy': 'fa-files-o',
-    # }
+    _ICONS = {
+        'archiving': 'fa fa-archive',
+        'content-comment': 'fa-comment-o',
+        'creation': 'fa-magic',
+        'deletion': 'fa-trash',
+        'edition': 'fa-edit',
+        'revision': 'fa-history',
+        'status-update': 'fa-random',
+        'unarchiving': 'fa-file-archive-o',
+        'undeletion': 'fa-trash-o',
+        'move': 'fa-arrows',
+        'copy': 'fa-files-o',
+    }
     #
     # _LABELS = {
     #     'archiving': l_('archive'),
@@ -242,9 +242,14 @@ class ActionDescription(object):
     def __init__(self, id):
         assert id in ActionDescription.allowed_values()
         self.id = id
+        # FIXME - G.M - 17-04-2018 - Label and icon needed for webdav
+        #  design template,
+        # find a way to not rely on this.
+        self.label = self.id
+        self.icon = ActionDescription._ICONS[id]
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # self.label = ActionDescription._LABELS[id]
-        # self.icon = ActionDescription._ICONS[id]
+
         # self.css = ''
 
     @classmethod

@@ -32,6 +32,7 @@ class Content(Fixture):
         content_api = ContentApi(
             current_user=admin,
             session=self._session,
+            config=self._config
         )
         role_api = RoleApi(
             current_user=admin,

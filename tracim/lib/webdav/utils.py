@@ -2,6 +2,8 @@
 
 import transaction
 from os.path import normpath as base_normpath
+
+from sqlalchemy.orm import Session
 from wsgidav import util
 from wsgidav import compat
 
@@ -97,6 +99,7 @@ class FakeFileStream(object):
 
     def __init__(
             self,
+            session: Session,
             content_api: ContentApi,
             workspace: Workspace,
             path: str,
@@ -114,7 +117,7 @@ class FakeFileStream(object):
         :param parent:
         """
         self._file_stream = compat.BytesIO()
-
+        self._session = session
         self._file_name = file_name if file_name != '' else self._content.file_name
         self._content = content
         self._api = content_api
@@ -193,7 +196,11 @@ class FakeFileStream(object):
         Called when we're updating an existing content; we create a new revision and update the file content
         """
 
-        with new_revision(self._content):
+        with new_revision(
+                session=self._session,
+                content=self._content,
+                tm=transaction.manager,
+        ):
             self._api.update_file_data(
                 self._content,
                 self._file_name,

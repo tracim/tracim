@@ -253,6 +253,7 @@ class Workspace(DAVCollection):
             content = resource.content
 
         return FakeFileStream(
+            session=self.session,
             file_name=file_name,
             content_api=self.content_api,
             workspace=self.workspace,
@@ -1045,7 +1046,8 @@ class File(DAVNonCollection):
             content_api=self.content_api,
             file_name=self.content.get_label_as_file(),
             workspace=self.content.workspace,
-            path=self.path
+            path=self.path,
+            session=self.session,
         )
 
     def moveRecursive(self, destpath):
@@ -1136,8 +1138,15 @@ class File(DAVNonCollection):
                 self.content_api.save(self.content)
 
             # INFO - G.M - 2018-03-09 - Moving file if needed
-            workspace_api = WorkspaceApi(self.user)
-            content_api = ContentApi(self.user)
+            workspace_api = WorkspaceApi(
+                current_user=self.user,
+                session=self.session,
+                )
+            content_api = ContentApi(
+                current_user=self.user,
+                session=self.session,
+                config=self.provider.app_config
+            )
 
             destination_workspace = self.provider.get_workspace_from_path(
                 destpath,
@@ -1314,7 +1323,7 @@ class HistoryOtherFile(OtherFile):
     A virtual resource corresponding to a specific tracim's revision's page and thread
     """
     def __init__(self, path: str, environ: dict, content: Content, user:User, content_revision: ContentRevisionRO):
-        super(HistoryOtherFile, self).__init__(path, environ, content, user=user, session=session)
+        super(HistoryOtherFile, self).__init__(path, environ, content, user=user, session=self.session)
         self.content_revision = content_revision
         self.content_designed = self.design()
 
