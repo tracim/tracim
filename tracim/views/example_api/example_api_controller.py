@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 # TODO - G.M - 10-04-2018 - [cleanup][tempExample] - Drop this file
 from datetime import datetime
-from http import HTTPStatus
-
+try:  # Python 3.5+
+    from http import HTTPStatus
+except ImportError:
+    from http import client as HTTPStatus
 from pyramid.config import Configurator
 
 from hapic.data import HapicData
