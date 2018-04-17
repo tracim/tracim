@@ -83,3 +83,7 @@ class ImmutableAttribute(TracimException):
 
 class DigestAuthNotImplemented(Exception):
     pass
+
+
+class LoginFailed(TracimException):
+    pass
