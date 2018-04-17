@@ -14,7 +14,6 @@ from tracim.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.views.core_api.session_controller import SessionController
-#from tracim.views.example_api.example_api_controller import ExampleApiController
 from tracim.views.default.default_controller import DefaultController
 
 
@@ -49,8 +48,6 @@ def main(global_config, **settings):
     # Add controllers
     default_controllers = DefaultController()
     default_controllers.bind(configurator)
-    #example_api_controllers = ExampleApiController()
-    #example_api_controllers.bind(configurator)
     session_api = SessionController()
     session_api.bind(configurator)
     # TODO - G.M - 09-04-2018 - Enable swagger ui doc
