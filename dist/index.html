@@ -33,6 +33,9 @@
     <script src="/dev/popper-1.12.3.js"></script>
     <script src="/dev/bootstrap-4.0.0-beta.2.js"></script>
 
+    <script type="text/javascript" src="/asset/tinymce/jquery.tinymce.min.js"></script>
+    <script type="text/javascript" src="/asset/tinymce/tinymce.min.js"></script>
+
     <script type='text/javascript'>
       let prevSelectedApp = {name: ''} // default value
 
@@ -72,13 +75,8 @@
     </script>
 
     <script type='text/javascript'>
-      if (window.matchMedia("(min-width:1200px)").matches) {
-
-        var jsScript = document.createElement("script");
-        jsScript.type = "text/javascript";
-        jsScript.src = "https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=dfdhxdokxj2wagzkbxfgysgh86d6rr9m3dln0172vo3shipc";
-
-        jsScript.onload = function() {
+      $(document).ready(function () {
+        wysiwyg = function () {
           function base64EncodeAndTinyMceInsert (files) {
             for (var i = 0; i < files.length; i++) {
               if (files[i].size > 1000000)
@@ -133,38 +131,37 @@
                 icon: 'mce-ico mce-i-image',
                 title: 'Image',
                 onclick: function () {
-                  var hiddenTinyMceInput = $('#hidden_tinymce_fileinput')
-
-                  if (hiddenTinyMceInput.length > 0) hiddenTinyMceInput.remove()
+                  if ($('#hidden_tinymce_fileinput').length > 0) $('#hidden_tinymce_fileinput').remove()
 
                   fileTag = document.createElement('input')
                   fileTag.id = 'hidden_tinymce_fileinput'
                   fileTag.type = 'file'
                   $('body').append(fileTag)
 
-                  hiddenTinyMceInput.on('change', function () {
+                  $('#hidden_tinymce_fileinput').on('change', function () {
                     base64EncodeAndTinyMceInsert($(this)[0].files)
                   })
 
-                  hiddenTinyMceInput.click()
+                  $('#hidden_tinymce_fileinput').click()
                 }
               })
 
               //////////////////////////////////////////////
               // Handle drag & drop image into TinyMce by encoding them in base64 (to avoid uploading them somewhere and keep saving comment in string format)
               $editor
-                .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
-                  e.preventDefault()
-                  e.stopPropagation()
-                })
-                .on('drop', function(e) {
-                  base64EncodeAndTinyMceInsert(e.dataTransfer.files)
-                })
+              .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
+                e.preventDefault()
+                e.stopPropagation()
+              })
+              .on('drop', function(e) {
+                base64EncodeAndTinyMceInsert(e.dataTransfer.files)
+              })
             }
           });
         }
-        document.getElementsByTagName("body")[0].appendChild(jsScript);
-      }
+
+        wysiwyg()
+      })
     </script>
   </body>
 </html>
