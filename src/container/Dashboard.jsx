@@ -10,9 +10,17 @@ class Dashboard extends Component {
 
         <div className='dashboard'>
           <div className='container-fluid nopadding'>
-            <div className='pageTitleGeneric'>
-              <div className='pageTitleGeneric__title dashboard__title'>
-                Dashboard
+            <div className='dashboard__header mb-5'>
+              <div className='pageTitleGeneric dashboard__header__title d-flex align-items-center'>
+                <div className='pageTitleGeneric__title dashboard__header__title__text mr-3'>
+                  Dashboard
+                </div>
+                <div className='dashboard__header__acces'>
+                  (privé)
+                </div>
+              </div>
+              <div className='dashboard__header__advancedmode mr-3'>
+                <button type='button' className='btn btn-primary'>Activé édition avancé</button>
               </div>
             </div>
 
@@ -47,12 +55,12 @@ class Dashboard extends Component {
                   <div className='dashboard__userstatut__notification__text'>
                     Vous êtes abonné(e) aux notifications de ce workspace
                   </div>
-                  <div className='dashboard__userstatut__notification__btn btn btn-primary'>
+                  <div className='dashboard__userstatut__notification__btn btn btn-outline-primary'>
                     Changer de statut
                   </div>
 
                   <div className='dashboard__userstatut__notification__subscribe dropdown'>
-                    <button className='dashboard__userstatut__notification__subscribe__btn btn btn-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                    <button className='dashboard__userstatut__notification__subscribe__btn btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                       Abonné(e)
                     </button>
                     <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
@@ -100,6 +108,17 @@ class Dashboard extends Component {
                 </div>
               </div>
 
+              <div className='dashboard__calltoaction__button btnaction visioconf'>
+                <div className='dashboard__calltoaction__button__text'>
+                  <div className='dashboard__calltoaction__button__text__icon'>
+                    <i className='fa fa-video-camera' />
+                  </div>
+                  <div className='dashboard__calltoaction__button__text__title'>
+                    débuter une visioconférence
+                  </div>
+                </div>
+              </div>
+
               <div className='dashboard__calltoaction__button btnaction calendar'>
                 <div className='dashboard__calltoaction__button__text'>
                   <div className='dashboard__calltoaction__button__text__icon'>
@@ -130,7 +149,7 @@ class Dashboard extends Component {
                     Activité récente
                   </div>
 
-                  <div className='dashboard__activity__header__allread btn btn-primary'>
+                  <div className='dashboard__activity__header__allread btn btn-outline-primary'>
                     Tout marquer comme lu
                   </div>
                 </div>
@@ -190,7 +209,7 @@ class Dashboard extends Component {
                   </div>
 
                   <div className='dashboard__activity__more d-flex flex-row-reverse'>
-                    <div className='dashboard__activity__more__btn btn btn-primary'>
+                    <div className='dashboard__activity__more__btn btn btn-outline-primary'>
                       Voir plus
                     </div>
                   </div>
@@ -209,7 +228,7 @@ class Dashboard extends Component {
                       <div className='dashboard__memberlist__list__item__avatar'>
                         <img src={imgProfil} alt='avatar' />
                       </div>
-                      <div className='dashboard__memberlist__list__item__info'>
+                      <div className='dashboard__memberlist__list__item__info mr-auto'>
                         <div className='dashboard__memberlist__list__item__info__name'>
                           Jean Dupont
                         </div>
@@ -217,13 +236,16 @@ class Dashboard extends Component {
                           Responsable
                         </div>
                       </div>
+                      <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
+                        <i className='fa fa-trash-o' />
+                      </div>
                     </li>
 
                     <li className='dashboard__memberlist__list__item'>
                       <div className='dashboard__memberlist__list__item__avatar'>
                         <img src={imgProfil} alt='avatar' />
                       </div>
-                      <div className='dashboard__memberlist__list__item__info'>
+                      <div className='dashboard__memberlist__list__item__info mr-auto'>
                         <div className='dashboard__memberlist__list__item__info__name'>
                           Aldwin Vinel
                         </div>
@@ -231,13 +253,16 @@ class Dashboard extends Component {
                           lecteur
                         </div>
                       </div>
+                      <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
+                        <i className='fa fa-trash-o' />
+                      </div>
                     </li>
 
                     <li className='dashboard__memberlist__list__item'>
                       <div className='dashboard__memberlist__list__item__avatar'>
                         <img src={imgProfil} alt='avatar' />
                       </div>
-                      <div className='dashboard__memberlist__list__item__info'>
+                      <div className='dashboard__memberlist__list__item__info mr-auto'>
                         <div className='dashboard__memberlist__list__item__info__name'>
                           William Himme
                         </div>
@@ -245,19 +270,8 @@ class Dashboard extends Component {
                           contributeur
                         </div>
                       </div>
-                    </li>
-
-                    <li className='dashboard__memberlist__list__item'>
-                      <div className='dashboard__memberlist__list__item__avatar'>
-                        <img src={imgProfil} alt='avatar' />
-                      </div>
-                      <div className='dashboard__memberlist__list__item__info'>
-                        <div className='dashboard__memberlist__list__item__info__name'>
-                          Yacine Lite
-                        </div>
-                        <div className='dashboard__memberlist__list__item__info__role'>
-                          Gestionnaire de contenu
-                        </div>
+                      <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
+                        <i className='fa fa-trash-o' />
                       </div>
                     </li>
 
@@ -265,13 +279,16 @@ class Dashboard extends Component {
                       <div className='dashboard__memberlist__list__item__avatar'>
                         <img src={imgProfil} alt='avatar' />
                       </div>
-                      <div className='dashboard__memberlist__list__item__info'>
+                      <div className='dashboard__memberlist__list__item__info mr-auto'>
                         <div className='dashboard__memberlist__list__item__info__name'>
                           Yacine Lite
                         </div>
                         <div className='dashboard__memberlist__list__item__info__role'>
                           Gestionnaire de contenu
                         </div>
+                      </div>
+                      <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
+                        <i className='fa fa-trash-o' />
                       </div>
                     </li>
 
@@ -279,13 +296,33 @@ class Dashboard extends Component {
                       <div className='dashboard__memberlist__list__item__avatar'>
                         <img src={imgProfil} alt='avatar' />
                       </div>
-                      <div className='dashboard__memberlist__list__item__info'>
+                      <div className='dashboard__memberlist__list__item__info mr-auto'>
                         <div className='dashboard__memberlist__list__item__info__name'>
                           Yacine Lite
                         </div>
                         <div className='dashboard__memberlist__list__item__info__role'>
                           Gestionnaire de contenu
                         </div>
+                      </div>
+                      <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
+                        <i className='fa fa-trash-o' />
+                      </div>
+                    </li>
+
+                    <li className='dashboard__memberlist__list__item'>
+                      <div className='dashboard__memberlist__list__item__avatar'>
+                        <img src={imgProfil} alt='avatar' />
+                      </div>
+                      <div className='dashboard__memberlist__list__item__info mr-auto'>
+                        <div className='dashboard__memberlist__list__item__info__name'>
+                          Yacine Lite
+                        </div>
+                        <div className='dashboard__memberlist__list__item__info__role'>
+                          Gestionnaire de contenu
+                        </div>
+                      </div>
+                      <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
+                        <i className='fa fa-trash-o' />
                       </div>
                     </li>
 
@@ -304,11 +341,14 @@ class Dashboard extends Component {
                   </div>
 
                   <form className='dashboard__memberlist__addmember'>
-                    <label className='dashboard__memberlist__addmember__label' for='addmember'>Indiquer le nom de l'utilisateur</label>
+                    <div className='dashboard__memberlist__addmember__close d-flex justify-content-end'>
+                      <i className='fa fa-times' />
+                    </div>
+                    <label className='dashboard__memberlist__addmember__label' htmlFor='addmember'>Indiquer le nom de l'utilisateur</label>
                     <input type='text' id='addmember' className='dashboard__memberlist__addmember__name form-control' placeholder='Name' />
                     <div className='dashboard__memberlist__addmember__role'>
                       <div className='dashboard__memberlist__addmember__role__dropdown dropdown'>
-                        <button className='dashboard__memberlist__addmember__role__dropdown__button btn btn-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                        <button className='dashboard__memberlist__addmember__role__dropdown__button btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                           Rôle du membre
                         </button>
                         <div className='dashboard__memberlist__addmember__role__dropdown__submenu dropdown-menu'>
@@ -339,35 +379,60 @@ class Dashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <input type='submit' className='dashboard__memberlist__addmember__submitbtn' />
+                    <div className='dashboard__memberlist__addmember__submitbtn'>
+                      <button type='submit' className='btn btn-outline-primary'>Valider</button>
+                    </div>
                   </form>
 
                 </div>
               </div>
             </div>
 
-            <div className='dashboard__webdav genericWebdav'>
+            <div className='dashboard__moreinfo'>
+              <div className='dashboard__moreinfo__webdav genericBtnInfoDashboard mr-5'>
 
-              <div className='dashboard__webdav__btn genericWebdav__btn'>
-                <div className='dashboard__webdav__btn__icon genericWebdav__btn__icon'>
-                  <i className='fa fa-windows' />
+                <div className='dashboard__moreinfo__webdav__btn genericBtnInfoDashboard__btn'>
+                  <div className='dashboard__moreinfo__webdav__btn__icon genericBtnInfoDashboard__btn__icon'>
+                    <i className='fa fa-windows' />
+                  </div>
+
+                  <div className='dashboard__moreinfo__webdav__btn__text genericBtnInfoDashboard__btn__text'>
+                    Implémenter Tracim dans votre explorateur
+                  </div>
                 </div>
 
-                <div className='dashboard__webdav__btn__text genericWebdav__btn__text'>
-                  Implémenter Tracim dans votre explorateur
+                <div className='dashboard__moreinfo__webdav__information genericBtnInfoDashboard__info'>
+                  <div className='dashboard__moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
+                    Lorem ipsum dolore dolore laborum exercitation et deserunt ad ullamco nostrud dolore magna in proident elit amet do eu ut officia anim magna dolore adipisicing aliqua qui reprehenderit laborum labore tempor consectetur ut pariatur deserunt nostrud.
+                  </div>
+
+                  <div className='dashboard__moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
+                    http://algoo.trac.im/webdav/
+                  </div>
                 </div>
               </div>
+              <div className='dashboard__moreinfo__calendar genericBtnInfoDashboard'>
 
-              <div className='dashboard__webdav__information genericWebdav__info'>
-                <div className='dashboard__webdav__information__text genericWebdav__info__text'>
-                  Lorem ipsum dolore dolore laborum exercitation et deserunt ad ullamco nostrud dolore magna in proident elit amet do eu ut officia anim magna dolore adipisicing aliqua qui reprehenderit laborum labore tempor consectetur ut pariatur deserunt nostrud.
+                <div className='dashboard__moreinfo__calendar__btn genericBtnInfoDashboard__btn'>
+                  <div className='dashboard__moreinfo__calendar__btn__icon genericBtnInfoDashboard__btn__icon'>
+                    <i className='fa fa-calendar' />
+                  </div>
+
+                  <div className='dashboard__moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text'>
+                    Calendrier de l'espace de travail
+                  </div>
                 </div>
 
-                <div className='dashboard__webdav__information__link genericWebdav__info__link'>
-                  http://algoo.trac.im/webdav/
+                <div className='dashboard__moreinfo__calendar__information genericBtnInfoDashboard__info'>
+                  <div className='dashboard__moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
+                    Lorem ipsum dolore dolore laborum exercitation et deserunt ad ullamco nostrud dolore magna in proident elit amet do eu ut officia anim magna dolore adipisicing aliqua qui reprehenderit laborum labore tempor consectetur ut pariatur deserunt nostrud.
+                  </div>
+
+                  <div className='dashboard__moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>
+                    http://algoo.trac.im/calendar/
+                  </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>

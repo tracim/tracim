@@ -17,8 +17,16 @@ bgandcolor()
 
 .dashboard
   margin-left 20px
-  &__title
-    margin 0
+  &__header
+    flexwrap()
+    align-items center
+    justify-content space-between
+    &__title
+      width auto
+      &__text
+        margin 0
+    &__advancedmode
+      cursor pointer
   &__wkswrapper
     flexwrap()
   &__workspace
@@ -60,14 +68,14 @@ bgandcolor()
             padding 10px
   &__calltoaction
     flexwrap()
-    margin 50px 0
+    margin 100px 0
     &__button
       &:active
         box-shadow inset 0px 0px 5px 2px #656565
       &__text
         &__icon
           font-size 30px
-          .fa-comments-o, .fa-paperclip, .fa-calendar, .fa-file-text-o, .fa-folder-open-o
+          .fa-comments-o, .fa-paperclip, .fa-calendar, .fa-file-text-o, .fa-folder-open-o, .fa-video-camera
               color white
         &__title
           font-size 18px
@@ -78,12 +86,15 @@ bgandcolor()
       background-color writefile
     .importfile
       background-color importfile
+    .visioconf
+      background-color grey-hover
     .calendar
       background-color calendar
     .explore
       background-color explore
   &__wksinfo
     flexwrap()
+    margin-top 150px
   &__activity
     margin 0 35px 50px 0
     width 60%
@@ -108,6 +119,10 @@ bgandcolor()
       cursor pointer
       &:hover
         background-color folder-hover
+      &:nth-child(even)
+        background-color grey-hover
+        &:hover
+          background-color folder-hover
       &__icon
         margin 0 25px
         font-size 25px
@@ -142,8 +157,14 @@ bgandcolor()
         display flex
         border-bottom 1px solid grey
         padding 10px 15px
+        &:hover
+          background-color folder-hover
         &:nth-last-child(1)
           border-bottom 0
+        &:nth-child(even)
+          background-color grey-hover
+          &:hover
+            background-color folder-hover
         &__avatar
           margin-right 20px
           width 50px
@@ -153,6 +174,10 @@ bgandcolor()
             font-size 20px
           &__role
             font-size 18px
+        &__delete
+          font-size 20px
+          color blue
+          cursor pointer
     &__btnadd
       border-top 1px solid grey
       padding 15px
@@ -180,29 +205,37 @@ bgandcolor()
       position absolute
       top 0
       display none
+      padding 15px
       flex-direction column
-      justify-content center
-      align-items center
       height 100%
       width 100%
       background-color off-white
+      &__close
+        font-size 20px
+        cursor pointer
+      &__label
+        margin-top 80px
       &__name
         margin-bottom 20px
         border 1px solid grey
         border-radius 10px
         padding 10px 25px
-        width auto
+        width 300px
       &__role
         margin-bottom 90px
         &__dropdown
           &__button
+            display flex
+            justify-content flex-start
             border 1px solid blue
             border-radius 10px
             padding 10px 25px
+            width 300px
             &::after
-              margin 10px 0 0 20px
+              margin 10px 0 0 120px
           &__submenu
             padding 0
+            width 300px
             &__item
               display flex
               padding 10px
@@ -211,20 +244,28 @@ bgandcolor()
               &__icon
                 margin-right 15px
       &__submitbtn
-        border 1px solid blue
-        border-radius 5px
-        padding 5px 35px
-        bgandcolor()
-        cursor pointer
-        &:hover, &:focus
-          hoverfocus()
-  &__webdav
-    margin-bottom 100px
-    &__btn
-      width 300px
-    &__information
-      display none
-      width 600px
+        display flex
+        justify-content flex-end
+        & > button
+          padding 8px 30px
+          cursor pointer
+  &__moreinfo
+    display flex
+    flexwrap wrap
+    &__webdav
+      margin-bottom 40px
+      &__btn
+        width 300px
+      &__information
+        display none
+        width 600px
+    &__calendar
+      margin-bottom 100px
+      &__btn
+        width 300px
+      &__information
+        display none
+        width 600px
 
 /****** CLASS ACTIVE *******/
 
@@ -246,7 +287,13 @@ bgandcolor()
 /*** active webdav ***/
 
 .activewebdav
-  .dashboard__webdav__information
+  .dashboard__moreinfo__webdav__information
+    display block
+
+/*** active calendar ***/
+
+.activecalendar
+  .dashboard__moreinfo__calendar__information
     display block
 
 /**** MEDIAQUERIES *****/
@@ -294,7 +341,7 @@ bgandcolor()
     &__memberlist
       margin 50px 0
       width 90%
-    &__webdav__information
+    &__moreinfo__webdav__information
       width 500px
 
 /**** MEDIA 575px ****/
@@ -340,7 +387,8 @@ bgandcolor()
           border-bottom 1px solid grey
       &__btnadd
         border-top 0
-    &__webdav
-      margin-left 10px
-      &__information
-        width 350px
+    &__moreinfo
+      &__webdav
+        margin-left 10px
+        &__information
+          width 350px
