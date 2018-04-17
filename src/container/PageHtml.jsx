@@ -97,6 +97,8 @@ class pageHtml extends React.Component {
       content: fetchResultPageHtml.json,
       timeline: fetchResultTimeline.json
     })
+
+    wysiwyg()
   }
 
   handleClickBtnCloseApp = () => {
