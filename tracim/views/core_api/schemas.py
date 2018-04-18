@@ -3,12 +3,12 @@ import marshmallow
 
 
 class ProfileSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int(dump_only=True, required=True)
+    id = marshmallow.fields.Int(dump_only=True)
     name = marshmallow.fields.String()
 
 
 class UserSchema(marshmallow.Schema):
-    user_id = marshmallow.fields.Int(dump_only=True, required=True)
+    user_id = marshmallow.fields.Int(dump_only=True)
     email = marshmallow.fields.Email(required=True)
     display_name = marshmallow.fields.String()
     created = marshmallow.fields.DateTime(format='iso8601')
