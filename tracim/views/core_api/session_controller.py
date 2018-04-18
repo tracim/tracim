@@ -1,4 +1,5 @@
 # coding=utf-8
+import os
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim import TracimRequest
@@ -7,6 +8,7 @@ from tracim.lib.core.user import UserApi
 from tracim.views.controllers import Controller
 from pyramid.config import Configurator
 
+from tracim.views import BASE_API_V2
 from tracim.views.core_api.schemas import UserSchema, OkResponse
 from tracim.views.core_api.schemas import LoginOutputHeaders
 from tracim.views.core_api.schemas import BasicAuthSchema
@@ -80,7 +82,7 @@ class SessionController(Controller):
         # Login
         configurator.add_route(
             'login',
-            '/sessions/login',
+            os.path.join(BASE_API_V2, 'sessions', 'login'),
             request_method='GET'
         )
         configurator.add_view(
@@ -91,7 +93,7 @@ class SessionController(Controller):
         # Logout
         configurator.add_route(
             'logout',
-            '/sessions/logout',
+            os.path.join(BASE_API_V2, 'sessions', 'logout'),
             request_method='GET'
         )
 
@@ -99,12 +101,11 @@ class SessionController(Controller):
             self.logout,
             route_name='logout',
             renderer='json'
-
         )
         # Whoami
         configurator.add_route(
             'whoami',
-            '/sessions/whoami',
+            os.path.join(BASE_API_V2, 'sessions', 'whoami'),
             request_method='GET'
         )
         configurator.add_view(
