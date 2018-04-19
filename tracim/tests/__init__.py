@@ -16,6 +16,7 @@ from tracim.lib.utils.logger import logger
 from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.config import CFG
+from tracim.extensions import hapic
 from tracim import main
 from webtest import TestApp
 
@@ -36,8 +37,7 @@ class FunctionalTest(unittest.TestCase):
             'preview_cache_dir': '/tmp/test/preview_cache',
 
         }
-        from tracim.extensions import hapic
-        hapic._context = None
+        hapic.reset_context()
         app = main({}, **settings)
         self.init_database(settings)
         self.testapp = TestApp(app)
