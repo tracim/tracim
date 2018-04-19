@@ -34,8 +34,8 @@
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
     "customClass": "wsContentPageHtml",
-    "icon": "fa fa-fw fa-file-word-o",
-    "color": "#65c7f2",
+    "icon": "fa fa-fw fa-file-text-o",
+    "color": "#3f52e3",
     "domContainer": "appContainer"
   }, {
     "name": "PageMarkdown",
@@ -58,7 +58,7 @@
     "componentLeft": "File",
     "componentRight": "undefined",
     "customClass": "wsContentFile",
-    "icon": "fa fa-fw fa-file-text-o",
+    "icon": "fa fa-fw fa-file-image-o",
     "color": "#263462",
     "domContainer": "appContainer"
   }, {
@@ -284,7 +284,7 @@
         "username": "Peter",
         "avatar": "https://avatars3.githubusercontent.com/u/1104637?s=460&v=4"
       },
-      "text": "Tu aurais envie de manger quoi exactement ?",
+      "text": "Bonjour, Dans le cadre d'une procédure de renouvellement de DSP, où deux sociétés se sont portées candidats et ont remis une offre, la société qui n'a pas retenue souhaite que le rapport d'analyse des offres lui soit communiqué. Ce document peut il être communiqué, en tout ou partie, dans le respect des préconisations de la CADA (loi 07-07-1978) ?Merci pour votre retour d'expérience.",
       "createdAt": {
         "day": "05/03/18",
         "hour": "10h00"
@@ -300,7 +300,7 @@
         "day": "05/03/18",
         "hour": "09h59"
       },
-      "text": "Ben je sais pas, par exemple une quiche lorraine."
+      "text": "Le doc est communicable mais doit être en partie occulté. Je te met en pièce jointe un doc la dessus. Tu peux aussi voir le Conseil n° 20003802 et Avis n° 20011051 de la CADA"
     }, {
       "id": 2,
       "author": {
@@ -308,7 +308,7 @@
         "username": "Peter",
         "avatar": "https://avatars3.githubusercontent.com/u/1104637?s=460&v=4"
       },
-      "text": "Une ouiche.",
+      "text": "Oups, je ne trouve plus comment faire. :-O  tant pis je te colle le texte ci après  Une fois la délégation de service public  ou le marché signé, les documents composant la procédure de passation perdent leur caractère préparatoire  au sens des dispositions de l’article 2 de la loi du 17 juillet 1978, et deviennent, en principe, communicables à toute personne qui en fait la demande, y compris à un candidat évincé [Voir FAQ n° 2 et 7].  Toutefois, en vertu du II de l’article 6 de la même loi, ce droit d’accès doit s’exercer dans le respect du secret en matière industrielle et commerciale lequel recouvre le secret des procédés, le secret des informations économiques et financières, et le secret des stratégies commerciales  [Voir FAQ n° 4]. À ce titre, sont notamment exclus de la communication les éléments suivants, qui devront être occultés :  - les mentions relatives aux moyens techniques et humains ;  - les mentions concernant le chiffre d’affaires, les coordonnées bancaires ;  - les références autres que celles qui correspondent à des marchés publics.  La communication de certaines informations comporte un risque d’atteinte à la libre concurrence (dans le rapport d’analyse des offres ou le détail des prix par exemple). Les autorités administratives doivent donc, pour apprécier les informations qui sont protégées par le secret en matière industrielle et commerciale, tenir compte du mode de passation, de la durée, ou de l’objet du marché [Voir FAQ n° 5].  Le tableau ci-après fait apparaître les pièces qui ne posent aucune difficulté de communication, et celles qui nécessitent une analyse du risque d’atteinte à la concurrence. La CADA a dégagé, au fur à mesure des affaires qui lui étaient soumises, trois catégories de marchés : ponctuel, répétitif et fréquent [pour leur définition voir FAQ n° 6].  Le détail de l’offre de prix de l’entreprise attributaire est communicable dans le cas d'un marché ponctuel , car il reflète le coût du service public, et ne l’est pas pour un marché répétitif, car il serait susceptible de porter atteinte à la concurrence lors du renouvellement du marché  .",
       "createdAt": {
         "day": "05/03/18",
         "hour": "09h59"
@@ -316,47 +316,23 @@
     }, {
       "id": 3,
       "author": {
-        "id": 3,
-        "username": "Steven",
-        "avatar": "https://avatars3.githubusercontent.com/u/705214?s=460&v=4"
-      },
-      "createdAt": {
-        "day": "05/03/18",
-        "hour": "09h59"
-      },
-      "text": "Quoi ?"
-    }, {
-      "id": 4,
-      "author": {
         "id": 5,
         "username": "Peter",
         "avatar": "https://avatars3.githubusercontent.com/u/1104637?s=460&v=4"
       },
-      "text": "On dit « une ouiche lorraine ».",
+      "text": "il y a aussi des informations générales et un tableau récapitulatif intéressant au lien suivant :  http://www.cada.fr/marches-publics%2c6085.html  bon WE.",
       "createdAt": {
         "day": "05/03/18",
         "hour": "09h59"
       }
     }, {
-      "id": 5,
+      "id": 4,
       "author": {
         "id": 3,
         "username": "Steven",
         "avatar": "https://avatars3.githubusercontent.com/u/705214?s=460&v=4"
       },
-      "createdAt": {
-        "day": "05/03/18",
-        "hour": "09h58"
-      },
-      "text": "Tu es sûr ?"
-    }, {
-      "id": 6,
-      "author": {
-        "id": 3,
-        "username": "Steven",
-        "avatar": "https://avatars3.githubusercontent.com/u/705214?s=460&v=4"
-      },
-      "text": "Ça fait bizarre, « ouiche lorraine ».",
+      "text": "Je croyais que le rapport d'analyse des offres n'étant pas une pièce officielle de la procédure de DSP, n'avait pas à être communiqué. En revanche, l'avis de la COP qui est une pièce officielle de la procédure doit être communiqué à la demande d'un candidat en occultant certains éléments énoncés ci-dessous. J'ai tout faux ?!",
       "createdAt": {
         "day": "05/03/18",
         "hour": "09h59"
