@@ -17,10 +17,12 @@ class UserSchema(marshmallow.Schema):
     timezone = marshmallow.fields.String()
     # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
     caldav_url = marshmallow.fields.Url(
+        allow_none=True,
+        default=None,
         relative=True,
         attribute='calendar_url'
     )
-    avatar_url = marshmallow.fields.Url()
+    avatar_url = marshmallow.fields.Url(allow_none=True, default=None)
     profile = marshmallow.fields.Nested(
         ProfileSchema,
         many=False,
