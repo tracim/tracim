@@ -50,17 +50,4 @@ def main(global_config, **settings):
     default_controllers.bind(configurator)
     session_api = SessionController()
     session_api.bind(configurator)
-    # TODO - G.M - 09-04-2018 - Enable swagger ui doc
-    # time.sleep(1)
-    # s = json.dumps(
-    #     hapic.generate_doc(
-    #         title='Tracim v2 API',
-    #         description='API of Tracim v2',
-    #
-    #     )
-    # )
-    # time.sleep(1)
-    # # print swagger doc
-    # print(s)
-    # time.sleep(1)
     return configurator.make_wsgi_app()
