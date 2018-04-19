@@ -15,6 +15,21 @@ bgandcolor()
   background-color transparent
   color blue
 
+label()
+  font-weight 500
+  font-size 18px
+  color blue
+
+coloricon()
+  .fa-gavel
+    color responsable
+  .fa-graduation-cap
+    color gestionnaire
+  .fa-pencil
+    color contributeur
+  .fa-eye
+    color lecteur
+
 .dashboard
   margin-left 20px
   &__header
@@ -59,7 +74,6 @@ bgandcolor()
         btnNotification()
         cursor pointer
       &__subscribe
-        display none
         &__btn
           btnNotification()
         &__submenu
@@ -201,10 +215,7 @@ bgandcolor()
           font-size 18px
           color blue
           cursor pointer
-    &__addmember
-      position absolute
-      top 0
-      display none
+    &__form
       padding 15px
       flex-direction column
       height 100%
@@ -213,36 +224,41 @@ bgandcolor()
       &__close
         font-size 20px
         cursor pointer
-      &__label
-        margin-top 80px
-      &__name
-        margin-bottom 20px
-        border 1px solid grey
-        border-radius 10px
-        padding 10px 25px
-        width 300px
-      &__role
-        margin-bottom 90px
-        &__dropdown
-          &__button
-            display flex
-            justify-content flex-start
-            border 1px solid blue
+      &__member
+        &__name
+          .name__label
+            margin 30px 0 20px 0
+            label()
+          .name__input
+            margin-bottom 20px
+            border 1px solid grey
             border-radius 10px
-            padding 10px 25px
+            padding 10px
             width 300px
-            &::after
-              margin 10px 0 0 120px
-          &__submenu
-            padding 0
-            width 300px
-            &__item
-              display flex
-              padding 10px
-              &:hover,&:focus
-                hoverfocus()
-              &__icon
-                margin-right 15px
+        &__create
+          display flex
+          align-items center
+          margin 15px 0
+      &__role
+        margin-bottom 15px
+        coloricon()
+        &__text
+          margin 15px 0
+          label()
+        &__list
+          display flex
+          align-items center
+          flex-wrap wrap
+          margin 0
+          padding 0
+          list-style none
+          &__item
+            display flex
+            align-items center
+            margin 10px 25px 10px 0
+            .item
+              &__text
+                display flex
       &__submitbtn
         display flex
         justify-content flex-end
@@ -251,50 +267,22 @@ bgandcolor()
           cursor pointer
   &__moreinfo
     display flex
+    justify-content space-between
     flexwrap wrap
     &__webdav
       margin-bottom 40px
       &__btn
         width 300px
       &__information
-        display none
-        width 600px
+        width 550px
     &__calendar
       margin-bottom 100px
+      &__wrapperBtn
+        margin-right 300px
       &__btn
         width 300px
       &__information
-        display none
-        width 600px
-
-/****** CLASS ACTIVE *******/
-
-/*** active dropdown subscribe ***/
-
-.activebtnsubs
-  .dashboard__userstatut__notification
-    &__btn
-      display none
-    &__subscribe
-      display flex
-
-/*** active form on list member ***/
-
-.activeform
-  .dashboard__memberlist__addmember
-    display flex
-
-/*** active webdav ***/
-
-.activewebdav
-  .dashboard__moreinfo__webdav__information
-    display block
-
-/*** active calendar ***/
-
-.activecalendar
-  .dashboard__moreinfo__calendar__information
-    display block
+        width 550px
 
 /**** MEDIAQUERIES *****/
 
