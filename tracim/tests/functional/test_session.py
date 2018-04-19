@@ -66,7 +66,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['is_active']
         assert res.json_body['profile']
         assert isinstance(res.json_body['profile']['id'], int)
-        assert res.json_body['profile']['name'] == 'administrators'
+        assert res.json_body['profile']['slug'] == 'administrators'
 
     def test_unauthenticated(self):
         self.testapp.authorization = (
