@@ -1,12 +1,13 @@
 # coding=utf-8
+import pytest
+
 from tracim.tests import FunctionalTest
 
 
 class TestLogoutEndpoint(FunctionalTest):
 
     def test_logout(self):
-        res = self.testapp.get('/api/v2/sessions/logout', status=200)
-        assert res.json_body == {'message': 'ok'}
+        res = self.testapp.get('/api/v2/sessions/logout', status=204)
 
 
 class TestLoginEndpoint(FunctionalTest):
@@ -18,10 +19,9 @@ class TestLoginEndpoint(FunctionalTest):
         }
         res = self.testapp.get(
             '/api/v2/sessions/login',
-            status=200,
+            status=204,
             params=params
         )
-        assert res.json_body == {'message': 'ok'}
 
     def test_bad_password(self):
         params = {
@@ -51,7 +51,7 @@ class TestLoginEndpoint(FunctionalTest):
 
 class TestWhoamiEndpoint(FunctionalTest):
 
-    def test_login_ok(self):
+    def test_whoami_ok(self):
         self.testapp.authorization = (
             'Basic',
             (

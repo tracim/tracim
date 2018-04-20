@@ -38,5 +38,5 @@ class LoginOutputHeaders(marshmallow.Schema):
     expire_after = marshmallow.fields.String()
 
 
-class OkResponse(marshmallow.Schema):
-    message = marshmallow.fields.String(required=True)
+class NoContentSchema(marshmallow.Schema):
+    pass

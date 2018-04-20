@@ -1,5 +1,9 @@
 # coding=utf-8
 import os
+from http.client import HTTPException
+
+from pyramid.httpexceptions import HTTPNoContent
+from pyramid.response import Response
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim import TracimRequest
@@ -9,7 +13,7 @@ from tracim.views.controllers import Controller
 from pyramid.config import Configurator
 
 from tracim.views import BASE_API_V2
-from tracim.views.core_api.schemas import UserSchema, OkResponse
+from tracim.views.core_api.schemas import UserSchema, NoContentSchema
 from tracim.views.core_api.schemas import LoginOutputHeaders
 from tracim.views.core_api.schemas import BasicAuthSchema
 from tracim.exceptions import NotAuthentificated, LoginFailed
@@ -28,7 +32,10 @@ class SessionController(Controller):
     @hapic.handle_exception(LoginFailed, http_code=HTTPStatus.BAD_REQUEST)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
-    @hapic.output_body(OkResponse())
+    @hapic.output_body(
+        NoContentSchema(),
+        default_http_code=HTTPStatus.NO_CONTENT
+    )
     def login(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs user into the system
@@ -52,15 +59,19 @@ class SessionController(Controller):
         except NoResultFound:
             # User does not exist
             raise LoginFailed('Bad Credentials')
-        return {'message': 'ok'}
+        return
 
     @hapic.with_api_doc()
-    @hapic.output_body(OkResponse())
+    @hapic.output_body(
+        NoContentSchema(),
+        default_http_code=HTTPStatus.NO_CONTENT
+    )
     def logout(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs out current logged in user session
         """
-        return {'message': 'ok'}
+
+        return
 
     @hapic.with_api_doc()
     @hapic.handle_exception(
@@ -69,7 +80,6 @@ class SessionController(Controller):
     )
     @hapic.output_body(
         UserSchema(),
-        default_http_code=HTTPStatus.OK,
     )
     def whoami(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -88,7 +98,6 @@ class SessionController(Controller):
         configurator.add_view(
             self.login,
             route_name='login',
-            renderer='json'
         )
         # Logout
         configurator.add_route(
@@ -100,7 +109,6 @@ class SessionController(Controller):
         configurator.add_view(
             self.logout,
             route_name='logout',
-            renderer='json'
         )
         # Whoami
         configurator.add_route(
@@ -111,5 +119,4 @@ class SessionController(Controller):
         configurator.add_view(
             self.whoami,
             route_name='whoami',
-            renderer='json'
         )
