@@ -18,11 +18,10 @@ class UserSchema(marshmallow.Schema):
     # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
     caldav_url = marshmallow.fields.Url(
         allow_none=True,
-        default=None,
         relative=True,
         attribute='calendar_url'
     )
-    avatar_url = marshmallow.fields.Url(allow_none=True, default=None)
+    avatar_url = marshmallow.fields.Url(allow_none=True)
     profile = marshmallow.fields.Nested(
         ProfileSchema,
         many=False,

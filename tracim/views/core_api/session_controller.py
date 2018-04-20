@@ -9,6 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim import TracimRequest
 from tracim.extensions import hapic
 from tracim.lib.core.user import UserApi
+from tracim.models.context_models import UserInContext
 from tracim.views.controllers import Controller
 from pyramid.config import Configurator
 
@@ -85,7 +86,12 @@ class SessionController(Controller):
         """
         Return current logged in user or 401
         """
-        return request.current_user
+        app_config = request.registry.settings['CFG']
+        return UserInContext(
+            user=request.current_user,
+            dbsession=request.dbsession,
+            config=app_config,
+        )
 
     def bind(self, configurator: Configurator):
 
