@@ -2,29 +2,54 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
-const PopinFixedHeader = props => {
-  return (
-    <div className={classnames('wsContentGeneric__header', `${props.customClass}__header`)}>
-      <div className={classnames('wsContentGeneric__header__icon', `${props.customClass}__header__icon`)}>
-        <i className={props.icon} />
-      </div>
+class PopinFixedHeader extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      editTitle: false
+    }
+  }
 
-      <div className={classnames('wsContentGeneric__header__title mr-auto', `${props.customClass}__header__title`)}>
-        {props.name}
-      </div>
+  handleClickChangeTitleBtn = () => this.setState(prevState => ({
+    editTitle: !prevState.editTitle
+  }))
 
-      <div className={classnames('wsContentGeneric__header__edittitle', `${props.customClass}__header__changetitle`)}>
-        <i className='fa fa-pencil' />
-      </div>
+  render () {
+    const { customClass, icon, name, onChangeTitle, onClickCloseBtn } = this.props
 
-      <div
-        className={classnames('wsContentGeneric__header__close', `${props.customClass}__header__close`)}
-        onClick={props.onClickCloseBtn}
-      >
-        <i className='fa fa-times' />
+    return (
+      <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
+        <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
+          <i className={icon} />
+        </div>
+
+        <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>
+          {this.state.editTitle === false &&
+            <div>
+              {name}
+            </div>
+          }
+          {this.state.editTitle === true &&
+            <input onChange={onChangeTitle} />
+          }
+        </div>
+
+        <div
+          className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle`)}
+          onClick={this.handleClickChangeTitleBtn}
+        >
+          <i className='fa fa-pencil' />
+        </div>
+
+        <div
+          className={classnames('wsContentGeneric__header__close', `${customClass}__header__close`)}
+          onClick={onClickCloseBtn}
+        >
+          <i className='fa fa-times' />
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 export default PopinFixedHeader
@@ -33,10 +58,12 @@ PopinFixedHeader.propTypes = {
   icon: PropTypes.string.isRequired,
   onClickCloseBtn: PropTypes.func.isRequired,
   customClass: PropTypes.string,
-  name: PropTypes.string
+  name: PropTypes.string,
+  onChangeTitle: PropTypes.func
 }
 
 PopinFixedHeader.defaultProps = {
   customClass: '',
-  name: ''
+  name: '',
+  onChangeTitle: () => {}
 }
