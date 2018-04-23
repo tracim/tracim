@@ -6,13 +6,39 @@ const FileItem = props => {
   const iconStatus = (() => {
     switch (props.status) {
       case 'current':
-        return 'fa fa-cogs current-color'
+        return 'fa fa-cogs'
       case 'validated':
-        return 'fa fa-check validated-color'
+        return 'fa fa-check'
       case 'canceled':
-        return 'fa fa-ban canceled-color'
+        return 'fa fa-times'
       case 'outdated':
-        return '' // @TODO
+        return 'fa fa-ban'
+    }
+  })()
+
+  const textStatus = (() => {
+    switch (props.status) {
+      case 'current':
+        return 'En cours'
+      case 'validated':
+        return 'Validé'
+      case 'canceled':
+        return 'Annulé'
+      case 'outdated':
+        return 'Obsolète'
+    }
+  })()
+
+  const colorStatus = (() => {
+    switch (props.status) {
+      case 'current':
+        return ' currentColor'
+      case 'validated':
+        return ' validateColor'
+      case 'canceled':
+        return ' cancelColor'
+      case 'outdated':
+        return ' outdateColor'
     }
   })()
 
@@ -44,8 +70,13 @@ const FileItem = props => {
       </div>
 
       <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
-        <div className='file__status'>
-          <i className={iconStatus} />
+        <div className={classnames('file__status') + colorStatus}>
+          <div className='file__status__text d-none d-lg-block text-center'>
+            {textStatus}
+          </div>
+          <div className='file__status__icon d-block d-lg-none text-center'>
+            <i className={iconStatus} />
+          </div>
         </div>
       </div>
     </div>

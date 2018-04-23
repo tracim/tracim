@@ -3,6 +3,18 @@ iconrules()
   margin-right 10px
   font-size 20px
 
+.currentColor
+  color currentColor
+
+.validateColor
+  color validateColor
+
+.cancelColor
+  color cancelColor
+
+.outdateColor
+  color outdateColor
+
 .file
   display flex
   padding 10px 0
@@ -34,8 +46,11 @@ iconrules()
         &:hover, &:focus
           color blue
   &__status
-    font-size 30px
-    text-align center
+    &__text
+      font-size 20px
+    &__icon
+      font-size 30px
+
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .file
