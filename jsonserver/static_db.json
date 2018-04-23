@@ -100,7 +100,7 @@
   }],
   "workspace_detail": {
     "id": 1,
-    "title": "Mission interne - développement",
+    "title": "Liste des contenus",
     "owner_id": 5,
     "content": [
       {
@@ -125,7 +125,7 @@
         "workspace_id": 1,
         "title": "Une photo",
         "type": "File",
-        "status": "current"
+        "status": "outdated"
       },
       {
         "id": 10,
@@ -133,7 +133,7 @@
         "workspace_id": 1,
         "title": "README.md de tracim_lib",
         "type": "PageMarkdown",
-        "status": "current"
+        "status": "validated"
       },
       {
         "id": 7,
@@ -141,7 +141,7 @@
         "workspace_id": 1,
         "title": "Etape d'installation de Tracim",
         "type": "Task",
-        "status": "current"
+        "status": "canceled"
       },
       {
         "id": 8,
@@ -264,11 +264,12 @@
     "type": "pageHtml",
     "title": "La programmation fonctionnelle",
     "status": "validated",
-    "version": "3",
-    "text": "<h1>Mon titre nul</h1>Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle",
+    "icon": "fa fa-fw fa-code-fork",
+    "version": "version n°5",
+    "text": "Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle",
     "workspace": {
       "id": 1,
-      "title": "Mission interne - développement",
+      "title": "Liste des contenus",
       "owner_id": 5
     }
   },

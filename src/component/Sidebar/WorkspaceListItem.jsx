@@ -42,7 +42,7 @@ const WorkspaceListItem = props => {
             <div className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'>
               <div className='dropdown__title'>
                 <div className='dropdown__title__text'>
-                  Tous les fichiers
+                  Tous les contenus
                 </div>
               </div>
             </div>
