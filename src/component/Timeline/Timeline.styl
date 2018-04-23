@@ -67,11 +67,6 @@
   &__texteditor
     flex 0 1 auto
     padding 2px
-    &__simpletext
-      display none
-      width 70%
-      &__icon
-        cursor pointer
     &__wysiwyg
       display block
       & > textarea
@@ -114,16 +109,34 @@
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
-  .timeline__messagelist__item
-    margin-right 35px
+  .timeline
+    &__messagelist__item
+      margin-right 35px
+    &__texteditor
+      display flex
+      align-items center
+      &__wysiwyg
+        width 70%
+        & > textarea
+          border-radius 5px
+          height 40px
+      &__submit
+        width 30%
+        margin-left 10px
 
 /**** MEDIA 575px ****/
 
 @media (max-width: max-xs)
 
-  .timeline__texteditor
-    &__simpletext
-      margin-left 0
-      width 65%
-    &__submit
-      margin-left 10px
+  .timeline
+    &__texteditor
+      display flex
+      align-items center
+      &__wysiwyg
+        width 70%
+        & > textarea
+          border-radius 5px
+          height 40px
+      &__submit
+        width 30%
+        margin-left 10px

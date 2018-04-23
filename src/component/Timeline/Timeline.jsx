@@ -71,19 +71,7 @@ const Timeline = props => {
       </ul>
 
       <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
-        <div
-          className={classnames(`${props.customClass}__texteditor__simpletext`, 'timeline__texteditor__simpletext input-group d-inline-flex d-sm-inline-flex d-md-inline-flex d-lg-none')}>
-          <input
-            type='text'
-            className={classnames(`${props.customClass}__texteditor__simpletext__input`, 'timeline__texteditor__simpletext__input form-control')}
-            placeholder='...'
-          />
-          <div
-            className={classnames(`${props.customClass}__texteditor__simpletext__icon`, 'timeline__texteditor__simpletext__icon input-group-addon')}>
-            <i className='fa fa-font' />
-          </div>
-        </div>
-        <div className={classnames(`${props.customClass}__texteditor__wysiwyg`, 'timeline__texteditor__wysiwyg d-none d-lg-block')}>
+        <div className={classnames(`${props.customClass}__texteditor__wysiwyg`, 'timeline__texteditor__wysiwyg')}>
           <textarea />
         </div>
         <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit d-inline-flex d-lg-flex justify-content-lg-center')}>
