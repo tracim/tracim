@@ -52,8 +52,13 @@
       &__submit
         &__btn
           display flex
+          border-color threadColor
           color off-white
-          background-color darkBlue
+          background-color threadColor
+          &:hover, &:focus
+            border-color darkenThread
+            background-color darkenThread
+            box-shadow shadow-all-side-thread
 
 .received
   text-align right
