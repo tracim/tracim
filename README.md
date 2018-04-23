@@ -90,6 +90,20 @@ Run pep8 checks:
 
     pep8 tracim
 
+Tracim API
+----------
+
+Tracim_backend give access to a REST API in */api/v2*.
+This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
+The specification is accessible when you run Tracim, go to */api/v2/doc* .
+
+For example, with default config:
+
+    # run tracim
+    pserve development.ini
+    # launch your favorite web-browser
+    firefox http://localhost:6543/api/v2/doc/
+
 CI
 ---
 

@@ -50,9 +50,9 @@ def main(global_config, **settings):
     default_controllers.bind(configurator)
     session_api = SessionController()
     session_api.bind(configurator)
-    # hapic.add_documentation_view(
-    #     '/api/v2/doc',
-    #     'Tracim v2 API',
-    #     'API of Tracim v2',
-    # )
+    hapic.add_documentation_view(
+        '/api/v2/doc',
+        'Tracim v2 API',
+        'API of Tracim v2',
+    )
     return configurator.make_wsgi_app()
