@@ -14,19 +14,6 @@
     &:hover
       color white
 
-/**** MENU HAMBURGER ON EXPAND BAR *****/
-
-.hamburger--spring .hamburger-inner
-  margin 4px 8px
-
-.hamburger--spring .hamburger-inner::before
-  top 7px
-
-.hamburger--spring .hamburger-inner::after
-  top 14px
-
- /***************************************/
-
 .sidebar
   min-height 100%
   background-color secondColor
@@ -34,6 +21,10 @@
 
 sidebar-width = 300px
 sidebar-animate-speed = 0.5s
+
+.sidebarSticky
+  position sticky
+  top 87px
 
 leftside()
   flex-grow 0
@@ -45,44 +36,22 @@ leftside()
   position relative
   transition all sidebar-animate-speed
   width sidebar-width
+  z-index 2
   &.sidebarclose
     width 0
-    .hamburger--spring
-      .hamburger-inner
-        transition-delay 0.22s
-        background-color transparent
-        &::before
-            top -3px
-            transition top 0.1s 0.15s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
-            transform translate3d(0, 10px, 0) rotate(45deg)
-        &::after
-            top -3px
-            transition top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
-            transform translate3d(0, 10px, 0) rotate(-45deg)
   &__expand
     position absolute
     top 0
-    right -49px
-    padding 4px
+    right -40px
+    padding 4px 10px
     border-left 1px solid off-white
     border-bottom-right-radius 15px
     cursor pointer
     background-color blue
     color white
     transition all sidebar-animate-speed
-    &__btnHamburger
-      padding 0
-      &:focus
-        outline none
-      &__box
-        &__icon, &__icon::before, &__icon::after
-          width 20px
-          height 2px
-          background-color off-white
-        &__icon::before
-          top 8px
-        &__icon::after
-          top 16px
+    & > i
+      padding 0 5px 8px 0
   &__btnnewworkspace
     margin 50px 0
     overflow hidden
@@ -105,6 +74,8 @@ leftside()
           height 100%
           background-color blue
           cursor pointer
+          &:hover
+            background-color darkenBlue
         &__number
           leftside()
           padding 12px
@@ -155,6 +126,9 @@ leftside()
 
 @media (min-width: min-sm) and (max-width: max-md)
 
+  .sidebarSticky
+    top 69px
+
   .sidebar
     position fixed
 
@@ -171,6 +145,9 @@ leftside()
 
   .sidebarpagecontainer
     padding-top 69px
+
+  .sidebarSticky
+    top 69px
 
   .sidebar
     position fixed

@@ -65,38 +65,35 @@ class Sidebar extends React.Component {
     return (
       <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
         <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
-          { /* <i className={classnames('fa fa-fw', {'fa-plus-square-o': sidebarClose, 'fa-minus-square-o': !sidebarClose})} /> */ }
-          <button className='hamburger hamburger--spring sidebar__expand__btnHamburger' type='button'>
-            <span className='hamburger-box sidebar__expand__btnHamburger__box'>
-              <span className='hamburger-inner sidebar__expand__btnHamburger__box__icon' />
-            </span>
-          </button>
+          <i className={classnames('fa fa-arrow-left', {'fa-arrow-right': sidebarClose, 'fa-arrow-left': !sidebarClose})} />
         </div>
 
-        <nav className='sidebar__navigation'>
-          <ul className='sidebar__navigation__workspace'>
-            { workspaceList.map((ws, i) =>
-              <WorkspaceListItem
-                number={++i}
-                wsId={ws.id}
-                name={ws.title}
-                app={app}
-                lang={activeLang}
-                activeFilterList={ws.id === workspaceIdInUrl ? workspace.filter : []}
-                isOpenInSidebar={ws.isOpenInSidebar}
-                onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
-                onClickAllContent={this.handleClickAllContent}
-                onClickContentFilter={this.handleClickContentFilter}
-                key={ws.id}
-              />
-            )}
-          </ul>
-        </nav>
+        <div className='sidebarSticky'>
+          <nav className='sidebar__navigation'>
+            <ul className='sidebar__navigation__workspace'>
+              { workspaceList.map((ws, i) =>
+                <WorkspaceListItem
+                  number={++i}
+                  wsId={ws.id}
+                  name={ws.title}
+                  app={app}
+                  lang={activeLang}
+                  activeFilterList={ws.id === workspaceIdInUrl ? workspace.filter : []}
+                  isOpenInSidebar={ws.isOpenInSidebar}
+                  onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
+                  onClickAllContent={this.handleClickAllContent}
+                  onClickContentFilter={this.handleClickContentFilter}
+                  key={ws.id}
+                />
+              )}
+            </ul>
+          </nav>
 
-        <div className='sidebar__btnnewworkspace'>
-          <button className='sidebar__btnnewworkspace__btn btn btn-success'>
-            {t('Sidebar.create_new_workspace')}
-          </button>
+          <div className='sidebar__btnnewworkspace'>
+            <button className='sidebar__btnnewworkspace__btn btn btn-success'>
+              {t('Sidebar.create_new_workspace')}
+            </button>
+          </div>
         </div>
       </div>
     )
