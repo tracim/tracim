@@ -40,7 +40,7 @@ const debug = {
     type: 'pageHtml',
     title: 'Test debug pageHtml',
     status: 'validated',
-    version: '-1',
+    version: 'version n°1',
     text: 'This is the default pageHtml content for debug purpose',
     workspace: {
       id: -1,

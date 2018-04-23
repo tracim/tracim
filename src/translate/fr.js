@@ -1,7 +1,7 @@
 const fr = {
   translation: { // 'fr' in the namespace 'translation'
     PopinFixedOption: {
-      new_version: 'UN TRUC SYMPA'
+      new_version: 'nouvelle version'
     }
   }
 }
