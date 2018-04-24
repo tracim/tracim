@@ -4,14 +4,17 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
 
+from tracim.exceptions import UserNotExist, AuthenticationFailed
 from tracim.lib.core.user import UserApi
+from tracim.models import User
+from tracim.models.context_models import UserInContext
 from tracim.tests import DefaultTest
 from tracim.tests import eq_
 
 
 class TestUserApi(DefaultTest):
 
-    def test_create_and_update_user(self):
+    def test_unit__create_and_update_user__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -25,7 +28,7 @@ class TestUserApi(DefaultTest):
         eq_('bob@bob', nu.email)
         eq_('bob', nu.display_name)
 
-    def test_user_with_email_exists(self):
+    def test_unit__user_with_email_exists__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -38,7 +41,7 @@ class TestUserApi(DefaultTest):
         eq_(True, api.user_with_email_exists('bibi@bibi'))
         eq_(False, api.user_with_email_exists('unknown'))
 
-    def test_get_one_by_email(self):
+    def test_unit__get_one_by_email__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -51,7 +54,7 @@ class TestUserApi(DefaultTest):
 
         eq_(uid, api.get_one_by_email('bibi@bibi').user_id)
 
-    def test_get_one_by_email_exception(self):
+    def test_unit__get_one_by_email__err__user_does_not_exist(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -60,20 +63,19 @@ class TestUserApi(DefaultTest):
         with pytest.raises(NoResultFound):
             api.get_one_by_email('unknown')
 
-    def test_get_all(self):
-        # TODO - G.M - 29-03-2018 Check why this method is not enabled
-        api = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.config,
-        )
-        # u1 = api.create_user(True)
-        # u2 = api.create_user(True)
+    # def test_unit__get_all__ok__nominal_case(self):
+    #     # TODO - G.M - 29-03-2018 Check why this method is not enabled
+    #     api = UserApi(
+    #         current_user=None,
+    #         session=self.session,
+    #         config=self.config,
+    #     )
+    #     u1 = api.create_user(True)
+    #     u2 = api.create_user(True)
+    #     users = api.get_all()
+    #     assert 2==len(users)
 
-        # users = api.get_all()
-        # ok_(2==len(users))
-
-    def test_get_one(self):
+    def test_unit__get_one__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -83,3 +85,72 @@ class TestUserApi(DefaultTest):
         api.update(u, 'titi', 'titi@titi', True)
         one = api.get_one(u.user_id)
         eq_(u.user_id, one.user_id)
+
+    def test_unit__get_correct_user_type__ok__no_context(self):
+        user = User(email='admin@tracim.tracim')
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        new_user = api._get_correct_user_type(user, in_context=False)
+        assert isinstance(new_user, User)
+        assert user == new_user
+
+    def test_unit__get_correct_user_type__ok__with_context(self):
+        user = User(email='admin@tracim.tracim')
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        new_user = api._get_correct_user_type(user, in_context=True)
+        assert isinstance(new_user, UserInContext)
+        assert user != new_user
+        assert new_user.user == user
+
+    def test_unit__get_current__ok__nominal_case(self):
+        user = User(email='admin@tracim.tracim')
+        api = UserApi(
+            current_user=user,
+            session=self.session,
+            config=self.config,
+        )
+        assert api.get_current().email == 'admin@tracim.tracim'
+
+    def test_unit__get_current__err__user_not_exist(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        with pytest.raises(UserNotExist):
+            api.get_current()
+
+    def test_unit__authenticate_user___ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        user = api.authenticate_user('admin@admin.admin', 'admin@admin.admin')
+        assert isinstance(user, User)
+        assert user.email == 'admin@admin.admin'
+
+    def test_unit__authenticate_user___err__bad_password(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        with pytest.raises(AuthenticationFailed):
+            api.authenticate_user('admin@admin.admin', 'bad_password')
+
+    def test_unit__authenticate_user___err__bad_user(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        with pytest.raises(AuthenticationFailed):
+            api.authenticate_user('unknown_user', 'bad_password')
