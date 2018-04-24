@@ -11,6 +11,36 @@ settingText()
 .table tr:nth-child(even)
   background-color grey-hover
 
+
+/**** MENU HAMBURGER ON EXPAND BAR *****/
+
+.hamburger--spring .hamburger-inner
+  margin 4px 8px
+
+.hamburger--spring .hamburger-inner::before
+  top 7px
+
+.hamburger--spring .hamburger-inner::after
+  top 14px
+
+/***************************************/
+
+.hamburger--spring
+  .hamburger-inner
+    transition-delay 0.22s
+    background-color transparent
+    &::before
+      top -3px
+      transition top 0.1s 0.15s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
+      transform translate3d(0, 10px, 0) rotate(45deg)
+    &::after
+      top -3px
+      transition top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
+      transform translate3d(0, 10px, 0) rotate(-45deg)
+
+.hamburger-inner, .hamburger-inner::after, .hamburger-inner::before
+  width 30px
+
 .account
   &__userinformation
     display flex
@@ -91,12 +121,10 @@ settingText()
             margin-bottom 15px
             font-size 18px
           &__txtinput
-            display inline-flex
+            display block
             width auto
-            margin 0 15px 15px 0
             border 1px solid blue
             border-radius 5px
-            padding 8px 15px
           &__button
             vertical-align top
             border 1px solid blue
@@ -170,7 +198,7 @@ settingText()
             &:focus
               outline none
             &__box
-              margin-top 15px
+              margin 15px 5px 0 0
               &__icon, &__icon::before, &__icon::after
                 width 30px
         &__list
@@ -235,6 +263,10 @@ settingText()
 /***** MEDIA XS *****/
 
 @media (max-width: max-xs)
+
+  .hamburger-box
+    width 45px
+    height 22px
 
   .account
     &__userinformation

@@ -25,11 +25,13 @@ class Account extends React.Component {
         name: 'personalData',
         menuLabel: 'Informations Compte',
         active: true
-      }, {
-        name: 'calendar',
-        menuLabel: 'Calendrier',
-        active: false
-      }, {
+      },
+      // {
+      //   name: 'calendar',
+      //   menuLabel: 'Calendrier',
+      //   active: false
+      // },
+      {
         name: 'notification',
         menuLabel: 'Notifications',
         active: false

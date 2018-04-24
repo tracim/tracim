@@ -14,14 +14,12 @@
     "logged": true,
     "user": {
       "id": 5,
-      "username": "Smoi",
-      "firstname": "Côme",
-      "lastname": "Stoilenom",
-      "email": "osef@algoo.fr",
-      "avatar": "https://avatars3.githubusercontent.com/u/11177014?s=460&v=4",
+      "username": "franclecompte",
+      "firstname": "François",
+      "lastname": "Lecompte",
+      "email": "francois.lecompte@algoo.fr",
+      "avatar": "https://rawgit.com/tracim/tracim_front/develop/src/img/imgProfil.png",
       "role": "Utilisateur",
-      "job": "Integrateur | Webdesigner",
-      "company": "Algoo",
       "caldav_url": "http://algoo.trac.im/caldav/user/5.ics/"
     }
   },
