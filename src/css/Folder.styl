@@ -83,15 +83,29 @@ folderopen()
         text-align center
       &__text
         margin 0 15px 0 0
+        white-space nowrap
+        text-overflow ellipsis
+        overflow hidden
+        width 400px
         font-size 17px
         color darkBlue
-      &__addbtn
-        margin auto 0
-        cursor pointer
-        &:hover > .folder__header__name__addbtn__text
-          color white
-        &__text
-          font-size 17px
+      &__button
+        &__advancedbtn
+          position relative
+        &__addbtn
+          margin auto 0
+          cursor pointer
+          &:hover > .folder__header__name__addbtn__text
+            color white
+          .addbtn
+            &__text
+              font-size 17px
+              &::after
+                margin-left 20px
+            &__subdropdown
+              padding 0
+              .subdropdown__link
+                padding 10px
     &__contenttype
       display flex
       justify-content flex-end
@@ -104,11 +118,6 @@ folderopen()
         & > i
           margin-right 3px
 
-@media (min-width: min-sm) and (max-width: max-sm)
-  .folder
-      &__contenttype
-        display none
-
 @media (max-width: max-xs)
   .folder
     &__header
@@ -118,5 +127,4 @@ folderopen()
           font-size 20px
         &__text
           font-size 15px
-      &__contenttype
-        display none
+
