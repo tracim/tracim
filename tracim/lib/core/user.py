@@ -95,18 +95,19 @@ class UserApi(object):
         except:
             return False
 
-    def authenticate_user(self, email, password) -> User:
+    def authenticate_user(self, email, password, in_context=False) -> User:
         """
         Authenticate user with email and password, raise AuthenticationFailed
         if uncorrect.
         :param email: email of the user
         :param password: cleartext password of the user
+        :param in_context:
         :return: User who was authenticated.
         """
         try:
             user = self.get_one_by_email(email)
             if user.validate_password(password):
-                return user
+                return self._get_correct_user_type(user, in_context=in_context)
             else:
                 raise BadUserPassword()
         except (BadUserPassword, NoResultFound):
