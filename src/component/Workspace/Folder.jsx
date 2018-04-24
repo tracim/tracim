@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import FileItem from './FileItem.jsx'
+// import FileItem from './FileItem.jsx'
 import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 
 class Folder extends React.Component {
@@ -38,7 +38,13 @@ class Folder extends React.Component {
   }
 
   render () {
-    const { app, folderData, onClickItem, onClickFolder, isLast, t } = this.props
+    const {
+      // app,
+      folderData,
+      // onClickItem,
+      // onClickFolder,
+      isLast,
+      t } = this.props
 
     return (
       <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
@@ -205,8 +211,8 @@ Folder.propTypes = {
     title: PropTypes.string.isRequired,
     content: PropTypes.array
   }),
-  app: PropTypes.object,
-  onClickItem: PropTypes.func.isRequired,
-  onClickFolder: PropTypes.func.isRequired,
+  // app: PropTypes.object,
+  // onClickItem: PropTypes.func.isRequired,
+  // onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
 }
