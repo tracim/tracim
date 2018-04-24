@@ -15,6 +15,7 @@ from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.views.core_api.session_controller import SessionController
 from tracim.views.default.default_controller import DefaultController
+from tracim.views.errors import Error
 
 
 def main(global_config, **settings):
@@ -44,7 +45,12 @@ def main(global_config, **settings):
     # Add SqlAlchemy DB
     configurator.include('.models')
     # set Hapic
-    hapic.set_context(PyramidContext(configurator))
+    hapic.set_context(
+        PyramidContext(
+            configurator=configurator,
+            default_error_builder=Error()
+        )
+    )
     # Add controllers
     default_controllers = DefaultController()
     default_controllers.bind(configurator)

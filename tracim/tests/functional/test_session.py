@@ -1,7 +1,6 @@
 # coding=utf-8
-import pytest
-
 from tracim.tests import FunctionalTest
+from tracim.tests import FunctionalTestNoDB
 
 
 class TestLogoutEndpoint(FunctionalTest):
@@ -11,6 +10,20 @@ class TestLogoutEndpoint(FunctionalTest):
 
     def test_api__access_logout_post_enpoint__ok__nominal_case(self):
         res = self.testapp.get('/api/v2/sessions/logout', status=204)
+
+
+class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
+
+    def test_api__try_login_enpoint__err_500__no_inited_db(self):
+        params = {
+            'email': 'admin@admin.admin',
+            'password': 'admin@admin.admin',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/sessions/login',
+            params=params,
+            status=500,
+        )
 
 
 class TestLoginEndpoint(FunctionalTest):
