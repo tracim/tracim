@@ -79,11 +79,12 @@ class SessionController(Controller):
         Return current logged in user or 401
         """
         app_config = request.registry.settings['CFG']
-        return UserInContext(
-            user=request.current_user,
-            dbsession=request.dbsession,
+        uapi = UserApi(
+            request.current_user,
+            session=request.dbsession,
             config=app_config,
         )
+        return uapi.get_current(in_context=True)
 
     def bind(self, configurator: Configurator):
 

@@ -74,6 +74,14 @@ class UserApi(object):
     def get_one_by_id(self, id: int, in_context=False) -> User:
         return self.get_one(user_id=id, in_context=in_context)
 
+    def get_current(self, in_context: bool=False):
+        """
+        Get current_user
+        :param in_context:
+        :return:
+        """
+        return self._get_correct_user_type(self._user, in_context)
+
     def get_all(self) -> typing.Iterable[User]:
         return self._session.query(User).order_by(User.display_name).all()
 
