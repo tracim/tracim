@@ -159,7 +159,7 @@ class Folder extends React.Component {
             </div>
           </div>
 
-          <div className='col-5 col-sm-5 col-md-5 col-lg-4 col-xl-3 d-none'>
+          {/* <div className='col-5 col-sm-5 col-md-5 col-lg-4 col-xl-3 d-none'>
             <div className='folder__header__contenttype d-none d-sm-flex'>
               <div className='folder__header__contenttype__text d-none d-lg-flex'>
                 {t('Folder.content_type')} :
@@ -191,7 +191,7 @@ class Folder extends React.Component {
               isLast={isLast && i === folderData.content.length - 1}
               key={c.id}
             />
-          )}
+          )} */}
         </div>
       </div>
     )
