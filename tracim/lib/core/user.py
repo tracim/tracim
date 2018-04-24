@@ -6,7 +6,7 @@ import typing as typing
 
 from tracim.models.auth import User
 from sqlalchemy.orm.exc import NoResultFound
-from tracim.exceptions import BadUserPassword
+from tracim.exceptions import BadUserPassword, UserNotExist
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.context_models import UserInContext
 
@@ -80,6 +80,8 @@ class UserApi(object):
         :param in_context:
         :return:
         """
+        if not self._user:
+            raise UserNotExist()
         return self._get_correct_user_type(self._user, in_context)
 
     def get_all(self) -> typing.Iterable[User]:
@@ -95,7 +97,11 @@ class UserApi(object):
         except:
             return False
 
-    def authenticate_user(self, email, password, in_context=False) -> User:
+    def authenticate_user(self,
+                          email: str,
+                          password: str,
+                          in_context=False
+        ) -> typing.Union[User, UserInContext]:
         """
         Authenticate user with email and password, raise AuthenticationFailed
         if uncorrect.
