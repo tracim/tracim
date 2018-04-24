@@ -29,7 +29,7 @@ class SessionController(Controller):
 
     @hapic.with_api_doc()
     @hapic.input_headers(LoginOutputHeaders())
-    @hapic.input_query(BasicAuthSchema())
+    @hapic.input_body(BasicAuthSchema())
     @hapic.handle_exception(LoginFailed, http_code=HTTPStatus.BAD_REQUEST)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
@@ -41,10 +41,8 @@ class SessionController(Controller):
         """
         Logs user into the system
         """
-        email = request.params['email']
-        password = request.params['password']
-        if not (email and password):
-            raise Exception
+        email = request.json_body['email']
+        password = request.json_body['password']
         app_config = request.registry.settings['CFG']
         try:
             uapi = UserApi(
@@ -99,7 +97,7 @@ class SessionController(Controller):
         configurator.add_route(
             'login',
             os.path.join(BASE_API_V2, 'sessions', 'login'),
-            request_method='GET'
+            request_method='POST',
         )
         configurator.add_view(
             self.login,
@@ -107,20 +105,28 @@ class SessionController(Controller):
         )
         # Logout
         configurator.add_route(
-            'logout',
+            'post_logout',
             os.path.join(BASE_API_V2, 'sessions', 'logout'),
-            request_method='GET'
+            request_method='POST',
         )
-
+        configurator.add_route(
+            'get_logout',
+            os.path.join(BASE_API_V2, 'sessions', 'logout'),
+            request_method='GET',
+        )
         configurator.add_view(
             self.logout,
-            route_name='logout',
+            route_name='get_logout',
+        )
+        configurator.add_view(
+            self.logout,
+            route_name='post_logout',
         )
         # Whoami
         configurator.add_route(
             'whoami',
             os.path.join(BASE_API_V2, 'sessions', 'whoami'),
-            request_method='GET'
+            request_method='GET',
         )
         configurator.add_view(
             self.whoami,

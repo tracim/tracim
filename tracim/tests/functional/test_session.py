@@ -7,6 +7,7 @@ from tracim.tests import FunctionalTest
 class TestLogoutEndpoint(FunctionalTest):
 
     def test_logout(self):
+        res = self.testapp.post_json('/api/v2/sessions/logout', status=204)
         res = self.testapp.get('/api/v2/sessions/logout', status=204)
 
 
@@ -17,10 +18,10 @@ class TestLoginEndpoint(FunctionalTest):
             'email': 'admin@admin.admin',
             'password': 'admin@admin.admin',
         }
-        res = self.testapp.get(
+        res = self.testapp.post_json(
             '/api/v2/sessions/login',
+            params=params,
             status=204,
-            params=params
         )
 
     def test_bad_password(self):
@@ -28,7 +29,7 @@ class TestLoginEndpoint(FunctionalTest):
             'email': 'admin@admin.admin',
             'password': 'bad_password',
         }
-        res = self.testapp.get(
+        res = self.testapp.post_json(
             '/api/v2/sessions/login',
             status=400,
             params=params,
@@ -39,14 +40,14 @@ class TestLoginEndpoint(FunctionalTest):
             'email': 'unknown_user@unknown.unknown',
             'password': 'bad_password',
         }
-        res = self.testapp.get(
+        res = self.testapp.post_json(
             '/api/v2/sessions/login',
             status=400,
             params=params,
         )
 
     def test_uncomplete(self):
-        res = self.testapp.get('/api/v2/sessions/login', status=400)
+        res = self.testapp.post_json('/api/v2/sessions/login', status=400)
 
 
 class TestWhoamiEndpoint(FunctionalTest):
