@@ -42,12 +42,6 @@ class DefaultController(Controller):
             exception=exception
         )
 
-    def swagger_doc(self, request: TracimRequest):
-        return hapic.generate_doc(
-                title='Tracim v2 API',
-                description='API of Tracim v2',
-        )
-
     def bind(self, configurator: Configurator):
         configurator.add_view(
             self.notfound_view,
@@ -58,14 +52,4 @@ class DefaultController(Controller):
             self.exception_view,
             renderer='json',
             context=Exception,
-        )
-        configurator.add_route(
-            'swagger_doc',
-            '/swagger_doc',
-            request_method='GET',
-        )
-        configurator.add_view(
-            self.swagger_doc,
-            route_name='swagger_doc',
-            renderer='json',
         )
