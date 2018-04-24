@@ -6,14 +6,16 @@ from tracim.tests import FunctionalTest
 
 class TestLogoutEndpoint(FunctionalTest):
 
-    def test_logout(self):
+    def test_api__access_logout_get_enpoint__ok__nominal_case(self):
         res = self.testapp.post_json('/api/v2/sessions/logout', status=204)
+
+    def test_api__access_logout_post_enpoint__ok__nominal_case(self):
         res = self.testapp.get('/api/v2/sessions/logout', status=204)
 
 
 class TestLoginEndpoint(FunctionalTest):
 
-    def test_login_ok(self):
+    def test_api__try_login_enpoint__ok_204__nominal_case(self):
         params = {
             'email': 'admin@admin.admin',
             'password': 'admin@admin.admin',
@@ -24,7 +26,7 @@ class TestLoginEndpoint(FunctionalTest):
             status=204,
         )
 
-    def test_bad_password(self):
+    def test_api__try_login_enpoint__err_400__bad_password(self):
         params = {
             'email': 'admin@admin.admin',
             'password': 'bad_password',
@@ -35,7 +37,7 @@ class TestLoginEndpoint(FunctionalTest):
             params=params,
         )
 
-    def test_bad_user(self):
+    def test_api__try_login_enpoint__err_400__unregistered_user(self):
         params = {
             'email': 'unknown_user@unknown.unknown',
             'password': 'bad_password',
@@ -46,13 +48,13 @@ class TestLoginEndpoint(FunctionalTest):
             params=params,
         )
 
-    def test_uncomplete(self):
+    def test_api__try_login_enpoint__err_400__no_json_body(self):
         res = self.testapp.post_json('/api/v2/sessions/login', status=400)
 
 
 class TestWhoamiEndpoint(FunctionalTest):
 
-    def test_whoami_ok(self):
+    def test_api__try_whoami_enpoint__ok_200__nominal_case(self):
         self.testapp.authorization = (
             'Basic',
             (
@@ -71,7 +73,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
 
-    def test_unauthenticated(self):
+    def test_api__try_whoami_enpoint__err_401__unauthenticated(self):
         self.testapp.authorization = (
             'Basic',
             (
