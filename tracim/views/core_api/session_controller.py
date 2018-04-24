@@ -14,10 +14,13 @@ from tracim.views.controllers import Controller
 from pyramid.config import Configurator
 
 from tracim.views import BASE_API_V2
-from tracim.views.core_api.schemas import UserSchema, NoContentSchema
+from tracim.views.core_api.schemas import UserSchema
+from tracim.views.core_api.schemas import NoContentSchema
+
 from tracim.views.core_api.schemas import LoginOutputHeaders
 from tracim.views.core_api.schemas import BasicAuthSchema
-from tracim.exceptions import NotAuthentificated, LoginFailed
+from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import AuthenticationFailed
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -30,7 +33,7 @@ class SessionController(Controller):
     @hapic.with_api_doc()
     @hapic.input_headers(LoginOutputHeaders())
     @hapic.input_body(BasicAuthSchema())
-    @hapic.handle_exception(LoginFailed, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(AuthenticationFailed, http_code=HTTPStatus.BAD_REQUEST)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
     @hapic.output_body(
@@ -44,21 +47,12 @@ class SessionController(Controller):
         email = request.json_body['email']
         password = request.json_body['password']
         app_config = request.registry.settings['CFG']
-        try:
-            uapi = UserApi(
-                None,
-                session=request.dbsession,
-                config=app_config,
-            )
-            user = uapi.get_one_by_email(email)
-            valid_password = user.validate_password(password)
-            if not valid_password:
-                # Bad password
-                raise LoginFailed('Bad Credentials')
-        except NoResultFound:
-            # User does not exist
-            raise LoginFailed('Bad Credentials')
-        return
+        uapi = UserApi(
+            None,
+            session=request.dbsession,
+            config=app_config,
+        )
+        return uapi.authenticate_user(email, password)
 
     @hapic.with_api_doc()
     @hapic.output_body(

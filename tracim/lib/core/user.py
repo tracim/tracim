@@ -5,6 +5,9 @@ import transaction
 import typing as typing
 
 from tracim.models.auth import User
+from sqlalchemy.orm.exc import NoResultFound
+from tracim.exceptions import BadUserPassword
+from tracim.exceptions import AuthenticationFailed
 
 
 class UserApi(object):
@@ -14,20 +17,45 @@ class UserApi(object):
         self._user = current_user
         self._config = config
 
-    def get_all(self):
-        return self._session.query(User).order_by(User.display_name).all()
-
     def _base_query(self):
         return self._session.query(User)
 
-    def get_one(self, user_id: int):
+    def get_one(self, user_id: int) -> User:
         return self._base_query().filter(User.user_id==user_id).one()
 
-    def get_one_by_email(self, email: str):
+    def get_one_by_email(self, email: str) -> User:
         return self._base_query().filter(User.email==email).one()
 
     def get_one_by_id(self, id: int) -> User:
         return self._base_query().filter(User.user_id==id).one()
+
+    def get_all(self) -> typing.Iterable[User]:
+        return self._session.query(User).order_by(User.display_name).all()
+
+    def user_with_email_exists(self, email: str):
+        try:
+            self.get_one_by_email(email)
+            return True
+        # TODO - G.M - 09-04-2018 - Better exception
+        except:
+            return False
+
+    def authenticate_user(self, email, password) -> User:
+        """
+        Authenticate user with email and password, raise AuthenticationFailed
+        if uncorrect.
+        :param email: email of the user
+        :param password: cleartext password of the user
+        :return: User who was authenticated.
+        """
+        try:
+            user = self.get_one_by_email(email)
+            if user.validate_password(password):
+                return user
+            else:
+                raise BadUserPassword()
+        except (BadUserPassword, NoResultFound):
+            raise AuthenticationFailed
 
     def update(
             self,
@@ -47,14 +75,6 @@ class UserApi(object):
 
         if do_save:
             self.save(user)
-
-    def user_with_email_exists(self, email: str):
-        try:
-            self.get_one_by_email(email)
-            return True
-        # TODO - G.M - 09-04-2018 - Better exception
-        except:
-            return False
 
     def create_user(self, email=None, groups=[], save_now=False) -> User:
         user = User()
