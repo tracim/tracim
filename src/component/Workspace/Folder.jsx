@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-// import FileItem from './FileItem.jsx'
+import FileItem from './FileItem.jsx'
 import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 
 class Folder extends React.Component {
@@ -39,12 +39,13 @@ class Folder extends React.Component {
 
   render () {
     const {
-      // app,
+      app,
       folderData,
-      // onClickItem,
-      // onClickFolder,
+      onClickItem,
+      onClickFolder,
       isLast,
-      t } = this.props
+      t
+    } = this.props
 
     return (
       <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
@@ -68,13 +69,12 @@ class Folder extends React.Component {
 
               <div className='folder__header__name__button d-flex align-items-center '>
 
-                {this.state.openExtandedAction === false &&
-                  <div>
-                    <div className='folder__header__name__button__advancedbtn btn btn-outline-primary d-none d-md-block' onClick={this.handleClickToggleExtandedAction}>
-                      <i className='fa fa-fw fa-ellipsis-h' />
-                    </div>
-                  </div>
-                }
+                <div
+                  className='folder__header__name__button__advancedbtn btn btn-outline-primary d-none d-md-block'
+                  onClick={this.handleClickToggleExtandedAction}
+                >
+                  <i className='fa fa-fw fa-ellipsis-h' />
+                </div>
 
                 {this.state.openExtandedAction === true &&
                   <PopupExtandedAction
@@ -87,6 +87,7 @@ class Folder extends React.Component {
                   <button className='addbtn__text btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                     {t('Folder.create')} ...
                   </button>
+
                   <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
                     <div className='subdropdown__link dropdown-item'>
                       <div className='subdropdown__link__folder d-flex align-items-center'>
@@ -164,8 +165,10 @@ class Folder extends React.Component {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* <div className='col-5 col-sm-5 col-md-5 col-lg-4 col-xl-3 d-none'>
+          {/*
+          <div className='col-5 col-sm-5 col-md-5 col-lg-4 col-xl-3 d-none'>
             <div className='folder__header__contenttype d-none d-sm-flex'>
               <div className='folder__header__contenttype__text d-none d-lg-flex'>
                 {t('Folder.content_type')} :
@@ -175,7 +178,7 @@ class Folder extends React.Component {
               </div>
             </div>
           </div>
-        </div>
+        */}
 
         <div className='folder__content'>
           { folderData.content.map((c, i) => c.type === 'folder'
@@ -197,7 +200,7 @@ class Folder extends React.Component {
               isLast={isLast && i === folderData.content.length - 1}
               key={c.id}
             />
-          )} */}
+          )}
         </div>
       </div>
     )
@@ -211,8 +214,8 @@ Folder.propTypes = {
     title: PropTypes.string.isRequired,
     content: PropTypes.array
   }),
-  // app: PropTypes.object,
-  // onClickItem: PropTypes.func.isRequired,
-  // onClickFolder: PropTypes.func.isRequired,
+  app: PropTypes.object,
+  onClickItem: PropTypes.func.isRequired,
+  onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired
 }
