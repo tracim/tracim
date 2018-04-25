@@ -133,14 +133,14 @@ class pageHtml extends React.Component {
 
         <PopinFixedOption
           customClass={`${config.customClass}`}
-          onClickNewVersion={this.handleClickNewVersion}
+          onClickNewVersionBtn={this.handleClickNewVersion}
           i18n={i18n}
         />
 
         <PopinFixedContent customClass={`${config.customClass}__contentpage`}>
           <PageHtmlComponent
             mode={this.state.mode}
-            onClickCloseNewVersion={this.handleCloseNewVersion}
+            onClickCloseEditMode={this.handleCloseNewVersion}
             version={content.version}
             text={content.text}
             key={'PageHtml'}

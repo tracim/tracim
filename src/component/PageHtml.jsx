@@ -13,7 +13,7 @@ const PageHtml = props => {
       }
 
       {props.mode === MODE.EDIT &&
-        <TextAreaApp customClass={'wsContentPageHtml'} onClickCancelBtn={props.onClickCloseNewVersion}/>
+        <TextAreaApp customClass={'wsContentPageHtml'} onClickCancelBtn={props.onClickCloseEditMode}/>
       }
     </div>
   )

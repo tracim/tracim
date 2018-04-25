@@ -4,3 +4,8 @@ export const FETCH_CONFIG = {
     'Content-Type': 'application/json'
   }
 }
+
+export const MODE = {
+  VIEW: 'view',
+  EDIT: 'edit'
+}
