@@ -3,7 +3,9 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import SelectStatus from '../Input/SelectStatus/SelectStatus.jsx'
+import StatusContent from '../OptionComponent/StatusContent.jsx'
+import NewVersionBtn from '../OptionComponent/NewVersionBtn.jsx'
+import EditContent from '../OptionComponent/EditContent.jsx'
 
 const PopinFixedOption = props => {
   translate.setI18n(props.i18n ? props.i18n : i18n) // mandatory to allow Apps to overrides trad
@@ -11,22 +13,13 @@ const PopinFixedOption = props => {
   return (
     <div className={classnames('wsContentGeneric__option', `${props.customClass}__option`)}>
       <div className={classnames('wsContentGeneric__option__menu', `${props.customClass}__option__menu`)}>
-        <div
-          className='wsContentGeneric__option__menu__addversion btn btn-outline-primary mr-auto'
-          onClick={props.onClickNewVersion}
-        >
-          {props.t('PopinFixedOption.new_version')}
-          <i className='fa fa-plus-circle ml-3' />
-        </div>
 
-        <SelectStatus />
+        <NewVersionBtn onClickNewVersionBtn={props.onClickNewVersionBtn} />
 
-        <div className={classnames('wsContentGeneric__option__menu__action d-none d-sm-block', `${props.customClass}__option__menu__action`)}>
-          <i className='fa fa-archive' />
-        </div>
-        <div className={classnames('wsContentGeneric__option__menu__action d-none d-sm-block', `${props.customClass}__option__menu__action`)}>
-          <i className='fa fa-trash' />
-        </div>
+        <StatusContent />
+
+        <EditContent />
+
       </div>
     </div>
   )
