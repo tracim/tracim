@@ -13,9 +13,9 @@ from tracim.lib.utils.authentification import basic_auth_check_credentials
 from tracim.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
+from tracim.views import BASE_API_V2
 from tracim.views.core_api.session_controller import SessionController
-from tracim.views.default.default_controller import DefaultController
-from tracim.views.errors import Error
+from tracim.views.errors import ErrorSchema
 
 
 def main(global_config, **settings):
@@ -48,14 +48,12 @@ def main(global_config, **settings):
     hapic.set_context(
         PyramidContext(
             configurator=configurator,
-            default_error_builder=Error()
+            default_error_builder=ErrorSchema()
         )
     )
     # Add controllers
-    default_controllers = DefaultController()
-    default_controllers.bind(configurator)
     session_api = SessionController()
-    session_api.bind(configurator)
+    configurator.include(session_api.bind, route_prefix=BASE_API_V2)
     hapic.add_documentation_view(
         '/api/v2/doc',
         'Tracim v2 API',

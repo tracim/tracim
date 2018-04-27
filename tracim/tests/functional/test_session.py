@@ -1,4 +1,7 @@
 # coding=utf-8
+import pytest
+from sqlalchemy.exc import OperationalError
+
 from tracim.tests import FunctionalTest
 from tracim.tests import FunctionalTestNoDB
 
@@ -14,6 +17,8 @@ class TestLogoutEndpoint(FunctionalTest):
 
 class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
 
+    @pytest.mark.xfail(raises=OperationalError,
+                       reason='Not supported yet by hapic')
     def test_api__try_login_enpoint__err_500__no_inited_db(self):
         params = {
             'email': 'admin@admin.admin',
@@ -24,6 +29,10 @@ class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
             params=params,
             status=500,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
 
 class TestLoginEndpoint(FunctionalTest):
@@ -49,6 +58,10 @@ class TestLoginEndpoint(FunctionalTest):
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
     def test_api__try_login_enpoint__err_400__unregistered_user(self):
         params = {
@@ -60,9 +73,17 @@ class TestLoginEndpoint(FunctionalTest):
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
     def test_api__try_login_enpoint__err_400__no_json_body(self):
         res = self.testapp.post_json('/api/v2/sessions/login', status=400)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
 
 class TestWhoamiEndpoint(FunctionalTest):
@@ -95,3 +116,7 @@ class TestWhoamiEndpoint(FunctionalTest):
             )
         )
         res = self.testapp.get('/api/v2/sessions/whoami', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
