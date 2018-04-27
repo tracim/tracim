@@ -94,41 +94,13 @@ class SessionController(Controller):
     def bind(self, configurator: Configurator):
 
         # Login
-        configurator.add_route(
-            'login',
-            os.path.join(BASE_API_V2, 'sessions', 'login'),
-            request_method='POST',
-        )
-        configurator.add_view(
-            self.login,
-            route_name='login',
-        )
+        configurator.add_route('login', '/sessions/login', request_method='POST')
+        configurator.add_view(self.login, route_name='login')
         # Logout
-        configurator.add_route(
-            'post_logout',
-            os.path.join(BASE_API_V2, 'sessions', 'logout'),
-            request_method='POST',
-        )
-        configurator.add_route(
-            'get_logout',
-            os.path.join(BASE_API_V2, 'sessions', 'logout'),
-            request_method='GET',
-        )
-        configurator.add_view(
-            self.logout,
-            route_name='get_logout',
-        )
-        configurator.add_view(
-            self.logout,
-            route_name='post_logout',
-        )
+        configurator.add_route('logout', '/sessions/logout', request_method='POST')
+        configurator.add_view(self.logout, route_name='logout')
+        configurator.add_route('logout_get', '/sessions/logout', request_method='GET')
+        configurator.add_view(self.logout, route_name='logout_get')
         # Whoami
-        configurator.add_route(
-            'whoami',
-            os.path.join(BASE_API_V2, 'sessions', 'whoami'),
-            request_method='GET',
-        )
-        configurator.add_view(
-            self.whoami,
-            route_name='whoami',
-        )
+        configurator.add_route('whoami', '/sessions/whoami', request_method='GET')
+        configurator.add_view(self.whoami, route_name='whoami',)
