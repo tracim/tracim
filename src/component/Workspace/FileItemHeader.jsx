@@ -9,12 +9,12 @@ const FileItemHeader = props => {
           {props.t('FileItemHeader.type')}
         </div>
       </div>
-      <div className='col-8 col-sm-8 col-md-8 col-lg-8 col-xl-10'>
+      <div className='col-8 col-sm-8 col-md-8 col-lg-8 col-xl-9'>
         <div className='file__header__name'>
           {props.t('FileItemHeader.document_name')}
         </div>
       </div>
-      <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
+      <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2'>
         <div className='file__header__status'>
           {props.t('FileItemHeader.status')}
         </div>

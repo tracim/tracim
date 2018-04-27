@@ -3,14 +3,14 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import FileItem from './FileItem.jsx'
-import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
+// import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
+import BtnExtandedAction from '../BtnExtandedAction/ExtandedAction.jsx'
 
 class Folder extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      open: false,
-      openExtandedAction: false
+      open: false
     }
   }
 
@@ -24,17 +24,9 @@ class Folder extends React.Component {
     console.log('new file') // @TODO
   }
 
-  handleClickModify = e => {
-    e.stopPropagation() // because we have a link inside a link (togler and newFile)
-    console.log('modifier') // @TODO
-  }
-
-  handleClickToggleExtandedAction = e => {
+  handleClickStopEvent = e => {
     e.stopPropagation()
-
-    this.setState(prevState => ({
-      openExtandedAction: !prevState.openExtandedAction
-    }))
+    console.log('stop')
   }
 
   render () {
@@ -60,7 +52,7 @@ class Folder extends React.Component {
             </div>
           </div>
 
-          <div className='col-10 col-sm-10 col-md-10 col-lg-10 col-xl-11'>
+          <div className='col-10 col-sm-10 col-md-8 col-lg-8 col-xl-9'>
             <div className='folder__header__name align-items-center justify-content-between'>
 
               <div className='folder__header__name__text'>
@@ -70,20 +62,9 @@ class Folder extends React.Component {
               <div className='folder__header__name__button d-flex align-items-center '>
 
                 <div
-                  className='folder__header__name__button__advancedbtn btn btn-outline-primary d-none d-md-block'
-                  onClick={this.handleClickToggleExtandedAction}
+                  className='folder__header__name__button__addbtn mx-4'
+                  onClick={this.handleClickNewFile}
                 >
-                  <i className='fa fa-fw fa-ellipsis-h' />
-                </div>
-
-                {this.state.openExtandedAction === true &&
-                  <PopupExtandedAction
-                    openExtandedAction={this.state.openExtandedAction}
-                    onClickCloseBtn={this.handleClickToggleExtandedAction}
-                  />
-                }
-
-                <div className='folder__header__name__button__addbtn mx-4' onClick={this.handleClickNewFile}>
                   <button className='addbtn__text btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                     {t('Folder.create')} ...
                   </button>
@@ -95,7 +76,7 @@ class Folder extends React.Component {
                           <i className='fa fa-fw fa-folder-o' />
                         </div>
                         <div className='subdropdown__link__folder__text'>
-                          Créer un Dossier
+                          Créer un dossier
                         </div>
                       </div>
                     </div>
@@ -105,7 +86,7 @@ class Folder extends React.Component {
                           <i className='fa fa-fw fa-file-text-o' />
                         </div>
                         <div className='subdropdown__link__apphtml__text'>
-                          Créer une page Html
+                          Rédiger un document
                         </div>
                       </div>
                     </div>
@@ -125,7 +106,7 @@ class Folder extends React.Component {
                           <i className='fa fa-fw fa-file-code-o' />
                         </div>
                         <div className='subdropdown__link__appmarkdown__text'>
-                          Créer une page markdown
+                          Rédiger un document markdown
                         </div>
                       </div>
                     </div>
@@ -135,7 +116,7 @@ class Folder extends React.Component {
                           <i className='fa fa-fw fa-comments-o' />
                         </div>
                         <div className='subdropdown__link__appthread__text'>
-                          Créer une discussion
+                          Lancer une discussion
                         </div>
                       </div>
                     </div>
@@ -155,19 +136,26 @@ class Folder extends React.Component {
                           <i className='fa fa-fw fa-ticket' />
                         </div>
                         <div className='subdropdown__link__appissue__text'>
-                          Créer un ticket
+                          Ouvrir un ticket
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                <div className='d-none d-md-flex'>
+                  <BtnExtandedAction onClickStopEvent={this.handleClickStopEvent} />
+                </div>
+
               </div>
             </div>
           </div>
+
+          <div className='col-0 col-sm-0 col-md-2 col-lg-2 col-xl-2' />
+
         </div>
 
-          {/*
+        {/*
           <div className='col-5 col-sm-5 col-md-5 col-lg-4 col-xl-3 d-none'>
             <div className='folder__header__contenttype d-none d-sm-flex'>
               <div className='folder__header__contenttype__text d-none d-lg-flex'>

@@ -105,7 +105,7 @@
         "id": 1,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Design v2",
+        "title": "Modification Design v2",
         "type": "PageHtml",
         "status": "validated"
       },
@@ -113,7 +113,7 @@
         "id": 2,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "La programmation fonctionnelle est-elle vraiment utile ?",
+        "title": "Doit-on intégrer la nouvelle fonctionnalité de tracim maintenant ?",
         "type": "Thread",
         "status": "current"
       },
@@ -121,7 +121,7 @@
         "id": 6,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Une photo",
+        "title": "Maquette.png Tracim v3",
         "type": "File",
         "status": "outdated"
       },
@@ -145,7 +145,7 @@
         "id": 8,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Fixe du fichier css",
+        "title": "Correction du fichier css",
         "type": "Issue",
         "status": "current"
       },
@@ -153,7 +153,7 @@
         "id": 3,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Programmation objet",
+        "title": "Correction bug tracim",
         "type": "folder",
         "allowed_app": ["PageHtml", "Thread", "File", "PageMarkdown", "Task", "Issue"],
         "content": []
@@ -165,7 +165,7 @@
       "id": 4,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "Backend appli n°578",
+      "title": "Schema Backend tracim v2",
       "type": "File",
       "status": "outdated"
     },
@@ -173,7 +173,7 @@
       "id": 5,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "La programmation fonctionnelle",
+      "title": "Modification design v2",
       "type": "PageHtml",
       "status": "outdated"
     },
@@ -181,7 +181,7 @@
       "id": 11,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "ticket à fixe",
+      "title": "Correction à effectuer sur le frontend de Tracim v2",
       "type": "folder",
       "allowed_app": ["PageHtml", "Thread", "File", "PageMarkdown", "Task", "Issue"],
       "content": []
@@ -192,7 +192,7 @@
       "id": 12,
       "parent_id": 11,
       "workspace_id": 1,
-      "title": "ticket à fixe",
+      "title": "Liste des correction à effectuer",
       "type": "PageHtml",
       "status": "current"
     },
@@ -200,7 +200,7 @@
       "id": 13,
       "parent_id": 11,
       "workspace_id": 1,
-      "title": "issue n°555",
+      "title": "Ticket Prioritaire",
       "type": "Issue",
       "status": "current"
     }
@@ -260,7 +260,7 @@
   "content_data_pageHtml": {
     "id": "1",
     "type": "pageHtml",
-    "title": "La programmation fonctionnelle",
+    "title": "Modification Design v2",
     "status": "validated",
     "icon": "fa fa-fw fa-code-fork",
     "version": "version n°5",
@@ -274,7 +274,7 @@
   "content_data_thread": {
     "id": 2,
     "type": "thread",
-    "title": "La programmation fonctionnelle est-elle vraiment utile ?",
+    "title": "Doit-on intégrer la nouvelle fonctionnalité de tracim maintenant ?",
     "status": "validated",
     "message_list": [{
       "id": 0,
@@ -340,7 +340,7 @@
   },
   "workspace_list": [{
     "id": 0,
-    "title": "Ressources humaine"
+    "title": "Dev Tracim"
   }, {
     "id": 1,
     "title": "Marketing"

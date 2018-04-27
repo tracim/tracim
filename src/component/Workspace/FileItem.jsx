@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import BtnExtandedAction from '../BtnExtandedAction/ExtandedAction.jsx'
 
 const FileItem = props => {
   const iconStatus = (() => {
@@ -50,32 +51,39 @@ const FileItem = props => {
         </div>
       </div>
 
-      <div className='col-8 col-sm-8 col-md-8 col-lg-8 col-xl-10'>
+      <div className='col-8 col-sm-8 col-md-8 col-lg-8 col-xl-9'>
         <div className='file__name'>
           <div className='file__name__text'>
             { props.name }
           </div>
-          <div className='file__name__icons d-none d-md-flex'>
-            <div className='file__name__icons__download'>
-              <i className='fa fa-download' />
-            </div>
-            <div className='file__name__icons__archive'>
-              <i className='fa fa-archive' />
-            </div>
-            <div className='file__name__icons__delete'>
-              <i className='fa fa-trash-o' />
-            </div>
+
+          <div className='d-none d-md-flex'>
+            <BtnExtandedAction />
           </div>
+
+          {/*
+            <div className='file__name__icons d-none d-md-flex'>
+              <div className='file__name__icons__download'>
+                <i className='fa fa-download' />
+              </div>
+              <div className='file__name__icons__archive'>
+                <i className='fa fa-archive' />
+              </div>
+              <div className='file__name__icons__delete'>
+                <i className='fa fa-trash-o' />
+              </div>
+            </div>
+          */ }
         </div>
       </div>
 
-      <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
-        <div className={classnames('file__status') + colorStatus}>
-          <div className='file__status__text d-none d-lg-block text-center'>
-            {textStatus}
-          </div>
-          <div className='file__status__icon d-block d-lg-none text-center'>
+      <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2'>
+        <div className={classnames('file__status d-flex align-items-center justify-content-center') + colorStatus}>
+          <div className='file__status__icon d-block mr-3'>
             <i className={iconStatus} />
+          </div>
+          <div className='file__status__text d-none d-xl-block'>
+            {textStatus}
           </div>
         </div>
       </div>
