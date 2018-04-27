@@ -15,7 +15,7 @@ from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.views.core_api.session_controller import SessionController
 from tracim.views.default.default_controller import DefaultController
-from tracim.views.errors import Error
+from tracim.views.errors import ErrorSchema
 
 
 def main(global_config, **settings):
@@ -48,7 +48,7 @@ def main(global_config, **settings):
     hapic.set_context(
         PyramidContext(
             configurator=configurator,
-            default_error_builder=Error()
+            default_error_builder=ErrorSchema()
         )
     )
     # Add controllers

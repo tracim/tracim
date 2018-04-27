@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from tracim import TracimRequest
 from tracim.extensions import hapic
 from tracim.views.controllers import Controller
-from tracim.views.errors import Error
+from tracim.views.errors import ErrorSchema
 from pyramid.config import Configurator
 
 
