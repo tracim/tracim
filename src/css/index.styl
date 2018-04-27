@@ -1,7 +1,17 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
+bgandcolor()
+  border-color threadColor
+  color off-white
+  background-color threadColor
+
+bgandcolorhover()
+  border-color darkenThread
+  background-color darkenThread
+  box-shadow shadow-all-side-thread
+
 .wsContentThread
-  width 550px
+  width 1100px
   &__header
     color white
     background-color threadColor
@@ -44,21 +54,34 @@
     &__texteditor
       flex 0 1 auto
       border-top 1px solid grey
-      &__simpletext
-        &__input
-          &:focus
-            color darkBlue
-            border-color darkBlue
+      padding 35px 20px
+      &__textinput
+        width 85%
+        & > textarea
+          border-radius 5px
+          border 1.5px solid grey
+          padding 5px
+          height 80px
+          width 100%
+      &__wrapper
+        display flex
+        flex-direction column
+        justify-content center
+      &__advancedtext
+        &__btn
+          border-color threadColor
+          color threadColor
+          cursor pointer
+          &:hover, &:focus
+            bgandcolorhover()
       &__submit
         &__btn
           display flex
-          border-color threadColor
-          color off-white
-          background-color threadColor
+          cursor pointer
+          bgandcolor()
+          width 118px
           &:hover, &:focus
-            border-color darkenThread
-            background-color darkenThread
-            box-shadow shadow-all-side-thread
+            bgandcolorhover()
 
 .received
   text-align right
@@ -80,21 +103,35 @@
       &__title
         display none
 
-@media (min-width: max-xs) and (max-width: max-md)
+.activeAdvancedText
+  .wsContentThread__app
+    &__texteditor
+      padding 10px
+      height 500px
+      &__textinput
+        width 100%
+      &__wrapper
+        flex-direction row
+        width 100%
+      &__advancedtext
+        margin-right 20px
+
+@media (min-width: min-lg) and (max-width: max-lg)
   .wsContentThread
-    &__app
-      &__texteditor
-        padding 7px
-        &__simpletext
-          display inline-flex
-          width 70%
-        &__submit
-          display inline-flex
-          margin-left 30px
+    width 900px
+
+@media (min-width: min-md) and (max-width: max-md)
+  .wsContentThread
+    width 700px
+    &__app__texteditor__textinput
+      width 75%
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .wsContentThread
     top 69px
+    width 500px
+    &__app__texteditor__textinput
+      width 70%
 
 @media (max-width: max-xs)
   .wsContentThread
@@ -104,10 +141,6 @@
     z-index 1
     &__app
       &__texteditor
-        padding 7px
-        &__simpletext
-          display inline-flex
-          margin-right 15px
-          width 62%
-        &__submit
-          display inline-flex
+        padding 55px 20px 30px 20px
+        &__textinput
+          width 60%

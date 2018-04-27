@@ -95,7 +95,7 @@ class Thread extends React.Component {
       listMessage: fetchResultThread.json.message_list
     })
 
-    wysiwyg()
+    // wysiwyg()
   }
 
   handleClickBtnCloseApp = () => {

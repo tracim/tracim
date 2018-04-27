@@ -25,26 +25,28 @@ const Thread = props => {
         )}
       </ul>
 
-      <form className='wsContentThread__app__texteditor wsContentGeneric__texteditor'>
-        <div className='wsContentThread__app__texteditor__simpletext wsContentGeneric__texteditor__simpletext input-group d-inline-flex d-sm-inline-flex d-md-inline-flex d-lg-none'>
-          <input type='text' className='wsContentThread__app__texteditor__simpletext__input wsContentGeneric__texteditor__simpletext__input form-control' placeholder='...' />
+      <form className='wsContentThread__app__texteditor wsContentGeneric__texteditor d-flex align-items-center justify-content-between flex-wrap'>
+        <div className='wsContentThread__app__texteditor__textinput wsContentGeneric__texteditor__textinput'>
+          <textarea placeholder='Taper votre message ici'/>
+        </div>
 
-          <div className='wsContentThread__app__texteditor__simpletext__icon wsContentGeneric__texteditor__simpletext__icon input-group-addon'>
-            <i className='fa fa-font' />
+        <div className='wsContentThread__app__texteditor__wrapper'>
+
+          <div className='wsContentThread__app__texteditor__advancedtext wsContentGeneric__texteditor__advancedtext mb-2'>
+            <button type='button' className='wsContentThread__app__texteditor__advancedtext__btn wsContentGeneric__texteditor__advancedtext__btn btn btn-outline-primary'>
+              Texte Avancé
+            </button>
           </div>
-        </div>
 
-        <div className='wsContentGeneric__texteditor__wysiwyg d-none d-lg-block'>
-          <textarea className='form-control' />
-        </div>
+          <div className='wsContentThread__app__texteditor__submit wsContentGeneric__texteditor__submit mb-2'>
+            <button type='submit' className='wsContentThread__app__texteditor__submit__btn wsContentGeneric__texteditor__submit__btn btn btn-primary'>
+              Envoyer
+              <div className='wsContentThread__app__texteditor__submit__btn__icon wsContentGeneric__texteditor__submit__btn__icon ml-3'>
+                <i className='fa fa-paper-plane-o' />
+              </div>
+            </button>
+          </div>
 
-        <div className='wsContentThread__app__texteditor__submit wsContentGeneric__texteditor__submit d-lg-flex justify-content-lg-center my-3'>
-          <button type='submit' className='wsContentThread__app__texteditor__submit__btn wsContentGeneric__texteditor__submit__btn btn btn-primary'>
-            Envoyer
-            <div className='wsContentThread__app__texteditor__submit__btn__icon wsContentGeneric__texteditor__submit__btn__icon ml-3'>
-              <i className='fa fa-paper-plane-o' />
-            </div>
-          </button>
         </div>
       </form>
     </div>
