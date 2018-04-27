@@ -42,16 +42,17 @@ leftside()
   &__expand
     position absolute
     top 0
-    right -40px
-    padding 4px 10px
+    right -42px
+    display flex
+    justify-content center
+    align-items center
     border-left 1px solid off-white
     border-bottom-right-radius 15px
+    padding 8px 15px
     cursor pointer
     background-color blue
     color white
     transition all sidebar-animate-speed
-    & > i
-      padding 0 5px 8px 0
   &__btnnewworkspace
     margin 50px 0
     overflow hidden
@@ -121,6 +122,13 @@ leftside()
             &.activeFilter
               .dropdown__icon
                 background-color rgba(253, 253, 253, 0.8)
+
+/***** MEDIA 992px and 1199px ******/
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .sidebar
+    position fixed
 
 /***** MEDIA 576px and 991px ******/
 

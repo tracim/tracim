@@ -40,7 +40,7 @@ class Header extends React.Component {
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
           <div className='header__breadcrumb d-none d-lg-block ml-4'>
-            Ressource humaine - liste des contenus
+            Dev Tracim - liste des contenus
           </div>
 
           <NavbarToggler />

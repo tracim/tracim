@@ -28,7 +28,7 @@ const DropdownCreateButton = props => {
               <i className='fa fa-fw fa-folder-o' />
             </div>
             <div className='setting__link__folder__text'>
-              Créer un Dossier
+              Créer un dossier
             </div>
           </div>
         </div>
@@ -38,7 +38,7 @@ const DropdownCreateButton = props => {
               <i className='fa fa-fw fa-file-text-o' />
             </div>
             <div className='setting__link__apphtml__text'>
-              Créer une page Html
+              Rédiger un document
             </div>
           </div>
         </div>
@@ -58,7 +58,7 @@ const DropdownCreateButton = props => {
               <i className='fa fa-fw fa-file-code-o' />
             </div>
             <div className='setting__link__appmarkdown__text'>
-              Créer une page markdown
+              Rédiger un document markdown
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@ const DropdownCreateButton = props => {
               <i className='fa fa-fw fa-comments-o' />
             </div>
             <div className='setting__link__appthread__text'>
-              Créer une discussion
+              Lancer une discussion
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@ const DropdownCreateButton = props => {
               <i className='fa fa-fw fa-ticket' />
             </div>
             <div className='setting__link__appissue__text'>
-              Créer un ticket
+              Ouvrir un ticket
             </div>
           </div>
         </div>
