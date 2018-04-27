@@ -1,35 +1,30 @@
 # coding=utf-8
-import os
-from http.client import HTTPException
-
-from pyramid.httpexceptions import HTTPNoContent
-from pyramid.response import Response
-from sqlalchemy.orm.exc import NoResultFound
-
-from tracim import TracimRequest
-from tracim.extensions import hapic
-from tracim.lib.core.user import UserApi
-from tracim.models.context_models import UserInContext
-from tracim.views.controllers import Controller
 from pyramid.config import Configurator
-
-from tracim.views import BASE_API_V2
-from tracim.views.core_api.schemas import UserSchema, NoContentSchema
-from tracim.views.core_api.schemas import LoginOutputHeaders
-from tracim.views.core_api.schemas import BasicAuthSchema
-from tracim.exceptions import NotAuthentificated, LoginFailed
-
+from sqlalchemy.orm.exc import NoResultFound
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
 
+from tracim import TracimRequest
+from tracim.extensions import hapic
+from tracim.lib.core.user import UserApi
+from tracim.models.context_models import UserInContext
+from tracim.views.controllers import Controller
+from tracim.views.core_api.schemas import UserSchema
+from tracim.views.core_api.schemas import NoContentSchema
+from tracim.views.core_api.schemas import LoginOutputHeaders
+from tracim.views.core_api.schemas import BasicAuthSchema
+from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import LoginFailed
+
+
 class SessionController(Controller):
 
     @hapic.with_api_doc()
     @hapic.input_headers(LoginOutputHeaders())
-    @hapic.input_query(BasicAuthSchema())
+    @hapic.input_body(BasicAuthSchema())
     @hapic.handle_exception(LoginFailed, http_code=HTTPStatus.BAD_REQUEST)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
@@ -41,10 +36,8 @@ class SessionController(Controller):
         """
         Logs user into the system
         """
-        email = request.params['email']
-        password = request.params['password']
-        if not (email and password):
-            raise Exception
+        email = request.json_body['email']
+        password = request.json_body['password']
         app_config = request.registry.settings['CFG']
         try:
             uapi = UserApi(
@@ -96,33 +89,13 @@ class SessionController(Controller):
     def bind(self, configurator: Configurator):
 
         # Login
-        configurator.add_route(
-            'login',
-            os.path.join(BASE_API_V2, 'sessions', 'login'),
-            request_method='GET'
-        )
-        configurator.add_view(
-            self.login,
-            route_name='login',
-        )
+        configurator.add_route('login', '/sessions/login', request_method='POST')  # nopep8
+        configurator.add_view(self.login, route_name='login')
         # Logout
-        configurator.add_route(
-            'logout',
-            os.path.join(BASE_API_V2, 'sessions', 'logout'),
-            request_method='GET'
-        )
-
-        configurator.add_view(
-            self.logout,
-            route_name='logout',
-        )
+        configurator.add_route('logout', '/sessions/logout', request_method='POST')  # nopep8
+        configurator.add_view(self.logout, route_name='logout')
+        configurator.add_route('logout_get', '/sessions/logout', request_method='GET')  # nopep8
+        configurator.add_view(self.logout, route_name='logout_get')
         # Whoami
-        configurator.add_route(
-            'whoami',
-            os.path.join(BASE_API_V2, 'sessions', 'whoami'),
-            request_method='GET'
-        )
-        configurator.add_view(
-            self.whoami,
-            route_name='whoami',
-        )
+        configurator.add_route('whoami', '/sessions/whoami', request_method='GET')  # nopep8
+        configurator.add_view(self.whoami, route_name='whoami',)

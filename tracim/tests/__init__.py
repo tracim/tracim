@@ -27,10 +27,14 @@ def eq_(a, b, msg=None):
 
 
 class FunctionalTest(unittest.TestCase):
+
+    fixtures = [BaseFixture]
+    sqlalchemy_url = 'sqlite:///tracim_test.sqlite'
+
     def setUp(self):
         DepotManager._clear()
         settings = {
-            'sqlalchemy.url': 'sqlite:///tracim_test.sqlite',
+            'sqlalchemy.url': self.sqlalchemy_url,
             'user.auth_token.validity': '604800',
             'depot_storage_dir': '/tmp/test/depot',
             'depot_storage_name': 'test',
@@ -51,7 +55,7 @@ class FunctionalTest(unittest.TestCase):
             dbsession = get_tm_session(session_factory, transaction.manager)
             try:
                 fixtures_loader = FixturesLoader(dbsession, app_config)
-                fixtures_loader.loads([BaseFixture])
+                fixtures_loader.loads(self.fixtures)
                 transaction.commit()
                 print("Database initialized.")
             except IntegrityError:
@@ -72,10 +76,22 @@ class FunctionalTest(unittest.TestCase):
         DepotManager._clear()
 
 
+class FunctionalTestEmptyDB(FunctionalTest):
+    fixtures = []
+
+
+class FunctionalTestNoDB(FunctionalTest):
+    sqlalchemy_url = 'sqlite://'
+
+    def init_database(self, settings):
+        self.engine = get_engine(settings)
+
+
 class BaseTest(unittest.TestCase):
     """
     Pyramid default test.
     """
+
     def setUp(self):
         logger.debug(self, 'Setup Test...')
         self.config = testing.setUp(settings={
@@ -97,7 +113,7 @@ class BaseTest(unittest.TestCase):
             get_engine,
             get_session_factory,
             get_tm_session,
-            )
+        )
 
         self.engine = get_engine(settings)
         session_factory = get_session_factory(self.engine)
