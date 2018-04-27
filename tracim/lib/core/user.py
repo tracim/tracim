@@ -21,68 +21,44 @@ class UserApi(object):
     def _base_query(self):
         return self._session.query(User)
 
-    def _get_correct_user_type(
-            self,
-            user: User,
-            in_context: bool,
-    ) -> typing.Union[User, UserInContext]:
+    def get_user_with_context(self, user: User) -> UserInContext:
         """
-        Choose user type object depending on in_context bool.
-        :param user:
-        :param in_context:
-        :return: user as User or UserInContext if in_context is True
+        Return UserInContext object from User
         """
-        if in_context:
-            user = UserInContext(
-                user=user,
-                dbsession=self._session,
-                config=self._config,
-            )
+        user = UserInContext(
+            user=user,
+            dbsession=self._session,
+            config=self._config,
+        )
         return user
 
     # Getters
 
-    def get_one(
-            self,
-            user_id: int,
-            in_context: bool=False,
-    ) -> typing.Union[UserInContext, User]:
+    def get_one(self, user_id: int) -> User:
         """
         Get one user by user id
-        :param user_id:
-        :param in_context: Return User or UserInContext Object
-        :return: one user
         """
-        user = self._base_query().filter(User.user_id == user_id).one()
-        return self._get_correct_user_type(user, in_context)
+        return self._base_query().filter(User.user_id == user_id).one()
 
-    def get_one_by_email(
-            self,
-            email: str,
-            in_context: bool=False,
-    ) -> User:
+    def get_one_by_email(self, email: str) -> User:
         """
         Get one user by email
         :param email: Email of the user
-        :param in_context: Return User or UserInContext Object
         :return: one user
         """
-        user = self._base_query().filter(User.email == email).one()
-        return self._get_correct_user_type(user, in_context)
+        return self._base_query().filter(User.email == email).one()
 
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
-    def get_one_by_id(self, id: int, in_context=False) -> User:
-        return self.get_one(user_id=id, in_context=in_context)
+    def get_one_by_id(self, id: int) -> User:
+        return self.get_one(user_id=id)
 
-    def get_current(self, in_context: bool=False):
+    def get_current_user(self) -> User:
         """
         Get current_user
-        :param in_context:
-        :return:
         """
         if not self._user:
             raise UserNotExist()
-        return self._get_correct_user_type(self._user, in_context)
+        return self._user
 
     def get_all(self) -> typing.Iterable[User]:
         return self._session.query(User).order_by(User.display_name).all()
@@ -97,23 +73,18 @@ class UserApi(object):
         except:
             return False
 
-    def authenticate_user(self,
-                          email: str,
-                          password: str,
-                          in_context=False
-        ) -> typing.Union[User, UserInContext]:
+    def authenticate_user(self, email: str, password: str) -> User:
         """
         Authenticate user with email and password, raise AuthenticationFailed
         if uncorrect.
         :param email: email of the user
         :param password: cleartext password of the user
-        :param in_context:
         :return: User who was authenticated.
         """
         try:
             user = self.get_one_by_email(email)
             if user.validate_password(password):
-                return self._get_correct_user_type(user, in_context=in_context)
+                return user
             else:
                 raise BadUserPassword()
         except (BadUserPassword, NoResultFound):

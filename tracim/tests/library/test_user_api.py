@@ -86,46 +86,36 @@ class TestUserApi(DefaultTest):
         one = api.get_one(u.user_id)
         eq_(u.user_id, one.user_id)
 
-    def test_unit__get_correct_user_type__ok__no_context(self):
+    def test_unit__get_user_with_context__nominal_case(self):
         user = User(email='admin@tracim.tracim')
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
-        new_user = api._get_correct_user_type(user, in_context=False)
-        assert isinstance(new_user, User)
-        assert user == new_user
-
-    def test_unit__get_correct_user_type__ok__with_context(self):
-        user = User(email='admin@tracim.tracim')
-        api = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.config,
-        )
-        new_user = api._get_correct_user_type(user, in_context=True)
+        new_user = api.get_user_with_context(user)
         assert isinstance(new_user, UserInContext)
-        assert user != new_user
         assert new_user.user == user
 
-    def test_unit__get_current__ok__nominal_case(self):
+    def test_unit__get_current_user_ok__nominal_case(self):
         user = User(email='admin@tracim.tracim')
         api = UserApi(
             current_user=user,
             session=self.session,
             config=self.config,
         )
-        assert api.get_current().email == 'admin@tracim.tracim'
+        new_user = api.get_current_user()
+        assert isinstance(new_user, User)
+        assert user == new_user
 
-    def test_unit__get_current__err__user_not_exist(self):
+    def test_unit__get_current_user__err__user_not_exist(self):
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
         with pytest.raises(UserNotExist):
-            api.get_current()
+            api.get_current_user()
 
     def test_unit__authenticate_user___ok__nominal_case(self):
         api = UserApi(

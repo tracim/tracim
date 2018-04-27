@@ -62,7 +62,8 @@ class SessionController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        return uapi.get_current(in_context=True)
+        user = uapi.get_current_user()  # User
+        return uapi.get_user_with_context(user)
 
     def bind(self, configurator: Configurator):
 
