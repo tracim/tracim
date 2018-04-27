@@ -1,4 +1,7 @@
 # coding=utf-8
+import pytest
+from sqlalchemy.exc import OperationalError
+
 from tracim.tests import FunctionalTest
 from tracim.tests import FunctionalTestNoDB
 
@@ -14,6 +17,8 @@ class TestLogoutEndpoint(FunctionalTest):
 
 class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
 
+    @pytest.mark.xfail(raises=OperationalError,
+                       reason='Not supported yet by hapic')
     def test_api__try_login_enpoint__err_500__no_inited_db(self):
         params = {
             'email': 'admin@admin.admin',
