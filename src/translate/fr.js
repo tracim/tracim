@@ -13,7 +13,7 @@ const fr = {
       status: 'Statut'
     },
     Folder: {
-      create: 'Créer',
+      create: 'Créer dans ce dossier',
       content_type: 'Type de contenu'
     },
     Sidebar: {
