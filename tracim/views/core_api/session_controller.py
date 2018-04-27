@@ -33,13 +33,10 @@ class SessionController(Controller):
     @hapic.with_api_doc()
     @hapic.input_headers(LoginOutputHeaders())
     @hapic.input_body(BasicAuthSchema())
-    @hapic.handle_exception(AuthenticationFailed, http_code=HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
-    @hapic.output_body(
-        NoContentSchema(),
-        default_http_code=HTTPStatus.NO_CONTENT
-    )
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def login(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs user into the system
@@ -55,10 +52,7 @@ class SessionController(Controller):
         return uapi.authenticate_user(email, password)
 
     @hapic.with_api_doc()
-    @hapic.output_body(
-        NoContentSchema(),
-        default_http_code=HTTPStatus.NO_CONTENT
-    )
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def logout(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs out current logged in user session
@@ -67,13 +61,8 @@ class SessionController(Controller):
         return
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(
-        NotAuthentificated,
-        http_code=HTTPStatus.UNAUTHORIZED
-    )
-    @hapic.output_body(
-        UserSchema(),
-    )
+    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.output_body(UserSchema(),)
     def whoami(self, context, request: TracimRequest, hapic_data=None):
         """
         Return current logged in user or 401
