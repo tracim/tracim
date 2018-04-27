@@ -9,7 +9,7 @@ export const Notification = props => {
   return (
     <div className='account__userpreference__setting__notification'>
       <div className='notification__sectiontitle subTitle ml-2 ml-sm-0'>
-        Espace de Travail et Notification
+        Espace de Travail & Notification
       </div>
 
       <div className='notification__text ml-2 ml-sm-0'>

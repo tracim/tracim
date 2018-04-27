@@ -9,6 +9,8 @@ import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 import Calendar from '../component/Account/Calendar.jsx'
 import Notification from '../component/Account/Notification.jsx'
+import Password from '../component/Account/Password.jsx'
+import Timezone from '../component/Account/Timezone.jsx'
 import { Delimiter } from 'tracim_lib'
 import { updateUserWorkspaceSubscriptionNotif } from '../action-creator.sync.js'
 import {
@@ -23,17 +25,27 @@ class Account extends React.Component {
     this.state = {
       subComponentMenu: [{
         name: 'personalData',
-        menuLabel: 'Informations Compte',
+        menuLabel: 'Mon profil',
         active: true
       },
-      // {
-      //   name: 'calendar',
-      //   menuLabel: 'Calendrier',
-      //   active: false
-      // },
       {
         name: 'notification',
-        menuLabel: 'Notifications',
+        menuLabel: 'Espace de travail & Notifications',
+        active: false
+      },
+      {
+        name: 'password',
+        menuLabel: 'Mot de passe',
+        active: false
+      },
+      {
+        name: 'timezone',
+        menuLabel: 'Fuseau Horaire',
+        active: false
+      },
+      {
+        name: 'calendar',
+        menuLabel: 'Calendrier personnel',
         active: false
       }]
     }
@@ -66,13 +78,20 @@ class Account extends React.Component {
           return <PersonalData />
 
         case 'calendar':
-          return <Calendar user={this.props.user} timezone={this.props.timezone} />
+          return <Calendar user={this.props.user} />
 
         case 'notification':
           return <Notification
             workspaceList={this.props.workspaceList}
             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
           />
+
+        case 'timezone':
+          return <Timezone timezone={this.props.timezone} />
+
+        case 'password':
+          return <Password />
+
       }
     })()
 
