@@ -25,7 +25,7 @@ class SessionController(Controller):
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def login(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs user into the system
@@ -41,7 +41,7 @@ class SessionController(Controller):
         return uapi.authenticate_user(email, password)
 
     @hapic.with_api_doc()
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def logout(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs out current logged in user session
