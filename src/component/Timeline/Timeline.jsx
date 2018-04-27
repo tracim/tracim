@@ -70,20 +70,32 @@ const Timeline = props => {
         })}
       </ul>
 
-      <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
-        <div className={classnames(`${props.customClass}__texteditor__wysiwyg`, 'timeline__texteditor__wysiwyg')}>
-          <textarea />
+      <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor d-flex align-items-center justify-content-between flex-wrap')}>
+
+        <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
+          <textarea placeholder='Taper votre message ici'/>
         </div>
-        <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit d-inline-flex d-lg-flex justify-content-lg-center')}>
-          <button
-            type='submit'
-            className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__texteditor__submit__btn btn')}
-          >
-            Envoyer
-            <div className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}>
-              <i className='fa fa-paper-plane-o' />
-            </div>
-          </button>
+
+        <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
+
+          <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__texteditor__advancedtext')}>
+            <button type='button' className={classnames(`${props.customClass}__texteditor__advancedtext__btn`, 'timeline__texteditor__advancedtext__btn btn btn-outline-primary')}>
+              Texte Avancé
+            </button>
+          </div>
+
+          <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit mb-2')}>
+            <button
+              type='submit'
+              className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__texteditor__submit__btn btn')}
+            >
+              Envoyer
+              <div className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}>
+                <i className='fa fa-paper-plane-o' />
+              </div>
+            </button>
+          </div>
+
         </div>
       </form>
     </div>
