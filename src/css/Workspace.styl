@@ -8,12 +8,21 @@
     &__button
       display flex
       justify-content flex-end
-      margin 50px 10px 0 10px
+      margin 50px 15px 0 0
+      width 100%
       &__btnaddworkspace
         margin-bottom 50px
         padding 10px 55px
+
+@media (min-width: min-md) and (max-width: max-md)
+  .workspace
+    &__content
+      margin 0
+
 @media (min-width: min-sm) and (max-width: max-sm)
   .workspace
+    &__content
+      margin 0
     &__header
       &__btnaddworkspace
         display inline-block
