@@ -91,7 +91,6 @@ class Account extends React.Component {
 
         case 'password':
           return <Password />
-
       }
     })()
 
