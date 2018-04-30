@@ -3,7 +3,7 @@
 # https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/environment.html
 ###
 [app:main]
-use = egg:tracim
+use = egg:tracim_backend
 
 pyramid.reload_templates = true
 pyramid.debug_authorization = false
