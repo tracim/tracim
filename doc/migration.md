@@ -6,12 +6,11 @@ This document is intended to developers.
 
 Migrations on `Tracim` lays on [`alembic`](http://alembic.zzzcomputing.com/en/latest/index.html) which is the migration tool dedicated to `SQLAlchemy`.
 
-In order to use the `alembic` commands, change your current directory to be `tracim/` from the root of the project, also usually named `tracim/` 
+In order to use the `tracimcli` commands, go to the root of the project and
 and active the Tracim virtualenv:
 
-    user@host:~/tracim_backend$ cd tracim/
-    user@host:~/tracim_backend/tracim$ source env/bin/activate
-    (env) user@host:~/tracim_backend/tracim$
+    user@host:~/tracim_backend$ source env/bin/activate
+    (env) user@host:~/tracim_backend$
 
 ## Migration howto - Overview ##
    
