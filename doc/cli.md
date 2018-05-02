@@ -1,4 +1,4 @@
-## TracimCli ##
+# TracimCli #
 
 Tracim has a build-in command line tool.
 
@@ -6,12 +6,11 @@ Tracim has a build-in command line tool.
 
 This document is intended to developers or sysadmin.
 
-In order to use the `tracimcli` commands, change your current directory to be `tracim/` from the root of the project, also usually named `tracim/` 
+In order to use the `tracimcli` commands, go to the root of the project and
 and active the Tracim virtualenv:
 
-    user@host:~/tracim_backend$ cd tracim/
-    user@host:~/tracim_backend/tracim$ source env/bin/activate
-    (env) user@host:~/tracim_backend/tracim$
+    user@host:~/tracim_backend$ source env/bin/activate
+    (env) user@host:~/tracim_backend$
 
 ## Database ##
 
@@ -38,6 +37,10 @@ and active the Tracim virtualenv:
 
     tracimcli -h
     
+## Run services ##
 
+### Webdav wsgidav server ###
+
+    tracimcli webdav start
 
 
