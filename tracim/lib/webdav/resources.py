@@ -163,7 +163,8 @@ class Root(DAVCollection):
                     environ=self.environ,
                     workspace=workspace,
                     user=self.user,
-                    session=self.session)
+                    session=self.session,
+                )
             )
 
         return members
@@ -293,8 +294,12 @@ class Workspace(DAVCollection):
         transaction.commit()
 
         return Folder('%s/%s' % (self.path, transform_to_display(label)),
-                      self.environ, folder,
-                      self.workspace)
+                      self.environ,
+                      content=folder,
+                      session=self.session,
+                      user=self.user,
+                      workspace=self.workspace,
+                      )
 
     def delete(self):
         """For now, it is not possible to delete a workspace through the webdav client."""
@@ -337,12 +342,19 @@ class Workspace(DAVCollection):
                         environ=self.environ,
                         content=content,
                         user=self.user,
-                        session=self.session
+                        session=self.session,
                     )
                 )
             else:
                 self._file_count += 1
-                members.append(OtherFile(content_path, self.environ, content))
+                members.append(
+                    OtherFile(
+                        content_path,
+                        self.environ,
+                        content,
+                        session=self.session,
+                        user=self.user,
+                    ))
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
@@ -351,7 +363,9 @@ class Workspace(DAVCollection):
                     environ=self.environ,
                     content=self.content,
                     workspace=self.workspace,
-                    type=HistoryType.Standard
+                    type=HistoryType.Standard,
+                    session=self.session,
+                    user=self.user,
                 )
             )
 
@@ -361,7 +375,9 @@ class Workspace(DAVCollection):
                     path=self.path + '/' + ".deleted",
                     environ=self.environ,
                     content=self.content,
-                    workspace=self.workspace
+                    workspace=self.workspace,
+                    session=self.session,
+                    user=self.user,
                 )
             )
 
@@ -371,7 +387,9 @@ class Workspace(DAVCollection):
                     path=self.path + '/' + ".archived",
                     environ=self.environ,
                     content=self.content,
-                    workspace=self.workspace
+                    workspace=self.workspace,
+                    user=self.user,
+                    session=self.session,
                 )
             )
 
@@ -482,7 +500,10 @@ class Folder(Workspace):
 
     def move_folder(self, destpath):
 
-        workspace_api = WorkspaceApi(self.user)
+        workspace_api = WorkspaceApi(
+            current_user=self.user,
+            session=self.session,
+        )
         workspace = self.provider.get_workspace_from_path(
             normpath(destpath), workspace_api
         )
@@ -493,7 +514,11 @@ class Folder(Workspace):
             workspace
         )
 
-        with new_revision(self.content):
+        with new_revision(
+            content=self.content,
+            tm=transaction.manager,
+            session=self.session,
+        ):
             if basename(destpath) != self.getDisplayName():
                 self.content_api.update_content(self.content, transform_to_bdd(basename(destpath)))
                 self.content_api.save(self.content)
@@ -568,7 +593,9 @@ class Folder(Workspace):
                     environ=self.environ,
                     content=self.content,
                     workspace=self.workspace,
-                    type=HistoryType.Standard
+                    type=HistoryType.Standard,
+                    user=self.user,
+                    session=self.session,
                 )
             )
 
@@ -578,7 +605,9 @@ class Folder(Workspace):
                     path=self.path + '/' + ".deleted",
                     environ=self.environ,
                     content=self.content,
-                    workspace=self.workspace
+                    workspace=self.workspace,
+                    user=self.user,
+                    session=self.session,
                 )
             )
 
@@ -588,11 +617,16 @@ class Folder(Workspace):
                     path=self.path + '/' + ".archived",
                     environ=self.environ,
                     content=self.content,
-                    workspace=self.workspace
+                    workspace=self.workspace,
+                    user=self.user,
+                    session=self.session,
                 )
             )
 
         return members
+
+# TODO - G.M - 02-05-2018 - Check these object (History/Deleted/Archived Folder)
+# Those object are now not in used by tracim and also not tested,
 
 
 class HistoryFolder(Folder):
@@ -625,7 +659,9 @@ class HistoryFolder(Folder):
         self.content_api = ContentApi(
             current_user=self.user,
             show_archived=self._is_archived,
-            show_deleted=self._is_deleted
+            show_deleted=self._is_deleted,
+            session=self.session,
+            config=self.provider.app_config,
         )
 
     def __repr__(self) -> str:
@@ -649,7 +685,10 @@ class HistoryFolder(Folder):
         return HistoryFileFolder(
             path='%s/%s' % (self.path, content.get_label_as_file()),
             environ=self.environ,
-            content=content)
+            content=content,
+            session=self.session,
+            user=self.user,
+        )
 
     def getMemberNames(self) -> [str]:
         ret = []
@@ -695,7 +734,10 @@ class HistoryFolder(Folder):
                 members.append(HistoryFileFolder(
                     path='%s/%s' % (self.path, content.get_label_as_file()),
                     environ=self.environ,
-                    content=content))
+                    content=content,
+                    user=self.user,
+                    session=self.session,
+                ))
 
         return members
 
@@ -780,13 +822,36 @@ class DeletedFolder(HistoryFolder):
                 content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
                 if content.type == ContentType.Folder:
-                    members.append(Folder(content_path, self.environ, self.workspace, content))
+                    members.append(
+                        Folder(
+                            content_path,
+                            self.environ,
+                            self.workspace,
+                            content,
+                            user=self.user,
+                            session=self.session,
+                        ))
                 elif content.type == ContentType.File:
                     self._file_count += 1
-                    members.append(File(content_path, self.environ, content))
+                    members.append(
+                        File(
+                            content_path,
+                            self.environ,
+                            content,
+                            user=self.user,
+                            session=self.session,
+                        )
+                    )
                 else:
                     self._file_count += 1
-                    members.append(OtherFile(content_path, self.environ, content))
+                    members.append(
+                        OtherFile(
+                            content_path,
+                            self.environ,
+                            content,
+                            user=self.user,
+                            session=self.session,
+                    ))
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
@@ -797,6 +862,7 @@ class DeletedFolder(HistoryFolder):
                     workspace=self.workspace,
                     user=self.user,
                     type=HistoryType.Standard,
+                    session=self.session,
                 )
             )
 
@@ -877,13 +943,35 @@ class ArchivedFolder(HistoryFolder):
                 content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
                 if content.type == ContentType.Folder:
-                    members.append(Folder(content_path, self.environ, self.workspace, content))
+                    members.append(
+                        Folder(
+                            content_path,
+                            self.environ,
+                            self.workspace,
+                            content,
+                            user=self.user,
+                            session=self.session,
+                        ))
                 elif content.type == ContentType.File:
                     self._file_count += 1
-                    members.append(File(content_path, self.environ, content))
+                    members.append(
+                        File(
+                            content_path,
+                            self.environ,
+                            content,
+                            user=self.user,
+                            session=self.session,
+                        ))
                 else:
                     self._file_count += 1
-                    members.append(OtherFile(content_path, self.environ, content))
+                    members.append(
+                        OtherFile(
+                            content_path,
+                            self.environ,
+                            content,
+                            user=self.user,
+                            session=self.session,
+                        ))
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
@@ -893,7 +981,8 @@ class ArchivedFolder(HistoryFolder):
                     content=self.content,
                     workspace=self.workspace,
                     user=self.user,
-                    type=HistoryType.Standard
+                    type=HistoryType.Standard,
+                    session=self.session,
                 )
             )
 
@@ -955,13 +1044,19 @@ class HistoryFileFolder(HistoryFolder):
                 path='%s%s' % (left_side, transform_to_display(revision.file_name)),
                 environ=self.environ,
                 content=self.content,
-                content_revision=revision)
+                content_revision=revision,
+                session=self.session,
+                user=self.user,
+            )
         else:
             return HistoryOtherFile(
                 path='%s%s' % (left_side, transform_to_display(revision.get_label_as_file())),
                 environ=self.environ,
                 content=self.content,
-                content_revision=revision)
+                content_revision=revision,
+                session=self.session,
+                user=self.user,
+            )
 
     def getMemberList(self) -> [_DAVResource]:
         members = []
@@ -975,14 +1070,20 @@ class HistoryFileFolder(HistoryFolder):
                     path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
                     content=self.content,
-                    content_revision=content)
+                    content_revision=content,
+                    user=self.user,
+                    session=self.session,
+                    )
                 )
             else:
                 members.append(HistoryOtherFile(
                     path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
                     content=self.content,
-                    content_revision=content)
+                    content_revision=content,
+                    user=self.user,
+                    session=self.session,
+                    )
                 )
 
         return members
@@ -1322,8 +1423,20 @@ class HistoryOtherFile(OtherFile):
     """
     A virtual resource corresponding to a specific tracim's revision's page and thread
     """
-    def __init__(self, path: str, environ: dict, content: Content, user:User, content_revision: ContentRevisionRO):
-        super(HistoryOtherFile, self).__init__(path, environ, content, user=user, session=self.session)
+    def __init__(self,
+                 path: str,
+                 environ: dict,
+                 content: Content,
+                 user:User,
+                 content_revision: ContentRevisionRO,
+                 session: Session):
+        super(HistoryOtherFile, self).__init__(
+            path,
+            environ,
+            content,
+            user=user,
+            session=session
+        )
         self.content_revision = content_revision
         self.content_designed = self.design()
 
