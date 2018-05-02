@@ -118,6 +118,8 @@ class RootResource(DAVCollection):
                 workspace_path,
                 self.environ,
                 workspace,
+                session=self.session,
+                user=self.user,
             )
         except AttributeError:
             return None
@@ -150,7 +152,13 @@ class RootResource(DAVCollection):
         self.path, '' if self.path == '/' else '/', transform_to_display(new_workspace.label))
 
         transaction.commit()
-        return WorkspaceResource(workspace_path, self.environ, new_workspace)
+        return WorkspaceResource(
+            workspace_path,
+            self.environ,
+            new_workspace,
+            user=self.user,
+            session=self.session,
+        )
 
     def getMemberList(self):
         """
