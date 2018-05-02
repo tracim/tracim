@@ -68,19 +68,19 @@ class Provider(DAVProvider):
         path = normpath(path)
         root_path = environ['http_authenticator.realm']
 
-        # If the requested path is the root, then we return a Root resource
+        # If the requested path is the root, then we return a RootResource resource
         if path == root_path:
-            return resources.Root(path, environ, user=user, session=session)
+            return resources.RootResource(path, environ, user=user, session=session)
 
         workspace_api = WorkspaceApi(current_user=user, session=session)
         workspace = self.get_workspace_from_path(path, workspace_api)
 
-        # If the request path is in the form root/name, then we return a Workspace resource
+        # If the request path is in the form root/name, then we return a WorkspaceResource resource
         parent_path = dirname(path)
         if parent_path == root_path:
             if not workspace:
                 return None
-            return resources.Workspace(
+            return resources.WorkspaceResource(
                 path=path,
                 environ=environ,
                 workspace=workspace,
@@ -107,10 +107,10 @@ class Provider(DAVProvider):
 
         # Easy cases : path either end with /.deleted, /.archived or /.history, then we return corresponding resources
         if path.endswith(SpecialFolderExtension.Archived) and self._show_archive:
-            return resources.ArchivedFolder(path, environ, workspace, content)
+            return resources.ArchivedFolderResource(path, environ, workspace, content)
 
         if path.endswith(SpecialFolderExtension.Deleted) and self._show_delete:
-            return resources.DeletedFolder(path, environ, workspace, content)
+            return resources.DeletedFolderResource(path, environ, workspace, content)
 
         if path.endswith(SpecialFolderExtension.History) and self._show_history:
             is_deleted_folder = re.search(r'/\.deleted/\.history$', path) is not None
@@ -120,13 +120,13 @@ class Provider(DAVProvider):
                 else HistoryType.Archived if is_archived_folder \
                 else HistoryType.Standard
 
-            return resources.HistoryFolder(path, environ, workspace, content, type)
+            return resources.HistoryFolderResource(path, environ, workspace, content, type)
 
         # Now that's more complicated, we're trying to find out if the path end with /.history/file_name
         is_history_file_folder = re.search(r'/\.history/([^/]+)$', path) is not None
 
         if is_history_file_folder and self._show_history:
-            return resources.HistoryFileFolder(
+            return resources.HistoryFileFolderResource(
                 path=path,
                 environ=environ,
                 content=content
@@ -143,7 +143,7 @@ class Provider(DAVProvider):
             content = self.get_content_from_revision(content_revision, content_api)
 
             if content.type == ContentType.File:
-                return resources.HistoryFile(path, environ, content, content_revision)
+                return resources.HistoryFileResource(path, environ, content, content_revision)
             else:
                 return resources.HistoryOtherFile(path, environ, content, content_revision)
 
@@ -153,7 +153,7 @@ class Provider(DAVProvider):
         if content is None:
             return None
         if content.type == ContentType.Folder:
-            return resources.Folder(
+            return resources.FolderResource(
                 path=path,
                 environ=environ,
                 workspace=content.workspace,
@@ -162,7 +162,7 @@ class Provider(DAVProvider):
                 user=user,
             )
         elif content.type == ContentType.File:
-            return resources.File(
+            return resources.FileResource(
                 path=path,
                 environ=environ,
                 content=content,
@@ -170,7 +170,7 @@ class Provider(DAVProvider):
                 user=user
             )
         else:
-            return resources.OtherFile(
+            return resources.OtherFileResource(
                 path=path,
                 environ=environ,
                 content=content,
