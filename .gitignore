@@ -60,6 +60,7 @@ wsgidav.conf
 *~
 *.sqlite
 *.lock
+depot/
 
 # binary translation files
 *.mo
