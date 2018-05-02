@@ -75,9 +75,9 @@ class WebdavAppFactory(object):
             WsgiDavDirBrowser,
             TracimUserSession,
             HTTPAuthenticator,
-            TracimEnv,
             ErrorPrinter,
             TracimWsgiDavDebugFilter,
+            TracimEnv,
 
         ]
         config['provider_mapping'] = {

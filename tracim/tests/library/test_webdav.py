@@ -311,8 +311,6 @@ class TestWebDav(StandardTest):
             )
         )
 
-    @pytest.mark.xfail(raises=InvalidRequestError,
-                       reason='Sqlalchemy session and transaction bug')
     def test_unit__create_delete_and_create_file__ok(self):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
@@ -559,8 +557,6 @@ class TestWebDav(StandardTest):
                 content_to_move.parent.label
         )
 
-    @pytest.mark.xfail(raises=InvalidRequestError,
-                       reason='Sqlalchemy session and transaction bug')
     def test_unit__update_content__ok(self):
         provider = self._get_provider(self.app_config)
         environ = self._get_environ(
