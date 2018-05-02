@@ -8,7 +8,7 @@ from tracim.lib.core.user import UserApi
 from tracim.tests import eq_
 from tracim.lib.core.notifications import DummyNotifier
 from tracim.lib.webdav.dav_provider import Provider
-from tracim.lib.webdav.resources import Root
+from tracim.lib.webdav.resources import RootResource
 from tracim.models import Content
 from tracim.models import ContentRevisionRO
 from tracim.tests import StandardTest
@@ -88,8 +88,8 @@ class TestWebDav(StandardTest):
                 'bob@fsf.local',
             )
         )
-        assert root, 'Path / should return a Root instance'
-        assert isinstance(root, Root)
+        assert root, 'Path / should return a RootResource instance'
+        assert isinstance(root, RootResource)
 
     def test_unit__list_workspaces_with_user__ok(self):
         provider = self._get_provider(self.app_config)
@@ -100,14 +100,14 @@ class TestWebDav(StandardTest):
                 'bob@fsf.local',
             )
         )
-        assert root, 'Path / should return a Root instance'
-        assert isinstance(root, Root), 'Path / should return a Root instance'
+        assert root, 'Path / should return a RootResource instance'
+        assert isinstance(root, RootResource), 'Path / should return a RootResource instance'
 
         children = root.getMemberList()
         eq_(
             2,
             len(children),
-            msg='Root should return 2 workspaces instead {0}'.format(
+            msg='RootResource should return 2 workspaces instead {0}'.format(
                 len(children),
             )
         )
@@ -130,14 +130,14 @@ class TestWebDav(StandardTest):
                 'admin@admin.admin',
             )
         )
-        assert root, 'Path / should return a Root instance'
-        assert isinstance(root, Root), 'Path / should return a Root instance'
+        assert root, 'Path / should return a RootResource instance'
+        assert isinstance(root, RootResource), 'Path / should return a RootResource instance'
 
         children = root.getMemberList()
         eq_(
             2,
             len(children),
-            msg='Root should return 2 workspaces instead {0}'.format(
+            msg='RootResource should return 2 workspaces instead {0}'.format(
                 len(children),
             )
         )

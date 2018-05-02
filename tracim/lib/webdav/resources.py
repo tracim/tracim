@@ -74,13 +74,13 @@ class ManageActions(object):
         transaction.commit()
 
 
-class Root(DAVCollection):
+class RootResource(DAVCollection):
     """
-    Root ressource that represents tracim's home, which contains all workspaces
+    RootResource ressource that represents tracim's home, which contains all workspaces
     """
 
     def __init__(self, path: str, environ: dict, user: User, session: Session):
-        super(Root, self).__init__(path, environ)
+        super(RootResource, self).__init__(path, environ)
 
         self.user = user
         self.session = session
@@ -94,7 +94,7 @@ class Root(DAVCollection):
         )
 
     def __repr__(self) -> str:
-        return '<DAVCollection: Root>'
+        return '<DAVCollection: RootResource>'
 
     def getMemberNames(self) -> [str]:
         """
@@ -114,7 +114,11 @@ class Root(DAVCollection):
             workspace = self.workspace_api.get_one_by_label(label)
             workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', transform_to_display(workspace.label))
 
-            return Workspace(workspace_path, self.environ, workspace)
+            return WorkspaceResource(
+                workspace_path,
+                self.environ,
+                workspace,
+            )
         except AttributeError:
             return None
 
@@ -146,7 +150,7 @@ class Root(DAVCollection):
         self.path, '' if self.path == '/' else '/', transform_to_display(new_workspace.label))
 
         transaction.commit()
-        return Workspace(workspace_path, self.environ, new_workspace)
+        return WorkspaceResource(workspace_path, self.environ, new_workspace)
 
     def getMemberList(self):
         """
@@ -158,7 +162,7 @@ class Root(DAVCollection):
         for workspace in self.workspace_api.get_all():
             workspace_path = '%s%s%s' % (self.path, '' if self.path == '/' else '/', workspace.label)
             members.append(
-                Workspace(
+                WorkspaceResource(
                     path=workspace_path,
                     environ=self.environ,
                     workspace=workspace,
@@ -170,7 +174,7 @@ class Root(DAVCollection):
         return members
 
 
-class Workspace(DAVCollection):
+class WorkspaceResource(DAVCollection):
     """
     Workspace resource corresponding to tracim's workspaces.
     Direct children can only be folders, though files might come later on and are supported
@@ -183,7 +187,7 @@ class Workspace(DAVCollection):
                  user: User,
                  session: Session
     ) -> None:
-        super(Workspace, self).__init__(path, environ)
+        super(WorkspaceResource, self).__init__(path, environ)
 
         self.workspace = workspace
         self.content = None
@@ -263,7 +267,7 @@ class Workspace(DAVCollection):
             path=self.path + '/' + file_name
         )
 
-    def createCollection(self, label: str) -> 'Folder':
+    def createCollection(self, label: str) -> 'FolderResource':
         """
         Create a new folder for the current workspace. As it's not possible for the user to choose
         which types of content are allowed in this folder, we allow allow all of them.
@@ -293,13 +297,13 @@ class Workspace(DAVCollection):
 
         transaction.commit()
 
-        return Folder('%s/%s' % (self.path, transform_to_display(label)),
-                      self.environ,
-                      content=folder,
-                      session=self.session,
-                      user=self.user,
-                      workspace=self.workspace,
-                      )
+        return FolderResource('%s/%s' % (self.path, transform_to_display(label)),
+                              self.environ,
+                              content=folder,
+                              session=self.session,
+                              user=self.user,
+                              workspace=self.workspace,
+                              )
 
     def delete(self):
         """For now, it is not possible to delete a workspace through the webdav client."""
@@ -325,7 +329,7 @@ class Workspace(DAVCollection):
 
             if content.type == ContentType.Folder:
                 members.append(
-                    Folder(
+                    FolderResource(
                         path=content_path,
                         environ=self.environ,
                         workspace=self.workspace,
@@ -337,7 +341,7 @@ class Workspace(DAVCollection):
             elif content.type == ContentType.File:
                 self._file_count += 1
                 members.append(
-                    File(
+                    FileResource(
                         path=content_path,
                         environ=self.environ,
                         content=content,
@@ -348,7 +352,7 @@ class Workspace(DAVCollection):
             else:
                 self._file_count += 1
                 members.append(
-                    OtherFile(
+                    OtherFileResource(
                         content_path,
                         self.environ,
                         content,
@@ -358,7 +362,7 @@ class Workspace(DAVCollection):
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
-                HistoryFolder(
+                HistoryFolderResource(
                     path=self.path + '/' + ".history",
                     environ=self.environ,
                     content=self.content,
@@ -371,7 +375,7 @@ class Workspace(DAVCollection):
 
         if self.provider.show_delete():
             members.append(
-                DeletedFolder(
+                DeletedFolderResource(
                     path=self.path + '/' + ".deleted",
                     environ=self.environ,
                     content=self.content,
@@ -383,7 +387,7 @@ class Workspace(DAVCollection):
 
         if self.provider.show_archive():
             members.append(
-                ArchivedFolder(
+                ArchivedFolderResource(
                     path=self.path + '/' + ".archived",
                     environ=self.environ,
                     content=self.content,
@@ -396,9 +400,9 @@ class Workspace(DAVCollection):
         return members
 
 
-class Folder(Workspace):
+class FolderResource(WorkspaceResource):
     """
-    Folder resource corresponding to tracim's folders.
+    FolderResource resource corresponding to tracim's folders.
     Direct children can only be either folder, files, pages or threads
     By default when creating new folders, we allow them to contain all types of content
     """
@@ -412,7 +416,7 @@ class Folder(Workspace):
             user: User,
             session: Session
     ):
-        super(Folder, self).__init__(
+        super(FolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
@@ -549,7 +553,7 @@ class Folder(Workspace):
             try:
                 if content.type == ContentType.Folder:
                     members.append(
-                        Folder(
+                        FolderResource(
                             path=content_path,
                             environ=self.environ,
                             workspace=self.workspace,
@@ -561,7 +565,7 @@ class Folder(Workspace):
                 elif content.type == ContentType.File:
                     self._file_count += 1
                     members.append(
-                        File(
+                        FileResource(
                             path=content_path,
                             environ=self.environ,
                             content=content,
@@ -571,7 +575,7 @@ class Folder(Workspace):
                 else:
                     self._file_count += 1
                     members.append(
-                        OtherFile(
+                        OtherFileResource(
                             path=content_path,
                             environ=self.environ,
                             content=content,
@@ -588,7 +592,7 @@ class Folder(Workspace):
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
-                HistoryFolder(
+                HistoryFolderResource(
                     path=self.path + '/' + ".history",
                     environ=self.environ,
                     content=self.content,
@@ -601,7 +605,7 @@ class Folder(Workspace):
 
         if self.provider.show_delete():
             members.append(
-                DeletedFolder(
+                DeletedFolderResource(
                     path=self.path + '/' + ".deleted",
                     environ=self.environ,
                     content=self.content,
@@ -613,7 +617,7 @@ class Folder(Workspace):
 
         if self.provider.show_archive():
             members.append(
-                ArchivedFolder(
+                ArchivedFolderResource(
                     path=self.path + '/' + ".archived",
                     environ=self.environ,
                     content=self.content,
@@ -629,7 +633,7 @@ class Folder(Workspace):
 # Those object are now not in used by tracim and also not tested,
 
 
-class HistoryFolder(Folder):
+class HistoryFolderResource(FolderResource):
     """
     A virtual resource which contains a sub-folder for every files (DAVNonCollection) contained in the parent
     folder
@@ -644,7 +648,7 @@ class HistoryFolder(Folder):
                  content: Content=None,
                  type: str=HistoryType.Standard
     ) -> None:
-        super(HistoryFolder, self).__init__(
+        super(HistoryFolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
@@ -665,7 +669,7 @@ class HistoryFolder(Folder):
         )
 
     def __repr__(self) -> str:
-        return "<DAVCollection: HistoryFolder (%s)>" % self.content.file_name
+        return "<DAVCollection: HistoryFolderResource (%s)>" % self.content.file_name
 
     def getCreationDate(self) -> float:
         return mktime(datetime.now().timetuple())
@@ -682,7 +686,7 @@ class HistoryFolder(Folder):
             content_parent=self.content
         )
 
-        return HistoryFileFolder(
+        return HistoryFileFolderResource(
             path='%s/%s' % (self.path, content.get_label_as_file()),
             environ=self.environ,
             content=content,
@@ -731,7 +735,7 @@ class HistoryFolder(Folder):
         
         for content in children:
             if content.is_archived == self._is_archived and content.is_deleted == self._is_deleted:
-                members.append(HistoryFileFolder(
+                members.append(HistoryFileFolderResource(
                     path='%s/%s' % (self.path, content.get_label_as_file()),
                     environ=self.environ,
                     content=content,
@@ -742,7 +746,7 @@ class HistoryFolder(Folder):
         return members
 
 
-class DeletedFolder(HistoryFolder):
+class DeletedFolderResource(HistoryFolderResource):
     """
     A virtual resources which exists for every folder or workspaces which contains their deleted children
     """
@@ -756,7 +760,7 @@ class DeletedFolder(HistoryFolder):
             session: Session,
             content: Content=None
     ):
-        super(DeletedFolder, self).__init__(
+        super(DeletedFolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
@@ -769,7 +773,7 @@ class DeletedFolder(HistoryFolder):
         self._file_count = 0
 
     def __repr__(self):
-        return "<DAVCollection: DeletedFolder (%s)" % self.content.file_name
+        return "<DAVCollection: DeletedFolderResource (%s)" % self.content.file_name
 
     def getCreationDate(self) -> float:
         return mktime(datetime.now().timetuple())
@@ -823,7 +827,7 @@ class DeletedFolder(HistoryFolder):
 
                 if content.type == ContentType.Folder:
                     members.append(
-                        Folder(
+                        FolderResource(
                             content_path,
                             self.environ,
                             self.workspace,
@@ -834,7 +838,7 @@ class DeletedFolder(HistoryFolder):
                 elif content.type == ContentType.File:
                     self._file_count += 1
                     members.append(
-                        File(
+                        FileResource(
                             content_path,
                             self.environ,
                             content,
@@ -845,7 +849,7 @@ class DeletedFolder(HistoryFolder):
                 else:
                     self._file_count += 1
                     members.append(
-                        OtherFile(
+                        OtherFileResource(
                             content_path,
                             self.environ,
                             content,
@@ -855,7 +859,7 @@ class DeletedFolder(HistoryFolder):
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
-                HistoryFolder(
+                HistoryFolderResource(
                     path=self.path + '/' + ".history",
                     environ=self.environ,
                     content=self.content,
@@ -869,7 +873,7 @@ class DeletedFolder(HistoryFolder):
         return members
 
 
-class ArchivedFolder(HistoryFolder):
+class ArchivedFolderResource(HistoryFolderResource):
     """
     A virtual resources which exists for every folder or workspaces which contains their archived children
     """
@@ -882,7 +886,7 @@ class ArchivedFolder(HistoryFolder):
             session: Session,
             content: Content=None
     ):
-        super(ArchivedFolder, self).__init__(
+        super(ArchivedFolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=workspace,
@@ -895,7 +899,7 @@ class ArchivedFolder(HistoryFolder):
         self._file_count = 0
 
     def __repr__(self) -> str:
-        return "<DAVCollection: ArchivedFolder (%s)" % self.content.file_name
+        return "<DAVCollection: ArchivedFolderResource (%s)" % self.content.file_name
 
     def getCreationDate(self) -> float:
         return mktime(datetime.now().timetuple())
@@ -944,7 +948,7 @@ class ArchivedFolder(HistoryFolder):
 
                 if content.type == ContentType.Folder:
                     members.append(
-                        Folder(
+                        FolderResource(
                             content_path,
                             self.environ,
                             self.workspace,
@@ -955,7 +959,7 @@ class ArchivedFolder(HistoryFolder):
                 elif content.type == ContentType.File:
                     self._file_count += 1
                     members.append(
-                        File(
+                        FileResource(
                             content_path,
                             self.environ,
                             content,
@@ -965,7 +969,7 @@ class ArchivedFolder(HistoryFolder):
                 else:
                     self._file_count += 1
                     members.append(
-                        OtherFile(
+                        OtherFileResource(
                             content_path,
                             self.environ,
                             content,
@@ -975,7 +979,7 @@ class ArchivedFolder(HistoryFolder):
 
         if self._file_count > 0 and self.provider.show_history():
             members.append(
-                HistoryFolder(
+                HistoryFolderResource(
                     path=self.path + '/' + ".history",
                     environ=self.environ,
                     content=self.content,
@@ -989,7 +993,7 @@ class ArchivedFolder(HistoryFolder):
         return members
 
 
-class HistoryFileFolder(HistoryFolder):
+class HistoryFileFolderResource(HistoryFolderResource):
     """
     A virtual resource that contains for a given content (file/page/thread) all its revisions
     """
@@ -1002,7 +1006,7 @@ class HistoryFileFolder(HistoryFolder):
             user: User,
             session: Session
     ) -> None:
-        super(HistoryFileFolder, self).__init__(
+        super(HistoryFileFolderResource, self).__init__(
             path=path,
             environ=environ,
             workspace=content.workspace,
@@ -1013,7 +1017,7 @@ class HistoryFileFolder(HistoryFolder):
         )
 
     def __repr__(self) -> str:
-        return "<DAVCollection: HistoryFileFolder (%s)" % self.content.file_name
+        return "<DAVCollection: HistoryFileFolderResource (%s)" % self.content.file_name
 
     def getDisplayName(self) -> str:
         return self.content.get_label_as_file()
@@ -1040,7 +1044,7 @@ class HistoryFileFolder(HistoryFolder):
         left_side = '%s/(%d - %s) ' % (self.path, revision.revision_id, revision.revision_type)
 
         if self.content.type == ContentType.File:
-            return HistoryFile(
+            return HistoryFileResource(
                 path='%s%s' % (left_side, transform_to_display(revision.file_name)),
                 environ=self.environ,
                 content=self.content,
@@ -1066,7 +1070,7 @@ class HistoryFileFolder(HistoryFolder):
             left_side = '%s/(%d - %s) ' % (self.path, content.revision_id, content.revision_type)
 
             if self.content.type == ContentType.File:
-                members.append(HistoryFile(
+                members.append(HistoryFileResource(
                     path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
                     content=self.content,
@@ -1089,9 +1093,9 @@ class HistoryFileFolder(HistoryFolder):
         return members
 
 
-class File(DAVNonCollection):
+class FileResource(DAVNonCollection):
     """
-    File resource corresponding to tracim's files
+    FileResource resource corresponding to tracim's files
     """
     def __init__(
             self,
@@ -1101,7 +1105,7 @@ class File(DAVNonCollection):
             user: User,
             session: Session,
     ) -> None:
-        super(File, self).__init__(path, environ)
+        super(FileResource, self).__init__(path, environ)
 
         self.content = content
         self.user = user
@@ -1117,7 +1121,7 @@ class File(DAVNonCollection):
         # self.setPropertyValue('Win32FileAttributes', '00000021')
 
     def __repr__(self) -> str:
-        return "<DAVNonCollection: File (%d)>" % self.content.revision_id
+        return "<DAVNonCollection: FileResource (%d)>" % self.content.revision_id
 
     def getContentLength(self) -> int:
         return self.content.depot_file.file.content_length
@@ -1331,16 +1335,16 @@ class File(DAVNonCollection):
         ).action()
 
 
-class HistoryFile(File):
+class HistoryFileResource(FileResource):
     """
     A virtual resource corresponding to a specific tracim's revision's file
     """
     def __init__(self, path: str, environ: dict, content: Content, user: User, session: Session, content_revision: ContentRevisionRO):
-        super(HistoryFile, self).__init__(path, environ, content, user=user, session=session)
+        super(HistoryFileResource, self).__init__(path, environ, content, user=user, session=session)
         self.content_revision = content_revision
 
     def __repr__(self) -> str:
-        return "<DAVNonCollection: HistoryFile (%s-%s)" % (self.content.content_id, self.content.file_name)
+        return "<DAVNonCollection: HistoryFileResource (%s-%s)" % (self.content.content_id, self.content.file_name)
 
     def getDisplayName(self) -> str:
         left_side = '(%d - %s) ' % (self.content_revision.revision_id, self.content_revision.revision_type)
@@ -1369,12 +1373,12 @@ class HistoryFile(File):
         raise DAVError(HTTP_FORBIDDEN)
 
 
-class OtherFile(File):
+class OtherFileResource(FileResource):
     """
-    File resource corresponding to tracim's page and thread
+    FileResource resource corresponding to tracim's page and thread
     """
     def __init__(self, path: str, environ: dict, content: Content, user:User, session: Session):
-        super(OtherFile, self).__init__(path, environ, content, user=user, session=session)
+        super(OtherFileResource, self).__init__(path, environ, content, user=user, session=session)
 
         self.content_revision = self.content.revision
 
@@ -1393,7 +1397,7 @@ class OtherFile(File):
         return self.path
 
     def __repr__(self) -> str:
-        return "<DAVNonCollection: OtherFile (%s)" % self.content.file_name
+        return "<DAVNonCollection: OtherFileResource (%s)" % self.content.file_name
 
     def getContentLength(self) -> int:
         return len(self.content_designed)
@@ -1419,7 +1423,7 @@ class OtherFile(File):
             )
 
 
-class HistoryOtherFile(OtherFile):
+class HistoryOtherFile(OtherFileResource):
     """
     A virtual resource corresponding to a specific tracim's revision's page and thread
     """
