@@ -16,7 +16,17 @@ and active the Tracim virtualenv:
 
 ### Create database
 
-    tracim db init
+    tracimcli db init
+
+### Create database with some default test data (many users, workspaces, etc…)
+
+    tracimcli db init --test-data
+
+### Delete database /!\
+
+This will drop all your database, be carefull !
+
+    tracimcli db delete --force
 
 ## User ##
    
