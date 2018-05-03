@@ -8,6 +8,16 @@ from tracim.models import User
 from tracim.models.auth import Profile
 
 
+class LoginCredentials(object):
+    """
+    Login credentials model for login
+    """
+
+    def __init__(self, email: str, password: str):
+        self.email = email
+        self.password = password
+
+
 class UserInContext(object):
     """
     Interface to get User data and User data related to context.

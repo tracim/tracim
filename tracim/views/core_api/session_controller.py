@@ -30,15 +30,15 @@ class SessionController(Controller):
         """
         Logs user into the system
         """
-        email = request.json_body['email']
-        password = request.json_body['password']
+
+        login = hapic_data.body
         app_config = request.registry.settings['CFG']
         uapi = UserApi(
             None,
             session=request.dbsession,
             config=app_config,
         )
-        return uapi.authenticate_user(email, password)
+        return uapi.authenticate_user(login.email, login.password)
 
     @hapic.with_api_doc()
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
