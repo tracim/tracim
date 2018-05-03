@@ -28,7 +28,7 @@ get source from github:
 
 go to *tracim_backend* directory:
 
-    pushd tracim_backend
+    cd tracim_backend
 
 ### Setup Python Virtualenv ###
 
@@ -101,7 +101,7 @@ Run mypy checks:
 
 Run pep8 checks:
 
-    pep8 tracim --exclude 'tracim/env'
+    pep8 tracim
 
 Tracim API
 ----------
