@@ -14,20 +14,23 @@ Installation
 
 ### Distribution dependencies ###
 
-on Debian Stretch (9) :
+on Debian Stretch (9) with sudo:
 
+    sudo apt update
     sudo apt install git
-    sudo apt install python3 python-virtualenv python3-dev python-pip
+    sudo apt install python3 python3-venv python3-dev python3-pip
 
 ### Get the source ###
 
+get source from github:
+
     git clone https://github.com/tracim/tracim_backend.git
 
+go to *tracim_backend* directory:
+
+    cd tracim_backend
+
 ### Setup Python Virtualenv ###
-
-Go to *tracim* subdirectory:
-
-    cd tracim
 
 Create a Python virtual environment:
 
@@ -64,7 +67,7 @@ For mySQL:
 
 Create [configuration file](doc/setting.md) for a development environment:
 
-    cp development.ini.base development.ini
+    cp development.ini.sample development.ini
 
 Initialize the database using [tracimcli](doc/cli.md) tool
 
@@ -75,6 +78,16 @@ Initialize the database using [tracimcli](doc/cli.md) tool
 Run your project:
 
     pserve development.ini
+
+### Configure and Run Webdav Server (Unstable) ###
+
+create wsgidav configuration file :
+
+    cp wsgidav.conf.sample wsgidav.conf
+
+run wsgidav server:
+
+    tracimcli webdav start
 
 ### Run Tests and others checks ###
 

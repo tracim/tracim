@@ -5,7 +5,7 @@ from depot.manager import DepotManager
 from pyramid import testing
 from sqlalchemy.exc import IntegrityError
 
-from tracim.command.initializedb import InitializeDBCommand
+from tracim.command.database import InitializeDBCommand
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models import get_engine, DeclarativeBase, get_session_factory, \

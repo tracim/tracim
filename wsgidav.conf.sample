@@ -1,0 +1,38 @@
+################################################################################
+# Sample WsgiDAV configuration file
+#
+# 1. Rename this file to `wsgidav.conf`
+# 2. Adjust settings as appropriate
+# 3. Run tracim as you always do :)
+#
+################################################################################
+
+################################################################################
+# SERVER OPTIONS
+#===============================================================================
+
+
+# host  = "localhost"
+# host  = "192.168.0.1"
+host  = "0.0.0.0"
+
+port = 3030
+
+show_history = True
+show_deleted = True
+show_archived = True
+
+manager_locks = True
+
+root_path = ''
+
+# Tracim doesn't support digest auth for webdav
+acceptbasic = True
+acceptdigest = False
+defaultdigest = False
+#===============================================================================
+# Lock Manager
+#
+# Example: Use PERSISTENT shelve based lock manager
+#from wsgidav.lock_storage import LockStorageShelve
+#locksmanager = LockStorageShelve("wsgidav-locks.shelve")

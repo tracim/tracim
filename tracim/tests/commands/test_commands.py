@@ -19,3 +19,4 @@ class TestCommands(object):
         assert output.find('user create') > 0
         assert output.find('user update') > 0
         assert output.find('db init') > 0
+        assert output.find('db delete') > 0

@@ -98,7 +98,8 @@ setup(
             'test = tracim.command:TestTracimCommand',
             'user_create = tracim.command.user:CreateUserCommand',
             'user_update = tracim.command.user:UpdateUserCommand',
-            'db_init = tracim.command.initializedb:InitializeDBCommand',
+            'db_init = tracim.command.database:InitializeDBCommand',
+            'db_delete = tracim.command.database:DeleteDBCommand',
             'webdav start = tracim.command.webdav:WebdavRunnerCommand',
         ]
     },
