@@ -17,7 +17,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        u = api.create_user()
+        u = api.create_minimal_user()
         api.update(u, 'bob', 'bob@bob', True)
 
         nu = api.get_one_by_email('bob@bob')
@@ -31,7 +31,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        u = api.create_user()
+        u = api.create_minimal_user()
         api.update(u, 'bibi', 'bibi@bibi', True)
         transaction.commit()
 
@@ -44,7 +44,8 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        u = api.create_user()
+        u = api.create_minimal_user()
+        self.session.flush()
         api.update(u, 'bibi', 'bibi@bibi', True)
         uid = u.user_id
         transaction.commit()
@@ -67,8 +68,8 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        # u1 = api.create_user(True)
-        # u2 = api.create_user(True)
+        # u1 = api.create_minimal_user(True)
+        # u2 = api.create_minimal_user(True)
 
         # users = api.get_all()
         # ok_(2==len(users))
@@ -79,7 +80,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        u = api.create_user()
+        u = api.create_minimal_user()
         api.update(u, 'titi', 'titi@titi', True)
         one = api.get_one(u.user_id)
         eq_(u.user_id, one.user_id)

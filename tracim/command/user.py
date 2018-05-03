@@ -115,7 +115,7 @@ class UserCommand(AppContextCommand):
             password = ''
 
         try:
-            user = self._user_api.create_user(email=login)
+            user = self._user_api.create_minimal_user(email=login)
             user.password = password
             self._user_api.save(user)
             # TODO - G.M - 04-04-2018 - [Caldav] Check this code

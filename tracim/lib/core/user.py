@@ -4,6 +4,7 @@ import threading
 import transaction
 import typing as typing
 
+from tracim.lib.mail_notifier.notifier import get_email_manager
 from tracim.models.auth import User
 
 
@@ -34,14 +35,18 @@ class UserApi(object):
             user: User,
             name: str=None,
             email: str=None,
-            do_save=True,
+            password: str=None,
             timezone: str='',
+            do_save=True,
     ):
         if name is not None:
             user.display_name = name
 
         if email is not None:
             user.email = email
+
+        if password is not None:
+            user.password = password
 
         user.timezone = timezone
 
@@ -56,7 +61,40 @@ class UserApi(object):
         except:
             return False
 
-    def create_user(self, email=None, groups=[], save_now=False) -> User:
+    def create_user(
+        self,
+        email: str = None,
+        password: str = None,
+        name: str = None,
+        timezone: str = '',
+        groups=[],
+        do_save: bool=True,
+        do_notify: bool=True,
+    ) -> User:
+        new_user = self.create_minimal_user(email, groups, save_now=False)
+        self.update(
+            user=new_user,
+            name=name,
+            email=email,
+            password=password,
+            timezone=timezone,
+            do_save=do_save,
+        )
+        if do_notify:
+            email_manager = get_email_manager(self._config, self._session)
+            email_manager.notify_created_account(
+                new_user,
+                password=password
+            )
+        return new_user
+
+    def create_minimal_user(
+            self,
+            email=None,
+            groups=[],
+            save_now=False
+    ) -> User:
+        """Previous create_user method"""
         user = User()
 
         if email:

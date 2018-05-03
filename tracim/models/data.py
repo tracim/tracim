@@ -131,12 +131,12 @@ class UserRoleInWorkspace(DeclarativeBase):
     WORKSPACE_MANAGER = 8
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    # LABEL = dict()
-    # LABEL[0] = l_('N/A')
-    # LABEL[1] = l_('Reader')
-    # LABEL[2] = l_('Contributor')
-    # LABEL[4] = l_('Content Manager')
-    # LABEL[8] = l_('Workspace Manager')
+    LABEL = dict()
+    LABEL[0] = l_('N/A')
+    LABEL[1] = l_('Reader')
+    LABEL[2] = l_('Contributor')
+    LABEL[4] = l_('Content Manager')
+    LABEL[8] = l_('Workspace Manager')
     #
     # STYLE = dict()
     # STYLE[0] = ''
@@ -161,8 +161,9 @@ class UserRoleInWorkspace(DeclarativeBase):
     # def style(self):
     #     return UserRoleInWorkspace.STYLE[self.role]
     #
-    # def role_as_label(self):
-    #     return UserRoleInWorkspace.LABEL[self.role]
+
+    def role_as_label(self):
+        return UserRoleInWorkspace.LABEL[self.role]
 
     @classmethod
     def get_all_role_values(self):
@@ -318,6 +319,7 @@ class ContentStatus(object):
                  # type=''
     ):
         self.id = id
+        self.label = self.id
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # self.icon = ContentStatus._ICONS[id]
         # self.css = ContentStatus._CSS[id]

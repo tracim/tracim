@@ -34,6 +34,11 @@ requires = [
     # others
     'filedepot',
     'babel',
+    # mail-notifier
+    'mako',
+    'lxml',
+    'redis',
+    'rq',
 ]
 
 tests_require = [

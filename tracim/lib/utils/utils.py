@@ -1,8 +1,33 @@
 # -*- coding: utf-8 -*-
 import datetime
+from redis import Redis
+from rq import Queue
+
+from tracim.config import CFG
 
 DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
+
+
+def get_redis_connection(config: CFG) -> Redis:
+    """
+    :param config: current app_config
+    :return: redis connection
+    """
+    return Redis(
+        host=config.EMAIL_SENDER_REDIS_HOST,
+        port=config.EMAIL_SENDER_REDIS_PORT,
+        db=config.EMAIL_SENDER_REDIS_DB,
+    )
+
+
+def get_rq_queue(redis_connection: Redis, queue_name: str ='default') -> Queue:
+    """
+    :param queue_name: name of queue
+    :return: wanted queue
+    """
+
+    return Queue(name=queue_name, connection=redis_connection)
 
 
 def cmp_to_key(mycmp):
