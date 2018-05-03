@@ -87,7 +87,11 @@ class TestUserApi(DefaultTest):
         eq_(u.user_id, one.user_id)
 
     def test_unit__get_user_with_context__nominal_case(self):
-        user = User(email='admin@tracim.tracim')
+        user = User(
+            email='admin@tracim.tracim',
+            display_name='Admin',
+            is_active=True,
+        )
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -96,6 +100,15 @@ class TestUserApi(DefaultTest):
         new_user = api.get_user_with_context(user)
         assert isinstance(new_user, UserInContext)
         assert new_user.user == user
+        assert new_user.profile.name == 'nobody'
+        assert new_user.user_id == user.user_id
+        assert new_user.email == 'admin@tracim.tracim'
+        assert new_user.display_name == 'Admin'
+        assert new_user.is_active is True
+        # TODO - G.M - 03-05-2018 - [avatar][calendar] Should test this
+        # with true value when those param will be available.
+        assert new_user.avatar_url is None
+        assert new_user.calendar_url is None
 
     def test_unit__get_current_user_ok__nominal_case(self):
         user = User(email='admin@tracim.tracim')
