@@ -3,6 +3,7 @@ import argparse
 
 import plaster_pastedeploy
 import transaction
+from depot.manager import DepotManager
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
@@ -113,10 +114,19 @@ class DeleteDBCommand(AppContextCommand):
         setup_logging(config_uri)
         settings = get_appsettings(config_uri)
         engine = get_engine(settings)
+        app_config = CFG(settings)
+        app_config.configure_filedepot()
+
         if parsed_args.force:
-            print('Database deletion begin')
+            print('Database deletion begin.')
             DeclarativeBase.metadata.drop_all(engine)
-            print('Database deletion done')
+            print('Database deletion done.')
+            print('Cleaning depot begin.')
+            depot = DepotManager.get()
+            depot_files = depot.list()
+            for file in depot_files:
+                depot.delete(file)
+            print('Cleaning depot done.')
         else:
             print('Warning, You should use --force if you really want to'
                   ' delete database.')
