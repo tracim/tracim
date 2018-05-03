@@ -89,7 +89,7 @@ class AuthenticationFailed(TracimException):
     pass
 
 
-class BadUserPassword(TracimException):
+class WrongUserPassword(TracimException):
     pass
 
 class UserNotExist(TracimException):

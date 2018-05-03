@@ -127,20 +127,20 @@ class TestUserApi(DefaultTest):
         assert isinstance(user, User)
         assert user.email == 'admin@admin.admin'
 
-    def test_unit__authenticate_user___err__bad_password(self):
+    def test_unit__authenticate_user___err__wrong_password(self):
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
         with pytest.raises(AuthenticationFailed):
-            api.authenticate_user('admin@admin.admin', 'bad_password')
+            api.authenticate_user('admin@admin.admin', 'wrong_password')
 
-    def test_unit__authenticate_user___err__bad_user(self):
+    def test_unit__authenticate_user___err__wrong_user(self):
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
         with pytest.raises(AuthenticationFailed):
-            api.authenticate_user('unknown_user', 'bad_password')
+            api.authenticate_user('unknown_user', 'wrong_password')

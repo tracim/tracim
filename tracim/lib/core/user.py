@@ -4,16 +4,24 @@ import threading
 import transaction
 import typing as typing
 
+from sqlalchemy.orm import Session
+
+from tracim import CFG
 from tracim.models.auth import User
 from sqlalchemy.orm.exc import NoResultFound
-from tracim.exceptions import BadUserPassword, UserNotExist
+from tracim.exceptions import WrongUserPassword, UserNotExist
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.context_models import UserInContext
 
 
 class UserApi(object):
 
-    def __init__(self, current_user: typing.Optional[User], session, config):
+    def __init__(
+            self,
+            current_user: typing.Optional[User],
+            session: Session,
+            config: CFG,
+    ) -> None:
         self._session = session
         self._user = current_user
         self._config = config
@@ -65,7 +73,7 @@ class UserApi(object):
 
     # Check methods
 
-    def user_with_email_exists(self, email: str):
+    def user_with_email_exists(self, email: str) -> bool:
         try:
             self.get_one_by_email(email)
             return True
@@ -86,9 +94,9 @@ class UserApi(object):
             if user.validate_password(password):
                 return user
             else:
-                raise BadUserPassword()
-        except (BadUserPassword, NoResultFound):
-            raise AuthenticationFailed
+                raise WrongUserPassword()
+        except (WrongUserPassword, NoResultFound):
+            raise AuthenticationFailed()
 
     # Actions
 
@@ -99,7 +107,7 @@ class UserApi(object):
             email: str=None,
             do_save=True,
             timezone: str='',
-    ):
+    ) -> None:
         if name is not None:
             user.display_name = name
 
