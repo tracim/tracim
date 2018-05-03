@@ -124,8 +124,8 @@ class DeleteDBCommand(AppContextCommand):
             print('Cleaning depot begin.')
             depot = DepotManager.get()
             depot_files = depot.list()
-            for file in depot_files:
-                depot.delete(file)
+            for file_ in depot_files:
+                depot.delete(file_)
             print('Cleaning depot done.')
         else:
             print('Warning, You should use --force if you really want to'
