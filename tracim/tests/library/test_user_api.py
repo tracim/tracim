@@ -5,34 +5,45 @@ from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 from tracim.lib.core.user import UserApi
+from tracim.models import User
 from tracim.tests import DefaultTest
 from tracim.tests import eq_
 
 
 class TestUserApi(DefaultTest):
 
-    def test_create_and_update_user(self):
+    def test_unit__create_minimal_user__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
-        u = api.create_minimal_user()
-        api.update(u, 'bob', 'bob@bob', True)
+        u = api.create_minimal_user('bob@bob')
+        assert u.email == 'bob@bob'
+        assert u.display_name is None
 
+    def test_unit__create_minimal_user_and_update__ok__nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_minimal_user('bob@bob')
+        api.update(u, 'bob', 'bob@bob', 'pass', do_save=True)
         nu = api.get_one_by_email('bob@bob')
-        assert nu != None
-        eq_('bob@bob', nu.email)
-        eq_('bob', nu.display_name)
+        assert nu is not None
+        assert nu.email == 'bob@bob'
+        assert nu.display_name == 'bob'
+        assert nu.validate_password('pass')
 
-    def test_user_with_email_exists(self):
+    def test_unit__user_with_email_exists__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
-        u = api.create_minimal_user()
-        api.update(u, 'bibi', 'bibi@bibi', True)
+        u = api.create_minimal_user('bibi@bibi')
+        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
         transaction.commit()
 
         eq_(True, api.user_with_email_exists('bibi@bibi'))
@@ -44,9 +55,9 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        u = api.create_minimal_user()
+        u = api.create_minimal_user('bibi@bibi')
         self.session.flush()
-        api.update(u, 'bibi', 'bibi@bibi', True)
+        api.update(u, 'bibi', 'bibi@bibi', 'pass', do_save=True)
         uid = u.user_id
         transaction.commit()
 
@@ -62,17 +73,16 @@ class TestUserApi(DefaultTest):
             api.get_one_by_email('unknown')
 
     def test_get_all(self):
-        # TODO - G.M - 29-03-2018 Check why this method is not enabled
         api = UserApi(
             current_user=None,
             session=self.session,
             config=self.config,
         )
-        # u1 = api.create_minimal_user(True)
-        # u2 = api.create_minimal_user(True)
+        u1 = api.create_minimal_user('bibi@bibi')
 
-        # users = api.get_all()
-        # ok_(2==len(users))
+        users = api.get_all()
+        # u1 + Admin user from BaseFixture
+        assert 2 == len(users)
 
     def test_get_one(self):
         api = UserApi(
@@ -80,7 +90,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        u = api.create_minimal_user()
-        api.update(u, 'titi', 'titi@titi', True)
+        u = api.create_minimal_user('titi@titi')
+        api.update(u, 'titi', 'titi@titi', 'pass', do_save=True)
         one = api.get_one(u.user_id)
         eq_(u.user_id, one.user_id)

@@ -97,15 +97,14 @@ class UserApi(object):
 
     def create_minimal_user(
             self,
-            email=None,
+            email,
             groups=[],
             save_now=False
     ) -> User:
         """Previous create_user method"""
         user = User()
 
-        if email:
-            user.email = email
+        user.email = email
 
         for group in groups:
             user.groups.append(group)

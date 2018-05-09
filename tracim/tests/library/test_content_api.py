@@ -1116,8 +1116,7 @@ class TestContentApi(DefaultTest):
         
         wid = workspace.workspace_id
 
-        user2 = uapi.create_minimal_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1237,8 +1236,7 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
 
-        user2 = uapi.create_minimal_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1314,8 +1312,7 @@ class TestContentApi(DefaultTest):
         )
         wid = workspace.workspace_id
 
-        user2 = uapi.create_minimal_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1427,8 +1424,7 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
 
-        user2 = uapi.create_minimal_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1508,8 +1504,7 @@ class TestContentApi(DefaultTest):
         )
         wid = workspace.workspace_id
 
-        user2 = uapi.create_minimal_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1657,8 +1652,7 @@ class TestContentApi(DefaultTest):
         )
         wid = workspace.workspace_id
 
-        user2 = uapi.create_minimal_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
