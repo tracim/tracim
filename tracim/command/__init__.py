@@ -75,17 +75,6 @@ class AppContextCommand(Command):
     #     transaction.commit()
 
 
-# TODO - G.M - 10-04-2018 - [Cleanup][tempExample] - Drop this
-class TestTracimCommand(AppContextCommand):
-
-    def take_app_action(
-            self,
-            parser: argparse.ArgumentParser,
-            app_context: AppEnvironment
-    ) -> None:
-        print('test')
-
-
 class Extender(argparse.Action):
     """
     Copied class from http://stackoverflow.com/a/12461237/801924
