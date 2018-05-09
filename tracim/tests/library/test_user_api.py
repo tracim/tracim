@@ -35,6 +35,26 @@ class TestUserApi(DefaultTest):
         assert nu.display_name == 'bob'
         assert nu.validate_password('pass')
 
+    def test__unit__create__user__ok_nominal_case(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u = api.create_user(
+            email='bob@bob',
+            password='pass',
+            name='bob',
+            timezone='+2',
+            do_save=True,
+            do_notify=False,
+        )
+        assert u is not None
+        assert u.email == "bob@bob"
+        assert u.validate_password('pass')
+        assert u.display_name == 'bob'
+        assert u.timezone == '+2'
+
     def test_unit__user_with_email_exists__ok__nominal_case(self):
         api = UserApi(
             current_user=None,

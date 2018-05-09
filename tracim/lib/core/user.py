@@ -65,7 +65,7 @@ class UserApi(object):
 
     def create_user(
         self,
-        email: str = None,
+        email,
         password: str = None,
         name: str = None,
         timezone: str = '',
