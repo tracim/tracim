@@ -81,8 +81,7 @@
     <div id="footer">
         <p>
             ${_('This email was sent by <i>Tracim</i>, a collaborative software developped by Algoo.')}<br/>
-            FIXME ADDR
-            Algoo SAS &mdash; 9 rue du rocher de Lorzier, 38430 Moirans, France &mdash; <a style="text-decoration: none;" href="http://algoo.fr">www.algoo.fr</a>
+            Algoo SAS &mdash; 340 Rue de l'Eygala, 38430 Moirans, France &mdash; <a style="text-decoration: none;" href="http://algoo.fr">www.algoo.fr</a>
         </p>
     </div>
   </body>

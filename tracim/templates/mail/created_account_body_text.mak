@@ -18,9 +18,8 @@ ${login_url}
 This email was sent by *Tracim*,
 a collaborative software developped by Algoo.
 
-FIXME ADDR
 **Algoo SAS**
-9 rue du rocher de Lorzier
+340 Rue de l'Eygala
 38430 Moirans
 France
 http://algoo.fr
