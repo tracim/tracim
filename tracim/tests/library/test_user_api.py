@@ -5,7 +5,6 @@ from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 from tracim.lib.core.user import UserApi
-from tracim.models import User
 from tracim.tests import DefaultTest
 from tracim.tests import eq_
 
@@ -49,7 +48,7 @@ class TestUserApi(DefaultTest):
         eq_(True, api.user_with_email_exists('bibi@bibi'))
         eq_(False, api.user_with_email_exists('unknown'))
 
-    def test_get_one_by_email(self):
+    def test_unit__get_one_by_email__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -63,7 +62,7 @@ class TestUserApi(DefaultTest):
 
         eq_(uid, api.get_one_by_email('bibi@bibi').user_id)
 
-    def test_get_one_by_email_exception(self):
+    def test_unit__get_one_by_email__ok__user_not_found(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -72,7 +71,7 @@ class TestUserApi(DefaultTest):
         with pytest.raises(NoResultFound):
             api.get_one_by_email('unknown')
 
-    def test_get_all(self):
+    def test_unit__get_all__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
@@ -84,7 +83,7 @@ class TestUserApi(DefaultTest):
         # u1 + Admin user from BaseFixture
         assert 2 == len(users)
 
-    def test_get_one(self):
+    def test_unit__get_one__ok__nominal_case(self):
         api = UserApi(
             current_user=None,
             session=self.session,
