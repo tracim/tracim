@@ -87,3 +87,7 @@ class DigestAuthNotImplemented(Exception):
 
 class LoginFailed(TracimException):
     pass
+
+
+class NotificationNotSend(TracimException):
+    pass

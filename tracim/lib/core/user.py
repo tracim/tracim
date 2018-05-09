@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import threading
+from smtplib import SMTPException
 
 import transaction
 import typing as typing
 
+from tracim.exceptions import NotificationNotSend
 from tracim.lib.mail_notifier.notifier import get_email_manager
 from tracim.models.auth import User
 
@@ -78,14 +80,19 @@ class UserApi(object):
             email=email,
             password=password,
             timezone=timezone,
-            do_save=do_save,
+            do_save=False,
         )
         if do_notify:
-            email_manager = get_email_manager(self._config, self._session)
-            email_manager.notify_created_account(
-                new_user,
-                password=password
-            )
+            try:
+                email_manager = get_email_manager(self._config, self._session)
+                email_manager.notify_created_account(
+                    new_user,
+                    password=password
+                )
+            except SMTPException as e:
+                raise NotificationNotSend()
+        if do_save:
+            self.save(new_user)
         return new_user
 
     def create_minimal_user(
