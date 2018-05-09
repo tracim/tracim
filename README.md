@@ -89,11 +89,22 @@ run wsgidav server:
 
     tracimcli webdav start
 
-### Run Tests and others checks ###
+### Run Tests ###
+
+Before running some functional test related to email, you need a local working *MailHog*
+see here : https://github.com/mailhog/MailHog
+
+You can run it this way with docker :
+
+    docker pull mailhog/mailhog
+    docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+
 
 Run your project's tests:
 
     pytest
+
+### Lints and others checks ###
 
 Run mypy checks:
 
