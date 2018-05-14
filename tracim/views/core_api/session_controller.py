@@ -94,99 +94,6 @@ class SessionController(Controller):
             config=app_config,
         )
 
-    @hapic.with_api_doc()
-    @hapic.output_body(
-        UserSchema(),
-    )
-    def create_user(self, context, request: TracimRequest, hapic_data=None):
-        """
-        Return current logged in user or 401
-        """
-        app_config = request.registry.settings['CFG']
-        uapi = UserApi(
-            None,
-            session=request.dbsession,
-            config=app_config,
-        )
-        group_api = GroupApi(current_user=None, session=request.dbsession)
-        groups = [group_api.get_one(Group.TIM_USER),
-                  group_api.get_one(Group.TIM_MANAGER),
-                  group_api.get_one(Group.TIM_ADMIN)]
-        user = uapi.create_user(
-            email='dev.tracim.testuser@algoo.fr',
-            password='toto',
-            name='toto',
-            groups=groups,
-            timezone="lapin",
-            do_save=True,
-            do_notify=True,
-        )
-        wapi = WorkspaceApi(
-            current_user=user,
-            session=request.dbsession,
-        )
-        workspace = wapi.get_one_by_label('w1')
-        rapi = RoleApi(
-            session=request.dbsession,
-            current_user=user,
-        )
-        rapi.create_one(
-            user=user,
-            workspace=workspace,
-            role_level=8,
-            with_notif=True,
-            flush=True,
-        )
-        return UserInContext(
-            user=user,
-            dbsession=request.dbsession,
-            config=app_config,
-        )
-
-    @hapic.with_api_doc()
-    @hapic.handle_exception(
-        NotAuthentificated,
-        http_code=HTTPStatus.UNAUTHORIZED
-    )
-    @hapic.output_body(
-        NoContentSchema()
-    )
-    def add_content(self, context, request: TracimRequest, hapic_data=None):
-        """
-        Return current logged in user or 401
-        """
-        app_config = request.registry.settings['CFG']
-        uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,
-        )
-        workspace = WorkspaceApi(
-            current_user=request.current_user,
-            session=request.dbsession
-        ).get_one_by_label('w1')
-        api = ContentApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,
-        )
-        item = api.create(
-            ContentType.Folder,
-            workspace,
-            None,
-            'parent',
-            do_save=True,
-        )
-        item2 = api.create(
-            ContentType.File,
-            workspace,
-            item,
-            'file1',
-            do_save=True,
-            do_notify=True,
-        )
-        return
-
     def bind(self, configurator: Configurator):
 
         # Login
@@ -200,9 +107,3 @@ class SessionController(Controller):
         # Whoami
         configurator.add_route('whoami', '/sessions/whoami', request_method='GET')  # nopep8
         configurator.add_view(self.whoami, route_name='whoami',)
-
-        configurator.add_route('create_user_test', '/create_user', request_method='POST')  # nopep8
-        configurator.add_view(self.create_user, route_name='create_user_test',)
-
-        configurator.add_route('add_content', '/add_content', request_method='POST')  # nopep8
-        configurator.add_view(self.add_content, route_name='add_content',)
