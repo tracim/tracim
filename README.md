@@ -19,6 +19,7 @@ on Debian Stretch (9) with sudo:
     sudo apt update
     sudo apt install git
     sudo apt install python3 python3-venv python3-dev python3-pip
+    sudo apt install redis-server
 
 ### Get the source ###
 
