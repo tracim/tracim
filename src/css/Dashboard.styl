@@ -4,21 +4,21 @@ flexwrap()
 
 btnNotification()
   margin 20px 0
-  border 1px solid blue
+  border 1px solid thirdColor
   padding 10px 15px
 
 hoverfocus()
-  background-color blue
+  background-color thirdColor
   color white
 
 bgandcolor()
   background-color transparent
-  color blue
+  color thirdColor
 
 label()
   font-weight 500
   font-size 18px
-  color blue
+  color thirdColor
 
 coloricon()
   .fa-gavel
@@ -32,6 +32,25 @@ coloricon()
 
 .dashboard
   margin-left 20px
+  .btn-primary
+    background-color thirdColor
+    color off-white
+    border-color secondColor
+    &:hover, &:focus, &:active
+      color off-white
+      border-color secondColor
+      background-color secondColor
+      box-shadow 0 0 1px 2px fifthColor
+      outline fifthColor
+  .btn-outline-primary
+    color thirdColor
+    border-color thirdColor
+    &:hover, &:focus, &:active
+      color off-white
+      border-color thirdColor
+      background-color thirdColor
+      box-shadow 0 0 1px 2px fifthColor
+      outline fifthColor
   &__header
     flexwrap()
     align-items center
@@ -51,7 +70,7 @@ coloricon()
       margin-bottom 20px
       font-size 40px
       font-weight 500
-      color darkBlue
+      color darkthirdColor
     &__detail
       margin-bottom 20px
       font-size 18px
@@ -132,11 +151,11 @@ coloricon()
       padding 15px
       cursor pointer
       &:hover
-        background-color folder-hover
+        background-color fourthColor
       &:nth-child(even)
         background-color grey-hover
         &:hover
-          background-color folder-hover
+          background-color fourthColor
       &__icon
         margin 0 25px
         font-size 25px
@@ -172,13 +191,13 @@ coloricon()
         border-bottom 1px solid grey
         padding 10px 15px
         &:hover
-          background-color folder-hover
+          background-color fourthColor
         &:nth-last-child(1)
           border-bottom 0
         &:nth-child(even)
           background-color grey-hover
           &:hover
-            background-color folder-hover
+            background-color fourthColor
         &__avatar
           margin-right 20px
           & > img
@@ -191,7 +210,7 @@ coloricon()
             font-size 18px
         &__delete
           font-size 20px
-          color blue
+          color thirdColor
           cursor pointer
     &__btnadd
       border-top 1px solid grey
@@ -214,7 +233,7 @@ coloricon()
             font-size 25px
         &__text
           font-size 18px
-          color blue
+          color thirdColor
           cursor pointer
     &__form
       padding 15px

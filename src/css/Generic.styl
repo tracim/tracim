@@ -3,6 +3,35 @@
   &__content
     height 100%
 
+.btn-outline-primary
+  &:hover, &:focus, &:active, &:visited
+    color off-white
+    border-color thirdColor
+    background-color thirdColor
+    box-shadow 0 0 1px 2px fifthColor
+    outline fifthColor
+
+.btn-outline-primary.dropdown-toggle
+  &:hover, &:focus, &:active, &:visited
+    color off-white
+    border-color thirdColor
+    background-color thirdColor
+    box-shadow 0 0 1px 2px fifthColor
+    outline fifthColor
+
+.btn-primary
+  &:hover, &:focus, &:active, &:visited
+    color off-white
+    border-color secondColor
+    background-color secondColor
+    box-shadow 0 0 1px 2px fifthColor
+    outline fifthColor
+
+.dropdown-item
+  &:hover, &:focus, &:active, &:visited
+    background-color fourthColor
+    color off-white
+
 .sidebarpagecontainer
   display flex
   padding-top 88px
@@ -112,7 +141,7 @@
 .subTitle
   font-size 20px
   font-weight 500
-  color blue
+  color thirdColor
 
 .btnaction
   display flex
@@ -131,13 +160,13 @@
   &__btn
     display flex
     margin-bottom 30px
-    border 1px solid blue
+    border 1px solid thirdColor
     border-radius 10px
     padding 15px 25px
-    color blue
+    color thirdColor
     cursor pointer
     &:hover, &:focus
-      background-color blue
+      background-color thirdColor
       color white
     &__icon
       margin-right 20px

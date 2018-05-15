@@ -1,6 +1,6 @@
 // -----------------------------------------------------
 // border management for Workspace container
-border-style = 1px solid darkBlue
+border-style = 1px solid secondColor
 .folder__header
   border border-style
 .folder + .file, .file + .file
@@ -15,6 +15,9 @@ border-style = 1px solid darkBlue
     border-bottom border-style
 // @Info: the very last line of file or folder has it's border bottom added in js
 // -----------------------------------------------------
+
+.folder.active > .folder__content > .file, .folder.active > .folder__content > .extandedaction
+  padding-right 7px
 
 folderclose()
   height 0
@@ -55,9 +58,9 @@ folderopen()
     background-color lightGrey
     cursor pointer
     &:hover
-      background-color folder-hover
+      background-color fourthColor
       .folder__header__triangleborder__triangle
-        border-color folder-hover transparent transparent transparent
+        border-color fourthColor transparent transparent transparent
     &__triangleborder
       display none
       position absolute
@@ -65,7 +68,7 @@ folderopen()
       left -1px
       border-style solid
       border-width 25px 30px 0 30px
-      border-color darkBlue transparent transparent transparent
+      border-color secondColor transparent transparent transparent
       z-index 1
       &__triangle
         display none
@@ -79,7 +82,7 @@ folderopen()
       display flex
       &__icon
         font-size 25px
-        color darkBlue
+        color darkGrey
         text-align center
       &__text
         margin 0 15px 0 0
@@ -88,7 +91,7 @@ folderopen()
         overflow hidden
         width 400px
         font-size 17px
-        color darkBlue
+        color darkGrey
       &__button
         &__advancedbtn
           position relative
@@ -100,6 +103,14 @@ folderopen()
           .addbtn
             &__text
               font-size 17px
+              color thirdColor
+              border-color thirdColor
+              &:hover, &:focus, &:active
+                color off-white
+                border-color thirdColor
+                background-color thirdColor
+                box-shadow 0 0 1px 2px fifthColor
+                outline fifthColor
               &::after
                 margin-left 20px
             &__subdropdown
