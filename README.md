@@ -19,6 +19,7 @@ on Debian Stretch (9) with sudo:
     sudo apt update
     sudo apt install git
     sudo apt install python3 python3-venv python3-dev python3-pip
+    sudo apt install uwsgi uwsgi-plugin-python
 
 ### Get the source ###
 
@@ -73,23 +74,39 @@ Initialize the database using [tracimcli](doc/cli.md) tool
 
     tracimcli db init
 
-### Run Tracim_backend ###
-
-Run your project:
-
-    pserve development.ini
-
-### Configure and Run Webdav Server (Unstable) ###
-
-create wsgidav configuration file :
+create wsgidav configuration file for webdav:
 
     cp wsgidav.conf.sample wsgidav.conf
+
+## Run Tracim_backend ##
+
+### With Uwsgi ###
+
+Run all services with uwsgi
+
+    # pyramid webserver
+    uwsgi -d /tmp/tracim_web.log --http-socket :6543 --ini-paste-logged  development.ini -H env --pidfile /tmp/tracim_web.pid
+    # webdav wsgidav server
+    uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --wsgi-file wsgi//webdav.py  development.ini -H env --pidfile /tmp/tracim_webdav.pid
+
+to stop them:
+
+    # pyramid webserver
+    uwsgi --stop /tmp/tracim_web.pid
+    # webdav wsgidav server
+    uswgi --stop /tmp/tracim_webdav.pid
+
+### With Waitress (legacy way, usefull for debug) ###
+
+run tracim_backend web api:
+
+    pserve developement.ini
 
 run wsgidav server:
 
     tracimcli webdav start
 
-### Run Tests and others checks ###
+## Run Tests and others checks ##
 
 Run your project's tests:
 
