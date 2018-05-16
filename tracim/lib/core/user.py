@@ -4,30 +4,101 @@ import threading
 import transaction
 import typing as typing
 
+from sqlalchemy.orm import Session
+
+from tracim import CFG
 from tracim.models.auth import User
+from sqlalchemy.orm.exc import NoResultFound
+from tracim.exceptions import WrongUserPassword, UserNotExist
+from tracim.exceptions import AuthenticationFailed
+from tracim.models.context_models import UserInContext
 
 
 class UserApi(object):
 
-    def __init__(self, current_user: typing.Optional[User], session, config):
+    def __init__(
+            self,
+            current_user: typing.Optional[User],
+            session: Session,
+            config: CFG,
+    ) -> None:
         self._session = session
         self._user = current_user
         self._config = config
 
-    def get_all(self):
-        return self._session.query(User).order_by(User.display_name).all()
-
     def _base_query(self):
         return self._session.query(User)
 
-    def get_one(self, user_id: int):
-        return self._base_query().filter(User.user_id==user_id).one()
+    def get_user_with_context(self, user: User) -> UserInContext:
+        """
+        Return UserInContext object from User
+        """
+        user = UserInContext(
+            user=user,
+            dbsession=self._session,
+            config=self._config,
+        )
+        return user
 
-    def get_one_by_email(self, email: str):
-        return self._base_query().filter(User.email==email).one()
+    # Getters
 
+    def get_one(self, user_id: int) -> User:
+        """
+        Get one user by user id
+        """
+        return self._base_query().filter(User.user_id == user_id).one()
+
+    def get_one_by_email(self, email: str) -> User:
+        """
+        Get one user by email
+        :param email: Email of the user
+        :return: one user
+        """
+        return self._base_query().filter(User.email == email).one()
+
+    # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
     def get_one_by_id(self, id: int) -> User:
-        return self._base_query().filter(User.user_id==id).one()
+        return self.get_one(user_id=id)
+
+    def get_current_user(self) -> User:
+        """
+        Get current_user
+        """
+        if not self._user:
+            raise UserNotExist()
+        return self._user
+
+    def get_all(self) -> typing.Iterable[User]:
+        return self._session.query(User).order_by(User.display_name).all()
+
+    # Check methods
+
+    def user_with_email_exists(self, email: str) -> bool:
+        try:
+            self.get_one_by_email(email)
+            return True
+        # TODO - G.M - 09-04-2018 - Better exception
+        except:
+            return False
+
+    def authenticate_user(self, email: str, password: str) -> User:
+        """
+        Authenticate user with email and password, raise AuthenticationFailed
+        if uncorrect.
+        :param email: email of the user
+        :param password: cleartext password of the user
+        :return: User who was authenticated.
+        """
+        try:
+            user = self.get_one_by_email(email)
+            if user.validate_password(password):
+                return user
+            else:
+                raise WrongUserPassword()
+        except (WrongUserPassword, NoResultFound):
+            raise AuthenticationFailed()
+
+    # Actions
 
     def update(
             self,
@@ -36,7 +107,7 @@ class UserApi(object):
             email: str=None,
             do_save=True,
             timezone: str='',
-    ):
+    ) -> None:
         if name is not None:
             user.display_name = name
 
@@ -47,14 +118,6 @@ class UserApi(object):
 
         if do_save:
             self.save(user)
-
-    def user_with_email_exists(self, email: str):
-        try:
-            self.get_one_by_email(email)
-            return True
-        # TODO - G.M - 09-04-2018 - Better exception
-        except:
-            return False
 
     def create_user(self, email=None, groups=[], save_now=False) -> User:
         user = User()

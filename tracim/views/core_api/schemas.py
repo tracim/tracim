@@ -1,5 +1,8 @@
 # coding=utf-8
 import marshmallow
+from marshmallow import post_load
+
+from tracim.models.context_models import LoginCredentials, UserInContext
 
 
 class ProfileSchema(marshmallow.Schema):
@@ -8,6 +11,7 @@ class ProfileSchema(marshmallow.Schema):
 
 
 class UserSchema(marshmallow.Schema):
+
     user_id = marshmallow.fields.Int(dump_only=True)
     email = marshmallow.fields.Email(required=True)
     display_name = marshmallow.fields.String()
@@ -29,8 +33,13 @@ class UserSchema(marshmallow.Schema):
 
 
 class BasicAuthSchema(marshmallow.Schema):
+
     email = marshmallow.fields.Email(required=True)
     password = marshmallow.fields.String(required=True, load_only=True)
+
+    @post_load
+    def make_login(self, data):
+        return LoginCredentials(**data)
 
 
 class LoginOutputHeaders(marshmallow.Schema):
