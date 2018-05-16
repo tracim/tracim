@@ -19,7 +19,6 @@ on Debian Stretch (9) with sudo:
     sudo apt update
     sudo apt install git
     sudo apt install python3 python3-venv python3-dev python3-pip
-    sudo apt install uwsgi uwsgi-plugin-python
 
 ### Get the source ###
 
@@ -84,8 +83,10 @@ create wsgidav configuration file for webdav:
 
 Run all services with uwsgi
 
+    # install uwsgi with pip ( unneeded if you already have uwsgi with python3 plugin enabled)
+    sudo pip3 install uwsgi
     # set tracim_conf_file path
-    set TRACIM_CONF_PATH="$(pwd)/development.ini"
+    export TRACIM_CONF_PATH="$(pwd)/development.ini"
     # pyramid webserver
     uwsgi -d /tmp/tracim_web.log --http-socket :6543 --wsgi-file wsgi/web.py -H env --pidfile /tmp/tracim_web.pid
     # webdav wsgidav server
