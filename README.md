@@ -87,6 +87,7 @@ Run all services with uwsgi
     sudo pip3 install uwsgi
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
+    export TRACIM_WEBDAV_CONF_PATH="$(pwd)/wsgidav.conf"
     # pyramid webserver
     uwsgi -d /tmp/tracim_web.log --http-socket :6543 --wsgi-file wsgi/web.py -H env --pidfile /tmp/tracim_web.pid
     # webdav wsgidav server
@@ -97,7 +98,7 @@ to stop them:
     # pyramid webserver
     uwsgi --stop /tmp/tracim_web.pid
     # webdav wsgidav server
-    uswgi --stop /tmp/tracim_webdav.pid
+    uwsgi --stop /tmp/tracim_webdav.pid
 
 ### With Waitress (legacy way, usefull for debug) ###
 
