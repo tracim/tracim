@@ -84,10 +84,12 @@ create wsgidav configuration file for webdav:
 
 Run all services with uwsgi
 
+    # set tracim_conf_file path
+    set TRACIM_CONF_PATH="$(pwd)/development.ini"
     # pyramid webserver
-    uwsgi -d /tmp/tracim_web.log --http-socket :6543 --ini-paste-logged  development.ini -H env --pidfile /tmp/tracim_web.pid
+    uwsgi -d /tmp/tracim_web.log --http-socket :6543 --wsgi-file wsgi/web.py -H env --pidfile /tmp/tracim_web.pid
     # webdav wsgidav server
-    uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --wsgi-file wsgi//webdav.py  development.ini -H env --pidfile /tmp/tracim_webdav.pid
+    uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --wsgi-file wsgi/webdav.py -H env --pidfile /tmp/tracim_webdav.pid
 
 to stop them:
 
