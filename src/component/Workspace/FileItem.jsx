@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import BtnExtandedAction from '../BtnExtandedAction/ExtandedAction.jsx'
+import BtnExtandedAction from './BtnExtandedAction.jsx'
 
 const FileItem = props => {
   const iconStatus = (() => {
@@ -58,7 +58,7 @@ const FileItem = props => {
           </div>
 
           <div className='d-none d-md-flex'>
-            <BtnExtandedAction />
+            <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
           </div>
 
           {/*

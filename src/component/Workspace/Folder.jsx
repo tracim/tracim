@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import FileItem from './FileItem.jsx'
 // import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
-import BtnExtandedAction from '../BtnExtandedAction/ExtandedAction.jsx'
+import BtnExtandedAction from './BtnExtandedAction.jsx'
 
 class Folder extends React.Component {
   constructor (props) {
@@ -24,16 +24,12 @@ class Folder extends React.Component {
     console.log('new file') // @TODO
   }
 
-  handleClickStopEvent = e => {
-    e.stopPropagation()
-    console.log('stop')
-  }
-
   render () {
     const {
       app,
       folderData,
       onClickItem,
+      onClickExtendedAction,
       onClickFolder,
       isLast,
       t
@@ -144,7 +140,13 @@ class Folder extends React.Component {
                 </div>
 
                 <div className='d-none d-md-flex'>
-                  <BtnExtandedAction onClickStopEvent={this.handleClickStopEvent} />
+                  <BtnExtandedAction onClickExtendedAction={{
+                    edit: e => onClickExtendedAction.edit(e, folderData),
+                    move: e => onClickExtendedAction.move(e, folderData),
+                    download: e => onClickExtendedAction.download(e, folderData),
+                    archive: e => onClickExtendedAction.archive(e, folderData),
+                    delete: e => onClickExtendedAction.delete(e, folderData)
+                  }} />
                 </div>
 
               </div>
@@ -155,25 +157,13 @@ class Folder extends React.Component {
 
         </div>
 
-        {/*
-          <div className='col-5 col-sm-5 col-md-5 col-lg-4 col-xl-3 d-none'>
-            <div className='folder__header__contenttype d-none d-sm-flex'>
-              <div className='folder__header__contenttype__text d-none d-lg-flex'>
-                {t('Folder.content_type')} :
-              </div>
-              <div className='folder__header__contenttype__icon'>
-                { folderData.allowed_app.map(a => <i className={(app[a] || {icon: ''}).icon} key={`${folderData.id}_${a}`} />)}
-              </div>
-            </div>
-          </div>
-        */}
-
         <div className='folder__content'>
           { folderData.content.map((c, i) => c.type === 'folder'
             ? <Folder
               app={app}
               folderData={c}
               onClickItem={onClickItem}
+              onClickExtendedAction={onClickExtendedAction}
               onClickFolder={onClickFolder}
               isLast={isLast}
               t={t}
@@ -185,6 +175,14 @@ class Folder extends React.Component {
               type={c.type}
               status={c.status}
               onClickItem={() => onClickItem(c)}
+              onClickExtendedAction={{
+                // we have to use the event here because it is the only place where we also have the content (c)
+                edit: e => onClickExtendedAction.edit(e, c),
+                move: e => onClickExtendedAction.move(e, c),
+                download: e => onClickExtendedAction.download(e, c),
+                archive: e => onClickExtendedAction.archive(e, c),
+                delete: e => onClickExtendedAction.delete(e, c)
+              }}
               isLast={isLast && i === folderData.content.length - 1}
               key={c.id}
             />

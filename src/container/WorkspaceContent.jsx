@@ -43,6 +43,31 @@ class WorkspaceContent extends React.Component {
     // dispatch(setActiveFileContentActive(content))
   }
 
+  handleClickEditContentItem = (e, content) => {
+    e.stopPropagation()
+    console.log('edit nyi', content)
+  }
+
+  handleClickMoveContentItem = (e, content) => {
+    e.stopPropagation()
+    console.log('move nyi', content)
+  }
+
+  handleClickDownloadContentItem = (e, content) => {
+    e.stopPropagation()
+    console.log('download nyi', content)
+  }
+
+  handleClickArchiveContentItem = (e, content) => {
+    e.stopPropagation()
+    console.log('archive nyi', content)
+  }
+
+  handleClickDeleteContentItem = (e, content) => {
+    e.stopPropagation()
+    console.log('delete nyi', content)
+  }
+
   handleClickFolder = folderId => {
     this.props.dispatch(getFolderContent(this.props.workspace.id, folderId))
   }
@@ -81,6 +106,13 @@ class WorkspaceContent extends React.Component {
                     app={app}
                     folderData={c}
                     onClickItem={this.handleClickContentItem}
+                    onClickExtendedAction={{
+                      edit: this.handleClickEditContentItem,
+                      move: this.handleClickMoveContentItem,
+                      download: this.handleClickDownloadContentItem,
+                      archive: this.handleClickArchiveContentItem,
+                      delete: this.handleClickDeleteContentItem
+                    }}
                     onClickFolder={this.handleClickFolder}
                     isLast={i === filteredWorkspaceContent.length - 1}
                     key={c.id}
@@ -93,6 +125,13 @@ class WorkspaceContent extends React.Component {
                     icon={(app[c.type] || {icon: ''}).icon}
                     status={c.status}
                     onClickItem={() => this.handleClickContentItem(c)}
+                    onClickExtendedAction={{
+                      edit: e => this.handleClickEditContentItem(e, c),
+                      move: e => this.handleClickMoveContentItem(e, c),
+                      download: e => this.handleClickDownloadContentItem(e, c),
+                      archive: e => this.handleClickArchiveContentItem(e, c),
+                      delete: e => this.handleClickDeleteContentItem(e, c)
+                    }}
                     isLast={i === filteredWorkspaceContent.length - 1}
                     key={c.id}
                   />
