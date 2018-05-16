@@ -6,7 +6,7 @@ const DropdownCreateButton = props => {
   return (
     <div className={classnames(props.parentClass, props.customClass, 'dropdownCreateBtn')}>
       <button
-        className={classnames(`${props.parentClass}__label`, 'dropdownCreateBtn__label btn btn-succes dropdown-toggle')}
+        className={classnames(`${props.parentClass}__label`, 'dropdownCreateBtn__label btn btn-primary dropdown-toggle')}
         type='button'
         id='dropdownCreateBtn'
         data-toggle='dropdown'

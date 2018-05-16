@@ -16,7 +16,7 @@ border-style = 1px solid secondColor
 // @Info: the very last line of file or folder has it's border bottom added in js
 // -----------------------------------------------------
 
-.folder.active > .folder__content > .file, .folder.active > .folder__content > .extandedaction
+.folder > .folder__content > .file, .folder > .folder__content > .extandedaction
   padding-right 7px
 
 folderclose()
@@ -58,9 +58,9 @@ folderopen()
     background-color lightGrey
     cursor pointer
     &:hover
-      background-color fourthColor
+      background-color hover-theme
       .folder__header__triangleborder__triangle
-        border-color fourthColor transparent transparent transparent
+        border-color hover-theme transparent transparent transparent
     &__triangleborder
       display none
       position absolute
@@ -77,7 +77,7 @@ folderopen()
         left -30px
         border-style solid
         border-width 25px 30px 0 30px
-        border-color lightGrey transparent transparent transparent
+        border-color fourthColor transparent transparent transparent
     &__name
       display flex
       &__icon
@@ -103,8 +103,8 @@ folderopen()
           .addbtn
             &__text
               font-size 17px
-              color thirdColor
-              border-color thirdColor
+              color fontColor
+              border-color secondColor
               &:hover, &:focus, &:active
                 color off-white
                 border-color thirdColor

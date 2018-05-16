@@ -7,13 +7,13 @@ const FileItem = props => {
   const iconStatus = (() => {
     switch (props.status) {
       case 'current':
-        return 'fa fa-cogs'
+        return 'fa fa-fw fa-cogs'
       case 'validated':
-        return 'fa fa-check'
+        return 'fa fa-fw fa-check'
       case 'canceled':
-        return 'fa fa-times'
+        return 'fa fa-fw fa-times'
       case 'outdated':
-        return 'fa fa-ban'
+        return 'fa fa-fw fa-ban'
     }
   })()
 
@@ -78,8 +78,8 @@ const FileItem = props => {
       </div>
 
       <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2'>
-        <div className={classnames('file__status d-flex align-items-center justify-content-center') + colorStatus}>
-          <div className='file__status__icon d-block mr-3'>
+        <div className={classnames('file__status d-flex align-items-center justify-content-start') + colorStatus}>
+          <div className='file__status__icon d-block '>
             <i className={iconStatus} />
           </div>
           <div className='file__status__text d-none d-xl-block'>

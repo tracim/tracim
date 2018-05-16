@@ -90,7 +90,7 @@ class Sidebar extends React.Component {
           </nav>
 
           <div className='sidebar__btnnewworkspace'>
-            <button className='sidebar__btnnewworkspace__btn btn btn-success'>
+            <button className='sidebar__btnnewworkspace__btn btn btn-primary'>
               {t('Sidebar.create_new_workspace')}
             </button>
           </div>

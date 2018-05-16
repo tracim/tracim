@@ -3,34 +3,36 @@
   &__content
     height 100%
 
-.btn-outline-primary
-  &:hover, &:focus, &:active, &:visited
-    color off-white
-    border-color thirdColor
-    background-color thirdColor
-    box-shadow 0 0 1px 2px fifthColor
-    outline fifthColor
-
-.btn-outline-primary.dropdown-toggle
-  &:hover, &:focus, &:active, &:visited
-    color off-white
-    border-color thirdColor
-    background-color thirdColor
-    box-shadow 0 0 1px 2px fifthColor
-    outline fifthColor
 
 .btn-primary
-  &:hover, &:focus, &:active, &:visited
-    color off-white
-    border-color secondColor
-    background-color secondColor
-    box-shadow 0 0 1px 2px fifthColor
-    outline fifthColor
+  background-color thirdColor
+  border-color secondColor
+  &:hover, &:focus, &:active, &:visited, &:focus-within
+    background-color hover-button
+    border-color hover-button
+    box-shadow 0 0 1px 2px secondColor
+    outline secondColor solid 1px
 
-.dropdown-item
-  &:hover, &:focus, &:active, &:visited
-    background-color fourthColor
-    color off-white
+.btn-outline-primary
+  color fontColor
+  border-color secondColor
+  &:hover, &:focus, &:active, &:visited, &:focus-within
+    background-color hover-button
+    border-color hover-button
+    box-shadow 0 0 1px 2px secondColor
+    outline secondColor solid 1px
+
+.btn-primary.active, .btn-primary:active, .show>.btn-primary.dropdown-toggle
+  background-color hover-button
+  border-color hover-button
+  box-shadow 0 0 1px 2px secondColor
+  outline secondColor solid 1px
+
+.btn-outline-primary.active, .btn-outline-primary:active, .show>.btn-outline-primary.dropdown-toggle
+  background-color hover-button
+  border-color hover-button
+  box-shadow 0 0 1px 2px secondColor
+  outline secondColor solid 1px
 
 .sidebarpagecontainer
   display flex
@@ -93,7 +95,7 @@
   margin-left 10px
   &__label
     padding 10px 65px
-    background-color green
+    background-color thirdColor
     cursor pointer
     &__text
       display inline-block

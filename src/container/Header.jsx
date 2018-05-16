@@ -9,7 +9,7 @@ import MenuActionListItemSearch from '../component/Header/MenuActionListItem/Sea
 import MenuActionListItemDropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
 import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
-import logoHeader from '../img/logoHeader.svg'
+import logoHeader from '../img/logo-tracim.png'
 import { setLangActive } from '../action-creator.sync.js'
 
 class Header extends React.Component {
