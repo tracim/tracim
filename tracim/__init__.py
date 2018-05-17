@@ -3,13 +3,11 @@ import json
 import time
 
 from pyramid.config import Configurator
-from pyramid.events import NewResponse
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
 
 from tracim.extensions import hapic
 from tracim.config import CFG
-from tracim.lib.utils.pyramid_events import cors_headers
 from tracim.lib.utils.request import TracimRequest
 from tracim.lib.utils.authentification import basic_auth_check_credentials
 from tracim.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
@@ -18,6 +16,7 @@ from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.views import BASE_API_V2
 from tracim.views.core_api.session_controller import SessionController
 from tracim.views.errors import ErrorSchema
+from tracim.lib.utils.cors import add_cors_support
 
 
 def main(global_config, **settings):
@@ -33,6 +32,9 @@ def main(global_config, **settings):
         basic_auth_check_credentials,
         realm=BASIC_AUTH_WEBUI_REALM,
     )
+    configurator.include(add_cors_support)
+    # make sure to add this before other routes to intercept OPTIONS
+    configurator.add_cors_preflight_handler()
     # Default authorization : Accept anything.
     configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
     configurator.set_authentication_policy(authn_policy)
@@ -46,7 +48,6 @@ def main(global_config, **settings):
     configurator.include('pyramid_jinja2')
     # Add SqlAlchemy DB
     configurator.include('.models')
-    configurator.add_subscriber(cors_headers, NewResponse)
     # set Hapic
     hapic.set_context(
         PyramidContext(
