@@ -44,13 +44,13 @@ const FileItem = props => {
   })()
 
   return (
-    <div className={classnames('file', 'align-items-center', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
-      <div className='file__type'>
+    <div className={classnames('content', 'align-items-center', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
+      <div className='content__type'>
         <i className={props.icon} />
       </div>
 
-      <div className='file__name'>
-        <div className='file__name__text'>
+      <div className='content__name'>
+        <div className='content__name__text'>
           { props.name }
         </div>
       </div>
@@ -59,11 +59,11 @@ const FileItem = props => {
         <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
       </div>
 
-      <div className={classnames('file__status d-flex align-items-center justify-content-start') + colorStatus}>
-        <div className='file__status__icon d-block '>
+      <div className={classnames('content__status d-flex align-items-center justify-content-start') + colorStatus}>
+        <div className='content__status__icon d-block '>
           <i className={iconStatus} />
         </div>
-        <div className='file__status__text d-none d-xl-block'>
+        <div className='content__status__text d-none d-xl-block'>
           {textStatus}
         </div>
       </div>
