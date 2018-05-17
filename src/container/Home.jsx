@@ -7,7 +7,7 @@ class Home extends React.Component {
     return (
       <div>
         Home.<br />
-        User logged in : {user.isLoggedIn.toString()}
+        User logged in : {user.logged.toString()}
       </div>
     )
   }

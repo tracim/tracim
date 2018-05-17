@@ -7,6 +7,13 @@ const en = {
       marketing_msg: 'Create your own collaborative workspaces on trac.im',
       copyright: 'Copyright 2013 - 2017'
     },
+    FlashMessage: {
+      error: 'Error'
+    },
+    Login: {
+      fail: 'Unknown email or password',
+      logout_error: 'Disconnection error'
+    },
     FileItemHeader: {
       type: 'Type',
       document_name: "Document's name",

@@ -40,14 +40,14 @@ server.patch('/user', (req, res) => res.jsonp({lang: 'fr'}))
 
 server.get('/lang', (req, res) => res.jsonp(jsonDb.lang))
 
-server.post('/user/login', (req, res) => {
+server.post('/sessions/login', (req, res) => {
   if (req.body.login !== '' && req.body.password !== '') return res.jsonp(jsonDb.user_logged)
   else return res.jsonp('error')
 })
 
 server.get('/app/config', (req, res) => res.jsonp(jsonDb.app_config))
 
-server.get('/user/is_logged_in', (req, res) =>
+server.get('/sessions/whoami', (req, res) =>
   // res.jsonp({"logged": false})
   res.jsonp(jsonDb.user_logged)
 )
