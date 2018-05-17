@@ -53,26 +53,12 @@ const FileItem = props => {
         <div className='file__name__text'>
           { props.name }
         </div>
-
-
-        {/*
-          <div className='file__name__icons d-none d-md-flex'>
-            <div className='file__name__icons__download'>
-              <i className='fa fa-download' />
-            </div>
-            <div className='file__name__icons__archive'>
-              <i className='fa fa-archive' />
-            </div>
-            <div className='file__name__icons__delete'>
-              <i className='fa fa-trash-o' />
-            </div>
-          </div>
-        */ }
       </div>
 
       <div className='d-none d-md-flex'>
         <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
       </div>
+
       <div className={classnames('file__status d-flex align-items-center justify-content-start') + colorStatus}>
         <div className='file__status__icon d-block '>
           <i className={iconStatus} />

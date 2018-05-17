@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import appFactory from '../appFactory.js'
 import Sidebar from './Sidebar.jsx'
 import Folder from '../component/Workspace/Folder.jsx'
-import FileItem from '../component/Workspace/FileItem.jsx'
-import FileItemHeader from '../component/Workspace/FileItemHeader.jsx'
+import ContentItem from '../component/Workspace/ContentItem.jsx'
+import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
 import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
@@ -98,7 +98,7 @@ class WorkspaceContent extends React.Component {
 
           <PageContent parentClass='workspace__content'>
             <div className='workspace__content__fileandfolder folder__content active'>
-              <FileItemHeader />
+              <ContentItemHeader />
 
               { filteredWorkspaceContent.map((c, i) => c.type === 'folder'
                 ? (
@@ -119,7 +119,7 @@ class WorkspaceContent extends React.Component {
                   />
                 )
                 : (
-                  <FileItem
+                  <ContentItem
                     name={c.title}
                     type={c.type}
                     icon={(app[c.type] || {icon: ''}).icon}

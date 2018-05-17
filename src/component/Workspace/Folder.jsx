@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import FileItem from './FileItem.jsx'
+import FileItem from './ContentItem.jsx'
 // import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 
