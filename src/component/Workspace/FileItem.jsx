@@ -54,9 +54,6 @@ const FileItem = props => {
           { props.name }
         </div>
 
-        <div className='d-none d-md-flex'>
-          <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
-        </div>
 
         {/*
           <div className='file__name__icons d-none d-md-flex'>
@@ -73,6 +70,9 @@ const FileItem = props => {
         */ }
       </div>
 
+      <div className='d-none d-md-flex'>
+        <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
+      </div>
       <div className={classnames('file__status d-flex align-items-center justify-content-start') + colorStatus}>
         <div className='file__status__icon d-block '>
           <i className={iconStatus} />
