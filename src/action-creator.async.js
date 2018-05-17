@@ -5,10 +5,10 @@ import {
   LANG,
   updateLangList,
   USER_LOGIN,
+  USER_LOGOUT,
   USER_DATA,
   USER_ROLE,
   USER_CONNECTED,
-  setUserConnected,
   updateUserData,
   setUserRole,
   WORKSPACE,
@@ -89,33 +89,41 @@ export const getTimezone = () => async dispatch => {
 }
 
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {
-  const fetchUserLogin = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/login`,
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.mockApiUrl}/sessions/login`,
     param: {
       headers: {...FETCH_CONFIG.headers},
       method: 'POST',
       body: JSON.stringify({
         email: login,
-        password: password
-        // remember_me: rememberMe
+        password: password,
+        remember_me: rememberMe
       })
     },
     actionName: USER_LOGIN,
     dispatch
   })
-  if (fetchUserLogin.status === 200) dispatch(setUserConnected(fetchUserLogin.json))
+}
+
+export const postUserLogout = () => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.mockApiUrl}/sessions/logout`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'POST'
+    },
+    actionName: USER_LOGOUT,
+    dispatch
+  })
 }
 
 export const getUserIsConnected = () => async dispatch => {
-  const fetchUserLogged = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`,
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.mockApiUrl}/sessions/whoami`,
     param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: USER_CONNECTED,
     dispatch
   })
-  if (fetchUserLogged.status === 200) dispatch(setUserConnected(fetchUserLogged.json))
-  else if (fetchUserLogged.status === 401) dispatch(setUserConnected({logged: false}))
-  else dispatch(setUserConnected({logged: undefined}))
 }
 
 export const getUserRole = user => async dispatch => {

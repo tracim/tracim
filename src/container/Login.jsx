@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
+import { translate } from 'react-i18next'
 import LoginLogo from '../component/Login/LoginLogo.jsx'
 import LoginLogoImg from '../img/logoTracimWhite.svg'
 import { postUserLogin } from '../action-creator.async.js'
@@ -11,31 +12,48 @@ import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import InputCheckbox from '../component/common/Input/InputCheckbox.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import LoginBtnForgotPw from '../component/Login/LoginBtnForgotPw.jsx'
+import {
+  newFlashMessage,
+  setUserConnected
+} from '../action-creator.sync.js'
+import {PAGE_NAME} from '../helper.js'
 
 class Login extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      inputLogin: '',
-      inputPassword: '',
+      inputLogin: {
+        value: '',
+        isInvalid: false
+      },
+      inputPassword: {
+        value: '',
+        isInvalid: false
+      },
       inputRememberMe: false
     }
   }
 
-  handleChangeLogin = e => this.setState({inputLogin: e.target.value})
-  handleChangePassword = e => this.setState({inputPassword: e.target.value})
+  handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
+  handleChangePassword = e => this.setState({inputPassword: {...this.state.inputPassword, value: e.target.value}})
   handleChangeRememberMe = () => this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
 
   handleClickSubmit = async () => {
-    const { history, dispatch } = this.props
+    const { history, dispatch, t } = this.props
     const { inputLogin, inputPassword, inputRememberMe } = this.state
 
-    await dispatch(postUserLogin(inputLogin, inputPassword, inputRememberMe))
-    history.push('/')
+    const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
+
+    if (fetchPostUserLogin.status === 200) {
+      dispatch(setUserConnected({...fetchPostUserLogin.json, logged: true}))
+      history.push(PAGE_NAME.HOME)
+    } else if (fetchPostUserLogin.status === 400) {
+      dispatch(newFlashMessage(t('Login.fail'), 'danger'))
+    }
   }
 
   render () {
-    if (this.props.user.isLoggedIn) return <Redirect to={{pathname: '/'}} />
+    if (this.props.user.logged) return <Redirect to={{pathname: '/'}} />
     else {
       return (
         <section className='loginpage'>
@@ -58,7 +76,8 @@ class Login extends React.Component {
                         type='email'
                         placeHolder='Adresse Email'
                         invalidMsg='Email invalide.'
-                        value={this.state.inputLogin}
+                        isInvalid={this.state.inputLogin.isInvalid}
+                        value={this.state.inputLogin.value}
                         onChange={this.handleChangeLogin}
                       />
 
@@ -69,7 +88,8 @@ class Login extends React.Component {
                         type='password'
                         placeHolder='Mot de passe'
                         invalidMsg='Mot de passe invalide.'
-                        value={this.state.inputPassword}
+                        isInvalid={this.state.inputPassword.isInvalid}
+                        value={this.state.inputPassword.value}
                         onChange={this.handleChangePassword}
                       />
 
@@ -114,4 +134,4 @@ class Login extends React.Component {
 }
 
 const mapStateToProps = ({ user }) => ({ user })
-export default connect(mapStateToProps)(Login)
+export default connect(mapStateToProps)(translate()(Login))

@@ -68,11 +68,12 @@
           .btnquestion__icon
             color darkGrey
       &__itemprofil
-        &__profilgroup
-          .profilgroup__name
+        .profilgroup
+          &__name
             border 0
             padding 0 5px
             background-color transparent
+            cursor pointer
             &:hover
               background-color lightGrey
             &:focus
@@ -91,15 +92,16 @@
               vertical-align middle
               margin-right 10px
               color darkGrey
-          .profilgroup__sub
+          &__sub
             color darkGrey
             cursor pointer
             &:focus
               box-shadow none
-          .profilgroup__setting
+          &__setting
             padding 0
             left inherit
             right 0
+            cursor pointer
             .dropdown-item
               color fontColor
             &__link

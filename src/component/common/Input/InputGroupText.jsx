@@ -10,7 +10,7 @@ const InputGroupText = props => {
       </div>
       <input
         type={props.type}
-        className={classnames(`${props.parentClassName}__input`, 'form-control')}
+        className={classnames(`${props.parentClassName}__input`, 'form-control', {'is-invalid': props.isInvalid})}
         placeholder={props.placeHolder}
         value={props.value}
         onChange={props.onChange}
@@ -32,6 +32,7 @@ InputGroupText.propTypes = {
   icon: PropTypes.string,
   placeHolder: PropTypes.string,
   invalidMsg: PropTypes.string,
+  isInvalid: PropTypes.bool,
   onChange: PropTypes.func
 }
 
@@ -40,5 +41,6 @@ InputGroupText.defaultProps = {
   icon: false,
   placeHolder: '',
   invalidMsg: false,
+  isInvalid: false,
   onChange: () => {}
 }
