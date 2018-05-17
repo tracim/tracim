@@ -37,7 +37,7 @@ class TestLoginEndpointUnititedDB(FunctionalTestNoDB):
 
 class TestLoginEndpoint(FunctionalTest):
 
-    def test_api__try_login_enpoint__ok_204__nominal_case(self):
+    def test_api__try_login_enpoint__ok_200__nominal_case(self):
         params = {
             'email': 'admin@admin.admin',
             'password': 'admin@admin.admin',
@@ -45,8 +45,17 @@ class TestLoginEndpoint(FunctionalTest):
         res = self.testapp.post_json(
             '/api/v2/sessions/login',
             params=params,
-            status=204,
+            status=200,
         )
+        assert res.json_body['display_name'] == 'Global manager'
+        assert res.json_body['email'] == 'admin@admin.admin'
+        assert res.json_body['created']
+        assert res.json_body['is_active']
+        assert res.json_body['profile']
+        assert isinstance(res.json_body['profile']['id'], int)
+        assert res.json_body['profile']['slug'] == 'administrators'
+        assert res.json_body['caldav_url'] is None
+        assert res.json_body['avatar_url'] is None
 
     def test_api__try_login_enpoint__err_400__bad_password(self):
         params = {
