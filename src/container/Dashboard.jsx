@@ -462,7 +462,7 @@ class Dashboard extends Component {
                         </ul>
                       </div>
                       <div className='dashboard__memberlist__form__submitbtn'>
-                        <button type='submit' className='btn btn-outline-primary'>Valider</button>
+                        <button className='btn btn-outline-primary'>Valider</button>
                       </div>
                     </form>
                   }

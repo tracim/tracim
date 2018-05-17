@@ -26,8 +26,8 @@
   "app_config": [{
     "name": "PageHtml",
     "label": {
-      "fr": "Page Html",
-      "en": "Html page"
+      "fr": "Document",
+      "en": "Document"
     },
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
@@ -38,8 +38,8 @@
   }, {
     "name": "PageMarkdown",
     "label": {
-      "fr": "Page Markdown",
-      "en": "Markdown page"
+      "fr": "Document markdown",
+      "en": "Markdown document"
     },
     "componentLeft": "PageMarkdown",
     "componentRight": "undefined",
