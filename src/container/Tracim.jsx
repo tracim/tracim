@@ -15,12 +15,12 @@ import PrivateRoute from './PrivateRoute.jsx'
 import { PAGE_NAME } from '../helper.js'
 import {
   getLangList,
-  getIsUserConnected
+  getUserIsConnected
 } from '../action-creator.async.js'
 
 class Tracim extends React.Component {
   componentDidMount () {
-    this.props.dispatch(getIsUserConnected())
+    this.props.dispatch(getUserIsConnected())
     this.props.dispatch(getLangList())
   }
 

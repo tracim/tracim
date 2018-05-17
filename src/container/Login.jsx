@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 import LoginLogo from '../component/Login/LoginLogo.jsx'
 import LoginLogoImg from '../img/logoTracimWhite.svg'
-import { userLogin } from '../action-creator.async.js'
+import { postUserLogin } from '../action-creator.async.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -30,7 +30,7 @@ class Login extends React.Component {
     const { history, dispatch } = this.props
     const { inputLogin, inputPassword, inputRememberMe } = this.state
 
-    await dispatch(userLogin(inputLogin, inputPassword, inputRememberMe))
+    await dispatch(postUserLogin(inputLogin, inputPassword, inputRememberMe))
     history.push('/')
   }
 

@@ -1,9 +1,10 @@
 export const FETCH_CONFIG = {
-  header: {
+  headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
-  apiUrl: 'http://localhost:3001'
+  apiUrl: 'http://localhost:6543/api/v2',
+  mockApiUrl: 'http://localhost:3001'
 }
 
 export const PAGE_NAME = {
