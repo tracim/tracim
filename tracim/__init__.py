@@ -5,6 +5,8 @@ import time
 from pyramid.config import Configurator
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
+from pyramid.exceptions import NotFound
+from sqlalchemy.exc import OperationalError
 
 from tracim.extensions import hapic
 from tracim.config import CFG
@@ -49,12 +51,13 @@ def main(global_config, **settings):
     # Add SqlAlchemy DB
     configurator.include('.models')
     # set Hapic
-    hapic.set_context(
-        PyramidContext(
-            configurator=configurator,
-            default_error_builder=ErrorSchema()
-        )
+    context = PyramidContext(
+        configurator=configurator,
+        default_error_builder=ErrorSchema()
     )
+    hapic.set_context(context)
+    context.handle_exception(NotFound, 404)
+    context.handle_exception(OperationalError, 500)
     # Add controllers
     session_api = SessionController()
     configurator.include(session_api.bind, route_prefix=BASE_API_V2)
