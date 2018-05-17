@@ -3,11 +3,13 @@ import json
 import time
 
 from pyramid.config import Configurator
+from pyramid.events import NewResponse
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
 
 from tracim.extensions import hapic
 from tracim.config import CFG
+from tracim.lib.utils.pyramid_events import cors_headers
 from tracim.lib.utils.request import TracimRequest
 from tracim.lib.utils.authentification import basic_auth_check_credentials
 from tracim.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
@@ -44,6 +46,7 @@ def main(global_config, **settings):
     configurator.include('pyramid_jinja2')
     # Add SqlAlchemy DB
     configurator.include('.models')
+    configurator.add_subscriber(cors_headers, NewResponse)
     # set Hapic
     hapic.set_context(
         PyramidContext(
