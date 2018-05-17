@@ -38,122 +38,116 @@ class Folder extends React.Component {
     return (
       <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
         <div className='folder__header align-items-center' onClick={this.handleClickToggleFolder}>
+
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
-          <div className='col-2 col-sm-2 col-md-2 col-lg-2 col-xl-1'>
-            <div className='folder__header__name__icon'>
-              <i className={classnames('fa', {'fa-folder-open-o': this.state.open, 'fa-folder-o': !this.state.open})} />
-            </div>
+          <div className='folder__header__icon'>
+            <i className={classnames('fa fa-fw', {'fa-folder-open-o': this.state.open, 'fa-folder-o': !this.state.open})} />
           </div>
 
-          <div className='col-10 col-sm-10 col-md-8 col-lg-8 col-xl-9'>
-            <div className='folder__header__name align-items-center justify-content-between'>
+          <div className='folder__header__name'>
+            { folderData.title }
+          </div>
 
-              <div className='folder__header__name__text'>
-                { folderData.title }
-              </div>
+          <div className='folder__header__button'>
 
-              <div className='folder__header__name__button d-flex align-items-center '>
+            <div
+              className='folder__header__button__addbtn'
+              onClick={this.handleClickNewFile}
+            >
+              <button className='addbtn__text btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                {t('Folder.create')} ...
+              </button>
 
-                <div
-                  className='folder__header__name__button__addbtn mx-4'
-                  onClick={this.handleClickNewFile}
-                >
-                  <button className='addbtn__text btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                    {t('Folder.create')} ...
-                  </button>
-
-                  <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <div className='subdropdown__link dropdown-item'>
-                      <div className='subdropdown__link__folder d-flex align-items-center'>
-                        <div className='subdropdown__link__folder__icon mr-3'>
-                          <i className='fa fa-fw fa-folder-o' />
-                        </div>
-                        <div className='subdropdown__link__folder__text'>
-                          Créer un dossier
-                        </div>
-                      </div>
+              <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                <div className='subdropdown__link dropdown-item'>
+                  <div className='subdropdown__link__folder d-flex align-items-center'>
+                    <div className='subdropdown__link__folder__icon mr-3'>
+                      <i className='fa fa-fw fa-folder-o' />
                     </div>
-                    <div className='subdropdown__link dropdown-item'>
-                      <div className='subdropdown__link__apphtml d-flex align-items-center'>
-                        <div className='subdropdown__link__apphtml__icon mr-3'>
-                          <i className='fa fa-fw fa-file-text-o' />
-                        </div>
-                        <div className='subdropdown__link__apphtml__text'>
-                          Rédiger un document
-                        </div>
-                      </div>
-                    </div>
-                    <div className='subdropdown__link dropdown-item'>
-                      <div className='subdropdown__link__appfile d-flex align-items-center'>
-                        <div className='subdropdown__link__appfile__icon mr-3'>
-                          <i className='fa fa-fw fa-file-image-o' />
-                        </div>
-                        <div className='subdropdown__link__appfile__text'>
-                          Importer un fichier
-                        </div>
-                      </div>
-                    </div>
-                    <div className='subdropdown__link dropdown-item'>
-                      <div className='subdropdown__link__appmarkdown d-flex align-items-center'>
-                        <div className='subdropdown__link__appmarkdown__icon mr-3'>
-                          <i className='fa fa-fw fa-file-code-o' />
-                        </div>
-                        <div className='subdropdown__link__appmarkdown__text'>
-                          Rédiger un document markdown
-                        </div>
-                      </div>
-                    </div>
-                    <div className='subdropdown__link dropdown-item'>
-                      <div className='subdropdown__link__appthread d-flex align-items-center'>
-                        <div className='subdropdown__link__appthread__icon mr-3'>
-                          <i className='fa fa-fw fa-comments-o' />
-                        </div>
-                        <div className='subdropdown__link__appthread__text'>
-                          Lancer une discussion
-                        </div>
-                      </div>
-                    </div>
-                    <div className='subdropdown__link dropdown-item'>
-                      <div className='subdropdown__link__apptask d-flex align-items-center'>
-                        <div className='subdropdown__link__apptask__icon mr-3'>
-                          <i className='fa fa-fw fa-list-ul' />
-                        </div>
-                        <div className='subdropdown__link__apptask__text'>
-                          Créer une tâche
-                        </div>
-                      </div>
-                    </div>
-                    <div className='subdropdown__link dropdown-item'>
-                      <div className='subdropdown__link__appissue d-flex align-items-center'>
-                        <div className='subdropdown__link__appissue__icon mr-3'>
-                          <i className='fa fa-fw fa-ticket' />
-                        </div>
-                        <div className='subdropdown__link__appissue__text'>
-                          Ouvrir un ticket
-                        </div>
-                      </div>
+                    <div className='subdropdown__link__folder__text'>
+                      Créer un dossier
                     </div>
                   </div>
                 </div>
-
-                <div className='d-none d-md-flex'>
-                  <BtnExtandedAction onClickExtendedAction={{
-                    edit: e => onClickExtendedAction.edit(e, folderData),
-                    move: e => onClickExtendedAction.move(e, folderData),
-                    download: e => onClickExtendedAction.download(e, folderData),
-                    archive: e => onClickExtendedAction.archive(e, folderData),
-                    delete: e => onClickExtendedAction.delete(e, folderData)
-                  }} />
+                <div className='subdropdown__link dropdown-item'>
+                  <div className='subdropdown__link__apphtml d-flex align-items-center'>
+                    <div className='subdropdown__link__apphtml__icon mr-3'>
+                      <i className='fa fa-fw fa-file-text-o' />
+                    </div>
+                    <div className='subdropdown__link__apphtml__text'>
+                      Rédiger un document
+                    </div>
+                  </div>
                 </div>
-
+                <div className='subdropdown__link dropdown-item'>
+                  <div className='subdropdown__link__appfile d-flex align-items-center'>
+                    <div className='subdropdown__link__appfile__icon mr-3'>
+                      <i className='fa fa-fw fa-file-image-o' />
+                    </div>
+                    <div className='subdropdown__link__appfile__text'>
+                      Importer un fichier
+                    </div>
+                  </div>
+                </div>
+                <div className='subdropdown__link dropdown-item'>
+                  <div className='subdropdown__link__appmarkdown d-flex align-items-center'>
+                    <div className='subdropdown__link__appmarkdown__icon mr-3'>
+                      <i className='fa fa-fw fa-file-code-o' />
+                    </div>
+                    <div className='subdropdown__link__appmarkdown__text'>
+                      Rédiger un document markdown
+                    </div>
+                  </div>
+                </div>
+                <div className='subdropdown__link dropdown-item'>
+                  <div className='subdropdown__link__appthread d-flex align-items-center'>
+                    <div className='subdropdown__link__appthread__icon mr-3'>
+                      <i className='fa fa-fw fa-comments-o' />
+                    </div>
+                    <div className='subdropdown__link__appthread__text'>
+                      Lancer une discussion
+                    </div>
+                  </div>
+                </div>
+                <div className='subdropdown__link dropdown-item'>
+                  <div className='subdropdown__link__apptask d-flex align-items-center'>
+                    <div className='subdropdown__link__apptask__icon mr-3'>
+                      <i className='fa fa-fw fa-list-ul' />
+                    </div>
+                    <div className='subdropdown__link__apptask__text'>
+                      Créer une tâche
+                    </div>
+                  </div>
+                </div>
+                <div className='subdropdown__link dropdown-item'>
+                  <div className='subdropdown__link__appissue d-flex align-items-center'>
+                    <div className='subdropdown__link__appissue__icon mr-3'>
+                      <i className='fa fa-fw fa-ticket' />
+                    </div>
+                    <div className='subdropdown__link__appissue__text'>
+                      Ouvrir un ticket
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <div className='d-none d-md-flex'>
+                <BtnExtandedAction onClickExtendedAction={{
+                  edit: e => onClickExtendedAction.edit(e, folderData),
+                  move: e => onClickExtendedAction.move(e, folderData),
+                  download: e => onClickExtendedAction.download(e, folderData),
+                  archive: e => onClickExtendedAction.archive(e, folderData),
+                  delete: e => onClickExtendedAction.delete(e, folderData)
+                }} />
+              </div>
+
             </div>
           </div>
 
-          <div className='col-0 col-sm-0 col-md-2 col-lg-2 col-xl-2' />
+          <div className='folder__header__status' />
 
         </div>
 

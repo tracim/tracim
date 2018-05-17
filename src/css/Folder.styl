@@ -16,8 +16,8 @@ border-style = 1px solid secondColor
 // @Info: the very last line of file or folder has it's border bottom added in js
 // -----------------------------------------------------
 
-.folder > .folder__content > .file, .folder > .folder__content > .extandedaction
-  padding-right 7px
+// .folder > .folder__content > .file, .folder > .folder__content > .extandedaction
+//   padding-right 7px
 
 folderclose()
   height 0
@@ -51,7 +51,7 @@ folderopen()
   &__header
     position relative
     display flex
-    justify-content space-between
+    align-items center
     margin-left -30px
     border-bottom 0
     padding 10px 0
@@ -78,45 +78,54 @@ folderopen()
         border-style solid
         border-width 25px 30px 0 30px
         border-color lightGrey transparent transparent transparent
+    &__icon
+      flex-grow 0
+      padding 0 25px
+      font-size 30px
+      color darkGrey
+      text-align center
     &__name
-      display flex
-      &__icon
-        font-size 25px
-        color darkGrey
-        text-align center
-      &__text
-        margin 0 15px 0 0
-        white-space nowrap
-        text-overflow ellipsis
-        overflow hidden
-        width 400px
-        font-size 17px
-        color darkGrey
-      &__button
-        &__advancedbtn
-          position relative
-        &__addbtn
-          margin auto 0
-          cursor pointer
-          &:hover > .folder__header__name__addbtn__text
-            color white
-          .addbtn
-            &__text
-              font-size 17px
-              color fontColor
-              border-color secondColor
-              &:hover, &:focus, &:active
-                color off-white
-                border-color thirdColor
-                background-color thirdColor
-                box-shadow 0 0 1px 2px fifthColor
-                outline fifthColor
-              &::after
-                margin-left 20px
-            &__subdropdown
-              padding 0
-              .subdropdown__link
-                padding 10px
+      flex-grow 2
+      flex-shrink 2
+      margin 0 15px 0 0
+      white-space nowrap
+      text-overflow ellipsis
+      overflow hidden
+      width 400px
+      font-size 17px
+      color darkGrey
+    &__button
+      flex-grow 0
+      &__advancedbtn
+        position relative
+      &__addbtn
+        display flex
+        margin auto 0
+        cursor pointer
+        &:hover > .folder__header__name__addbtn__text
+          color white
+        .addbtn
+          &__text
+            margin-right 40px
+            font-size 17px
+            color fontColor
+            border-color secondColor
+            &:hover, &:focus, &:active
+              color off-white
+              border-color thirdColor
+              background-color thirdColor
+              box-shadow 0 0 1px 2px fifthColor
+              outline fifthColor
+            &::after
+              margin-left 20px
+          &__subdropdown
+            padding 0
+            .subdropdown__link
+              padding 10px
+    &__status
+      flex-grow 0
+      padding 0 15px
+      width 180px
     &__contenttype
       display flex
       justify-content flex-end
