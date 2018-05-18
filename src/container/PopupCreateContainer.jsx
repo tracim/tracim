@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import GenericContent from '../Component/PopupContent/GenericContent.jsx'
-import FileContent from '../Component/PopupContent/FileContent.jsx'
-import WksContent from '../Component/PopupContent/WksContent.jsx'
+// import GenericContent from '../component/PopupContent/GenericContent.jsx'
+import FileContent from '../component/PopupContent/FileContent.jsx'
+// import WksContent from '../component/PopupContent/WksContent.jsx'
 
 class PopupCreateContainer extends Component {
   render () {
@@ -10,7 +10,40 @@ class PopupCreateContainer extends Component {
         <div className='popupcontent__container card'>
           <div className='popupcontent__container__header' />
           <div className='card-body nopadding'>
-            <FileContent />
+            <div className='filecontent p-3'>
+              <div className='filecontent__close d-flex justify-content-end'>
+                <i className='fa fa-times' />
+              </div>
+              <div className='filecontent__contentname d-flex align-items-center mb-4'>
+                <div className='filecontent__contentname__icon mr-3'>
+                  <i className='fa fa-file-text-o' />
+                </div>
+                <div className='filecontent__contentname__title'>
+                  Fichier de prévisualisation
+                </div>
+              </div>
+
+              <div className='filecontent__text'>Importer votre fichier :</div>
+              <div className='filecontent__form mb-4' drop='true'>
+                <div className='filecontent__form__icon d-flex justify-content-center'>
+                  <label htmlFor='filecontentUpload' type='file'>
+                    <i className='fa fa-download' />
+                  </label>
+                  <input type='file' className='d-none' id='filecontentUpload' />
+                </div>
+                <div className='filecontent__form__instruction text-center'>
+                  Glisser votre fichier ici
+                </div>
+                <div className='filecontent__form__text text-center'>
+                  Vous pouvez également importer votre fichier en cliquant sur l'icon
+                </div>
+              </div>
+              <div className='filecontent__button d-flex justify-content-end'>
+                <button className='filecontent__form__button btn btn-outline-primary'>
+                  Créer et Valider
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

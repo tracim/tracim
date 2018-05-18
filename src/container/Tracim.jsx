@@ -8,6 +8,7 @@ import Dashboard from './Dashboard.jsx'
 import Account from './Account.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
+import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route,
   withRouter
@@ -59,6 +60,7 @@ class Tracim extends React.Component {
               <PrivateRoute path={`${PAGE_NAME.WS_CONTENT}/:idws/:filter?`} component={WorkspaceContent} />
               <PrivateRoute exact path={PAGE_NAME.ACCOUNT} component={Account} />
               <PrivateRoute exact path={PAGE_NAME.DASHBOARD} component={Dashboard} />
+              <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} />
 
               <Footer />
             </div>
