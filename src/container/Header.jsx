@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
