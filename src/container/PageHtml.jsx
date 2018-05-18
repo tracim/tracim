@@ -25,7 +25,7 @@ const debug = {
     icon: 'fa fa-file-text-o',
     color: '#fdfdfd',
     domContainer: 'appContainer',
-    apiUrl: 'http://localhost:3001'
+    mockApiUrl: 'http://localhost:3001'
   },
   loggedUser: {
     id: 5,
@@ -82,11 +82,11 @@ class pageHtml extends React.Component {
     const { content, config } = this.state
     if (content.id === '-1') return // debug case
 
-    const fetchResultPageHtml = await fetch(`${config.apiUrl}/workspace/${content.workspace.id}/content/${content.id}`, {
+    const fetchResultPageHtml = await fetch(`${config.mockApiUrl}/workspace/${content.workspace.id}/content/${content.id}`, {
       ...FETCH_CONFIG,
       method: 'GET'
     })
-    const fetchResultTimeline = await fetch(`${config.apiUrl}/workspace/${content.workspace.id}/content/${content.id}/timeline`, {
+    const fetchResultTimeline = await fetch(`${config.mockApiUrl}/workspace/${content.workspace.id}/content/${content.id}/timeline`, {
       ...FETCH_CONFIG,
       method: 'GET'
     })
