@@ -24,7 +24,8 @@ const debug = {
     icon: 'fa fa-comments-o',
     color: '#65c7f2',
     domContainer: 'appContainer',
-    apiUrl: 'http://localhost:3001'
+    apiUrl: 'http://localhost:3001',
+    mockApiUrl: 'http://localhost:3001'
   },
   loggedUser: {
     id: 5,
@@ -78,7 +79,7 @@ class Thread extends React.Component {
     const { content, config } = this.state
     if (content.id === '-1') return // debug case
 
-    const fetchResultThread = await fetch(`${config.apiUrl}/workspace/${content.workspace.id}/content/${content.id}`, {
+    const fetchResultThread = await fetch(`${config.mockApiUrl}/workspace/${content.workspace.id}/content/${content.id}`, {
       ...FETCH_CONFIG,
       method: 'GET'
     })
