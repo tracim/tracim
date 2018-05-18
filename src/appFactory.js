@@ -7,7 +7,8 @@ export function appFactory (WrappedComponent) {
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
-        apiUrl: FETCH_CONFIG.apiUrl
+        apiUrl: FETCH_CONFIG.apiUrl,
+        mockApiUrl: FETCH_CONFIG.mockApiUrl
       },
       content
     })
