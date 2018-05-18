@@ -16,6 +16,7 @@ from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.views import BASE_API_V2
 from tracim.views.core_api.session_controller import SessionController
 from tracim.views.errors import ErrorSchema
+from tracim.lib.utils.cors import add_cors_support
 
 
 def main(global_config, **settings):
@@ -31,6 +32,9 @@ def main(global_config, **settings):
         basic_auth_check_credentials,
         realm=BASIC_AUTH_WEBUI_REALM,
     )
+    configurator.include(add_cors_support)
+    # make sure to add this before other routes to intercept OPTIONS
+    configurator.add_cors_preflight_handler()
     # Default authorization : Accept anything.
     configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
     configurator.set_authentication_policy(authn_policy)
