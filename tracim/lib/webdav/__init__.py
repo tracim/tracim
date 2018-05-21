@@ -48,7 +48,10 @@ class WebdavAppFactory(object):
         # Get pyramid Env
         tracim_config_file_path = os.path.abspath(tracim_config_file_path)
         config['tracim_config'] = tracim_config_file_path
-        settings = get_appsettings(config['tracim_config'])
+        global_conf = get_appsettings(config['tracim_config']).global_conf
+        local_conf = get_appsettings(config['tracim_config'], 'tracim_web')
+        settings = global_conf
+        settings.update(local_conf)
         app_config = CFG(settings)
 
         default_config_file = os.path.abspath(settings['wsgidav.config_path'])
