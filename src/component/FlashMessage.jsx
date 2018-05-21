@@ -9,8 +9,10 @@ const FlashMessage = props => {
           <div className={classnames('flashmessage__container__header', props.flashMessage[0].type)} />
 
           <div className='card-body nopadding'>
-            <div className='flashmessage__container__close' onClick={() => props.removeFlashMessage(props.flashMessage[0].message)}>
-              <i className='fa fa-times' />
+            <div className='flashmessage__container__close'>
+              <div className='flashmessage__container__close__icon' onClick={() => props.removeFlashMessage(props.flashMessage[0].message)}>
+                <i className='fa fa-times' />
+              </div>
             </div>
 
             <div className='flashmessage__container__content'>
