@@ -1,5 +1,10 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
+btncolor()
+  background-color htmlColor
+  box-shadow 0 0 1px 2px htmlColor
+  color off-white
+
 .wsContentPageHtml
   width 1155px
   &__header
@@ -9,6 +14,29 @@
     &__icon
       .fa-file-text-o
         color white
+  .newversionbtn
+    border-color htmlColor
+    color fontColor
+    &:hover, &:focus, &:visited, &:active
+      btncolor()
+  .optionicon
+    &:hover, &:focus, &:active
+      color htmlColor
+  .selectStatus
+    .dropdown-item
+      &:hover, &:focus, &:active, &visited, &:focus-within
+        background-color htmlColor
+        color off-white
+  &__cancel
+    border-color htmlColor
+    &:hover, &:focus, &:active, &:visited, &focus-within
+      border-color htmlColor
+      btncolor()
+  &__submit
+    border-color htmlColor
+    &:hover, &:focus, &:active, &:visited, &focus-within
+      border-color htmlColor
+      btncolor()
   &__contentpage
     &__textnote
       margin 10px
@@ -50,20 +78,19 @@
           color fontColor
           font-size 17px
     &__texteditor
-      &__simpletext
-        &__input
-          &:focus
-            color htmlColor
+      &__advancedtext
+        &__btn
+          color fontColor
+          border-color htmlColor
+          &:hover ,&:focus, &:visited, &:active
             border-color htmlColor
+            btncolor()
       &__submit
         &__btn
           border-color htmlColor
           background-color htmlColor
           color white
-          &:hover
-            border-color htmlColor
-            background-color htmlColor
-          &:focus
+          &:hover, &:focus, &:visited, &:active
             border-color htmlColor
             background-color htmlColor
 
