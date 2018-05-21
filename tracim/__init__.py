@@ -15,6 +15,7 @@ from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.views import BASE_API_V2
 from tracim.views.core_api.session_controller import SessionController
+from tracim.views.core_api.system_controller import SystemController
 from tracim.views.errors import ErrorSchema
 from tracim.lib.utils.cors import add_cors_support
 
@@ -57,7 +58,9 @@ def main(global_config, **settings):
     )
     # Add controllers
     session_api = SessionController()
+    system_api = SystemController()
     configurator.include(session_api.bind, route_prefix=BASE_API_V2)
+    configurator.include(system_api.bind, route_prefix=BASE_API_V2)
     hapic.add_documentation_view(
         '/api/v2/doc',
         'Tracim v2 API',

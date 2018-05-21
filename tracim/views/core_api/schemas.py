@@ -2,7 +2,7 @@
 import marshmallow
 from marshmallow import post_load
 
-from tracim.models.context_models import LoginCredentials, UserInContext
+from tracim.models.context_models import LoginCredentials
 
 
 class ProfileSchema(marshmallow.Schema):
@@ -48,3 +48,54 @@ class LoginOutputHeaders(marshmallow.Schema):
 
 class NoContentSchema(marshmallow.Schema):
     pass
+
+
+class WorkspaceMenuEntrySchema(marshmallow.Schema):
+    slug = marshmallow.fields.String()
+    label = marshmallow.fields.String()
+    route = marshmallow.fields.String()
+    hexcolor = marshmallow.fields.String()
+    icon = marshmallow.fields.String()
+
+
+class WorkspaceSchema(marshmallow.Schema):
+    id = marshmallow.fields.Int()
+    slug = marshmallow.fields.String()
+    label = marshmallow.fields.String()
+    description = marshmallow.fields.String()
+    sidebar_entries = marshmallow.fields.Nested(
+        WorkspaceMenuEntrySchema,
+        many=True,
+    )
+
+
+class WorkspaceDigestSchema(marshmallow.Schema):
+    id = marshmallow.fields.Int()
+    label = marshmallow.fields.String()
+    sidebar_entries = marshmallow.fields.Nested(
+        WorkspaceMenuEntrySchema,
+        many=True,
+    )
+
+
+class WorkspaceMemberSchema(marshmallow.Schema):
+    role = marshmallow.fields.String()
+    user_id = marshmallow.fields.Int()
+    workspace_id = marshmallow.fields.Int()
+    # TODO user
+
+
+class ApplicationConfigSchema(marshmallow.Schema):
+    pass
+    #  TODO
+
+
+class ApplicationSchema(marshmallow.Schema):
+    label = marshmallow.fields.String()
+    slug = marshmallow.fields.String()
+    icon = marshmallow.fields.String()
+    hexcolor = marshmallow.fields.String()
+    is_active = marshmallow.fields.Boolean()
+    config = marshmallow.fields.Nested(
+        ApplicationConfigSchema,
+    )
