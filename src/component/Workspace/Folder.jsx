@@ -36,7 +36,7 @@ class Folder extends React.Component {
     } = this.props
 
     return (
-      <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
+      <div className={classnames('folder', {'active': this.state.open && folderData.content.length > 0, 'item-last': isLast})}>
         <div className='folder__header align-items-center' onClick={this.handleClickToggleFolder}>
 
           <div className='folder__header__triangleborder'>

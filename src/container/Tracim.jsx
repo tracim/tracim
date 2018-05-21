@@ -20,7 +20,8 @@ import {
   getUserIsConnected
 } from '../action-creator.async.js'
 import {
-  removeFlashMessage, setUserConnected
+  removeFlashMessage,
+  setUserConnected
 } from '../action-creator.sync.js'
 
 class Tracim extends React.Component {

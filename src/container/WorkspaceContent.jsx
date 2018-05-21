@@ -76,7 +76,7 @@ class WorkspaceContent extends React.Component {
     ? contentList
     : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
       .map(c => c.type !== 'folder' ? c : {...c, content: this.filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
-      .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder
+      // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty folders
 
   render () {
     const { workspace, app } = this.props
