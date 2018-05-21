@@ -11,7 +11,7 @@ require('./css/index.styl')
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename={'/#'}>
       <I18nextProvider i18n={i18n}>
         <Tracim />
       </I18nextProvider>

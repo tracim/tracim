@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 // import GenericContent from '../component/PopupContent/GenericContent.jsx'
-import FileContent from '../component/PopupContent/FileContent.jsx'
+// import FileContent from '../component/PopupContent/FileContent.jsx'
 // import WksContent from '../component/PopupContent/WksContent.jsx'
 
 class PopupCreateContainer extends Component {

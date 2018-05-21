@@ -60,7 +60,7 @@ class Tracim extends React.Component {
               <PrivateRoute path={`${PAGE_NAME.WS_CONTENT}/:idws/:filter?`} component={WorkspaceContent} />
               <PrivateRoute exact path={PAGE_NAME.ACCOUNT} component={Account} />
               <PrivateRoute exact path={PAGE_NAME.DASHBOARD} component={Dashboard} />
-              <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} />
+              <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
               <Footer />
             </div>
