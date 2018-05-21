@@ -1,9 +1,7 @@
 # coding=utf-8
 # Runner for uwsgi
 import os
-import pyramid.paster
+from wsgi import web_app
 
 config_uri = os.environ['TRACIM_CONF_PATH']
-
-pyramid.paster.setup_logging(config_uri)
-application = pyramid.paster.get_app(config_uri)
+application = web_app(config_uri)
