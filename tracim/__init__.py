@@ -13,15 +13,18 @@ from tracim.lib.utils.authentification import basic_auth_check_credentials
 from tracim.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
+from tracim.lib.webdav import WebdavAppFactory
 from tracim.views import BASE_API_V2
 from tracim.views.core_api.session_controller import SessionController
 from tracim.views.errors import ErrorSchema
 from tracim.lib.utils.cors import add_cors_support
 
 
-def main(global_config, **settings):
+def web(global_config, **local_settings):
     """ This function returns a Pyramid WSGI application.
     """
+    settings = global_config
+    settings.update(local_settings)
     # set CFG object
     app_config = CFG(settings)
     app_config.configure_filedepot()
@@ -64,3 +67,12 @@ def main(global_config, **settings):
         'API of Tracim v2',
     )
     return configurator.make_wsgi_app()
+
+
+def webdav(global_config, **local_settings):
+    settings = global_config
+    settings.update(local_settings)
+    app_factory = WebdavAppFactory(
+        tracim_config_file_path=settings['__file__'],
+    )
+    return app_factory.get_wsgi_app()

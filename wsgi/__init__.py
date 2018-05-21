@@ -1,4 +1,5 @@
 # coding=utf-8
+import plaster
 import pyramid.paster
 
 from tracim.lib.webdav import WebdavAppFactory
@@ -10,7 +11,7 @@ def web_app(config_uri):
 
 
 def webdav_app(config_uri):
-    app_factory = WebdavAppFactory(
-        tracim_config_file_path=config_uri,
-    )
-    return app_factory.get_wsgi_app()
+    config_uri = '{}#webdav'.format(config_uri)
+    plaster.setup_logging(config_uri)
+    loader = plaster.get_loader(config_uri, protocols=['wsgi'])
+    return loader.get_wsgi_app()
