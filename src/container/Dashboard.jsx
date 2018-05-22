@@ -41,9 +41,7 @@ class Dashboard extends Component {
                 <div className='pageTitleGeneric__title dashboard__header__title__text mr-3'>
                   Dashboard
                 </div>
-                <div className='dashboard__header__acces'>
-                  (privé)
-                </div>
+                <div className='dashboard__header__acces' />
               </div>
               <div className='dashboard__header__advancedmode mr-3'>
                 <button type='button' className='btn btn-primary'>Activer édition avancé</button>
@@ -53,12 +51,11 @@ class Dashboard extends Component {
             <div className='dashboard__wkswrapper'>
               <div className='dashboard__workspace'>
                 <div className='dashboard__workspace__title'>
-                  Nouvelle ligne directive sur le nouveau design de Tracim
+                  Développement tracim
                 </div>
 
                 <div className='dashboard__workspace__detail'>
-                  Ut in et sit adipisicing mollit amet ut exercitation proident laborum duis occaecat eu aute qui ut.
-                  Dolore veniam eu consectetur occaecat est elit dolor nulla est ut amet do reprehenderit eiusmod tempor.
+                  Ligne directive pour le prochain design de Tracim et des futurs fonctionnalités.
                 </div>
               </div>
               <div className='dashboard__userstatut'>
@@ -147,7 +144,7 @@ class Dashboard extends Component {
                     <i className='fa fa-video-camera' />
                   </div>
                   <div className='dashboard__calltoaction__button__text__title'>
-                    débuter une visioconférence
+                    Débuter une visioconférence
                   </div>
                 </div>
               </div>
@@ -192,7 +189,7 @@ class Dashboard extends Component {
                       <i className='fa fa-comments-o' />
                     </div>
                     <div className='dashboard__activity__workspace__name'>
-                      <span>Workspace 1</span>
+                      <span>Développement Tracim</span>
                     </div>
                   </div>
 
@@ -201,7 +198,7 @@ class Dashboard extends Component {
                       <i className='fa fa-list-ul' />
                     </div>
                     <div className='dashboard__activity__workspace__name'>
-                      Workspace 2
+                      Mission externe
                     </div>
                   </div>
 
@@ -210,7 +207,7 @@ class Dashboard extends Component {
                       <i className='fa fa-list-ul' />
                     </div>
                     <div className='dashboard__activity__workspace__name'>
-                      Workspace 3
+                      Recherche et developpement
                     </div>
                   </div>
 
@@ -219,7 +216,7 @@ class Dashboard extends Component {
                       <i className='fa fa-file-text-o' />
                     </div>
                     <div className='dashboard__activity__workspace__name'>
-                      <span>Workspace 4</span>
+                      <span>Marketing</span>
                     </div>
                   </div>
 
@@ -228,7 +225,7 @@ class Dashboard extends Component {
                       <i className='fa fa-comments-o' />
                     </div>
                     <div className='dashboard__activity__workspace__name'>
-                      <span>Workspace 5</span>
+                      <span>Évolution</span>
                     </div>
                   </div>
 
@@ -237,7 +234,7 @@ class Dashboard extends Component {
                       <i className='fa fa-file-text-o' />
                     </div>
                     <div className='dashboard__activity__workspace__name'>
-                      Workspace 6
+                      Commercialisation
                     </div>
                   </div>
 
@@ -285,7 +282,7 @@ class Dashboard extends Component {
                               Aldwin Vinel
                             </div>
                             <div className='dashboard__memberlist__list__item__info__role'>
-                              lecteur
+                              Lecteur
                             </div>
                           </div>
                           <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
@@ -302,7 +299,7 @@ class Dashboard extends Component {
                               William Himme
                             </div>
                             <div className='dashboard__memberlist__list__item__info__role'>
-                              contributeur
+                              Contributeur
                             </div>
                           </div>
                           <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
@@ -319,7 +316,7 @@ class Dashboard extends Component {
                               Yacine Lite
                             </div>
                             <div className='dashboard__memberlist__list__item__info__role'>
-                              Gestionnaire de contenu
+                              Contributeur
                             </div>
                           </div>
                           <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
@@ -333,10 +330,10 @@ class Dashboard extends Component {
                           </div>
                           <div className='dashboard__memberlist__list__item__info mr-auto'>
                             <div className='dashboard__memberlist__list__item__info__name'>
-                              Yacine Lite
+                              Alexi Falcin
                             </div>
                             <div className='dashboard__memberlist__list__item__info__role'>
-                              Gestionnaire de contenu
+                              Gestionnaire
                             </div>
                           </div>
                           <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
@@ -350,10 +347,27 @@ class Dashboard extends Component {
                           </div>
                           <div className='dashboard__memberlist__list__item__info mr-auto'>
                             <div className='dashboard__memberlist__list__item__info__name'>
-                              Yacine Lite
+                              Mickaël Fonati
                             </div>
                             <div className='dashboard__memberlist__list__item__info__role'>
-                              Gestionnaire de contenu
+                              Gestionnaire
+                            </div>
+                          </div>
+                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
+                            <i className='fa fa-trash-o' />
+                          </div>
+                        </li>
+
+                        <li className='dashboard__memberlist__list__item'>
+                          <div className='dashboard__memberlist__list__item__avatar'>
+                            <img src={imgProfil} alt='avatar' />
+                          </div>
+                          <div className='dashboard__memberlist__list__item__info mr-auto'>
+                            <div className='dashboard__memberlist__list__item__info__name'>
+                              Eva Lonbard
+                            </div>
+                            <div className='dashboard__memberlist__list__item__info__role'>
+                              Gestionnaire
                             </div>
                           </div>
                           <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
