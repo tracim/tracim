@@ -32,6 +32,10 @@ class UserSchema(marshmallow.Schema):
     )
 
 
+class UserIdPathSchema(marshmallow.Schema):
+    user_id = marshmallow.fields.Int()
+
+
 class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(required=True)
@@ -67,7 +71,6 @@ class WorkspaceSchema(marshmallow.Schema):
         WorkspaceMenuEntrySchema,
         many=True,
     )
-
 
 class WorkspaceDigestSchema(marshmallow.Schema):
     id = marshmallow.fields.Int()

@@ -14,7 +14,7 @@ class Application(object):
             hexcolor: str,
             is_active: bool,
             config: typing.Dict[str, str],
-            routes: typing.List[str],
+            main_route: str,
     ) -> None:
         self.label = label
         self.slug = slug
@@ -22,7 +22,7 @@ class Application(object):
         self.hexcolor = hexcolor
         self.is_active = is_active
         self.config = config
-        self.routes = routes
+        self.main_route = main_route
 
 
 # TODO - G.M - 21-05-2018 Do not rely on hardcoded app list
@@ -34,9 +34,7 @@ calendar = Application(
     hexcolor='#757575',
     is_active=True,
     config={},
-    routes=[
-        '/#/workspaces/{workspace_id}/calendar',
-    ],
+    main_route='/#/workspaces/{workspace_id}/calendar',
 )
 
 thread = Application(
@@ -46,9 +44,8 @@ thread = Application(
     hexcolor='#ad4cf9',
     is_active=True,
     config={},
-    routes=[
-        '/#/workspaces/{workspace_id}/contents?type=thread',
-    ],
+    main_route='/#/workspaces/{workspace_id}/contents?type=thread',
+
 )
 
 file = Application(
@@ -58,9 +55,7 @@ file = Application(
     hexcolor='#FF9900',
     is_active=True,
     config={},
-    routes=[
-        '/#/workspaces/{workspace_id}/contents?type=file',
-    ],
+    main_route='/#/workspaces/{workspace_id}/contents?type=file',
 )
 
 pagemarkdownplus = Application(
@@ -70,9 +65,7 @@ pagemarkdownplus = Application(
     hexcolor='#f12d2d',
     is_active=True,
     config={},
-    routes=[
-        '/#/workspaces/{workspace_id}/contents?type=file',
-    ],
+    main_route='/#/workspaces/{workspace_id}/contents?type=pagemarkdownplus',
 )
 
 pagehtml = Application(
@@ -82,9 +75,7 @@ pagehtml = Application(
     hexcolor='#3f52e3',
     is_active=True,
     config={},
-    routes=[
-        '/#/workspaces/{workspace_id}/contents?type=file',
-    ],
+    main_route='/#/workspaces/{workspace_id}/contents?type=pagehtml',
 )
 # List of applications
 applications = [

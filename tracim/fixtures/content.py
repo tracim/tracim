@@ -40,9 +40,21 @@ class Content(Fixture):
         )
 
         # Workspaces
-        w1 = admin_workspace_api.create_workspace('w1', save_now=True)
-        w2 = bob_workspace_api.create_workspace('w2', save_now=True)
-        w3 = admin_workspace_api.create_workspace('w3', save_now=True)
+        w1 = admin_workspace_api.create_workspace(
+            'w1',
+            description='This is a workspace',
+            save_now=True
+        )
+        w2 = bob_workspace_api.create_workspace(
+            'w2',
+            description='A great workspace',
+            save_now=True
+        )
+        w3 = admin_workspace_api.create_workspace(
+            'w3',
+            description='Just another workspace',
+            save_now=True
+        )
 
         # Workspaces roles
         role_api.create_one(

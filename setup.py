@@ -34,6 +34,7 @@ requires = [
     # others
     'filedepot',
     'babel',
+    'python-slugify',
 ]
 
 tests_require = [

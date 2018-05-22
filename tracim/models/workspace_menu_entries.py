@@ -1,4 +1,9 @@
 # coding=utf-8
+import typing
+from copy import copy
+
+from tracim.models.applications import applications
+from tracim.models.data import Workspace
 
 
 class WorkspaceMenuEntry(object):
@@ -29,10 +34,38 @@ dashboard_menu_entry = WorkspaceMenuEntry(
 )
 all_content_menu_entry = WorkspaceMenuEntry(
   slug="contents/all",
-  label="Tous les contenus",
+  label="All Contents",
   route="/#/workspaces/{workspace_id}/contents",
   hexcolor="#fdfdfd",
   icon="",
 )
 
 
+def default_workspace_menu_entry(
+    workspace: Workspace,
+)-> typing.List[WorkspaceMenuEntry]:
+    """
+    Get default menu entry for a workspace
+    """
+    menu_entries = [
+        copy(dashboard_menu_entry),
+        copy(all_content_menu_entry),
+    ]
+    for app in applications:
+        if app.main_route:
+            new_entry = WorkspaceMenuEntry(
+                slug=app.slug,
+                label=app.label,
+                hexcolor=app.hexcolor,
+                icon=app.icon,
+                route=app.main_route
+            )
+            menu_entries.append(new_entry)
+
+    for entry in menu_entries:
+        entry.route = entry.route.replace(
+            '{workspace_id}',
+            str(workspace.workspace_id)
+        )
+
+    return menu_entries

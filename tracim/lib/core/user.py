@@ -7,7 +7,7 @@ import typing as typing
 from sqlalchemy.orm import Session
 
 from tracim import CFG
-from tracim.models.auth import User
+from tracim.models.auth import User, Group
 from sqlalchemy.orm.exc import NoResultFound
 from tracim.exceptions import WrongUserPassword, UserNotExist
 from tracim.exceptions import AuthenticationFailed
@@ -98,6 +98,16 @@ class UserApi(object):
         except (WrongUserPassword, NoResultFound):
             raise AuthenticationFailed()
 
+    def can_see_private_info_of_user(self, user: User):
+        """
+        Return boolean wheter current api user has right
+        to see private information of a user.
+        :param user:
+        :return:
+        """
+        return self._user and (
+                self._user.user_id == user.user_id or
+                self._user.profile.id >= Group.TIM_ADMIN)
     # Actions
 
     def update(

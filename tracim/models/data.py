@@ -173,6 +173,7 @@ class UserRoleInWorkspace(DeclarativeBase):
             UserRoleInWorkspace.WORKSPACE_MANAGER
         ]
 
+
 class RoleType(object):
     def __init__(self, role_id):
         self.role_type_id = role_id

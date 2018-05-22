@@ -2,10 +2,14 @@
 import typing
 from datetime import datetime
 
+from slugify import slugify
 from sqlalchemy.orm import Session
 from tracim import CFG
 from tracim.models import User
 from tracim.models.auth import Profile
+from tracim.models.data import Workspace
+from tracim.models.workspace_menu_entries import default_workspace_menu_entry, \
+    WorkspaceMenuEntry
 
 
 class LoginCredentials(object):
@@ -74,3 +78,60 @@ class UserInContext(object):
     def avatar_url(self) -> typing.Optional[str]:
         # TODO - G-M - 20-04-2018 - [Avatar] Add user avatar feature
         return None
+
+
+class WorkspaceInContext(object):
+    """
+    Interface to get Workspace data and Workspace data related to context.
+    """
+
+    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG):
+        self.workspace = workspace
+        self.dbsession = dbsession
+        self.config = config
+
+    @property
+    def workspace_id(self) -> int:
+        """
+        numeric id of the workspace.
+        """
+        return self.workspace.workspace_id
+
+    @property
+    def id(self) -> int:
+        """
+        alias of workspace_id
+        """
+        return self.workspace_id
+
+    @property
+    def label(self) -> str:
+        """
+        get workspace label
+        """
+        return self.workspace.label
+
+    @property
+    def description(self) -> str:
+        """
+        get workspace description
+        """
+        return self.workspace.description
+
+    @property
+    def slug(self) -> str:
+        """
+        get workspace slug
+        """
+        return slugify(self.workspace.label)
+
+    @property
+    def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:
+        """
+        get sidebar entries, those depends on activated apps.
+        """
+        # TODO - G.M - 22-05-2018 - Rework on this in
+        # order to not use hardcoded list
+        # list should be able to change (depending on activated/disabled
+        # apps)
+        return default_workspace_menu_entry(self.workspace)
