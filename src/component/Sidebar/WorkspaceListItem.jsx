@@ -4,17 +4,12 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AnimateHeight from 'react-animate-height'
 
-const pad = number => {
-  number = number.toString()
-  return number.length < 2 ? pad('0' + number, 2) : number
-}
-
 const WorkspaceListItem = props => {
   return (
     <li className='sidebar__navigation__workspace__item'>
       <div className='sidebar__navigation__workspace__item__wrapper' onClick={props.onClickTitle}>
         <div className='sidebar__navigation__workspace__item__number'>
-          {pad(props.number)}
+          {props.name.substring(0, 2).toUpperCase()}
         </div>
 
         <div className='sidebar__navigation__workspace__item__name' title={props.name}>
