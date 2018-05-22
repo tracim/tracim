@@ -16,7 +16,7 @@ import {
   newFlashMessage,
   setUserConnected
 } from '../action-creator.sync.js'
-import {PAGE_NAME} from '../helper.js'
+import {PAGE} from '../helper.js'
 
 class Login extends React.Component {
   constructor (props) {
@@ -46,7 +46,7 @@ class Login extends React.Component {
 
     if (fetchPostUserLogin.status === 200) {
       dispatch(setUserConnected({...fetchPostUserLogin.json, logged: true}))
-      history.push(PAGE_NAME.HOME)
+      history.push(PAGE.HOME)
     } else if (fetchPostUserLogin.status === 400) {
       dispatch(newFlashMessage(t('Login.fail'), 'danger'))
     }

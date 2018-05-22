@@ -33,10 +33,6 @@ export const WORKSPACE_LIST = 'WorkspaceList'
 export const updateWorkspaceListData = workspaceList => ({ type: `Update/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `Set/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
 
-export const FILE_CONTENT = 'FileContent'
-export const setActiveFileContentActive = file => ({ type: `Set/${FILE_CONTENT}/Active`, file })
-export const setActiveFileContentHide = () => ({ type: `Set/${FILE_CONTENT}/Hide` })
-
 export const APP_LIST = 'App/List'
 export const setAppList = appList => ({ type: `Set/${APP_LIST}`, appList })
 

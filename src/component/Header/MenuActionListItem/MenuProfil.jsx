@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { PAGE_NAME } from '../../../helper.js'
+import { PAGE } from '../../../helper.js'
 
 const MenuProfil = props => {
   return props.user.logged
@@ -15,7 +15,7 @@ const MenuProfil = props => {
             </div>
           </button>
           <div className='profilgroup__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
-            <Link className='setting__link dropdown-item' to={PAGE_NAME.ACCOUNT}>Mon compte</Link>
+            <Link className='setting__link dropdown-item' to={PAGE.ACCOUNT}>Mon compte</Link>
             {/* <div className='setting__link dropdown-item'>Mot de passe</div> */}
             <div className='setting__link dropdown-item' onClick={props.onClickLogout}>Se déconnecter</div>
           </div>

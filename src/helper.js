@@ -7,11 +7,20 @@ export const FETCH_CONFIG = {
   mockApiUrl: 'http://localhost:3001'
 }
 
-export const PAGE_NAME = {
+export const PAGE = {
   HOME: '/',
-  WS_CONTENT: '/workspace',
+  WORKSPACE: {
+    DASHBOARD: idws => `/workspace/${idws}`,
+    NEW: '/workspace/new',
+    CALENDAR: idws => `/workspace/${idws}/apps/calendar`,
+    CONTENT_LIST: idws => `/workspace/${idws}/apps/contents`,
+    CONTENT: (idws, idcts) => `/workspace/${idws}/apps/contents/${idcts}`,
+    CONTENT_NEW: (idws, ctstype) => `/workspace/${idws}/apps/contents/${ctstype}/new`,
+    CONTENT_EDIT: (idws, idcts) => `/workspace/${idws}/apps/contents/${idcts}/edit`,
+    CONTENT_TITLE_EDIT: (idws, idcts) => `/workspace/${idws}/apps/contents/${idcts}/title/edit`,
+    ADMIN: idws => `/workspace/${idws}/admin`
+  },
   LOGIN: '/login',
-  DASHBOARD: '/dashboard',
   ACCOUNT: '/account'
 }
 

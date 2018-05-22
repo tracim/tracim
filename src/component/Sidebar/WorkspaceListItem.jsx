@@ -33,7 +33,7 @@ const WorkspaceListItem = props => {
         >
           <li
             className='sidebar__navigation__workspace__item__submenu__dropdown'
-            onClick={() => props.onClickAllContent(props.wsId)}
+            onClick={() => props.onClickAllContent(props.idWs)}
           >
             <div className='dropdown__icon'>
               <i className='fa fa-th' />
@@ -89,7 +89,7 @@ const WorkspaceListItem = props => {
           { Object.keys(props.app).map(a =>
             <li
               className={classnames('sidebar__navigation__workspace__item__submenu__dropdown', {'activeFilter': props.activeFilterList.includes(a)})}
-              onClick={() => props.onClickContentFilter(props.wsId, a)}
+              onClick={() => props.onClickContentFilter(props.idWs, a)}
               key={a}
             >
               <div className='dropdown__icon'>

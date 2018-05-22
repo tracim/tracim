@@ -14,33 +14,41 @@ import {
   getWorkspaceContent,
   getFolderContent
 } from '../action-creator.async.js'
+import {newFlashMessage, setWorkspaceData} from '../action-creator.sync.js'
+import { PAGE } from '../helper.js'
+
+const qs = require('query-string')
 
 class WorkspaceContent extends React.Component {
-  componentDidMount () {
-    const { workspaceList, app, match, dispatch } = this.props
+  async componentDidMount () {
+    const { workspaceList, app, match, location, dispatch } = this.props
 
-    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws, match.params.filter))
-    else if (workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id, match.params.filter)) // load first ws if none specified
+    if (Object.keys(app).length === 0) await dispatch(getAppList())
 
-    if (Object.keys(app).length === 0) dispatch(getAppList())
-  }
+    const wsToLoad = (() => {
+      if (match.params.idws !== undefined) return match.params.idws
+      if (workspaceList.length > 0) return workspaceList[0].id // load first ws if none specified
+      return null
+    })()
 
-  componentDidUpdate (prevProps) {
-    const { workspace, workspaceList, match, dispatch } = this.props
+    if (wsToLoad === null) return
 
-    // if a workspace is already loaded and the idws in url hasn't changed, do nothing
-    if (workspace.id !== -1 && prevProps.match.params.idws === match.params.idws) return
+    const wsContent = await dispatch(getWorkspaceContent(wsToLoad))
+    if (wsContent.status === 200) {
+      dispatch(setWorkspaceData(wsContent.json, qs.parse(location.search).type))
 
-    // if the idws in url has changed, load the new workspace
-    if (match.params.idws !== undefined) dispatch(getWorkspaceContent(match.params.idws, match.params.filter))
-    // else bellow is for loading url PAGE_NAME.HOME (without an idws), when workspaceList is loaded, load the first workspace
-    else if (workspace.id === -1 && workspaceList.length > 0) dispatch(getWorkspaceContent(workspaceList[0].id))
+      if (match.params.idcts) { // if a content id is in url, open it
+        const contentToOpen = wsContent.json.content.find(wsc => wsc.id === parseInt(match.params.idcts))
+        if (contentToOpen === undefined) return
+
+        this.handleClickContentItem(contentToOpen)
+      }
+    } else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
   handleClickContentItem = content => {
+    this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.workspace_id, content.id)}${this.props.location.search}`)
     this.props.renderApp(this.props.app[content.type], this.props.user, {...content, workspace: this.props.workspace})
-    // Côme - 2018/03/08 - line bellow is useless because we cannot call the reducer again when hiding app since the call comes from the app
-    // dispatch(setActiveFileContentActive(content))
   }
 
   handleClickEditContentItem = (e, content) => {

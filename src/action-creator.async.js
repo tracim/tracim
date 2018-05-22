@@ -12,7 +12,6 @@ import {
   updateUserData,
   setUserRole,
   WORKSPACE,
-  setWorkspaceData,
   WORKSPACE_LIST,
   updateWorkspaceListData,
   FOLDER,
@@ -169,14 +168,13 @@ export const getWorkspaceList = (userId, workspaceIdToOpen) => async dispatch =>
   }
 }
 
-export const getWorkspaceContent = (workspaceId, filterStr) => async dispatch => {
-  const fetchGetWorkspaceContent = await fetchWrapper({
+export const getWorkspaceContent = workspaceId => dispatch => {
+  return fetchWrapper({
     url: `${FETCH_CONFIG.mockApiUrl}/workspace/${workspaceId}`,
     param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: WORKSPACE,
     dispatch
   })
-  if (fetchGetWorkspaceContent.status === 200) dispatch(setWorkspaceData(fetchGetWorkspaceContent.json, filterStr))
 }
 
 export const getFolderContent = (workspaceId, folderId) => async dispatch => {
