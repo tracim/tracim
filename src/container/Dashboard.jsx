@@ -324,7 +324,7 @@ class Dashboard extends Component {
                           </div>
                         </li>
 
-                       <li className='dashboard__memberlist__list__item'>
+                        <li className='dashboard__memberlist__list__item'>
                           <div className='dashboard__memberlist__list__item__avatar'>
                             <img src={imgProfil} alt='avatar' />
                           </div>
