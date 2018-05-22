@@ -9,7 +9,7 @@ import {
   setWorkspaceListIsOpenInSidebar,
   updateWorkspaceFilter
 } from '../action-creator.sync.js'
-import { PAGE_NAME } from '../helper.js'
+import { PAGE } from '../helper.js'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -38,22 +38,22 @@ class Sidebar extends React.Component {
     user.id !== -1 && prevProps.user.id !== user.id && dispatch(getWorkspaceList(user.id, newWorkspaceId))
   }
 
-  handleClickWorkspace = (wsId, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(wsId, newIsOpenInSidebar))
+  handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
 
-  handleClickAllContent = wsId => {
+  handleClickAllContent = idWs => {
     this.props.dispatch(updateWorkspaceFilter([]))
 
-    this.props.history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}`)
+    this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
   }
 
-  handleClickContentFilter = (wsId, filter) => {
+  handleClickContentFilter = (idWs, filter) => {
     const { workspace, history, dispatch } = this.props
 
     const newFilter = workspace.filter.includes(filter) ? [] : [filter] // use an array to allow multiple filters (NYI)
 
     dispatch(updateWorkspaceFilter(newFilter))
 
-    history.push(`${PAGE_NAME.WS_CONTENT}/${wsId}/${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
+    history.push(`${PAGE.WORKSPACE.CONTENT_LIST(idWs)}?type=${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
   }
 
   handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
@@ -74,7 +74,7 @@ class Sidebar extends React.Component {
               { workspaceList.map((ws, i) =>
                 <WorkspaceListItem
                   number={++i}
-                  wsId={ws.id}
+                  idWs={ws.id}
                   name={ws.title}
                   app={app}
                   lang={activeLang}

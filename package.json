@@ -29,6 +29,7 @@
     "file-loader": "^1.1.5",
     "i18next": "^10.5.0",
     "prop-types": "^15.6.0",
+    "query-string": "^6.1.0",
     "react": "^16.0.0",
     "react-animate-height": "^0.10.10",
     "react-dom": "^16.0.0",
