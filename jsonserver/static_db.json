@@ -113,7 +113,7 @@
         "id": 2,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Doit-on intégrer la nouvelle fonctionnalité de tracim maintenant ?",
+        "title": "Doit-on intégrer la nouvelle fonctionnalité maintenant ?",
         "type": "Thread",
         "status": "current"
       },
@@ -121,7 +121,7 @@
         "id": 6,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Maquette.png Tracim v3",
+        "title": "Maquette.png",
         "type": "File",
         "status": "outdated"
       },
@@ -129,7 +129,7 @@
         "id": 10,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "README.md de tracim_lib",
+        "title": "README.md",
         "type": "PageMarkdown",
         "status": "validated"
       },
@@ -137,7 +137,7 @@
         "id": 7,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Etape d'installation de Tracim",
+        "title": "Les etapes pour installer le logiciel",
         "type": "Task",
         "status": "canceled"
       },
@@ -145,7 +145,7 @@
         "id": 8,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Correction du fichier css",
+        "title": "Correction du fichier CSS",
         "type": "Issue",
         "status": "current"
       },
@@ -153,7 +153,7 @@
         "id": 3,
         "parent_id": null,
         "workspace_id": 1,
-        "title": "Correction bug tracim",
+        "title": "Correction bug",
         "type": "folder",
         "allowed_app": ["PageHtml", "Thread", "File", "PageMarkdown", "Task", "Issue"],
         "content": []
@@ -165,7 +165,7 @@
       "id": 4,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "Schema Backend tracim v2",
+      "title": "Schema Backend",
       "type": "File",
       "status": "outdated"
     },
@@ -181,7 +181,7 @@
       "id": 11,
       "parent_id": 3,
       "workspace_id": 1,
-      "title": "Correction à effectuer sur le frontend de Tracim v2",
+      "title": "Correction à effectuer",
       "type": "folder",
       "allowed_app": ["PageHtml", "Thread", "File", "PageMarkdown", "Task", "Issue"],
       "content": []
@@ -192,7 +192,7 @@
       "id": 12,
       "parent_id": 11,
       "workspace_id": 1,
-      "title": "Liste des correction à effectuer",
+      "title": "Liste des corrections à effectuer",
       "type": "PageHtml",
       "status": "current"
     },
@@ -217,7 +217,7 @@
       "day": "27/11/17",
       "hour": "11h45"
     },
-    "text": "Proident esse laboris in sed officia exercitation ut anim ea."
+    "text": "Voici le début de ce qui nous servira de cachier des charges pour la partie design du logiciel, chacun peut completer le documents, nésité pas à faire des retours ! "
   }, {
     "id": 1,
     "type": "message",
@@ -228,9 +228,9 @@
     },
     "createdAt": {
       "day": "27/11/16",
-      "hour": "10h30"
+      "hour": "10h35"
     },
-    "text": "Proident esse laboris in sed officia exercitation ut anim ea. in sed officia exercitation ut"
+    "text": "Bonjour, je viens de modifier le cahier des charges sur la partie design v2."
   }, {
     "id": 2,
     "type": "message",
@@ -243,7 +243,7 @@
       "day": "27/11/15",
       "hour": "10h30"
     },
-    "text": "Proident esse laboris in sed officia exercitation ut anim ea. Proident esse laboris in sed officia exercitation ut anim ea. Proident esse laboris in sed officia exercitation ut anim ea."
+    "text": "Je viens de tout relire, je pense que c'est bon, on peut commencer les choses sérieuses."
   }, {
     "id": 3,
     "type": "version",
@@ -253,7 +253,7 @@
       "avatar": "https://www.algoo.fr/static/images/algoo_images/algoo-logo.jpg"
     },
     "createdAt": {
-      "day": "27/11/11"
+      "day": "24/11/11"
     },
     "number": "5"
   }],
@@ -264,7 +264,7 @@
     "status": "validated",
     "icon": "fa fa-fw fa-code-fork",
     "version": "version n°5",
-    "text": "Je suis le contenu de cette fameuse <b>page HTML</b><br /> sur la programmation fonctionnelle",
+    "text": " <center><b>Design V2</b></center><br/><br/><br/> Suite à la réunion tenue ce vendredi, je mets à jour ce document concernant le futur design de notre interface. Comme convenue nous aurons un dashboard qui va résumer toute l'activité présente sur le site ainsi que toutes les personnes qui auront participer au projet. De plus il y aura la présence d'un historique pour permettre à tout le monde de voir, qui a modifié, créé ou contribué aux documents. Mais aussi savoir qui a déposé ou envoyé un message dans le canal de discussion. <br/><br/><br/><br/><br/> Deuxième point évoqué: Le fait de pouvoir modifier l'interface et la couleur pour les futurs utilisateurs. On devra donc avoir accés à différents thémes d'interface et de couleurs prédéfinis mais aussi le possibilité de pouvoir créer ces propres thémes. Des maquettes devront bientôt être disponible pour nous donner un aperçu de ce que pourra être l'outil final. <br/><br/><br/><br/> Nécesité pas à rajouter,modifier ce que j'ai écrit, il doit surêment y avoir des manques. ",
     "workspace": {
       "id": 1,
       "title": "Liste des contenus",
@@ -286,7 +286,7 @@
       "text": "Bonjour, Dans le cadre d'une procédure de renouvellement de DSP, où deux sociétés se sont portées candidats et ont remis une offre, la société qui n'a pas retenue souhaite que le rapport d'analyse des offres lui soit communiqué. Ce document peut il être communiqué, en tout ou partie, dans le respect des préconisations de la CADA (loi 07-07-1978) ?Merci pour votre retour d'expérience.",
       "createdAt": {
         "day": "05/03/18",
-        "hour": "10h00"
+        "hour": "9h33"
       }
     }, {
       "id": 1,
@@ -297,7 +297,7 @@
       },
       "createdAt": {
         "day": "05/03/18",
-        "hour": "09h59"
+        "hour": "09h40"
       },
       "text": "Le doc est communicable mais doit être en partie occulté. Je te met en pièce jointe un doc la dessus. Tu peux aussi voir le Conseil n° 20003802 et Avis n° 20011051 de la CADA"
     }, {
@@ -310,7 +310,7 @@
       "text": "Oups, je ne trouve plus comment faire. :-O  tant pis je te colle le texte ci après  Une fois la délégation de service public  ou le marché signé, les documents composant la procédure de passation perdent leur caractère préparatoire  au sens des dispositions de l’article 2 de la loi du 17 juillet 1978, et deviennent, en principe, communicables à toute personne qui en fait la demande, y compris à un candidat évincé [Voir FAQ n° 2 et 7].  Toutefois, en vertu du II de l’article 6 de la même loi, ce droit d’accès doit s’exercer dans le respect du secret en matière industrielle et commerciale lequel recouvre le secret des procédés, le secret des informations économiques et financières, et le secret des stratégies commerciales  [Voir FAQ n° 4]. À ce titre, sont notamment exclus de la communication les éléments suivants, qui devront être occultés :  - les mentions relatives aux moyens techniques et humains ;  - les mentions concernant le chiffre d’affaires, les coordonnées bancaires ;  - les références autres que celles qui correspondent à des marchés publics.  La communication de certaines informations comporte un risque d’atteinte à la libre concurrence (dans le rapport d’analyse des offres ou le détail des prix par exemple). Les autorités administratives doivent donc, pour apprécier les informations qui sont protégées par le secret en matière industrielle et commerciale, tenir compte du mode de passation, de la durée, ou de l’objet du marché [Voir FAQ n° 5].  Le tableau ci-après fait apparaître les pièces qui ne posent aucune difficulté de communication, et celles qui nécessitent une analyse du risque d’atteinte à la concurrence. La CADA a dégagé, au fur à mesure des affaires qui lui étaient soumises, trois catégories de marchés : ponctuel, répétitif et fréquent [pour leur définition voir FAQ n° 6].  Le détail de l’offre de prix de l’entreprise attributaire est communicable dans le cas d'un marché ponctuel , car il reflète le coût du service public, et ne l’est pas pour un marché répétitif, car il serait susceptible de porter atteinte à la concurrence lors du renouvellement du marché  .",
       "createdAt": {
         "day": "05/03/18",
-        "hour": "09h59"
+        "hour": "09h46"
       }
     }, {
       "id": 3,
@@ -322,7 +322,7 @@
       "text": "il y a aussi des informations générales et un tableau récapitulatif intéressant au lien suivant :  http://www.cada.fr/marches-publics%2c6085.html  bon WE.",
       "createdAt": {
         "day": "05/03/18",
-        "hour": "09h59"
+        "hour": "09h50"
       }
     }, {
       "id": 4,
@@ -334,13 +334,13 @@
       "text": "Je croyais que le rapport d'analyse des offres n'étant pas une pièce officielle de la procédure de DSP, n'avait pas à être communiqué. En revanche, l'avis de la COP qui est une pièce officielle de la procédure doit être communiqué à la demande d'un candidat en occultant certains éléments énoncés ci-dessous. J'ai tout faux ?!",
       "createdAt": {
         "day": "05/03/18",
-        "hour": "09h59"
+        "hour": "10h00"
       }
     }]
   },
   "workspace_list": [{
     "id": 0,
-    "title": "Dev Tracim"
+    "title": "Developpement Tracim"
   }, {
     "id": 1,
     "title": "Marketing"
