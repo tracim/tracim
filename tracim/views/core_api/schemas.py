@@ -36,6 +36,10 @@ class UserIdPathSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int()
 
 
+class WorkspaceIdPathSchema(marshmallow.Schema):
+    workspace_id = marshmallow.fields.Int()
+
+
 class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(required=True)
@@ -72,6 +76,7 @@ class WorkspaceSchema(marshmallow.Schema):
         many=True,
     )
 
+
 class WorkspaceDigestSchema(marshmallow.Schema):
     id = marshmallow.fields.Int()
     label = marshmallow.fields.String()
@@ -82,10 +87,12 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
-    role = marshmallow.fields.String()
+    slug = marshmallow.fields.String()
     user_id = marshmallow.fields.Int()
     workspace_id = marshmallow.fields.Int()
-    # TODO user
+    user = marshmallow.fields.Nested(
+        UserSchema(only=('display_name', 'avatar_url'))
+    )
 
 
 class ApplicationConfigSchema(marshmallow.Schema):

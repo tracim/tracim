@@ -14,8 +14,8 @@ from tracim.exceptions import NotAuthentificated, InsufficientUserProfile, \
 from tracim.lib.core.user import UserApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.views.controllers import Controller
-from tracim.views.core_api.schemas import WorkspaceSchema, UserSchema, \
-    UserIdPathSchema
+from tracim.views.core_api.schemas import UserIdPathSchema, \
+    WorkspaceDigestSchema
 
 
 class UserController(Controller):
@@ -25,7 +25,7 @@ class UserController(Controller):
     @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UserNotExist, HTTPStatus.NOT_FOUND)
-    @hapic.output_body(WorkspaceSchema(many=True),)
+    @hapic.output_body(WorkspaceDigestSchema(many=True),)
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
@@ -49,13 +49,11 @@ class UserController(Controller):
             raise UserNotExist()
         if not uapi.can_see_private_info_of_user(user):
             raise InsufficientUserProfile()
-        workspaces = wapi.get_all_for_user(user)
-        workspaces_in_context = []
-        for workspace in workspaces:
-            workspaces_in_context.append(
-                WorkspaceInContext(workspace, request.dbsession, app_config)
-            )
-        return workspaces_in_context
+
+        return [
+            WorkspaceInContext(workspace, request.dbsession, app_config)
+            for workspace in wapi.get_all_for_user(user)
+        ]
 
     def bind(self, configurator: Configurator) -> None:
         """

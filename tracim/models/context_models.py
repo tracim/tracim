@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from tracim import CFG
 from tracim.models import User
 from tracim.models.auth import Profile
-from tracim.models.data import Workspace
+from tracim.models.data import Workspace, UserRoleInWorkspace
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry, \
     WorkspaceMenuEntry
 
@@ -135,3 +135,72 @@ class WorkspaceInContext(object):
         # list should be able to change (depending on activated/disabled
         # apps)
         return default_workspace_menu_entry(self.workspace)
+
+
+class UserRoleWorkspaceInContext(object):
+    """
+    Interface to get UserRoleInWorkspace data and related content
+
+    """
+    def __init__(
+            self,
+            user_role: UserRoleInWorkspace,
+            dbsession: Session,
+            config: CFG,
+    )-> None:
+        self.user_role = user_role
+        self.dbsession = dbsession
+        self.config = config
+
+    @property
+    def user_id(self) -> int:
+        """
+        User who has the role has this id
+        :return: user id as integer
+        """
+        return self.user_role.user_id
+
+    @property
+    def workspace_id(self) -> int:
+        """
+        This role apply only on the workspace with this workspace_id
+        :return: workspace id as integer
+        """
+        return self.user_role.workspace_id
+
+    # TODO - G.M - 23-05-2018 - Check the API spec for this this !
+
+    @property
+    def slug(self) -> str:
+        """
+        simple name of the role of the user.
+        can be anything from UserRoleInWorkspace SLUG, like
+        'not_applicable', 'reader',
+        'contributor', 'content_manager', 'workspace_manager'
+        :return: user workspace role as slug.
+        """
+        return UserRoleInWorkspace.SLUG[self.user_role.role]
+
+    @property
+    def user(self) -> UserInContext:
+        """
+        User who has this role, with context data
+        :return: UserInContext object
+        """
+        return UserInContext(
+            self.user_role.user,
+            self.dbsession,
+            self.config
+        )
+
+    @property
+    def workspace(self) -> WorkspaceInContext:
+        """
+        Workspace related to this role, with his context data
+        :return: WorkspaceInContext object
+        """
+        return WorkspaceInContext(
+            self.user_role.workspace,
+            self.dbsession,
+            self.config
+        )
