@@ -61,7 +61,7 @@ class Tracim extends React.Component {
               {/* bellow, the '?' is important, it avoid to have to declare another route for CONTENT_LIST which could double match */}
               <PrivateRoute path={PAGE.WORKSPACE.CONTENT(':idws', ':idcts?')} component={WorkspaceContent} />
               <PrivateRoute path={PAGE.ACCOUNT} component={Account} />
-              <PrivateRoute path={PAGE.WORKSPACE.DASHBOARD()} component={Dashboard} />
+              <PrivateRoute exact path={PAGE.WORKSPACE.DASHBOARD()} component={Dashboard} />
               <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
               <Footer />

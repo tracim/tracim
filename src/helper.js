@@ -10,7 +10,7 @@ export const FETCH_CONFIG = {
 export const PAGE = {
   HOME: '/',
   WORKSPACE: {
-    DASHBOARD: (idws = 'idws') => `/workspace/${idws}`,
+    DASHBOARD: (idws = ':idws') => `/workspace/${idws}`,
     NEW: '/workspace/new',
     CALENDAR: (idws = ':idws') => `/workspace/${idws}/apps/calendar`,
     CONTENT_LIST: (idws = ':idws') => `/workspace/${idws}/apps/contents`,
