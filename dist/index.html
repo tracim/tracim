@@ -40,6 +40,7 @@
       let prevSelectedApp = {name: ''} // default value
 
       GLOBAL_renderApp = app => {
+        console.log('GLOBAL_renderApp => ', app)
         const selectedApp = (() => {
           switch (app.config.name) {
             case 'PageHtml':

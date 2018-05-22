@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import FileItem from './FileItem.jsx'
+import FileItem from './ContentItem.jsx'
 // import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 
@@ -36,7 +36,7 @@ class Folder extends React.Component {
     } = this.props
 
     return (
-      <div className={classnames('folder', {'active': this.state.open, 'item-last': isLast})}>
+      <div className={classnames('folder', {'active': this.state.open && folderData.content.length > 0, 'item-last': isLast})}>
         <div className='folder__header align-items-center' onClick={this.handleClickToggleFolder}>
 
           <div className='folder__header__triangleborder'>

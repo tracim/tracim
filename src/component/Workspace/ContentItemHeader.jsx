@@ -3,14 +3,14 @@ import { translate } from 'react-i18next'
 
 const FileItemHeader = props => {
   return (
-    <div className='file__header'>
-      <div className='file__header__type'>
+    <div className='content__header'>
+      <div className='content__header__type'>
         {props.t('FileItemHeader.type')}
       </div>
-      <div className='file__header__name'>
+      <div className='content__header__name'>
         {props.t('FileItemHeader.document_name')}
       </div>
-      <div className='file__header__status'>
+      <div className='content__header__status'>
         {props.t('FileItemHeader.status')}
       </div>
     </div>

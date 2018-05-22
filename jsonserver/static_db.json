@@ -11,23 +11,24 @@
     "active": false
   }],
   "user_logged": {
-    "logged": true,
-    "user": {
-      "id": 5,
-      "username": "franclecompte",
-      "firstname": "François",
-      "lastname": "Lecompte",
-      "email": "francois.lecompte@algoo.fr",
-      "avatar": "https://rawgit.com/tracim/tracim_front/develop/src/img/imgProfil.png",
-      "role": "Utilisateur",
-      "caldav_url": "http://algoo.trac.im/caldav/user/5.ics/"
-    }
+    "timezone": "",
+    "profile": {
+      "id": 3,
+      "slug": "administrators"
+    },
+    "email": "admin@admin.admin",
+    "is_active": true,
+    "caldav_url": null,
+    "user_id": 1,
+    "avatar_url": null,
+    "created": "2018-05-17T08:43:03.745219+00:00",
+    "display_name": "Global manager"
   },
   "app_config": [{
     "name": "PageHtml",
     "label": {
-      "fr": "Page Html",
-      "en": "Html page"
+      "fr": "Document",
+      "en": "Document"
     },
     "componentLeft": "PageHtml",
     "componentRight": "Timeline",
@@ -38,8 +39,8 @@
   }, {
     "name": "PageMarkdown",
     "label": {
-      "fr": "Page Markdown",
-      "en": "Markdown page"
+      "fr": "Document markdown",
+      "en": "Markdown document"
     },
     "componentLeft": "PageMarkdown",
     "componentRight": "undefined",

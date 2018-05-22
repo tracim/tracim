@@ -59,3 +59,12 @@ You also need to make the mock api able to tell tracim_frontend that it handle y
 - add an entry for you App in tracim_frontend/jsonserver/static_db.json in the `app_config` property
 - reload your mock api server
 - add the source of your app in tracim_frontend/dist/index.html and an entry to the switch case of the function `GLOBAL_renderApp`. All of this will be handled by backend later on, this is all work in progress stuffs.
+
+
+#### Urls list
+- __/__ => detail of the first workspace 
+- __/login__ => login page
+- __/workspace/:idws__ => detail of the workspace :idws
+- __/workspace/:idws/content/:idc__ => detail of the workspace :idws with the app of the content :idc openned
+- __/account__ => profile page of the connected user
+- __/dashboard__ => dashboard of a workspace (code not plugged in therefore no :idws in url) 

@@ -64,11 +64,11 @@ class Sidebar extends React.Component {
 
     return (
       <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
-        <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
-          <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
-        </div>
-
         <div className='sidebarSticky'>
+          <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
+            <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
+          </div>
+
           <nav className='sidebar__navigation'>
             <ul className='sidebar__navigation__workspace'>
               { workspaceList.map((ws, i) =>

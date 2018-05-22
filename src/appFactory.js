@@ -4,10 +4,11 @@ import { FETCH_CONFIG } from './helper.js'
 export function appFactory (WrappedComponent) {
   return class AppFactory extends React.Component {
     renderApp = (appConfig, user, content) => GLOBAL_renderApp({
-      loggedUser: user.isLoggedIn ? user : {},
+      loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
-        apiUrl: FETCH_CONFIG.apiUrl
+        apiUrl: FETCH_CONFIG.apiUrl,
+        mockApiUrl: FETCH_CONFIG.mockApiUrl
       },
       content
     })

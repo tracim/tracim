@@ -3,13 +3,13 @@
 border-style = 1px solid secondColor
 .folder__header
   border border-style
-.folder + .file, .file + .file
+.folder + .content, .content + .content
   border-bottom 0
-.folder__content > .file, .folder__content > .folder
+.folder__content > .content, .folder__content > .folder
   border-bottom 0
 .folder:not(.active).item-last
   border-bottom border-style
-.file
+.content
   border border-style
   &.item-last
     border-bottom border-style

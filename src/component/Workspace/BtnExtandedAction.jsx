@@ -15,6 +15,7 @@ const ExtandedAction = props => {
       >
         <i className='fa fa-fw fa-ellipsis-h' />
       </button>
+
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
         <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.edit}>
           <div className='subdropdown__item__icon mr-3'>

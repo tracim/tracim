@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import i18n from '../i18n.js'
+import { translate } from 'react-i18next'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import MenuLinkList from '../component/Header/MenuLinkList.jsx'
@@ -10,7 +11,14 @@ import MenuActionListItemDropdownLang from '../component/Header/MenuActionListIt
 import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import logoHeader from '../img/logo-tracim.png'
-import { setLangActive } from '../action-creator.sync.js'
+import {
+  newFlashMessage,
+  setLangActive,
+  setUserDisconnected
+} from '../action-creator.sync.js'
+import {
+  postUserLogout
+} from '../action-creator.async.js'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -29,7 +37,13 @@ class Header extends React.Component {
 
   handleClickHelp = () => {}
 
-  handleClickLogout = () => {}
+  handleClickLogout = async () => {
+    const { dispatch, t } = this.props
+
+    const fetchPostUserLogout = await dispatch(postUserLogout())
+    if (fetchPostUserLogout.status === 204) dispatch(setUserDisconnected())
+    else dispatch(newFlashMessage(t('Login.logout_error', 'danger')))
+  }
 
   render () {
     const { lang, user } = this.props
@@ -79,4 +93,4 @@ class Header extends React.Component {
 }
 
 const mapStateToProps = ({ lang, user }) => ({ lang, user })
-export default connect(mapStateToProps)(Header)
+export default connect(mapStateToProps)(translate()(Header))
