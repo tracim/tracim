@@ -12,7 +12,6 @@ import {
   updateUserData,
   setUserRole,
   WORKSPACE,
-  setWorkspaceData,
   WORKSPACE_LIST,
   updateWorkspaceListData,
   FOLDER,

@@ -58,10 +58,10 @@ class Tracim extends React.Component {
               <Route path={PAGE.LOGIN} component={Login} />
 
               <PrivateRoute exact path={PAGE.HOME} component={WorkspaceContent} />
-              <PrivateRoute path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
+              <PrivateRoute exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} /> {/* "exact" here to not double match Route WORKSPACE.CONTENT */}
               <PrivateRoute path={PAGE.WORKSPACE.CONTENT(':idws', ':idcts')} component={WorkspaceContent} />
-              <PrivateRoute exact path={PAGE.ACCOUNT} component={Account} />
-              <PrivateRoute exact path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
+              <PrivateRoute path={PAGE.ACCOUNT} component={Account} />
+              <PrivateRoute path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
               <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
               <Footer />
