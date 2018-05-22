@@ -21,6 +21,7 @@ const qs = require('query-string')
 
 class WorkspaceContent extends React.Component {
   async componentDidMount () {
+    console.log('WorkspaceContent did mount')
     const { workspaceList, app, match, location, dispatch } = this.props
 
     if (Object.keys(app).length === 0) await dispatch(getAppList())
