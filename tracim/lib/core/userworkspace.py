@@ -120,8 +120,8 @@ class RoleApi(object):
         return self._session.query(UserRoleInWorkspace)\
             .filter(UserRoleInWorkspace.user_id == user_id)
 
-    def get_all_for_user(self, user_id):
-        return self._get_all_for_user(user_id).all()
+    def get_all_for_user(self, user: User):
+        return self._get_all_for_user(user.user_id).all()
 
     def get_all_for_user_order_by_workspace(
             self,
@@ -130,9 +130,9 @@ class RoleApi(object):
         return self._get_all_for_user(user_id)\
             .join(UserRoleInWorkspace.workspace).order_by(Workspace.label).all()
 
-    def get_all_for_workspace(self, workspace_id):
+    def get_all_for_workspace(self, workspace:Workspace):
         return self._session.query(UserRoleInWorkspace)\
-            .filter(UserRoleInWorkspace.workspace_id == workspace_id).all()
+            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id).all()  # nopep8
 
     def save(self, role: UserRoleInWorkspace):
         self._session.flush()

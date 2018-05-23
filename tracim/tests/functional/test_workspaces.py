@@ -74,20 +74,19 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['hexcolor'] == "#757575"
         assert sidebar_entry['icon'] == "calendar-alt"
 
-    # TODO - G.M - 22-05-2018 - Check if this feature is needed
-    # def test_api__get_workspace__err_403__unallowed_user(self):
-    #     self.testapp.authorization = (
-    #         'Basic',
-    #         (
-    #             'lawrence-not-real-email@fsf.local',
-    #             'foobarbaz'
-    #         )
-    #     )
-    #     res = self.testapp.get('/api/v2/workspaces/1', status=403)
-    #     assert isinstance(res.json, dict)
-    #     assert 'code' in res.json.keys()
-    #     assert 'message' in res.json.keys()
-    #     assert 'details' in res.json.keys()
+    def test_api__get_workspace__err_403__unallowed_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'lawrence-not-real-email@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/1', status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
     def test_api__get_workspace__err_401__unregistered_user(self):
         self.testapp.authorization = (
@@ -103,7 +102,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace__err_404__workspace_does_not_exist(self):
+    def test_api__get_workspace__err_403__workspace_does_not_exist(self):
         self.testapp.authorization = (
             'Basic',
             (
@@ -111,7 +110,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/5', status=404)
+        res = self.testapp.get('/api/v2/workspaces/5', status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
@@ -139,21 +138,19 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['user']['display_name'] == 'Global manager'
         assert user_role['user']['avatar_url'] is None  # TODO
 
-
-
-    # def test_api__get_workspace_members__err_400__unallowed_user(self):
-    #     self.testapp.authorization = (
-    #         'Basic',
-    #         (
-    #             'lawrence-not-real-email@fsf.local',
-    #             'foobarbaz'
-    #         )
-    #     )
-    #     res = self.testapp.get('/api/v2/workspaces/3/members', status=403)
-    #     assert isinstance(res.json, dict)
-    #     assert 'code' in res.json.keys()
-    #     assert 'message' in res.json.keys()
-    #     assert 'details' in res.json.keys()
+    def test_api__get_workspace_members__err_403__unallowed_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'lawrence-not-real-email@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/3/members', status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
 
     def test_api__get_workspace_members__err_401__unregistered_user(self):
         self.testapp.authorization = (
@@ -169,7 +166,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace_members__err_404__workspace_does_not_exist(self):
+    def test_api__get_workspace_members__err_403__workspace_does_not_exist(self):
         self.testapp.authorization = (
             'Basic',
             (
@@ -177,7 +174,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/5/members', status=404)
+        res = self.testapp.get('/api/v2/workspaces/5/members', status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()

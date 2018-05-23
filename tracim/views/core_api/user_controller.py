@@ -30,27 +30,23 @@ class UserController(Controller):
         """
         Get list of user workspaces
         """
-        uid = hapic_data.path['user_id']
         app_config = request.registry.settings['CFG']
+
+        uid = hapic_data.path['user_id']
         uapi = UserApi(
             request.current_user,
             session=request.dbsession,
             config=app_config,
         )
+        user = uapi.get_one(uid)
+        if not uapi.can_see_private_info_of_user(user):
+            raise InsufficientUserProfile()
+
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        # TODO - G.M - 22-05-2018 - Refactor this in a more lib way( avoid
-        # try/catch and complex code here).
-        try:
-            user = uapi.get_one(uid)
-        except NoResultFound:
-            raise UserNotExist()
-        if not uapi.can_see_private_info_of_user(user):
-            raise InsufficientUserProfile()
-
         return [
             WorkspaceInContext(workspace, request.dbsession, app_config)
             for workspace in wapi.get_all_for_user(user)

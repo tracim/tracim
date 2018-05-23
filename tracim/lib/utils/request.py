@@ -74,7 +74,6 @@ class TracimRequest(Request):
             )
         self._current_user = user
 
-
 ###
 # Utils for TracimRequest
 ###
@@ -112,9 +111,10 @@ def get_workspace(
     """
     workspace_id = ''
     try:
-        if 'workspace_id' not in request.json_body:
-            raise WorkspaceNotFound('No workspace_id param in json body')
-        workspace_id = request.json_body['workspace_id']
+        if 'workspace_id' in request.matchdict:
+            workspace_id = request.matchdict['workspace_id']
+        if not workspace_id:
+            raise WorkspaceNotFound('No workspace_id param')
         wapi = WorkspaceApi(
             current_user=user,
             session=request.dbsession,

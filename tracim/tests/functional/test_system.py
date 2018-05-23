@@ -4,14 +4,13 @@ from tracim.tests import FunctionalTest
 
 class TestApplicationsEndpoint(FunctionalTest):
     def test_api__get_applications__ok_200__nominal_case(self):
-        # TODO need authorization ? check permissions ?
-        # self.testapp.authorization = (
-        #     'Basic',
-        #     (
-        #         'admin@admin.admin',
-        #         'admin@admin.admin'
-        #     )
-        # )
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
         res = self.testapp.get('/api/v2/system/applications', status=200)
         res = res.json_body
         application = res[0]
@@ -49,3 +48,17 @@ class TestApplicationsEndpoint(FunctionalTest):
         assert application['hexcolor'] == '#757575'
         assert application['is_active'] is True
         assert 'config' in application
+
+    def test_api__get_workspace__err_401__unregistered_user(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/system/applications', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()

@@ -4,8 +4,10 @@ from pyramid.config import Configurator
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim.lib.core.userworkspace import RoleApi
+from tracim.lib.utils.authorization import require_workspace_role
 from tracim.models.context_models import WorkspaceInContext, \
     UserRoleWorkspaceInContext
+from tracim.models.data import UserRoleInWorkspace
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -25,10 +27,11 @@ from tracim.views.core_api.schemas import WorkspaceSchema, UserSchema, \
 class WorkspaceController(Controller):
 
     @hapic.with_api_doc()
-    @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
-    #@hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.NOT_FOUND)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceSchema())
     def workspace(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -41,19 +44,14 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        # TODO - G.M - 22-05-2018 - Refactor this in a more lib way( avoid
-        # try/catch and complex code here).
-        try:
-            workspace = wapi.get_one(wid)
-        except NoResultFound:
-            raise WorkspaceNotFound()
-        return wapi.get_workspace_with_context(workspace)
+        return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc()
-    @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
-    #@hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.NOT_FOUND)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
     def workspaces_members(
             self,
@@ -64,25 +62,15 @@ class WorkspaceController(Controller):
         """
         Get Members of this workspace
         """
-        wid = hapic_data.path['workspace_id']
         app_config = request.registry.settings['CFG']
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
-        wapi = WorkspaceApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,
-        )
-        try:
-            wapi.get_one(wid)
-        except NoResultFound:
-            raise WorkspaceNotFound()
         return [
             rapi.get_user_role_workspace_with_context(user_role)
-            for user_role in rapi.get_all_for_workspace(wid)
+            for user_role in rapi.get_all_for_workspace(request.current_workspace)
         ]
 
     def bind(self, configurator: Configurator) -> None:
