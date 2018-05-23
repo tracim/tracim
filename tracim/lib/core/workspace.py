@@ -3,11 +3,14 @@ import typing
 
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
+
+from tracim import CFG
 from tracim.lib.utils.translation import fake_translator as _
 
 from tracim.lib.core.userworkspace import RoleApi
 from tracim.models.auth import Group
 from tracim.models.auth import User
+from tracim.models.context_models import WorkspaceInContext
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 
@@ -20,6 +23,7 @@ class WorkspaceApi(object):
             self,
             session: Session,
             current_user: User,
+            config: CFG,
             force_role: bool=False
     ):
         """
@@ -28,6 +32,7 @@ class WorkspaceApi(object):
         """
         self._session = session
         self._user = current_user
+        self._config = config
         self._force_role = force_role
 
     def _base_query_without_roles(self):
@@ -41,6 +46,20 @@ class WorkspaceApi(object):
             join(Workspace.roles).\
             filter(UserRoleInWorkspace.user_id == self._user.user_id).\
             filter(Workspace.is_deleted == False)
+
+    def get_workspace_with_context(
+            self,
+            workspace: Workspace
+    ) -> WorkspaceInContext:
+        """
+        Return WorkspaceInContext object from Workspace
+        """
+        workspace = WorkspaceInContext(
+            workspace=workspace,
+            dbsession=self._session,
+            config=self._config,
+        )
+        return workspace
 
     def create_workspace(
             self,
@@ -62,6 +81,7 @@ class WorkspaceApi(object):
         role_api = RoleApi(
             session=self._session,
             current_user=self._user,
+            config=self._config
         )
 
         role = role_api.create_one(

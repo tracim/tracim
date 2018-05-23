@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import typing
 
+from tracim import CFG
+from tracim.models.context_models import UserRoleWorkspaceInContext
+
 __author__ = 'damien'
 
 from sqlalchemy.orm import Session
@@ -38,6 +41,20 @@ class RoleApi(object):
         ],
     }
 
+    def get_user_role_workspace_with_context(
+            self,
+            user_role: UserRoleInWorkspace
+    ) -> UserRoleWorkspaceInContext:
+        """
+        Return WorkspaceInContext object from Workspace
+        """
+        workspace = UserRoleWorkspaceInContext(
+            user_role=user_role,
+            dbsession=self._session,
+            config=self._config,
+        )
+        return workspace
+
     @classmethod
     def role_can_read_member_role(cls, reader_role: int, tested_role: int) \
             -> bool:
@@ -56,9 +73,13 @@ class RoleApi(object):
 
         return role
 
-    def __init__(self, session: Session, current_user: typing.Optional[User]):
+    def __init__(self,
+                 session: Session,
+                 current_user: typing.Optional[User],
+                 config: CFG):
         self._session = session
         self._user = current_user
+        self._config = config
 
     def _get_one_rsc(self, user_id, workspace_id):
         """

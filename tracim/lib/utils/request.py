@@ -115,7 +115,11 @@ def get_workspace(
         if 'workspace_id' not in request.json_body:
             raise WorkspaceNotFound('No workspace_id param in json body')
         workspace_id = request.json_body['workspace_id']
-        wapi = WorkspaceApi(current_user=user, session=request.dbsession)
+        wapi = WorkspaceApi(
+            current_user=user,
+            session=request.dbsession,
+            config=request.registry.settings['CFG']
+        )
         workspace = wapi.get_one(workspace_id)
     except JSONDecodeError:
         raise WorkspaceNotFound('Bad json body')

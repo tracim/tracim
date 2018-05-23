@@ -24,10 +24,12 @@ class Content(Fixture):
         admin_workspace_api = WorkspaceApi(
             current_user=admin,
             session=self._session,
+            config=self._config,
         )
         bob_workspace_api = WorkspaceApi(
             current_user=bob,
             session=self._session,
+            config=self._config
         )
         content_api = ContentApi(
             current_user=admin,
@@ -37,6 +39,7 @@ class Content(Fixture):
         role_api = RoleApi(
             current_user=admin,
             session=self._session,
+            config=self._config,
         )
 
         # Workspaces

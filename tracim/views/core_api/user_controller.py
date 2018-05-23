@@ -40,6 +40,7 @@ class UserController(Controller):
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
+            config=app_config,
         )
         # TODO - G.M - 22-05-2018 - Refactor this in a more lib way( avoid
         # try/catch and complex code here).

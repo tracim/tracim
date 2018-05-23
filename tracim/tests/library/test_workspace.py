@@ -44,6 +44,7 @@ class TestThread(DefaultTest):
             .filter(User.email == 'admin@admin.admin').one()
         wapi = WorkspaceApi(
             session=self.session,
+            config=self.app_config,
             current_user=admin,
         )
         w = wapi.create_workspace(label='workspace w', save_now=True)
@@ -57,6 +58,7 @@ class TestThread(DefaultTest):
         rapi = RoleApi(
             session=self.session,
             current_user=admin,
+            config=self.app_config,
         )
         r = rapi.create_one(u, w, UserRoleInWorkspace.READER, with_notif=True)
         eq_([r, ], wapi.get_notifiable_roles(workspace=w))
@@ -75,6 +77,7 @@ class TestThread(DefaultTest):
         wapi = WorkspaceApi(
             session=self.session,
             current_user=admin,
+            config=self.app_config,
         )
         eq_([], wapi.get_all_manageable())
         # Checks an admin gets all workspaces.
@@ -87,15 +90,18 @@ class TestThread(DefaultTest):
         gapi = GroupApi(
             session=self.session,
             current_user=None,
+            config=self.app_config,
         )
         u = uapi.create_user('u.s@e.r', [gapi.get_one(Group.TIM_USER)], True)
         wapi = WorkspaceApi(
             session=self.session,
-            current_user=u
+            current_user=u,
+            config=self.app_config,
         )
         rapi = RoleApi(
             session=self.session,
-            current_user=u
+            current_user=u,
+            config=self.app_config,
         )
         rapi.create_one(u, w4, UserRoleInWorkspace.READER, False)
         rapi.create_one(u, w3, UserRoleInWorkspace.CONTRIBUTOR, False)

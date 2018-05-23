@@ -1,3 +1,5 @@
+import typing
+
 from pyramid.config import Configurator
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -30,13 +32,14 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema())
     def workspace(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get workspace information
+        Get workspace informations
         """
         wid = hapic_data.path['workspace_id']
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
+            config=app_config,
         )
         # TODO - G.M - 22-05-2018 - Refactor this in a more lib way( avoid
         # try/catch and complex code here).
@@ -44,7 +47,7 @@ class WorkspaceController(Controller):
             workspace = wapi.get_one(wid)
         except NoResultFound:
             raise WorkspaceNotFound()
-        return WorkspaceInContext(workspace, request.dbsession, app_config)
+        return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc()
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -57,27 +60,28 @@ class WorkspaceController(Controller):
             context,
             request: TracimRequest,
             hapic_data=None
-    ) -> None:
+    ) -> typing.List[UserRoleWorkspaceInContext]:
+        """
+        Get Members of this workspace
+        """
         wid = hapic_data.path['workspace_id']
         app_config = request.registry.settings['CFG']
         rapi = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
+            config=app_config,
         )
         wapi = WorkspaceApi(
             current_user=request.current_user,
             session=request.dbsession,
+            config=app_config,
         )
         try:
             wapi.get_one(wid)
         except NoResultFound:
             raise WorkspaceNotFound()
         return [
-            UserRoleWorkspaceInContext(
-                user_role,
-                request.dbsession,
-                app_config
-            )
+            rapi.get_user_role_workspace_with_context(user_role)
             for user_role in rapi.get_all_for_workspace(wid)
         ]
 
@@ -91,4 +95,4 @@ class WorkspaceController(Controller):
         configurator.add_route('workspace', '/workspaces/{workspace_id}', request_method='GET')  # nopep8
         configurator.add_view(self.workspace, route_name='workspace')
         configurator.add_route('workspace_members', '/workspaces/{workspace_id}/members', request_method='GET')  # nopep8
-        configurator.add_view(self.workspaces_members, route_name='workspace_members')
+        configurator.add_view(self.workspaces_members, route_name='workspace_members')  # nopep8
