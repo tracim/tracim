@@ -20,6 +20,11 @@ bgandcolorhover()
     &__icon
       .fa-comments-o
         color white
+  .newversionbtn
+    visibility hidden
+  .optionicon
+    &:hover, &:focus, &:active
+      color threadColor
   &__app
     display flex
     flex-flow column
@@ -79,7 +84,6 @@ bgandcolorhover()
           display flex
           cursor pointer
           bgandcolor()
-          width 118px
           &:hover, &:focus
             bgandcolorhover()
 
