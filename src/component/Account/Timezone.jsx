@@ -1,6 +1,10 @@
 import React from 'react'
+import Select from 'react-select'
+import 'react-select/dist/react-select.css'
 
 export const Timezone = props => {
+  const handleChangeTimezone = selectedTimezone => props.onChangeTimezone(props.timezone.find(t => t.place === selectedTimezone.place))
+
   return (
     <div className='account__userpreference__setting__calendar'>
 
@@ -13,13 +17,17 @@ export const Timezone = props => {
       </div>
 
       <div className='calendar__timezone ml-2 ml-sm-0 dropdown'>
-        <button className='calendar__timezone__btn btn dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-          Fuseau Horaire
-        </button>
-        <div className='calendar__timezone__submenu dropdown-menu'>
-          {props.timezone.map((t, i) => <div className='calendar__timezone__submenu__item dropdown-item' key={i}>{t.place} {t.gmt}</div>)}
-        </div>
+        <Select
+          name='timezoneSelect'
+          className='calendar__timezone__select'
+          value={props.timezoneUser}
+          labelKey='place'
+          valueKey='place'
+          options={props.timezone}
+          onChange={handleChangeTimezone}
+        />
       </div>
+
     </div>
   )
 }

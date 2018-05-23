@@ -71,6 +71,8 @@ class Account extends React.Component {
   handleChangeSubscriptionNotif = (workspaceId, subscriptionNotif) =>
     this.props.dispatch(updateUserWorkspaceSubscriptionNotif(workspaceId, subscriptionNotif))
 
+  handleChangeTimezone = newTimezone => console.log('(NYI) new timezone : ', newTimezone)
+
   render () {
     const subComponent = (() => {
       switch (this.state.subComponentMenu.find(({active}) => active).name) {
@@ -87,7 +89,7 @@ class Account extends React.Component {
           />
 
         case 'timezone':
-          return <Timezone timezone={this.props.timezone} />
+          return <Timezone timezone={this.props.timezone} onChangeTimezone={this.handleChangeTimezone} />
 
         case 'password':
           return <Password />
