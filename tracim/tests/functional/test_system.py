@@ -1,9 +1,19 @@
 # coding=utf-8
+"""
+Tests for /api/v2/system subpath endpoints.
+"""
 from tracim.tests import FunctionalTest
 
 
 class TestApplicationsEndpoint(FunctionalTest):
+    """
+    Tests for /api/v2/system/applications
+    """
+
     def test_api__get_applications__ok_200__nominal_case(self):
+        """
+        Get applications list with a registered user.
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -50,6 +60,9 @@ class TestApplicationsEndpoint(FunctionalTest):
         assert 'config' in application
 
     def test_api__get_workspace__err_401__unregistered_user(self):
+        """
+        Get applications list with an unregistered user (bad auth)
+        """
         self.testapp.authorization = (
             'Basic',
             (

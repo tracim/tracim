@@ -1,14 +1,23 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+"""
+Tests for /api/v2/users subpath endpoints.
+"""
 from tracim.tests import FunctionalTest
 from tracim.fixtures.content import Content as ContentFixtures
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 
 
 class TestUserWorkspaceEndpoint(FunctionalTest):
-
+    # -*- coding: utf-8 -*-
+    """
+    Tests for /api/v2/users/{user_id}/workspaces
+    """
     fixtures = [BaseFixture, ContentFixtures]
 
     def test_api__get_user_workspaces__ok_200__nominal_case(self):
+        """
+        Check obtain all workspaces reachables for user with user auth.
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -21,7 +30,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         workspace = res[0]
         assert workspace['id'] == 1
         assert workspace['label'] == 'w1'
-        assert len(workspace['sidebar_entries']) == 7  # TODO change this
+        assert len(workspace['sidebar_entries']) == 7
 
         sidebar_entry = workspace['sidebar_entries'][0]
         assert sidebar_entry['slug'] == 'dashboard'
@@ -73,6 +82,10 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['icon'] == "calendar-alt"
 
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
+        """
+        Check obtain all workspaces reachables for one user
+        with another non-admin user auth.
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -87,6 +100,10 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
     def test_api__get_user_workspaces__err_401__unregistered_user(self):
+        """
+        Check obtain all workspaces reachables for one user
+        without correct user auth (user unregistered).
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -101,6 +118,11 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
     def test_api__get_user_workspaces__err_404__user_does_not_exist(self):
+        """
+        Check obtain all workspaces reachables for one user who does
+        not exist
+        with a correct user auth.
+        """
         self.testapp.authorization = (
             'Basic',
             (

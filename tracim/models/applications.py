@@ -59,7 +59,7 @@ file = Application(
 )
 
 pagemarkdownplus = Application(
-    label='Rich Markdown Files',  # TODO : Better label
+    label='Rich Markdown Files',  # TODO - G.M - 24-05-2018 - Check label
     slug='contents/pagemarkdownplus',
     icon='file-code',
     hexcolor='#f12d2d',
@@ -69,7 +69,7 @@ pagemarkdownplus = Application(
 )
 
 pagehtml = Application(
-    label='Text Documents',  # TODO : Better label
+    label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
     slug='contents/pagehtml',
     icon='file-text-o',
     hexcolor='#3f52e3',

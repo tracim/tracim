@@ -97,7 +97,7 @@ class WorkspaceMemberSchema(marshmallow.Schema):
 
 class ApplicationConfigSchema(marshmallow.Schema):
     pass
-    #  TODO
+    #  TODO - G.M - 24-05-2018 - Set this
 
 
 class ApplicationSchema(marshmallow.Schema):

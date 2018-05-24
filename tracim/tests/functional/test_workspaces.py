@@ -1,15 +1,23 @@
-# coding=utf-8
-from tracim.models.data import UserRoleInWorkspace
+# -*- coding: utf-8 -*-
+"""
+Tests for /api/v2/workspaces subpath endpoints.
+"""
 from tracim.tests import FunctionalTest
 from tracim.fixtures.content import Content as ContentFixtures
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 
 
 class TestWorkspaceEndpoint(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces/{workspace_id} endpoint
+    """
 
     fixtures = [BaseFixture, ContentFixtures]
 
-    def test_api__get_workspace__ok_200__nominal_case(self):
+    def test_api__get_workspace__ok_200__nominal_case(self) -> None:
+        """
+        Check obtain workspace reachable for user.
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -23,7 +31,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'w1'
         assert workspace['label'] == 'w1'
         assert workspace['description'] == 'This is a workspace'
-        assert len(workspace['sidebar_entries']) == 7  # TODO change this
+        assert len(workspace['sidebar_entries']) == 7
 
         sidebar_entry = workspace['sidebar_entries'][0]
         assert sidebar_entry['slug'] == 'dashboard'
@@ -74,7 +82,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['hexcolor'] == "#757575"
         assert sidebar_entry['icon'] == "calendar-alt"
 
-    def test_api__get_workspace__err_403__unallowed_user(self):
+    def test_api__get_workspace__err_403__unallowed_user(self) -> None:
+        """
+        Check obtain workspace unreachable for user
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -88,7 +99,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace__err_401__unregistered_user(self):
+    def test_api__get_workspace__err_401__unregistered_user(self) -> None:
+        """
+        Check obtain workspace without registered user.
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -102,7 +116,10 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace__err_403__workspace_does_not_exist(self):
+    def test_api__get_workspace__err_403__workspace_does_not_exist(self) -> None:  # nopep8
+        """
+        Check obtain workspace who does not exist with an existing user.
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -118,10 +135,16 @@ class TestWorkspaceEndpoint(FunctionalTest):
 
 
 class TestWorkspaceMembersEndpoint(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/members endpoint
+    """
 
     fixtures = [BaseFixture, ContentFixtures]
 
     def test_api__get_workspace_members__ok_200__nominal_case(self):
+        """
+        Check obtain workspace members list with a reachable workspace for user
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -129,16 +152,22 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body
+        res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
         user_role = res[0]
         assert user_role['slug'] == 'workspace_manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
         assert user_role['user']['display_name'] == 'Global manager'
-        assert user_role['user']['avatar_url'] is None  # TODO
+        # TODO - G.M - 24-05-2018 - [Avatar] Replace
+        # by correct value when avatar feature will be enabled
+        assert user_role['user']['avatar_url'] is None
 
     def test_api__get_workspace_members__err_403__unallowed_user(self):
+        """
+        Check obtain workspace members list with an unreachable workspace for
+        user
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -153,6 +182,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
     def test_api__get_workspace_members__err_401__unregistered_user(self):
+        """
+        Check obtain workspace members list with an unregistered user
+        """
         self.testapp.authorization = (
             'Basic',
             (
@@ -166,7 +198,11 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace_members__err_403__workspace_does_not_exist(self):
+    def test_api__get_workspace_members__err_403__workspace_does_not_exist(self):  # nopep8
+        """
+        Check obtain workspace members list with an existing user but
+        an unexisting workspace
+        """
         self.testapp.authorization = (
             'Basic',
             (
