@@ -1,6 +1,8 @@
 from pyramid.config import Configurator
 from sqlalchemy.orm.exc import NoResultFound
 
+from tracim.lib.utils.authorization import require_same_user_or_profile
+from tracim.models import Group
 from tracim.models.context_models import WorkspaceInContext
 
 try:  # Python 3.5+
@@ -21,27 +23,17 @@ from tracim.views.core_api.schemas import UserIdPathSchema, \
 class UserController(Controller):
 
     @hapic.with_api_doc()
-    @hapic.input_path(UserIdPathSchema())
     @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UserNotExist, HTTPStatus.NOT_FOUND)
+    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True),)
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
         """
         app_config = request.registry.settings['CFG']
-
-        uid = hapic_data.path['user_id']
-        uapi = UserApi(
-            request.current_user,
-            session=request.dbsession,
-            config=app_config,
-        )
-        user = uapi.get_one(uid)
-        if not uapi.can_see_private_info_of_user(user):
-            raise InsufficientUserProfile()
-
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
@@ -49,7 +41,7 @@ class UserController(Controller):
         )
         return [
             WorkspaceInContext(workspace, request.dbsession, app_config)
-            for workspace in wapi.get_all_for_user(user)
+            for workspace in wapi.get_all_for_user(request.candidate_user)
         ]
 
     def bind(self, configurator: Configurator) -> None:

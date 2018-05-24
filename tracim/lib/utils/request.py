@@ -1,8 +1,11 @@
-import typing
+# -*- coding: utf-8 -*-
+"""
+TracimRequest and related functions
+"""
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import NotAuthentificated, UserNotExist
 from tracim.exceptions import WorkspaceNotFound
 from tracim.exceptions import ImmutableAttribute
 from tracim.lib.core.user import UserApi
@@ -32,8 +35,13 @@ class TracimRequest(Request):
             decode_param_names,
             **kw
         )
+        # Current workspace, found by request headers or content
         self._current_workspace = None  # type: Workspace
+        # Authenticated user
         self._current_user = None  # type: User
+        # User found from request headers, content, distinct from authenticated
+        # user
+        self._user_candidate = None  # type: User
 
     @property
     def current_workspace(self) -> Workspace:
@@ -62,8 +70,11 @@ class TracimRequest(Request):
 
     @property
     def current_user(self) -> User:
+        """
+        Get user from authentication mecanism.
+        """
         if self._current_user is None:
-            self.current_user = get_safe_user(self)
+            self.current_user = get_auth_safe_user(self)
         return self._current_user
 
     @current_user.setter
@@ -74,11 +85,55 @@ class TracimRequest(Request):
             )
         self._current_user = user
 
+    # TODO - G.M - 24-05-2018 - Find a better naming for this ?
+    @property
+    def candidate_user(self) -> User:
+        """
+        Get user from headers/body request. This user is not
+        the one found by authentication mecanism. This user
+        can help user to know about who one page is about in
+        a similar way as current_workspace.
+        """
+        if self._user_candidate is None:
+            self.candidate_user = get_candidate_user(self)
+        return self._user_candidate
+
+    @candidate_user.setter
+    def candidate_user(self, user: User) -> None:
+        if self._user_candidate is not None:
+            raise ImmutableAttribute(
+                "Can't modify already setted candidate_user"
+            )
+        self._user_candidate = user
 ###
 # Utils for TracimRequest
 ###
 
-def get_safe_user(
+
+def get_candidate_user(
+        request: TracimRequest
+) -> User:
+    """
+    Get candidate user
+    :param request: pyramid request
+    :return: user found from header/body
+    """
+    app_config = request.registry.settings['CFG']
+    uapi = UserApi(None, session=request.dbsession, config=app_config)
+
+    try:
+        login = None
+        if 'user_id' in request.matchdict:
+            login = request.matchdict['user_id']
+        if not login:
+            raise UserNotExist('no user_id found, incorrect request ?')
+        user = uapi.get_one(login)
+    except NoResultFound:
+        raise NotAuthentificated('User not found')
+    return user
+
+
+def get_auth_safe_user(
         request: TracimRequest,
 ) -> User:
     """

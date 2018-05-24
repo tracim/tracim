@@ -106,16 +106,6 @@ class UserApi(object):
         except (WrongUserPassword, NoResultFound, UserNotExist):
             raise AuthenticationFailed()
 
-    def can_see_private_info_of_user(self, user: User):
-        """
-        Return boolean wheter current api user has right
-        to see private information of a user.
-        :param user:
-        :return:
-        """
-        return self._user and (
-                self._user.user_id == user.user_id or
-                self._user.profile.id >= Group.TIM_ADMIN)
     # Actions
 
     def update(
