@@ -2,11 +2,27 @@
 import os
 import subprocess
 
+import pytest
+import transaction
+from pkg_resources import load_entry_point
+from sqlalchemy.orm.exc import NoResultFound
+
 import tracim
+from tracim.command import TracimCLI
+from tracim.command.user import UserCommand
+from tracim.exceptions import UserNotExist
+from tracim.lib.core.user import UserApi
+from tracim.tests import CommandFunctionalTest
 
 
-class TestCommands(object):
-    def test_commands(self):
+class TestCommands(CommandFunctionalTest):
+    """
+    Test tracimcli command line ui.
+    """
+
+    config_section = 'app:command_test'
+
+    def test_func__check_commands_list__ok__nominal_case(self):
         """
         Test listing of tracimcli command: Tracim commands must be listed
         :return:
@@ -20,3 +36,52 @@ class TestCommands(object):
         assert output.find('user update') > 0
         assert output.find('db init') > 0
         assert output.find('db delete') > 0
+        assert output.find('webdav start') > 0
+
+    def test_func__user_create_command__ok__nominal_case(self):
+        """
+        Test User creation
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(NoResultFound):
+            api.get_one_by_email('command_test@user')
+        app = TracimCLI()
+        result = app.run([
+            'user', 'create',
+            '-c', 'tests_configs.ini#command_test',
+            '-l', 'command_test@user',
+            '-p', 'new_password'
+        ])
+        new_user = api.get_one_by_email('command_test@user')
+        assert new_user.email == 'command_test@user'
+        assert new_user.validate_password('new_password')
+
+    def test_func__user_update_command__ok__nominal_case(self):
+        """
+        Test user password update
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        result = app.run([
+            'user', 'update',
+            '-c', 'tests_configs.ini#command_test',
+            '-l', 'admin@admin.admin',
+            '-p', 'new_password'
+        ])
+        new_user = api.get_one_by_email('admin@admin.admin')
+        assert new_user.email == 'admin@admin.admin'
+        assert new_user.validate_password('new_password')
+        assert not new_user.validate_password('admin@admin.admin')
