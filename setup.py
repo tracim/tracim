@@ -34,6 +34,11 @@ requires = [
     # others
     'filedepot',
     'babel',
+    # mail-notifier
+    'mako',
+    'lxml',
+    'redis',
+    'rq',
 ]
 
 tests_require = [
@@ -42,6 +47,7 @@ tests_require = [
     'pytest-cov',
     'pep8',
     'mypy',
+    'requests'
 ]
 
 mysql_require = [

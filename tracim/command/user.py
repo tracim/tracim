@@ -12,6 +12,7 @@ from tracim.command import Extender
 #from tracim.lib.daemons import RadicaleDaemon
 #from tracim.lib.email import get_email_manager
 from tracim.exceptions import AlreadyExistError
+from tracim.exceptions import NotificationNotSend
 from tracim.exceptions import CommandAbortedError
 from tracim.lib.core.group import GroupApi
 from tracim.lib.core.user import UserApi
@@ -106,7 +107,13 @@ class UserCommand(AppContextCommand):
             group.users.remove(user)
         self._session.flush()
 
-    def _create_user(self, login: str, password: str, **kwargs) -> User:
+    def _create_user(
+            self,
+            login: str,
+            password: str,
+            do_notify: bool,
+            **kwargs
+    ) -> User:
         if not password:
             if self._password_required():
                 raise CommandAbortedError(
@@ -115,18 +122,23 @@ class UserCommand(AppContextCommand):
             password = ''
 
         try:
-            user = self._user_api.create_user(email=login)
-            user.password = password
-            self._user_api.save(user)
+            user = self._user_api.create_user(
+                email=login,
+                password=password,
+                do_save=True,
+                do_notify=do_notify,
+            )
             # TODO - G.M - 04-04-2018 - [Caldav] Check this code
             # # We need to enable radicale if it not already done
             # daemons = DaemonsManager()
             # daemons.run('radicale', RadicaleDaemon)
-
             self._user_api.execute_created_user_actions(user)
         except IntegrityError:
             self._session.rollback()
             raise AlreadyExistError()
+        except NotificationNotSend as exception:
+            self._session.rollback()
+            raise exception
 
         return user
 
@@ -166,10 +178,13 @@ class UserCommand(AppContextCommand):
             try:
                 user = self._create_user(
                     login=parsed_args.login,
-                    password=parsed_args.password
+                    password=parsed_args.password,
+                    do_notify=parsed_args.send_email,
                 )
             except AlreadyExistError:
                 raise CommandAbortedError("Error: User already exist (use `user update` command instead)")
+            except NotificationNotSend:
+                raise CommandAbortedError("Error: Cannot send email notification, user not created.")
             # TODO - G.M - 04-04-2018 - [Email] Check this code
             # if parsed_args.send_email:
             #     email_manager = get_email_manager()

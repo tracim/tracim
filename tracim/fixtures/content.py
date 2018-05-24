@@ -58,12 +58,14 @@ class Content(Fixture):
             workspace=w1,
             label='w1f1',
             do_save=True,
+            do_notify=False,
         )
         w1f2 = content_api.create(
             content_type=ContentType.Folder,
             workspace=w1,
             label='w1f2',
             do_save=True,
+            do_notify=False,
         )
 
         w2f1 = content_api.create(
@@ -71,12 +73,14 @@ class Content(Fixture):
             workspace=w2,
             label='w2f1',
             do_save=True,
+            do_notify=False,
         )
         w2f2 = content_api.create(
             content_type=ContentType.Folder,
             workspace=w2,
             label='w2f2',
             do_save=True,
+            do_notify=False,
         )
 
         w3f1 = content_api.create(
@@ -84,6 +88,7 @@ class Content(Fixture):
             workspace=w3,
             label='w3f3',
             do_save=True,
+            do_notify=False,
         )
 
         # Pages, threads, ..
@@ -93,6 +98,7 @@ class Content(Fixture):
             parent=w1f1,
             label='w1f1p1',
             do_save=True,
+            do_notify=False,
         )
         w1f1t1 = content_api.create(
             content_type=ContentType.Thread,
@@ -100,6 +106,7 @@ class Content(Fixture):
             parent=w1f1,
             label='w1f1t1',
             do_save=False,
+            do_notify=False,
         )
         w1f1t1.description = 'w1f1t1 description'
         self._session.add(w1f1t1)
@@ -109,6 +116,7 @@ class Content(Fixture):
             parent=w1f1,
             label='w1f1d1',
             do_save=False,
+            do_notify=False,
         )
         w1f1d1_txt.file_extension = '.txt'
         w1f1d1_txt.depot_file = FileIntent(
@@ -123,6 +131,7 @@ class Content(Fixture):
             parent=w1f1,
             label='w1f1d2',
             do_save=False,
+            do_notify=False,
         )
         w1f1d2_html.file_extension = '.html'
         w1f1d2_html.depot_file = FileIntent(
@@ -137,6 +146,7 @@ class Content(Fixture):
             label='w1f1f1',
             parent=w1f1,
             do_save=True,
+            do_notify=False,
         )
 
         w2f1p1 = content_api.create(
@@ -145,5 +155,6 @@ class Content(Fixture):
             parent=w2f1,
             label='w2f1p1',
             do_save=True,
+            do_notify=False,
         )
         self._session.flush()
