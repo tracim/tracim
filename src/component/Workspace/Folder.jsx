@@ -19,9 +19,9 @@ class Folder extends React.Component {
     this.setState({open: !this.state.open})
   }
 
-  handleClickNewFile = e => {
+  handleClickCreateContent = (e, folder, type) => {
     e.stopPropagation() // because we have a link inside a link (togler and newFile)
-    console.log('new file') // @TODO
+    this.props.onClickCreateContent(folder, type)
   }
 
   render () {
@@ -53,16 +53,15 @@ class Folder extends React.Component {
 
           <div className='folder__header__button'>
 
-            <div
-              className='folder__header__button__addbtn'
-              onClick={this.handleClickNewFile}
-            >
+            <div className='folder__header__button__addbtn'>
               <button className='addbtn__text btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                 {t('Folder.create')} ...
               </button>
 
+              {/* @TODO generate the subdropdown with available app from redux */}
+
               <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                <div className='subdropdown__link dropdown-item'>
+                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'folder')}>
                   <div className='subdropdown__link__folder d-flex align-items-center'>
                     <div className='subdropdown__link__folder__icon mr-3'>
                       <i className='fa fa-fw fa-folder-o' />
@@ -72,7 +71,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
-                <div className='subdropdown__link dropdown-item'>
+                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'PageHtml')}>
                   <div className='subdropdown__link__apphtml d-flex align-items-center'>
                     <div className='subdropdown__link__apphtml__icon mr-3'>
                       <i className='fa fa-fw fa-file-text-o' />
@@ -82,7 +81,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
-                <div className='subdropdown__link dropdown-item'>
+                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'File')}>
                   <div className='subdropdown__link__appfile d-flex align-items-center'>
                     <div className='subdropdown__link__appfile__icon mr-3'>
                       <i className='fa fa-fw fa-file-image-o' />
@@ -92,7 +91,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
-                <div className='subdropdown__link dropdown-item'>
+                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'PageMarkdown')}>
                   <div className='subdropdown__link__appmarkdown d-flex align-items-center'>
                     <div className='subdropdown__link__appmarkdown__icon mr-3'>
                       <i className='fa fa-fw fa-file-code-o' />
@@ -102,7 +101,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
-                <div className='subdropdown__link dropdown-item'>
+                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Thread')}>
                   <div className='subdropdown__link__appthread d-flex align-items-center'>
                     <div className='subdropdown__link__appthread__icon mr-3'>
                       <i className='fa fa-fw fa-comments-o' />
@@ -112,7 +111,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
-                <div className='subdropdown__link dropdown-item'>
+                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Task')}>
                   <div className='subdropdown__link__apptask d-flex align-items-center'>
                     <div className='subdropdown__link__apptask__icon mr-3'>
                       <i className='fa fa-fw fa-list-ul' />
@@ -122,7 +121,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
-                <div className='subdropdown__link dropdown-item'>
+                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Issue')}>
                   <div className='subdropdown__link__appissue d-flex align-items-center'>
                     <div className='subdropdown__link__appissue__icon mr-3'>
                       <i className='fa fa-fw fa-ticket' />

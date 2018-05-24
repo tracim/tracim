@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import PopupCreateContainer from './PopupCreateContainer.jsx'
+import PopupCreateContainer from '../component/PopupCreateContent/PopupCreateContainer.jsx'
 import ProgressBar from './ProgressBar.jsx'
 import Home from './Home.jsx'
 import CardPopup from '../component/common/CardPopup/CardPopup.jsx'

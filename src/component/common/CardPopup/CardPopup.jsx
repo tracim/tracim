@@ -16,18 +16,7 @@ const CardPopup = props => {
           </div>
 
           <div className='cardPopup__body'>
-            <div className='cardPopup__body__icon'>
-              <i className={props.icon} />
-            </div>
-
-            <div className='cardPopup__body__text'>
-              <div className='cardPopup__body__text__title'>
-                {props.title}
-              </div>
-              <div className='cardPopup__body__text__message'>
-                {props.message}
-              </div>
-            </div>
+            { props.children }
           </div>
         </div>
       </div>
@@ -39,16 +28,10 @@ export default CardPopup
 
 CardPopup.propTypes = {
   customClass: PropTypes.string,
-  title: PropTypes.string,
-  message: PropTypes.string,
-  icon: PropTypes.string,
   onClose: PropTypes.func
 }
 
 CardPopup.defaultProps = {
   customClass: 'defaultCustomClass',
-  title: 'Default title',
-  message: 'Default message',
-  icon: 'fa fa-times-circle',
   onClose: () => {}
 }

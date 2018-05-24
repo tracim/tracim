@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import appFactory from '../appFactory.js'
+import { PAGE } from '../helper.js'
 import Sidebar from './Sidebar.jsx'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
@@ -9,29 +10,41 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
+import PopupCreateContent from '../component/PopupCreateContent/PopupCreateContainer.jsx'
 import {
   getAppList,
   getWorkspaceContent,
   getFolderContent
 } from '../action-creator.async.js'
-import {newFlashMessage, setWorkspaceData} from '../action-creator.sync.js'
-import { PAGE } from '../helper.js'
+import {
+  newFlashMessage,
+  setWorkspaceData
+} from '../action-creator.sync.js'
 
 const qs = require('query-string')
 
 class WorkspaceContent extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      popupCreateContent: {
+        display: false,
+        type: undefined,
+        folder: undefined
+      }
+    }
+  }
+
   async componentDidMount () {
     const { workspaceList, app, match, location, dispatch } = this.props
 
     if (Object.keys(app).length === 0) dispatch(getAppList()) // async but no need await
 
-    const wsToLoad = (() => {
-      if (match.params.idws !== undefined) return match.params.idws
-      if (workspaceList.length > 0) return workspaceList[0].id // load first ws if none specified
-      return null
-    })()
+    let wsToLoad = null
+    if (match.params.idws !== undefined) wsToLoad = match.params.idws
+    else if (workspaceList.length > 0) wsToLoad = workspaceList[0].id // load first ws if none specified
 
-    if (wsToLoad === null) return
+    if (wsToLoad === null) return // ws already loaded
 
     const wsContent = await dispatch(getWorkspaceContent(wsToLoad))
     if (wsContent.status === 200) {
@@ -80,16 +93,32 @@ class WorkspaceContent extends React.Component {
     this.props.dispatch(getFolderContent(this.props.workspace.id, folderId))
   }
 
-  filterWorkspaceContent = (contentList, filter) => filter.length === 0
-    ? contentList
-    : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
-      .map(c => c.type !== 'folder' ? c : {...c, content: this.filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
-      // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty folders
+  handleClickCreateContent = (folder, contentType) => this.setState({
+    popupCreateContent: {
+      display: true,
+      type: contentType,
+      folder: folder
+    }
+  })
+
+  handleClosePopupCreateContent = () => this.setState({
+    popupCreateContent: {
+      display: false,
+      type: undefined,
+      folder: undefined
+    }
+  })
 
   render () {
     const { workspace, app } = this.props
 
-    const filteredWorkspaceContent = this.filterWorkspaceContent(workspace.content, workspace.filter)
+    const filterWorkspaceContent = (contentList, filter) => filter.length === 0
+      ? contentList
+      : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
+        .map(c => c.type !== 'folder' ? c : {...c, content: this.filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
+    // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty folders
+
+    const filteredWorkspaceContent = filterWorkspaceContent(workspace.content, workspace.filter)
 
     return (
       <div className='sidebarpagecontainer'>
@@ -105,6 +134,14 @@ class WorkspaceContent extends React.Component {
           </PageTitle>
 
           <PageContent parentClass='workspace__content'>
+            { this.state.popupCreateContent.display &&
+              <PopupCreateContent
+                type={this.state.popupCreateContent.type}
+                folder={this.state.popupCreateContent.folder}
+                onClose={this.handleClosePopupCreateContent}
+              />
+            }
+
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />
 
@@ -122,6 +159,7 @@ class WorkspaceContent extends React.Component {
                       delete: this.handleClickDeleteContentItem
                     }}
                     onClickFolder={this.handleClickFolder}
+                    onClickCreateContent={this.handleClickCreateContent}
                     isLast={i === filteredWorkspaceContent.length - 1}
                     key={c.id}
                   />
