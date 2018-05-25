@@ -137,6 +137,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     SLUG[CONTRIBUTOR] = 'contributor'
     SLUG[CONTENT_MANAGER] = 'content_manager'
     SLUG[WORKSPACE_MANAGER] = 'workspace_manager'
+
     # LABEL = dict()
     # LABEL[0] = l_('N/A')
     # LABEL[1] = l_('Reader')
@@ -171,13 +172,26 @@ class UserRoleInWorkspace(DeclarativeBase):
     #     return UserRoleInWorkspace.LABEL[self.role]
 
     @classmethod
-    def get_all_role_values(self):
+    def get_all_role_values(cls) -> typing.List[int]:
+        """
+        Return all valid role value
+        """
         return [
             UserRoleInWorkspace.READER,
             UserRoleInWorkspace.CONTRIBUTOR,
             UserRoleInWorkspace.CONTENT_MANAGER,
             UserRoleInWorkspace.WORKSPACE_MANAGER
         ]
+
+    @classmethod
+    def get_all_role_slug(cls) -> typing.List[str]:
+        """
+        Return all valid role slug
+        """
+        # INFO - G.M - 25-05-2018 - Be carefull, as long as this method
+        # and get_all_role_values are both used for API, this method should
+        # return item in the same order as get_all_role_values
+        return [cls.SLUG[value] for value in cls.get_all_role_values()]
 
 
 class RoleType(object):

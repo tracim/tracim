@@ -171,7 +171,14 @@ class UserRoleWorkspaceInContext(object):
     # TODO - G.M - 23-05-2018 - Check the API spec for this this !
 
     @property
-    def slug(self) -> str:
+    def role_id(self) -> int:
+        """
+        role as int id, each value refer to a different role.
+        """
+        return self.user_role.role
+
+    @property
+    def role_slug(self) -> str:
         """
         simple name of the role of the user.
         can be anything from UserRoleInWorkspace SLUG, like

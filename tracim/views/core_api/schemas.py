@@ -1,8 +1,10 @@
 # coding=utf-8
 import marshmallow
 from marshmallow import post_load
+from marshmallow.validate import OneOf
 
 from tracim.models.context_models import LoginCredentials
+from tracim.models.data import UserRoleInWorkspace
 
 
 class ProfileSchema(marshmallow.Schema):
@@ -87,7 +89,8 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
-    slug = marshmallow.fields.String()
+    role_id = marshmallow.fields.Int(validate=OneOf(UserRoleInWorkspace.get_all_role_values()))  # nopep8
+    role_slug = marshmallow.fields.String(validate=OneOf(UserRoleInWorkspace.get_all_role_slug()))  # nopep8
     user_id = marshmallow.fields.Int()
     workspace_id = marshmallow.fields.Int()
     user = marshmallow.fields.Nested(
