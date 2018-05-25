@@ -3,13 +3,14 @@ import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import OneOf
 
+from tracim.models.auth import Profile
 from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
 
 
 class ProfileSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int(dump_only=True)
-    slug = marshmallow.fields.String(attribute='name')
+    id = marshmallow.fields.Int(dump_only=True, validate=OneOf(Profile._IDS))
+    slug = marshmallow.fields.String(attribute='name', validate=OneOf(Profile._NAME))
 
 
 class UserSchema(marshmallow.Schema):
