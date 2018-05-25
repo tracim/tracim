@@ -34,6 +34,8 @@ class TracimRequest(Request):
         )
         self._current_workspace = None  # type: Workspace
         self._current_user = None  # type: User
+        # INFO - G.M - 18-05-2018 - Close db at the end of the request
+        self.add_finished_callback(self._cleanup)
 
     @property
     def current_workspace(self) -> Workspace:
@@ -74,6 +76,18 @@ class TracimRequest(Request):
             )
         self._current_user = user
 
+    def _cleanup(self, request: 'TracimRequest') -> None:
+        """
+        Close dbsession at the end of the request in order to avoid exception
+        about not properly closed session or "object created in another thread"
+        issue
+        see https://github.com/tracim/tracim_backend/issues/62
+        :param request: same as self, request
+        :return: nothing.
+        """
+        self._current_user = None
+        self._current_workspace = None
+        self.dbsession.close()
 
 ###
 # Utils for TracimRequest
