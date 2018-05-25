@@ -263,13 +263,17 @@ class TracimEnv(BaseMiddleware):
         self.app_config.configure_filedepot()
 
     def __call__(self, environ, start_response):
-        with transaction.manager as tm:
-            dbsession = get_tm_session(self.session_factory, transaction.manager)
-            environ['tracim_tm'] = tm
-            environ['tracim_dbsession'] = dbsession
-            environ['tracim_cfg'] = self.app_config
-
-            return self._application(environ, start_response)
+        # TODO - G.M - 18-05-2018 - This code should not create trouble
+        # with thread and database, this should be verify.
+        # see https://github.com/tracim/tracim_backend/issues/62
+        tm = transaction.manager
+        dbsession = get_tm_session(self.session_factory, tm)
+        environ['tracim_tm'] = tm
+        environ['tracim_dbsession'] = dbsession
+        environ['tracim_cfg'] = self.app_config
+        app = self._application(environ, start_response)
+        dbsession.close()
+        return app
 
 
 class TracimUserSession(BaseMiddleware):

@@ -42,6 +42,8 @@ class TracimRequest(Request):
         # User found from request headers, content, distinct from authenticated
         # user
         self._user_candidate = None  # type: User
+        # INFO - G.M - 18-05-2018 - Close db at the end of the request
+        self.add_finished_callback(self._cleanup)
 
     @property
     def current_workspace(self) -> Workspace:
@@ -97,6 +99,20 @@ class TracimRequest(Request):
         if self._user_candidate is None:
             self.candidate_user = get_candidate_user(self)
         return self._user_candidate
+
+    def _cleanup(self, request: 'TracimRequest') -> None:
+        """
+        Close dbsession at the end of the request in order to avoid exception
+        about not properly closed session or "object created in another thread"
+        issue
+        see https://github.com/tracim/tracim_backend/issues/62
+        :param request: same as self, request
+        :return: nothing.
+        """
+        self._current_user = None
+        self._current_workspace = None
+        self.dbsession.close()
+
 
     @candidate_user.setter
     def candidate_user(self, user: User) -> None:
