@@ -44,14 +44,10 @@ class WebdavAppFactory(object):
         # Set config defaults
         config = DEFAULT_CONFIG.copy()
         temp_verbose = config["verbose"]
-
         # Get pyramid Env
         tracim_config_file_path = os.path.abspath(tracim_config_file_path)
         config['tracim_config'] = tracim_config_file_path
-        global_conf = get_appsettings(config['tracim_config']).global_conf
-        local_conf = get_appsettings(config['tracim_config'], 'tracim_web')
-        settings = global_conf
-        settings.update(local_conf)
+        settings = self._get_tracim_settings(config)
         app_config = CFG(settings)
 
         default_config_file = os.path.abspath(settings['wsgidav.config_path'])
@@ -91,9 +87,22 @@ class WebdavAppFactory(object):
         config['domaincontroller'] = TracimDomainController(
             presetdomain=None,
             presetserver=None,
-            app_config = app_config,
+            app_config=app_config,
         )
         return config
+
+    def _get_tracim_settings(
+            self,
+            default_config,
+    ):
+        """
+        Get tracim settings
+        """
+        global_conf = get_appsettings(default_config['tracim_config']).global_conf
+        local_conf = get_appsettings(default_config['tracim_config'], 'tracim_web')  # nopep8
+        settings = global_conf
+        settings.update(local_conf)
+        return settings
 
     # INFO - G.M - 13-04-2018 - Copy from
     # wsgidav.server.run_server._readConfigFile
