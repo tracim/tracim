@@ -65,7 +65,7 @@ npm run build
 ```
 #### copy the builded source to tracim_frontend
 ```
-cp dist/pageHtml.app.js __tracim_frontend repo__/dist/app
+cp dist/pageHtml.app.js "tracim_frontend repo"/dist/app
 ```
 
 
