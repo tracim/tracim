@@ -28,6 +28,7 @@
 
     <script src='/app/pageHtml.app.js'></script>
     <script src='/app/thread.app.js'></script>
+    <script src='/app/file.app.js'></script>
 
     <script src="/dev/jquery-3.2.1.js"></script>
     <script src="/dev/popper-1.12.3.js"></script>
@@ -47,6 +48,9 @@
               return appPageHtml
             case 'Thread':
               return appThread
+            case 'File':
+              console.log('spoted')
+              return appFile
           }
         })()
 
@@ -71,6 +75,8 @@
             GLOBAL_dispatchEvent('PageHtml_hideApp', {}); break
           case 'Thread':
             GLOBAL_dispatchEvent('Thread_hideApp', {}); break
+          case 'File':
+            GLOBAL_dispatchEvent('File_hideApp', {}); break
         }
       }
     </script>

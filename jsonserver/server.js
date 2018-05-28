@@ -84,6 +84,8 @@ server.get('/workspace/:idws/content/:idc', (req, res) => {
       return res.jsonp(jsonDb.content_data_pageHtml)
     case '2':
       return res.jsonp(jsonDb.content_data_thread)
+    case '6':
+      return res.jsonp({})
   }
 })
 
@@ -93,6 +95,8 @@ server.get('/workspace/:idws/content/:idc/timeline', (req, res) => {
       return res.jsonp(jsonDb.timeline)
     case '2':
       return res.jsonp([])
+    case '6': // File
+      return res.jsonp(jsonDb.timeline)
   }
 })
 
