@@ -44,6 +44,26 @@ class AcceptAllAuthorizationPolicy(object):
 # We prefer to use decorators
 
 
+def require_same_user_or_profile(group):
+    """
+    Decorator for view to restrict access of tracim request if candidate user
+    is distinct from authenticated user and not with high enough profile.
+    :param group: value from Group Object
+    like Group.TIM_USER or Group.TIM_MANAGER
+    :return:
+    """
+    def decorator(func):
+        def wrapper(self, context, request: 'TracimRequest'):
+            auth_user = request.current_user
+            candidate_user = request.candidate_user
+            if auth_user.user_id == candidate_user.user_id or \
+                    auth_user.profile.id >= group:
+                return func(self, context, request)
+            raise InsufficientUserProfile()
+        return wrapper
+    return decorator
+
+
 def require_profile(group):
     """
     Decorator for view to restrict access of tracim request if profile is

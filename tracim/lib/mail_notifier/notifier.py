@@ -238,6 +238,7 @@ class EmailManager(object):
         notifiable_roles = WorkspaceApi(
             current_user=user,
             session=self.session,
+            config=self.config
         ).get_notifiable_roles(content.workspace)
 
         if len(notifiable_roles) <= 0:

@@ -24,10 +24,12 @@ class Content(Fixture):
         admin_workspace_api = WorkspaceApi(
             current_user=admin,
             session=self._session,
+            config=self._config,
         )
         bob_workspace_api = WorkspaceApi(
             current_user=bob,
             session=self._session,
+            config=self._config
         )
         content_api = ContentApi(
             current_user=admin,
@@ -37,12 +39,25 @@ class Content(Fixture):
         role_api = RoleApi(
             current_user=admin,
             session=self._session,
+            config=self._config,
         )
 
         # Workspaces
-        w1 = admin_workspace_api.create_workspace('w1', save_now=True)
-        w2 = bob_workspace_api.create_workspace('w2', save_now=True)
-        w3 = admin_workspace_api.create_workspace('w3', save_now=True)
+        w1 = admin_workspace_api.create_workspace(
+            'w1',
+            description='This is a workspace',
+            save_now=True
+        )
+        w2 = bob_workspace_api.create_workspace(
+            'w2',
+            description='A great workspace',
+            save_now=True
+        )
+        w3 = admin_workspace_api.create_workspace(
+            'w3',
+            description='Just another workspace',
+            save_now=True
+        )
 
         # Workspaces roles
         role_api.create_one(

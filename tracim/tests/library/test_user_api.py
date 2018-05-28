@@ -91,7 +91,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        with pytest.raises(NoResultFound):
+        with pytest.raises(UserNotExist):
             api.get_one_by_email('unknown')
 
     def test_unit__get_all__ok__nominal_case(self):
@@ -187,4 +187,4 @@ class TestUserApi(DefaultTest):
             config=self.config,
         )
         with pytest.raises(AuthenticationFailed):
-            api.authenticate_user('unknown_user', 'wrong_password')
+            api.authenticate_user('admin@admin.admin', 'wrong_password')

@@ -45,19 +45,20 @@ class FunctionalTest(unittest.TestCase):
 
         }
         hapic.reset_context()
+        self.engine = get_engine(self.settings)
+        DeclarativeBase.metadata.create_all(self.engine)
+        self.session_factory = get_session_factory(self.engine)
+        self.app_config = CFG(self.settings)
+        self.app_config.configure_filedepot()
         self.init_database(self.settings)
+        DepotManager._clear()
         self.run_app()
 
     def run_app(self):
         app = web({}, **self.settings)
-        self.init_database(self.settings)
         self.testapp = TestApp(app)
 
     def init_database(self, settings):
-        self.engine = get_engine(settings)
-        DeclarativeBase.metadata.create_all(self.engine)
-        self.session_factory = get_session_factory(self.engine)
-        self.app_config = CFG(settings)
         with transaction.manager:
             dbsession = get_tm_session(self.session_factory, transaction.manager)
             try:
@@ -171,6 +172,7 @@ class DefaultTest(StandardTest):
         WorkspaceApi(
             current_user=user,
             session=self.session,
+            config=self.app_config,
         ).create_workspace(name, save_now=True)
 
         eq_(

@@ -18,6 +18,7 @@ class TestGroupApi(DefaultTest):
         api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         group = api.get_one(1)
         assert group.group_id == 1
@@ -30,6 +31,7 @@ class TestGroupApi(DefaultTest):
         api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         with pytest.raises(GroupNotExist):
             group = api.get_one(10)
@@ -41,6 +43,7 @@ class TestGroupApi(DefaultTest):
         api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         group = api.get_one_with_name('administrators')
         assert group.group_id == 3
@@ -53,6 +56,7 @@ class TestGroupApi(DefaultTest):
         api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         with pytest.raises(GroupNotExist):
             group = api.get_one_with_name('unknown_group')
@@ -64,6 +68,7 @@ class TestGroupApi(DefaultTest):
         api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         groups = api.get_all()
         assert ['users', 'managers', 'administrators'] == [group.group_name for group in groups]  # nopep8

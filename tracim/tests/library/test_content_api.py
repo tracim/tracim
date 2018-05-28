@@ -107,7 +107,11 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None,session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
@@ -116,7 +120,8 @@ class TestContentApi(DefaultTest):
                                         groups=groups, save_now=True)
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace('test workspace', save_now=True)
         api = ContentApi(
             current_user=user,
@@ -133,7 +138,11 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config
+        )
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user,
@@ -154,7 +163,11 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config
+        )
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user, 
@@ -168,7 +181,11 @@ class TestContentApi(DefaultTest):
         # Test that the item is still available if "show deleted" is activated
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         api = ContentApi(
             current_user=user,
             session=self.session,
@@ -184,14 +201,25 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None, session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_minimal_user(email='this.is@user',
-                                        groups=groups, save_now=True)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        user = uapi.create_minimal_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True,
+        )
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.create_workspace(
             'test workspace',
             save_now=True
@@ -210,7 +238,11 @@ class TestContentApi(DefaultTest):
         transaction.commit()
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         api = ContentApi(
             session=self.session,
             current_user=user,
@@ -231,7 +263,11 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user, 
@@ -245,7 +281,11 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user,
@@ -269,7 +309,11 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None, session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
@@ -281,7 +325,8 @@ class TestContentApi(DefaultTest):
         )
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
@@ -301,7 +346,11 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user, 
@@ -326,7 +375,11 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None, session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
@@ -335,7 +388,8 @@ class TestContentApi(DefaultTest):
                                         groups=groups, save_now=True)
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config
         ).create_workspace('test workspace', save_now=True)
         api = ContentApi(
             current_user=user, 
@@ -371,7 +425,11 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user = uapi.get_one(uid)
-        workspace_api = WorkspaceApi(current_user=user, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.get_one(wid)
         api = ContentApi(
             current_user=user,
@@ -394,7 +452,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -405,7 +464,8 @@ class TestContentApi(DefaultTest):
 
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
@@ -432,7 +492,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -443,7 +504,8 @@ class TestContentApi(DefaultTest):
 
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
@@ -474,7 +536,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -485,7 +548,8 @@ class TestContentApi(DefaultTest):
 
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
@@ -516,7 +580,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -534,12 +599,17 @@ class TestContentApi(DefaultTest):
         )
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
         )
-        RoleApi(current_user=user, session=self.session).create_one(
+        RoleApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
             user2,
             workspace,
             UserRoleInWorkspace.WORKSPACE_MANAGER,
@@ -581,6 +651,7 @@ class TestContentApi(DefaultTest):
         workspace2 = WorkspaceApi(
             current_user=user2,
             session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace2',
             save_now=True
@@ -628,7 +699,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -646,12 +718,17 @@ class TestContentApi(DefaultTest):
         )
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
         )
-        RoleApi(current_user=user, session=self.session).create_one(
+        RoleApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
             user2,
             workspace,
             UserRoleInWorkspace.WORKSPACE_MANAGER,
@@ -692,7 +769,8 @@ class TestContentApi(DefaultTest):
         )
         workspace2 = WorkspaceApi(
             current_user=user2,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace2',
             save_now=True
@@ -738,7 +816,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -756,12 +835,17 @@ class TestContentApi(DefaultTest):
         )
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
         )
-        RoleApi(current_user=user, session=self.session).create_one(
+        RoleApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
             user2, workspace,
             UserRoleInWorkspace.WORKSPACE_MANAGER,
             with_notif=False
@@ -837,7 +921,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -851,6 +936,7 @@ class TestContentApi(DefaultTest):
         wapi = WorkspaceApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         workspace1 = wapi.create_workspace(
             'test workspace n°1',
@@ -862,6 +948,7 @@ class TestContentApi(DefaultTest):
         role_api1 = RoleApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         role_api1.create_one(
             user_b,
@@ -873,6 +960,7 @@ class TestContentApi(DefaultTest):
         role_api2 = RoleApi(
             current_user=user_b,
             session=self.session,
+            config=self.app_config,
         )
         role_api2.create_one(user_b, workspace2, UserRoleInWorkspace.READER,
                              False)
@@ -940,7 +1028,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config = self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -957,10 +1046,15 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
 
-        wapi = WorkspaceApi(current_user=user_a, session=self.session)
+        wapi = WorkspaceApi(
+            current_user=user_a,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace_api = WorkspaceApi(
             current_user=user_a,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         workspace = wapi.create_workspace(
             'test workspace',
@@ -969,6 +1063,7 @@ class TestContentApi(DefaultTest):
         role_api = RoleApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         role_api.create_one(
             user_b,
@@ -1004,7 +1099,11 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None, session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
@@ -1023,6 +1122,7 @@ class TestContentApi(DefaultTest):
         wapi = WorkspaceApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         workspace = wapi.create_workspace(
             'test workspace',
@@ -1031,6 +1131,7 @@ class TestContentApi(DefaultTest):
         role_api = RoleApi(
             current_user=user_a,
             session=self.session,
+            config=self.app_config,
         )
         role_api.create_one(
             user_b,
@@ -1097,7 +1198,11 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None, session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
@@ -1108,7 +1213,11 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
 
-        workspace_api = WorkspaceApi(current_user=user1, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.create_workspace(
             'test workspace',
             save_now=True
@@ -1121,7 +1230,8 @@ class TestContentApi(DefaultTest):
 
         RoleApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_one(
             user2,
             workspace,
@@ -1152,7 +1262,8 @@ class TestContentApi(DefaultTest):
         user1 = uapi.get_one(u1id)
         workspace = WorkspaceApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).get_one(wid)
         api = ContentApi(
             current_user=user1,
@@ -1193,6 +1304,7 @@ class TestContentApi(DefaultTest):
         workspace = WorkspaceApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).get_one(wid)
         api = ContentApi(
             current_user=user1,
@@ -1216,7 +1328,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config = self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -1231,6 +1344,7 @@ class TestContentApi(DefaultTest):
         workspace = WorkspaceApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
@@ -1241,7 +1355,8 @@ class TestContentApi(DefaultTest):
 
         RoleApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_one(
             user2,
             workspace,
@@ -1293,7 +1408,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -1305,7 +1421,11 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
 
-        workspace_api = WorkspaceApi(current_user=user1, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.create_workspace(
             'test workspace',
             save_now=True
@@ -1318,6 +1438,7 @@ class TestContentApi(DefaultTest):
         RoleApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).create_one(
             user2,
             workspace,
@@ -1345,7 +1466,11 @@ class TestContentApi(DefaultTest):
 
         # Refresh instances after commit
         user1 = uapi.get_one(u1id)
-        workspace_api2 = WorkspaceApi(current_user=user1, session=self.session)
+        workspace_api2 = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(
             current_user=user1,
@@ -1387,6 +1512,7 @@ class TestContentApi(DefaultTest):
         workspace = WorkspaceApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).get_one(wid)
 
         updated = api.get_one(pcid, ContentType.Any, workspace)
@@ -1407,6 +1533,7 @@ class TestContentApi(DefaultTest):
         group_api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -1418,7 +1545,11 @@ class TestContentApi(DefaultTest):
             save_now=True,
         )
 
-        workspace_api = WorkspaceApi(current_user=user1, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.create_workspace(
             'test workspace',
             save_now=True
@@ -1430,6 +1561,7 @@ class TestContentApi(DefaultTest):
         RoleApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).create_one(
             user2,
             workspace,
@@ -1485,7 +1617,11 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None, session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
@@ -1497,7 +1633,11 @@ class TestContentApi(DefaultTest):
         )
         u1id = user1.user_id
 
-        workspace_api = WorkspaceApi(current_user=user1, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.create_workspace(
             'test workspace',
             save_now=True
@@ -1509,7 +1649,8 @@ class TestContentApi(DefaultTest):
 
         RoleApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_one(
             user2,
             workspace,
@@ -1545,7 +1686,8 @@ class TestContentApi(DefaultTest):
         ).get_one(u1id)
         workspace = WorkspaceApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).get_one(wid)
 
         content = api.get_one(pcid, ContentType.Any, workspace)
@@ -1583,6 +1725,7 @@ class TestContentApi(DefaultTest):
         workspace = WorkspaceApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).get_one(wid)
         u2 = UserApi(
             current_user=None,
@@ -1632,7 +1775,8 @@ class TestContentApi(DefaultTest):
         )
         group_api = GroupApi(
             current_user=None,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -1645,7 +1789,11 @@ class TestContentApi(DefaultTest):
         )
         u1id = user1.user_id
 
-        workspace_api = WorkspaceApi(current_user=user1, session=self.session)
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
         workspace = workspace_api.create_workspace(
             'test workspace',
             save_now=True
@@ -1657,7 +1805,8 @@ class TestContentApi(DefaultTest):
 
         RoleApi(
             current_user=user1,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_one(
             user2,
             workspace,
@@ -1692,6 +1841,7 @@ class TestContentApi(DefaultTest):
         workspace = WorkspaceApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).get_one(wid)
 
         content = api.get_one(pcid, ContentType.Any, workspace)
@@ -1729,6 +1879,7 @@ class TestContentApi(DefaultTest):
         workspace = WorkspaceApi(
             current_user=user1,
             session=self.session,
+            config=self.app_config,
         ).get_one(wid)
         # show archived is used at the top end of the test
         api = ContentApi(
@@ -1782,6 +1933,7 @@ class TestContentApi(DefaultTest):
         group_api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -1792,7 +1944,8 @@ class TestContentApi(DefaultTest):
 
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True
@@ -1802,7 +1955,6 @@ class TestContentApi(DefaultTest):
             current_user=user, 
             session=self.session,
             config=self.app_config,
-
         )
         a = api.create(ContentType.Folder, workspace, None,
                        'this is randomized folder', True)
@@ -1837,6 +1989,7 @@ class TestContentApi(DefaultTest):
         group_api = GroupApi(
             current_user=None,
             session=self.session,
+            config=self.app_config,
         )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
@@ -1847,7 +2000,8 @@ class TestContentApi(DefaultTest):
 
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'test workspace',
             save_now=True,
@@ -1888,7 +2042,11 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             current_user=None,
         )
-        group_api = GroupApi(current_user=None, session=self.session)
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
         groups = [group_api.get_one(Group.TIM_USER),
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
@@ -1898,7 +2056,8 @@ class TestContentApi(DefaultTest):
 
         workspace = WorkspaceApi(
             current_user=user,
-            session=self.session
+            session=self.session,
+            config=self.app_config,
         ).create_workspace('test workspace', save_now=True)
 
         api = ContentApi(
@@ -2032,6 +2191,7 @@ class TestContentApiSecurity(DefaultTest):
         bob_workspace = WorkspaceApi(
             current_user=bob,
             session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'bob_workspace',
             save_now=True,
@@ -2039,6 +2199,7 @@ class TestContentApiSecurity(DefaultTest):
         admin_workspace = WorkspaceApi(
             current_user=admin,
             session=self.session,
+            config=self.app_config,
         ).create_workspace(
             'admin_workspace',
             save_now=True,

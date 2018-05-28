@@ -11,7 +11,7 @@ import tracim
 from tracim.command import TracimCLI
 from tracim.command.user import UserCommand
 from tracim.exceptions import UserAlreadyExistError, BadCommandError, \
-    GroupNotExist
+    GroupNotExist, UserNotExist
 from tracim.lib.core.user import UserApi
 from tracim.tests import CommandFunctionalTest
 
@@ -48,7 +48,7 @@ class TestCommands(CommandFunctionalTest):
             session=self.session,
             config=self.app_config,
         )
-        with pytest.raises(NoResultFound):
+        with pytest.raises(UserNotExist):
             api.get_one_by_email('command_test@user')
         app = TracimCLI()
         result = app.run([
@@ -72,7 +72,7 @@ class TestCommands(CommandFunctionalTest):
             session=self.session,
             config=self.app_config,
         )
-        with pytest.raises(NoResultFound):
+        with pytest.raises(UserNotExist):
             api.get_one_by_email('command_test@user')
         app = TracimCLI()
         result = app.run([

@@ -39,6 +39,7 @@ requires = [
     'lxml',
     'redis',
     'rq',
+    'python-slugify',
 ]
 
 tests_require = [

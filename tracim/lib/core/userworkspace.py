@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import typing
 
+from tracim import CFG
+from tracim.models.context_models import UserRoleWorkspaceInContext
+
 __author__ = 'damien'
 
 from sqlalchemy.orm import Session
-from tracim.models.auth import User
+from tracim.models.auth import User, Group
 from tracim.models.data import Workspace
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import RoleType
@@ -38,6 +41,20 @@ class RoleApi(object):
         ],
     }
 
+    def get_user_role_workspace_with_context(
+            self,
+            user_role: UserRoleInWorkspace
+    ) -> UserRoleWorkspaceInContext:
+        """
+        Return WorkspaceInContext object from Workspace
+        """
+        workspace = UserRoleWorkspaceInContext(
+            user_role=user_role,
+            dbsession=self._session,
+            config=self._config,
+        )
+        return workspace
+
     @classmethod
     def role_can_read_member_role(cls, reader_role: int, tested_role: int) \
             -> bool:
@@ -56,9 +73,13 @@ class RoleApi(object):
 
         return role
 
-    def __init__(self, session: Session, current_user: typing.Optional[User]):
+    def __init__(self,
+                 session: Session,
+                 current_user: typing.Optional[User],
+                 config: CFG):
         self._session = session
         self._user = current_user
+        self._config = config
 
     def _get_one_rsc(self, user_id, workspace_id):
         """
@@ -99,8 +120,8 @@ class RoleApi(object):
         return self._session.query(UserRoleInWorkspace)\
             .filter(UserRoleInWorkspace.user_id == user_id)
 
-    def get_all_for_user(self, user_id):
-        return self._get_all_for_user(user_id).all()
+    def get_all_for_user(self, user: User):
+        return self._get_all_for_user(user.user_id).all()
 
     def get_all_for_user_order_by_workspace(
             self,
@@ -109,9 +130,9 @@ class RoleApi(object):
         return self._get_all_for_user(user_id)\
             .join(UserRoleInWorkspace.workspace).order_by(Workspace.label).all()
 
-    def get_all_for_workspace(self, workspace_id):
+    def get_all_for_workspace(self, workspace:Workspace):
         return self._session.query(UserRoleInWorkspace)\
-            .filter(UserRoleInWorkspace.workspace_id == workspace_id).all()
+            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id).all()  # nopep8
 
     def save(self, role: UserRoleInWorkspace):
         self._session.flush()
