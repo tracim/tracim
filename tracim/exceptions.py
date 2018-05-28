@@ -25,15 +25,11 @@ class ConfigurationError(TracimError):
     pass
 
 
-class AlreadyExistError(TracimError):
+class UserAlreadyExistError(TracimError):
     pass
 
 
-class CommandError(TracimError):
-    pass
-
-
-class CommandAbortedError(CommandError):
+class BadCommandError(TracimError):
     pass
 
 
@@ -98,4 +94,8 @@ class UserNotExist(TracimException):
 
 
 class NotificationNotSend(TracimException):
+    pass
+
+
+class GroupNotExist(TracimError):
     pass
