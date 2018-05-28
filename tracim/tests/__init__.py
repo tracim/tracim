@@ -35,6 +35,7 @@ class FunctionalTest(unittest.TestCase):
     sqlalchemy_url = 'sqlite:///tracim_test.sqlite'
 
     def setUp(self):
+        logger._logger.setLevel('WARNING')
         DepotManager._clear()
         self.settings = {
             'sqlalchemy.url': self.sqlalchemy_url,
@@ -100,6 +101,7 @@ class CommandFunctionalTest(FunctionalTest):
     def run_app(self):
         self.session = get_tm_session(self.session_factory, transaction.manager)
 
+
 class BaseTest(unittest.TestCase):
     """
     Pyramid default test.
@@ -109,6 +111,7 @@ class BaseTest(unittest.TestCase):
     config_section = 'base_test'
 
     def setUp(self):
+        logger._logger.setLevel('WARNING')
         logger.debug(self, 'Setup Test...')
         self.settings = plaster.get_settings(
             self.config_uri,
