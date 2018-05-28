@@ -20,7 +20,7 @@ from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.config import CFG
 from tracim.extensions import hapic
-from tracim import main
+from tracim import web
 from webtest import TestApp
 
 
@@ -49,7 +49,8 @@ class FunctionalTest(unittest.TestCase):
         self.run_app()
 
     def run_app(self):
-        app = main({}, **self.settings)
+        app = web({}, **self.settings)
+        self.init_database(self.settings)
         self.testapp = TestApp(app)
 
     def init_database(self, settings):

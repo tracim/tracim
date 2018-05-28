@@ -256,7 +256,10 @@ class TracimEnv(BaseMiddleware):
         super().__init__(application, config)
         self._application = application
         self._config = config
-        self.settings = get_appsettings(config['tracim_config'])
+        global_conf = get_appsettings(config['tracim_config']).global_conf
+        local_conf = get_appsettings(config['tracim_config'], 'tracim_web')
+        self.settings = global_conf
+        self.settings.update(local_conf)
         self.engine = get_engine(self.settings)
         self.session_factory = get_session_factory(self.engine)
         self.app_config = CFG(self.settings)

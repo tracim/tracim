@@ -95,7 +95,8 @@ setup(
     install_requires=requires,
     entry_points={
         'paste.app_factory': [
-            'main = tracim:main',
+            'main = tracim:web',
+            'webdav = tracim:webdav'
         ],
         'console_scripts': [
             'tracimcli = tracim.command:main',
