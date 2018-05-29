@@ -52,7 +52,6 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body['created']
         assert res.json_body['is_active']
         assert res.json_body['profile']
-        assert isinstance(res.json_body['profile']['id'], int)
         assert res.json_body['profile']['slug'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
@@ -111,7 +110,6 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['created']
         assert res.json_body['is_active']
         assert res.json_body['profile']
-        assert isinstance(res.json_body['profile']['id'], int)
         assert res.json_body['profile']['slug'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None

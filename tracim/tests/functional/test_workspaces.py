@@ -156,7 +156,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert len(res) == 2
         user_role = res[0]
         assert user_role['role_slug'] == 'workspace_manager'
-        assert user_role['role_id'] == 8
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
         assert user_role['user']['display_name'] == 'Global manager'
