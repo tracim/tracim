@@ -13,12 +13,10 @@ import {
   setUserRole,
   WORKSPACE,
   WORKSPACE_LIST,
-  updateWorkspaceListData,
   FOLDER,
   setFolderData,
   APP_LIST,
-  setAppList,
-  setWorkspaceListIsOpenInSidebar
+  setAppList
 } from './action-creator.sync.js'
 
 /*
@@ -155,17 +153,13 @@ export const updateUserLang = newLang => async dispatch => { // unused
 //   console.log('jsonResponseNoData', fetchResponseNoData)
 // }
 
-export const getWorkspaceList = (userId, workspaceIdToOpen) => async dispatch => {
-  const fetchGetWorkspaceList = await fetchWrapper({
+export const getWorkspaceList = userId => dispatch => {
+  return fetchWrapper({
     url: `${FETCH_CONFIG.mockApiUrl}/user/${userId}/workspace`,
     param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: WORKSPACE_LIST,
     dispatch
   })
-  if (fetchGetWorkspaceList.status === 200) {
-    dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
-    dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdToOpen, true))
-  }
 }
 
 export const getWorkspaceContent = workspaceId => dispatch => {

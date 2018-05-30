@@ -95,7 +95,7 @@ const WorkspaceListItem = props => {
 
                 <div className='dropdown__title' id='navbarDropdown'>
                   <div className='dropdown__title__text'>
-                    { props.app[a].label[props.lang.id] }
+                    {props.app[a].label[props.lang.id]}
                   </div>
                 </div>
               </div>

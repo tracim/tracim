@@ -14,11 +14,14 @@ import PopupCreateContent from '../component/PopupCreateContent/PopupCreateConta
 import {
   getAppList,
   getWorkspaceContent,
-  getFolderContent
+  getFolderContent,
+  getWorkspaceList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  setWorkspaceData
+  setWorkspaceData,
+  setWorkspaceListIsOpenInSidebar,
+  updateWorkspaceListData
 } from '../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -31,18 +34,32 @@ class WorkspaceContent extends React.Component {
         display: false,
         type: undefined,
         folder: undefined
-      }
+      },
+      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
     }
   }
 
   async componentDidMount () {
-    const { workspaceList, app, match, location, dispatch } = this.props
+    const { workspaceIdInUrl } = this.state
+    const { user, workspaceList, app, match, location, dispatch } = this.props
 
     if (Object.keys(app).length === 0) dispatch(getAppList()) // async but no need await
 
     let wsToLoad = null
     if (match.params.idws !== undefined) wsToLoad = match.params.idws
-    else if (workspaceList.length > 0) wsToLoad = workspaceList[0].id // load first ws if none specified
+
+    if (user.user_id !== -1 && workspaceList.length === 0) {
+      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user.user_id))
+
+      if (fetchGetWorkspaceList.status === 200) {
+        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].id, true))
+
+        if (match.params.idws === undefined && fetchGetWorkspaceList.json.length > 0) {
+          wsToLoad = fetchGetWorkspaceList.json[0].id // load first ws if none specified
+        }
+      }
+    }
 
     if (wsToLoad === null) return // ws already loaded
 
@@ -57,6 +74,17 @@ class WorkspaceContent extends React.Component {
         this.handleClickContentItem(contentToOpen)
       }
     } else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { user, match, dispatch } = this.props
+
+    if (this.state.workspaceIdInUrl === null) return
+
+    const newWorkspaceId = parseInt(match.params.idws)
+    prevState.workspaceIdInUrl !== newWorkspaceId && this.setState({workspaceIdInUrl: newWorkspaceId})
+
+    if (user.id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, newWorkspaceId))
   }
 
   handleClickContentItem = content => {
@@ -115,7 +143,7 @@ class WorkspaceContent extends React.Component {
     const filterWorkspaceContent = (contentList, filter) => filter.length === 0
       ? contentList
       : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
-        .map(c => c.type !== 'folder' ? c : {...c, content: this.filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
+        .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
     // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty folders
 
     const filteredWorkspaceContent = filterWorkspaceContent(workspace.content, workspace.filter)

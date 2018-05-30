@@ -4,7 +4,6 @@ import { withRouter } from 'react-router'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
-import { getWorkspaceList } from '../action-creator.async.js'
 import {
   setWorkspaceListIsOpenInSidebar,
   updateWorkspaceFilter
@@ -20,22 +19,11 @@ class Sidebar extends React.Component {
     }
   }
 
-  componentDidMount () {
-    const { workspaceIdInUrl } = this.state
-    const { user, workspaceList, dispatch } = this.props
-
-    user.id !== -1 && workspaceList.length === 0 && dispatch(getWorkspaceList(user.id, workspaceIdInUrl))
-  }
-
   componentDidUpdate (prevProps, prevState) {
-    const { user, match, dispatch } = this.props
+    if (this.props.match.params.idws === undefined) return
 
-    if (this.state.workspaceIdInUrl === null) return
-
-    const newWorkspaceId = parseInt(match.params.idws)
-    prevState.workspaceIdInUrl !== newWorkspaceId && this.setState({workspaceIdInUrl: newWorkspaceId})
-
-    user.id !== -1 && prevProps.user.id !== user.id && dispatch(getWorkspaceList(user.id, newWorkspaceId))
+    const newWorkspaceId = parseInt(this.props.match.params.idws)
+    if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
   }
 
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
