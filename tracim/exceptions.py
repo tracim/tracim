@@ -95,3 +95,11 @@ class WrongUserPassword(TracimException):
 
 class UserNotExist(TracimException):
     pass
+
+
+class ContentStatusNotExist(TracimError):
+    pass
+
+
+class ContentTypeNotExist(TracimError):
+    pass
