@@ -215,3 +215,341 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
+
+
+class TestWorkspaceContents(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/contents endpoint
+    """
+
+    fixtures = [BaseFixture, ContentFixtures]
+
+    def test_api__get_workspace_content__ok_200__get_default(self):
+        """
+        Check obtain workspace contents with defaults filters
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/1/contents', status=200).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    # Root related
+
+    def test_api__get_workspace_content__ok_200__get_all_root_content(self):
+        """
+        Check obtain workspace all root contents
+        """
+        params = {
+            'parent_id': 0,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):
+        """
+        Check obtain workspace root active contents
+        """
+        params = {
+            'parent_id': 0,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):
+        """
+        Check obtain workspace root archived contents
+        """
+        params = {
+            'parent_id': 0,
+            'show_archived': 1,
+            'show_deleted': 0,
+            'show_active': 0,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):
+        """
+         Check obtain workspace root deleted contents
+         """
+        params = {
+            'parent_id': 0,
+            'show_archived': 0,
+            'show_deleted': 1,
+            'show_active': 0,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_nothing_root_content(self):
+        """
+        Check obtain workspace root content who does not match any type
+        (archived, deleted, active) result should be empty list.
+        """
+        params = {
+            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 0,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    # Folder related
+
+    def test_api__get_workspace_content__ok_200__get_all_folder_content(self):
+        """
+         Check obtain workspace folder all contents
+         """
+        params = {
+            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):
+        """
+         Check obtain workspace folder active contents
+         """
+        params = {
+            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):
+        """
+         Check obtain workspace folder archived contents
+         """
+        params = {
+            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):
+        """
+         Check obtain workspace folder deleted contents
+         """
+        params = {
+            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):
+        """
+        Check obtain workspace folder content who does not match any type
+        (archived, deleted, active) result should be empty list.
+        """
+        params = {
+            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 0,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body   # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
+
+    # Error case
+
+    def test_api__get_workspace_content__err_403__unallowed_user(self):
+        """
+        Check obtain workspace content list with an unreachable workspace for
+        user
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'lawrence-not-real-email@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/3/contents', status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api__get_workspace_content__err_401__unregistered_user(self):
+        """
+        Check obtain workspace content list with an unregistered user
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/1/contents', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api__get_workspace_content__err_403__workspace_does_not_exist(self):  # nopep8
+        """
+        Check obtain workspace contents list with an existing user but
+        an unexisting workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/5/contents', status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api_get_workspace_content__err_404__parent_id_does_not_exist(self):
+        # TODO - G.M - 30-05-2018 - Check this test
+        raise NotImplementedError()
