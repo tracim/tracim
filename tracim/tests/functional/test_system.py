@@ -131,7 +131,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         assert content_type['creation_label'] == 'Write a document'
         assert 'available_statuses' in content_type
         assert len(content_type['available_statuses']) == 4
-
+        # TODO - G.M - 31-05-2018 - Check Folder type
         # TODO - G.M - 29-05-2018 - Better check for available_statuses
 
     def test_api__get_content_types__err_401__unregistered_user(self):

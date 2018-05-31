@@ -219,7 +219,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
 
-@pytest.mark.xfail()
 class TestWorkspaceContents(FunctionalTest):
     """
     Tests for /api/v2/workspaces/{workspace_id}/contents endpoint
@@ -240,7 +239,40 @@ class TestWorkspaceContents(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/workspaces/1/contents', status=200).json_body   # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
-        raise NotImplementedError()
+        assert len(res) == 3
+        content = res[0]
+        assert content['id'] == 1
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Tools'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] == True
+        assert content['slug'] == 'tools'
+        assert content['status_slug'] == 'open'
+        assert set(content['sub_content_type_slug']) == set(['thread', 'page', 'folder', 'file'])
+        assert content['workspace_id'] == 1
+        content = res[1]
+        assert content['id'] == 2
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Menus'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] == True
+        assert content['slug'] == 'menus'
+        assert content['status_slug'] == 'open'
+        assert set(content['sub_content_type_slug']) == set(['thread', 'page', 'folder', 'file'])
+        assert content['workspace_id'] == 1
+        content = res[2]
+        assert content['id'] == 11
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Current Menu'
+        assert content['parent_id'] == 2
+        assert content['show_in_ui'] == True
+        assert content['slug'] == 'current-menu'
+        assert content['status_slug'] == 'open'
+        assert set(content['sub_content_type_slug']) == set(['thread', 'page', 'folder', 'file'])
+        assert content['workspace_id'] == 1
 
     # Root related
 
@@ -267,8 +299,31 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
         ).json_body  # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
-        raise NotImplementedError()
+        assert len(res) == 2
+        content = res[0]
+        assert content['id'] == 1
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Tools'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] == True
+        assert content['slug'] == 'tools'
+        assert content['status_slug'] == 'open'
+        assert set(content['sub_content_type_slug']) == set(['thread', 'page', 'folder', 'file'])
+        assert content['workspace_id'] == 1
+        content = res[1]
+        assert content['id'] == 2
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Menus'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] == True
+        assert content['slug'] == 'menus'
+        assert content['status_slug'] == 'open'
+        assert set(content['sub_content_type_slug']) == set(['thread', 'page', 'folder', 'file'])
+        assert content['workspace_id'] == 1
 
+    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):
         """
         Check obtain workspace root active contents
@@ -294,6 +349,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         raise NotImplementedError()
 
+    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):
         """
         Check obtain workspace root archived contents
@@ -319,6 +375,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         raise NotImplementedError()
 
+    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):
         """
          Check obtain workspace root deleted contents
@@ -368,7 +425,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
         ).json_body  # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
-        raise NotImplementedError()
+        assert res == []
 
     # Folder related
 
@@ -395,8 +452,20 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
         ).json_body   # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
-        raise NotImplementedError()
+        assert len(res) == 1
+        content = res[0]
+        assert content['id'] == 11
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Current Menu'
+        assert content['parent_id'] == 2
+        assert content['show_in_ui'] == True
+        assert content['slug'] == 'current-menu'
+        assert content['status_slug'] == 'open'
+        assert set(content['sub_content_type_slug']) == set(['thread', 'page', 'folder', 'file'])
+        assert content['workspace_id'] == 1
 
+    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):
         """
          Check obtain workspace folder active contents
@@ -422,6 +491,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         raise NotImplementedError()
 
+    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):
         """
          Check obtain workspace folder archived contents
@@ -447,6 +517,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         raise NotImplementedError()
 
+    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):
         """
          Check obtain workspace folder deleted contents
@@ -496,7 +567,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
         ).json_body   # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
-        raise NotImplementedError()
+        assert res == []
 
     # Error case
 
@@ -552,7 +623,3 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
-
-    def test_api_get_workspace_content__err_404__parent_id_does_not_exist(self):
-        # TODO - G.M - 30-05-2018 - Check this test
-        raise NotImplementedError()

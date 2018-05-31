@@ -5,7 +5,7 @@ from marshmallow.validate import OneOf
 
 from tracim.models.auth import Profile
 from tracim.models.contents import CONTENT_DEFAULT_TYPE, GlobalStatus, CONTENT_DEFAULT_STATUS
-from tracim.models.context_models import LoginCredentials
+from tracim.models.context_models import LoginCredentials, ContentFilter
 from tracim.models.data import UserRoleInWorkspace
 
 
@@ -85,8 +85,7 @@ class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema
     pass
 
 
-class FilterContentPathSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4, required=True)
+class FilterContentQuerySchema(marshmallow.Schema):
     parent_id = workspace_id = marshmallow.fields.Int(
         example=2,
         default=None,
@@ -118,7 +117,9 @@ class FilterContentPathSchema(marshmallow.Schema):
                     'The reason for this parameter to exist is for example '
                     'to allow to show only archived documents'
     )
-
+    @post_load
+    def make_content_filter(self, data):
+        return ContentFilter(**data)
 ###
 
 
@@ -325,9 +326,8 @@ class ContentDigestSchema(marshmallow.Schema):
         example='htmlpage',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
-    sub_content_type_slug = marshmallow.fields.Nested(
-        ContentTypeSchema(only=('slug',)),
-        many=True,
+    sub_content_type_slug = marshmallow.fields.List(
+        marshmallow.fields.Str,
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'

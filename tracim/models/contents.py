@@ -87,7 +87,7 @@ class ContentStatusLegacy(NewContentStatus):
     def __init__(self, slug: str):
         for status in CONTENT_DEFAULT_STATUS:
             if slug == status.slug:
-                super(ContentStatusLegacy).__init__(
+                super(ContentStatusLegacy, self).__init__(
                     slug=status.slug,
                     global_status=status.global_status,
                     label=status.label,
@@ -168,12 +168,22 @@ pagehtml_type = NewContentType(
     available_statuses=CONTENT_DEFAULT_STATUS,
 )
 
+# TODO - G.M - 31-05-2018 - Set Better folder params
+folder_type = NewContentType(
+    slug='folder',
+    icon=thread.icon,
+    hexcolor=thread.hexcolor,
+    label='Folder',
+    creation_label='Create collection of any documents',
+    available_statuses=CONTENT_DEFAULT_STATUS,
+)
 
 CONTENT_DEFAULT_TYPE = [
     thread_type,
     file_type,
     pagemarkdownplus_type,
     pagehtml_type,
+    folder_type,
 ]
 
 
@@ -195,7 +205,7 @@ class ContentTypeLegacy(NewContentType):
     def __init__(self, slug: str):
         for content_type in CONTENT_DEFAULT_TYPE:
             if slug == content_type.slug:
-                super(ContentTypeLegacy).__init__(
+                super(ContentTypeLegacy, self).__init__(
                     slug=content_type.slug,
                     icon=content_type.icon,
                     hexcolor=content_type.hexcolor,

@@ -1148,6 +1148,10 @@ class Content(DeclarativeBase):
         return not self.is_archived and not self.is_deleted
 
     @property
+    def is_active(self) -> bool:
+        return self.is_editable
+
+    @property
     def depot_file(self) -> UploadedFile:
         return self.revision.depot_file
 

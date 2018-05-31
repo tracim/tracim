@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from tracim import CFG
 from tracim.models import User
 from tracim.models.auth import Profile
-from tracim.models.data import Workspace, UserRoleInWorkspace
+from tracim.models.data import Workspace, UserRoleInWorkspace, Content
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry, \
     WorkspaceMenuEntry
 
@@ -21,6 +21,21 @@ class LoginCredentials(object):
         self.email = email
         self.password = password
 
+
+class ContentFilter(object):
+    """
+    Content filter model
+    """
+    def __init__(self,
+                 parent_id: int = None,
+                 show_archived: int = 0,
+                 show_deleted: int = 0,
+                 show_active: int = 1,
+                 ):
+        self.parent_id = parent_id
+        self.show_archived = bool(show_archived)
+        self.show_deleted = bool(show_deleted)
+        self.show_active = bool(show_active)
 
 class UserInContext(object):
     """
@@ -211,3 +226,67 @@ class UserRoleWorkspaceInContext(object):
             self.dbsession,
             self.config
         )
+
+
+class ContentInContext(object):
+    """
+    Interface to get Content data and Content data related to context.
+    """
+
+    def __init__(self, content: Content, dbsession: Session, config: CFG):
+        self.content = content
+        self.dbsession = dbsession
+        self.config = config
+
+    # Default
+
+    @property
+    def id(self) -> int:
+        return self.content.content_id
+
+    @property
+    def parent_id(self) -> int:
+        return self.content.parent_id
+
+    @property
+    def workspace_id(self) -> int:
+        return self.content.workspace_id
+
+    @property
+    def label(self) -> str:
+        return self.content.label
+
+    @property
+    def content_type_slug(self) -> str:
+        return self.content.type
+
+    @property
+    def sub_content_type_slug(self) -> typing.List[str]:
+        return [type.slug for type in self.content.get_allowed_content_types()]
+
+    @property
+    def status_slug(self) -> str:
+        return self.content.status
+
+    @property
+    def is_archived(self):
+        return self.content.is_archived
+
+    @property
+    def is_deleted(self):
+        return self.content.is_deleted
+
+    # Context-related
+
+    @property
+    def show_in_ui(self):
+        # TODO - G.M - 31-05-2018 - Enable Show_in_ui params
+        # if false, then do not show content in the treeview.
+        # This may his maybe used for specific contents or for sub-contents.
+        # Default is True.
+        # In first version of the API, this field is always True
+        return True
+
+    @property
+    def slug(self):
+        return slugify(self.content.label)
