@@ -113,11 +113,11 @@ class TestWebDav(StandardTest):
         )
 
         workspaces_names = [w.name for w in children]
-        assert 'w1' in workspaces_names, \
-            'w1 should be in names ({0})'.format(
+        assert 'Recipes' in workspaces_names, \
+            'Recipes should be in names ({0})'.format(
                 workspaces_names,
         )
-        assert 'w2' in workspaces_names, 'w2 should be in names ({0})'.format(
+        assert 'Others' in workspaces_names, 'Others should be in names ({0})'.format(
             workspaces_names,
         )
 
@@ -137,138 +137,138 @@ class TestWebDav(StandardTest):
         eq_(
             2,
             len(children),
-            msg='RootResource should return 2 workspaces instead {0}'.format(
+            msg='RootResource should return 3 workspaces instead {0}'.format(
                 len(children),
             )
         )
 
         workspaces_names = [w.name for w in children]
-        assert 'w1' in workspaces_names, 'w1 should be in names ({0})'.format(
+        assert 'Recipes' in workspaces_names, 'Recipes should be in names ({0})'.format(
             workspaces_names,
         )
-        assert 'w3' in workspaces_names, 'w3 should be in names ({0})'.format(
+        assert 'Business' in workspaces_names, 'Business should be in names ({0})'.format(
             workspaces_names,
         )
 
     def test_unit__list_workspace_folders__ok(self):
         provider = self._get_provider(self.app_config)
-        w1 = provider.getResourceInst(
-            '/w1/',
+        Recipes = provider.getResourceInst(
+            '/Recipes/',
             self._get_environ(
                 provider,
                 'bob@fsf.local',
             )
         )
-        assert w1, 'Path /w1 should return a Wrkspace instance'
+        assert Recipes, 'Path /Recipes should return a Wrkspace instance'
 
-        children = w1.getMemberList()
+        children = Recipes.getMemberList()
         eq_(
             2,
             len(children),
-            msg='w1 should list 2 folders instead {0}'.format(
+            msg='Recipes should list 2 folders instead {0}'.format(
                 len(children),
             ),
         )
 
         folders_names = [f.name for f in children]
-        assert 'w1f1' in folders_names, 'w1f1 should be in names ({0})'.format(
+        assert 'Salads' in folders_names, 'Salads should be in names ({0})'.format(
                 folders_names,
         )
-        assert 'w1f2' in folders_names, 'w1f2 should be in names ({0})'.format(
+        assert 'Desserts' in folders_names, 'Desserts should be in names ({0})'.format(
                 folders_names,
         )
 
     def test_unit__list_content__ok(self):
         provider = self._get_provider(self.app_config)
-        w1f1 = provider.getResourceInst(
-            '/w1/w1f1',
+        Salads = provider.getResourceInst(
+            '/Recipes/Desserts',
             self._get_environ(
                 provider,
                 'bob@fsf.local',
             )
         )
-        assert w1f1, 'Path /w1f1 should return a Wrkspace instance'
+        assert Salads, 'Path /Salads should return a Wrkspace instance'
 
-        children = w1f1.getMemberList()
+        children = Salads.getMemberList()
         eq_(
             5,
             len(children),
-            msg='w1f1 should list 5 folders instead {0}'.format(
+            msg='Salads should list 5 Files instead {0}'.format(
                 len(children),
             ),
         )
 
         content_names = [c.name for c in children]
-        assert 'w1f1p1.html' in content_names, \
-            'w1f1.html should be in names ({0})'.format(
+        assert 'Brownie Recipe.html' in content_names, \
+            'Brownie Recipe.html should be in names ({0})'.format(
                 content_names,
         )
 
-        assert 'w1f1t1.html' in content_names,\
-            'w1f1t1.html should be in names ({0})'.format(
+        assert 'Best Cakes ʔ.html' in content_names,\
+            'Best Cakes ʔ.html should be in names ({0})'.format(
                 content_names,
         )
-        assert 'w1f1d1.txt' in content_names,\
-            'w1f1d1.txt should be in names ({0})'.format(content_names,)
+        assert 'Apple_Pie.txt' in content_names,\
+            'Apple_Pie.txt should be in names ({0})'.format(content_names,)
 
-        assert 'w1f1f1' in content_names, \
-            'w1f1f1 should be in names ({0})'.format(
+        assert 'Fruits Desserts' in content_names, \
+            'Fruits Desserts should be in names ({0})'.format(
                 content_names,
         )
 
-        assert 'w1f1d2.html' in content_names,\
-            'w1f1d2.html should be in names ({0})'.format(
+        assert 'Tiramisu Recipe.html' in content_names,\
+            'Tiramisu Recipe.html should be in names ({0})'.format(
                 content_names,
         )
 
     def test_unit__get_content__ok(self):
         provider = self._get_provider(self.app_config)
-        w1f1d1 = provider.getResourceInst(
-            '/w1/w1f1/w1f1d1.txt',
+        pie = provider.getResourceInst(
+            '/Recipes/Desserts/Apple_Pie.txt',
             self._get_environ(
                 provider,
                 'bob@fsf.local',
             )
         )
 
-        assert w1f1d1, 'w1f1d1 should be found'
-        eq_('w1f1d1.txt', w1f1d1.name)
+        assert pie, 'Apple_Pie should be found'
+        eq_('Apple_Pie.txt', pie.name)
 
     def test_unit__delete_content__ok(self):
         provider = self._get_provider(self.app_config)
-        w1f1d1 = provider.getResourceInst(
-            '/w1/w1f1/w1f1d1.txt',
+        pie = provider.getResourceInst(
+            '/Recipes/Desserts/Apple_Pie.txt',
             self._get_environ(
                 provider,
                 'bob@fsf.local',
             )
         )
         
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(Content.label == 'w1f1d1') \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(Content.label == 'Apple_Pie') \
             .one()  # It must exist only one revision, cf fixtures
         eq_(
             False,
-            content_w1f1d1.is_deleted,
+            content_pie.is_deleted,
             msg='Content should not be deleted !'
         )
-        content_w1f1d1_id = content_w1f1d1.content_id
+        content_pie_id = content_pie.content_id
 
-        w1f1d1.delete()
+        pie.delete()
 
         self.session.flush()
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(Content.content_id == content_w1f1d1_id) \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(Content.content_id == content_pie_id) \
             .order_by(Content.revision_id.desc()) \
             .first()
         eq_(
             True,
-            content_w1f1d1.is_deleted,
+            content_pie.is_deleted,
             msg='Content should be deleted !'
         )
 
         result = provider.getResourceInst(
-            '/w1/w1f1/w1f1d1.txt',
+            '/Recipes/Desserts/Apple_Pie.txt',
             self._get_environ(
                 provider,
                 'bob@fsf.local',
@@ -285,7 +285,7 @@ class TestWebDav(StandardTest):
             'bob@fsf.local',
         )
         result = provider.getResourceInst(
-            '/w1/w1f1/new_file.txt',
+            '/Recipes/Salads/greek_salad.txt',
             environ,
         )
 
@@ -296,17 +296,17 @@ class TestWebDav(StandardTest):
         result = self._put_new_text_file(
             provider,
             environ,
-            '/w1/w1f1/new_file.txt',
-            b'hello\n',
+            '/Recipes/Salads/greek_salad.txt',
+            b'Greek Salad\n',
         )
 
         assert result, 'Result should not be None instead {0}'.format(
             result
         )
         eq_(
-            b'hello\n',
+            b'Greek Salad\n',
             result.content.depot_file.file.read(),
-            msg='fiel content should be "hello\n" but it is {0}'.format(
+            msg='fiel content should be "Greek Salad\n" but it is {0}'.format(
                 result.content.depot_file.file.read()
             )
         )
@@ -318,7 +318,7 @@ class TestWebDav(StandardTest):
             'bob@fsf.local',
         )
         new_file = provider.getResourceInst(
-            '/w1/w1f1/new_file.txt',
+            '/Recipes/Salads/greek_salad.txt',
             environ,
         )
 
@@ -330,15 +330,15 @@ class TestWebDav(StandardTest):
         new_file = self._put_new_text_file(
             provider,
             environ,
-            '/w1/w1f1/new_file.txt',
-            b'hello\n',
+            '/Recipes/Salads/greek_salad.txt',
+            b'Greek Salad\n',
         )
         assert new_file, 'Result should not be None instead {0}'.format(
             new_file
         )
 
         content_new_file = self.session.query(ContentRevisionRO) \
-            .filter(Content.label == 'new_file') \
+            .filter(Content.label == 'greek_salad') \
             .one()  # It must exist only one revision
         eq_(
             False,
@@ -351,18 +351,18 @@ class TestWebDav(StandardTest):
         new_file.delete()
 
         self.session.flush()
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
+        content_pie = self.session.query(ContentRevisionRO) \
             .filter(Content.content_id == content_new_file_id) \
             .order_by(Content.revision_id.desc()) \
             .first()
         eq_(
             True,
-            content_w1f1d1.is_deleted,
+            content_pie.is_deleted,
             msg='Content should be deleted !'
         )
 
         result = provider.getResourceInst(
-            '/w1/w1f1/new_file.txt',
+            '/Recipes/Salads/greek_salad.txt',
             self._get_environ(
                 provider,
                 'bob@fsf.local',
@@ -376,8 +376,8 @@ class TestWebDav(StandardTest):
         new_file = self._put_new_text_file(
             provider,
             environ,
-            '/w1/w1f1/new_file.txt',
-            b'hello\n',
+            '/Recipes/Salads/greek_salad.txt',
+            b'greek_salad\n',
         )
         assert new_file, 'Result should not be None instead {0}'.format(
             new_file
@@ -385,19 +385,19 @@ class TestWebDav(StandardTest):
 
         # Previous file is still dleeted
         self.session.flush()
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
+        content_pie = self.session.query(ContentRevisionRO) \
             .filter(Content.content_id == content_new_file_id) \
             .order_by(Content.revision_id.desc()) \
             .first()
         eq_(
             True,
-            content_w1f1d1.is_deleted,
+            content_pie.is_deleted,
             msg='Content should be deleted !'
         )
 
         # And an other file exist for this name
         content_new_new_file = self.session.query(ContentRevisionRO) \
-            .filter(Content.label == 'new_file') \
+            .filter(Content.label == 'greek_salad') \
             .order_by(Content.revision_id.desc()) \
             .first()
         assert content_new_new_file.content_id != content_new_file_id,\
@@ -415,29 +415,29 @@ class TestWebDav(StandardTest):
             provider,
             'bob@fsf.local',
         )
-        w1f1d1 = provider.getResourceInst(
-            '/w1/w1f1/w1f1d1.txt',
+        pie = provider.getResourceInst(
+            '/Recipes/Desserts/Apple_Pie.txt',
             environ,
         )
 
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(Content.label == 'w1f1d1') \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(Content.label == 'Apple_Pie') \
             .one()  # It must exist only one revision, cf fixtures
-        assert content_w1f1d1, 'w1f1d1 should be exist'
-        content_w1f1d1_id = content_w1f1d1.content_id
+        assert content_pie, 'Apple_Pie should be exist'
+        content_pie_id = content_pie.content_id
 
-        w1f1d1.moveRecursive('/w1/w1f1/w1f1d1_RENAMED.txt')
+        pie.moveRecursive('/Recipes/Desserts/Apple_Pie_RENAMED.txt')
 
         # Database content is renamed
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(ContentRevisionRO.content_id == content_w1f1d1_id) \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(ContentRevisionRO.content_id == content_pie_id) \
             .order_by(ContentRevisionRO.revision_id.desc()) \
             .first()
         eq_(
-            'w1f1d1_RENAMED',
-            content_w1f1d1.label,
-            msg='File should be labeled w1f1d1_RENAMED, not {0}'.format(
-                content_w1f1d1.label
+            'Apple_Pie_RENAMED',
+            content_pie.label,
+            msg='File should be labeled Apple_Pie_RENAMED, not {0}'.format(
+                content_pie.label
             )
         )
 
@@ -447,34 +447,34 @@ class TestWebDav(StandardTest):
             provider,
             'bob@fsf.local',
         )
-        w1f1d1 = provider.getResourceInst(
-            '/w1/w1f1/w1f1d1.txt',
+        pie = provider.getResourceInst(
+            '/Recipes/Desserts/Apple_Pie.txt',
             environ,
         )
 
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(Content.label == 'w1f1d1') \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(Content.label == 'Apple_Pie') \
             .one()  # It must exist only one revision, cf fixtures
-        assert content_w1f1d1, 'w1f1d1 should be exist'
-        content_w1f1d1_id = content_w1f1d1.content_id
-        content_w1f1d1_parent = content_w1f1d1.parent
+        assert content_pie, 'Apple_Pie should be exist'
+        content_pie_id = content_pie.content_id
+        content_pie_parent = content_pie.parent
         eq_(
-            content_w1f1d1_parent.label,
-            'w1f1',
-            msg='field parent should be w1f1',
+            content_pie_parent.label,
+            'Desserts',
+            msg='field parent should be Desserts',
         )
 
-        w1f1d1.moveRecursive('/w1/w1f2/w1f1d1.txt')  # move in f2
+        pie.moveRecursive('/Recipes/Salads/Apple_Pie.txt')  # move in f2
 
         # Database content is moved
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(ContentRevisionRO.content_id == content_w1f1d1_id) \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(ContentRevisionRO.content_id == content_pie_id) \
             .order_by(ContentRevisionRO.revision_id.desc()) \
             .first()
 
-        assert content_w1f1d1.parent.label != content_w1f1d1_parent.label,\
-            'file should be moved in w1f2 but is in {0}'.format(
-                content_w1f1d1.parent.label
+        assert content_pie.parent.label != content_pie_parent.label,\
+            'file should be moved in Salads but is in {0}'.format(
+                content_pie.parent.label
         )
 
     def test_unit__move_and_rename_content__ok(self):
@@ -483,39 +483,39 @@ class TestWebDav(StandardTest):
             provider,
             'bob@fsf.local',
         )
-        w1f1d1 = provider.getResourceInst(
-            '/w1/w1f1/w1f1d1.txt',
+        pie = provider.getResourceInst(
+            '/Recipes/Desserts/Apple_Pie.txt',
             environ,
         )
 
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(Content.label == 'w1f1d1') \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(Content.label == 'Apple_Pie') \
             .one()  # It must exist only one revision, cf fixtures
-        assert content_w1f1d1, 'w1f1d1 should be exist'
-        content_w1f1d1_id = content_w1f1d1.content_id
-        content_w1f1d1_parent = content_w1f1d1.parent
+        assert content_pie, 'Apple_Pie should be exist'
+        content_pie_id = content_pie.content_id
+        content_pie_parent = content_pie.parent
         eq_(
-            content_w1f1d1_parent.label,
-            'w1f1',
-            msg='field parent should be w1f1',
+            content_pie_parent.label,
+            'Desserts',
+            msg='field parent should be Desserts',
         )
 
-        w1f1d1.moveRecursive('/w1/w1f2/w1f1d1_RENAMED.txt')
+        pie.moveRecursive('/Others/Infos/Apple_Pie_RENAMED.txt')
 
         # Database content is moved
-        content_w1f1d1 = self.session.query(ContentRevisionRO) \
-            .filter(ContentRevisionRO.content_id == content_w1f1d1_id) \
+        content_pie = self.session.query(ContentRevisionRO) \
+            .filter(ContentRevisionRO.content_id == content_pie_id) \
             .order_by(ContentRevisionRO.revision_id.desc()) \
             .first()
-        assert content_w1f1d1.parent.label != content_w1f1d1_parent.label,\
-            'file should be moved in w1f2 but is in {0}'.format(
-                content_w1f1d1.parent.label
+        assert content_pie.parent.label != content_pie_parent.label,\
+            'file should be moved in Recipesf2 but is in {0}'.format(
+                content_pie.parent.label
         )
         eq_(
-            'w1f1d1_RENAMED',
-            content_w1f1d1.label,
-            msg='File should be labeled w1f1d1_RENAMED, not {0}'.format(
-                content_w1f1d1.label
+            'Apple_Pie_RENAMED',
+            content_pie.label,
+            msg='File should be labeled Apple_Pie_RENAMED, not {0}'.format(
+                content_pie.label
             )
         )
 
@@ -526,23 +526,23 @@ class TestWebDav(StandardTest):
             'bob@fsf.local',
         )
         content_to_move_res = provider.getResourceInst(
-            '/w1/w1f1/w1f1d1.txt',
+            '/Recipes/Desserts/Apple_Pie.txt',
             environ,
         )
 
         content_to_move = self.session.query(ContentRevisionRO) \
-            .filter(Content.label == 'w1f1d1') \
+            .filter(Content.label == 'Apple_Pie') \
             .one()  # It must exist only one revision, cf fixtures
-        assert content_to_move, 'w1f1d1 should be exist'
+        assert content_to_move, 'Apple_Pie should be exist'
         content_to_move_id = content_to_move.content_id
         content_to_move_parent = content_to_move.parent
         eq_(
             content_to_move_parent.label,
-            'w1f1',
-            msg='field parent should be w1f1',
+            'Desserts',
+            msg='field parent should be Desserts',
         )
 
-        content_to_move_res.moveRecursive('/w2/w2f1/w1f1d1.txt')  # move in w2, f1
+        content_to_move_res.moveRecursive('/Others/Infos/Apple_Pie.txt')  # move in Business, f1
 
         # Database content is moved
         content_to_move = self.session.query(ContentRevisionRO) \
@@ -552,8 +552,8 @@ class TestWebDav(StandardTest):
 
         assert content_to_move.parent, 'Content should have a parent'
 
-        assert content_to_move.parent.label == 'w2f1',\
-            'file should be moved in w2f1 but is in {0}'.format(
+        assert content_to_move.parent.label == 'Infos',\
+            'file should be moved in Infos but is in {0}'.format(
                 content_to_move.parent.label
         )
 
@@ -564,7 +564,7 @@ class TestWebDav(StandardTest):
             'bob@fsf.local',
         )
         result = provider.getResourceInst(
-            '/w1/w1f1/new_file.txt',
+            '/Recipes/Salads/greek_salad.txt',
             environ,
         )
 
@@ -575,7 +575,7 @@ class TestWebDav(StandardTest):
         result = self._put_new_text_file(
             provider,
             environ,
-            '/w1/w1f1/new_file.txt',
+            '/Recipes/Salads/greek_salad.txt',
             b'hello\n',
         )
 
