@@ -70,9 +70,11 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
+        
+        roles = rapi.get_all_for_workspace(request.current_workspace)
         return [
             rapi.get_user_role_workspace_with_context(user_role)
-            for user_role in rapi.get_all_for_workspace(request.current_workspace)
+            for user_role in roles
         ]
 
     def bind(self, configurator: Configurator) -> None:
