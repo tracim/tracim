@@ -7,7 +7,8 @@ from tracim.models.context_models import UserRoleWorkspaceInContext
 __author__ = 'damien'
 
 from sqlalchemy.orm import Session
-from tracim.models.auth import User, Group
+from tracim.models.auth import User
+from tracim.models.auth import Group
 from tracim.models.data import Workspace
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import RoleType
