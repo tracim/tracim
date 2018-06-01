@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from depot.io.utils import FileIntent
+import transaction
 
 from tracim import models
 from tracim.fixtures import Fixture
@@ -9,6 +10,7 @@ from tracim.lib.core.userworkspace import RoleApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models.data import ContentType
 from tracim.models.data import UserRoleInWorkspace
+from tracim.models.revision_protection import new_revision
 
 
 class Content(Fixture):
@@ -160,4 +162,42 @@ class Content(Fixture):
             label='Current Menu',
             do_save=True,
         )
+
+        new_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=recipe_workspace,
+            parent=fruits_desserts_folder,
+            label='New Fruit Salad',
+            do_save=True,
+        )
+        old_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=recipe_workspace,
+            parent=fruits_desserts_folder,
+            label='Fruit Salad',
+            do_save=True,
+        )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=old_fruit_salad,
+        ):
+            content_api.archive(old_fruit_salad)
+        content_api.save(old_fruit_salad)
+
+        bad_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=recipe_workspace,
+            parent=fruits_desserts_folder,
+            label='Bad Fruit Salad',
+            do_save=True,
+        )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=bad_fruit_salad,
+        ):
+            content_api.delete(bad_fruit_salad)
+        content_api.save(bad_fruit_salad)
+
         self._session.flush()

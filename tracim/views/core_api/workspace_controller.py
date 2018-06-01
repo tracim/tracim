@@ -93,7 +93,6 @@ class WorkspaceController(Controller):
         """
         return list of contents found in the workspace
         """
-        #hapic_data.query=
         app_config = request.registry.settings['CFG']
         content_filter = hapic_data.query
         api = ContentApi(

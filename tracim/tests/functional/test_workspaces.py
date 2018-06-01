@@ -465,13 +465,13 @@ class TestWorkspaceContents(FunctionalTest):
         assert set(content['sub_content_type_slug']) == set(['thread', 'page', 'folder', 'file'])
         assert content['workspace_id'] == 1
 
-    @pytest.mark.xfail()
+
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):
         """
          Check obtain workspace folder active contents
          """
         params = {
-            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'parent_id': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 1,
@@ -484,23 +484,22 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/contents',
+            '/api/v2/workspaces/2/contents',
             status=200,
             params=params,
         ).json_body   # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
         raise NotImplementedError()
 
-    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):
         """
          Check obtain workspace folder archived contents
          """
         params = {
-            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
-            'show_archived': 0,
+            'parent_id': 10,
+            'show_archived': 1,
             'show_deleted': 0,
-            'show_active': 1,
+            'show_active': 0,
         }
         self.testapp.authorization = (
             'Basic',
@@ -510,23 +509,22 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/contents',
+            '/api/v2/workspaces/2/contents',
             status=200,
             params=params,
         ).json_body   # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
         raise NotImplementedError()
 
-    @pytest.mark.xfail()
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):
         """
          Check obtain workspace folder deleted contents
          """
         params = {
-            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'parent_id': 10,
             'show_archived': 0,
-            'show_deleted': 0,
-            'show_active': 1,
+            'show_deleted': 1,
+            'show_active': 0,
         }
         self.testapp.authorization = (
             'Basic',
@@ -536,7 +534,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/contents',
+            '/api/v2/workspaces/2/contents',
             status=200,
             params=params,
         ).json_body   # nopep8
@@ -549,7 +547,7 @@ class TestWorkspaceContents(FunctionalTest):
         (archived, deleted, active) result should be empty list.
         """
         params = {
-            'parent_id': 2,  # TODO - G.M - 30-05-2018 - Find a real id
+            'parent_id': 10,
             'show_archived': 0,
             'show_deleted': 0,
             'show_active': 0,
@@ -562,7 +560,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/contents',
+            '/api/v2/workspaces/2/contents',
             status=200,
             params=params,
         ).json_body   # nopep8

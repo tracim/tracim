@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 import os
 
-from operator import itemgetter
+from operator import itemgetter, not_
 
 import transaction
 from sqlalchemy import func
@@ -241,6 +241,11 @@ class ContentApi(object):
     def _base_query(self, workspace: Workspace=None) -> Query:
         result = self.__real_base_query(workspace)
 
+        if not self._show_active:
+            result = result.filter(or_(
+                Content.is_deleted==True,
+                Content.is_archived==True,
+            ))
         if not self._show_deleted:
             result = result.filter(Content.is_deleted==False)
 
@@ -249,9 +254,6 @@ class ContentApi(object):
 
         if not self._show_temporary:
             result = result.filter(Content.is_temporary==False)
-
-        if not self._show_active:
-            result = result.filter(Content.is_active==False)
 
         return result
 
