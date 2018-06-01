@@ -58,6 +58,7 @@ def main(global_config, **settings):
     hapic.set_context(context)
     context.handle_exception(NotFound, 404)
     context.handle_exception(OperationalError, 500)
+    context.handle_exception(Exception, 500)
     # Add controllers
     session_api = SessionController()
     configurator.include(session_api.bind, route_prefix=BASE_API_V2)
