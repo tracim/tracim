@@ -40,9 +40,11 @@ class UserController(Controller):
             session=request.dbsession,
             config=app_config,
         )
+        
+        workspaces = wapi.get_all_for_user(request.candidate_user)
         return [
             WorkspaceInContext(workspace, request.dbsession, app_config)
-            for workspace in wapi.get_all_for_user(request.candidate_user)
+            for workspace in workspaces
         ]
 
     def bind(self, configurator: Configurator) -> None:
