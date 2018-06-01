@@ -11,13 +11,14 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim import hapic, TracimRequest
-from tracim.exceptions import NotAuthentificated, InsufficientUserProfile, \
-    UserNotExist
+from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import InsufficientUserProfile
+from tracim.exceptions import UserNotExist
 from tracim.lib.core.user import UserApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.views.controllers import Controller
-from tracim.views.core_api.schemas import UserIdPathSchema, \
-    WorkspaceDigestSchema
+from tracim.views.core_api.schemas import UserIdPathSchema
+from tracim.views.core_api.schemas import WorkspaceDigestSchema
 
 
 class UserController(Controller):
