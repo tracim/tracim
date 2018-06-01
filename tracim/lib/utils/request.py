@@ -5,7 +5,8 @@ TracimRequest and related functions
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim.exceptions import NotAuthentificated, UserNotExist
+from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import UserNotExist
 from tracim.exceptions import WorkspaceNotFound
 from tracim.exceptions import ImmutableAttribute
 from tracim.lib.core.user import UserApi
