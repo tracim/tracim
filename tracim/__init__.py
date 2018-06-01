@@ -53,7 +53,8 @@ def main(global_config, **settings):
     # set Hapic
     context = PyramidContext(
         configurator=configurator,
-        default_error_builder=ErrorSchema()
+        default_error_builder=ErrorSchema(),
+        debug=app_config.DEBUG,
     )
     hapic.set_context(context)
     context.handle_exception(NotFound, 404)
