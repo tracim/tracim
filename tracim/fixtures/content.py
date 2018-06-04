@@ -200,4 +200,40 @@ class Content(Fixture):
             content_api.delete(bad_fruit_salad)
         content_api.save(bad_fruit_salad)
 
+        # File at the root for test
+        new_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=other_workspace,
+            label='New Fruit Salad',
+            do_save=True,
+        )
+        old_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=other_workspace,
+            label='Fruit Salad',
+            do_save=True,
+        )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=old_fruit_salad,
+        ):
+            content_api.archive(old_fruit_salad)
+        content_api.save(old_fruit_salad)
+
+        bad_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=other_workspace,
+            label='Bad Fruit Salad',
+            do_save=True,
+        )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=bad_fruit_salad,
+        ):
+            content_api.delete(bad_fruit_salad)
+        content_api.save(bad_fruit_salad)
+
+
         self._session.flush()
