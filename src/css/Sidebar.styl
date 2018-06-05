@@ -27,7 +27,6 @@ sidebar-animate-speed = 0.5s
   top 87px
 
 leftside()
-  flex-grow 0
   height 100%
   font-size 18px
   background-color rgba(253, 253, 253, 0.3)
@@ -83,12 +82,12 @@ leftside()
           &:hover
             background-color fifthColor
         &__number
+          display flex
           leftside()
           padding 12px
           width 50px
           letter-spacing 2px
         &__name
-          flex-grow 2
           padding 10px
           font-size 20px
           color off-white
@@ -96,8 +95,7 @@ leftside()
           overflow hidden
           text-overflow ellipsis
         &__icon
-          flex-grow 0
-          padding 10px
+          margin 0 10px 0 auto
           color white
         &__submenu
           margin 0

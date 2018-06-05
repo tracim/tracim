@@ -15,9 +15,15 @@ const MenuProfil = props => {
             </div>
           </button>
           <div className='profilgroup__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
-            <Link className='setting__link dropdown-item' to={PAGE.ACCOUNT}>Mon compte</Link>
+            <Link className='setting__link dropdown-item' to={PAGE.ACCOUNT}>
+              <i className='fa fa-fw fa-user-o mr-2' />
+              Mon compte
+            </Link>
             {/* <div className='setting__link dropdown-item'>Mot de passe</div> */}
-            <div className='setting__link dropdown-item' onClick={props.onClickLogout}>Se déconnecter</div>
+            <div className='setting__link dropdown-item' onClick={props.onClickLogout}>
+              <i className='fa fa-fw fa-sign-out mr-2' />
+              Se déconnecter
+            </div>
           </div>
         </div>
       </li>

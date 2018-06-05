@@ -99,7 +99,7 @@
   }],
   "workspace_detail": {
     "id": 1,
-    "title": "Liste des contenus",
+    "title": "Tous les contenus",
     "owner_id": 5,
     "content": [
       {
@@ -218,7 +218,7 @@
       "day": "27/11/17",
       "hour": "11h45"
     },
-    "text": "Voici le début de ce qui nous servira de cachier des charges pour la partie design du logiciel, chacun peut completer le documents, nésité pas à faire des retours ! "
+    "text": "Voici le début de ce qui nous servira de cachier des charges pour la partie design du logiciel, chacun peut completer le documents, n'hésité pas à faire des retours ! "
   }, {
     "id": 1,
     "type": "message",
@@ -249,8 +249,8 @@
     "id": 3,
     "type": "version",
     "author": {
-      "id": 1,
-      "username": "smoi",
+      "id": 5,
+      "username": "stoi",
       "avatar": "https://www.algoo.fr/static/images/algoo_images/algoo-logo.jpg"
     },
     "createdAt": {
