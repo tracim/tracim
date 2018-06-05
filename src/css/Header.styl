@@ -1,7 +1,7 @@
 .header
   position fixed
   width 100%
-  box-shadow shadow-bottom
+  border-bottom 1px solid grey
   z-index 5
   &__logo
     &__img
@@ -69,6 +69,7 @@
             color darkGrey
       &__itemprofil
         .profilgroup
+          margin-right 30px
           &__name
             border 0
             padding 0 5px
@@ -105,6 +106,22 @@
             .setting__link
               padding 10px
               color fontColor
+      &__itemnotification
+        &__timeline
+          margin-right 30px
+          .timeline
+            &__btnnotif
+              color darkGrey
+              &::after
+                margin-left 15px
+            &__subdropdown
+              padding 0
+              left inherit
+              right 0
+              cursor pointer
+              &__text
+                padding 10px;
+
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .header

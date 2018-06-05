@@ -10,6 +10,7 @@ import MenuActionListItemSearch from '../component/Header/MenuActionListItem/Sea
 import MenuActionListItemDropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
 import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
+import MenuActionListItemNotification from '../component/Header/MenuActionListItem/Notification.jsx'
 import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
@@ -83,6 +84,8 @@ class Header extends React.Component {
                 user={user}
                 onClickLogout={this.handleClickLogout}
               />
+
+              <MenuActionListItemNotification />
             </ul>
 
           </div>
