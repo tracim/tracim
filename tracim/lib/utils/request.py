@@ -5,7 +5,7 @@ TracimRequest and related functions
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim.exceptions import NotAuthentificated, UserNotExist
+from tracim.exceptions import NotAuthentificated, UserDoesNotExist
 from tracim.exceptions import WorkspaceNotFound
 from tracim.exceptions import ImmutableAttribute
 from tracim.lib.core.user import UserApi
@@ -142,7 +142,7 @@ def get_candidate_user(
         if 'user_id' in request.matchdict:
             login = request.matchdict['user_id']
         if not login:
-            raise UserNotExist('no user_id found, incorrect request ?')
+            raise UserDoesNotExist('no user_id found, incorrect request ?')
         user = uapi.get_one(login)
     except NoResultFound:
         raise NotAuthentificated('User not found')

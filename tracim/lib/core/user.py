@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from tracim import CFG
 from tracim.models.auth import User, Group
 from sqlalchemy.orm.exc import NoResultFound
-from tracim.exceptions import WrongUserPassword, UserNotExist
+from tracim.exceptions import WrongUserPassword, UserDoesNotExist
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.context_models import UserInContext
 
@@ -48,8 +48,8 @@ class UserApi(object):
         """
         try:
             user = self._base_query().filter(User.user_id == user_id).one()
-        except NoResultFound:
-            raise UserNotExist()
+        except NoResultFound as exc:
+            raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc  # nopep8
         return user
 
     def get_one_by_email(self, email: str) -> User:
@@ -60,8 +60,8 @@ class UserApi(object):
         """
         try:
             user = self._base_query().filter(User.email == email).one()
-        except NoResultFound:
-            raise UserNotExist()
+        except NoResultFound as exc:
+            raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc  # nopep8
         return user
 
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
@@ -73,7 +73,7 @@ class UserApi(object):
         Get current_user
         """
         if not self._user:
-            raise UserNotExist()
+            raise UserDoesNotExist()
         return self._user
 
     def get_all(self) -> typing.Iterable[User]:
@@ -103,7 +103,7 @@ class UserApi(object):
                 return user
             else:
                 raise WrongUserPassword()
-        except (WrongUserPassword, NoResultFound, UserNotExist):
+        except (WrongUserPassword, UserDoesNotExist):
             raise AuthenticationFailed()
 
     # Actions
