@@ -73,7 +73,7 @@ class UserApi(object):
         Get current_user
         """
         if not self._user:
-            raise UserDoesNotExist()
+            raise UserDoesNotExist('There is no current user')
         return self._user
 
     def get_all(self) -> typing.Iterable[User]:
@@ -102,9 +102,9 @@ class UserApi(object):
             if user.validate_password(password):
                 return user
             else:
-                raise WrongUserPassword()
-        except (WrongUserPassword, UserDoesNotExist):
-            raise AuthenticationFailed()
+                raise WrongUserPassword('User "{}" password is incorrect'.format(email))  # nopep8
+        except (WrongUserPassword, UserDoesNotExist) as exc:
+            raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
 
     # Actions
 
