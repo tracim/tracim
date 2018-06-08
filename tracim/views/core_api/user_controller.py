@@ -11,13 +11,14 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim import hapic, TracimRequest
-from tracim.exceptions import NotAuthentificated, InsufficientUserProfile, \
-    UserDoesNotExist
-from tracim.lib.core.user import UserApi
+
+from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import InsufficientUserProfile
+from tracim.exceptions import UserDoesNotExist
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.views.controllers import Controller
-from tracim.views.core_api.schemas import UserIdPathSchema, \
-    WorkspaceDigestSchema
+from tracim.views.core_api.schemas import UserIdPathSchema
+from tracim.views.core_api.schemas import WorkspaceDigestSchema
 
 
 class UserController(Controller):
@@ -39,9 +40,11 @@ class UserController(Controller):
             session=request.dbsession,
             config=app_config,
         )
+        
+        workspaces = wapi.get_all_for_user(request.candidate_user)
         return [
             WorkspaceInContext(workspace, request.dbsession, app_config)
-            for workspace in wapi.get_all_for_user(request.candidate_user)
+            for workspace in workspaces
         ]
 
     def bind(self, configurator: Configurator) -> None:

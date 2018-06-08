@@ -7,7 +7,8 @@ import typing as typing
 from sqlalchemy.orm import Session
 
 from tracim import CFG
-from tracim.models.auth import User, Group
+from tracim.models.auth import User
+from tracim.models.auth import Group
 from sqlalchemy.orm.exc import NoResultFound
 from tracim.exceptions import WrongUserPassword, UserDoesNotExist
 from tracim.exceptions import AuthenticationFailed

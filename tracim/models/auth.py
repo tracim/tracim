@@ -91,15 +91,19 @@ class Group(DeclarativeBase):
 class Profile(object):
     """This model is the "max" group associated to a given user."""
 
-    _NAME = [Group.TIM_NOBODY_GROUPNAME,
-             Group.TIM_USER_GROUPNAME,
-             Group.TIM_MANAGER_GROUPNAME,
-             Group.TIM_ADMIN_GROUPNAME]
+    _NAME = [
+        Group.TIM_NOBODY_GROUPNAME,
+        Group.TIM_USER_GROUPNAME,
+        Group.TIM_MANAGER_GROUPNAME,
+        Group.TIM_ADMIN_GROUPNAME,
+    ]
 
-    _IDS = [Group.TIM_NOBODY,
-            Group.TIM_USER,
-            Group.TIM_MANAGER,
-            Group.TIM_ADMIN]
+    _IDS = [
+        Group.TIM_NOBODY,
+        Group.TIM_USER,
+        Group.TIM_MANAGER,
+        Group.TIM_ADMIN,
+    ]
 
     # TODO - G.M - 18-04-2018 [Cleanup] Drop this
     # _LABEL = [l_('Nobody'),
