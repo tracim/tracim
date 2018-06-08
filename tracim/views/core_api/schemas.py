@@ -69,17 +69,6 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
     icon = marshmallow.fields.String()
 
 
-class WorkspaceSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int()
-    slug = marshmallow.fields.String()
-    label = marshmallow.fields.String()
-    description = marshmallow.fields.String()
-    sidebar_entries = marshmallow.fields.Nested(
-        WorkspaceMenuEntrySchema,
-        many=True,
-    )
-
-
 class WorkspaceDigestSchema(marshmallow.Schema):
     id = marshmallow.fields.Int()
     label = marshmallow.fields.String()
@@ -87,6 +76,11 @@ class WorkspaceDigestSchema(marshmallow.Schema):
         WorkspaceMenuEntrySchema,
         many=True,
     )
+
+
+class WorkspaceSchema(WorkspaceDigestSchema):
+    slug = marshmallow.fields.String()
+    description = marshmallow.fields.String()
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
