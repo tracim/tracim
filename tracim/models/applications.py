@@ -25,7 +25,6 @@ class Application(object):
         self.main_route = main_route
 
 
-# TODO - G.M - 21-05-2018 Do not rely on hardcoded app list
 # default apps
 calendar = Application(
     label='Calendar',
@@ -77,6 +76,7 @@ pagehtml = Application(
     config={},
     main_route='/#/workspaces/{workspace_id}/contents?type=pagehtml',
 )
+# TODO - G.M - 08-06-2018 - This is hardcoded lists of app, make this dynamic.
 # List of applications
 applications = [
     pagehtml,

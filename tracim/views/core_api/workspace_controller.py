@@ -79,8 +79,8 @@ class WorkspaceController(Controller):
 
     def bind(self, configurator: Configurator) -> None:
         """
-        Create all routes and views using pyramid configurator
-        for this controller
+        Create all routes and views using
+        pyramid configurator for this controller
         """
 
         # Applications
