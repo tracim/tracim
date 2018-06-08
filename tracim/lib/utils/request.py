@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import UserNotFoundInTracimRequest
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspaceNotFound
 from tracim.exceptions import ImmutableAttribute
@@ -144,10 +145,10 @@ def get_candidate_user(
         if 'user_id' in request.matchdict:
             login = request.matchdict['user_id']
         if not login:
-            raise UserDoesNotExist('no user_id found, incorrect request ?')
+            raise UserNotFoundInTracimRequest('You request a candidate user but the context not permit to found one')  # nopep8
         user = uapi.get_one(login)
-    except NoResultFound:
-        raise NotAuthentificated('User not found')
+    except UserNotFoundInTracimRequest as exc:
+        raise UserDoesNotExist('User {} not found'.format(login)) from exc
     return user
 
 
@@ -164,11 +165,10 @@ def get_auth_safe_user(
     try:
         login = request.authenticated_userid
         if not login:
-            raise NotAuthentificated('not authenticated user_id,'
-                                     'Failed Authentification ?')
+            raise UserNotFoundInTracimRequest('You request a current user but the context not permit to found one')  # nopep8
         user = uapi.get_one_by_email(login)
-    except NoResultFound:
-        raise NotAuthentificated('User not found')
+    except (UserDoesNotExist, UserNotFoundInTracimRequest) as exc:
+        raise NotAuthentificated('User {} not found'.format(login)) from exc
     return user
 
 
