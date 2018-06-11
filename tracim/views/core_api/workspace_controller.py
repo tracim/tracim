@@ -1,7 +1,7 @@
 import typing
 
+import transaction
 from pyramid.config import Configurator
-
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -12,7 +12,7 @@ from tracim.lib.core.workspace import WorkspaceApi
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.userworkspace import RoleApi
 from tracim.lib.utils.authorization import require_workspace_role
-from tracim.models.data import UserRoleInWorkspace
+from tracim.models.data import UserRoleInWorkspace, ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
 from tracim.exceptions import NotAuthentificated
@@ -20,10 +20,16 @@ from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import WorkspaceNotFound
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FilterContentQuerySchema
+from tracim.views.core_api.schemas import ContentMoveSchema
+from tracim.views.core_api.schemas import NoContentSchema
+from tracim.views.core_api.schemas import ContentCreationSchema
+from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import ContentDigestSchema
 from tracim.views.core_api.schemas import WorkspaceSchema
 from tracim.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim.views.core_api.schemas import WorkspaceMemberSchema
+from tracim.models.data import ContentType
+from tracim.models.revision_protection import new_revision
 
 
 class WorkspaceController(Controller):
@@ -113,6 +119,218 @@ class WorkspaceController(Controller):
         ]
         return contents
 
+    @hapic.with_api_doc()
+    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.input_body(ContentCreationSchema())
+    @hapic.output_body(ContentDigestSchema())
+    def create_generic_empty_content(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> typing.List[ContentInContext]:
+        """
+        create a generic empty content
+        """
+        app_config = request.registry.settings['CFG']
+        creation_data = hapic_data.body
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.create(
+            label=creation_data.label,
+            content_type=creation_data.content_type_slug,
+            workspace=request.current_workspace,
+        )
+        api.save(content, ActionDescription.CREATION)
+        content = api.get_content_in_context(content)
+        return content
+
+    @hapic.with_api_doc()
+    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_body(ContentMoveSchema())
+    @hapic.output_body(NoContentSchema())
+    def move_content(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> typing.List[ContentInContext]:
+        """
+        move a content
+        """
+        app_config = request.registry.settings['CFG']
+        path_data = hapic_data.path
+        move_data = hapic_data.body
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            path_data.content_id,
+            content_type=ContentType.Any
+        )
+        new_parent = api.get_one(
+            move_data.new_parent_id, content_type=ContentType.Any
+        )
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.move(content, new_parent=new_parent)
+        return
+
+    @hapic.with_api_doc()
+    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema())
+    def delete_content(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> typing.List[ContentInContext]:
+        """
+        delete a content
+        """
+        app_config = request.registry.settings['CFG']
+        path_data = hapic_data.path
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            path_data.content_id,
+            content_type=ContentType.Any
+        )
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.delete(content)
+        return
+
+    @hapic.with_api_doc()
+    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema())
+    def undelete_content(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> typing.List[ContentInContext]:
+        """
+        undelete a content
+        """
+        app_config = request.registry.settings['CFG']
+        path_data = hapic_data.path
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+            show_deleted=True,
+        )
+        content = api.get_one(
+            path_data.content_id,
+            content_type=ContentType.Any
+        )
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.undelete(content)
+        return
+
+    @hapic.with_api_doc()
+    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema())
+    def archive_content(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> typing.List[ContentInContext]:
+        """
+        archive a content
+        """
+        app_config = request.registry.settings['CFG']
+        path_data = hapic_data.path
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(path_data.content_id, content_type=ContentType.Any)
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.archive(content)
+        return
+
+    @hapic.with_api_doc()
+    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema())
+    def unarchive_content(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> typing.List[ContentInContext]:
+        """
+        unarchive a content
+        """
+        app_config = request.registry.settings['CFG']
+        path_data = hapic_data.path
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+            show_archived=True,
+        )
+        content = api.get_one(
+            path_data.content_id,
+            content_type=ContentType.Any
+        )
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.unarchive(content)
+        return
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using
@@ -128,3 +346,19 @@ class WorkspaceController(Controller):
         # Workspace Content
         configurator.add_route('workspace_content', '/workspaces/{workspace_id}/contents', request_method='GET')  # nopep8
         configurator.add_view(self.workspace_content, route_name='workspace_content')  # nopep8
+        # Create Generic Content
+        configurator.add_route('create_generic_content', '/workspaces/{workspace_id}/contents', request_method='POST')  # nopep8
+        configurator.add_view(self.create_generic_empty_content, route_name='create_generic_content')  # nopep8
+        # Move Content
+        configurator.add_route('move_content', '/workspaces/{workspace_id}/contents/{content_id}/move', request_method='PUT')  # nopep8
+        configurator.add_view(self.move_content, route_name='move_content')  # nopep8
+        # Delete/Undelete Content
+        configurator.add_route('delete_content', '/workspaces/{workspace_id}/contents/{content_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_view(self.delete_content, route_name='delete_content')  # nopep8
+        configurator.add_route('undelete_content', '/workspaces/{workspace_id}/contents/{content_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_view(self.undelete_content, route_name='undelete_content')  # nopep8
+        # # Archive/Unarchive Content
+        configurator.add_route('archive_content', '/workspaces/{workspace_id}/contents/{content_id}/archive', request_method='PUT')  # nopep8
+        configurator.add_view(self.archive_content, route_name='archive_content')  # nopep8
+        configurator.add_route('unarchive_content', '/workspaces/{workspace_id}/contents/{content_id}/unarchive', request_method='PUT')  # nopep8
+        configurator.add_view(self.unarchive_content, route_name='unarchive_content')  # nopep8

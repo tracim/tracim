@@ -13,6 +13,14 @@ from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
 
 
+class MoveParams(object):
+    """
+    Json body params for move action
+    """
+    def __init__(self, new_parent_id: str):
+        self.new_parent_id = new_parent_id
+
+
 class LoginCredentials(object):
     """
     Login credentials model for login
@@ -23,20 +31,43 @@ class LoginCredentials(object):
         self.password = password
 
 
+class WorkspaceAndContentPath(object):
+    """
+    Paths params with workspace id and content_id
+    """
+    def __init__(self, workspace_id: int, content_id: int):
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+
+
 class ContentFilter(object):
     """
     Content filter model
     """
-    def __init__(self,
-                 parent_id: int = None,
-                 show_archived: int = 0,
-                 show_deleted: int = 0,
-                 show_active: int = 1,
-                 ):
+    def __init__(
+            self,
+            parent_id: int = None,
+            show_archived: int = 0,
+            show_deleted: int = 0,
+            show_active: int = 1,
+    ):
         self.parent_id = parent_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
+
+
+class ContentCreation(object):
+    """
+    Content creation model
+    """
+    def __init__(
+            self,
+            label: str,
+            content_type_slug: str,
+    ):
+        self.label = label
+        self.content_type_slug = content_type_slug
 
 
 class UserInContext(object):

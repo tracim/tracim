@@ -727,3 +727,136 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
+
+    def test_api__post_content_create_generic_content__ok_200__nominal_case(self) -> None:
+        """
+        Create generic content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedContent',
+            'content_type_slug': 'markdownpage',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        assert res
+        assert res.json_body
+        assert res.json_body['status_slug'] == 'open'
+        assert res.json_body['id']
+        assert res.json_body['content_type_slug'] == 'markdownpage'
+        assert res.json_body['is_archived'] is False
+        assert res.json_body['is_deleted'] is False
+        assert res.json_body['workspace_id'] == 1
+        assert res.json_body['slug'] == 'genericcreatedcontent'
+        assert res.json_body['parent_id'] is None
+        assert res.json_body['show_in_ui'] is True
+        assert res.json_body['sub_content_type_slug']
+
+    def test_api_put_move_content__ok_200__nominal_case(self):
+        """
+        Move content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'new_parent_id': '4',  # Salads
+        }
+        # TODO - G.M - 2018-06-163 - Check content
+        res = self.testapp.put_json(
+            # INFO - G.M - 2018-06-163 - move Apple_Pie
+            # from Desserts to Salads subfolder of workspace Recipes
+            '/api/v2/workspaces/2/contents/8/move',
+            params=params,
+            status=200
+        )
+        # TODO - G.M - 2018-06-163 - Recheck content
+
+    def test_api_put_delete_content__ok_200__nominal_case(self):
+        """
+        Move content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # TODO - G.M - 2018-06-163 - Check content
+        res = self.testapp.put_json(
+            # INFO - G.M - 2018-06-163 - delete Apple_Pie
+            '/api/v2/workspaces/2/contents/8/delete',
+            status=200
+        )
+        # TODO - G.M - 2018-06-163 - Recheck content
+
+    def test_api_put_archive_content__ok_200__nominal_case(self):
+        """
+        archive content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # TODO - G.M - 2018-06-163 - Check content
+        res = self.testapp.put_json(
+            # INFO - G.M - 2018-06-163 - archive Apple_Pie
+            '/api/v2/workspaces/2/contents/8/archive',
+            status=200
+        )
+        # TODO - G.M - 2018-06-163 - Recheck content
+
+    def test_api_put_undelete_content__ok_200__nominal_case(self):
+        """
+        Delete content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        # TODO - G.M - 2018-06-163 - Check content
+        res = self.testapp.put_json(
+            # INFO - G.M - 2018-06-163 - delete Apple_Pie
+            '/api/v2/workspaces/2/contents/14/undelete',
+            status=200
+        )
+        # TODO - G.M - 2018-06-163 - Recheck content
+
+    def test_api_put_unarchive_content__ok_200__nominal_case(self):
+        """
+        Delete content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        # TODO - G.M - 2018-06-163 - Check content
+        res = self.testapp.put_json(
+            # INFO - G.M - 2018-06-163 - delete Apple_Pie
+            '/api/v2/workspaces/2/contents/13/unarchive',
+            status=200
+        )
+        # TODO - G.M - 2018-06-163 - Recheck content

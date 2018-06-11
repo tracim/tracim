@@ -4,8 +4,15 @@ from marshmallow import post_load
 from marshmallow.validate import OneOf
 
 from tracim.models.auth import Profile
-from tracim.models.contents import CONTENT_DEFAULT_TYPE, GlobalStatus, CONTENT_DEFAULT_STATUS
-from tracim.models.context_models import LoginCredentials, ContentFilter
+from tracim.models.contents import CONTENT_DEFAULT_TYPE
+from tracim.models.contents import CONTENT_DEFAULT_STATUS
+from tracim.models.contents import GlobalStatus
+from tracim.models.contents import open_status
+from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import MoveParams
+from tracim.models.context_models import WorkspaceAndContentPath
+from tracim.models.context_models import ContentFilter
+from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
 
 
@@ -82,7 +89,9 @@ class ContentIdPathSchema(marshmallow.Schema):
 
 
 class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema):
-    pass
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndContentPath(**data)
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
@@ -292,6 +301,10 @@ class ContentMoveSchema(marshmallow.Schema):
         description='id of the new parent content id.'
     )
 
+    @post_load
+    def make_move_params(self, data):
+        return MoveParams(**data)
+
 
 class ContentCreationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
@@ -300,8 +313,12 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type_slug = marshmallow.fields.String(
         example='htmlpage',
-        validate=OneOf(CONTENT_DEFAULT_TYPE),
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
+
+    @post_load
+    def make_content_filter(self, data):
+        return ContentCreation(**data)
 
 
 class ContentDigestSchema(marshmallow.Schema):
@@ -330,9 +347,10 @@ class ContentDigestSchema(marshmallow.Schema):
         example='closed-deprecated',
         validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
         description='this slug is found in content_type available statuses',
+        default=open_status
     )
-    is_archived = marshmallow.fields.Bool(example=False)
-    is_deleted = marshmallow.fields.Bool(example=False)
+    is_archived = marshmallow.fields.Bool(example=False, default=False)
+    is_deleted = marshmallow.fields.Bool(example=False, default=False)
     show_in_ui = marshmallow.fields.Bool(
         example=True,
         description='if false, then do not show content in the treeview. '
