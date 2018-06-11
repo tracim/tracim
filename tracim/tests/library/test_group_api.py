@@ -1,7 +1,7 @@
 # coding=utf-8
 import pytest
 
-from tracim.exceptions import GroupNotExist
+from tracim.exceptions import GroupDoesNotExist
 from tracim.lib.core.group import GroupApi
 from tracim.tests import DefaultTest
 from tracim.fixtures.users_and_groups import Base as BaseFixture
@@ -33,7 +33,7 @@ class TestGroupApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        with pytest.raises(GroupNotExist):
+        with pytest.raises(GroupDoesNotExist):
             group = api.get_one(10)
 
     def test_unit__get_one_group_with_name__nominal_case(self) -> None:
@@ -58,7 +58,7 @@ class TestGroupApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        with pytest.raises(GroupNotExist):
+        with pytest.raises(GroupDoesNotExist):
             group = api.get_one_with_name('unknown_group')
 
     def test_unit__get_all__ok__nominal_case(self):

@@ -8,8 +8,8 @@ from tracim import CFG
 from tracim.models import User
 from tracim.models.auth import Profile
 from tracim.models.data import Workspace, UserRoleInWorkspace
-from tracim.models.workspace_menu_entries import default_workspace_menu_entry, \
-    WorkspaceMenuEntry
+from tracim.models.workspace_menu_entries import default_workspace_menu_entry
+from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
 
 
 class LoginCredentials(object):

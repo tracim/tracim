@@ -24,7 +24,6 @@ class WorkspaceMenuEntry(object):
         self.hexcolor = hexcolor
         self.icon = icon
 
-
 dashboard_menu_entry = WorkspaceMenuEntry(
   slug='dashboard',
   label='Dashboard',
@@ -40,7 +39,8 @@ all_content_menu_entry = WorkspaceMenuEntry(
   icon="",
 )
 
-
+# TODO - G.M - 08-06-2018 - This is hardcoded default menu entry,
+#  of app, make this dynamic (and loaded from application system)
 def default_workspace_menu_entry(
     workspace: Workspace,
 )-> typing.List[WorkspaceMenuEntry]:

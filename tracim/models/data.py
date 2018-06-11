@@ -131,13 +131,13 @@ class UserRoleInWorkspace(DeclarativeBase):
     WORKSPACE_MANAGER = 8
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-
-    SLUG = dict()
-    SLUG[NOT_APPLICABLE] = 'not_applicable'
-    SLUG[READER] = 'reader'
-    SLUG[CONTRIBUTOR] = 'contributor'
-    SLUG[CONTENT_MANAGER] = 'content_manager'
-    SLUG[WORKSPACE_MANAGER] = 'workspace_manager'
+    SLUG = {
+        NOT_APPLICABLE: 'not_applicable',
+        READER: 'reader',
+        CONTRIBUTOR: 'contributor',
+        CONTENT_MANAGER: 'content_manager',
+        WORKSPACE_MANAGER: 'workspace_manager',
+    }
 
     LABEL = dict()
     LABEL[0] = l_('N/A')

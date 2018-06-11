@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import subprocess
-
 import pytest
-import transaction
-from pkg_resources import load_entry_point
-from sqlalchemy.orm.exc import NoResultFound
-
 import tracim
 from tracim.command import TracimCLI
-from tracim.command.user import UserCommand
-from tracim.exceptions import UserAlreadyExistError, BadCommandError, \
-    GroupNotExist, UserNotExist
+from tracim.exceptions import UserAlreadyExistError
+from tracim.exceptions import BadCommandError
+from tracim.exceptions import GroupDoesNotExist
+from tracim.exceptions import UserDoesNotExist
 from tracim.lib.core.user import UserApi
 from tracim.tests import CommandFunctionalTest
 
@@ -48,7 +44,7 @@ class TestCommands(CommandFunctionalTest):
             session=self.session,
             config=self.app_config,
         )
-        with pytest.raises(UserNotExist):
+        with pytest.raises(UserDoesNotExist):
             api.get_one_by_email('command_test@user')
         app = TracimCLI()
         result = app.run([
@@ -72,7 +68,7 @@ class TestCommands(CommandFunctionalTest):
             session=self.session,
             config=self.app_config,
         )
-        with pytest.raises(UserNotExist):
+        with pytest.raises(UserDoesNotExist):
             api.get_one_by_email('command_test@user')
         app = TracimCLI()
         result = app.run([
@@ -98,7 +94,7 @@ class TestCommands(CommandFunctionalTest):
             config=self.app_config,
         )
         app = TracimCLI()
-        with pytest.raises(GroupNotExist):
+        with pytest.raises(GroupDoesNotExist):
             result = app.run([
                 'user', 'create',
                 '-c', 'tests_configs.ini#command_test',

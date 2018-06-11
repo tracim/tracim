@@ -12,7 +12,7 @@ from tracim.command import Extender
 #from tracim.lib.daemons import DaemonsManager
 #from tracim.lib.daemons import RadicaleDaemon
 #from tracim.lib.email import get_email_manager
-from tracim.exceptions import UserAlreadyExistError, GroupNotExist
+from tracim.exceptions import UserAlreadyExistError, GroupDoesNotExist
 from tracim.exceptions import NotificationNotSend
 from tracim.exceptions import BadCommandError
 from tracim.lib.core.group import GroupApi
@@ -93,7 +93,7 @@ class UserCommand(AppContextCommand):
             for group in groups_availables:
                 msg+= "'{}',".format(group)
             self._session.rollback()
-            raise GroupNotExist(msg)
+            raise GroupDoesNotExist(msg)
         return self._group_api.get_one_with_name(name)
 
     def _add_user_to_named_group(

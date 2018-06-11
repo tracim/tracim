@@ -89,13 +89,17 @@ class WrongUserPassword(TracimException):
     pass
 
 
-class UserNotExist(TracimException):
-    pass
-
-
 class NotificationNotSend(TracimException):
     pass
 
 
-class GroupNotExist(TracimError):
+class GroupDoesNotExist(TracimError):
+    pass
+
+
+class UserDoesNotExist(TracimException):
+    pass
+
+
+class UserNotFoundInTracimRequest(TracimException):
     pass
