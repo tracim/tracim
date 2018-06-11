@@ -38,14 +38,14 @@
     <table style="width: 100%; cell-padding: 0; border-collapse: collapse; margin: 0">
       <tr style="background-color: F5F5F5; border-bottom: 1px solid #CCC;" >
         <td style="background-color: #666;">
-            <!-- FIXME - G.M - 09-06-2018 - restore logo -->
+            <img alt="logo" src="${logo_url}" style="vertical-align: middle;">
         </td>
         <td style="padding: 0.5em; background-color: #666; text-align: left;">
           <span style="font-size: 1.3em; color: #FFF; font-weight: bold;">
             ${main_title}
             &mdash;&nbsp;<span style="font-weight: bold; color: #999; font-weight: bold;">
-              ${status|n}
-              <!-- FIXME - G.M - 09-06-2018 - restore icon -->
+              ${status_label|n}
+              <img alt="status_icon" src="${status_icon_url}" style="vertical-align: middle;">
             </span>
         </td>
       </tr>
@@ -54,15 +54,14 @@
     <p id="content-intro">${content_intro|n}</p>
     <div id="content-body">
         <div>${content_text|n}</div>
-        <!-- FIXME - G.M - 09-06-2018 - fix action url -->
         <div href='' id="call-to-action-container">
         </div>
     </div>
     
     <div id="footer">
         <p>
-            <!-- FIXME - G.M - 09-06-2018 - Set correct workspace url -->
-            ${_('{user_display_name}, you receive this email because you are registered on <i>{website_title}</i> and you are <i>{user_role_label}</i> in the workspace <a href="{workspace_url}">{workspace_label}</a>.').format(user_display_name=user.display_name, user_role_label=role, workspace_url='', workspace_label=workspace.label, website_title=config.WEBSITE_TITLE)|n}
+
+            ${_('{user_display_name}, you receive this email because you are registered on <i>{website_title}</i> and you are <i>{user_role_label}</i> in the workspace <a href="{workspace_url}">{workspace_label}</a>.').format(user_display_name=user.display_name, user_role_label=role_label, workspace_url=workspace_url, workspace_label=workspace.label, website_title=config.WEBSITE_TITLE)|n}
         </p>
         <hr/>
         <p>
