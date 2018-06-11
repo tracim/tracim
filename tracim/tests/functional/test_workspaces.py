@@ -48,16 +48,16 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['icon'] == ""
 
         sidebar_entry = workspace['sidebar_entries'][2]
-        assert sidebar_entry['slug'] == 'contents/pagehtml'
+        assert sidebar_entry['slug'] == 'contents/htmlpage'
         assert sidebar_entry['label'] == 'Text Documents'
-        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=pagehtml'  # nopep8
+        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=htmlpage'  # nopep8
         assert sidebar_entry['hexcolor'] == "#3f52e3"
         assert sidebar_entry['icon'] == "file-text-o"
 
         sidebar_entry = workspace['sidebar_entries'][3]
-        assert sidebar_entry['slug'] == 'contents/pagemarkdownplus'
-        assert sidebar_entry['label'] == 'Rich Markdown Files'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=pagemarkdownplus"    # nopep8
+        assert sidebar_entry['slug'] == 'contents/markdownpluspage'
+        assert sidebar_entry['label'] == 'Markdown Plus Documents'
+        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=markdownpluspage"    # nopep8
         assert sidebar_entry['hexcolor'] == "#f12d2d"
         assert sidebar_entry['icon'] == "file-code"
 
