@@ -6,6 +6,7 @@ from waitress import serve
 
 from tracim.command import AppContextCommand
 from tracim.lib.webdav import WebdavAppFactory
+from wsgi import webdav_app
 
 
 class WebdavRunnerCommand(AppContextCommand):
@@ -22,8 +23,5 @@ class WebdavRunnerCommand(AppContextCommand):
         super(WebdavRunnerCommand, self).take_action(parsed_args)
         tracim_config = parsed_args.config_file
         # TODO - G.M - 16-04-2018 - Allow specific webdav config file
-        app_factory = WebdavAppFactory(
-            tracim_config_file_path=tracim_config,
-        )
-        app = app_factory.get_wsgi_app()
+        app = webdav_app(tracim_config)
         serve(app, port=app.config['port'], host=app.config['host'])

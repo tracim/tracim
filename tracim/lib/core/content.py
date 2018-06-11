@@ -376,7 +376,7 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         assert content_type in ContentType.allowed_types()
 
         if content_type == ContentType.Folder and not label:
@@ -399,7 +399,7 @@ class ContentApi(object):
 
         if do_save:
             self._session.add(content)
-            self.save(content, ActionDescription.CREATION)
+            self.save(content, ActionDescription.CREATION, do_notify=do_notify)
         return content
 
 
@@ -1127,8 +1127,9 @@ class ContentApi(object):
         :return:
         """
         NotifierFactory.create(
-            self._config,
-            self._user
+            config=self._config,
+            current_user=self._user,
+            session=self._session,
         ).notify_content_update(content)
 
     def get_keywords(self, search_string, search_string_separators=None) -> [str]:

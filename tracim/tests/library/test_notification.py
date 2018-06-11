@@ -4,18 +4,20 @@ import re
 
 
 from tracim.lib.core.notifications import DummyNotifier
-from tracim.lib.core.notifications import EmailNotifier
+
 from tracim.lib.core.notifications import NotifierFactory
+from tracim.lib.mail_notifier.notifier import EmailNotifier
 from tracim.models.auth import User
 from tracim.models.data import Content
 from tracim.tests import DefaultTest
 from tracim.tests import eq_
 
+
 class TestDummyNotifier(DefaultTest):
 
     def test_dummy_notifier__notify_content_update(self):
         c = Content()
-        notifier = DummyNotifier(self.app_config)
+        notifier = DummyNotifier(self.app_config, self.session)
         notifier.notify_content_update(c)
         # INFO - D.A. - 2014-12-09 -
         # Old notification_content_update raised an exception
