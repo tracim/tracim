@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
+
+import plaster
+import requests
 import transaction
 from depot.manager import DepotManager
 from pyramid import testing
@@ -92,16 +95,16 @@ class BaseTest(unittest.TestCase):
     Pyramid default test.
     """
 
+    config_uri = 'tests_configs.ini'
+    config_section = 'base_test'
+
     def setUp(self):
         logger.debug(self, 'Setup Test...')
-        self.config = testing.setUp(settings={
-            'sqlalchemy.url': 'sqlite:///:memory:',
-            'user.auth_token.validity': '604800',
-            'depot_storage_dir': '/tmp/test/depot',
-            'depot_storage_name': 'test',
-            'preview_cache_dir': '/tmp/test/preview_cache',
-
-        })
+        self.settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
+        self.config = testing.setUp(settings = self.settings)
         self.config.include('tracim.models')
         DepotManager._clear()
         DepotManager.configure(
@@ -225,3 +228,15 @@ class DefaultTest(StandardTest):
             owner=user
         )
         return thread
+
+
+class MailHogTest(DefaultTest):
+    """
+    Theses test need a working mailhog
+    """
+
+    config_section = 'mail_test'
+
+    def tearDown(self):
+        logger.debug(self, 'Cleanup MailHog list...')
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
