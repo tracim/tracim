@@ -93,5 +93,8 @@ class WrongUserPassword(TracimException):
     pass
 
 
-class UserNotExist(TracimException):
+class UserDoesNotExist(TracimException):
+    pass
+
+class UserNotFoundInTracimRequest(TracimException):
     pass

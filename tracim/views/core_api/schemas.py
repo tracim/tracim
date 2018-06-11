@@ -127,20 +127,6 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
         description = 'Entry element of a workspace menu'
 
 
-class WorkspaceSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int(example=4)
-    slug = marshmallow.fields.String(example='intranet')
-    label = marshmallow.fields.String(example='Intranet')
-    description = marshmallow.fields.String(example='All intranet data.')
-    sidebar_entries = marshmallow.fields.Nested(
-        WorkspaceMenuEntrySchema,
-        many=True,
-    )
-
-    class Meta:
-        description = 'Full workspace informations'
-
-
 class WorkspaceDigestSchema(marshmallow.Schema):
     id = marshmallow.fields.Int(example=4)
     label = marshmallow.fields.String(example='Intranet')
@@ -151,6 +137,14 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
     class Meta:
         description = 'Digest of workspace informations'
+
+
+class WorkspaceSchema(WorkspaceDigestSchema):
+    slug = marshmallow.fields.String(example='intranet')
+    description = marshmallow.fields.String(example='All intranet data.')
+
+    class Meta:
+        description = 'Full workspace informations'
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):

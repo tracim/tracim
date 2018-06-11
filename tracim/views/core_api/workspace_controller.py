@@ -5,8 +5,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from tracim.lib.core.userworkspace import RoleApi
 from tracim.lib.utils.authorization import require_workspace_role
-from tracim.models.context_models import WorkspaceInContext, \
-    UserRoleWorkspaceInContext
+from tracim.models.context_models import WorkspaceInContext
+from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.data import UserRoleInWorkspace
 
 try:  # Python 3.5+
@@ -15,14 +15,16 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim import hapic, TracimRequest
-from tracim.exceptions import NotAuthentificated, InsufficientUserProfile, \
-    WorkspaceNotFound
+from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import InsufficientUserProfile
+from tracim.exceptions import WorkspaceNotFound
 from tracim.lib.core.user import UserApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.views.controllers import Controller
-from tracim.views.core_api.schemas import WorkspaceSchema, UserSchema, \
-    WorkspaceIdPathSchema, WorkspaceMemberSchema
-
+from tracim.views.core_api.schemas import WorkspaceSchema
+from tracim.views.core_api.schemas import UserSchema
+from tracim.views.core_api.schemas import WorkspaceIdPathSchema
+from tracim.views.core_api.schemas import WorkspaceMemberSchema
 
 class WorkspaceController(Controller):
 
@@ -68,15 +70,17 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
+        
+        roles = rapi.get_all_for_workspace(request.current_workspace)
         return [
             rapi.get_user_role_workspace_with_context(user_role)
-            for user_role in rapi.get_all_for_workspace(request.current_workspace)
+            for user_role in roles
         ]
 
     def bind(self, configurator: Configurator) -> None:
         """
-        Create all routes and views using pyramid configurator
-        for this controller
+        Create all routes and views using
+        pyramid configurator for this controller
         """
 
         # Applications

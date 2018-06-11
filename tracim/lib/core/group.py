@@ -17,7 +17,6 @@ class GroupApi(object):
             session: Session,
             current_user: typing.Optional[User],
             config: CFG
-
     ):
         self._user = current_user
         self._session = session

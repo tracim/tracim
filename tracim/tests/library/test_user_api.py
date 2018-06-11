@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import transaction
 
-from tracim.exceptions import UserNotExist, AuthenticationFailed
+from tracim.exceptions import UserDoesNotExist, AuthenticationFailed
 from tracim.lib.core.user import UserApi
 from tracim.models import User
 from tracim.models.context_models import UserInContext
@@ -60,7 +60,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        with pytest.raises(UserNotExist):
+        with pytest.raises(UserDoesNotExist):
             api.get_one_by_email('unknown')
 
     # def test_unit__get_all__ok__nominal_case(self):
@@ -127,7 +127,7 @@ class TestUserApi(DefaultTest):
             session=self.session,
             config=self.config,
         )
-        with pytest.raises(UserNotExist):
+        with pytest.raises(UserDoesNotExist):
             api.get_current_user()
 
     def test_unit__authenticate_user___ok__nominal_case(self):
