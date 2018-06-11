@@ -12,7 +12,7 @@ except ImportError:
 
 from tracim import hapic, TracimRequest
 
-from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import UserDoesNotExist
 from tracim.lib.core.workspace import WorkspaceApi
@@ -24,7 +24,7 @@ from tracim.views.core_api.schemas import WorkspaceDigestSchema
 class UserController(Controller):
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UserDoesNotExist, HTTPStatus.NOT_FOUND)
     @require_same_user_or_profile(Group.TIM_ADMIN)

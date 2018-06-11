@@ -47,7 +47,7 @@ thread = Application(
 
 )
 
-file = Application(
+_file = Application(
     label='Files',
     slug='contents/files',
     icon='paperclip',
@@ -81,7 +81,7 @@ htmlpage = Application(
 applications = [
     htmlpage,
     markdownpluspage,
-    file,
+    _file,
     thread,
     calendar,
 ]

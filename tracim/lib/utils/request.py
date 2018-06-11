@@ -6,7 +6,7 @@ from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
 
-from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import UserNotFoundInTracimRequest
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspaceNotFound
@@ -40,11 +40,14 @@ class TracimRequest(Request):
         )
         # Current workspace, found by request headers or content
         self._current_workspace = None  # type: Workspace
+
         # Authenticated user
         self._current_user = None  # type: User
+
         # User found from request headers, content, distinct from authenticated
         # user
         self._user_candidate = None  # type: User
+
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
 
@@ -168,7 +171,7 @@ def get_auth_safe_user(
             raise UserNotFoundInTracimRequest('You request a current user but the context not permit to found one')  # nopep8
         user = uapi.get_one_by_email(login)
     except (UserDoesNotExist, UserNotFoundInTracimRequest) as exc:
-        raise NotAuthentificated('User {} not found'.format(login)) from exc
+        raise NotAuthenticated('User {} not found'.format(login)) from exc
     return user
 
 
@@ -187,7 +190,7 @@ def get_workspace(
         if 'workspace_id' in request.matchdict:
             workspace_id = request.matchdict['workspace_id']
         if not workspace_id:
-            raise WorkspaceNotFound('No workspace_id param')
+            raise WorkspaceNotFound('No workspace_id property found in request')
         wapi = WorkspaceApi(
             current_user=user,
             session=request.dbsession,

@@ -4,6 +4,8 @@ from paste.deploy.converters import asbool
 from tracim.lib.utils.logger import logger
 from depot.manager import DepotManager
 
+from tracim.models.data import ActionDescription, ContentType
+
 
 class CFG(object):
     """Object used for easy access to config file parameters."""
@@ -128,90 +130,91 @@ class CFG(object):
             '604800',
         ))
 
+        self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
         ###
         # EMAIL related stuff (notification, reply)
-        ###
-        #
-        # self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
-        #     # ActionDescription.COMMENT,
-        #     # ActionDescription.CREATION,
-        #     # ActionDescription.EDITION,
-        #     # ActionDescription.REVISION,
-        #     # ActionDescription.STATUS_UPDATE
-        # ]
-        #
-        # self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
-        #     # ContentType.Page,
-        #     # ContentType.Thread,
-        #     # ContentType.File,
-        #     # ContentType.Comment,
-        #     # ContentType.Folder -- Folder is skipped
-        # ]
-        # if settings.get('email.notification.from'):
-        #     raise Exception(
-        #         'email.notification.from configuration is deprecated. '
-        #         'Use instead email.notification.from.email and '
-        #         'email.notification.from.default_label.'
-        #     )
-        #
-        # self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
-        #     'email.notification.from.email',
-        # )
-        # self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = settings.get(
-        #     'email.notification.from.default_label'
-        # )
-        # self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = settings.get(
-        #     'email.notification.reply_to.email',
-        # )
-        # self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = settings.get(
-        #     'email.notification.references.email'
-        # )
-        # self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
-        #     'email.notification.content_update.template.html',
-        # )
-        # self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = settings.get(
-        #     'email.notification.content_update.template.text',
-        # )
-        # self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
-        #     'email.notification.created_account.template.html',
-        #     './tracim/templates/mail/created_account_body_html.mak',
-        # )
-        # self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT = settings.get(
-        #     'email.notification.created_account.template.text',
-        #     './tracim/templates/mail/created_account_body_text.mak',
-        # )
-        # self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
-        #     'email.notification.content_update.subject',
-        # )
-        # self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
-        #     'email.notification.created_account.subject',
-        #     '[{website_title}] Created account',
-        # )
-        # self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
-        #     'email.notification.processing_mode',
-        # )
-        #
+        ##
+
+        self.EMAIL_NOTIFICATION_NOTIFIED_EVENTS = [
+            ActionDescription.COMMENT,
+            ActionDescription.CREATION,
+            ActionDescription.EDITION,
+            ActionDescription.REVISION,
+            ActionDescription.STATUS_UPDATE
+        ]
+
+        self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
+            ContentType.Page,
+            ContentType.Thread,
+            ContentType.File,
+            ContentType.Comment,
+            # ContentType.Folder -- Folder is skipped
+        ]
+        if settings.get('email.notification.from'):
+            raise Exception(
+                'email.notification.from configuration is deprecated. '
+                'Use instead email.notification.from.email and '
+                'email.notification.from.default_label.'
+            )
+
+        self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
+            'email.notification.from.email',
+        )
+        self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = settings.get(
+            'email.notification.from.default_label'
+        )
+        self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = settings.get(
+            'email.notification.reply_to.email',
+        )
+        self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = settings.get(
+            'email.notification.references.email'
+        )
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
+            'email.notification.content_update.template.html',
+        )
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = settings.get(
+            'email.notification.content_update.template.text',
+        )
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
+            'email.notification.created_account.template.html',
+            './tracim/templates/mail/created_account_body_html.mak',
+        )
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT = settings.get(
+            'email.notification.created_account.template.text',
+            './tracim/templates/mail/created_account_body_text.mak',
+        )
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
+            'email.notification.content_update.subject',
+        )
+        self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
+            'email.notification.created_account.subject',
+            '[{website_title}] Created account',
+        )
+        self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
+            'email.notification.processing_mode',
+        )
+
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
-        # self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
-        #     'email.notification.smtp.server',
-        # )
-        # self.EMAIL_NOTIFICATION_SMTP_PORT = settings.get(
-        #     'email.notification.smtp.port',
-        # )
-        # self.EMAIL_NOTIFICATION_SMTP_USER = settings.get(
-        #     'email.notification.smtp.user',
-        # )
-        # self.EMAIL_NOTIFICATION_SMTP_PASSWORD = settings.get(
-        #     'email.notification.smtp.password',
-        # )
-        # self.EMAIL_NOTIFICATION_LOG_FILE_PATH = settings.get(
-        #     'email.notification.log_file_path',
-        #     None,
-        # )
-        #
+        self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
+            'email.notification.smtp.server',
+        )
+        self.EMAIL_NOTIFICATION_SMTP_PORT = settings.get(
+            'email.notification.smtp.port',
+        )
+        self.EMAIL_NOTIFICATION_SMTP_USER = settings.get(
+            'email.notification.smtp.user',
+        )
+        self.EMAIL_NOTIFICATION_SMTP_PASSWORD = settings.get(
+            'email.notification.smtp.password',
+        )
+        self.EMAIL_NOTIFICATION_LOG_FILE_PATH = settings.get(
+            'email.notification.log_file_path',
+            None,
+        )
+
         # self.EMAIL_REPLY_ACTIVATED = asbool(settings.get(
         #     'email.reply.activated',
         #     False,
@@ -267,36 +270,36 @@ class CFG(object):
         #         mandatory_msg.format('email.reply.lockfile_path')
         #     )
         #
-        # self.EMAIL_PROCESSING_MODE = settings.get(
-        #     'email.processing_mode',
-        #     'sync',
-        # ).upper()
-        #
-        # if self.EMAIL_PROCESSING_MODE not in (
-        #         self.CST.ASYNC,
-        #         self.CST.SYNC,
-        # ):
-        #     raise Exception(
-        #         'email.processing_mode '
-        #         'can ''be "{}" or "{}", not "{}"'.format(
-        #             self.CST.ASYNC,
-        #             self.CST.SYNC,
-        #             self.EMAIL_PROCESSING_MODE,
-        #         )
-        #     )
-        #
-        # self.EMAIL_SENDER_REDIS_HOST = settings.get(
-        #     'email.async.redis.host',
-        #     'localhost',
-        # )
-        # self.EMAIL_SENDER_REDIS_PORT = int(settings.get(
-        #     'email.async.redis.port',
-        #     6379,
-        # ))
-        # self.EMAIL_SENDER_REDIS_DB = int(settings.get(
-        #     'email.async.redis.db',
-        #     0,
-        # ))
+        self.EMAIL_PROCESSING_MODE = settings.get(
+            'email.processing_mode',
+            'sync',
+        ).upper()
+
+        if self.EMAIL_PROCESSING_MODE not in (
+                self.CST.ASYNC,
+                self.CST.SYNC,
+        ):
+            raise Exception(
+                'email.processing_mode '
+                'can ''be "{}" or "{}", not "{}"'.format(
+                    self.CST.ASYNC,
+                    self.CST.SYNC,
+                    self.EMAIL_PROCESSING_MODE,
+                )
+            )
+
+        self.EMAIL_SENDER_REDIS_HOST = settings.get(
+            'email.async.redis.host',
+            'localhost',
+        )
+        self.EMAIL_SENDER_REDIS_PORT = int(settings.get(
+            'email.async.redis.port',
+            6379,
+        ))
+        self.EMAIL_SENDER_REDIS_DB = int(settings.get(
+            'email.async.redis.db',
+            0,
+        ))
 
         ###
         # WSGIDAV (Webdav server)
