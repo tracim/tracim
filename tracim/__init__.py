@@ -59,11 +59,13 @@ def web(global_config, **local_settings):
     # set Hapic
     context = PyramidContext(
         configurator=configurator,
-        default_error_builder=ErrorSchema()
+        default_error_builder=ErrorSchema(),
+        debug=app_config.DEBUG,
     )
     hapic.set_context(context)
     context.handle_exception(NotFound, 404)
     context.handle_exception(OperationalError, 500)
+    context.handle_exception(Exception, 500)
     # Add controllers
     session_controller = SessionController()
     system_controller = SystemController()

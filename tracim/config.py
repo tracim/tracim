@@ -130,6 +130,7 @@ class CFG(object):
             '604800',
         ))
 
+        self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
         ###
         # EMAIL related stuff (notification, reply)
