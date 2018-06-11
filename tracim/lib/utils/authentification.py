@@ -51,6 +51,6 @@ def _get_basic_auth_unsafe_user(
         if not login:
             return None
         user = uapi.get_one_by_email(login)
-    except (NoResultFound, UserDoesNotExist):
+    except UserDoesNotExist:
         return None
     return user
