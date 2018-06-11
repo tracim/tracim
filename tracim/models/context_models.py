@@ -7,9 +7,10 @@ from sqlalchemy.orm import Session
 from tracim import CFG
 from tracim.models import User
 from tracim.models.auth import Profile
-from tracim.models.data import Workspace, UserRoleInWorkspace, Content
-from tracim.models.workspace_menu_entries import default_workspace_menu_entry, \
-    WorkspaceMenuEntry
+from tracim.models.data import Content
+from tracim.models.data import Workspace, UserRoleInWorkspace
+from tracim.models.workspace_menu_entries import default_workspace_menu_entry
+from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
 
 
 class LoginCredentials(object):
@@ -36,6 +37,7 @@ class ContentFilter(object):
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
+
 
 class UserInContext(object):
     """

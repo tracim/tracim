@@ -25,14 +25,14 @@ class TestApplicationsEndpoint(FunctionalTest):
         res = res.json_body
         application = res[0]
         assert application['label'] == "Text Documents"
-        assert application['slug'] == 'contents/pagehtml'
+        assert application['slug'] == 'contents/htmlpage'
         assert application['icon'] == 'file-text-o'
         assert application['hexcolor'] == '#3f52e3'
         assert application['is_active'] is True
         assert 'config' in application
         application = res[1]
-        assert application['label'] == "Rich Markdown Files"
-        assert application['slug'] == 'contents/pagemarkdownplus'
+        assert application['label'] == "Markdown Plus Documents"
+        assert application['slug'] == 'contents/markdownpluspage'
         assert application['icon'] == 'file-code'
         assert application['hexcolor'] == '#f12d2d'
         assert application['is_active'] is True

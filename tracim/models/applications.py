@@ -25,7 +25,6 @@ class Application(object):
         self.main_route = main_route
 
 
-# TODO - G.M - 21-05-2018 Do not rely on hardcoded app list
 # default apps
 calendar = Application(
     label='Calendar',
@@ -58,29 +57,30 @@ file = Application(
     main_route='/#/workspaces/{workspace_id}/contents?type=file',
 )
 
-pagemarkdownplus = Application(
-    label='Rich Markdown Files',  # TODO - G.M - 24-05-2018 - Check label
-    slug='contents/pagemarkdownplus',
+markdownpluspage = Application(
+    label='Markdown Plus Documents',  # TODO - G.M - 24-05-2018 - Check label
+    slug='contents/markdownpluspage',
     icon='file-code',
     hexcolor='#f12d2d',
     is_active=True,
     config={},
-    main_route='/#/workspaces/{workspace_id}/contents?type=pagemarkdownplus',
+    main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
 )
 
-pagehtml = Application(
+htmlpage = Application(
     label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
-    slug='contents/pagehtml',
+    slug='contents/htmlpage',
     icon='file-text-o',
     hexcolor='#3f52e3',
     is_active=True,
     config={},
-    main_route='/#/workspaces/{workspace_id}/contents?type=pagehtml',
+    main_route='/#/workspaces/{workspace_id}/contents?type=htmlpage',
 )
+# TODO - G.M - 08-06-2018 - This is hardcoded lists of app, make this dynamic.
 # List of applications
 applications = [
-    pagehtml,
-    pagemarkdownplus,
+    htmlpage,
+    markdownpluspage,
     file,
     thread,
     calendar,
