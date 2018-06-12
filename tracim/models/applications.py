@@ -16,6 +16,18 @@ class Application(object):
             config: typing.Dict[str, str],
             main_route: str,
     ) -> None:
+        """
+        @param label: public label of application
+        @param slug: identifier of application
+        @param icon: font awesome icon class
+        @param hexcolor: hexa color of application main color
+        @param is_active: True if application enable, False if inactive
+        @param config: a dict with eventual application config
+        @param main_route: the route of the frontend "home" screen of
+        the application. For exemple, if you have an application
+        called "calendar", the main route will be something
+        like /#/workspace/{wid}/calendar.
+        """
         self.label = label
         self.slug = slug
         self.fa_icon = fa_icon
