@@ -66,7 +66,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
     label = marshmallow.fields.String()
     route = marshmallow.fields.String()
     hexcolor = marshmallow.fields.String()
-    icon = marshmallow.fields.String()
+    fa_icon = marshmallow.fields.String()
 
 
 class WorkspaceDigestSchema(marshmallow.Schema):
@@ -101,7 +101,7 @@ class ApplicationConfigSchema(marshmallow.Schema):
 class ApplicationSchema(marshmallow.Schema):
     label = marshmallow.fields.String()
     slug = marshmallow.fields.String()
-    icon = marshmallow.fields.String()
+    fa_icon = marshmallow.fields.String()
     hexcolor = marshmallow.fields.String()
     is_active = marshmallow.fields.Boolean()
     config = marshmallow.fields.Nested(
