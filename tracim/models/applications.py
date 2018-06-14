@@ -10,15 +10,27 @@ class Application(object):
             self,
             label: str,
             slug: str,
-            icon: str,
+            fa_icon: str,
             hexcolor: str,
             is_active: bool,
             config: typing.Dict[str, str],
             main_route: str,
     ) -> None:
+        """
+        @param label: public label of application
+        @param slug: identifier of application
+        @param icon: font awesome icon class
+        @param hexcolor: hexa color of application main color
+        @param is_active: True if application enable, False if inactive
+        @param config: a dict with eventual application config
+        @param main_route: the route of the frontend "home" screen of
+        the application. For exemple, if you have an application
+        called "calendar", the main route will be something
+        like /#/workspace/{wid}/calendar.
+        """
         self.label = label
         self.slug = slug
-        self.icon = icon
+        self.fa_icon = fa_icon
         self.hexcolor = hexcolor
         self.is_active = is_active
         self.config = config
@@ -29,7 +41,7 @@ class Application(object):
 calendar = Application(
     label='Calendar',
     slug='calendar',
-    icon='calendar-alt',
+    fa_icon='calendar-alt',
     hexcolor='#757575',
     is_active=True,
     config={},
@@ -39,7 +51,7 @@ calendar = Application(
 thread = Application(
     label='Threads',
     slug='contents/threads',
-    icon='comments-o',
+    fa_icon='comments-o',
     hexcolor='#ad4cf9',
     is_active=True,
     config={},
@@ -50,7 +62,7 @@ thread = Application(
 _file = Application(
     label='Files',
     slug='contents/files',
-    icon='paperclip',
+    fa_icon='paperclip',
     hexcolor='#FF9900',
     is_active=True,
     config={},
@@ -60,7 +72,7 @@ _file = Application(
 markdownpluspage = Application(
     label='Markdown Plus Documents',  # TODO - G.M - 24-05-2018 - Check label
     slug='contents/markdownpluspage',
-    icon='file-code',
+    fa_icon='file-code',
     hexcolor='#f12d2d',
     is_active=True,
     config={},
@@ -70,7 +82,7 @@ markdownpluspage = Application(
 htmlpage = Application(
     label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
     slug='contents/htmlpage',
-    icon='file-text-o',
+    fa_icon='file-text-o',
     hexcolor='#3f52e3',
     is_active=True,
     config={},

@@ -14,7 +14,7 @@ class WorkspaceMenuEntry(object):
             self,
             label: str,
             slug: str,
-            icon: str,
+            fa_icon: str,
             hexcolor: str,
             route: str,
     ) -> None:
@@ -22,21 +22,21 @@ class WorkspaceMenuEntry(object):
         self.label = label
         self.route = route
         self.hexcolor = hexcolor
-        self.icon = icon
+        self.fa_icon = fa_icon
 
 dashboard_menu_entry = WorkspaceMenuEntry(
   slug='dashboard',
   label='Dashboard',
   route='/#/workspaces/{workspace_id}/dashboard',
   hexcolor='#252525',
-  icon="",
+  fa_icon="",
 )
 all_content_menu_entry = WorkspaceMenuEntry(
   slug="contents/all",
   label="All Contents",
   route="/#/workspaces/{workspace_id}/contents",
   hexcolor="#fdfdfd",
-  icon="",
+  fa_icon="",
 )
 
 # TODO - G.M - 08-06-2018 - This is hardcoded default menu entry,
@@ -57,7 +57,7 @@ def default_workspace_menu_entry(
                 slug=app.slug,
                 label=app.label,
                 hexcolor=app.hexcolor,
-                icon=app.icon,
+                fa_icon=app.fa_icon,
                 route=app.main_route
             )
             menu_entries.append(new_entry)
