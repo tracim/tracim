@@ -10,7 +10,6 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
-import PopupCreateContent from '../component/PopupCreateContent/PopupCreateContainer.jsx'
 import {
   getAppList,
   getWorkspaceContent,
@@ -18,7 +17,7 @@ import {
   getWorkspaceList
 } from '../action-creator.async.js'
 import {
-  newFlashMessage,
+  newFlashMessage, setAppList,
   setWorkspaceData,
   setWorkspaceListIsOpenInSidebar,
   updateWorkspaceListData
@@ -37,13 +36,29 @@ class WorkspaceContent extends React.Component {
       },
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'openContentUrl':
+        this.props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.idContent))
+        break
+      case 'appClosed':
+        this.props.history.push(PAGE.WORKSPACE.CONTENT(this.props.workspace.id, ''))
+        break
+    }
   }
 
   async componentDidMount () {
     const { workspaceIdInUrl } = this.state
     const { user, workspaceList, app, match, location, dispatch } = this.props
 
-    if (Object.keys(app).length === 0) dispatch(getAppList()) // async but no need await
+    if (Object.keys(app).length === 0) {
+      const fetchGetAppList = await dispatch(getAppList())
+      if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
+    }
 
     let wsToLoad = null
     if (match.params.idws !== undefined) wsToLoad = match.params.idws
@@ -64,33 +79,34 @@ class WorkspaceContent extends React.Component {
     if (wsToLoad === null) return // ws already loaded
 
     const wsContent = await dispatch(getWorkspaceContent(wsToLoad))
-    if (wsContent.status === 200) {
-      dispatch(setWorkspaceData(wsContent.json, qs.parse(location.search).type))
 
-      if (match.params.idcts) { // if a content id is in url, open it
-        const contentToOpen = wsContent.json.content.find(wsc => wsc.id === parseInt(match.params.idcts))
-        if (contentToOpen === undefined) return
-
-        this.handleClickContentItem(contentToOpen)
-      }
-    } else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+    if (wsContent.status === 200) dispatch(setWorkspaceData(wsContent.json, qs.parse(location.search).type))
+    else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { user, match, dispatch } = this.props
+    const { app, workspace, user, renderApp, match, dispatch } = this.props
 
     if (this.state.workspaceIdInUrl === null) return
 
     const newWorkspaceId = parseInt(match.params.idws)
-    prevState.workspaceIdInUrl !== newWorkspaceId && this.setState({workspaceIdInUrl: newWorkspaceId})
+    if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
 
     if (user.id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, newWorkspaceId))
+
+    if (match.params.idcts) { // if a content id is in url, open it
+      const contentToOpen = workspace.content.find(wsc => wsc.id === parseInt(match.params.idcts))
+      if (contentToOpen === undefined) return
+
+      renderApp(
+        app[contentToOpen.type],
+        user,
+        {...contentToOpen, workspace: workspace}
+      )
+    }
   }
 
-  handleClickContentItem = content => {
-    this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.workspace_id, content.id)}${this.props.location.search}`)
-    this.props.renderApp(this.props.app[content.type], this.props.user, {...content, workspace: this.props.workspace})
-  }
+  handleClickContentItem = content => this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.workspace_id, content.id)}${this.props.location.search}`)
 
   handleClickEditContentItem = (e, content) => {
     e.stopPropagation()
@@ -121,21 +137,9 @@ class WorkspaceContent extends React.Component {
     this.props.dispatch(getFolderContent(this.props.workspace.id, folderId))
   }
 
-  handleClickCreateContent = (folder, contentType) => this.setState({
-    popupCreateContent: {
-      display: true,
-      type: contentType,
-      folder: folder
-    }
-  })
-
-  handleClosePopupCreateContent = () => this.setState({
-    popupCreateContent: {
-      display: false,
-      type: undefined,
-      folder: undefined
-    }
-  })
+  handleClickCreateContent = (folder, contentType) => {
+    this.props.renderCreateContentApp(this.props.app[contentType], this.props.user, folder)
+  }
 
   render () {
     const { workspace, app } = this.props
@@ -162,13 +166,7 @@ class WorkspaceContent extends React.Component {
           </PageTitle>
 
           <PageContent parentClass='workspace__content'>
-            { this.state.popupCreateContent.display &&
-              <PopupCreateContent
-                type={this.state.popupCreateContent.type}
-                folder={this.state.popupCreateContent.folder}
-                onClose={this.handleClosePopupCreateContent}
-              />
-            }
+            <div id='popupCreateContentContainer' />
 
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />

@@ -15,8 +15,7 @@ import {
   WORKSPACE_LIST,
   FOLDER,
   setFolderData,
-  APP_LIST,
-  setAppList
+  APP_LIST
 } from './action-creator.sync.js'
 
 /*
@@ -87,7 +86,7 @@ export const getTimezone = () => async dispatch => {
 
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/sessions/login`,
+    url: `${FETCH_CONFIG.mockApiUrl}/sessions/login`, // FETCH_CONFIG.apiUrl
     param: {
       headers: {...FETCH_CONFIG.headers},
       method: 'POST',
@@ -104,7 +103,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
 
 export const postUserLogout = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/sessions/logout`,
+    url: `${FETCH_CONFIG.mockApiUrl}/sessions/logout`, // FETCH_CONFIG.apiUrl
     param: {
       headers: {...FETCH_CONFIG.headers},
       method: 'POST'
@@ -116,7 +115,7 @@ export const postUserLogout = () => async dispatch => {
 
 export const getUserIsConnected = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/sessions/whoami`,
+    url: `${FETCH_CONFIG.mockApiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
     param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: USER_CONNECTED,
     dispatch
@@ -181,12 +180,11 @@ export const getFolderContent = (workspaceId, folderId) => async dispatch => {
   if (fetchGetFolderContent.status === 200) dispatch(setFolderData(folderId, fetchGetFolderContent.json))
 }
 
-export const getAppList = () => async dispatch => {
-  const fetchGetAppList = await fetchWrapper({
+export const getAppList = () => dispatch => {
+  return fetchWrapper({
     url: `${FETCH_CONFIG.mockApiUrl}/app/config`,
     param: {...FETCH_CONFIG.header, method: 'GET'},
     actionName: APP_LIST,
     dispatch
   })
-  if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
 }

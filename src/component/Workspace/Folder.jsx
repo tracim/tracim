@@ -20,6 +20,7 @@ class Folder extends React.Component {
   }
 
   handleClickCreateContent = (e, folder, type) => {
+    e.preventDefault()
     e.stopPropagation() // because we have a link inside a link (togler and newFile)
     this.props.onClickCreateContent(folder, type)
   }

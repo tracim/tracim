@@ -60,6 +60,7 @@
       "fetch",
       "history",
       "GLOBAL_renderApp",
+      "GLOBAL_renderCreateContentApp",
       "GLOBAL_dispatchEvent",
       "GLOBAL_hideApp"
     ],

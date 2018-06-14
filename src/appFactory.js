@@ -13,15 +13,25 @@ export function appFactory (WrappedComponent) {
       content
     })
 
-    emitEventApp = (type, data) => GLOBAL_dispatchEvent(type, data)
+    renderCreateContentApp = (appConfig, user, folder) => GLOBAL_renderCreateContentApp({
+      loggedUser: user.logged ? user : {},
+      config: {
+        ...appConfig,
+        domContainer: 'popupCreateContentContainer',
+        apiUrl: FETCH_CONFIG.apiUrl,
+        mockApiUrl: FETCH_CONFIG.mockApiUrl
+      },
+      folder
+    })
 
-    hideApp = appName => GLOBAL_hideApp(appName)
+    emitEventApp = (type, data) => GLOBAL_dispatchEvent(type, data)
 
     render () {
       return (
         <WrappedComponent
           {...this.props}
           renderApp={this.renderApp}
+          renderCreateContentApp={this.renderCreateContentApp}
           emitEventApp={this.emitEventApp}
           hideApp={this.hideApp}
         />

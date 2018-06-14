@@ -1,11 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import CardPopup from '../common/CardPopup/CardPopup.jsx'
+// import CardPopup from '../common/CardPopup/CardPopup.jsx'
+import { CardPopup } from 'tracim_lib'
 import GenericContent from './ContentType/GenericContent.jsx'
 import FileContent from './ContentType/FileContent.jsx'
 import WsContent from './ContentType/WsContent.jsx'
 
 require('./PopupCreateContainer.styl')
+
+console.log('cardPopp', CardPopup)
+console.log('Warning: PopupCreateContainer is deprecated')
 
 const PopupCreateContainer = props => {
   const FormCreateContent = (() => {
