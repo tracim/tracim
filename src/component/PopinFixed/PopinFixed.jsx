@@ -9,7 +9,7 @@ require('./PopinFixed.styl')
 
 const PopinFixed = props => {
   return (
-    <div className={classnames('wsContentGeneric', props.customClass, {'visible': props.visible})}>
+    <div className={classnames('wsContentGeneric', props.customClass, {'visible': props.visible})} style={props.style}>
       {props.children}
     </div>
   )

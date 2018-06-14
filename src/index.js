@@ -14,6 +14,9 @@ import libBtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 
 import libDelimiter from './component/Delimiter/Delimiter.jsx'
 
+import libCardPopup from './component/CardPopup/CardPopup.jsx'
+import libCardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
+
 export const langFr = fr
 export const langEn = en
 
@@ -30,3 +33,6 @@ export const TextAreaApp = libTextAreaApp
 export const BtnSwitch = libBtnSwitch
 
 export const Delimiter = libDelimiter
+
+export const CardPopup = libCardPopup
+export const CardPopupCreateContent = libCardPopupCreateContent
