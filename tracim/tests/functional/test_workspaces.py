@@ -728,7 +728,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__post_content_create_generic_content__ok_200__nominal_case(self) -> None:
+    def test_api__post_content_create_generic_content__ok_200__nominal_case(self) -> None:  # nopep8
         """
         Create generic content
         """
@@ -760,10 +760,22 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_type_slug']
+        params_active = {
+            'parent_id': 0,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
+        active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
+        assert res.json_body in active_contents
 
     def test_api_put_move_content__ok_200__nominal_case(self):
         """
         Move content
+        move Apple_Pie (content_id: 8)
+        from Desserts folder(content_id: 3) to Salads subfolder (content_id: 4)
+        of workspace Recipes.
         """
         self.testapp.authorization = (
             'Basic',
@@ -775,19 +787,37 @@ class TestWorkspaceContents(FunctionalTest):
         params = {
             'new_parent_id': '4',  # Salads
         }
+        params_folder1 = {
+            'parent_id': 3,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_folder2 = {
+            'parent_id': 4,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
+        folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
+        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
-            # INFO - G.M - 2018-06-163 - move Apple_Pie
-            # from Desserts to Salads subfolder of workspace Recipes
             '/api/v2/workspaces/2/contents/8/move',
             params=params,
             status=200
         )
-        # TODO - G.M - 2018-06-163 - Recheck content
+        new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
+        new_folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
+        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
 
     def test_api_put_delete_content__ok_200__nominal_case(self):
         """
-        Move content
+        delete content
+        delete Apple_pie ( content_id: 8, parent_id: 3)
         """
         self.testapp.authorization = (
             'Basic',
@@ -796,17 +826,37 @@ class TestWorkspaceContents(FunctionalTest):
                 'admin@admin.admin'
             )
         )
+        params_active = {
+            'parent_id': 3,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_deleted = {
+            'parent_id': 3,
+            'show_archived': 0,
+            'show_deleted': 1,
+            'show_active': 0,
+        }
+        active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
+        assert [content for content in active_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in deleted_contents if content['id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             # INFO - G.M - 2018-06-163 - delete Apple_Pie
             '/api/v2/workspaces/2/contents/8/delete',
             status=200
         )
-        # TODO - G.M - 2018-06-163 - Recheck content
+        new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        new_deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
+        assert not [content for content in new_active_contents if content['id'] == 8]  # nopep8
+        assert [content for content in new_deleted_contents if content['id'] == 8]  # nopep8
 
     def test_api_put_archive_content__ok_200__nominal_case(self):
         """
         archive content
+        archive Apple_pie ( content_id: 8, parent_id: 3)
         """
         self.testapp.authorization = (
             'Basic',
@@ -815,17 +865,35 @@ class TestWorkspaceContents(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        # TODO - G.M - 2018-06-163 - Check content
+        params_active = {
+            'parent_id': 3,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_archived = {
+            'parent_id': 3,
+            'show_archived': 1,
+            'show_deleted': 0,
+            'show_active': 0,
+        }
+        active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
+        assert [content for content in active_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in archived_contents if content['id'] == 8]  # nopep8
         res = self.testapp.put_json(
-            # INFO - G.M - 2018-06-163 - archive Apple_Pie
             '/api/v2/workspaces/2/contents/8/archive',
             status=200
         )
-        # TODO - G.M - 2018-06-163 - Recheck content
+        new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        new_archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
+        assert not [content for content in new_active_contents if content['id'] == 8]  # nopep8
+        assert [content for content in new_archived_contents if content['id'] == 8]  # nopep8
 
     def test_api_put_undelete_content__ok_200__nominal_case(self):
         """
-        Delete content
+        Undelete content
+        undelete Bad_Fruit_Salad ( content_id: 14, parent_id: 10)
         """
         self.testapp.authorization = (
             'Basic',
@@ -834,17 +902,35 @@ class TestWorkspaceContents(FunctionalTest):
                 'foobarbaz'
             )
         )
-        # TODO - G.M - 2018-06-163 - Check content
+        params_active = {
+            'parent_id': 10,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_deleted = {
+            'parent_id': 10,
+            'show_archived': 0,
+            'show_deleted': 1,
+            'show_active': 0,
+        }
+        active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
+        assert not [content for content in active_contents if content['id'] == 14]  # nopep8
+        assert [content for content in deleted_contents if content['id'] == 14]  # nopep8
         res = self.testapp.put_json(
-            # INFO - G.M - 2018-06-163 - delete Apple_Pie
             '/api/v2/workspaces/2/contents/14/undelete',
             status=200
         )
-        # TODO - G.M - 2018-06-163 - Recheck content
+        new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        new_deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
+        assert [content for content in new_active_contents if content['id'] == 14]  # nopep8
+        assert not [content for content in new_deleted_contents if content['id'] == 14]  # nopep8
 
     def test_api_put_unarchive_content__ok_200__nominal_case(self):
         """
-        Delete content
+        unarchive content,
+        unarchive Fruit_salads ( content_id: 13, parent_id: 10)
         """
         self.testapp.authorization = (
             'Basic',
@@ -853,10 +939,27 @@ class TestWorkspaceContents(FunctionalTest):
                 'foobarbaz'
             )
         )
-        # TODO - G.M - 2018-06-163 - Check content
+        params_active = {
+            'parent_id': 10,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_archived = {
+            'parent_id': 10,
+            'show_archived': 1,
+            'show_deleted': 0,
+            'show_active': 0,
+        }
+        active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
+        assert not [content for content in active_contents if content['id'] == 13]  # nopep8
+        assert [content for content in archived_contents if content['id'] == 13]  # nopep8
         res = self.testapp.put_json(
-            # INFO - G.M - 2018-06-163 - delete Apple_Pie
             '/api/v2/workspaces/2/contents/13/unarchive',
             status=200
         )
-        # TODO - G.M - 2018-06-163 - Recheck content
+        new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
+        new_archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
+        assert [content for content in new_active_contents if content['id'] == 13]  # nopep8
+        assert not [content for content in new_archived_contents if content['id'] == 13]  # nopep8

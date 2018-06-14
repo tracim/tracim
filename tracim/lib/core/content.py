@@ -105,6 +105,7 @@ class ContentApi(object):
         ContentType.Comment,
         ContentType.Thread,
         ContentType.Page,
+        ContentType.MarkdownPage,
     )
 
     def __init__(

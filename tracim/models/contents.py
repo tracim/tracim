@@ -201,6 +201,7 @@ class ContentTypeLegacy(NewContentType):
     File = file_type.slug
     Thread = thread_type.slug
     Page = htmlpage_type.slug
+    MarkdownPage = markdownpluspage_type.slug
 
     def __init__(self, slug: str):
         for content_type in CONTENT_DEFAULT_TYPE:
