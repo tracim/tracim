@@ -50,7 +50,8 @@
       "fetch",
       "history",
       "GLOBAL_renderApp",
-      "GLOBAL_unmountApp"
+      "GLOBAL_unmountApp",
+      "GLOBAL_dispatchEvent"
     ],
     "parser": "babel-eslint",
     "ignore": []

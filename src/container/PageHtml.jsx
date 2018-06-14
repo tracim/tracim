@@ -27,6 +27,7 @@ const debug = {
     domContainer: 'appContainer',
     mockApiUrl: 'http://localhost:3001'
   },
+  contentAction: 'showContent',
   loggedUser: {
     id: 5,
     username: 'Smoi',
@@ -67,8 +68,8 @@ class pageHtml extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: action }) => { // action: { type: '', data: {} }
-    switch (action.type) {
+  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    switch (type) {
       case 'PageHtml_showApp':
         this.setState({isVisible: true})
         break
@@ -104,6 +105,7 @@ class pageHtml extends React.Component {
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
+    GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
   }
 
   handleChangeTitle = e => console.log('new title : ', e.target.value)
