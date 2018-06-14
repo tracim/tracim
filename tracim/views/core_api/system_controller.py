@@ -1,7 +1,7 @@
 # coding=utf-8
 from pyramid.config import Configurator
 
-from tracim.exceptions import NotAuthentificated, InsufficientUserProfile
+from tracim.exceptions import NotAuthenticated, InsufficientUserProfile
 from tracim.lib.utils.authorization import require_profile
 from tracim.models import Group
 from tracim.models.applications import applications
@@ -20,7 +20,7 @@ from tracim.views.core_api.schemas import ApplicationSchema
 class SystemController(Controller):
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @require_profile(Group.TIM_USER)
     @hapic.output_body(ApplicationSchema(many=True),)

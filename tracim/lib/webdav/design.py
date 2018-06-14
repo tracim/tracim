@@ -164,7 +164,7 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
                     <td>%s</td>
                 </tr>
                 ''' % ('warning' if event.id == content_revision.revision_id else '',
-                       event.type.icon,
+                       event.type.fa_icon,
                        label,
                        date,
                        event.owner.display_name,
@@ -282,7 +282,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
                         </div>
                     </div>
                     ''' % ('warning' if t.id == content_revision.revision_id else '',
-                           t.type.icon,
+                           t.type.fa_icon,
                            t.owner.display_name,
                            t.create_readable_date(),
                            label,

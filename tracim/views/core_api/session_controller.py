@@ -13,7 +13,7 @@ from tracim.views.core_api.schemas import UserSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.views.core_api.schemas import LoginOutputHeaders
 from tracim.views.core_api.schemas import BasicAuthSchema
-from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
 
 
@@ -52,7 +52,7 @@ class SessionController(Controller):
         return
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.output_body(UserSchema(),)
     def whoami(self, context, request: TracimRequest, hapic_data=None):
         """

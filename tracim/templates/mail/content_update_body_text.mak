@@ -16,7 +16,7 @@ Hope you'll switch your mail client configuration and enjoy Tracim :)
 
 
 You receive this email because you are registered on /${config.WEBSITE_TITLE}/
-and you are /${role}/ in the workspace /${workspace.label}/
+and you are /${role_label}/ in the workspace /${workspace.label}/
 
 ----
 

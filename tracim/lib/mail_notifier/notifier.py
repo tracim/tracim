@@ -238,7 +238,7 @@ class EmailManager(object):
         notifiable_roles = WorkspaceApi(
             current_user=user,
             session=self.session,
-            config=self.config
+            config=self.config,
         ).get_notifiable_roles(content.workspace)
 
         if len(notifiable_roles) <= 0:
@@ -358,22 +358,22 @@ class EmailManager(object):
         text_template_file_path = self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_TEXT  # nopep8
         html_template_file_path = self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML  # nopep8
 
+        context = {
+            'user': user,
+            'password': password,
+            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
+            'logo_url': '',
+            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
+            'login_url': self.config.WEBSITE_BASE_URL,
+        }
         body_text = self._render_template(
             mako_template_filepath=text_template_file_path,
-            context={
-                'user': user,
-                'password': password,
-                'login_url': self.config.WEBSITE_BASE_URL,
-            }
+            context=context
         )
 
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path,
-            context={
-                'user': user,
-                'password': password,
-                'login_url': self.config.WEBSITE_BASE_URL,
-            }
+            context=context,
         )
 
         part1 = MIMEText(body_text, 'plain', 'utf-8')
@@ -433,6 +433,15 @@ class EmailManager(object):
         content_intro = ''
         content_text = ''
         call_to_action_text = ''
+
+        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for call_to_action_url  # nopep8
+        call_to_action_url =''
+        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for status_icon_url  # nopep8
+        status_icon_url = ''
+        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for workspace_url  # nopep8
+        workspace_url = ''
+        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
+        logo_url = ''
 
         action = content.get_last_action().id
         if ActionDescription.COMMENT == action:
@@ -523,20 +532,25 @@ class EmailManager(object):
             )
             raise ValueError('Unexpected empty notification')
 
+        context = {
+            'user': role.user,
+            'workspace': role.workspace,
+            'workspace_url': workspace_url,
+            'main_title': main_title,
+            'status_label': content.get_status().label,
+            'status_icon_url': status_icon_url,
+            'role_label': role.role_as_label(),
+            'content_intro': content_intro,
+            'content_text': content_text,
+            'call_to_action_text': call_to_action_text,
+            'call_to_action_url': call_to_action_url,
+            'logo_url': logo_url,
+        }
         user = role.user
         workspace = role.workspace
         body_content = self._render_template(
             mako_template_filepath=mako_template_filepath,
-            context={
-                'user': role.user,
-                'workspace': role.workspace,
-                'main_title': main_title,
-                'status': content.get_status().label,
-                'role': role.role_as_label(),
-                'content_intro': content_intro,
-                'content_text': content_text,
-                'call_to_action_text': call_to_action_text,
-            }
+            context=context,
         )
         return body_content
 

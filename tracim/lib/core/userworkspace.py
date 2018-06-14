@@ -49,6 +49,7 @@ class RoleApi(object):
         """
         Return WorkspaceInContext object from Workspace
         """
+        assert self._config
         workspace = UserRoleWorkspaceInContext(
             user_role=user_role,
             dbsession=self._session,
@@ -138,7 +139,8 @@ class RoleApi(object):
         workspace:Workspace
     ) -> typing.List[UserRoleInWorkspace]:
         return self._session.query(UserRoleInWorkspace)\
-            .filter(UserRoleInWorkspace.workspace_id == workspace.workspace_id).all()  # nopep8
+            .filter(UserRoleInWorkspace.workspace_id==workspace.workspace_id)\
+            .all()
 
     def save(self, role: UserRoleInWorkspace) -> None:
         self._session.flush()

@@ -114,7 +114,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
                     'which must be replaced on backend size '
                     '(the route must be ready-to-use)'
     )
-    icon = marshmallow.fields.String(
+    fa_icon = marshmallow.fields.String(
         example='file-text-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-text-o icon',  # nopep8
     )
@@ -170,7 +170,7 @@ class ApplicationConfigSchema(marshmallow.Schema):
 class ApplicationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(example='Calendar')
     slug = marshmallow.fields.String(example='calendar')
-    icon = marshmallow.fields.String(
+    fa_icon = marshmallow.fields.String(
         example='file-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8
     )

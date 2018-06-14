@@ -44,7 +44,7 @@ class AcceptAllAuthorizationPolicy(object):
 # We prefer to use decorators
 
 
-def require_same_user_or_profile(group):
+def require_same_user_or_profile(group: int):
     """
     Decorator for view to restrict access of tracim request if candidate user
     is distinct from authenticated user and not with high enough profile.
@@ -64,7 +64,7 @@ def require_same_user_or_profile(group):
     return decorator
 
 
-def require_profile(group):
+def require_profile(group: int):
     """
     Decorator for view to restrict access of tracim request if profile is
     not high enough
@@ -82,7 +82,7 @@ def require_profile(group):
     return decorator
 
 
-def require_workspace_role(minimal_required_role):
+def require_workspace_role(minimal_required_role: int):
     """
     Decorator for view to restrict access of tracim request if role
     is not high enough

@@ -34,12 +34,12 @@ requires = [
     # others
     'filedepot',
     'babel',
+    'python-slugify',
     # mail-notifier
     'mako',
     'lxml',
     'redis',
     'rq',
-    'python-slugify',
 ]
 
 tests_require = [

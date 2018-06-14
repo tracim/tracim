@@ -124,7 +124,6 @@ You can run it this way with docker :
     docker pull mailhog/mailhog
     docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 
-
 Run your project's tests:
 
     pytest

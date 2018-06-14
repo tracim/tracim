@@ -38,7 +38,7 @@
     <table style="width: 100%; cell-padding: 0; border-collapse: collapse; margin: 0">
       <tr style="background-color: F5F5F5; border-bottom: 1px solid #CCC;" >
         <td style="background-color: #666;">
-            <!-- FIXME - G.M - 09-06-2018 - restore logo -->
+            <img alt="logo" src="${logo_url}" style="vertical-align: middle;">
         </td>
         <td style="padding: 0.5em; background-color: #666; text-align: left;">
           <span style="font-size: 1.3em; color: #FFF; font-weight: bold;">

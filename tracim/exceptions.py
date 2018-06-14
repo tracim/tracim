@@ -57,7 +57,7 @@ class SameValueError(ValueError):
     pass
 
 
-class NotAuthentificated(TracimException):
+class NotAuthenticated(TracimException):
     pass
 
 
