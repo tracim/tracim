@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
+
+import plaster
+import requests
 import transaction
 from depot.manager import DepotManager
 from pyramid import testing
@@ -17,7 +20,7 @@ from tracim.fixtures import FixturesLoader
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from tracim.config import CFG
 from tracim.extensions import hapic
-from tracim import main
+from tracim import web
 from webtest import TestApp
 
 
@@ -32,8 +35,9 @@ class FunctionalTest(unittest.TestCase):
     sqlalchemy_url = 'sqlite:///tracim_test.sqlite'
 
     def setUp(self):
+        logger._logger.setLevel('WARNING')
         DepotManager._clear()
-        settings = {
+        self.settings = {
             'sqlalchemy.url': self.sqlalchemy_url,
             'user.auth_token.validity': '604800',
             'depot_storage_dir': '/tmp/test/depot',
@@ -42,19 +46,24 @@ class FunctionalTest(unittest.TestCase):
 
         }
         hapic.reset_context()
-        app = main({}, **settings)
-        self.init_database(settings)
+        self.engine = get_engine(self.settings)
+        DeclarativeBase.metadata.create_all(self.engine)
+        self.session_factory = get_session_factory(self.engine)
+        self.app_config = CFG(self.settings)
+        self.app_config.configure_filedepot()
+        self.init_database(self.settings)
+        DepotManager._clear()
+        self.run_app()
+
+    def run_app(self):
+        app = web({}, **self.settings)
         self.testapp = TestApp(app)
 
     def init_database(self, settings):
-        self.engine = get_engine(settings)
-        DeclarativeBase.metadata.create_all(self.engine)
-        session_factory = get_session_factory(self.engine)
-        app_config = CFG(settings)
         with transaction.manager:
-            dbsession = get_tm_session(session_factory, transaction.manager)
+            dbsession = get_tm_session(self.session_factory, transaction.manager)
             try:
-                fixtures_loader = FixturesLoader(dbsession, app_config)
+                fixtures_loader = FixturesLoader(dbsession, self.app_config)
                 fixtures_loader.loads(self.fixtures)
                 transaction.commit()
                 print("Database initialized.")
@@ -87,21 +96,28 @@ class FunctionalTestNoDB(FunctionalTest):
         self.engine = get_engine(settings)
 
 
+class CommandFunctionalTest(FunctionalTest):
+
+    def run_app(self):
+        self.session = get_tm_session(self.session_factory, transaction.manager)
+
+
 class BaseTest(unittest.TestCase):
     """
     Pyramid default test.
     """
 
-    def setUp(self):
-        logger.debug(self, 'Setup Test...')
-        self.config = testing.setUp(settings={
-            'sqlalchemy.url': 'sqlite:///:memory:',
-            'user.auth_token.validity': '604800',
-            'depot_storage_dir': '/tmp/test/depot',
-            'depot_storage_name': 'test',
-            'preview_cache_dir': '/tmp/test/preview_cache',
+    config_uri = 'tests_configs.ini'
+    config_section = 'base_test'
 
-        })
+    def setUp(self):
+        logger._logger.setLevel('WARNING')
+        logger.debug(self, 'Setup Test...')
+        self.settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
+        self.config = testing.setUp(settings = self.settings)
         self.config.include('tracim.models')
         DepotManager._clear()
         DepotManager.configure(
@@ -226,3 +242,15 @@ class DefaultTest(StandardTest):
             owner=user
         )
         return thread
+
+
+class MailHogTest(DefaultTest):
+    """
+    Theses test need a working mailhog
+    """
+
+    config_section = 'mail_test'
+
+    def tearDown(self):
+        logger.debug(self, 'Cleanup MailHog list...')
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')

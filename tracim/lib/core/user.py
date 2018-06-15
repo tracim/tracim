@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import threading
+from smtplib import SMTPException
 
 import transaction
 import typing as typing
 
+from tracim.exceptions import NotificationNotSend
+from tracim.lib.mail_notifier.notifier import get_email_manager
 from sqlalchemy.orm import Session
 
 from tracim import CFG
@@ -114,8 +117,9 @@ class UserApi(object):
             user: User,
             name: str=None,
             email: str=None,
-            do_save=True,
+            password: str=None,
             timezone: str='',
+            do_save=True,
     ) -> None:
         if name is not None:
             user.display_name = name
@@ -123,16 +127,56 @@ class UserApi(object):
         if email is not None:
             user.email = email
 
+        if password is not None:
+            user.password = password
+
         user.timezone = timezone
 
         if do_save:
             self.save(user)
 
-    def create_user(self, email=None, groups=[], save_now=False) -> User:
+    def create_user(
+        self,
+        email,
+        password: str = None,
+        name: str = None,
+        timezone: str = '',
+        groups=[],
+        do_save: bool=True,
+        do_notify: bool=True,
+    ) -> User:
+        new_user = self.create_minimal_user(email, groups, save_now=False)
+        self.update(
+            user=new_user,
+            name=name,
+            email=email,
+            password=password,
+            timezone=timezone,
+            do_save=False,
+        )
+        if do_notify:
+            try:
+                email_manager = get_email_manager(self._config, self._session)
+                email_manager.notify_created_account(
+                    new_user,
+                    password=password
+                )
+            except SMTPException as e:
+                raise NotificationNotSend()
+        if do_save:
+            self.save(new_user)
+        return new_user
+
+    def create_minimal_user(
+            self,
+            email,
+            groups=[],
+            save_now=False
+    ) -> User:
+        """Previous create_user method"""
         user = User()
 
-        if email:
-            user.email = email
+        user.email = email
 
         for group in groups:
             user.groups.append(group)

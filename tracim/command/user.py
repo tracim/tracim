@@ -3,6 +3,7 @@ import argparse
 from pyramid.scripting import AppEnvironment
 import transaction
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim import CFG
 from tracim.command import AppContextCommand
@@ -11,8 +12,9 @@ from tracim.command import Extender
 #from tracim.lib.daemons import DaemonsManager
 #from tracim.lib.daemons import RadicaleDaemon
 #from tracim.lib.email import get_email_manager
-from tracim.exceptions import AlreadyExistError
-from tracim.exceptions import CommandAbortedError
+from tracim.exceptions import UserAlreadyExistError, GroupDoesNotExist
+from tracim.exceptions import NotificationNotSend
+from tracim.exceptions import BadCommandError
 from tracim.lib.core.group import GroupApi
 from tracim.lib.core.user import UserApi
 from tracim.models import User
@@ -84,6 +86,14 @@ class UserCommand(AppContextCommand):
         return self._user_api.user_with_email_exists(login)
 
     def _get_group(self, name: str) -> Group:
+        groups_availables = [group.group_name
+                             for group in self._group_api.get_all()]
+        if name not in groups_availables:
+            msg = "Group '{}' does not exist, choose a group name in : ".format(name)  # nopep8
+            for group in groups_availables:
+                msg+= "'{}',".format(group)
+            self._session.rollback()
+            raise GroupDoesNotExist(msg)
         return self._group_api.get_one_with_name(name)
 
     def _add_user_to_named_group(
@@ -91,6 +101,7 @@ class UserCommand(AppContextCommand):
             user: str,
             group_name: str
     ) -> None:
+
         group = self._get_group(group_name)
         if user not in group.users:
             group.users.append(user)
@@ -106,27 +117,38 @@ class UserCommand(AppContextCommand):
             group.users.remove(user)
         self._session.flush()
 
-    def _create_user(self, login: str, password: str, **kwargs) -> User:
+    def _create_user(
+            self,
+            login: str,
+            password: str,
+            do_notify: bool,
+            **kwargs
+    ) -> User:
         if not password:
             if self._password_required():
-                raise CommandAbortedError(
+                raise BadCommandError(
                     "You must provide -p/--password parameter"
                 )
             password = ''
 
         try:
-            user = self._user_api.create_user(email=login)
-            user.password = password
-            self._user_api.save(user)
+            user = self._user_api.create_user(
+                email=login,
+                password=password,
+                do_save=True,
+                do_notify=do_notify,
+            )
             # TODO - G.M - 04-04-2018 - [Caldav] Check this code
             # # We need to enable radicale if it not already done
             # daemons = DaemonsManager()
             # daemons.run('radicale', RadicaleDaemon)
-
             self._user_api.execute_created_user_actions(user)
         except IntegrityError:
             self._session.rollback()
-            raise AlreadyExistError()
+            raise UserAlreadyExistError()
+        except NotificationNotSend as exception:
+            self._session.rollback()
+            raise exception
 
         return user
 
@@ -167,10 +189,13 @@ class UserCommand(AppContextCommand):
             try:
                 user = self._create_user(
                     login=parsed_args.login,
-                    password=parsed_args.password
+                    password=parsed_args.password,
+                    do_notify=parsed_args.send_email,
                 )
-            except AlreadyExistError:
-                raise CommandAbortedError("Error: User already exist (use `user update` command instead)")
+            except UserAlreadyExistError:
+                raise UserAlreadyExistError("Error: User already exist (use `user update` command instead)")
+            except NotificationNotSend:
+                raise NotificationNotSend("Error: Cannot send email notification, user not created.")
             # TODO - G.M - 04-04-2018 - [Email] Check this code
             # if parsed_args.send_email:
             #     email_manager = get_email_manager()
@@ -228,5 +253,5 @@ class UpdateUserCommand(UserCommand):
     action = UserCommand.ACTION_UPDATE
 
 
-class LDAPUserUnknown(CommandAbortedError):
+class LDAPUserUnknown(BadCommandError):
     pass

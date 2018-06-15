@@ -53,7 +53,7 @@ class TestThread(DefaultTest):
             current_user=admin,
             config=self.config
         )
-        u = uapi.create_user(email='u.u@u.u', save_now=True)
+        u = uapi.create_minimal_user(email='u.u@u.u', save_now=True)
         eq_([], wapi.get_notifiable_roles(workspace=w))
         rapi = RoleApi(
             session=self.session,
@@ -92,7 +92,7 @@ class TestThread(DefaultTest):
             current_user=None,
             config=self.app_config,
         )
-        u = uapi.create_user('u.s@e.r', [gapi.get_one(Group.TIM_USER)], True)
+        u = uapi.create_minimal_user('u.s@e.r', [gapi.get_one(Group.TIM_USER)], True)
         wapi = WorkspaceApi(
             session=self.session,
             current_user=u,

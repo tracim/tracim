@@ -3,8 +3,10 @@ import io
 
 import pytest
 from sqlalchemy.exc import InvalidRequestError
-
+from wsgidav.wsgidav_app import DEFAULT_CONFIG
+from tracim import WebdavAppFactory
 from tracim.lib.core.user import UserApi
+from tracim.lib.webdav import TracimDomainController
 from tracim.tests import eq_
 from tracim.lib.core.notifications import DummyNotifier
 from tracim.lib.webdav.dav_provider import Provider
@@ -15,6 +17,53 @@ from tracim.tests import StandardTest
 from tracim.fixtures.content import Content as ContentFixtures
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 from wsgidav import util
+from unittest.mock import MagicMock
+
+
+class TestWebdavFactory(StandardTest):
+
+    def test_unit__initConfig__ok__nominal_case(self):
+        """
+        Check if config is correctly modify for wsgidav using mocked
+        wsgidav and tracim conf (as dict)
+        :return:
+        """
+        tracim_settings = {
+            'sqlalchemy.url': 'sqlite:///:memory:',
+            'user.auth_token.validity': '604800',
+            'depot_storage_dir': '/tmp/test/depot',
+            'depot_storage_name': 'test',
+            'preview_cache_dir': '/tmp/test/preview_cache',
+            'wsgidav.config_path': 'development.ini'
+
+        }
+        wsgidav_setting = DEFAULT_CONFIG.copy()
+        wsgidav_setting.update(
+            {
+               'root_path':  '',
+               'acceptbasic': True,
+               'acceptdigest': False,
+               'defaultdigest': False,
+            }
+        )
+        mock = MagicMock()
+        mock._initConfig = WebdavAppFactory._initConfig
+        mock._readConfigFile.return_value = wsgidav_setting
+        mock._get_tracim_settings.return_value = tracim_settings
+        config = mock._initConfig(mock)
+        assert config
+        assert config['acceptbasic'] is True
+        assert config['acceptdigest'] is False
+        assert config['defaultdigest'] is False
+        # TODO - G.M - 25-05-2018 - Better check for middleware stack config
+        assert 'middleware_stack' in config
+        assert len(config['middleware_stack']) == 7
+        assert 'root_path' in config
+        assert 'provider_mapping' in config
+        assert config['root_path'] in config['provider_mapping']
+        assert isinstance(config['provider_mapping'][config['root_path']], Provider)  # nopep8
+        assert 'domaincontroller' in config
+        assert isinstance(config['domaincontroller'], TracimDomainController)
 
 
 class TestWebDav(StandardTest):

@@ -1,3 +1,4 @@
+import copy
 import transaction
 
 
@@ -23,7 +24,11 @@ class FixturesLoader(object):
         loaded = [] if loaded is None else loaded
         self._loaded = loaded
         self._session = session
-        self._config = config
+        # FIXME - G.M - 2018-06-169 - Fixture failed with email_notification
+        # activated, disable it there now. Find better way to fix this
+        # later
+        self._config = copy.copy(config)
+        self._config.EMAIL_NOTIFICATION_ACTIVATED = False
 
     def loads(self, fixtures_classes):
         for fixture_class in fixtures_classes:

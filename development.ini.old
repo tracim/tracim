@@ -2,9 +2,7 @@
 # app configuration
 # https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/environment.html
 ###
-[pipeline:main]
-pipeline = tracim_web
-[app:tracim_web]
+[app:main]
 use = egg:tracim_backend
 
 pyramid.reload_templates = true
@@ -15,12 +13,6 @@ pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_debugtoolbar
 
-[pipeline:webdav]
-pipeline = tracim_webdav
-[app:tracim_webdav]
-use = egg:tracim_backend#webdav
-
-[DEFAULT]
 sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 
 retry.attempts = 3
@@ -34,7 +26,7 @@ retry.attempts = 3
 ###
 
 ### Global
-
+debug = false
 cache_dir = %(here)s/data
 # preview generator cache directory
 preview_cache_dir = /tmp/tracim/preview/

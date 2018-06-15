@@ -116,8 +116,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
         workspace = WorkspaceApi(
             current_user=user,
             session=self.session,
@@ -210,8 +210,11 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True,
+        )
         workspace_api = WorkspaceApi(
             current_user=user,
             session=self.session,
@@ -315,7 +318,7 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(
+        user = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True
@@ -381,8 +384,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
         workspace = WorkspaceApi(
             current_user=user,
             session=self.session,
@@ -456,8 +459,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
             current_user=user,
@@ -496,8 +499,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
             current_user=user,
@@ -540,8 +543,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
             current_user=user,
@@ -584,12 +587,12 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(
+        user = uapi.create_minimal_user(
             email='user1@user',
             groups=groups,
             save_now=True
         )
-        user2 = uapi.create_user(
+        user2 = uapi.create_minimal_user(
             email='user2@user',
             groups=groups,
             save_now=True
@@ -703,12 +706,12 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(
+        user = uapi.create_minimal_user(
             email='user1@user',
             groups=groups,
             save_now=True
         )
-        user2 = uapi.create_user(
+        user2 = uapi.create_minimal_user(
             email='user2@user',
             groups=groups,
             save_now=True
@@ -820,12 +823,12 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(
+        user = uapi.create_minimal_user(
             email='user1@user',
             groups=groups,
             save_now=True,
         )
-        user2 = uapi.create_user(
+        user2 = uapi.create_minimal_user(
             email='user2@user',
             groups=groups,
             save_now=True
@@ -925,10 +928,10 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user_a = uapi.create_user(email='this.is@user',
-                                  groups=groups, save_now=True)
-        user_b = uapi.create_user(email='this.is@another.user',
-                                  groups=groups, save_now=True)
+        user_a = uapi.create_minimal_user(email='this.is@user',
+                                          groups=groups, save_now=True)
+        user_b = uapi.create_minimal_user(email='this.is@another.user',
+                                          groups=groups, save_now=True)
 
         wapi = WorkspaceApi(
             current_user=user_a,
@@ -1032,12 +1035,12 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user_a = uapi.create_user(
+        user_a = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True
         )
-        user_b = uapi.create_user(
+        user_b = uapi.create_minimal_user(
             email='this.is@another.user',
             groups=groups,
             save_now=True
@@ -1105,12 +1108,12 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user_a = uapi.create_user(
+        user_a = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True
         )
-        user_b = uapi.create_user(
+        user_b = uapi.create_minimal_user(
             email='this.is@another.user',
             groups=groups,
             save_now=True
@@ -1204,7 +1207,7 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user1 = uapi.create_user(
+        user1 = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True
@@ -1222,8 +1225,7 @@ class TestContentApi(DefaultTest):
         
         wid = workspace.workspace_id
 
-        user2 = uapi.create_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1333,7 +1335,7 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user1 = uapi.create_user(
+        user1 = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True,
@@ -1348,8 +1350,7 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
 
-        user2 = uapi.create_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1414,7 +1415,7 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user1 = uapi.create_user(
+        user1 = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True
@@ -1431,8 +1432,7 @@ class TestContentApi(DefaultTest):
         )
         wid = workspace.workspace_id
 
-        user2 = uapi.create_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1539,7 +1539,7 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user1 = uapi.create_user(
+        user1 = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True,
@@ -1555,8 +1555,7 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
 
-        user2 = uapi.create_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1627,7 +1626,7 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user1 = uapi.create_user(
+        user1 = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True
@@ -1645,8 +1644,7 @@ class TestContentApi(DefaultTest):
         )
         wid = workspace.workspace_id
 
-        user2 = uapi.create_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1784,7 +1782,7 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user1 = uapi.create_user(
+        user1 = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
             save_now=True
@@ -1802,8 +1800,7 @@ class TestContentApi(DefaultTest):
         )
         wid = workspace.workspace_id
 
-        user2 = uapi.create_user()
-        user2.email = 'this.is@another.user'
+        user2 = uapi.create_minimal_user('this.is@another.user')
         uapi.save(user2)
 
         RoleApi(
@@ -1942,8 +1939,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
             current_user=user,
@@ -1998,8 +1995,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
             current_user=user,
@@ -2054,8 +2051,8 @@ class TestContentApi(DefaultTest):
                   group_api.get_one(Group.TIM_MANAGER),
                   group_api.get_one(Group.TIM_ADMIN)]
 
-        user = uapi.create_user(email='this.is@user',
-                                groups=groups, save_now=True)
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
 
         workspace = WorkspaceApi(
             current_user=user,

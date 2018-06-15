@@ -19,6 +19,7 @@ on Debian Stretch (9) with sudo:
     sudo apt update
     sudo apt install git
     sudo apt install python3 python3-venv python3-dev python3-pip
+    sudo apt install redis-server
 
 ### Get the source ###
 
@@ -110,11 +111,24 @@ run wsgidav server:
 
     tracimcli webdav start
 
+
 ## Run Tests and others checks ##
+
+### Run Tests ###
+
+Before running some functional test related to email, you need a local working *MailHog*
+see here : https://github.com/mailhog/MailHog
+
+You can run it this way with docker :
+
+    docker pull mailhog/mailhog
+    docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 
 Run your project's tests:
 
     pytest
+
+### Lints and others checks ###
 
 Run mypy checks:
 

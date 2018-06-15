@@ -173,7 +173,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
                     'which must be replaced on backend size '
                     '(the route must be ready-to-use)'
     )
-    icon = marshmallow.fields.String(
+    fa_icon = marshmallow.fields.String(
         example='file-text-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-text-o icon',  # nopep8
     )
@@ -229,7 +229,7 @@ class ApplicationConfigSchema(marshmallow.Schema):
 class ApplicationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(example='Calendar')
     slug = marshmallow.fields.String(example='calendar')
-    icon = marshmallow.fields.String(
+    fa_icon = marshmallow.fields.String(
         example='file-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8
     )
@@ -261,7 +261,7 @@ class StatusSchema(marshmallow.Schema):
         validate=OneOf([status.value for status in GlobalStatus]),
     )
     label = marshmallow.fields.String(example='Open')
-    icon = marshmallow.fields.String(example='fa-check')
+    fa_icon = marshmallow.fields.String(example='fa-check')
     hexcolor = marshmallow.fields.String(example='#0000FF')
 
 
@@ -270,7 +270,7 @@ class ContentTypeSchema(marshmallow.Schema):
         example='pagehtml',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
-    icon = marshmallow.fields.String(
+    fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
         description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8
     )

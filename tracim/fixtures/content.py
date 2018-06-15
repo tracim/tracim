@@ -75,12 +75,14 @@ class Content(Fixture):
             workspace=business_workspace,
             label='Tools',
             do_save=True,
+            do_notify=False,
         )
         menu_workspace = content_api.create(
             content_type=ContentType.Folder,
             workspace=business_workspace,
             label='Menus',
             do_save=True,
+            do_notify=False,
         )
 
         dessert_folder = content_api.create(
@@ -88,18 +90,21 @@ class Content(Fixture):
             workspace=recipe_workspace,
             label='Desserts',
             do_save=True,
+            do_notify=False,
         )
         salads_folder = content_api.create(
             content_type=ContentType.Folder,
             workspace=recipe_workspace,
             label='Salads',
             do_save=True,
+            do_notify=False,
         )
         other_folder = content_api.create(
             content_type=ContentType.Folder,
             workspace=other_workspace,
             label='Infos',
             do_save=True,
+            do_notify=False,
         )
 
         # Pages, threads, ..
@@ -109,6 +114,7 @@ class Content(Fixture):
             parent=dessert_folder,
             label='Tiramisu Recipe',
             do_save=True,
+            do_notify=False,
         )
         best_cake_thread = content_api.create(
             content_type=ContentType.Thread,
@@ -116,6 +122,7 @@ class Content(Fixture):
             parent=dessert_folder,
             label='Best Cakes ?',
             do_save=False,
+            do_notify=False,
         )
         best_cake_thread.description = 'What is the best cake ?'
         self._session.add(best_cake_thread)
@@ -125,6 +132,7 @@ class Content(Fixture):
             parent=dessert_folder,
             label='Apple_Pie',
             do_save=False,
+            do_notify=False,
         )
         apple_pie_recipe.file_extension = '.txt'
         apple_pie_recipe.depot_file = FileIntent(
@@ -139,6 +147,7 @@ class Content(Fixture):
             parent=dessert_folder,
             label='Brownie Recipe',
             do_save=False,
+            do_notify=False,
         )
         Brownie_recipe.file_extension = '.html'
         Brownie_recipe.depot_file = FileIntent(
@@ -176,6 +185,7 @@ class Content(Fixture):
             parent=fruits_desserts_folder,
             label='Fruit Salad',
             do_save=True,
+            do_notify=False,
         )
         with new_revision(
                 session=self._session,
@@ -191,6 +201,7 @@ class Content(Fixture):
             parent=fruits_desserts_folder,
             label='Bad Fruit Salad',
             do_save=True,
+            do_notify=False,
         )
         with new_revision(
                 session=self._session,

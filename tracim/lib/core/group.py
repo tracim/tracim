@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 import typing
 
+from sqlalchemy.orm.exc import NoResultFound
+
+from tracim.exceptions import GroupDoesNotExist
 from tracim import CFG
+
 
 __author__ = 'damien'
 
@@ -26,7 +30,18 @@ class GroupApi(object):
         return self._session.query(Group)
 
     def get_one(self, group_id) -> Group:
-        return self._base_query().filter(Group.group_id == group_id).one()
+        try:
+            group = self._base_query().filter(Group.group_id == group_id).one()
+            return group
+        except NoResultFound:
+            raise GroupDoesNotExist()
 
     def get_one_with_name(self, group_name) -> Group:
-        return self._base_query().filter(Group.group_name == group_name).one()
+        try:
+            group = self._base_query().filter(Group.group_name == group_name).one()
+            return group
+        except NoResultFound:
+            raise GroupDoesNotExist()
+
+    def get_all(self):
+        return self._base_query().order_by(Group.group_id).all()

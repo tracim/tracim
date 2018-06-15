@@ -3,7 +3,7 @@ import typing
 from enum import Enum
 
 from tracim.exceptions import ContentStatusNotExist, ContentTypeNotExist
-from tracim.models.applications import htmlpage, file, thread, markdownpluspage
+from tracim.models.applications import htmlpage, _file, thread, markdownpluspage
 
 
 ####
@@ -24,13 +24,13 @@ class NewContentStatus(object):
             slug: str,
             global_status: str,
             label: str,
-            icon: str,
+            fa_icon: str,
             hexcolor: str,
     ):
         self.slug = slug
         self.global_status = global_status
         self.label = label
-        self.icon = icon
+        self.fa_icon = fa_icon
         self.hexcolor = hexcolor
 
 
@@ -38,7 +38,7 @@ open_status = NewContentStatus(
     slug='open',
     global_status=GlobalStatus.OPEN.value,
     label='Open',
-    icon='fa-square-o',
+    fa_icon='fa-square-o',
     hexcolor='#000FF',
 )
 
@@ -46,7 +46,7 @@ closed_validated_status = NewContentStatus(
     slug='closed-validated',
     global_status=GlobalStatus.CLOSED.value,
     label='Validated',
-    icon='fa-check-square-o',
+    fa_icon='fa-check-square-o',
     hexcolor='#000FF',
 )
 
@@ -54,7 +54,7 @@ closed_unvalidated_status = NewContentStatus(
     slug='closed-unvalidated',
     global_status=GlobalStatus.CLOSED.value,
     label='Cancelled',
-    icon='fa-close',
+    fa_icon='fa-close',
     hexcolor='#000FF',
 )
 
@@ -62,7 +62,7 @@ closed_deprecated_status = NewContentStatus(
     slug='closed-deprecated',
     global_status=GlobalStatus.CLOSED.value,
     label='Deprecated',
-    icon='fa-warning',
+    fa_icon='fa-warning',
     hexcolor='#000FF',
 )
 
@@ -91,7 +91,7 @@ class ContentStatusLegacy(NewContentStatus):
                     slug=status.slug,
                     global_status=status.global_status,
                     label=status.label,
-                    icon=status.icon,
+                    fa_icon=status.fa_icon,
                     hexcolor=status.hexcolor,
                 )
                 return
@@ -117,7 +117,7 @@ class NewContentType(object):
     def __init__(
             self,
             slug: str,
-            icon: str,
+            fa_icon: str,
             hexcolor: str,
             label: str,
             creation_label: str,
@@ -125,7 +125,7 @@ class NewContentType(object):
 
     ):
         self.slug = slug
-        self.icon = icon
+        self.fa_icon = fa_icon
         self.hexcolor = hexcolor
         self.label = label
         self.creation_label = creation_label
@@ -134,7 +134,7 @@ class NewContentType(object):
 
 thread_type = NewContentType(
     slug='thread',
-    icon=thread.icon,
+    fa_icon=thread.fa_icon,
     hexcolor=thread.hexcolor,
     label='Thread',
     creation_label='Discuss about a topic',
@@ -143,8 +143,8 @@ thread_type = NewContentType(
 
 file_type = NewContentType(
     slug='file',
-    icon=file.icon,
-    hexcolor=file.hexcolor,
+    fa_icon=_file.fa_icon,
+    hexcolor=_file.hexcolor,
     label='File',
     creation_label='Upload a file',
     available_statuses=CONTENT_DEFAULT_STATUS,
@@ -152,7 +152,7 @@ file_type = NewContentType(
 
 markdownpluspage_type = NewContentType(
     slug='markdownpage',
-    icon=markdownpluspage.icon,
+    fa_icon=markdownpluspage.fa_icon,
     hexcolor=markdownpluspage.hexcolor,
     label='Rich Markdown File',
     creation_label='Create a Markdown document',
@@ -161,7 +161,7 @@ markdownpluspage_type = NewContentType(
 
 htmlpage_type = NewContentType(
     slug='page',
-    icon=htmlpage.icon,
+    fa_icon=htmlpage.fa_icon,
     hexcolor=htmlpage.hexcolor,
     label='Text Document',
     creation_label='Write a document',
@@ -171,7 +171,7 @@ htmlpage_type = NewContentType(
 # TODO - G.M - 31-05-2018 - Set Better folder params
 folder_type = NewContentType(
     slug='folder',
-    icon=thread.icon,
+    fa_icon=thread.fa_icon,
     hexcolor=thread.hexcolor,
     label='Folder',
     creation_label='Create collection of any documents',
@@ -208,7 +208,7 @@ class ContentTypeLegacy(NewContentType):
             if slug == content_type.slug:
                 super(ContentTypeLegacy, self).__init__(
                     slug=content_type.slug,
-                    icon=content_type.icon,
+                    fa_icon=content_type.fa_icon,
                     hexcolor=content_type.hexcolor,
                     label=content_type.label,
                     creation_label=content_type.creation_label,

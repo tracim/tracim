@@ -37,49 +37,49 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['label'] == 'Dashboard'
         assert sidebar_entry['route'] == '/#/workspaces/1/dashboard'  # nopep8
         assert sidebar_entry['hexcolor'] == "#252525"
-        assert sidebar_entry['icon'] == ""
+        assert sidebar_entry['fa_icon'] == ""
 
         sidebar_entry = workspace['sidebar_entries'][1]
         assert sidebar_entry['slug'] == 'contents/all'
         assert sidebar_entry['label'] == 'All Contents'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents"  # nopep8
         assert sidebar_entry['hexcolor'] == "#fdfdfd"
-        assert sidebar_entry['icon'] == ""
+        assert sidebar_entry['fa_icon'] == ""
 
         sidebar_entry = workspace['sidebar_entries'][2]
         assert sidebar_entry['slug'] == 'contents/htmlpage'
         assert sidebar_entry['label'] == 'Text Documents'
         assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=htmlpage'  # nopep8
         assert sidebar_entry['hexcolor'] == "#3f52e3"
-        assert sidebar_entry['icon'] == "file-text-o"
+        assert sidebar_entry['fa_icon'] == "file-text-o"
 
         sidebar_entry = workspace['sidebar_entries'][3]
         assert sidebar_entry['slug'] == 'contents/markdownpluspage'
         assert sidebar_entry['label'] == 'Markdown Plus Documents'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=markdownpluspage"    # nopep8
         assert sidebar_entry['hexcolor'] == "#f12d2d"
-        assert sidebar_entry['icon'] == "file-code"
+        assert sidebar_entry['fa_icon'] == "file-code"
 
         sidebar_entry = workspace['sidebar_entries'][4]
         assert sidebar_entry['slug'] == 'contents/files'
         assert sidebar_entry['label'] == 'Files'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=file"  # nopep8
         assert sidebar_entry['hexcolor'] == "#FF9900"
-        assert sidebar_entry['icon'] == "paperclip"
+        assert sidebar_entry['fa_icon'] == "paperclip"
 
         sidebar_entry = workspace['sidebar_entries'][5]
         assert sidebar_entry['slug'] == 'contents/threads'
         assert sidebar_entry['label'] == 'Threads'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
         assert sidebar_entry['hexcolor'] == "#ad4cf9"
-        assert sidebar_entry['icon'] == "comments-o"
+        assert sidebar_entry['fa_icon'] == "comments-o"
 
         sidebar_entry = workspace['sidebar_entries'][6]
         assert sidebar_entry['slug'] == 'calendar'
         assert sidebar_entry['label'] == 'Calendar'
         assert sidebar_entry['route'] == "/#/workspaces/1/calendar"  # nopep8
         assert sidebar_entry['hexcolor'] == "#757575"
-        assert sidebar_entry['icon'] == "calendar-alt"
+        assert sidebar_entry['fa_icon'] == "calendar-alt"
 
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
         """

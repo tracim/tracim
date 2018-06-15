@@ -15,7 +15,7 @@ from tracim.lib.utils.authorization import require_workspace_role
 from tracim.models.data import UserRoleInWorkspace, ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
-from tracim.exceptions import NotAuthentificated
+from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import WorkspaceNotFound
 from tracim.views.controllers import Controller
@@ -28,14 +28,14 @@ from tracim.views.core_api.schemas import ContentDigestSchema
 from tracim.views.core_api.schemas import WorkspaceSchema
 from tracim.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim.views.core_api.schemas import WorkspaceMemberSchema
-from tracim.models.data import ContentType
+from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.revision_protection import new_revision
 
 
 class WorkspaceController(Controller):
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -55,7 +55,7 @@ class WorkspaceController(Controller):
         return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -84,7 +84,7 @@ class WorkspaceController(Controller):
         ]
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -120,7 +120,7 @@ class WorkspaceController(Controller):
         return contents
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
@@ -153,7 +153,7 @@ class WorkspaceController(Controller):
         return content
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
@@ -193,7 +193,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
@@ -228,7 +228,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
@@ -264,7 +264,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
@@ -296,7 +296,7 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc()
-    @hapic.handle_exception(NotAuthentificated, HTTPStatus.UNAUTHORIZED)
+    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)

@@ -24,7 +24,7 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic',
+    'hapic>=0.41',
     'marshmallow <3.0.0a1,>2.0.0',
     # CLI
     'cliff',
@@ -35,6 +35,11 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
+    # mail-notifier
+    'mako',
+    'lxml',
+    'redis',
+    'rq',
 ]
 
 tests_require = [
@@ -43,6 +48,7 @@ tests_require = [
     'pytest-cov',
     'pep8',
     'mypy',
+    'requests'
 ]
 
 mysql_require = [
@@ -90,7 +96,8 @@ setup(
     install_requires=requires,
     entry_points={
         'paste.app_factory': [
-            'main = tracim:main',
+            'main = tracim:web',
+            'webdav = tracim:webdav'
         ],
         'console_scripts': [
             'tracimcli = tracim.command:main',

@@ -25,15 +25,11 @@ class ConfigurationError(TracimError):
     pass
 
 
-class AlreadyExistError(TracimError):
+class UserAlreadyExistError(TracimError):
     pass
 
 
-class CommandError(TracimError):
-    pass
-
-
-class CommandAbortedError(CommandError):
+class BadCommandError(TracimError):
     pass
 
 
@@ -61,7 +57,7 @@ class SameValueError(ValueError):
     pass
 
 
-class NotAuthentificated(TracimException):
+class NotAuthenticated(TracimException):
     pass
 
 
@@ -90,6 +86,14 @@ class AuthenticationFailed(TracimException):
 
 
 class WrongUserPassword(TracimException):
+    pass
+
+
+class NotificationNotSend(TracimException):
+    pass
+
+
+class GroupDoesNotExist(TracimError):
     pass
 
 

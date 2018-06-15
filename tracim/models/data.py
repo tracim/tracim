@@ -139,12 +139,12 @@ class UserRoleInWorkspace(DeclarativeBase):
         WORKSPACE_MANAGER: 'workspace_manager',
     }
 
-    # LABEL = dict()
-    # LABEL[0] = l_('N/A')
-    # LABEL[1] = l_('Reader')
-    # LABEL[2] = l_('Contributor')
-    # LABEL[4] = l_('Content Manager')
-    # LABEL[8] = l_('Workspace Manager')
+    LABEL = dict()
+    LABEL[0] = l_('N/A')
+    LABEL[1] = l_('Reader')
+    LABEL[2] = l_('Contributor')
+    LABEL[4] = l_('Content Manager')
+    LABEL[8] = l_('Workspace Manager')
     #
     # STYLE = dict()
     # STYLE[0] = ''
@@ -162,15 +162,16 @@ class UserRoleInWorkspace(DeclarativeBase):
     #
     #
     # @property
-    # def icon(self):
+    # def fa_icon(self):
     #     return UserRoleInWorkspace.ICON[self.role]
     #
     # @property
     # def style(self):
     #     return UserRoleInWorkspace.STYLE[self.role]
     #
-    # def role_as_label(self):
-    #     return UserRoleInWorkspace.LABEL[self.role]
+
+    def role_as_label(self):
+        return UserRoleInWorkspace.LABEL[self.role]
 
     @classmethod
     def get_all_role_values(cls) -> typing.List[int]:
@@ -199,7 +200,7 @@ class RoleType(object):
     def __init__(self, role_id):
         self.role_type_id = role_id
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # self.icon = UserRoleInWorkspace.ICON[role_id]
+        # self.fa_icon = UserRoleInWorkspace.ICON[role_id]
         # self.role_label = UserRoleInWorkspace.LABEL[role_id]
         # self.css_style = UserRoleInWorkspace.STYLE[role_id]
 
@@ -264,11 +265,12 @@ class ActionDescription(object):
     def __init__(self, id):
         assert id in ActionDescription.allowed_values()
         self.id = id
-        # FIXME - G.M - 17-04-2018 - Label and icon needed for webdav
+        # FIXME - G.M - 17-04-2018 - Label and fa_icon needed for webdav
         #  design template,
         # find a way to not rely on this.
         self.label = self.id
-        self.icon = ActionDescription._ICONS[id]
+        self.fa_icon = ActionDescription._ICONS[id]
+        #self.icon = self.fa_icon
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # self.label = ActionDescription._LABELS[id]
 
@@ -290,8 +292,8 @@ class ActionDescription(object):
                 ]
 
 
-from .contents import ContentStatusLegacy as ContentStatus
-from .contents import ContentTypeLegacy as ContentType
+from tracim.models.contents import ContentStatusLegacy as ContentStatus
+from tracim.models.contents import ContentTypeLegacy as ContentType
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
 # is lost .
 
@@ -1464,7 +1466,7 @@ class VirtualEvent(object):
         assert hasattr(type, 'id')
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # assert hasattr(type, 'css')
-        # assert hasattr(type, 'icon')
+        # assert hasattr(type, 'fa_icon')
         # assert hasattr(type, 'label')
 
     def created_as_delta(self, delta_from_datetime:datetime=None):

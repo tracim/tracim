@@ -27,42 +27,36 @@ from tracim.models import get_engine, get_session_factory
 class WebdavAppFactory(object):
 
     def __init__(self,
-                 webdav_config_file_path: str = None,
                  tracim_config_file_path: str = None,
                  ):
         self.config = self._initConfig(
-            webdav_config_file_path,
             tracim_config_file_path
         )
 
     def _initConfig(self,
-                    webdav_config_file_path: str = None,
                     tracim_config_file_path: str = None
                     ):
         """Setup configuration dictionary from default,
          command line and configuration file."""
-        if not webdav_config_file_path:
-            webdav_config_file_path = DEFAULT_WEBDAV_CONFIG_FILE
         if not tracim_config_file_path:
             tracim_config_file_path = DEFAULT_TRACIM_CONFIG_FILE
 
         # Set config defaults
         config = DEFAULT_CONFIG.copy()
         temp_verbose = config["verbose"]
+        # Get pyramid Env
+        tracim_config_file_path = os.path.abspath(tracim_config_file_path)
+        config['tracim_config'] = tracim_config_file_path
+        settings = self._get_tracim_settings(config)
+        app_config = CFG(settings)
 
-        default_config_file = os.path.abspath(webdav_config_file_path)
+        default_config_file = os.path.abspath(settings['wsgidav.config_path'])
         webdav_config_file = self._readConfigFile(
-            webdav_config_file_path,
+            default_config_file,
             temp_verbose
             )
         # Configuration file overrides defaults
         config.update(webdav_config_file)
-
-        # Get pyramid Env
-        tracim_config_file_path = os.path.abspath(tracim_config_file_path)
-        config['tracim_config'] = tracim_config_file_path
-        settings = get_appsettings(config['tracim_config'])
-        app_config = CFG(settings)
 
         if not useLxml and config["verbose"] >= 1:
             print(
@@ -93,9 +87,22 @@ class WebdavAppFactory(object):
         config['domaincontroller'] = TracimDomainController(
             presetdomain=None,
             presetserver=None,
-            app_config = app_config,
+            app_config=app_config,
         )
         return config
+
+    def _get_tracim_settings(
+            self,
+            default_config,
+    ):
+        """
+        Get tracim settings
+        """
+        global_conf = get_appsettings(default_config['tracim_config']).global_conf
+        local_conf = get_appsettings(default_config['tracim_config'], 'tracim_web')  # nopep8
+        settings = global_conf
+        settings.update(local_conf)
+        return settings
 
     # INFO - G.M - 13-04-2018 - Copy from
     # wsgidav.server.run_server._readConfigFile

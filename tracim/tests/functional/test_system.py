@@ -26,35 +26,35 @@ class TestApplicationsEndpoint(FunctionalTest):
         application = res[0]
         assert application['label'] == "Text Documents"
         assert application['slug'] == 'contents/htmlpage'
-        assert application['icon'] == 'file-text-o'
+        assert application['fa_icon'] == 'file-text-o'
         assert application['hexcolor'] == '#3f52e3'
         assert application['is_active'] is True
         assert 'config' in application
         application = res[1]
         assert application['label'] == "Markdown Plus Documents"
         assert application['slug'] == 'contents/markdownpluspage'
-        assert application['icon'] == 'file-code'
+        assert application['fa_icon'] == 'file-code'
         assert application['hexcolor'] == '#f12d2d'
         assert application['is_active'] is True
         assert 'config' in application
         application = res[2]
         assert application['label'] == "Files"
         assert application['slug'] == 'contents/files'
-        assert application['icon'] == 'paperclip'
+        assert application['fa_icon'] == 'paperclip'
         assert application['hexcolor'] == '#FF9900'
         assert application['is_active'] is True
         assert 'config' in application
         application = res[3]
         assert application['label'] == "Threads"
         assert application['slug'] == 'contents/threads'
-        assert application['icon'] == 'comments-o'
+        assert application['fa_icon'] == 'comments-o'
         assert application['hexcolor'] == '#ad4cf9'
         assert application['is_active'] is True
         assert 'config' in application
         application = res[4]
         assert application['label'] == "Calendar"
         assert application['slug'] == 'calendar'
-        assert application['icon'] == 'calendar-alt'
+        assert application['fa_icon'] == 'calendar-alt'
         assert application['hexcolor'] == '#757575'
         assert application['is_active'] is True
         assert 'config' in application
@@ -98,7 +98,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
 
         content_type = res[0]
         assert content_type['slug'] == 'thread'
-        assert content_type['icon'] == 'comments-o'
+        assert content_type['fa_icon'] == 'comments-o'
         assert content_type['hexcolor'] == '#ad4cf9'
         assert content_type['label'] == 'Thread'
         assert content_type['creation_label'] == 'Discuss about a topic'
@@ -107,7 +107,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
 
         content_type = res[1]
         assert content_type['slug'] == 'file'
-        assert content_type['icon'] == 'paperclip'
+        assert content_type['fa_icon'] == 'paperclip'
         assert content_type['hexcolor'] == '#FF9900'
         assert content_type['label'] == 'File'
         assert content_type['creation_label'] == 'Upload a file'
@@ -116,7 +116,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
 
         content_type = res[2]
         assert content_type['slug'] == 'markdownpage'
-        assert content_type['icon'] == 'file-code'
+        assert content_type['fa_icon'] == 'file-code'
         assert content_type['hexcolor'] == '#f12d2d'
         assert content_type['label'] == 'Rich Markdown File'
         assert content_type['creation_label'] == 'Create a Markdown document'
@@ -125,7 +125,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
 
         content_type = res[3]
         assert content_type['slug'] == 'page'
-        assert content_type['icon'] == 'file-text-o'
+        assert content_type['fa_icon'] == 'file-text-o'
         assert content_type['hexcolor'] == '#3f52e3'
         assert content_type['label'] == 'Text Document'
         assert content_type['creation_label'] == 'Write a document'

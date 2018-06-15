@@ -9,7 +9,7 @@ from cliff.commandmanager import CommandManager
 
 from pyramid.paster import bootstrap
 from pyramid.scripting import AppEnvironment
-from tracim.exceptions import CommandAbortedError
+from tracim.exceptions import BadCommandError
 from tracim.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 
 
@@ -55,6 +55,7 @@ class AppContextCommand(Command):
             with bootstrap(parsed_args.config_file) as app_context:
                 with app_context['request'].tm:
                     self.take_app_action(parsed_args, app_context)
+
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
