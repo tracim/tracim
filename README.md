@@ -5,7 +5,7 @@
 tracim_backend
 ==============
 
-This code is Work in progress. Not usable at all for production.
+This code is "work in progress". Not usable at all for production.
 
 Backend source code of tracim v2, using Pyramid Framework.
 
