@@ -97,6 +97,14 @@ class GroupDoesNotExist(TracimError):
     pass
 
 
+class ContentStatusNotExist(TracimError):
+    pass
+
+
+class ContentTypeNotExist(TracimError):
+    pass
+
+
 class UserDoesNotExist(TracimException):
     pass
 

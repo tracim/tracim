@@ -1,25 +1,17 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
-
 import os
-
+import datetime
+import re
+import typing
 from operator import itemgetter
+from operator import not_
 
 import transaction
 from sqlalchemy import func
 from sqlalchemy.orm import Query
-
-__author__ = 'damien'
-
-import datetime
-import re
-import typing
-
-from tracim.lib.utils.translation import fake_translator as _
-
 from depot.manager import DepotManager
 from depot.io.utils import FileIntent
-
 import sqlalchemy
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
@@ -29,6 +21,7 @@ from sqlalchemy import desc
 from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
+
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
@@ -44,6 +37,11 @@ from tracim.models.data import NodeTreeItem
 from tracim.models.data import RevisionReadStatus
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
+from tracim.lib.utils.translation import fake_translator as _
+from tracim.models.context_models import ContentInContext
+
+
+__author__ = 'damien'
 
 
 def compare_content_for_sorting_by_type_and_name(
@@ -103,6 +101,7 @@ class ContentApi(object):
         ContentType.Comment,
         ContentType.Thread,
         ContentType.Page,
+        ContentType.MarkdownPage,
     )
 
     def __init__(
@@ -113,6 +112,7 @@ class ContentApi(object):
             show_archived: bool = False,
             show_deleted: bool = False,
             show_temporary: bool = False,
+            show_active: bool = True,
             all_content_in_treeview: bool = True,
             force_show_all_types: bool = False,
             disable_user_workspaces_filter: bool = False,
@@ -124,6 +124,7 @@ class ContentApi(object):
         self._show_archived = show_archived
         self._show_deleted = show_deleted
         self._show_temporary = show_temporary
+        self._show_active = show_active
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
@@ -155,6 +156,9 @@ class ContentApi(object):
             self._show_archived = previous_show_archived
             self._show_deleted = previous_show_deleted
             self._show_temporary = previous_show_temporary
+
+    def get_content_in_context(self, content: Content):
+        return ContentInContext(content, self._session, self._config)
 
     def get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
@@ -234,6 +238,11 @@ class ContentApi(object):
     def _base_query(self, workspace: Workspace=None) -> Query:
         result = self.__real_base_query(workspace)
 
+        if not self._show_active:
+            result = result.filter(or_(
+                Content.is_deleted==True,
+                Content.is_archived==True,
+            ))
         if not self._show_deleted:
             result = result.filter(Content.is_deleted==False)
 
@@ -686,8 +695,9 @@ class ContentApi(object):
 
         if parent_id:
             resultset = resultset.filter(Content.parent_id==parent_id)
-        if parent_id is False:
+        if parent_id == 0 or parent_id is False:
             resultset = resultset.filter(Content.parent_id == None)
+        # parent_id == None give all contents
 
         return resultset.all()
 

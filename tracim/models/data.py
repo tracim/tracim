@@ -292,250 +292,254 @@ class ActionDescription(object):
                 ]
 
 
-class ContentStatus(object):
-    """
-    Allowed status are:
-    - open
-    - closed-validated
-    - closed-invalidated
-    - closed-deprecated
-    """
-
-    OPEN = 'open'
-    CLOSED_VALIDATED = 'closed-validated'
-    CLOSED_UNVALIDATED = 'closed-unvalidated'
-    CLOSED_DEPRECATED = 'closed-deprecated'
-
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    # _LABELS = {'open': l_('work in progress'),
-    #            'closed-validated': l_('closed — validated'),
-    #            'closed-unvalidated': l_('closed — cancelled'),
-    #            'closed-deprecated': l_('deprecated')}
-    #
-    # _LABELS_THREAD = {'open': l_('subject in progress'),
-    #                   'closed-validated': l_('subject closed — resolved'),
-    #                   'closed-unvalidated': l_('subject closed — cancelled'),
-    #                   'closed-deprecated': l_('deprecated')}
-    #
-    # _LABELS_FILE = {'open': l_('work in progress'),
-    #                 'closed-validated': l_('closed — validated'),
-    #                 'closed-unvalidated': l_('closed — cancelled'),
-    #                 'closed-deprecated': l_('deprecated')}
-    #
-    # _ICONS = {
-    #     'open': 'fa fa-square-o',
-    #     'closed-validated': 'fa fa-check-square-o',
-    #     'closed-unvalidated': 'fa fa-close',
-    #     'closed-deprecated': 'fa fa-warning',
-    # }
-    #
-    # _CSS = {
-    #     'open': 'tracim-status-open',
-    #     'closed-validated': 'tracim-status-closed-validated',
-    #     'closed-unvalidated': 'tracim-status-closed-unvalidated',
-    #     'closed-deprecated': 'tracim-status-closed-deprecated',
-    # }
-
-    def __init__(self,
-                 id,
-                 # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-                 # type=''
-    ):
-        self.id = id
-        self.label = self.id
-        # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # self.fa_icon = ContentStatus._ICONS[id]
-        # self.css = ContentStatus._CSS[id]
-        #
-        # if type==ContentType.Thread:
-        #     self.label = ContentStatus._LABELS_THREAD[id]
-        # elif type==ContentType.File:
-        #     self.label = ContentStatus._LABELS_FILE[id]
-        # else:
-        #     self.label = ContentStatus._LABELS[id]
+from tracim.models.contents import ContentStatusLegacy as ContentStatus
+from tracim.models.contents import ContentTypeLegacy as ContentType
+# TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
+# is lost .
 
 
-    @classmethod
-    def all(cls, type='') -> ['ContentStatus']:
-        # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # all = []
-        # all.append(ContentStatus('open', type))
-        # all.append(ContentStatus('closed-validated', type))
-        # all.append(ContentStatus('closed-unvalidated', type))
-        # all.append(ContentStatus('closed-deprecated', type))
-        # return all
-        status_list = list()
-        for elem in cls.allowed_values():
-            status_list.append(ContentStatus(elem))
-        return status_list
+# class ContentStatus(object):
+#     """
+#     Allowed status are:
+#     - open
+#     - closed-validated
+#     - closed-invalidated
+#     - closed-deprecated
+#     """
+#
+#     OPEN = 'open'
+#     CLOSED_VALIDATED = 'closed-validated'
+#     CLOSED_UNVALIDATED = 'closed-unvalidated'
+#     CLOSED_DEPRECATED = 'closed-deprecated'
+#
+#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#     # _LABELS = {'open': l_('work in progress'),
+#     #            'closed-validated': l_('closed — validated'),
+#     #            'closed-unvalidated': l_('closed — cancelled'),
+#     #            'closed-deprecated': l_('deprecated')}
+#     #
+#     # _LABELS_THREAD = {'open': l_('subject in progress'),
+#     #                   'closed-validated': l_('subject closed — resolved'),
+#     #                   'closed-unvalidated': l_('subject closed — cancelled'),
+#     #                   'closed-deprecated': l_('deprecated')}
+#     #
+#     # _LABELS_FILE = {'open': l_('work in progress'),
+#     #                 'closed-validated': l_('closed — validated'),
+#     #                 'closed-unvalidated': l_('closed — cancelled'),
+#     #                 'closed-deprecated': l_('deprecated')}
+#     #
+#     # _ICONS = {
+#     #     'open': 'fa fa-square-o',
+#     #     'closed-validated': 'fa fa-check-square-o',
+#     #     'closed-unvalidated': 'fa fa-close',
+#     #     'closed-deprecated': 'fa fa-warning',
+#     # }
+#     #
+#     # _CSS = {
+#     #     'open': 'tracim-status-open',
+#     #     'closed-validated': 'tracim-status-closed-validated',
+#     #     'closed-unvalidated': 'tracim-status-closed-unvalidated',
+#     #     'closed-deprecated': 'tracim-status-closed-deprecated',
+#     # }
+#
+#     def __init__(self,
+#                  id,
+#                  # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#                  # type=''
+#     ):
+#         self.id = id
+#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#         # self.icon = ContentStatus._ICONS[id]
+#         # self.css = ContentStatus._CSS[id]
+#         #
+#         # if type==ContentType.Thread:
+#         #     self.label = ContentStatus._LABELS_THREAD[id]
+#         # elif type==ContentType.File:
+#         #     self.label = ContentStatus._LABELS_FILE[id]
+#         # else:
+#         #     self.label = ContentStatus._LABELS[id]
+#
+#
+#     @classmethod
+#     def all(cls, type='') -> ['ContentStatus']:
+#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#         # all = []
+#         # all.append(ContentStatus('open', type))
+#         # all.append(ContentStatus('closed-validated', type))
+#         # all.append(ContentStatus('closed-unvalidated', type))
+#         # all.append(ContentStatus('closed-deprecated', type))
+#         # return all
+#         status_list = list()
+#         for elem in cls.allowed_values():
+#             status_list.append(ContentStatus(elem))
+#         return status_list
+#
+#     @classmethod
+#     def allowed_values(cls):
+#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#         # return ContentStatus._LABELS.keys()
+#         return [
+#             ContentStatus.OPEN,
+#             ContentStatus.CLOSED_UNVALIDATED,
+#             ContentStatus.CLOSED_VALIDATED,
+#             ContentStatus.CLOSED_DEPRECATED
+#         ]
 
-    @classmethod
-    def allowed_values(cls):
-        # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # return ContentStatus._LABELS.keys()
-        return [
-            ContentStatus.OPEN,
-            ContentStatus.CLOSED_UNVALIDATED,
-            ContentStatus.CLOSED_VALIDATED,
-            ContentStatus.CLOSED_DEPRECATED
-        ]
 
-
-class ContentType(object):
-    Any = 'any'
-
-    Folder = 'folder'
-    File = 'file'
-    Comment = 'comment'
-    Thread = 'thread'
-    Page = 'page'
-    Event = 'event'
-
-    # TODO - G.M - 10-04-2018 - [Cleanup] Do we really need this ?
-    # _STRING_LIST_SEPARATOR = ','
-
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    # _ICONS = {  # Deprecated
-    #     'dashboard': 'fa-home',
-    #     'workspace': 'fa-bank',
-    #     'folder': 'fa fa-folder-open-o',
-    #     'file': 'fa fa-paperclip',
-    #     'page': 'fa fa-file-text-o',
-    #     'thread': 'fa fa-comments-o',
-    #     'comment': 'fa fa-comment-o',
-    #     'event': 'fa fa-calendar-o',
-    # }
-    #
-    # _CSS_ICONS = {
-    #     'dashboard': 'fa fa-home',
-    #     'workspace': 'fa fa-bank',
-    #     'folder': 'fa fa-folder-open-o',
-    #     'file': 'fa fa-paperclip',
-    #     'page': 'fa fa-file-text-o',
-    #     'thread': 'fa fa-comments-o',
-    #     'comment': 'fa fa-comment-o',
-    #     'event': 'fa fa-calendar-o',
-    # }
-    #
-    # _CSS_COLORS = {
-    #     'dashboard': 't-dashboard-color',
-    #     'workspace': 't-less-visible',
-    #     'folder': 't-folder-color',
-    #     'file': 't-file-color',
-    #     'page': 't-page-color',
-    #     'thread': 't-thread-color',
-    #     'comment': 't-thread-color',
-    #     'event': 't-event-color',
-    # }
-
-    _ORDER_WEIGHT = {
-        'folder': 0,
-        'page': 1,
-        'thread': 2,
-        'file': 3,
-        'comment': 4,
-        'event': 5,
-    }
-
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    # _LABEL = {
-    #     'dashboard': '',
-    #     'workspace': l_('workspace'),
-    #     'folder': l_('folder'),
-    #     'file': l_('file'),
-    #     'page': l_('page'),
-    #     'thread': l_('thread'),
-    #     'comment': l_('comment'),
-    #     'event': l_('event'),
-    # }
-    #
-    # _DELETE_LABEL = {
-    #     'dashboard': '',
-    #     'workspace': l_('Delete this workspace'),
-    #     'folder': l_('Delete this folder'),
-    #     'file': l_('Delete this file'),
-    #     'page': l_('Delete this page'),
-    #     'thread': l_('Delete this thread'),
-    #     'comment': l_('Delete this comment'),
-    #     'event': l_('Delete this event'),
-    # }
-    #
-    # @classmethod
-    # def get_icon(cls, type: str):
-    #     assert(type in ContentType._ICONS) # DYN_REMOVE
-    #     return ContentType._ICONS[type]
-
-    @classmethod
-    def all(cls):
-        return cls.allowed_types()
-
-    @classmethod
-    def allowed_types(cls):
-        return [cls.Folder, cls.File, cls.Comment, cls.Thread, cls.Page,
-                cls.Event]
-
-    @classmethod
-    def allowed_types_for_folding(cls):
-        # This method is used for showing only "main"
-        # types in the left-side treeview
-        return [cls.Folder, cls.File, cls.Thread, cls.Page]
-
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-    # @classmethod
-    # def allowed_types_from_str(cls, allowed_types_as_string: str):
-    #     allowed_types = []
-    #     # HACK - THIS
-    #     for item in allowed_types_as_string.split(ContentType._STRING_LIST_SEPARATOR):
-    #         if item and item in ContentType.allowed_types_for_folding():
-    #             allowed_types.append(item)
-    #     return allowed_types
-    #
-    # @classmethod
-    # def fill_url(cls, content: 'Content'):
-    #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
-    #     # Make this code dynamic loading data types
-    #
-    #     if content.type==ContentType.Folder:
-    #         return '/workspaces/{}/folders/{}'.format(content.workspace_id, content.content_id)
-    #     elif content.type==ContentType.File:
-    #         return '/workspaces/{}/folders/{}/files/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-    #     elif content.type==ContentType.Thread:
-    #         return '/workspaces/{}/folders/{}/threads/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-    #     elif content.type==ContentType.Page:
-    #         return '/workspaces/{}/folders/{}/pages/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-    #
-    # @classmethod
-    # def fill_url_for_workspace(cls, workspace: Workspace):
-    #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
-    #     # Make this code dynamic loading data types
-    #     return '/workspaces/{}'.format(workspace.workspace_id)
-
-    @classmethod
-    def sorted(cls, types: ['ContentType']) -> ['ContentType']:
-        return sorted(types, key=lambda content_type: content_type.priority)
-
-    @property
-    def type(self):
-        return self.id
-
-    def __init__(self, type):
-        self.id = type
-        # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # self.fa_icon = ContentType._CSS_ICONS[type]
-        # self.color = ContentType._CSS_COLORS[type]  # deprecated
-        # self.css = ContentType._CSS_COLORS[type]
-        # self.label = ContentType._LABEL[type]
-        self.priority = ContentType._ORDER_WEIGHT[type]
-
-    def toDict(self):
-        return dict(id=self.type,
-                    type=self.type,
-                    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-                    # fa_icon=self.fa_icon,
-                    # color=self.color,
-                    # label=self.label,
-                    priority=self.priority)
-
+# class ContentType(object):
+#     Any = 'any'
+#
+#     Folder = 'folder'
+#     File = 'file'
+#     Comment = 'comment'
+#     Thread = 'thread'
+#     Page = 'page'
+#     Event = 'event'
+#
+#     # TODO - G.M - 10-04-2018 - [Cleanup] Do we really need this ?
+#     # _STRING_LIST_SEPARATOR = ','
+#
+#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#     # _ICONS = {  # Deprecated
+#     #     'dashboard': 'fa-home',
+#     #     'workspace': 'fa-bank',
+#     #     'folder': 'fa fa-folder-open-o',
+#     #     'file': 'fa fa-paperclip',
+#     #     'page': 'fa fa-file-text-o',
+#     #     'thread': 'fa fa-comments-o',
+#     #     'comment': 'fa fa-comment-o',
+#     #     'event': 'fa fa-calendar-o',
+#     # }
+#     #
+#     # _CSS_ICONS = {
+#     #     'dashboard': 'fa fa-home',
+#     #     'workspace': 'fa fa-bank',
+#     #     'folder': 'fa fa-folder-open-o',
+#     #     'file': 'fa fa-paperclip',
+#     #     'page': 'fa fa-file-text-o',
+#     #     'thread': 'fa fa-comments-o',
+#     #     'comment': 'fa fa-comment-o',
+#     #     'event': 'fa fa-calendar-o',
+#     # }
+#     #
+#     # _CSS_COLORS = {
+#     #     'dashboard': 't-dashboard-color',
+#     #     'workspace': 't-less-visible',
+#     #     'folder': 't-folder-color',
+#     #     'file': 't-file-color',
+#     #     'page': 't-page-color',
+#     #     'thread': 't-thread-color',
+#     #     'comment': 't-thread-color',
+#     #     'event': 't-event-color',
+#     # }
+#
+#     _ORDER_WEIGHT = {
+#         'folder': 0,
+#         'page': 1,
+#         'thread': 2,
+#         'file': 3,
+#         'comment': 4,
+#         'event': 5,
+#     }
+#
+#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#     # _LABEL = {
+#     #     'dashboard': '',
+#     #     'workspace': l_('workspace'),
+#     #     'folder': l_('folder'),
+#     #     'file': l_('file'),
+#     #     'page': l_('page'),
+#     #     'thread': l_('thread'),
+#     #     'comment': l_('comment'),
+#     #     'event': l_('event'),
+#     # }
+#     #
+#     # _DELETE_LABEL = {
+#     #     'dashboard': '',
+#     #     'workspace': l_('Delete this workspace'),
+#     #     'folder': l_('Delete this folder'),
+#     #     'file': l_('Delete this file'),
+#     #     'page': l_('Delete this page'),
+#     #     'thread': l_('Delete this thread'),
+#     #     'comment': l_('Delete this comment'),
+#     #     'event': l_('Delete this event'),
+#     # }
+#     #
+#     # @classmethod
+#     # def get_icon(cls, type: str):
+#     #     assert(type in ContentType._ICONS) # DYN_REMOVE
+#     #     return ContentType._ICONS[type]
+#
+#     @classmethod
+#     def all(cls):
+#         return cls.allowed_types()
+#
+#     @classmethod
+#     def allowed_types(cls):
+#         return [cls.Folder, cls.File, cls.Comment, cls.Thread, cls.Page,
+#                 cls.Event]
+#
+#     @classmethod
+#     def allowed_types_for_folding(cls):
+#         # This method is used for showing only "main"
+#         # types in the left-side treeview
+#         return [cls.Folder, cls.File, cls.Thread, cls.Page]
+#
+#     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#     # @classmethod
+#     # def allowed_types_from_str(cls, allowed_types_as_string: str):
+#     #     allowed_types = []
+#     #     # HACK - THIS
+#     #     for item in allowed_types_as_string.split(ContentType._STRING_LIST_SEPARATOR):
+#     #         if item and item in ContentType.allowed_types_for_folding():
+#     #             allowed_types.append(item)
+#     #     return allowed_types
+#     #
+#     # @classmethod
+#     # def fill_url(cls, content: 'Content'):
+#     #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
+#     #     # Make this code dynamic loading data types
+#     #
+#     #     if content.type==ContentType.Folder:
+#     #         return '/workspaces/{}/folders/{}'.format(content.workspace_id, content.content_id)
+#     #     elif content.type==ContentType.File:
+#     #         return '/workspaces/{}/folders/{}/files/{}'.format(content.workspace_id, content.parent_id, content.content_id)
+#     #     elif content.type==ContentType.Thread:
+#     #         return '/workspaces/{}/folders/{}/threads/{}'.format(content.workspace_id, content.parent_id, content.content_id)
+#     #     elif content.type==ContentType.Page:
+#     #         return '/workspaces/{}/folders/{}/pages/{}'.format(content.workspace_id, content.parent_id, content.content_id)
+#     #
+#     # @classmethod
+#     # def fill_url_for_workspace(cls, workspace: Workspace):
+#     #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
+#     #     # Make this code dynamic loading data types
+#     #     return '/workspaces/{}'.format(workspace.workspace_id)
+#
+#     @classmethod
+#     def sorted(cls, types: ['ContentType']) -> ['ContentType']:
+#         return sorted(types, key=lambda content_type: content_type.priority)
+#
+#     @property
+#     def type(self):
+#         return self.id
+#
+#     def __init__(self, type):
+#         self.id = type
+#         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#         # self.icon = ContentType._CSS_ICONS[type]
+#         # self.color = ContentType._CSS_COLORS[type]  # deprecated
+#         # self.css = ContentType._CSS_COLORS[type]
+#         # self.label = ContentType._LABEL[type]
+#         self.priority = ContentType._ORDER_WEIGHT[type]
+#
+#     def toDict(self):
+#         return dict(id=self.type,
+#                     type=self.type,
+#                     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+#                     # icon=self.icon,
+#                     # color=self.color,
+#                     # label=self.label,
+#                     priority=self.priority)
 
 class ContentChecker(object):
 
@@ -1145,6 +1149,10 @@ class Content(DeclarativeBase):
     @property
     def is_editable(self) -> bool:
         return not self.is_archived and not self.is_deleted
+
+    @property
+    def is_active(self) -> bool:
+        return self.is_editable
 
     @property
     def depot_file(self) -> UploadedFile:

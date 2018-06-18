@@ -29,7 +29,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = res.json_body
         workspace = res[0]
         assert workspace['id'] == 1
-        assert workspace['label'] == 'w1'
+        assert workspace['label'] == 'Business'
         assert len(workspace['sidebar_entries']) == 7
 
         sidebar_entry = workspace['sidebar_entries'][0]

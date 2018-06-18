@@ -4,6 +4,14 @@ from marshmallow import post_load
 from marshmallow.validate import OneOf
 
 from tracim.models.auth import Profile
+from tracim.models.contents import CONTENT_DEFAULT_TYPE
+from tracim.models.contents import CONTENT_DEFAULT_STATUS
+from tracim.models.contents import GlobalStatus
+from tracim.models.contents import open_status
+from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import MoveParams
+from tracim.models.context_models import WorkspaceAndContentPath
+from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
 
@@ -65,12 +73,63 @@ class UserSchema(marshmallow.Schema):
         description = 'User account of Tracim'
 
 
+# Path Schemas
+
+
 class UserIdPathSchema(marshmallow.Schema):
-    user_id = marshmallow.fields.Int(example=3)
+    user_id = marshmallow.fields.Int(example=3, required=True)
 
 
 class WorkspaceIdPathSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4)
+    workspace_id = marshmallow.fields.Int(example=4, required=True)
+
+
+class ContentIdPathSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(example=6, required=True)
+
+
+class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndContentPath(**data)
+
+
+class FilterContentQuerySchema(marshmallow.Schema):
+    parent_id = workspace_id = marshmallow.fields.Int(
+        example=2,
+        default=None,
+        description='allow to filter items in a folder.'
+                    ' If not set, then return all contents.'
+                    ' If set to 0, then return root contents.'
+                    ' If set to another value, return all contents'
+                    ' directly included in the folder parent_id'
+    )
+    show_archived = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description='if set to 1, then show archived contents.'
+                    ' Default is 0 - hide archived content'
+    )
+    show_deleted = marshmallow.fields.Int(
+        example=0,
+        default=0,
+        description='if set to 1, then show deleted contents.'
+                    ' Default is 0 - hide deleted content'
+    )
+    show_active = marshmallow.fields.Int(
+        example=1,
+        default=1,
+        description='f set to 1, then show active contents. '
+                    'Default is 1 - show active content.'
+                    ' Note: active content are content '
+                    'that is neither archived nor deleted. '
+                    'The reason for this parameter to exist is for example '
+                    'to allow to show only archived documents'
+    )
+    @post_load
+    def make_content_filter(self, data):
+        return ContentFilter(**data)
+###
 
 
 class BasicAuthSchema(marshmallow.Schema):
@@ -188,3 +247,114 @@ class ApplicationSchema(marshmallow.Schema):
 
     class Meta:
         description = 'Tracim Application informations'
+
+
+class StatusSchema(marshmallow.Schema):
+    slug = marshmallow.fields.String(
+        example='open',
+        description='the slug represents the type of status. '
+                    'Statuses are open, closed-validated, closed-invalidated, closed-deprecated'  # nopep8
+    )
+    global_status = marshmallow.fields.String(
+        example='Open',
+        description='global_status: open, closed',
+        validate=OneOf([status.value for status in GlobalStatus]),
+    )
+    label = marshmallow.fields.String(example='Open')
+    fa_icon = marshmallow.fields.String(example='fa-check')
+    hexcolor = marshmallow.fields.String(example='#0000FF')
+
+
+class ContentTypeSchema(marshmallow.Schema):
+    slug = marshmallow.fields.String(
+        example='pagehtml',
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+    )
+    fa_icon = marshmallow.fields.String(
+        example='fa-file-text-o',
+        description='CSS class of the icon. Example: file-o for using Fontawesome file-o icon',  # nopep8
+    )
+    hexcolor = marshmallow.fields.String(
+        example="#FF0000",
+        description='HTML encoded color associated to the application. Example:#FF0000 for red'  # nopep8
+    )
+    label = marshmallow.fields.String(
+        example='Text Documents'
+    )
+    creation_label = marshmallow.fields.String(
+        example='Write a document'
+    )
+    available_statuses = marshmallow.fields.Nested(
+        StatusSchema,
+        many=True
+    )
+
+
+class ContentMoveSchema(marshmallow.Schema):
+    # TODO - G.M - 30-05-2018 - Read and apply this note
+    # Note:
+    # if the new workspace is different, then the backend
+    # must check if the user is allowed to move to this workspace
+    # (the user must be content manager of both workspaces)
+    new_parent_id = marshmallow.fields.Int(
+        example=42,
+        description='id of the new parent content id.'
+    )
+
+    @post_load
+    def make_move_params(self, data):
+        return MoveParams(**data)
+
+
+class ContentCreationSchema(marshmallow.Schema):
+    label = marshmallow.fields.String(
+        example='contract for client XXX',
+        description='Title of the content to create'
+    )
+    content_type_slug = marshmallow.fields.String(
+        example='htmlpage',
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+    )
+
+    @post_load
+    def make_content_filter(self, data):
+        return ContentCreation(**data)
+
+
+class ContentDigestSchema(marshmallow.Schema):
+    id = marshmallow.fields.Int(example=6)
+    slug = marshmallow.fields.Str(example='intervention-report-12')
+    parent_id = marshmallow.fields.Int(
+        example=34,
+        allow_none=True,
+        default=None
+    )
+    workspace_id = marshmallow.fields.Int(
+        example=19,
+    )
+    label = marshmallow.fields.Str(example='Intervention Report 12')
+    content_type_slug = marshmallow.fields.Str(
+        example='htmlpage',
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+    )
+    sub_content_type_slug = marshmallow.fields.List(
+        marshmallow.fields.Str,
+        description='list of content types allowed as sub contents. '
+                    'This field is required for folder contents, '
+                    'set it to empty list in other cases'
+    )
+    status_slug = marshmallow.fields.Str(
+        example='closed-deprecated',
+        validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
+        description='this slug is found in content_type available statuses',
+        default=open_status
+    )
+    is_archived = marshmallow.fields.Bool(example=False, default=False)
+    is_deleted = marshmallow.fields.Bool(example=False, default=False)
+    show_in_ui = marshmallow.fields.Bool(
+        example=True,
+        description='if false, then do not show content in the treeview. '
+                    'This may his maybe used for specific contents or '
+                    'for sub-contents. Default is True. '
+                    'In first version of the API, this field is always True',
+    )

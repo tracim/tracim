@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from depot.io.utils import FileIntent
+import transaction
 
 from tracim import models
 from tracim.fixtures import Fixture
@@ -9,6 +10,7 @@ from tracim.lib.core.userworkspace import RoleApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models.data import ContentType
 from tracim.models.data import UserRoleInWorkspace
+from tracim.models.revision_protection import new_revision
 
 
 class Content(Fixture):
@@ -43,133 +45,206 @@ class Content(Fixture):
         )
 
         # Workspaces
-        w1 = admin_workspace_api.create_workspace(
-            'w1',
-            description='This is a workspace',
-            save_now=True
+        business_workspace = admin_workspace_api.create_workspace(
+            'Business',
+            description='All importants documents',
+            save_now=True,
         )
-        w2 = bob_workspace_api.create_workspace(
-            'w2',
-            description='A great workspace',
-            save_now=True
+        recipe_workspace = admin_workspace_api.create_workspace(
+            'Recipes',
+            description='Our best recipes',
+            save_now=True,
         )
-        w3 = admin_workspace_api.create_workspace(
-            'w3',
-            description='Just another workspace',
-            save_now=True
+        other_workspace = bob_workspace_api.create_workspace(
+            'Others',
+            description='Other Workspace',
+            save_now=True,
         )
 
         # Workspaces roles
         role_api.create_one(
             user=bob,
-            workspace=w1,
+            workspace=recipe_workspace,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
             with_notif=False,
         )
-
         # Folders
-        w1f1 = content_api.create(
+
+        tool_workspace = content_api.create(
             content_type=ContentType.Folder,
-            workspace=w1,
-            label='w1f1',
+            workspace=business_workspace,
+            label='Tools',
             do_save=True,
             do_notify=False,
         )
-        w1f2 = content_api.create(
+        menu_workspace = content_api.create(
             content_type=ContentType.Folder,
-            workspace=w1,
-            label='w1f2',
+            workspace=business_workspace,
+            label='Menus',
             do_save=True,
             do_notify=False,
         )
 
-        w2f1 = content_api.create(
+        dessert_folder = content_api.create(
             content_type=ContentType.Folder,
-            workspace=w2,
-            label='w2f1',
+            workspace=recipe_workspace,
+            label='Desserts',
             do_save=True,
             do_notify=False,
         )
-        w2f2 = content_api.create(
+        salads_folder = content_api.create(
             content_type=ContentType.Folder,
-            workspace=w2,
-            label='w2f2',
+            workspace=recipe_workspace,
+            label='Salads',
             do_save=True,
             do_notify=False,
         )
-
-        w3f1 = content_api.create(
+        other_folder = content_api.create(
             content_type=ContentType.Folder,
-            workspace=w3,
-            label='w3f3',
+            workspace=other_workspace,
+            label='Infos',
             do_save=True,
             do_notify=False,
         )
 
         # Pages, threads, ..
-        w1f1p1 = content_api.create(
+        tiramisu_page = content_api.create(
             content_type=ContentType.Page,
-            workspace=w1,
-            parent=w1f1,
-            label='w1f1p1',
+            workspace=recipe_workspace,
+            parent=dessert_folder,
+            label='Tiramisu Recipe',
             do_save=True,
             do_notify=False,
         )
-        w1f1t1 = content_api.create(
+        best_cake_thread = content_api.create(
             content_type=ContentType.Thread,
-            workspace=w1,
-            parent=w1f1,
-            label='w1f1t1',
+            workspace=recipe_workspace,
+            parent=dessert_folder,
+            label='Best Cakes ?',
             do_save=False,
             do_notify=False,
         )
-        w1f1t1.description = 'w1f1t1 description'
-        self._session.add(w1f1t1)
-        w1f1d1_txt = content_api.create(
+        best_cake_thread.description = 'What is the best cake ?'
+        self._session.add(best_cake_thread)
+        apple_pie_recipe = content_api.create(
             content_type=ContentType.File,
-            workspace=w1,
-            parent=w1f1,
-            label='w1f1d1',
+            workspace=recipe_workspace,
+            parent=dessert_folder,
+            label='Apple_Pie',
             do_save=False,
             do_notify=False,
         )
-        w1f1d1_txt.file_extension = '.txt'
-        w1f1d1_txt.depot_file = FileIntent(
-            b'w1f1d1 content',
-            'w1f1d1.txt',
+        apple_pie_recipe.file_extension = '.txt'
+        apple_pie_recipe.depot_file = FileIntent(
+            b'Apple pie Recipe',
+            'apple_Pie.txt',
             'text/plain',
         )
-        self._session.add(w1f1d1_txt)
-        w1f1d2_html = content_api.create(
+        self._session.add(apple_pie_recipe)
+        Brownie_recipe = content_api.create(
             content_type=ContentType.File,
-            workspace=w1,
-            parent=w1f1,
-            label='w1f1d2',
+            workspace=recipe_workspace,
+            parent=dessert_folder,
+            label='Brownie Recipe',
             do_save=False,
             do_notify=False,
         )
-        w1f1d2_html.file_extension = '.html'
-        w1f1d2_html.depot_file = FileIntent(
-            b'<p>w1f1d2 content</p>',
-            'w1f1d2.html',
+        Brownie_recipe.file_extension = '.html'
+        Brownie_recipe.depot_file = FileIntent(
+            b'<p>Brownie Recipe</p>',
+            'brownie_recipe.html',
             'text/html',
         )
-        self._session.add(w1f1d2_html)
-        w1f1f1 = content_api.create(
+        self._session.add(Brownie_recipe)
+        fruits_desserts_folder = content_api.create(
             content_type=ContentType.Folder,
-            workspace=w1,
-            label='w1f1f1',
-            parent=w1f1,
+            workspace=recipe_workspace,
+            label='Fruits Desserts',
+            parent=dessert_folder,
             do_save=True,
-            do_notify=False,
         )
 
-        w2f1p1 = content_api.create(
+        menu_page = content_api.create(
             content_type=ContentType.Page,
-            workspace=w2,
-            parent=w2f1,
-            label='w2f1p1',
+            workspace=business_workspace,
+            parent=menu_workspace,
+            label='Current Menu',
+            do_save=True,
+        )
+
+        new_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=recipe_workspace,
+            parent=fruits_desserts_folder,
+            label='New Fruit Salad',
+            do_save=True,
+        )
+        old_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=recipe_workspace,
+            parent=fruits_desserts_folder,
+            label='Fruit Salad',
             do_save=True,
             do_notify=False,
         )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=old_fruit_salad,
+        ):
+            content_api.archive(old_fruit_salad)
+        content_api.save(old_fruit_salad)
+
+        bad_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=recipe_workspace,
+            parent=fruits_desserts_folder,
+            label='Bad Fruit Salad',
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=bad_fruit_salad,
+        ):
+            content_api.delete(bad_fruit_salad)
+        content_api.save(bad_fruit_salad)
+
+        # File at the root for test
+        new_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=other_workspace,
+            label='New Fruit Salad',
+            do_save=True,
+        )
+        old_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=other_workspace,
+            label='Fruit Salad',
+            do_save=True,
+        )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=old_fruit_salad,
+        ):
+            content_api.archive(old_fruit_salad)
+        content_api.save(old_fruit_salad)
+
+        bad_fruit_salad = content_api.create(
+            content_type=ContentType.Page,
+            workspace=other_workspace,
+            label='Bad Fruit Salad',
+            do_save=True,
+        )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=bad_fruit_salad,
+        ):
+            content_api.delete(bad_fruit_salad)
+        content_api.save(bad_fruit_salad)
+
+
         self._session.flush()

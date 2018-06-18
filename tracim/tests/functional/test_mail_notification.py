@@ -129,7 +129,7 @@ class TestNotificationsSync(MailHogTest):
             session=self.session,
             config=self.app_config,
         )
-        workspace = wapi.get_one_by_label('w1')
+        workspace = wapi.get_one_by_label('Recipes')
         user = uapi.get_one_by_email('bob@fsf.local')
         wapi.enable_notifications(user, workspace)
 
@@ -161,9 +161,9 @@ class TestNotificationsSync(MailHogTest):
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
-        assert headers['Subject'][0] == '[TRACIM] [w1] file1 (open)'
-        assert headers['References'][0] == 'test_user_refs+13@localhost'
-        assert headers['Reply-to'][0] == '"Bob i. & all members of w1" <test_user_reply+13@localhost>'  # nopep8
+        assert headers['Subject'][0] == '[TRACIM] [Recipes] file1 (Open)'
+        assert headers['References'][0] == 'test_user_refs+19@localhost'
+        assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+19@localhost>'  # nopep8
 
 
 class TestNotificationsAsync(MailHogTest):
@@ -221,7 +221,7 @@ class TestNotificationsAsync(MailHogTest):
             session=self.session,
             config=self.app_config,
         )
-        workspace = wapi.get_one_by_label('w1')
+        workspace = wapi.get_one_by_label('Recipes')
         user = uapi.get_one_by_email('bob@fsf.local')
         wapi.enable_notifications(user, workspace)
 
@@ -262,6 +262,6 @@ class TestNotificationsAsync(MailHogTest):
         headers = response[0]['Content']['Headers']
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
-        assert headers['Subject'][0] == '[TRACIM] [w1] file1 (open)'
-        assert headers['References'][0] == 'test_user_refs+13@localhost'
-        assert headers['Reply-to'][0] == '"Bob i. & all members of w1" <test_user_reply+13@localhost>'  # nopep8
+        assert headers['Subject'][0] == '[TRACIM] [Recipes] file1 (Open)'
+        assert headers['References'][0] == 'test_user_refs+19@localhost'
+        assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+19@localhost>'  # nopep8
