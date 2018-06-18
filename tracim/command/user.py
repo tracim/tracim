@@ -8,11 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim import CFG
 from tracim.command import AppContextCommand
 from tracim.command import Extender
-#from tracim.lib.auth.ldap import LDAPAuth
-#from tracim.lib.daemons import DaemonsManager
-#from tracim.lib.daemons import RadicaleDaemon
-#from tracim.lib.email import get_email_manager
-from tracim.exceptions import UserAlreadyExistError, GroupDoesNotExist
+from tracim.exceptions import UserAlreadyExistError
+from tracim.exceptions import GroupDoesNotExist
 from tracim.exceptions import NotificationNotSend
 from tracim.exceptions import BadCommandError
 from tracim.lib.core.group import GroupApi
