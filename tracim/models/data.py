@@ -130,13 +130,12 @@ class UserRoleInWorkspace(DeclarativeBase):
     CONTENT_MANAGER = 4
     WORKSPACE_MANAGER = 8
 
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     SLUG = {
-        NOT_APPLICABLE: 'not_applicable',
+        NOT_APPLICABLE: 'not-applicable',
         READER: 'reader',
         CONTRIBUTOR: 'contributor',
-        CONTENT_MANAGER: 'content_manager',
-        WORKSPACE_MANAGER: 'workspace_manager',
+        CONTENT_MANAGER: 'content-manager',
+        WORKSPACE_MANAGER: 'workspace-manager',
     }
 
     LABEL = dict()
@@ -145,6 +144,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     LABEL[2] = l_('Contributor')
     LABEL[4] = l_('Content Manager')
     LABEL[8] = l_('Workspace Manager')
+    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     #
     # STYLE = dict()
     # STYLE[0] = ''
