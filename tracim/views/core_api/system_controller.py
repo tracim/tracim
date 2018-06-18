@@ -1,7 +1,7 @@
 # coding=utf-8
 from pyramid.config import Configurator
-
-from tracim.exceptions import NotAuthenticated, InsufficientUserProfile
+from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import InsufficientUserProfile
 from tracim.lib.utils.authorization import require_profile
 from tracim.models import Group
 from tracim.models.applications import applications
@@ -15,7 +15,8 @@ except ImportError:
 from tracim import TracimRequest
 from tracim.extensions import hapic
 from tracim.views.controllers import Controller
-from tracim.views.core_api.schemas import ApplicationSchema, ContentTypeSchema
+from tracim.views.core_api.schemas import ApplicationSchema
+from tracim.views.core_api.schemas import ContentTypeSchema
 
 
 class SystemController(Controller):
