@@ -90,7 +90,8 @@ class RootResource(DAVCollection):
         self.workspace_api = WorkspaceApi(
             current_user=self.user,
             session=session,
-            force_role=True
+            force_role=True,
+            config=self.provider.app_config
         )
 
     def __repr__(self) -> str:
@@ -1254,6 +1255,7 @@ class FileResource(DAVNonCollection):
             workspace_api = WorkspaceApi(
                 current_user=self.user,
                 session=self.session,
+                config=self.provider.app_config,
                 )
             content_api = ContentApi(
                 current_user=self.user,

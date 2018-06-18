@@ -165,6 +165,7 @@ class UserCommand(AppContextCommand):
         self._group_api = GroupApi(
             current_user=None,
             session=self._session,
+            config=self._app_config,
         )
         user = self._proceed_user(parsed_args)
         self._proceed_groups(user, parsed_args)

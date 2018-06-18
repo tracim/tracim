@@ -127,6 +127,7 @@ class TestNotificationsSync(MailHogTest):
         wapi = WorkspaceApi(
             current_user=current_user,
             session=self.session,
+            config=self.app_config,
         )
         workspace = wapi.get_one_by_label('w1')
         user = uapi.get_one_by_email('bob@fsf.local')
@@ -218,6 +219,7 @@ class TestNotificationsAsync(MailHogTest):
         wapi = WorkspaceApi(
             current_user=current_user,
             session=self.session,
+            config=self.app_config,
         )
         workspace = wapi.get_one_by_label('w1')
         user = uapi.get_one_by_email('bob@fsf.local')

@@ -72,7 +72,11 @@ class Provider(DAVProvider):
         if path == root_path:
             return resources.RootResource(path, environ, user=user, session=session)
 
-        workspace_api = WorkspaceApi(current_user=user, session=session)
+        workspace_api = WorkspaceApi(
+            current_user=user,
+            session=session,
+            config=self.app_config,
+        )
         workspace = self.get_workspace_from_path(path, workspace_api)
 
         # If the request path is in the form root/name, then we return a WorkspaceResource resource
@@ -194,7 +198,11 @@ class Provider(DAVProvider):
 
         workspace = self.get_workspace_from_path(
             path,
-            WorkspaceApi(current_user=user, session=session)
+            WorkspaceApi(
+                current_user=user,
+                session=session,
+                config=self.app_config,
+            )
         )
 
         if parent_path == root_path or workspace is None:

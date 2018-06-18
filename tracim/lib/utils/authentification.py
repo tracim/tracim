@@ -4,6 +4,7 @@ from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim import TracimRequest
+from tracim.exceptions import UserDoesNotExist
 from tracim.lib.core.user import UserApi
 from tracim.models import User
 
@@ -50,6 +51,6 @@ def _get_basic_auth_unsafe_user(
         if not login:
             return None
         user = uapi.get_one_by_email(login)
-    except NoResultFound:
+    except UserDoesNotExist:
         return None
     return user

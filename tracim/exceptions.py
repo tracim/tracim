@@ -61,7 +61,7 @@ class SameValueError(ValueError):
     pass
 
 
-class NotAuthentificated(TracimException):
+class NotAuthenticated(TracimException):
     pass
 
 
@@ -93,7 +93,11 @@ class WrongUserPassword(TracimException):
     pass
 
 
-class UserNotExist(TracimException):
+class UserDoesNotExist(TracimException):
+    pass
+
+
+class UserNotFoundInTracimRequest(TracimException):
     pass
 
 

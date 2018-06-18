@@ -162,6 +162,7 @@ class DefaultTest(StandardTest):
         WorkspaceApi(
             current_user=user,
             session=self.session,
+            config=self.app_config,
         ).create_workspace(name, save_now=True)
 
         eq_(

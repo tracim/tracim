@@ -130,13 +130,21 @@ class UserRoleInWorkspace(DeclarativeBase):
     CONTENT_MANAGER = 4
     WORKSPACE_MANAGER = 8
 
-    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+    SLUG = {
+        NOT_APPLICABLE: 'not-applicable',
+        READER: 'reader',
+        CONTRIBUTOR: 'contributor',
+        CONTENT_MANAGER: 'content-manager',
+        WORKSPACE_MANAGER: 'workspace-manager',
+    }
+
     LABEL = dict()
     LABEL[0] = l_('N/A')
     LABEL[1] = l_('Reader')
     LABEL[2] = l_('Contributor')
     LABEL[4] = l_('Content Manager')
     LABEL[8] = l_('Workspace Manager')
+    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     #
     # STYLE = dict()
     # STYLE[0] = ''
@@ -154,7 +162,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     #
     #
     # @property
-    # def icon(self):
+    # def fa_icon(self):
     #     return UserRoleInWorkspace.ICON[self.role]
     #
     # @property
@@ -166,7 +174,10 @@ class UserRoleInWorkspace(DeclarativeBase):
         return UserRoleInWorkspace.LABEL[self.role]
 
     @classmethod
-    def get_all_role_values(self):
+    def get_all_role_values(cls) -> typing.List[int]:
+        """
+        Return all valid role value
+        """
         return [
             UserRoleInWorkspace.READER,
             UserRoleInWorkspace.CONTRIBUTOR,
@@ -174,11 +185,22 @@ class UserRoleInWorkspace(DeclarativeBase):
             UserRoleInWorkspace.WORKSPACE_MANAGER
         ]
 
+    @classmethod
+    def get_all_role_slug(cls) -> typing.List[str]:
+        """
+        Return all valid role slug
+        """
+        # INFO - G.M - 25-05-2018 - Be carefull, as long as this method
+        # and get_all_role_values are both used for API, this method should
+        # return item in the same order as get_all_role_values
+        return [cls.SLUG[value] for value in cls.get_all_role_values()]
+
+
 class RoleType(object):
     def __init__(self, role_id):
         self.role_type_id = role_id
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # self.icon = UserRoleInWorkspace.ICON[role_id]
+        # self.fa_icon = UserRoleInWorkspace.ICON[role_id]
         # self.role_label = UserRoleInWorkspace.LABEL[role_id]
         # self.css_style = UserRoleInWorkspace.STYLE[role_id]
 
@@ -243,11 +265,12 @@ class ActionDescription(object):
     def __init__(self, id):
         assert id in ActionDescription.allowed_values()
         self.id = id
-        # FIXME - G.M - 17-04-2018 - Label and icon needed for webdav
+        # FIXME - G.M - 17-04-2018 - Label and fa_icon needed for webdav
         #  design template,
         # find a way to not rely on this.
         self.label = self.id
-        self.icon = ActionDescription._ICONS[id]
+        self.fa_icon = ActionDescription._ICONS[id]
+        #self.icon = self.fa_icon
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # self.label = ActionDescription._LABELS[id]
 
@@ -321,7 +344,7 @@ class ContentStatus(object):
         self.id = id
         self.label = self.id
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # self.icon = ContentStatus._ICONS[id]
+        # self.fa_icon = ContentStatus._ICONS[id]
         # self.css = ContentStatus._CSS[id]
         #
         # if type==ContentType.Thread:
@@ -498,7 +521,7 @@ class ContentType(object):
     def __init__(self, type):
         self.id = type
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-        # self.icon = ContentType._CSS_ICONS[type]
+        # self.fa_icon = ContentType._CSS_ICONS[type]
         # self.color = ContentType._CSS_COLORS[type]  # deprecated
         # self.css = ContentType._CSS_COLORS[type]
         # self.label = ContentType._LABEL[type]
@@ -508,7 +531,7 @@ class ContentType(object):
         return dict(id=self.type,
                     type=self.type,
                     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-                    # icon=self.icon,
+                    # fa_icon=self.fa_icon,
                     # color=self.color,
                     # label=self.label,
                     priority=self.priority)
@@ -1435,7 +1458,7 @@ class VirtualEvent(object):
         assert hasattr(type, 'id')
         # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
         # assert hasattr(type, 'css')
-        # assert hasattr(type, 'icon')
+        # assert hasattr(type, 'fa_icon')
         # assert hasattr(type, 'label')
 
     def created_as_delta(self, delta_from_datetime:datetime=None):
