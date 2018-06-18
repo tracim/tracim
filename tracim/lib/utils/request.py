@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-TracimRequest and related functions
-"""
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
-
 
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import UserNotFoundInTracimRequest
@@ -46,7 +42,7 @@ class TracimRequest(Request):
 
         # User found from request headers, content, distinct from authenticated
         # user
-        self._user_candidate = None  # type: User
+        self._candidate_user = None  # type: User
 
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
@@ -60,7 +56,7 @@ class TracimRequest(Request):
         :return: Workspace of the request
         """
         if self._current_workspace is None:
-            self.current_workspace = get_workspace(self.current_user, self)
+            self.current_workspace = self._get_workspace(self.current_user, self)
         return self._current_workspace
 
     @current_workspace.setter
@@ -82,7 +78,7 @@ class TracimRequest(Request):
         Get user from authentication mecanism.
         """
         if self._current_user is None:
-            self.current_user = get_auth_safe_user(self)
+            self.current_user = self._get_auth_safe_user(self)
         return self._current_user
 
     @current_user.setter
@@ -102,9 +98,9 @@ class TracimRequest(Request):
         can help user to know about who one page is about in
         a similar way as current_workspace.
         """
-        if self._user_candidate is None:
-            self.candidate_user = get_candidate_user(self)
-        return self._user_candidate
+        if self._candidate_user is None:
+            self.candidate_user = self._get_candidate_user(self)
+        return self._candidate_user
 
     def _cleanup(self, request: 'TracimRequest') -> None:
         """
@@ -122,86 +118,87 @@ class TracimRequest(Request):
 
     @candidate_user.setter
     def candidate_user(self, user: User) -> None:
-        if self._user_candidate is not None:
+        if self._candidate_user is not None:
             raise ImmutableAttribute(
                 "Can't modify already setted candidate_user"
             )
-        self._user_candidate = user
-###
-# Utils for TracimRequest
-###
+        self._candidate_user = user
 
+    ###
+    # Utils for TracimRequest
+    ###
 
-def get_candidate_user(
-        request: TracimRequest
-) -> User:
-    """
-    Get candidate user
-    :param request: pyramid request
-    :return: user found from header/body
-    """
-    app_config = request.registry.settings['CFG']
-    uapi = UserApi(None, session=request.dbsession, config=app_config)
+    def _get_candidate_user(
+            self,
+            request: 'TracimRequest',
+    ) -> User:
+        """
+        Get candidate user
+        :param request: pyramid request
+        :return: user found from header/body
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(None, session=request.dbsession, config=app_config)
 
-    try:
-        login = None
-        if 'user_id' in request.matchdict:
-            login = request.matchdict['user_id']
-        if not login:
-            raise UserNotFoundInTracimRequest('You request a candidate user but the context not permit to found one')  # nopep8
-        user = uapi.get_one(login)
-    except UserNotFoundInTracimRequest as exc:
-        raise UserDoesNotExist('User {} not found'.format(login)) from exc
-    return user
+        try:
+            login = None
+            if 'user_id' in request.matchdict:
+                login = request.matchdict['user_id']
+            if not login:
+                raise UserNotFoundInTracimRequest('You request a candidate user but the context not permit to found one')  # nopep8
+            user = uapi.get_one(login)
+        except UserNotFoundInTracimRequest as exc:
+            raise UserDoesNotExist('User {} not found'.format(login)) from exc
+        return user
 
+    def _get_auth_safe_user(
+            self,
+            request: 'TracimRequest',
+    ) -> User:
+        """
+        Get current pyramid authenticated user from request
+        :param request: pyramid request
+        :return: current authenticated user
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(None, session=request.dbsession, config=app_config)
+        try:
+            login = request.authenticated_userid
+            if not login:
+                raise UserNotFoundInTracimRequest('You request a current user but the context not permit to found one')  # nopep8
+            user = uapi.get_one_by_email(login)
+        except (UserDoesNotExist, UserNotFoundInTracimRequest) as exc:
+            raise NotAuthenticated('User {} not found'.format(login)) from exc
+        return user
 
-def get_auth_safe_user(
-        request: TracimRequest,
-) -> User:
-    """
-    Get current pyramid authenticated user from request
-    :param request: pyramid request
-    :return: current authenticated user
-    """
-    app_config = request.registry.settings['CFG']
-    uapi = UserApi(None, session=request.dbsession, config=app_config)
-    try:
-        login = request.authenticated_userid
-        if not login:
-            raise UserNotFoundInTracimRequest('You request a current user but the context not permit to found one')  # nopep8
-        user = uapi.get_one_by_email(login)
-    except (UserDoesNotExist, UserNotFoundInTracimRequest) as exc:
-        raise NotAuthenticated('User {} not found'.format(login)) from exc
-    return user
-
-
-def get_workspace(
-        user: User,
-        request: TracimRequest
-) -> Workspace:
-    """
-    Get current workspace from request
-    :param user: User who want to check the workspace
-    :param request: pyramid request
-    :return: current workspace
-    """
-    workspace_id = ''
-    try:
-        if 'workspace_id' in request.matchdict:
-            workspace_id = request.matchdict['workspace_id']
-        if not workspace_id:
-            raise WorkspaceNotFound('No workspace_id property found in request')
-        wapi = WorkspaceApi(
-            current_user=user,
-            session=request.dbsession,
-            config=request.registry.settings['CFG']
-        )
-        workspace = wapi.get_one(workspace_id)
-    except JSONDecodeError:
-        raise WorkspaceNotFound('Bad json body')
-    except NoResultFound:
-        raise WorkspaceNotFound(
-            'Workspace {} does not exist '
-            'or is not visible for this user'.format(workspace_id)
-        )
-    return workspace
+    def _get_workspace(
+            self,
+            user: User,
+            request: 'TracimRequest'
+    ) -> Workspace:
+        """
+        Get current workspace from request
+        :param user: User who want to check the workspace
+        :param request: pyramid request
+        :return: current workspace
+        """
+        workspace_id = ''
+        try:
+            if 'workspace_id' in request.matchdict:
+                workspace_id = request.matchdict['workspace_id']
+            if not workspace_id:
+                raise WorkspaceNotFound('No workspace_id property found in request')
+            wapi = WorkspaceApi(
+                current_user=user,
+                session=request.dbsession,
+                config=request.registry.settings['CFG']
+            )
+            workspace = wapi.get_one(workspace_id)
+        except JSONDecodeError:
+            raise WorkspaceNotFound('Bad json body')
+        except NoResultFound:
+            raise WorkspaceNotFound(
+                'Workspace {} does not exist '
+                'or is not visible for this user'.format(workspace_id)
+            )
+        return workspace
