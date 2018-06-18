@@ -1,11 +1,11 @@
 # coding=utf-8
+from tracim.tests import FunctionalTest
+
 """
 Tests for /api/v2/system subpath endpoints.
 """
-from tracim.tests import FunctionalTest
 
-
-class TestApplicationsEndpoint(FunctionalTest):
+class TestApplicationEndpoint(FunctionalTest):
     """
     Tests for /api/v2/system/applications
     """

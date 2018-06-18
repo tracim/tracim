@@ -155,7 +155,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 1
         user_role = res[0]
-        assert user_role['role_slug'] == 'workspace_manager'
+        assert user_role['role_slug'] == 'workspace-manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
         assert user_role['user']['display_name'] == 'Global manager'
