@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-TracimRequest and related functions
-"""
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
-
 
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import UserNotFoundInTracimRequest
