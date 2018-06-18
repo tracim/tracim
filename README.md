@@ -111,7 +111,10 @@ run wsgidav server:
 
     tracimcli webdav start
 
+
 ## Run Tests and others checks ##
+
+### Run Tests ###
 
 Before running some functional test related to email, you need a local working *MailHog*
 see here : https://github.com/mailhog/MailHog

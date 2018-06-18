@@ -213,14 +213,13 @@ class TestContentApi(DefaultTest):
         user = uapi.create_minimal_user(
             email='this.is@user',
             groups=groups,
-            save_now=True
+            save_now=True,
         )
         workspace_api = WorkspaceApi(
             current_user=user,
             session=self.session,
-            config=self.app_config
+            config=self.app_config,
         )
-
         workspace = workspace_api.create_workspace(
             'test workspace',
             save_now=True

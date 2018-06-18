@@ -35,8 +35,9 @@ class FunctionalTest(unittest.TestCase):
     sqlalchemy_url = 'sqlite:///tracim_test.sqlite'
 
     def setUp(self):
+        logger._logger.setLevel('WARNING')
         DepotManager._clear()
-        settings = {
+        self.settings = {
             'sqlalchemy.url': self.sqlalchemy_url,
             'user.auth_token.validity': '604800',
             'depot_storage_dir': '/tmp/test/depot',
@@ -45,19 +46,24 @@ class FunctionalTest(unittest.TestCase):
 
         }
         hapic.reset_context()
-        app = web({}, **settings)
-        self.init_database(settings)
+        self.engine = get_engine(self.settings)
+        DeclarativeBase.metadata.create_all(self.engine)
+        self.session_factory = get_session_factory(self.engine)
+        self.app_config = CFG(self.settings)
+        self.app_config.configure_filedepot()
+        self.init_database(self.settings)
+        DepotManager._clear()
+        self.run_app()
+
+    def run_app(self):
+        app = web({}, **self.settings)
         self.testapp = TestApp(app)
 
     def init_database(self, settings):
-        self.engine = get_engine(settings)
-        DeclarativeBase.metadata.create_all(self.engine)
-        session_factory = get_session_factory(self.engine)
-        app_config = CFG(settings)
         with transaction.manager:
-            dbsession = get_tm_session(session_factory, transaction.manager)
+            dbsession = get_tm_session(self.session_factory, transaction.manager)
             try:
-                fixtures_loader = FixturesLoader(dbsession, app_config)
+                fixtures_loader = FixturesLoader(dbsession, self.app_config)
                 fixtures_loader.loads(self.fixtures)
                 transaction.commit()
                 print("Database initialized.")
@@ -90,6 +96,12 @@ class FunctionalTestNoDB(FunctionalTest):
         self.engine = get_engine(settings)
 
 
+class CommandFunctionalTest(FunctionalTest):
+
+    def run_app(self):
+        self.session = get_tm_session(self.session_factory, transaction.manager)
+
+
 class BaseTest(unittest.TestCase):
     """
     Pyramid default test.
@@ -99,6 +111,7 @@ class BaseTest(unittest.TestCase):
     config_section = 'base_test'
 
     def setUp(self):
+        logger._logger.setLevel('WARNING')
         logger.debug(self, 'Setup Test...')
         self.settings = plaster.get_settings(
             self.config_uri,
