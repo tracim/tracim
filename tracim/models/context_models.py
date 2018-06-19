@@ -112,7 +112,7 @@ class UserInContext(object):
 
     @property
     def profile(self) -> Profile:
-        return self.user.profile
+        return self.user.profile.name
 
     # Context related
 

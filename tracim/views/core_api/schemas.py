@@ -16,17 +16,6 @@ from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
 
 
-class ProfileSchema(marshmallow.Schema):
-    slug = marshmallow.fields.String(
-        attribute='name',
-        validate=OneOf(Profile._NAME),
-        example='managers',
-    )
-
-    class Meta:
-        description = 'User Profile, give user right on whole Tracim instance.'
-
-
 class UserSchema(marshmallow.Schema):
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
@@ -64,9 +53,10 @@ class UserSchema(marshmallow.Schema):
                     "If no avatar, then set it to null "
                     "(and frontend will interpret this with a default avatar)",
     )
-    profile = marshmallow.fields.Nested(
-        ProfileSchema,
-        many=False,
+    profile = marshmallow.fields.String(
+        attribute='profile',
+        validate=OneOf(Profile._NAME),
+        example='managers',
     )
 
     class Meta:
