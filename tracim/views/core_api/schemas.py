@@ -27,8 +27,8 @@ class UserSchema(marshmallow.Schema):
         example='Suri Cate',
     )
     created = marshmallow.fields.DateTime(
-        format='iso8601',
-        description='User account creation date (iso8601 format).',
+        format='%Y-%m-%dT%H:%M:%SZ',
+        description='User account creation date',
     )
     is_active = marshmallow.fields.Bool(
         example=True,
