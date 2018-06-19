@@ -814,6 +814,132 @@ class TestWorkspaceContents(FunctionalTest):
         assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
         assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
 
+    def test_api_put_move_content__ok_200__with_workspace_id(self):
+        """
+        Move content
+        move Apple_Pie (content_id: 8)
+        from Desserts folder(content_id: 3) to Salads subfolder (content_id: 4)
+        of workspace Recipes.
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'new_parent_id': '4',  # Salads
+            'new_workspace_id': '2',
+        }
+        params_folder1 = {
+            'parent_id': 3,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_folder2 = {
+            'parent_id': 4,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
+        folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
+        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
+        # TODO - G.M - 2018-06-163 - Check content
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/contents/8/move',
+            params=params,
+            status=200
+        )
+        new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
+        new_folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
+        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
+
+    def test_api_put_move_content__ok_200__to_another_workspace(self):
+        """
+        Move content
+        move Apple_Pie (content_id: 8)
+        from Desserts folder(content_id: 3) to Menus subfolder (content_id: 2)
+        of workspace Business.
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'new_parent_id': '2',  # Menus
+        }
+        params_folder1 = {
+            'parent_id': 3,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_folder2 = {
+            'parent_id': 2,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
+        folder2_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_folder2, status=200).json_body  # nopep8
+        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
+        # TODO - G.M - 2018-06-163 - Check content
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/contents/8/move',
+            params=params,
+            status=200
+        )
+        new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
+        new_folder2_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_folder2, status=200).json_body  # nopep8
+        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
+
+    def test_api_put_move_content__err_400__wrong_workspace_id(self):
+        """
+        Move content
+        move Apple_Pie (content_id: 8)
+        from Desserts folder(content_id: 3) to Salads subfolder (content_id: 4)
+        of workspace Recipes.
+        Workspace_id of parent_id don't match with workspace_id of workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'new_parent_id': '4',  # Salads
+            'new_workspace_id': '1',
+        }
+        params_folder1 = {
+            'parent_id': 3,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        params_folder2 = {
+            'parent_id': 4,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/contents/8/move',
+            params=params,
+            status=400,
+        )
+
     def test_api_put_delete_content__ok_200__nominal_case(self):
         """
         delete content

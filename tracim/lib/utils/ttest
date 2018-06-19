@@ -1,0 +1,341 @@
+
+definitions:
+  CommentSchema:
+    properties:
+      content_id:
+        example: 6
+        format: int32
+        type: integer
+      parent_id:
+        example: 34
+        format: int32
+        type: integer
+        x-nullable: true
+      content:
+        type: string
+        example: "Coucou !"
+      author:
+        $ref: '#/definitions/UserDigestSchema'
+  UserDigestSchema:
+    properties:
+      user_id:
+        example: 3
+        format: int32
+        readOnly: true
+        type: integer
+      avatar_url:
+        description: avatar_url is the url to the image file. If no avatar, then set
+          it to null (and frontend will interpret this with a default avatar)
+        example: /api/v2/assets/avatars/suri-cate.jpg
+        format: url
+        type: string
+        x-nullable: true
+      public_name:
+        example: Suri Cate
+        type: string
+  HtmlPageContentSchema:
+    properties:
+      content_type:
+        enum:
+        - thread
+        - file
+        - markdownpage
+        - page
+        - folder
+        example: htmlpage
+        type: string
+      content_id:
+        example: 6
+        format: int32
+        type: integer
+      is_archived:
+        example: false
+        type: boolean
+      is_deleted:
+        example: false
+        type: boolean
+      label:
+        example: Intervention Report 12
+        type: string
+      parent_id:
+        example: 34
+        format: int32
+        type: integer
+        x-nullable: true
+      show_in_ui:
+        description: if false, then do not show content in the treeview. This may
+          his maybe used for specific contents or for sub-contents. Default is True.
+          In first version of the API, this field is always True
+        example: true
+        type: boolean
+      slug:
+        example: intervention-report-12
+        type: string
+      status_slug:
+        description: this slug is found in content_type available statuses
+        enum:
+        - open
+        - closed-validated
+        - closed-unvalidated
+        - closed-deprecated
+        example: closed-deprecated
+        type: string
+      sub_content_types:
+        description: list of content types allowed as sub contents. This field is
+          required for folder contents, set it to empty list in other cases
+        items:
+          type: string
+        type: array
+      workspace_id:
+        example: 19
+        format: int32
+        type: integer
+      current_revision_id:
+        type: integer
+        example: 74
+      created:
+        format: date-time
+        type: string
+      author:
+        $ref: '#/definitions/UserDigestSchema'
+      modified:
+        format: date-time
+        type: string
+      last_modifier:
+        $ref: '#/definitions/UserDigestSchema'
+      content:
+        example: '<p> Coucou </p>'
+        type: string
+    type: object
+  HtmlPageRevisionSchema:
+    properties:
+      content_type:
+        enum:
+        - thread
+        - file
+        - markdownpage
+        - page
+        - folder
+        example: htmlpage
+        type: string
+      content_id:
+        example: 6
+        format: int32
+        type: integer
+      is_archived:
+        example: false
+        type: boolean
+      is_deleted:
+        example: false
+        type: boolean
+      label:
+        example: Intervention Report 12
+        type: string
+      parent_id:
+        example: 34
+        format: int32
+        type: integer
+        x-nullable: true
+      show_in_ui:
+        description: if false, then do not show content in the treeview. This may
+          his maybe used for specific contents or for sub-contents. Default is True.
+          In first version of the API, this field is always True
+        example: true
+        type: boolean
+      slug:
+        example: intervention-report-12
+        type: string
+      status_slug:
+        description: this slug is found in content_type available statuses
+        enum:
+        - open
+        - closed-validated
+        - closed-unvalidated
+        - closed-deprecated
+        example: closed-deprecated
+        type: string
+      sub_content_types:
+        description: list of content types allowed as sub contents. This field is
+          required for folder contents, set it to empty list in other cases
+        items:
+          type: string
+        type: array
+      workspace_id:
+        example: 19
+        format: int32
+        type: integer
+      revision_id:
+        type: integer
+        example: 74
+      created:
+        format: date-time
+        type: string
+      author:
+        $ref: '#/definitions/UserDigestSchema'
+      content:
+        example: '<p> Coucou </p>'
+        type: string
+    type: object
+  HtmlPageRevisionListSchema:
+    properties:
+      revisions:
+        type: array
+        items:
+          $ref: '#/definitions/HtmlPageRevisionSchema'
+      revision_nb:
+        type: integer
+        example: 40
+  HtmlPageModifySchema:
+    type: object
+    properties:
+      label:
+        example: "My Page"
+        type: string
+      content:
+        example: '<p> Coucou </p>'
+        type: string
+  ContentSetStatusSchema:
+    type: object
+    properties:
+      status:
+        example: "open-workinprogress"
+        type: string
+  NoContentSchema:
+    type: object
+info:
+  description: API of Tracim v2
+  title: Tracim v2 API
+  version: 1.0.0
+parameters: {}
+paths:
+  "/api/v2/workspaces/{workspace_id}/htmlpages/{htmlpage_id}":
+    get:
+      description: "get htmlpage content"
+      parameters:
+        - name: "workspace_id"
+          in: path
+          required: true
+          type: integer
+          description: id of the current workspace.
+        - name: "htmlpage_id"
+          in: path
+          required: true
+          type: integer
+          description: content id of htmlpage.
+      responses:
+        '200':
+          description: "nominal case"
+          schema:
+              $ref: '#/definitions/HtmlPageContentSchema'
+    put:
+      description: "modify htmlpage label or/and content"
+      parameters:
+        - in: body
+          name: "body"
+          schema:
+            $ref: '#/definitions/HtmlPageModifySchema'
+        - name: "workspace_id"
+          in: path
+          required: true
+          type: integer
+          description: id of the current workspace.
+        - name: "htmlpage_id"
+          in: path
+          required: true
+          type: integer
+          description: content id of htmlpage.
+      responses:
+        '200':
+          description: "nominal case"
+          schema:
+            $ref: '#/definitions/HtmlPageContentSchema'
+  "/api/v2/workspaces/{workspace_id}/htmlpages/{htmlpage_id}/revisions":
+    get:
+      description: "gets all htmlpages revisions (sorted by"
+      parameters:
+        - name: "workspace_id"
+          in: path
+          required: true
+          type: integer
+          description: id of the current workspace.
+        - name: "htmlpage_id"
+          in: path
+          required: true
+          type: integer
+          description: content id of htmlpage.
+      responses:
+        '200':
+          description: "nominal case"
+          schema:
+            $ref: '#/definitions/HtmlPageRevisionListSchema'
+  "/api/v2/workspaces/{workspace_id}/htmlpages/{htmlpage_id}/status":
+    put:
+      description: "set htmlpage content status"
+      parameters:
+        - in: body
+          name: "body"
+          schema:
+            $ref: '#/definitions/ContentSetStatusSchema'
+        - name: "workspace_id"
+          in: path
+          required: true
+          type: integer
+          description: id of the current workspace.
+        - name: "htmlpage_id"
+          in: path
+          required: true
+          type: integer
+          description: content id of htmlpage.
+      responses:
+        '200':
+          description: "nominal case"
+          schema:
+            $ref: '#/definitions/NoContentSchema'
+  "/api/v2/workspaces/{workspace_id}/contents/{content_id}/comments":
+    get:
+      description: "get all comments related to a content"
+      parameters:
+        - name: "workspace_id"
+          in: path
+          required: true
+          type: integer
+          description: id of the current workspace.
+        - name: "content_id"
+          in: path
+          required: true
+          type: integer
+          description: content id.
+      responses:
+        '200':
+          description: "nominal case"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CommentSchema'
+
+  "/api/v2/workspaces/{workspace_id}/contents/{content_id}/comments/{comments_id}":
+    delete:
+      description: "delete one comment"
+      parameters:
+        - name: "workspace_id"
+          in: path
+          required: true
+          type: integer
+          description: id of the current workspace.
+        - name: "content_id"
+          in: path
+          required: true
+          type: integer
+          description: content id.
+        - name: "comments_id"
+          in: path
+          required: true
+          type: integer
+          description: id of a comment related to content content_id.
+      responses:
+        '204':
+          description: "nominal case"
+          schema:
+            $ref: '#/definitions/NoContentSchema'
+swagger: '2.0'
+tags: []

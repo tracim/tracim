@@ -300,6 +300,12 @@ class ContentMoveSchema(marshmallow.Schema):
         example=42,
         description='id of the new parent content id.'
     )
+    new_workspace_id = marshmallow.fields.Int(
+        example=2,
+        description='id of the new workspace id.',
+        allow_none=True,
+        default=None,
+    )
 
     @post_load
     def make_move_params(self, data):

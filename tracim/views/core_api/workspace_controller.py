@@ -1,5 +1,4 @@
 import typing
-
 import transaction
 from pyramid.config import Configurator
 try:  # Python 3.5+
@@ -7,15 +6,20 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim import hapic, TracimRequest
+from tracim import hapic
+from tracim import TracimRequest
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.userworkspace import RoleApi
-from tracim.lib.utils.authorization import require_workspace_role
-from tracim.models.data import UserRoleInWorkspace, ActionDescription
+from tracim.lib.utils.authorization import require_workspace_role, \
+    require_candidate_workspace_role
+from tracim.models.data import UserRoleInWorkspace
+from tracim.models.data import ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
-from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import NotAuthenticated, InsufficientUserWorkspaceRole
+from tracim.exceptions import WorkspaceNotFoundInTracimRequest
+from tracim.exceptions import NotSameWorkspace
 from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import WorkspaceNotFound
 from tracim.views.controllers import Controller
@@ -156,7 +160,10 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(NotSameWorkspace, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @require_candidate_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())
     @hapic.output_body(NoContentSchema())
@@ -172,6 +179,7 @@ class WorkspaceController(Controller):
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
         move_data = hapic_data.body
+
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -184,12 +192,23 @@ class WorkspaceController(Controller):
         new_parent = api.get_one(
             move_data.new_parent_id, content_type=ContentType.Any
         )
+
+        try:
+            new_workspace = request.candidate_workspace
+        except WorkspaceNotFoundInTracimRequest:
+            new_workspace = None
+
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
                 content=content
         ):
-            api.move(content, new_parent=new_parent)
+            api.move(
+                content,
+                new_parent=new_parent,
+                new_workspace=new_workspace,
+                must_stay_in_same_workspace=False,
+            )
         return
 
     @hapic.with_api_doc()

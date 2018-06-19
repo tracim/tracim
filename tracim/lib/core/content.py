@@ -25,6 +25,7 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
+from tracim.exceptions import NotSameWorkspace
 from tracim.lib.utils.utils import current_date_for_filename
 from tracim.models.revision_protection import new_revision
 from tracim.models.auth import User
@@ -862,19 +863,25 @@ class ContentApi(object):
         else:
             raise ValueError('The given value {} is not allowed'.format(new_status))
 
-    def move(self, item: Content,
+    def move(self,
+             item: Content,
              new_parent: Content,
-             must_stay_in_same_workspace:bool=True,
-             new_workspace:Workspace=None):
+             must_stay_in_same_workspace: bool=True,
+             new_workspace: Workspace=None,
+    ):
         if must_stay_in_same_workspace:
             if new_parent and new_parent.workspace_id != item.workspace_id:
                 raise ValueError('the item should stay in the same workspace')
 
         item.parent = new_parent
-        if new_parent:
-            item.workspace = new_parent.workspace
-        elif new_workspace:
+        if new_workspace:
             item.workspace = new_workspace
+            if new_parent.workspace_id != new_workspace.workspace_id:
+                raise NotSameWorkspace(
+                    'new parent workspace and new workspace should be the same.'
+                )
+        else:
+            item.workspace = new_parent.workspace
 
         item.revision_type = ActionDescription.MOVE
 

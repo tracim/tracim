@@ -9,7 +9,7 @@ except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
 from tracim.exceptions import InsufficientUserWorkspaceRole, \
-    InsufficientUserProfile
+    InsufficientUserProfile, WorkspaceNotFoundInTracimRequest
 
 if TYPE_CHECKING:
     from tracim import TracimRequest
@@ -95,6 +95,31 @@ def require_workspace_role(minimal_required_role: int):
         def wrapper(self, context, request: 'TracimRequest'):
             user = request.current_user
             workspace = request.current_workspace
+            if workspace.get_user_role(user) >= minimal_required_role:
+                return func(self, context, request)
+            raise InsufficientUserWorkspaceRole()
+
+        return wrapper
+    return decorator
+
+
+def require_candidate_workspace_role(minimal_required_role: int):
+    """
+    Decorator for view to restrict access of tracim request if role
+    is not high enough. Do nothing is candidate_workspace_role is not found.
+    :param minimal_required_role: value from UserInWorkspace Object like
+    UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
+    :return: decorator
+    """
+    def decorator(func):
+
+        def wrapper(self, context, request: 'TracimRequest'):
+            user = request.current_user
+            try:
+                workspace = request.candidate_workspace
+            except WorkspaceNotFoundInTracimRequest:
+                return func(self, context, request)
+
             if workspace.get_user_role(user) >= minimal_required_role:
                 return func(self, context, request)
             raise InsufficientUserWorkspaceRole()

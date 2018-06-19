@@ -17,8 +17,9 @@ class MoveParams(object):
     """
     Json body params for move action
     """
-    def __init__(self, new_parent_id: str):
+    def __init__(self, new_parent_id: str, new_workspace_id: str = None):
         self.new_parent_id = new_parent_id
+        self.new_workspace_id = new_workspace_id
 
 
 class LoginCredentials(object):
