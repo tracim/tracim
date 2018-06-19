@@ -158,7 +158,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['role'] == 'workspace-manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
-        assert user_role['user']['display_name'] == 'Global manager'
+        assert user_role['user']['public_name'] == 'Global manager'
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
         assert user_role['user']['avatar_url'] is None

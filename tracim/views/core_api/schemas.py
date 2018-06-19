@@ -34,7 +34,7 @@ class UserSchema(marshmallow.Schema):
         required=True,
         example='suri.cate@algoo.fr'
     )
-    display_name = marshmallow.fields.String(
+    public_name = marshmallow.fields.String(
         example='Suri Cate',
     )
     created = marshmallow.fields.DateTime(
@@ -214,7 +214,7 @@ class WorkspaceMemberSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(example=3)
     workspace_id = marshmallow.fields.Int(example=4)
     user = marshmallow.fields.Nested(
-        UserSchema(only=('display_name', 'avatar_url'))
+        UserSchema(only=('public_name', 'avatar_url'))
     )
 
     class Meta:

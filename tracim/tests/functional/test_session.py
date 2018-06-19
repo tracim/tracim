@@ -45,7 +45,7 @@ class TestLoginEndpoint(FunctionalTest):
             params=params,
             status=200,
         )
-        assert res.json_body['display_name'] == 'Global manager'
+        assert res.json_body['public_name'] == 'Global manager'
         assert res.json_body['email'] == 'admin@admin.admin'
         assert res.json_body['created']
         assert res.json_body['is_active']
@@ -103,7 +103,7 @@ class TestWhoamiEndpoint(FunctionalTest):
             )
         )
         res = self.testapp.get('/api/v2/sessions/whoami', status=200)
-        assert res.json_body['display_name'] == 'Global manager'
+        assert res.json_body['public_name'] == 'Global manager'
         assert res.json_body['email'] == 'admin@admin.admin'
         assert res.json_body['created']
         assert res.json_body['is_active']

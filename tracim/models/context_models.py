@@ -91,6 +91,10 @@ class UserInContext(object):
         return self.user.user_id
 
     @property
+    def public_name(self) -> str:
+        return self.display_name
+
+    @property
     def display_name(self) -> str:
         return self.user.display_name
 
