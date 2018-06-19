@@ -145,7 +145,7 @@ class WorkspaceController(Controller):
         )
         content = api.create(
             label=creation_data.label,
-            content_type=creation_data.content_type_slug,
+            content_type=creation_data.content_type,
             workspace=request.current_workspace,
         )
         api.save(content, ActionDescription.CREATION)

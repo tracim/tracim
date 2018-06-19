@@ -64,10 +64,10 @@ class ContentCreation(object):
     def __init__(
             self,
             label: str,
-            content_type_slug: str,
+            content_type: str,
     ):
         self.label = label
-        self.content_type_slug = content_type_slug
+        self.content_type = content_type
 
 
 class UserInContext(object):
@@ -290,11 +290,11 @@ class ContentInContext(object):
         return self.content.label
 
     @property
-    def content_type_slug(self) -> str:
+    def content_type(self) -> str:
         return self.content.type
 
     @property
-    def sub_content_type_slug(self) -> typing.List[str]:
+    def sub_content_types(self) -> typing.List[str]:
         return [type.slug for type in self.content.get_allowed_content_types()]
 
     @property

@@ -247,7 +247,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'tools'
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
         content = res[1]
         assert content['id'] == 2
@@ -258,7 +258,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'menus'
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
         content = res[2]
         assert content['id'] == 11
@@ -269,7 +269,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'current-menu'
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
 
     # Root related
@@ -299,7 +299,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[1]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 15
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -308,11 +308,11 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
         content = res[2]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 16
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
@@ -321,11 +321,11 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
         content = res[3]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 17
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
@@ -334,7 +334,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):  # nopep8
@@ -362,7 +362,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         content = res[1]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 15
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -371,7 +371,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):  # nopep8
@@ -398,7 +398,7 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body   # nopep8
         assert len(res) == 1
         content = res[0]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 16
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
@@ -407,7 +407,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):  # nopep8
@@ -436,7 +436,7 @@ class TestWorkspaceContents(FunctionalTest):
 
         assert len(res) == 1
         content = res[0]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 17
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
@@ -445,7 +445,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_nothing_root_content(self):
@@ -500,7 +500,7 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body   # nopep8
         assert len(res) == 3
         content = res[0]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 12
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -509,11 +509,11 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
         content = res[1]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 13
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
@@ -522,11 +522,11 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
         content = res[2]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 14
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
@@ -535,7 +535,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):  # nopep8
@@ -562,7 +562,7 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body   # nopep8
         assert len(res) == 1
         content = res[0]
-        assert content['content_type_slug']
+        assert content['content_type']
         assert content['id'] == 12
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -571,7 +571,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):  # nopep8
@@ -598,7 +598,7 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body   # nopep8
         assert len(res) == 1
         content = res[0]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 13
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
@@ -607,7 +607,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):  # nopep8
@@ -635,7 +635,7 @@ class TestWorkspaceContents(FunctionalTest):
 
         assert len(res) == 1
         content = res[0]
-        assert content['content_type_slug'] == 'page'
+        assert content['content_type'] == 'page'
         assert content['id'] == 14
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
@@ -644,7 +644,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status_slug'] == 'open'
-        assert set(content['sub_content_type_slug']) == {'thread', 'page', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):  # nopep8
@@ -741,7 +741,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         params = {
             'label': 'GenericCreatedContent',
-            'content_type_slug': 'markdownpage',
+            'content_type': 'markdownpage',
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/contents',
@@ -752,14 +752,14 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body
         assert res.json_body['status_slug'] == 'open'
         assert res.json_body['id']
-        assert res.json_body['content_type_slug'] == 'markdownpage'
+        assert res.json_body['content_type'] == 'markdownpage'
         assert res.json_body['is_archived'] is False
         assert res.json_body['is_deleted'] is False
         assert res.json_body['workspace_id'] == 1
         assert res.json_body['slug'] == 'genericcreatedcontent'
         assert res.json_body['parent_id'] is None
         assert res.json_body['show_in_ui'] is True
-        assert res.json_body['sub_content_type_slug']
+        assert res.json_body['sub_content_types']
         params_active = {
             'parent_id': 0,
             'show_archived': 0,

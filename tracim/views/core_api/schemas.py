@@ -311,7 +311,7 @@ class ContentCreationSchema(marshmallow.Schema):
         example='contract for client XXX',
         description='Title of the content to create'
     )
-    content_type_slug = marshmallow.fields.String(
+    content_type = marshmallow.fields.String(
         example='htmlpage',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
@@ -333,11 +333,11 @@ class ContentDigestSchema(marshmallow.Schema):
         example=19,
     )
     label = marshmallow.fields.Str(example='Intervention Report 12')
-    content_type_slug = marshmallow.fields.Str(
+    content_type = marshmallow.fields.Str(
         example='htmlpage',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
-    sub_content_type_slug = marshmallow.fields.List(
+    sub_content_types = marshmallow.fields.List(
         marshmallow.fields.Str,
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
