@@ -280,10 +280,13 @@ class ContentInContext(object):
         self.config = config
 
     # Default
+    @property
+    def content_id(self) -> int:
+        return self.content.content_id
 
     @property
     def id(self) -> int:
-        return self.content.content_id
+        return self.content_id
 
     @property
     def parent_id(self) -> int:

@@ -28,7 +28,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/users/1/workspaces', status=200)
         res = res.json_body
         workspace = res[0]
-        assert workspace['id'] == 1
+        assert workspace['workspace_id'] == 1
         assert workspace['label'] == 'Business'
         assert workspace['slug'] == 'business'
         assert len(workspace['sidebar_entries']) == 7

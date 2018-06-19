@@ -187,7 +187,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
 
 
 class WorkspaceDigestSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int(example=4)
+    workspace_id = marshmallow.fields.Int(example=4)
     slug = marshmallow.fields.String(example='intranet')
     label = marshmallow.fields.String(example='Intranet')
     sidebar_entries = marshmallow.fields.Nested(
@@ -256,7 +256,7 @@ class StatusSchema(marshmallow.Schema):
                     'Statuses are open, closed-validated, closed-invalidated, closed-deprecated'  # nopep8
     )
     global_status = marshmallow.fields.String(
-        example='Open',
+        example='open',
         description='global_status: open, closed',
         validate=OneOf([status.value for status in GlobalStatus]),
     )
@@ -322,7 +322,7 @@ class ContentCreationSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int(example=6)
+    content_id = marshmallow.fields.Int(example=6)
     slug = marshmallow.fields.Str(example='intervention-report-12')
     parent_id = marshmallow.fields.Int(
         example=34,

@@ -27,7 +27,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/workspaces/1', status=200)
         workspace = res.json_body
-        assert workspace['id'] == 1
+        assert workspace['workspace_id'] == 1
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
@@ -239,7 +239,7 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 3
         content = res[0]
-        assert content['id'] == 1
+        assert content['content_id'] == 1
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Tools'
@@ -250,7 +250,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
         content = res[1]
-        assert content['id'] == 2
+        assert content['content_id'] == 2
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Menus'
@@ -261,7 +261,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
         content = res[2]
-        assert content['id'] == 11
+        assert content['content_id'] == 11
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Current Menu'
@@ -300,7 +300,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 4
         content = res[1]
         assert content['content_type'] == 'page'
-        assert content['id'] == 15
+        assert content['content_id'] == 15
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'New Fruit Salad'
@@ -313,7 +313,7 @@ class TestWorkspaceContents(FunctionalTest):
 
         content = res[2]
         assert content['content_type'] == 'page'
-        assert content['id'] == 16
+        assert content['content_id'] == 16
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
         assert content['label'].startswith('Fruit Salad')
@@ -326,7 +326,7 @@ class TestWorkspaceContents(FunctionalTest):
 
         content = res[3]
         assert content['content_type'] == 'page'
-        assert content['id'] == 17
+        assert content['content_id'] == 17
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
         assert content['label'].startswith('Bad Fruit Salad')
@@ -363,7 +363,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 2
         content = res[1]
         assert content['content_type'] == 'page'
-        assert content['id'] == 15
+        assert content['content_id'] == 15
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'New Fruit Salad'
@@ -399,7 +399,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 1
         content = res[0]
         assert content['content_type'] == 'page'
-        assert content['id'] == 16
+        assert content['content_id'] == 16
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
         assert content['label'].startswith('Fruit Salad')
@@ -437,7 +437,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 1
         content = res[0]
         assert content['content_type'] == 'page'
-        assert content['id'] == 17
+        assert content['content_id'] == 17
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
         assert content['label'].startswith('Bad Fruit Salad')
@@ -501,7 +501,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 3
         content = res[0]
         assert content['content_type'] == 'page'
-        assert content['id'] == 12
+        assert content['content_id'] == 12
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'New Fruit Salad'
@@ -514,7 +514,7 @@ class TestWorkspaceContents(FunctionalTest):
 
         content = res[1]
         assert content['content_type'] == 'page'
-        assert content['id'] == 13
+        assert content['content_id'] == 13
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
         assert content['label'].startswith('Fruit Salad')
@@ -527,7 +527,7 @@ class TestWorkspaceContents(FunctionalTest):
 
         content = res[2]
         assert content['content_type'] == 'page'
-        assert content['id'] == 14
+        assert content['content_id'] == 14
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
         assert content['label'].startswith('Bad Fruit Salad')
@@ -563,7 +563,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 1
         content = res[0]
         assert content['content_type']
-        assert content['id'] == 12
+        assert content['content_id'] == 12
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'New Fruit Salad'
@@ -599,7 +599,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 1
         content = res[0]
         assert content['content_type'] == 'page'
-        assert content['id'] == 13
+        assert content['content_id'] == 13
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
         assert content['label'].startswith('Fruit Salad')
@@ -636,7 +636,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 1
         content = res[0]
         assert content['content_type'] == 'page'
-        assert content['id'] == 14
+        assert content['content_id'] == 14
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
         assert content['label'].startswith('Bad Fruit Salad')
@@ -751,7 +751,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res
         assert res.json_body
         assert res.json_body['status'] == 'open'
-        assert res.json_body['id']
+        assert res.json_body['content_id']
         assert res.json_body['content_type'] == 'markdownpage'
         assert res.json_body['is_archived'] is False
         assert res.json_body['is_deleted'] is False
@@ -801,8 +801,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
+        assert [content for content in folder1_contents if content['content_id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['content_id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/move',
@@ -811,8 +811,8 @@ class TestWorkspaceContents(FunctionalTest):
         )
         new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         new_folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
-        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in new_folder1_contents if content['content_id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['content_id'] == 8]  # nopep8
 
     def test_api_put_delete_content__ok_200__nominal_case(self):
         """
@@ -840,8 +840,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
-        assert [content for content in active_contents if content['id'] == 8]  # nopep8
-        assert not [content for content in deleted_contents if content['id'] == 8]  # nopep8
+        assert [content for content in active_contents if content['content_id'] == 8]  # nopep8
+        assert not [content for content in deleted_contents if content['content_id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             # INFO - G.M - 2018-06-163 - delete Apple_Pie
@@ -850,8 +850,8 @@ class TestWorkspaceContents(FunctionalTest):
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
-        assert not [content for content in new_active_contents if content['id'] == 8]  # nopep8
-        assert [content for content in new_deleted_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in new_active_contents if content['content_id'] == 8]  # nopep8
+        assert [content for content in new_deleted_contents if content['content_id'] == 8]  # nopep8
 
     def test_api_put_archive_content__ok_200__nominal_case(self):
         """
@@ -879,16 +879,16 @@ class TestWorkspaceContents(FunctionalTest):
         }
         active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
-        assert [content for content in active_contents if content['id'] == 8]  # nopep8
-        assert not [content for content in archived_contents if content['id'] == 8]  # nopep8
+        assert [content for content in active_contents if content['content_id'] == 8]  # nopep8
+        assert not [content for content in archived_contents if content['content_id'] == 8]  # nopep8
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/archive',
             status=200
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
-        assert not [content for content in new_active_contents if content['id'] == 8]  # nopep8
-        assert [content for content in new_archived_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in new_active_contents if content['content_id'] == 8]  # nopep8
+        assert [content for content in new_archived_contents if content['content_id'] == 8]  # nopep8
 
     def test_api_put_undelete_content__ok_200__nominal_case(self):
         """
@@ -916,16 +916,16 @@ class TestWorkspaceContents(FunctionalTest):
         }
         active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
-        assert not [content for content in active_contents if content['id'] == 14]  # nopep8
-        assert [content for content in deleted_contents if content['id'] == 14]  # nopep8
+        assert not [content for content in active_contents if content['content_id'] == 14]  # nopep8
+        assert [content for content in deleted_contents if content['content_id'] == 14]  # nopep8
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/14/undelete',
             status=200
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
-        assert [content for content in new_active_contents if content['id'] == 14]  # nopep8
-        assert not [content for content in new_deleted_contents if content['id'] == 14]  # nopep8
+        assert [content for content in new_active_contents if content['content_id'] == 14]  # nopep8
+        assert not [content for content in new_deleted_contents if content['content_id'] == 14]  # nopep8
 
     def test_api_put_unarchive_content__ok_200__nominal_case(self):
         """
@@ -953,13 +953,13 @@ class TestWorkspaceContents(FunctionalTest):
         }
         active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
-        assert not [content for content in active_contents if content['id'] == 13]  # nopep8
-        assert [content for content in archived_contents if content['id'] == 13]  # nopep8
+        assert not [content for content in active_contents if content['content_id'] == 13]  # nopep8
+        assert [content for content in archived_contents if content['content_id'] == 13]  # nopep8
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/13/unarchive',
             status=200
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
-        assert [content for content in new_active_contents if content['id'] == 13]  # nopep8
-        assert not [content for content in new_archived_contents if content['id'] == 13]  # nopep8
+        assert [content for content in new_active_contents if content['content_id'] == 13]  # nopep8
+        assert not [content for content in new_archived_contents if content['content_id'] == 13]  # nopep8
