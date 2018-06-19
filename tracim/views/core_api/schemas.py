@@ -207,7 +207,7 @@ class WorkspaceSchema(WorkspaceDigestSchema):
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
-    role_slug = marshmallow.fields.String(
+    role = marshmallow.fields.String(
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
     )
@@ -343,7 +343,7 @@ class ContentDigestSchema(marshmallow.Schema):
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'
     )
-    status_slug = marshmallow.fields.Str(
+    status = marshmallow.fields.Str(
         example='closed-deprecated',
         validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
         description='this slug is found in content_type available statuses',

@@ -226,12 +226,16 @@ class UserRoleWorkspaceInContext(object):
         return self.user_role.role
 
     @property
+    def role(self) -> str:
+        return self.role_slug
+
+    @property
     def role_slug(self) -> str:
         """
         simple name of the role of the user.
         can be anything from UserRoleInWorkspace SLUG, like
         'not_applicable', 'reader',
-        'contributor', 'content_manager', 'workspace_manager'
+        'contributor', 'content-manager', 'workspace-manager'
         :return: user workspace role as slug.
         """
         return UserRoleInWorkspace.SLUG[self.user_role.role]
@@ -298,7 +302,7 @@ class ContentInContext(object):
         return [type.slug for type in self.content.get_allowed_content_types()]
 
     @property
-    def status_slug(self) -> str:
+    def status(self) -> str:
         return self.content.status
 
     @property

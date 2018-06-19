@@ -155,7 +155,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 1
         user_role = res[0]
-        assert user_role['role_slug'] == 'workspace-manager'
+        assert user_role['role'] == 'workspace-manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
         assert user_role['user']['display_name'] == 'Global manager'
@@ -246,7 +246,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'] == 'tools'
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
         content = res[1]
@@ -257,7 +257,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'] == 'menus'
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
         content = res[2]
@@ -268,7 +268,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] == 2
         assert content['show_in_ui'] is True
         assert content['slug'] == 'current-menu'
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 1
 
@@ -307,7 +307,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
@@ -320,7 +320,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
@@ -333,7 +333,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
@@ -370,7 +370,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
@@ -406,7 +406,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
@@ -444,7 +444,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 3
 
@@ -508,7 +508,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
@@ -521,7 +521,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
@@ -534,7 +534,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
@@ -570,7 +570,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
@@ -606,7 +606,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
@@ -643,7 +643,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
-        assert content['status_slug'] == 'open'
+        assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'thread', 'page', 'folder', 'file'}  # nopep8
         assert content['workspace_id'] == 2
 
@@ -750,7 +750,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert res
         assert res.json_body
-        assert res.json_body['status_slug'] == 'open'
+        assert res.json_body['status'] == 'open'
         assert res.json_body['id']
         assert res.json_body['content_type'] == 'markdownpage'
         assert res.json_body['is_archived'] is False
