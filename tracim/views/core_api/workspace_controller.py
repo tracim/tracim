@@ -159,7 +159,7 @@ class WorkspaceController(Controller):
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def move_content(
             self,
             context,
@@ -198,7 +198,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_content(
             self,
             context,
@@ -233,7 +233,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def undelete_content(
             self,
             context,
@@ -269,7 +269,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def archive_content(
             self,
             context,
@@ -301,7 +301,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def unarchive_content(
             self,
             context,

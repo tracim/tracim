@@ -807,7 +807,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/move',
             params=params,
-            status=200
+            status=204
         )
         new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         new_folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
@@ -846,7 +846,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.put_json(
             # INFO - G.M - 2018-06-163 - delete Apple_Pie
             '/api/v2/workspaces/2/contents/8/delete',
-            status=200
+            status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
@@ -883,7 +883,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert not [content for content in archived_contents if content['content_id'] == 8]  # nopep8
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/archive',
-            status=200
+            status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
@@ -920,7 +920,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert [content for content in deleted_contents if content['content_id'] == 14]  # nopep8
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/14/undelete',
-            status=200
+            status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_deleted_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_deleted, status=200).json_body  # nopep8
@@ -957,7 +957,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert [content for content in archived_contents if content['content_id'] == 13]  # nopep8
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/13/unarchive',
-            status=200
+            status=204
         )
         new_active_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_active, status=200).json_body  # nopep8
         new_archived_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_archived, status=200).json_body  # nopep8
