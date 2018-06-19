@@ -105,10 +105,29 @@
       {
         "id": 1,
         "parent_id": null,
+        "is_archived": false,
+        "is_deleted": false,
         "workspace_id": 1,
-        "title": "Modification Design v2",
-        "type": "PageHtml",
-        "status": "validated"
+        "show_in_ui": true,
+        "label": "Modification Design v2",
+        "slug": "modification-design-v2",
+        "content_type_slug": "htmlpage",
+        "status_slug": "validated"
+      },
+      {
+        "content_type_slug": "htmlpage",
+        "id": 6,
+        "is_archived": false,
+        "is_deleted": false,
+        "label": "Intervention Report 12",
+        "parent_id": 34,
+        "show_in_ui": true,
+        "slug": "intervention-report-12",
+        "status_slug": "closed-deprecated",
+        "sub_content_type_slug": [
+          "string"
+        ],
+        "workspace_id": 19
       },
       {
         "id": 2,

@@ -3,18 +3,21 @@ import {
   USER_ROLE
 } from '../action-creator.sync.js'
 
-const serializeWorkspaceItem = data => ({
-  id: data.id,
-  title: data.title,
-  role: data.role,
-  notif: data.notif
-})
-
 export function workspaceList (state = [], action) {
   switch (action.type) {
     case `Update/${WORKSPACE_LIST}`:
       return action.workspaceList.map(ws => ({
-        ...serializeWorkspaceItem(ws),
+        id: ws.id,
+        label: ws.label,
+        slug: ws.slug,
+        description: ws.description,
+        sidebarEntry: ws.sidebar_entries.map(sbe => ({
+          slug: sbe.slug,
+          route: sbe.route,
+          faIcon: sbe.fa_icon,
+          hexcolor: sbe.hexcolor,
+          label: sbe.label
+        })),
         isOpenInSidebar: false
       }))
 
@@ -24,7 +27,7 @@ export function workspaceList (state = [], action) {
         : ws
       )
 
-    case `Set/${USER_ROLE}`:
+    case `Set/${USER_ROLE}`: // not used yet
       return state.map(ws => {
         const foundWorkspace = action.userRole.find(r => ws.id === r.workspace.id) || {role: '', subscribed_to_notif: ''}
         return {
@@ -34,7 +37,7 @@ export function workspaceList (state = [], action) {
         }
       })
 
-    case `Update/${USER_ROLE}/SubscriptionNotif`:
+    case `Update/${USER_ROLE}/SubscriptionNotif`: // not used yet
       return state.map(ws => ws.id === action.workspaceId
         ? {...ws, notif: action.subscriptionNotif}
         : ws

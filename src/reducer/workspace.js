@@ -3,26 +3,22 @@ import {
   FOLDER
 } from '../action-creator.sync.js'
 
-const serializeWorkspace = data => ({
-  id: data.id,
-  title: data.title,
-  content: data.content,
-  ownerId: data.owner_id
-})
-
-export default function user (state = {
-  id: -1,
-  title: '',
-  ownerId: '',
-  content: [],
-  filter: []
-}, action) {
+export default function workspace (state = [], action) {
   switch (action.type) {
-    case `Set/${WORKSPACE}`:
-      return {
-        ...serializeWorkspace(action.workspace),
-        filter: action.filterStr ? action.filterStr.split(';') : []
-      }
+    case `Set/${WORKSPACE}/Content`:
+      return action.workspaceContent.map(wsc => ({
+        id: wsc.id,
+        label: wsc.label,
+        slug: wsc.slug,
+        type: wsc.content_type_slug,
+        workspaceId: wsc.workspace_id,
+        isArchived: wsc.is_archived,
+        parentId: wsc.parent_id,
+        isDeleted: wsc.is_deleted,
+        // show_in_ui: wsc.show_in_ui, ???
+        statusSlug: wsc.status_slug,
+        subContentTypeSlug: wsc.sub_content_type_slug,
+      }))
 
     case `Update/${WORKSPACE}/Filter`:
       return {...state, filter: action.filterList}

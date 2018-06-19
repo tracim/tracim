@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import appFactory from '../appFactory.js'
 import { PAGE } from '../helper.js'
 import Sidebar from './Sidebar.jsx'
@@ -12,13 +13,17 @@ import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import {
   getAppList,
+  getContentTypeList,
+  getWorkspaceContentList,
   getWorkspaceContent,
   getFolderContent,
   getWorkspaceList
 } from '../action-creator.async.js'
 import {
-  newFlashMessage, setAppList,
-  setWorkspaceData,
+  newFlashMessage,
+  setAppList,
+  setContentTypeList,
+  setWorkspaceContent,
   setWorkspaceListIsOpenInSidebar,
   updateWorkspaceListData
 } from '../action-creator.sync.js'
@@ -53,12 +58,20 @@ class WorkspaceContent extends React.Component {
 
   async componentDidMount () {
     const { workspaceIdInUrl } = this.state
-    const { user, workspaceList, app, match, location, dispatch } = this.props
+    const { user, workspaceList, app, contentType, match, location, dispatch } = this.props
 
-    if (Object.keys(app).length === 0) {
+    console.log('componentDidMount')
+
+    if (app.length === 0) {
       const fetchGetAppList = await dispatch(getAppList())
       if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
     }
+
+    if (contentType.length === 0) {
+      const fetchGetContentTypeList = await dispatch(getContentTypeList())
+      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
+    }
+
 
     let wsToLoad = null
     if (match.params.idws !== undefined) wsToLoad = match.params.idws
@@ -78,35 +91,46 @@ class WorkspaceContent extends React.Component {
 
     if (wsToLoad === null) return // ws already loaded
 
-    const wsContent = await dispatch(getWorkspaceContent(wsToLoad))
+    const wsContent = await dispatch(getWorkspaceContentList(wsToLoad))
 
-    if (wsContent.status === 200) dispatch(setWorkspaceData(wsContent.json, qs.parse(location.search).type))
+    if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { app, workspace, user, renderApp, match, dispatch } = this.props
+    const { contentType, workspace, user, renderApp, match } = this.props
+
+    console.log('componentDidUpdate')
 
     if (this.state.workspaceIdInUrl === null) return
 
-    const newWorkspaceId = parseInt(match.params.idws)
-    if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
+    const idWorkspace = parseInt(match.params.idws)
+    if (prevState.workspaceIdInUrl !== idWorkspace) this.setState({workspaceIdInUrl: idWorkspace})
 
-    if (user.id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, newWorkspaceId))
+    // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, idWorkspace))
 
-    if (match.params.idcts) { // if a content id is in url, open it
-      const contentToOpen = workspace.content.find(wsc => wsc.id === parseInt(match.params.idcts))
-      if (contentToOpen === undefined) return
+    if (match.params.idcts && workspace.id !== -1) { // if a content id is in url, open it
+      const idContentToOpen = parseInt(match.params.idcts)
+      const contentToOpen = workspace.find(wsc => wsc.id === idContentToOpen) // || await dispatch(getWorkspaceContent(idWorkspace, idContentToOpen))
+
+      // @FIXME : for alpha, we do not handle subfolder. commented code bellow should load a component that is not in the workspace root
+      // if (contentToOpen === undefined) { // content is not is ws root
+      //   const fetchContent = await dispatch(getWorkspaceContent(idWorkspace, idContentToOpen))
+      //   console.log(fetchContent)
+      // }
 
       renderApp(
-        app[contentToOpen.type],
+        contentType.find(ct => ct.type === contentToOpen.type),
         user,
         {...contentToOpen, workspace: workspace}
       )
     }
   }
 
-  handleClickContentItem = content => this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.workspace_id, content.id)}${this.props.location.search}`)
+  handleClickContentItem = content => {
+    console.log('content clicked', content)
+    this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.workspace_id, content.id)}${this.props.location.search}`)
+  }
 
   handleClickEditContentItem = (e, content) => {
     e.stopPropagation()
@@ -142,15 +166,24 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { workspace, app } = this.props
+    const { workspace, app, contentType } = this.props
 
-    const filterWorkspaceContent = (contentList, filter) => filter.length === 0
-      ? contentList
-      : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
-        .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
-    // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty folders
+    const filterWorkspaceContent = (contentList, filter) => {
+      console.log(contentList, filter)
+      return filter.length === 0
+        ? contentList
+        : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
+          // @FIXME we need to filter subfolder too, but right now, we dont handle subfolder
+          // .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
+    }
+    // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty
 
-    const filteredWorkspaceContent = filterWorkspaceContent(workspace.content, workspace.filter)
+    const urlFilter = qs.parse(this.props.location.search).type
+
+    const filteredWorkspaceContent = workspace.length > 0
+      ? filterWorkspaceContent(workspace, urlFilter ? [urlFilter] : [])
+      : []
+    console.log('workspaceContent => filteredWorkspaceContent', filteredWorkspaceContent)
 
     return (
       <div className='sidebarpagecontainer'>
@@ -160,7 +193,7 @@ class WorkspaceContent extends React.Component {
           <PageTitle
             parentClass='workspace__header'
             customClass='justify-content-between'
-            title={workspace.title}
+            title={workspace.label ? workspace.label : ''}
           >
             <DropdownCreateButton parentClass='workspace__header__btnaddworkspace' />
           </PageTitle>
@@ -192,10 +225,11 @@ class WorkspaceContent extends React.Component {
                 )
                 : (
                   <ContentItem
-                    name={c.title}
+                    label={c.label}
                     type={c.type}
-                    icon={(app[c.type] || {icon: ''}).icon}
-                    status={c.status}
+                    faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
+                    statusSlug={c.statusSlug}
+                    contentType={contentType.find(ct => ct.slug === c.type)}
                     onClickItem={() => this.handleClickContentItem(c)}
                     onClickExtendedAction={{
                       edit: e => this.handleClickEditContentItem(e, c),
@@ -222,5 +256,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspace, workspaceList, app }) => ({ user, workspace, workspaceList, app })
-export default connect(mapStateToProps)(appFactory(WorkspaceContent))
+const mapStateToProps = ({ user, workspace, workspaceList, app, contentType }) => ({ user, workspace, workspaceList, app, contentType })
+export default withRouter(connect(mapStateToProps)(appFactory(WorkspaceContent)))

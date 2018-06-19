@@ -6,16 +6,15 @@ import {
   updateLangList,
   USER_LOGIN,
   USER_LOGOUT,
-  USER_DATA,
   USER_ROLE,
   USER_CONNECTED,
-  updateUserData,
   setUserRole,
   WORKSPACE,
   WORKSPACE_LIST,
   FOLDER,
   setFolderData,
-  APP_LIST
+  APP_LIST,
+  CONTENT_TYPE_LIST
 } from './action-creator.sync.js'
 
 /*
@@ -66,8 +65,11 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
 
 export const getLangList = () => async dispatch => {
   const fetchGetLangList = await fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/lang`,
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/lang`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: LANG,
     dispatch
   })
@@ -76,8 +78,11 @@ export const getLangList = () => async dispatch => {
 
 export const getTimezone = () => async dispatch => {
   const fetchGetTimezone = await fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/timezone`,
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/timezone`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: TIMEZONE,
     dispatch
   })
@@ -86,7 +91,7 @@ export const getTimezone = () => async dispatch => {
 
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/sessions/login`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/login`, // FETCH_CONFIG.apiUrl
     param: {
       headers: {...FETCH_CONFIG.headers},
       method: 'POST',
@@ -103,7 +108,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
 
 export const postUserLogout = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/sessions/logout`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/logout`, // FETCH_CONFIG.apiUrl
     param: {
       headers: {...FETCH_CONFIG.headers},
       method: 'POST'
@@ -115,8 +120,11 @@ export const postUserLogout = () => async dispatch => {
 
 export const getUserIsConnected = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: USER_CONNECTED,
     dispatch
   })
@@ -124,67 +132,86 @@ export const getUserIsConnected = () => async dispatch => {
 
 export const getUserRole = user => async dispatch => {
   const fetchGetUserRole = await fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/user/${user.id}/roles`,
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/roles`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: USER_ROLE,
     dispatch
   })
   if (fetchGetUserRole.status === 200) dispatch(setUserRole(fetchGetUserRole.json))
 }
 
-export const updateUserLang = newLang => async dispatch => { // unused
-  const fetchUpdateUserLang = await fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/user`,
-    param: {...FETCH_CONFIG.header, method: 'PATCH', body: JSON.stringify({lang: newLang})},
-    actionName: USER_DATA,
-    dispatch
-  })
-  if (fetchUpdateUserLang.status === 200) dispatch(updateUserData({lang: fetchUpdateUserLang.json.lang}))
-}
-
-// export const testResponseNoData = () => async dispatch => {
-//   const fetchResponseNoData = await fetchWrapper({
-//     url: 'http://localhost:3001/deletenodata',
-//     param: {...FETCH_CONFIG.header, method: 'DELETE'},
-//     actionName: 'TestNoData',
-//     dispatch
-//   })
-//   console.log('jsonResponseNoData', fetchResponseNoData)
-// }
-
-export const getWorkspaceList = userId => dispatch => {
+export const getWorkspaceList = idUser => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/user/${userId}/workspace`,
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: WORKSPACE_LIST,
     dispatch
   })
 }
 
-export const getWorkspaceContent = workspaceId => dispatch => {
+export const getWorkspaceContentList = idWorkspace => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/workspace/${workspaceId}`,
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: WORKSPACE,
     dispatch
   })
 }
 
-export const getFolderContent = (workspaceId, folderId) => async dispatch => {
+export const getWorkspaceContent = (idWorkspace, idContent) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
+    actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
   const fetchGetFolderContent = await fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/workspace/${workspaceId}/folder/${folderId}`,
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/?parent_id=${idFolder}`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: `${WORKSPACE}/${FOLDER}`,
     dispatch
   })
-  if (fetchGetFolderContent.status === 200) dispatch(setFolderData(folderId, fetchGetFolderContent.json))
+  if (fetchGetFolderContent.status === 200) dispatch(setFolderData(idFolder, fetchGetFolderContent.json))
 }
 
 export const getAppList = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.mockApiUrl}/app/config`,
-    param: {...FETCH_CONFIG.header, method: 'GET'},
+    url: `${FETCH_CONFIG.apiUrl}/system/applications`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
     actionName: APP_LIST,
+    dispatch
+  })
+}
+
+export const getContentTypeList = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/content_types`,
+    param: {
+      headers: {...FETCH_CONFIG.headers},
+      method: 'GET'
+    },
+    actionName: CONTENT_TYPE_LIST,
     dispatch
   })
 }

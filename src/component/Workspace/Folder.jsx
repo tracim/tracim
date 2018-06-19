@@ -20,7 +20,6 @@ class Folder extends React.Component {
   }
 
   handleClickCreateContent = (e, folder, type) => {
-    e.preventDefault()
     e.stopPropagation() // because we have a link inside a link (togler and newFile)
     this.props.onClickCreateContent(folder, type)
   }
@@ -49,13 +48,21 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__name'>
-            { folderData.title }
+            { folderData.label }
           </div>
 
           <div className='folder__header__button'>
 
             <div className='folder__header__button__addbtn'>
-              <button className='addbtn__text btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+              <button
+                className='addbtn__text btn btn-outline-primary dropdown-toggle'
+                type='button'
+                id='dropdownMenuButton'
+                data-toggle='dropdown'
+                aria-haspopup='true'
+                aria-expanded='false'
+                onClick={e => e.stopPropagation()}
+              >
                 {t('Folder.create')} ...
               </button>
 
@@ -72,6 +79,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
+
                 <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'PageHtml')}>
                   <div className='subdropdown__link__apphtml d-flex align-items-center'>
                     <div className='subdropdown__link__apphtml__icon mr-3'>
@@ -82,6 +90,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
+
                 <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'File')}>
                   <div className='subdropdown__link__appfile d-flex align-items-center'>
                     <div className='subdropdown__link__appfile__icon mr-3'>
@@ -92,6 +101,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
+
                 <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'PageMarkdown')}>
                   <div className='subdropdown__link__appmarkdown d-flex align-items-center'>
                     <div className='subdropdown__link__appmarkdown__icon mr-3'>
@@ -102,6 +112,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
+
                 <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Thread')}>
                   <div className='subdropdown__link__appthread d-flex align-items-center'>
                     <div className='subdropdown__link__appthread__icon mr-3'>
@@ -112,6 +123,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
+
                 <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Task')}>
                   <div className='subdropdown__link__apptask d-flex align-items-center'>
                     <div className='subdropdown__link__apptask__icon mr-3'>
@@ -122,6 +134,7 @@ class Folder extends React.Component {
                     </div>
                   </div>
                 </div>
+
                 <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Issue')}>
                   <div className='subdropdown__link__appissue d-flex align-items-center'>
                     <div className='subdropdown__link__appissue__icon mr-3'>
@@ -152,35 +165,37 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          { folderData.content.map((c, i) => c.type === 'folder'
-            ? <Folder
-              app={app}
-              folderData={c}
-              onClickItem={onClickItem}
-              onClickExtendedAction={onClickExtendedAction}
-              onClickFolder={onClickFolder}
-              isLast={isLast}
-              t={t}
-              key={c.id}
-            />
-            : <FileItem
-              icon={(app[c.type] || {icon: ''}).icon}
-              name={c.title}
-              type={c.type}
-              status={c.status}
-              onClickItem={() => onClickItem(c)}
-              onClickExtendedAction={{
-                // we have to use the event here because it is the only place where we also have the content (c)
-                edit: e => onClickExtendedAction.edit(e, c),
-                move: e => onClickExtendedAction.move(e, c),
-                download: e => onClickExtendedAction.download(e, c),
-                archive: e => onClickExtendedAction.archive(e, c),
-                delete: e => onClickExtendedAction.delete(e, c)
-              }}
-              isLast={isLast && i === folderData.content.length - 1}
-              key={c.id}
-            />
-          )}
+          {
+          //   folderData.map((c, i) => c.type === 'folder'
+          //   ? <Folder
+          //     app={app}
+          //     folderData={c}
+          //     onClickItem={onClickItem}
+          //     onClickExtendedAction={onClickExtendedAction}
+          //     onClickFolder={onClickFolder}
+          //     isLast={isLast}
+          //     t={t}
+          //     key={c.id}
+          //   />
+          //   : <FileItem
+          //     icon={(app[c.type] || {icon: ''}).icon}
+          //     name={c.title}
+          //     type={c.type}
+          //     status={c.status}
+          //     onClickItem={() => onClickItem(c)}
+          //     onClickExtendedAction={{
+          //       // we have to use the event here because it is the only place where we also have the content (c)
+          //       edit: e => onClickExtendedAction.edit(e, c),
+          //       move: e => onClickExtendedAction.move(e, c),
+          //       download: e => onClickExtendedAction.download(e, c),
+          //       archive: e => onClickExtendedAction.archive(e, c),
+          //       delete: e => onClickExtendedAction.delete(e, c)
+          //     }}
+          //     isLast={isLast && i === folderData.content.length - 1}
+          //     key={c.id}
+          //   />
+          // )
+          }
         </div>
       </div>
     )
@@ -190,11 +205,8 @@ class Folder extends React.Component {
 export default translate()(Folder)
 
 Folder.propTypes = {
-  folderData: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    content: PropTypes.array
-  }),
-  app: PropTypes.object,
+  folderData: PropTypes.object,
+  app: PropTypes.array,
   onClickItem: PropTypes.func.isRequired,
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired

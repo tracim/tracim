@@ -58,6 +58,7 @@
   "standard": {
     "globals": [
       "fetch",
+      "btoa",
       "history",
       "GLOBAL_renderApp",
       "GLOBAL_renderCreateContentApp",

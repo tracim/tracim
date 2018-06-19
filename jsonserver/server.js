@@ -55,22 +55,31 @@ server.get('/sessions/whoami', (req, res) =>
 server.get('/user/:id/workspace', (req, res) => res.jsonp(jsonDb.workspace_list))
 
 server.get('/workspace/:id', (req, res) => res.jsonp(
-  Object.assign(
-    {},
-    jsonDb.workspace_detail,
-    {content: shuffle(jsonDb.workspace_detail.content.map(
-      c => Object.assign({}, c, {workspace_id: req.params.id})
-    ))},
-    {id: req.params.id}
-  )
+  {} // this EP should return meta data of the workspace (id, description, label, slug, sidebar_entries (?)
 ))
 
-server.get('/workspace/:idws/folder/:idf', (req, res) => {
-  switch (req.params.idf) {
-    case '3':
-      return res.jsonp(jsonDb.folder_content_3)
-    case '11':
-      return res.jsonp(jsonDb.folder_content_11)
+server.get('/workspace/:idws/contents/', (req, res) => {
+  console.log(req.query)
+  if (req.query.parent_id !== undefined) { // get content of a folder
+    switch (req.query.parent_id) {
+      case '3':
+        return res.jsonp(jsonDb.folder_content_3)
+      case '11':
+        return res.jsonp(jsonDb.folder_content_11)
+    }
+  } else { // get content of a workspace
+    return res.jsonp(
+      Object.assign(
+        {},
+        jsonDb.workspace_detail,
+        {
+          content: shuffle(jsonDb.workspace_detail.content.map(
+            c => Object.assign({}, c, {workspace_id: req.params.idws})
+          ))
+        },
+        {id: req.params.idws}
+      )
+    )
   }
 })
 
@@ -78,9 +87,10 @@ server.get('/user/:id/roles', (req, res) => res.jsonp(jsonDb.user_role))
 
 server.get('/timezone', (req, res) => res.jsonp(timezoneDb.timezone))
 
-server.get('/workspace/:idws/content/:idc', (req, res) => {
+server.get('/workspace/:idws/contents/:idc', (req, res) => {
   switch (req.params.idc) {
     case '1': // pageHtml
+    case '5':
       return res.jsonp(jsonDb.content_data_pageHtml)
     case '2':
       return res.jsonp(jsonDb.content_data_thread)
@@ -89,9 +99,10 @@ server.get('/workspace/:idws/content/:idc', (req, res) => {
   }
 })
 
-server.get('/workspace/:idws/content/:idc/timeline', (req, res) => {
+server.get('/workspace/:idws/contents/:idc/timeline', (req, res) => {
   switch (req.params.idc) {
     case '1': // pageHtml
+    case '5':
       return res.jsonp(jsonDb.timeline)
     case '2':
       return res.jsonp([])
@@ -104,3 +115,14 @@ server.use(router)
 server.listen(GLOBAL_PORT, () => {
   console.log('JSON Server is running on port : ' + GLOBAL_PORT)
 })
+
+
+/*
+Object.keys(req) :
+['_readableState', 'readable', 'domain', '_events', '_eventsCount', '_maxListeners', 'socket', 'connection',
+'httpVersionMajor', 'httpVersionMinor', 'httpVersion', 'complete', 'headers', 'rawHeaders', 'trailers', 'rawTrailers',
+'upgrade', 'url', 'method', 'statusCode', 'statusMessage', 'client', '_consuming', '_dumped', 'next', 'baseUrl',
+'originalUrl', '_parsedUrl', 'params', 'query', 'res', '_parsedOriginalUrl', '_startAt', '_startTime', '_remoteAddress',
+'body', 'route' ]
+
+ */

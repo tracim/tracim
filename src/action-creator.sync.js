@@ -23,7 +23,7 @@ export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNo
   ({ type: `Update/${USER_ROLE}/SubscriptionNotif`, workspaceId, subscriptionNotif })
 
 export const WORKSPACE = 'Workspace'
-export const setWorkspaceData = (workspace, filterStr = '') => ({ type: `Set/${WORKSPACE}`, workspace, filterStr })
+export const setWorkspaceContent = (workspaceContent, filterStr = '') => ({ type: `Set/${WORKSPACE}/Content`, workspaceContent, filterStr })
 export const updateWorkspaceFilter = filterList => ({ type: `Update/${WORKSPACE}/Filter`, filterList })
 
 export const FOLDER = 'Folder'
@@ -35,6 +35,9 @@ export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) =>
 
 export const APP_LIST = 'App/List'
 export const setAppList = appList => ({ type: `Set/${APP_LIST}`, appList })
+
+export const CONTENT_TYPE_LIST = 'ContentType/List'
+export const setContentTypeList = contentTypeList => ({ type: `Set/${CONTENT_TYPE_LIST}`, contentTypeList })
 
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `Update/${LANG}`, langList })

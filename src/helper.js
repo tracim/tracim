@@ -1,7 +1,8 @@
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
   },
   apiUrl: 'http://localhost:6543/api/v2',
   mockApiUrl: 'http://localhost:3001'
@@ -10,15 +11,15 @@ export const FETCH_CONFIG = {
 export const PAGE = {
   HOME: '/',
   WORKSPACE: {
-    DASHBOARD: (idws = ':idws') => `/workspace/${idws}`,
-    NEW: '/workspace/new',
-    CALENDAR: (idws = ':idws') => `/workspace/${idws}/apps/calendar`,
-    CONTENT_LIST: (idws = ':idws') => `/workspace/${idws}/apps/contents`,
-    CONTENT: (idws = ':idws', idcts = ':idcts') => `/workspace/${idws}/apps/contents/${idcts}`,
-    CONTENT_NEW: (idws = ':idws', ctstype = ':ctstype') => `/workspace/${idws}/apps/contents/${ctstype}/new`,
-    CONTENT_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspace/${idws}/apps/contents/${idcts}/edit`,
-    CONTENT_TITLE_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspace/${idws}/apps/contents/${idcts}/title/edit`,
-    ADMIN: (idws = ':idws') => `/workspace/${idws}/admin`
+    DASHBOARD: (idws = ':idws') => `/workspaces/${idws}`,
+    NEW: '/workspaces/new',
+    CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
+    CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
+    CONTENT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}`,
+    CONTENT_NEW: (idws = ':idws', ctstype = ':ctstype') => `/workspaces/${idws}/contents/${ctstype}/new`,
+    CONTENT_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/edit`,
+    CONTENT_TITLE_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/title/edit`,
+    ADMIN: (idws = ':idws') => `/workspaces/${idws}/admin`
   },
   LOGIN: '/login',
   ACCOUNT: '/account'
