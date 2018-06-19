@@ -30,6 +30,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         workspace = res[0]
         assert workspace['id'] == 1
         assert workspace['label'] == 'Business'
+        assert workspace['slug'] == 'business'
         assert len(workspace['sidebar_entries']) == 7
 
         sidebar_entry = workspace['sidebar_entries'][0]

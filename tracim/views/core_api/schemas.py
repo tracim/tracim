@@ -188,6 +188,7 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
 
 class WorkspaceDigestSchema(marshmallow.Schema):
     id = marshmallow.fields.Int(example=4)
+    slug = marshmallow.fields.String(example='intranet')
     label = marshmallow.fields.String(example='Intranet')
     sidebar_entries = marshmallow.fields.Nested(
         WorkspaceMenuEntrySchema,
@@ -199,7 +200,6 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 
 class WorkspaceSchema(WorkspaceDigestSchema):
-    slug = marshmallow.fields.String(example='intranet')
     description = marshmallow.fields.String(example='All intranet data.')
 
     class Meta:
