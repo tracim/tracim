@@ -85,9 +85,9 @@ class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-    parent_id = workspace_id = marshmallow.fields.Int(
+    parent_id = marshmallow.fields.Int(
         example=2,
-        default=None,
+        default=0,
         description='allow to filter items in a folder.'
                     ' If not set, then return all contents.'
                     ' If set to 0, then return root contents.'

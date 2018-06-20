@@ -291,6 +291,11 @@ class ContentInContext(object):
 
     @property
     def parent_id(self) -> int:
+        """
+        Return parent_id of the content, if it doesn't exist return 0
+        """
+        if not self.content.parent_id:
+            return 0
         return self.content.parent_id
 
     @property

@@ -166,7 +166,7 @@ class WorkspaceController(Controller):
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    @hapic.output_body(ContentDigestSchema())  # nopep8
     def move_content(
             self,
             context,
@@ -209,7 +209,11 @@ class WorkspaceController(Controller):
                 new_workspace=new_workspace,
                 must_stay_in_same_workspace=False,
             )
-        return
+        updated_content = api.get_one(
+            path_data.content_id,
+            content_type=ContentType.Any
+        )
+        return api.get_content_in_context(updated_content)
 
     @hapic.with_api_doc()
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
