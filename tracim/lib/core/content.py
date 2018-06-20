@@ -876,12 +876,14 @@ class ContentApi(object):
         item.parent = new_parent
         if new_workspace:
             item.workspace = new_workspace
-            if new_parent.workspace_id != new_workspace.workspace_id:
+            if new_parent and \
+                    new_parent.workspace_id != new_workspace.workspace_id:
                 raise NotSameWorkspace(
                     'new parent workspace and new workspace should be the same.'
                 )
         else:
-            item.workspace = new_parent.workspace
+            if new_parent:
+                item.workspace = new_parent.workspace
 
         item.revision_type = ActionDescription.MOVE
 
