@@ -106,7 +106,7 @@ def require_workspace_role(minimal_required_role: int):
 def require_candidate_workspace_role(minimal_required_role: int):
     """
     Decorator for view to restrict access of tracim request if role
-    is not high enough. Do nothing is candidate_workspace_role is not found.
+    is not high enough.
     :param minimal_required_role: value from UserInWorkspace Object like
     UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
     :return: decorator
@@ -115,10 +115,7 @@ def require_candidate_workspace_role(minimal_required_role: int):
 
         def wrapper(self, context, request: 'TracimRequest'):
             user = request.current_user
-            try:
-                workspace = request.candidate_workspace
-            except WorkspaceNotFoundInTracimRequest:
-                return func(self, context, request)
+            workspace = request.candidate_workspace
 
             if workspace.get_user_role(user) >= minimal_required_role:
                 return func(self, context, request)
