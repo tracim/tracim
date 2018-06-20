@@ -35,10 +35,12 @@ from tracim.views.core_api.schemas import WorkspaceMemberSchema
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.revision_protection import new_revision
 
+WORKSPACES_ENDPOINTS_TAG = 'Workspaces'
+
 
 class WorkspaceController(Controller):
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -58,7 +60,7 @@ class WorkspaceController(Controller):
         )
         return wapi.get_workspace_with_context(request.current_workspace)
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -87,7 +89,7 @@ class WorkspaceController(Controller):
             for user_role in roles
         ]
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -123,7 +125,7 @@ class WorkspaceController(Controller):
         ]
         return contents
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -156,7 +158,7 @@ class WorkspaceController(Controller):
         content = api.get_content_in_context(content)
         return content
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -215,7 +217,7 @@ class WorkspaceController(Controller):
         )
         return api.get_content_in_context(updated_content)
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -250,7 +252,7 @@ class WorkspaceController(Controller):
             api.delete(content)
         return
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -286,7 +288,7 @@ class WorkspaceController(Controller):
             api.undelete(content)
         return
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -318,7 +320,7 @@ class WorkspaceController(Controller):
             api.archive(content)
         return
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACES_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)

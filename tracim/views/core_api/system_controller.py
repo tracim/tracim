@@ -18,10 +18,11 @@ from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import ApplicationSchema
 from tracim.views.core_api.schemas import ContentTypeSchema
 
+SYSTEM_ENDPOINTS_TAG = 'System'
 
 class SystemController(Controller):
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[SYSTEM_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @require_profile(Group.TIM_USER)
@@ -32,7 +33,7 @@ class SystemController(Controller):
         """
         return applications
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[SYSTEM_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @require_profile(Group.TIM_USER)
