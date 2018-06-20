@@ -288,13 +288,14 @@ class ContentMoveSchema(marshmallow.Schema):
     # (the user must be content manager of both workspaces)
     new_parent_id = marshmallow.fields.Int(
         example=42,
-        description='id of the new parent content id.'
+        description='id of the new parent content id.',
+        allow_none=True,
+        required=True,
     )
     new_workspace_id = marshmallow.fields.Int(
         example=2,
         description='id of the new workspace id.',
-        allow_none=True,
-        default=None,
+        required=True
     )
 
     @post_load

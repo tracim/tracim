@@ -786,6 +786,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         params = {
             'new_parent_id': '4',  # Salads
+            'new_workspace_id': '2',
         }
         params_folder1 = {
             'parent_id': 3,
@@ -833,7 +834,8 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'new_parent_id': '0',  # root
+            'new_parent_id': None,  # root
+            'new_workspace_id': 2,
         }
         params_folder1 = {
             'parent_id': 3,
@@ -862,7 +864,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert not [content for content in new_folder1_contents if content['content_id'] == 8]  # nopep8
         assert [content for content in new_folder2_contents if content['content_id'] == 8]  # nopep8
         assert res.json_body
-        assert res.json_body['parent_id'] == 0
+        assert res.json_body['parent_id'] is None
         assert res.json_body['content_id'] == 8
         assert res.json_body['workspace_id'] == 2
 
@@ -931,6 +933,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         params = {
             'new_parent_id': '2',  # Menus
+            'new_workspace_id': '1',
         }
         params_folder1 = {
             'parent_id': 3,
@@ -978,7 +981,7 @@ class TestWorkspaceContents(FunctionalTest):
             )
         )
         params = {
-            'new_parent_id': '0', # root
+            'new_parent_id': None,  # root
             'new_workspace_id': '1',
         }
         params_folder1 = {
@@ -1008,7 +1011,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert not [content for content in new_folder1_contents if content['content_id'] == 8]  # nopep8
         assert [content for content in new_folder2_contents if content['content_id'] == 8]  # nopep8
         assert res.json_body
-        assert res.json_body['parent_id'] == 0
+        assert res.json_body['parent_id'] is None
         assert res.json_body['content_id'] == 8
         assert res.json_body['workspace_id'] == 1
 
