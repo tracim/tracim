@@ -243,7 +243,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Tools'
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'] == 'tools'
         assert content['status'] == 'open'
@@ -254,7 +254,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Menus'
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'] == 'menus'
         assert content['status'] == 'open'
@@ -304,7 +304,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'New Fruit Salad'
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
@@ -317,7 +317,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
         assert content['label'].startswith('Fruit Salad')
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status'] == 'open'
@@ -330,7 +330,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
         assert content['label'].startswith('Bad Fruit Salad')
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
@@ -367,7 +367,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'New Fruit Salad'
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
@@ -403,7 +403,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is True
         assert content['is_deleted'] is False
         assert content['label'].startswith('Fruit Salad')
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status'] == 'open'
@@ -441,7 +441,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['is_archived'] is False
         assert content['is_deleted'] is True
         assert content['label'].startswith('Bad Fruit Salad')
-        assert content['parent_id'] is None
+        assert content['parent_id'] == 0
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
@@ -757,7 +757,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert res.json_body['is_deleted'] is False
         assert res.json_body['workspace_id'] == 1
         assert res.json_body['slug'] == 'genericcreatedcontent'
-        assert res.json_body['parent_id'] is None
+        assert res.json_body['parent_id'] == 0
         assert res.json_body['show_in_ui'] is True
         assert res.json_body['sub_content_types']
         params_active = {
