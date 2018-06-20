@@ -845,8 +845,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
+        assert [content for content in folder1_contents if content['content_id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['content_id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/move',
@@ -855,8 +855,8 @@ class TestWorkspaceContents(FunctionalTest):
         )
         new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         new_folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
-        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in new_folder1_contents if content['content_id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['content_id'] == 8]  # nopep8
 
     def test_api_put_move_content__ok_200__with_workspace_id(self):
         """
@@ -890,8 +890,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
+        assert [content for content in folder1_contents if content['content_id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['content_id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/move',
@@ -900,8 +900,8 @@ class TestWorkspaceContents(FunctionalTest):
         )
         new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         new_folder2_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
-        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in new_folder1_contents if content['content_id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['content_id'] == 8]  # nopep8
 
     def test_api_put_move_content__ok_200__to_another_workspace(self):
         """
@@ -934,8 +934,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         folder2_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
+        assert [content for content in folder1_contents if content['content_id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['content_id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/move',
@@ -944,8 +944,8 @@ class TestWorkspaceContents(FunctionalTest):
         )
         new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         new_folder2_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
-        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in new_folder1_contents if content['content_id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['content_id'] == 8]  # nopep8
 
     def test_api_put_move_content__ok_200__to_another_workspace_root(self):
         """
@@ -979,8 +979,8 @@ class TestWorkspaceContents(FunctionalTest):
         }
         folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         folder2_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert [content for content in folder1_contents if content['id'] == 8]  # nopep8
-        assert not [content for content in folder2_contents if content['id'] == 8]  # nopep8
+        assert [content for content in folder1_contents if content['content_id'] == 8]  # nopep8
+        assert not [content for content in folder2_contents if content['content_id'] == 8]  # nopep8
         # TODO - G.M - 2018-06-163 - Check content
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/contents/8/move',
@@ -989,8 +989,8 @@ class TestWorkspaceContents(FunctionalTest):
         )
         new_folder1_contents = self.testapp.get('/api/v2/workspaces/2/contents', params=params_folder1, status=200).json_body  # nopep8
         new_folder2_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_folder2, status=200).json_body  # nopep8
-        assert not [content for content in new_folder1_contents if content['id'] == 8]  # nopep8
-        assert [content for content in new_folder2_contents if content['id'] == 8]  # nopep8
+        assert not [content for content in new_folder1_contents if content['content_id'] == 8]  # nopep8
+        assert [content for content in new_folder2_contents if content['content_id'] == 8]  # nopep8
 
     def test_api_put_move_content__err_400__wrong_workspace_id(self):
         """
