@@ -65,10 +65,10 @@ class ContentCreation(object):
     def __init__(
             self,
             label: str,
-            content_type_slug: str,
+            content_type: str,
     ):
         self.label = label
-        self.content_type_slug = content_type_slug
+        self.content_type = content_type
 
 
 class UserInContext(object):
@@ -92,6 +92,10 @@ class UserInContext(object):
         return self.user.user_id
 
     @property
+    def public_name(self) -> str:
+        return self.display_name
+
+    @property
     def display_name(self) -> str:
         return self.user.display_name
 
@@ -109,7 +113,7 @@ class UserInContext(object):
 
     @property
     def profile(self) -> Profile:
-        return self.user.profile
+        return self.user.profile.name
 
     # Context related
 
@@ -227,12 +231,16 @@ class UserRoleWorkspaceInContext(object):
         return self.user_role.role
 
     @property
+    def role(self) -> str:
+        return self.role_slug
+
+    @property
     def role_slug(self) -> str:
         """
         simple name of the role of the user.
         can be anything from UserRoleInWorkspace SLUG, like
         'not_applicable', 'reader',
-        'contributor', 'content_manager', 'workspace_manager'
+        'contributor', 'content-manager', 'workspace-manager'
         :return: user workspace role as slug.
         """
         return UserRoleInWorkspace.SLUG[self.user_role.role]
@@ -273,10 +281,13 @@ class ContentInContext(object):
         self.config = config
 
     # Default
+    @property
+    def content_id(self) -> int:
+        return self.content.content_id
 
     @property
     def id(self) -> int:
-        return self.content.content_id
+        return self.content_id
 
     @property
     def parent_id(self) -> int:
@@ -291,15 +302,15 @@ class ContentInContext(object):
         return self.content.label
 
     @property
-    def content_type_slug(self) -> str:
+    def content_type(self) -> str:
         return self.content.type
 
     @property
-    def sub_content_type_slug(self) -> typing.List[str]:
+    def sub_content_types(self) -> typing.List[str]:
         return [type.slug for type in self.content.get_allowed_content_types()]
 
     @property
-    def status_slug(self) -> str:
+    def status(self) -> str:
         return self.content.status
 
     @property
