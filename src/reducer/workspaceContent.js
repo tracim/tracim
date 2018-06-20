@@ -15,12 +15,12 @@ export default function workspace (state = [], action) {
         isArchived: wsc.is_archived,
         parentId: wsc.parent_id,
         isDeleted: wsc.is_deleted,
-        // show_in_ui: wsc.show_in_ui, ???
+        showInUi: wsc.show_in_ui,
         statusSlug: wsc.status_slug,
-        subContentTypeSlug: wsc.sub_content_type_slug,
+        subContentTypeSlug: wsc.sub_content_type_slug
       }))
 
-    case `Update/${WORKSPACE}/Filter`:
+    case `Update/${WORKSPACE}/Filter`: // not used anymore ?
       return {...state, filter: action.filterList}
 
     case `Set/${WORKSPACE}/${FOLDER}/Content`:

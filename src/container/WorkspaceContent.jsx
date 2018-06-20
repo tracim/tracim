@@ -15,7 +15,7 @@ import {
   getAppList,
   getContentTypeList,
   getWorkspaceContentList,
-  getWorkspaceContent,
+  // getWorkspaceContent,
   getFolderContent,
   getWorkspaceList
 } from '../action-creator.async.js'
@@ -39,7 +39,8 @@ class WorkspaceContent extends React.Component {
         type: undefined,
         folder: undefined
       },
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
+      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
+      workspaceOpened: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -52,6 +53,7 @@ class WorkspaceContent extends React.Component {
         break
       case 'appClosed':
         this.props.history.push(PAGE.WORKSPACE.CONTENT(this.props.workspace.id, ''))
+        this.setState({workspaceOpened: false})
         break
     }
   }
@@ -71,7 +73,6 @@ class WorkspaceContent extends React.Component {
       const fetchGetContentTypeList = await dispatch(getContentTypeList())
       if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
     }
-
 
     let wsToLoad = null
     if (match.params.idws !== undefined) wsToLoad = match.params.idws
@@ -98,7 +99,7 @@ class WorkspaceContent extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { contentType, workspace, user, renderApp, match } = this.props
+    const { contentType, workspaceContent, user, renderApp, match } = this.props
 
     console.log('componentDidUpdate')
 
@@ -109,9 +110,9 @@ class WorkspaceContent extends React.Component {
 
     // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, idWorkspace))
 
-    if (match.params.idcts && workspace.id !== -1) { // if a content id is in url, open it
+    if (match.params.idcts && workspaceContent.id !== -1 && !workspaceOpened && workspaceContent.length) { // if a content id is in url, open it
       const idContentToOpen = parseInt(match.params.idcts)
-      const contentToOpen = workspace.find(wsc => wsc.id === idContentToOpen) // || await dispatch(getWorkspaceContent(idWorkspace, idContentToOpen))
+      const contentToOpen = workspaceContent.find(wsc => wsc.id === idContentToOpen) // || await dispatch(getWorkspaceContent(idWorkspace, idContentToOpen))
 
       // @FIXME : for alpha, we do not handle subfolder. commented code bellow should load a component that is not in the workspace root
       // if (contentToOpen === undefined) { // content is not is ws root
@@ -119,17 +120,20 @@ class WorkspaceContent extends React.Component {
       //   console.log(fetchContent)
       // }
 
+      console.log('contentToOpen', contentToOpen)
+
       renderApp(
         contentType.find(ct => ct.type === contentToOpen.type),
         user,
-        {...contentToOpen, workspace: workspace}
+        {...contentToOpen, workspaceContent: workspaceContent}
       )
+      this.setState({workspaceOpened: true})
     }
   }
 
   handleClickContentItem = content => {
     console.log('content clicked', content)
-    this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.workspace_id, content.id)}${this.props.location.search}`)
+    this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.id)}${this.props.location.search}`)
   }
 
   handleClickEditContentItem = (e, content) => {
@@ -166,22 +170,22 @@ class WorkspaceContent extends React.Component {
   }
 
   render () {
-    const { workspace, app, contentType } = this.props
+    const { workspaceContent, app, contentType } = this.props
 
     const filterWorkspaceContent = (contentList, filter) => {
       console.log(contentList, filter)
       return filter.length === 0
         ? contentList
         : contentList.filter(c => c.type === 'folder' || filter.includes(c.type)) // keep unfiltered files and folders
-          // @FIXME we need to filter subfolder too, but right now, we dont handle subfolder
-          // .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
+      // @FIXME we need to filter subfolder too, but right now, we dont handle subfolder
+      // .map(c => c.type !== 'folder' ? c : {...c, content: filterWorkspaceContent(c.content, filter)}) // recursively filter folder content
     }
     // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty
 
     const urlFilter = qs.parse(this.props.location.search).type
 
-    const filteredWorkspaceContent = workspace.length > 0
-      ? filterWorkspaceContent(workspace, urlFilter ? [urlFilter] : [])
+    const filteredWorkspaceContent = workspaceContent.length > 0
+      ? filterWorkspaceContent(workspaceContent, urlFilter ? [urlFilter] : [])
       : []
     console.log('workspaceContent => filteredWorkspaceContent', filteredWorkspaceContent)
 
@@ -193,7 +197,7 @@ class WorkspaceContent extends React.Component {
           <PageTitle
             parentClass='workspace__header'
             customClass='justify-content-between'
-            title={workspace.label ? workspace.label : ''}
+            title={workspaceContent.label ? workspaceContent.label : ''}
           >
             <DropdownCreateButton parentClass='workspace__header__btnaddworkspace' />
           </PageTitle>
@@ -256,5 +260,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspace, workspaceList, app, contentType }) => ({ user, workspace, workspaceList, app, contentType })
+const mapStateToProps = ({ user, workspaceContent, workspaceList, app, contentType }) => ({ user, workspaceContent, workspaceList, app, contentType })
 export default withRouter(connect(mapStateToProps)(appFactory(WorkspaceContent)))
