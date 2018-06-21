@@ -25,7 +25,7 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
-from tracim.exceptions import NotSameWorkspace
+from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.lib.utils.utils import current_date_for_filename
 from tracim.models.revision_protection import new_revision
 from tracim.models.auth import User
@@ -878,7 +878,7 @@ class ContentApi(object):
             item.workspace = new_workspace
             if new_parent and \
                     new_parent.workspace_id != new_workspace.workspace_id:
-                raise NotSameWorkspace(
+                raise WorkspacesDoNotMatch(
                     'new parent workspace and new workspace should be the same.'
                 )
         else:

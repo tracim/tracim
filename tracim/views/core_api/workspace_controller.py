@@ -19,7 +19,7 @@ from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
 from tracim.exceptions import NotAuthenticated, InsufficientUserWorkspaceRole
 from tracim.exceptions import WorkspaceNotFoundInTracimRequest
-from tracim.exceptions import NotSameWorkspace
+from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import WorkspaceNotFound
 from tracim.views.controllers import Controller
@@ -163,7 +163,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(NotSameWorkspace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

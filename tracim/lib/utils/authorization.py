@@ -8,9 +8,8 @@ try:
 except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
-from tracim.exceptions import InsufficientUserWorkspaceRole, \
-    InsufficientUserProfile, WorkspaceNotFoundInTracimRequest
-
+from tracim.exceptions import InsufficientUserWorkspaceRole
+from tracim.exceptions import InsufficientUserProfile
 if TYPE_CHECKING:
     from tracim import TracimRequest
 ###

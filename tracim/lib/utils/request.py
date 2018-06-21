@@ -2,7 +2,8 @@
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim.exceptions import NotAuthenticated, WorkspaceNotFoundInTracimRequest
+from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim.exceptions import UserNotFoundInTracimRequest
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspaceNotFound
@@ -59,7 +60,7 @@ class TracimRequest(Request):
         :return: Workspace of the request
         """
         if self._current_workspace is None:
-            self.current_workspace = self._get_current_workspace(self.current_user, self)
+            self._current_workspace = self._get_current_workspace(self.current_user, self)
         return self._current_workspace
 
     @current_workspace.setter
@@ -108,10 +109,8 @@ class TracimRequest(Request):
     @property
     def candidate_workspace(self) -> Workspace:
         """
-        Get user from headers/body request. This user is not
-        the one found by authentication mecanism. This user
-        can help user to know about who one page is about in
-        a similar way as current_workspace.
+        Get workspace from headers/body request. This workspace is not
+        the one found from path. Its the one from json body.
         """
         if self._candidate_workspace is None:
             self._candidate_workspace = self._get_candidate_workspace(

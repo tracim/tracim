@@ -117,5 +117,5 @@ class UserNotFoundInTracimRequest(TracimException):
     pass
 
 
-class NotSameWorkspace(TracimException):
+class WorkspacesDoNotMatch(TracimException):
     pass
