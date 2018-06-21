@@ -16,15 +16,30 @@ from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
 
 
-class UserSchema(marshmallow.Schema):
-
+class UserDigestSchema(marshmallow.Schema):
+    """
+    Simple user schema
+    """
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
-    email = marshmallow.fields.Email(
-        required=True,
-        example='suri.cate@algoo.fr'
+    avatar_url = marshmallow.fields.Url(
+        allow_none=True,
+        example="/api/v2/assets/avatars/suri-cate.jpg",
+        description="avatar_url is the url to the image file. "
+                    "If no avatar, then set it to null "
+                    "(and frontend will interpret this with a default avatar)",
     )
     public_name = marshmallow.fields.String(
         example='Suri Cate',
+    )
+
+
+class UserSchema(UserDigestSchema):
+    """
+    Complete user schema
+    """
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
     )
     created = marshmallow.fields.DateTime(
         format='%Y-%m-%dT%H:%M:%SZ',
@@ -46,13 +61,6 @@ class UserSchema(marshmallow.Schema):
         example="/api/v2/calendar/user/3.ics/",
         description="The url for calendar CalDAV direct access",
     )
-    avatar_url = marshmallow.fields.Url(
-        allow_none=True,
-        example="/api/v2/assets/avatars/suri-cate.jpg",
-        description="avatar_url is the url to the image file. "
-                    "If no avatar, then set it to null "
-                    "(and frontend will interpret this with a default avatar)",
-    )
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
@@ -61,7 +69,6 @@ class UserSchema(marshmallow.Schema):
 
     class Meta:
         description = 'User account of Tracim'
-
 
 # Path Schemas
 
@@ -78,10 +85,21 @@ class ContentIdPathSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, required=True)
 
 
-class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema):
+class WorkspaceAndContentIdPathSchema(
+    WorkspaceIdPathSchema,
+    ContentIdPathSchema
+):
     @post_load
     def make_path_object(self, data):
         return WorkspaceAndContentPath(**data)
+
+
+class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
+    comment_id = marshmallow.fields.Int(
+        example=6,
+        description='id of a comment related to content content_id',
+        required=True
+    )
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
@@ -116,6 +134,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
                     'The reason for this parameter to exist is for example '
                     'to allow to show only archived documents'
     )
+
     @post_load
     def make_content_filter(self, data):
         return ContentFilter(**data)
@@ -335,7 +354,7 @@ class ContentDigestSchema(marshmallow.Schema):
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
     sub_content_types = marshmallow.fields.List(
-        marshmallow.fields.Str,
+        marshmallow.fields.String(),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'
@@ -354,4 +373,93 @@ class ContentDigestSchema(marshmallow.Schema):
                     'This may his maybe used for specific contents or '
                     'for sub-contents. Default is True. '
                     'In first version of the API, this field is always True',
+    )
+
+
+#####
+# Content
+#####
+
+class ContentSchema(ContentDigestSchema):
+    current_revision_id = marshmallow.fields.Int(example=12)
+    created = marshmallow.fields.DateTime(
+        format='%Y-%m-%dT%H:%M:%SZ',
+        description='Content creation date',
+    )
+    author = marshmallow.fields.Nested(UserDigestSchema)
+    modified = marshmallow.fields.DateTime(
+        format='%Y-%m-%dT%H:%M:%SZ',
+        description='date of last modification of content',
+    )
+    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+
+
+class ThreadContentSchema(ContentSchema):
+    raw_content = marshmallow.fields.String('Description of Thread')
+
+
+class HtmlDocumentContentSchema(ContentSchema):
+    raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
+
+#####
+# Revision
+#####
+
+
+class RevisionSchema(ContentDigestSchema):
+    comments_id = marshmallow.fields.List(marshmallow.fields.Int(example=4))
+    revision_id = marshmallow.fields.Int(example=12)
+    created = marshmallow.fields.DateTime(
+        format='%Y-%m-%dT%H:%M:%SZ',
+        description='Content creation date',
+    )
+    author = marshmallow.fields.Nested(UserDigestSchema)
+
+
+class ThreadRevisionSchema(RevisionSchema):
+    raw_content = marshmallow.fields.String('Description of Thread')
+
+
+class HtmlDocumentRevisionSchema(RevisionSchema):
+    raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
+
+
+####
+
+class CommentSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(example=6)
+    parent_id = marshmallow.fields.Int(example=34)
+    raw_content = marshmallow.fields.String(
+        example='<p>This is just an html comment !</p>'
+    )
+    author = marshmallow.fields.Nested(UserDigestSchema)
+
+
+class ContentModifySchema(marshmallow.Schema):
+    label = marshmallow.fields.String(
+        example='contract for client XXX',
+        description='New title of the content'
+    )
+
+
+class HtmlDocumentModifySchema(ContentModifySchema):
+    raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
+
+
+class ThreadModifySchema(ContentModifySchema):
+    raw_content = marshmallow.fields.String('Description of Thread')
+
+
+class SetCommentSchema(marshmallow.Schema):
+    raw_content = marshmallow.fields.String(
+        example='<p>This is just an html comment !</p>'
+    )
+
+
+class SetContentStatusSchema(marshmallow.Schema):
+    status = marshmallow.fields.Str(
+        example='closed-deprecated',
+        validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
+        description='this slug is found in content_type available statuses',
+        default=open_status
     )
