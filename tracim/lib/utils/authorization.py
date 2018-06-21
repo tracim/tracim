@@ -83,8 +83,8 @@ def require_profile(group: int):
 
 def require_workspace_role(minimal_required_role: int):
     """
-    Decorator for view to restrict access of tracim request if role
-    is not high enough
+    Restricts access to endpoint to minimal role or raise an exception.
+    Check role for current_workspace.
     :param minimal_required_role: value from UserInWorkspace Object like
     UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
     :return: decorator
@@ -104,8 +104,8 @@ def require_workspace_role(minimal_required_role: int):
 
 def require_candidate_workspace_role(minimal_required_role: int):
     """
-    Decorator for view to restrict access of tracim request if role
-    is not high enough.
+    Restricts access to endpoint to minimal role or raise an exception.
+    Check role for candidate_workspace.
     :param minimal_required_role: value from UserInWorkspace Object like
     UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
     :return: decorator
