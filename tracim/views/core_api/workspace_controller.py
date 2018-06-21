@@ -168,7 +168,7 @@ class WorkspaceController(Controller):
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())
-    @hapic.output_body(ContentDigestSchema())  # nopep8
+    @hapic.output_body(ContentDigestSchema())
     def move_content(
             self,
             context,
