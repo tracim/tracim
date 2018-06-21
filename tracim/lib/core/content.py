@@ -418,6 +418,8 @@ class ContentApi(object):
         item = Content()
         item.owner = self._user
         item.parent = parent
+        if parent and not workspace:
+            workspace = item.parent.workspace
         item.workspace = workspace
         item.type = ContentType.Comment
         item.description = content
@@ -449,15 +451,20 @@ class ContentApi(object):
 
         return content
 
-    def get_one(self, content_id: int, content_type: str, workspace: Workspace=None) -> Content:
+    def get_one(self, content_id: int, content_type: str, workspace: Workspace=None, parent: Content=None) -> Content:
 
         if not content_id:
             return None
 
-        if content_type==ContentType.Any:
-            return self._base_query(workspace).filter(Content.content_id==content_id).one()
+        base_request = self._base_query(workspace).filter(Content.content_id==content_id)
 
-        return self._base_query(workspace).filter(Content.content_id==content_id).filter(Content.type==content_type).one()
+        if content_type!=ContentType.Any:
+            base_request = base_request.filter(Content.type==content_type)
+
+        if parent:
+            base_request = base_request.filter(Content.parent_id==parent.content_id)  # nopep8
+
+        return base_request.one()
 
     def get_one_revision(self, revision_id: int = None) -> ContentRevisionRO:
         """

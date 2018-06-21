@@ -186,6 +186,33 @@ CONTENT_DEFAULT_TYPE = [
     folder_type,
 ]
 
+# TODO - G.M - 31-05-2018 - Set Better Event params
+event_type = NewContentType(
+    slug='event',
+    fa_icon=thread.fa_icon,
+    hexcolor=thread.hexcolor,
+    label='Event',
+    creation_label='Event',
+    available_statuses=CONTENT_DEFAULT_STATUS,
+)
+
+# TODO - G.M - 31-05-2018 - Set Better Event params
+comment_type = NewContentType(
+    slug='comment',
+    fa_icon=thread.fa_icon,
+    hexcolor=thread.hexcolor,
+    label='Comment',
+    creation_label='Comment',
+    available_statuses=CONTENT_DEFAULT_STATUS,
+)
+
+CONTENT_DEFAULT_TYPE_SPECIAL = [
+    event_type,
+    comment_type,
+]
+
+ALL_CONTENTS_DEFAULT_TYPES = CONTENT_DEFAULT_TYPE + CONTENT_DEFAULT_TYPE_SPECIAL
+
 
 class ContentTypeLegacy(NewContentType):
     """
@@ -204,7 +231,7 @@ class ContentTypeLegacy(NewContentType):
     MarkdownPage = markdownpluspage_type.slug
 
     def __init__(self, slug: str):
-        for content_type in CONTENT_DEFAULT_TYPE:
+        for content_type in ALL_CONTENTS_DEFAULT_TYPES:
             if slug == content_type.slug:
                 super(ContentTypeLegacy, self).__init__(
                     slug=content_type.slug,
@@ -223,8 +250,7 @@ class ContentTypeLegacy(NewContentType):
 
     @classmethod
     def allowed_types(cls) -> typing.List[str]:
-        contents_types = [status.slug for status in CONTENT_DEFAULT_TYPE]
-        contents_types.extend([cls.Folder, cls.Event, cls.Comment])
+        contents_types = [status.slug for status in ALL_CONTENTS_DEFAULT_TYPES]
         return contents_types
 
     @classmethod
@@ -232,7 +258,6 @@ class ContentTypeLegacy(NewContentType):
         # This method is used for showing only "main"
         # types in the left-side treeview
         contents_types = [status.slug for status in CONTENT_DEFAULT_TYPE]
-        contents_types.extend([cls.Folder])
         return contents_types
 
     # TODO - G.M - 30-05-2018 - This method don't do anything.

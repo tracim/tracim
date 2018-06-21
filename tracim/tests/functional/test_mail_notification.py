@@ -162,8 +162,8 @@ class TestNotificationsSync(MailHogTest):
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
         assert headers['Subject'][0] == '[TRACIM] [Recipes] file1 (Open)'
-        assert headers['References'][0] == 'test_user_refs+19@localhost'
-        assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+19@localhost>'  # nopep8
+        assert headers['References'][0] == 'test_user_refs+22@localhost'
+        assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'  # nopep8
 
 
 class TestNotificationsAsync(MailHogTest):
@@ -263,5 +263,5 @@ class TestNotificationsAsync(MailHogTest):
         assert headers['From'][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'  # nopep8
         assert headers['To'][0] == 'Global manager <admin@admin.admin>'
         assert headers['Subject'][0] == '[TRACIM] [Recipes] file1 (Open)'
-        assert headers['References'][0] == 'test_user_refs+19@localhost'
-        assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+19@localhost>'  # nopep8
+        assert headers['References'][0] == 'test_user_refs+22@localhost'
+        assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'  # nopep8

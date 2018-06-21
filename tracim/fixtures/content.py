@@ -38,6 +38,11 @@ class Content(Fixture):
             session=self._session,
             config=self._config
         )
+        bob_content_api = ContentApi(
+            current_user=bob,
+            session=self._session,
+            config=self._config
+        )
         role_api = RoleApi(
             current_user=admin,
             session=self._session,
@@ -246,5 +251,19 @@ class Content(Fixture):
             content_api.delete(bad_fruit_salad)
         content_api.save(bad_fruit_salad)
 
-
+        content_api.create_comment(
+            parent=best_cake_thread,
+            content='<p> What is for you the best cake ever ? </br> I personnally vote for Chocolate cupcake !</p>',  # nopep8
+            do_save=True,
+        )
+        bob_content_api.create_comment(
+            parent=best_cake_thread,
+            content='<p>What about Apple Pie ? There are Awesome !</p>',
+            do_save=True,
+        )
+        content_api.create_comment(
+            parent=best_cake_thread,
+            content='<p>You are right, but Kouign-amann are clearly better.</p>',
+            do_save=True,
+        )
         self._session.flush()

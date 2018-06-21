@@ -41,6 +41,16 @@ class WorkspaceAndContentPath(object):
         self.workspace_id = workspace_id
 
 
+class CommentPath(object):
+    """
+    Paths params with workspace id and content_id
+    """
+    def __init__(self, workspace_id: int, content_id: int, comment_id: int):
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.comment_id = comment_id
+
+
 class ContentFilter(object):
     """
     Content filter model
@@ -69,6 +79,17 @@ class ContentCreation(object):
     ):
         self.label = label
         self.content_type = content_type
+
+
+class CommentCreation(object):
+    """
+    Comment creation model
+    """
+    def __init__(
+            self,
+            raw_content: str,
+    ):
+        self.raw_content=raw_content
 
 
 class UserInContext(object):
@@ -323,6 +344,18 @@ class ContentInContext(object):
     @property
     def is_deleted(self):
         return self.content.is_deleted
+
+    @property
+    def raw_content(self):
+        return self.content.description
+
+    @property
+    def author(self):
+        return UserInContext(
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.owner
+        )
 
     # Context-related
 

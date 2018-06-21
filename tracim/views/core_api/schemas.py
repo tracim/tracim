@@ -9,6 +9,8 @@ from tracim.models.contents import CONTENT_DEFAULT_STATUS
 from tracim.models.contents import GlobalStatus
 from tracim.models.contents import open_status
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import CommentCreation
+from tracim.models.context_models import CommentPath
 from tracim.models.context_models import MoveParams
 from tracim.models.context_models import WorkspaceAndContentPath
 from tracim.models.context_models import ContentFilter
@@ -100,6 +102,9 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
         description='id of a comment related to content content_id',
         required=True
     )
+    @post_load
+    def make_path_object(self, data):
+        return CommentPath(**data)
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
@@ -454,6 +459,10 @@ class SetCommentSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
         example='<p>This is just an html comment !</p>'
     )
+
+    @post_load
+    def create_comment(self, data):
+        return CommentCreation(**data)
 
 
 class SetContentStatusSchema(marshmallow.Schema):
