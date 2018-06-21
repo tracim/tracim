@@ -195,10 +195,7 @@ class WorkspaceController(Controller):
             move_data.new_parent_id, content_type=ContentType.Any
         )
 
-        try:
-            new_workspace = request.candidate_workspace
-        except WorkspaceNotFoundInTracimRequest:
-            new_workspace = None
+        new_workspace = request.candidate_workspace
 
         with new_revision(
                 session=request.dbsession,
