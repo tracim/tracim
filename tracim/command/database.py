@@ -46,6 +46,7 @@ class InitializeDBCommand(AppContextCommand):
         config_uri = parsed_args.config_file
         setup_logging(config_uri)
         settings = get_appsettings(config_uri)
+        settings.update(settings.global_conf)
         self._create_schema(settings)
         self._populate_database(settings, add_test_data=parsed_args.test_data)
 
@@ -113,6 +114,7 @@ class DeleteDBCommand(AppContextCommand):
         config_uri = parsed_args.config_file
         setup_logging(config_uri)
         settings = get_appsettings(config_uri)
+        settings.update(settings.global_conf)
         engine = get_engine(settings)
         app_config = CFG(settings)
         app_config.configure_filedepot()
