@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Tests for /api/v2/workspaces subpath endpoints.
-"""
 from tracim.tests import FunctionalTest
 from tracim.fixtures.content import Content as ContentFixtures
 from tracim.fixtures.users_and_groups import Base as BaseFixture

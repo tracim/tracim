@@ -117,5 +117,17 @@ class UserNotFoundInTracimRequest(TracimException):
     pass
 
 
+class ContentNotFoundInTracimRequest(TracimException):
+    pass
+
+
+class ContentNotFound(TracimException):
+    pass
+
+
+class ContentTypeNotAllowed(TracimException):
+    pass
+
+
 class WorkspacesDoNotMatch(TracimException):
     pass

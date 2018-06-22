@@ -9,12 +9,15 @@ from tracim.models.contents import CONTENT_DEFAULT_STATUS
 from tracim.models.contents import GlobalStatus
 from tracim.models.contents import open_status
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentCreation
 from tracim.models.context_models import CommentPath
 from tracim.models.context_models import MoveParams
 from tracim.models.context_models import WorkspaceAndContentPath
 from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
+from tracim.models.context_models import HTMLDocumentUpdate
+from tracim.models.context_models import ThreadUpdate
 from tracim.models.data import UserRoleInWorkspace
 
 
@@ -412,7 +415,7 @@ class HtmlDocumentContentSchema(ContentSchema):
 
 
 class RevisionSchema(ContentDigestSchema):
-    comments_id = marshmallow.fields.List(marshmallow.fields.Int(example=4))
+    comments_ids = marshmallow.fields.List(marshmallow.fields.Int(example=4))
     revision_id = marshmallow.fields.Int(example=12)
     created = marshmallow.fields.DateTime(
         format='%Y-%m-%dT%H:%M:%SZ',
@@ -450,9 +453,17 @@ class ContentModifySchema(marshmallow.Schema):
 class HtmlDocumentModifySchema(ContentModifySchema):
     raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
 
+    @post_load
+    def html_document_update(self, data):
+        return HTMLDocumentUpdate(**data)
+
 
 class ThreadModifySchema(ContentModifySchema):
     raw_content = marshmallow.fields.String('Description of Thread')
+
+    @post_load
+    def thread_update(self, data):
+        return ThreadUpdate(**data)
 
 
 class SetCommentSchema(marshmallow.Schema):
@@ -470,5 +481,10 @@ class SetContentStatusSchema(marshmallow.Schema):
         example='closed-deprecated',
         validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
         description='this slug is found in content_type available statuses',
-        default=open_status
+        default=open_status,
+        required=True,
     )
+
+    @post_load
+    def set_status(self, data):
+        return SetContentStatus(**data)

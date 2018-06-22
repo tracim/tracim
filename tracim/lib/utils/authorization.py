@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
+import typing
 from typing import TYPE_CHECKING
 
+import functools
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
+
+from tracim.models.contents import NewContentType
+
 try:
     from json.decoder import JSONDecodeError
 except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
 from tracim.exceptions import InsufficientUserWorkspaceRole
+from tracim.exceptions import ContentTypeNotAllowed
 from tracim.exceptions import InsufficientUserProfile
 if TYPE_CHECKING:
     from tracim import TracimRequest
@@ -120,5 +126,23 @@ def require_candidate_workspace_role(minimal_required_role: int):
                 return func(self, context, request)
             raise InsufficientUserWorkspaceRole()
 
+        return wrapper
+    return decorator
+
+
+def require_content_types(content_types: typing.List['NewContentType']):
+    """
+    Restricts access to specific file type or raise an exception.
+    Check role for candidate_workspace.
+    :param content_types: list of NewContentType object
+    :return: decorator
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(self, context, request: 'TracimRequest'):
+            content = request.current_content
+            if content.type in [content.slug for content in content_types]:
+                return func(self, context, request)
+            raise ContentTypeNotAllowed()
         return wrapper
     return decorator

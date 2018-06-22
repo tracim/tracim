@@ -8,6 +8,7 @@ from tracim import CFG
 from tracim.models import User
 from tracim.models.auth import Profile
 from tracim.models.data import Content
+from tracim.models.data import ContentRevisionRO
 from tracim.models.data import Workspace, UserRoleInWorkspace
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
@@ -89,7 +90,44 @@ class CommentCreation(object):
             self,
             raw_content: str,
     ):
-        self.raw_content=raw_content
+        self.raw_content = raw_content
+
+
+class SetContentStatus(object):
+    """
+    Set content status
+    """
+    def __init__(
+            self,
+            status: str,
+    ):
+        self.status = status
+
+
+class HTMLDocumentUpdate(object):
+    """
+    Comment creation model
+    """
+    def __init__(
+            self,
+            label: str,
+            raw_content: str,
+    ):
+        self.label = label
+        self.raw_content = raw_content
+
+
+class ThreadUpdate(object):
+    """
+    Comment creation model
+    """
+    def __init__(
+            self,
+            label: str,
+            raw_content: str,
+    ):
+        self.label = label
+        self.raw_content = raw_content
 
 
 class UserInContext(object):
@@ -331,7 +369,7 @@ class ContentInContext(object):
 
     @property
     def sub_content_types(self) -> typing.List[str]:
-        return [type.slug for type in self.content.get_allowed_content_types()]
+        return [_type.slug for _type in self.content.get_allowed_content_types()]
 
     @property
     def status(self) -> str:
@@ -357,8 +395,27 @@ class ContentInContext(object):
             user=self.content.owner
         )
 
-    # Context-related
+    @property
+    def current_revision_id(self):
+        return self.content.revision_id
 
+    @property
+    def created(self):
+        return self.content.created
+
+    @property
+    def modified(self):
+        return self.updated
+
+    @property
+    def updated(self):
+        return self.content.updated
+
+    @property
+    def last_modifier(self):
+        # TODO - G.M - 2018-06-173 - Repair owner/last modifier
+        return self.author
+    # Context-related
     @property
     def show_in_ui(self):
         # TODO - G.M - 31-05-2018 - Enable Show_in_ui params
@@ -371,3 +428,111 @@ class ContentInContext(object):
     @property
     def slug(self):
         return slugify(self.content.label)
+
+
+class RevisionInContext(object):
+    """
+    Interface to get Content data and Content data related to context.
+    """
+
+    def __init__(self, content: ContentRevisionRO, dbsession: Session, config: CFG):
+        self.revision = content
+        self.dbsession = dbsession
+        self.config = config
+
+    # Default
+    @property
+    def content_id(self) -> int:
+        return self.revision.content_id
+
+    @property
+    def id(self) -> int:
+        return self.content_id
+
+    @property
+    def parent_id(self) -> int:
+        """
+        Return parent_id of the content
+        """
+        return self.revision.parent_id
+
+    @property
+    def workspace_id(self) -> int:
+        return self.revision.workspace_id
+
+    @property
+    def label(self) -> str:
+        return self.revision.label
+
+    @property
+    def content_type(self) -> str:
+        return self.revision.type
+
+    @property
+    def sub_content_types(self) -> typing.List[str]:
+        return [_type.slug for _type
+                in self.revision.node.get_allowed_content_types()]
+
+    @property
+    def status(self) -> str:
+        return self.revision.status
+
+    @property
+    def is_archived(self):
+        return self.revision.is_archived
+
+    @property
+    def is_deleted(self):
+        return self.revision.is_deleted
+
+    @property
+    def raw_content(self):
+        return self.revision.description
+
+    @property
+    def author(self):
+        return UserInContext(
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.revision.owner
+        )
+
+    @property
+    def revision_id(self):
+        return self.revision.revision_id
+
+    @property
+    def created(self):
+        return self.revision.created
+
+    @property
+    def modified(self):
+        return self.updated
+
+    @property
+    def updated(self):
+        return self.revision.updated
+
+    @property
+    def last_modifier(self):
+        # TODO - G.M - 2018-06-173 - Repair owner/last modifier
+        return self.author
+    
+    @property
+    def comments_ids(self):
+        # TODO - G.M - 2018-06-173 - Return comments related to this revision
+        return []
+
+    # Context-related
+    @property
+    def show_in_ui(self):
+        # TODO - G.M - 31-05-2018 - Enable Show_in_ui params
+        # if false, then do not show content in the treeview.
+        # This may his maybe used for specific contents or for sub-contents.
+        # Default is True.
+        # In first version of the API, this field is always True
+        return True
+
+    @property
+    def slug(self):
+        return slugify(self.revision.label)

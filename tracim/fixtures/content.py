@@ -121,6 +121,18 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=tiramisu_page,
+        ):
+            content_api.update_content(
+                item=tiramisu_page,
+                new_content='<p>To cook a great Tiramisu, you need many ingredients.</p>',  # nopep8
+                new_label='Tiramisu Recipe',
+            )
+            content_api.save(tiramisu_page)
+
         best_cake_thread = content_api.create(
             content_type=ContentType.Thread,
             workspace=recipe_workspace,

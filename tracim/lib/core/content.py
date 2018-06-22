@@ -16,6 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy import desc
 from sqlalchemy import distinct
@@ -25,6 +26,7 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
+from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.lib.utils.utils import current_date_for_filename
 from tracim.models.revision_protection import new_revision
@@ -39,8 +41,8 @@ from tracim.models.data import RevisionReadStatus
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 from tracim.lib.utils.translation import fake_translator as _
+from tracim.models.context_models import RevisionInContext
 from tracim.models.context_models import ContentInContext
-
 
 __author__ = 'damien'
 
@@ -161,6 +163,10 @@ class ContentApi(object):
     def get_content_in_context(self, content: Content):
         return ContentInContext(content, self._session, self._config)
 
+    def get_revision_in_context(self, revision: ContentRevisionRO):
+        # TODO - G.M - 2018-06-173 - create revision in context object
+        return RevisionInContext(revision, self._session, self._config)
+    
     def get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
         Return the Content/ContentRevision query join condition
@@ -464,7 +470,11 @@ class ContentApi(object):
         if parent:
             base_request = base_request.filter(Content.parent_id==parent.content_id)  # nopep8
 
-        return base_request.one()
+        try:
+            content = base_request.one()
+        except NoResultFound as exc:
+            raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
+        return content
 
     def get_one_revision(self, revision_id: int = None) -> ContentRevisionRO:
         """
