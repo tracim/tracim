@@ -70,7 +70,7 @@ class HTMLDocumentController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(HtmlDocumentModifySchema())
     @hapic.output_body(HtmlDocumentContentSchema())
-    def update_html_document(self, context, request: TracimRequest, hapic_data=None):
+    def update_html_document(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         update_html_document
         """

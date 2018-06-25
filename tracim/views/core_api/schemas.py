@@ -358,7 +358,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
-        example='htmlpage',
+        example='html-content',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
     sub_content_types = marshmallow.fields.List(
@@ -403,10 +403,18 @@ class ContentSchema(ContentDigestSchema):
 
 
 class ThreadContentSchema(ContentSchema):
+    content_type = marshmallow.fields.Str(
+        example='thread',
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+    )
     raw_content = marshmallow.fields.String('Description of Thread')
 
 
 class HtmlDocumentContentSchema(ContentSchema):
+    content_type = marshmallow.fields.Str(
+        example='html-content',
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+    )
     raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
 
 #####
@@ -425,10 +433,18 @@ class RevisionSchema(ContentDigestSchema):
 
 
 class ThreadRevisionSchema(RevisionSchema):
+    content_type = marshmallow.fields.Str(
+        example='thread',
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+    )
     raw_content = marshmallow.fields.String('Description of Thread')
 
 
 class HtmlDocumentRevisionSchema(RevisionSchema):
+    content_type = marshmallow.fields.Str(
+        example='html-content',
+        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+    )
     raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
 
 
