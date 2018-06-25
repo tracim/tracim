@@ -132,6 +132,7 @@ class HTMLDocumentController(Controller):
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([htmlpage_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
