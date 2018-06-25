@@ -78,7 +78,7 @@ class TestHtmlDocuments(FunctionalTest):
             )
         )
         params = {
-            'label' : 'My New label',
+            'label': 'My New label',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
         res = self.testapp.put_json(
@@ -136,7 +136,9 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
 
-    def test_api__get_html_document_revisions__ok_200__nominal_case(self) -> None:
+    def test_api__get_html_document_revisions__ok_200__nominal_case(
+            self
+    ) -> None:
         """
         Get one html document of a content
         """
