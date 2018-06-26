@@ -432,8 +432,7 @@ class TestThreads(FunctionalTest):
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 8
         assert revision['sub_content_types']
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision['comments_ids'] == []
+        assert revision['comments_ids'] == [18, 19, 20]
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
         assert revision['author']
@@ -453,7 +452,6 @@ class TestThreads(FunctionalTest):
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 26
         assert revision['sub_content_types']
-        # TODO - G.M - 2018-06-173 - Test with real comments
         assert revision['comments_ids'] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']

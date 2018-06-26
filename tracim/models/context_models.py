@@ -507,7 +507,7 @@ class RevisionInContext(object):
 
     @property
     def created(self):
-        return self.revision.created
+        return self.updated
 
     @property
     def modified(self):
@@ -518,9 +518,51 @@ class RevisionInContext(object):
         return self.revision.updated
 
     @property
+    def next_revision(self):
+        next_revision = None
+        revisions = self.revision.node.revisions
+        # INFO - G.M - 2018-06-177 - Get revisions more recent that
+        # current one
+        next_revisions = [
+            revision for revision in revisions
+            if revision.revision_id > self.revision.revision_id
+        ]
+        if next_revisions:
+            # INFO - G.M - 2018-06-177 -sort revisions by date
+            sorted_next_revisions = sorted(
+                next_revisions,
+                key=lambda revision: revision.updated
+            )
+            # INFO - G.M - 2018-06-177 - return only next revision
+            return sorted_next_revisions[0]
+        else:
+            return None
+
+    @property
     def comments_ids(self):
-        # TODO - G.M - 2018-06-173 - Return comments related to this revision
-        return []
+        comments = self.revision.node.get_comments()
+        # INFO - G.M - 2018-06-177 - Get comments more recent than revision.
+        revisions_comments = [
+            comment for comment in comments
+            if comment.created > self.revision.updated
+        ]
+        if self.next_revision:
+            # INFO - G.M - 2018-06-177 - if there is a revision more recent
+            # than current remove comments from theses rev (comments older
+            # than next_revision.)
+            revisions_comments = [
+                comment for comment in revisions_comments
+                if comment.created < self.next_revision.updated
+            ]
+        sorted_revision_comments = sorted(
+            revisions_comments,
+            key=lambda revision: revision.created
+        )
+        comments_id = [
+            comments.content_id
+            for comments in sorted_revision_comments
+        ]
+        return comments_id
 
     # Context-related
     @property
