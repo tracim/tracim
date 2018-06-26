@@ -40,7 +40,7 @@ class SystemController(Controller):
     @hapic.output_body(ContentTypeSchema(many=True),)
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get list of alls applications installed in this tracim instance.
+        Get list of alls content types availables in this tracim instance.
         """
 
         return CONTENT_DEFAULT_TYPE

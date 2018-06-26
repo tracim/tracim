@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import TYPE_CHECKING
-
+import functools
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 try:
@@ -52,6 +52,7 @@ def require_same_user_or_profile(group: int):
     :return:
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest'):
             auth_user = request.current_user
             candidate_user = request.candidate_user
@@ -72,6 +73,7 @@ def require_profile(group: int):
     :return:
     """
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest'):
             user = request.current_user
             if user.profile.id >= group:
@@ -90,7 +92,7 @@ def require_workspace_role(minimal_required_role: int):
     :return: decorator
     """
     def decorator(func):
-
+        @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest'):
             user = request.current_user
             workspace = request.current_workspace
