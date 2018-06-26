@@ -1,4 +1,5 @@
 # coding=utf-8
+import datetime
 import pytest
 from sqlalchemy.exc import OperationalError
 
@@ -45,12 +46,16 @@ class TestLoginEndpoint(FunctionalTest):
             params=params,
             status=200,
         )
-        assert res.json_body['display_name'] == 'Global manager'
-        assert res.json_body['email'] == 'admin@admin.admin'
         assert res.json_body['created']
+        datetime.datetime.strptime(
+            res.json_body['created'],
+            '%Y-%m-%dT%H:%M:%SZ'
+        )
+        assert res.json_body['public_name'] == 'Global manager'
+        assert res.json_body['email'] == 'admin@admin.admin'
         assert res.json_body['is_active']
         assert res.json_body['profile']
-        assert res.json_body['profile']['slug'] == 'administrators'
+        assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
 
@@ -103,12 +108,12 @@ class TestWhoamiEndpoint(FunctionalTest):
             )
         )
         res = self.testapp.get('/api/v2/sessions/whoami', status=200)
-        assert res.json_body['display_name'] == 'Global manager'
+        assert res.json_body['public_name'] == 'Global manager'
         assert res.json_body['email'] == 'admin@admin.admin'
         assert res.json_body['created']
         assert res.json_body['is_active']
         assert res.json_body['profile']
-        assert res.json_body['profile']['slug'] == 'administrators'
+        assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
 

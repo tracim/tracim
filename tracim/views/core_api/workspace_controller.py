@@ -1,5 +1,4 @@
 import typing
-
 import transaction
 from pyramid.config import Configurator
 try:  # Python 3.5+
@@ -7,15 +6,20 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim import hapic, TracimRequest
+from tracim import hapic
+from tracim import TracimRequest
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.userworkspace import RoleApi
-from tracim.lib.utils.authorization import require_workspace_role
-from tracim.models.data import UserRoleInWorkspace, ActionDescription
+from tracim.lib.utils.authorization import require_workspace_role, \
+    require_candidate_workspace_role
+from tracim.models.data import UserRoleInWorkspace
+from tracim.models.data import ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
-from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import NotAuthenticated, InsufficientUserWorkspaceRole
+from tracim.exceptions import WorkspaceNotFoundInTracimRequest
+from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import WorkspaceNotFound
 from tracim.views.controllers import Controller
@@ -31,10 +35,12 @@ from tracim.views.core_api.schemas import WorkspaceMemberSchema
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.revision_protection import new_revision
 
+WORKSPACE_ENDPOINTS_TAG = 'Workspaces'
+
 
 class WorkspaceController(Controller):
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -54,7 +60,7 @@ class WorkspaceController(Controller):
         )
         return wapi.get_workspace_with_context(request.current_workspace)
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -83,7 +89,7 @@ class WorkspaceController(Controller):
             for user_role in roles
         ]
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -119,7 +125,7 @@ class WorkspaceController(Controller):
         ]
         return contents
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
@@ -145,21 +151,24 @@ class WorkspaceController(Controller):
         )
         content = api.create(
             label=creation_data.label,
-            content_type=creation_data.content_type_slug,
+            content_type=creation_data.content_type,
             workspace=request.current_workspace,
         )
         api.save(content, ActionDescription.CREATION)
         content = api.get_content_in_context(content)
         return content
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @require_candidate_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(ContentDigestSchema())
     def move_content(
             self,
             context,
@@ -172,6 +181,7 @@ class WorkspaceController(Controller):
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
         move_data = hapic_data.body
+
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -184,21 +194,33 @@ class WorkspaceController(Controller):
         new_parent = api.get_one(
             move_data.new_parent_id, content_type=ContentType.Any
         )
+
+        new_workspace = request.candidate_workspace
+
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
                 content=content
         ):
-            api.move(content, new_parent=new_parent)
-        return
+            api.move(
+                content,
+                new_parent=new_parent,
+                new_workspace=new_workspace,
+                must_stay_in_same_workspace=False,
+            )
+        updated_content = api.get_one(
+            path_data.content_id,
+            content_type=ContentType.Any
+        )
+        return api.get_content_in_context(updated_content)
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_content(
             self,
             context,
@@ -227,13 +249,13 @@ class WorkspaceController(Controller):
             api.delete(content)
         return
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def undelete_content(
             self,
             context,
@@ -263,13 +285,13 @@ class WorkspaceController(Controller):
             api.undelete(content)
         return
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def archive_content(
             self,
             context,
@@ -295,13 +317,13 @@ class WorkspaceController(Controller):
             api.archive(content)
         return
 
-    @hapic.with_api_doc()
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(NoContentSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def unarchive_content(
             self,
             context,

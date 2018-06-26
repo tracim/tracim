@@ -65,6 +65,10 @@ class WorkspaceNotFound(NotFound):
     pass
 
 
+class WorkspaceNotFoundInTracimRequest(NotFound):
+    pass
+
+
 class InsufficientUserWorkspaceRole(TracimException):
     pass
 
@@ -110,4 +114,8 @@ class UserDoesNotExist(TracimException):
 
 
 class UserNotFoundInTracimRequest(TracimException):
+    pass
+
+
+class WorkspacesDoNotMatch(TracimException):
     pass

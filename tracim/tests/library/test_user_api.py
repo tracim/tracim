@@ -131,7 +131,7 @@ class TestUserApi(DefaultTest):
         new_user = api.get_user_with_context(user)
         assert isinstance(new_user, UserInContext)
         assert new_user.user == user
-        assert new_user.profile.name == 'nobody'
+        assert new_user.profile == 'nobody'
         assert new_user.user_id == user.user_id
         assert new_user.email == 'admin@tracim.tracim'
         assert new_user.display_name == 'Admin'

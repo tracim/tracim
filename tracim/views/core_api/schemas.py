@@ -16,17 +16,6 @@ from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
 
 
-class ProfileSchema(marshmallow.Schema):
-    slug = marshmallow.fields.String(
-        attribute='name',
-        validate=OneOf(Profile._NAME),
-        example='managers',
-    )
-
-    class Meta:
-        description = 'User Profile, give user right on whole Tracim instance.'
-
-
 class UserSchema(marshmallow.Schema):
 
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
@@ -34,12 +23,12 @@ class UserSchema(marshmallow.Schema):
         required=True,
         example='suri.cate@algoo.fr'
     )
-    display_name = marshmallow.fields.String(
+    public_name = marshmallow.fields.String(
         example='Suri Cate',
     )
     created = marshmallow.fields.DateTime(
-        format='iso8601',
-        description='User account creation date (iso8601 format).',
+        format='%Y-%m-%dT%H:%M:%SZ',
+        description='User account creation date',
     )
     is_active = marshmallow.fields.Bool(
         example=True,
@@ -64,9 +53,10 @@ class UserSchema(marshmallow.Schema):
                     "If no avatar, then set it to null "
                     "(and frontend will interpret this with a default avatar)",
     )
-    profile = marshmallow.fields.Nested(
-        ProfileSchema,
-        many=False,
+    profile = marshmallow.fields.String(
+        attribute='profile',
+        validate=OneOf(Profile._NAME),
+        example='managers',
     )
 
     class Meta:
@@ -95,9 +85,9 @@ class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
-    parent_id = workspace_id = marshmallow.fields.Int(
+    parent_id = marshmallow.fields.Int(
         example=2,
-        default=None,
+        default=0,
         description='allow to filter items in a folder.'
                     ' If not set, then return all contents.'
                     ' If set to 0, then return root contents.'
@@ -187,7 +177,8 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
 
 
 class WorkspaceDigestSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int(example=4)
+    workspace_id = marshmallow.fields.Int(example=4)
+    slug = marshmallow.fields.String(example='intranet')
     label = marshmallow.fields.String(example='Intranet')
     sidebar_entries = marshmallow.fields.Nested(
         WorkspaceMenuEntrySchema,
@@ -199,7 +190,6 @@ class WorkspaceDigestSchema(marshmallow.Schema):
 
 
 class WorkspaceSchema(WorkspaceDigestSchema):
-    slug = marshmallow.fields.String(example='intranet')
     description = marshmallow.fields.String(example='All intranet data.')
 
     class Meta:
@@ -207,14 +197,14 @@ class WorkspaceSchema(WorkspaceDigestSchema):
 
 
 class WorkspaceMemberSchema(marshmallow.Schema):
-    role_slug = marshmallow.fields.String(
+    role = marshmallow.fields.String(
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
     )
     user_id = marshmallow.fields.Int(example=3)
     workspace_id = marshmallow.fields.Int(example=4)
     user = marshmallow.fields.Nested(
-        UserSchema(only=('display_name', 'avatar_url'))
+        UserSchema(only=('public_name', 'avatar_url'))
     )
 
     class Meta:
@@ -256,7 +246,7 @@ class StatusSchema(marshmallow.Schema):
                     'Statuses are open, closed-validated, closed-invalidated, closed-deprecated'  # nopep8
     )
     global_status = marshmallow.fields.String(
-        example='Open',
+        example='open',
         description='global_status: open, closed',
         validate=OneOf([status.value for status in GlobalStatus]),
     )
@@ -298,7 +288,14 @@ class ContentMoveSchema(marshmallow.Schema):
     # (the user must be content manager of both workspaces)
     new_parent_id = marshmallow.fields.Int(
         example=42,
-        description='id of the new parent content id.'
+        description='id of the new parent content id.',
+        allow_none=True,
+        required=True,
+    )
+    new_workspace_id = marshmallow.fields.Int(
+        example=2,
+        description='id of the new workspace id.',
+        required=True
     )
 
     @post_load
@@ -311,7 +308,7 @@ class ContentCreationSchema(marshmallow.Schema):
         example='contract for client XXX',
         description='Title of the content to create'
     )
-    content_type_slug = marshmallow.fields.String(
+    content_type = marshmallow.fields.String(
         example='htmlpage',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
@@ -322,7 +319,7 @@ class ContentCreationSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(marshmallow.Schema):
-    id = marshmallow.fields.Int(example=6)
+    content_id = marshmallow.fields.Int(example=6)
     slug = marshmallow.fields.Str(example='intervention-report-12')
     parent_id = marshmallow.fields.Int(
         example=34,
@@ -333,17 +330,17 @@ class ContentDigestSchema(marshmallow.Schema):
         example=19,
     )
     label = marshmallow.fields.Str(example='Intervention Report 12')
-    content_type_slug = marshmallow.fields.Str(
+    content_type = marshmallow.fields.Str(
         example='htmlpage',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
-    sub_content_type_slug = marshmallow.fields.List(
+    sub_content_types = marshmallow.fields.List(
         marshmallow.fields.Str,
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'
     )
-    status_slug = marshmallow.fields.Str(
+    status = marshmallow.fields.Str(
         example='closed-deprecated',
         validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
         description='this slug is found in content_type available statuses',

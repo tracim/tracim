@@ -3,6 +3,7 @@ from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim.exceptions import UserNotFoundInTracimRequest
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspaceNotFound
@@ -34,8 +35,11 @@ class TracimRequest(Request):
             decode_param_names,
             **kw
         )
-        # Current workspace, found by request headers or content
+        # Current workspace, found in request path
         self._current_workspace = None  # type: Workspace
+
+        # Candidate workspace found in request body
+        self._candidate_workspace = None  # type: Workspace
 
         # Authenticated user
         self._current_user = None  # type: User
@@ -56,7 +60,7 @@ class TracimRequest(Request):
         :return: Workspace of the request
         """
         if self._current_workspace is None:
-            self.current_workspace = self._get_workspace(self.current_user, self)
+            self._current_workspace = self._get_current_workspace(self.current_user, self)
         return self._current_workspace
 
     @current_workspace.setter
@@ -101,6 +105,19 @@ class TracimRequest(Request):
         if self._candidate_user is None:
             self.candidate_user = self._get_candidate_user(self)
         return self._candidate_user
+
+    @property
+    def candidate_workspace(self) -> Workspace:
+        """
+        Get workspace from headers/body request. This workspace is not
+        the one found from path. Its the one from json body.
+        """
+        if self._candidate_workspace is None:
+            self._candidate_workspace = self._get_candidate_workspace(
+                self.current_user,
+                self
+            )
+        return self._candidate_workspace
 
     def _cleanup(self, request: 'TracimRequest') -> None:
         """
@@ -171,7 +188,7 @@ class TracimRequest(Request):
             raise NotAuthenticated('User {} not found'.format(login)) from exc
         return user
 
-    def _get_workspace(
+    def _get_current_workspace(
             self,
             user: User,
             request: 'TracimRequest'
@@ -187,7 +204,39 @@ class TracimRequest(Request):
             if 'workspace_id' in request.matchdict:
                 workspace_id = request.matchdict['workspace_id']
             if not workspace_id:
-                raise WorkspaceNotFound('No workspace_id property found in request')
+                raise WorkspaceNotFoundInTracimRequest('No workspace_id property found in request')
+            wapi = WorkspaceApi(
+                current_user=user,
+                session=request.dbsession,
+                config=request.registry.settings['CFG']
+            )
+            workspace = wapi.get_one(workspace_id)
+        except JSONDecodeError:
+            raise WorkspaceNotFound('Bad json body')
+        except NoResultFound:
+            raise WorkspaceNotFound(
+                'Workspace {} does not exist '
+                'or is not visible for this user'.format(workspace_id)
+            )
+        return workspace
+
+    def _get_candidate_workspace(
+            self,
+            user: User,
+            request: 'TracimRequest'
+    ) -> Workspace:
+        """
+        Get current workspace from request
+        :param user: User who want to check the workspace
+        :param request: pyramid request
+        :return: current workspace
+        """
+        workspace_id = ''
+        try:
+            if 'new_workspace_id' in request.json_body:
+                workspace_id = request.json_body['new_workspace_id']
+            if not workspace_id:
+                raise WorkspaceNotFoundInTracimRequest('No new_workspace_id property found in body')
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
