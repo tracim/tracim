@@ -392,7 +392,7 @@ class ContentInContext(object):
         return UserInContext(
             dbsession=self.dbsession,
             config=self.config,
-            user=self.content.owner
+            user=self.content.first_revision.owner
         )
 
     @property
@@ -413,8 +413,12 @@ class ContentInContext(object):
 
     @property
     def last_modifier(self):
-        # TODO - G.M - 2018-06-173 - Repair owner/last modifier
-        return self.author
+        return UserInContext(
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.last_revision.owner
+        )
+
     # Context-related
     @property
     def show_in_ui(self):
@@ -513,11 +517,6 @@ class RevisionInContext(object):
     def updated(self):
         return self.revision.updated
 
-    @property
-    def last_modifier(self):
-        # TODO - G.M - 2018-06-173 - Repair owner/last modifier
-        return self.author
-    
     @property
     def comments_ids(self):
         # TODO - G.M - 2018-06-173 - Return comments related to this revision

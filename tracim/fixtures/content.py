@@ -117,7 +117,7 @@ class Content(Fixture):
             content_type=ContentType.Page,
             workspace=recipe_workspace,
             parent=dessert_folder,
-            label='Tiramisu Recipe',
+            label='Tiramisu Recipes !!!',
             do_save=True,
             do_notify=False,
         )
@@ -128,8 +128,8 @@ class Content(Fixture):
         ):
             content_api.update_content(
                 item=tiramisu_page,
-                new_content='<p>To cook a great Tiramisu, you need many ingredients.</p>',  # nopep8
-                new_label='Tiramisu Recipe',
+                new_content='<p>To cook a greet Tiramisu, you need many ingredients.</p>',  # nopep8
+                new_label='Tiramisu Recipes !!!',
             )
             content_api.save(tiramisu_page)
 
@@ -137,11 +137,11 @@ class Content(Fixture):
             content_type=ContentType.Thread,
             workspace=recipe_workspace,
             parent=dessert_folder,
-            label='Best Cakes ?',
+            label='Best Cake',
             do_save=False,
             do_notify=False,
         )
-        best_cake_thread.description = 'What is the best cake ?'
+        best_cake_thread.description = 'Which is the best cake ?'
         self._session.add(best_cake_thread)
         apple_pie_recipe = content_api.create(
             content_type=ContentType.File,
@@ -278,4 +278,27 @@ class Content(Fixture):
             content='<p>You are right, but Kouign-amann are clearly better.</p>',
             do_save=True,
         )
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=best_cake_thread,
+        ):
+            bob_content_api.update_content(
+                item=best_cake_thread,
+                new_content='What is the best cake ?',
+                new_label='Best Cakes ?',
+            )
+            bob_content_api.save(best_cake_thread)
+
+        with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=tiramisu_page,
+        ):
+            bob_content_api.update_content(
+                item=tiramisu_page,
+                new_content='<p>To cook a great Tiramisu, you need many ingredients.</p>',  # nopep8
+                new_label='Tiramisu Recipe',
+            )
+            bob_content_api.save(tiramisu_page)
         self._session.flush()

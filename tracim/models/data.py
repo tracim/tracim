@@ -598,6 +598,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     revision_id = Column(Integer, primary_key=True)
     content_id = Column(Integer, ForeignKey('content.id'), nullable=False)
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
 
     label = Column(Unicode(1024), unique=False, nullable=False)
@@ -631,6 +632,7 @@ class ContentRevisionRO(DeclarativeBase):
     parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
 
     node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     owner = relationship('User', remote_side=[User.user_id])
 
     """ List of column copied when make a new revision from another """
@@ -788,7 +790,7 @@ class ContentRevisionRO(DeclarativeBase):
             file_extension,
         )
 
-
+# TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
 Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
 Index('idx__content_revisions__parent_id', ContentRevisionRO.parent_id)
 
@@ -867,6 +869,8 @@ class Content(DeclarativeBase):
     def revision_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.revision_id
 
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
+    # and should be author of first revision.
     @hybrid_property
     def owner_id(self) -> int:
         return self.revision.owner_id
@@ -1113,6 +1117,8 @@ class Content(DeclarativeBase):
     def node(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.node
 
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
+    # and should be author of first revision.
     @hybrid_property
     def owner(self) -> User:
         return self.revision.owner

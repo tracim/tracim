@@ -54,7 +54,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['slug'] == 'tiramisu-recipe'
         assert content['status'] == 'open'
         assert content['workspace_id'] == 2
-        assert content['current_revision_id'] == 7
+        assert content['current_revision_id'] == 27
         # TODO - G.M - 2018-06-173 - check date format
         assert content['created']
         assert content['author']
@@ -63,7 +63,10 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['author']['public_name'] == 'Global manager'
         # TODO - G.M - 2018-06-173 - check date format
         assert content['modified']
-        assert content['last_modifier'] == content['author']
+        assert content['last_modifier'] != content['author']
+        assert content['last_modifier']['user_id'] == 3
+        assert content['last_modifier']['public_name'] == 'Bob i.'
+        assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == '<p>To cook a great Tiramisu, you need many ingredients.</p>'  # nopep8
 
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
@@ -97,7 +100,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['slug'] == 'my-new-label'
         assert content['status'] == 'open'
         assert content['workspace_id'] == 2
-        assert content['current_revision_id'] == 26
+        assert content['current_revision_id'] == 28
         # TODO - G.M - 2018-06-173 - check date format
         assert content['created']
         assert content['author']
@@ -124,7 +127,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['slug'] == 'my-new-label'
         assert content['status'] == 'open'
         assert content['workspace_id'] == 2
-        assert content['current_revision_id'] == 26
+        assert content['current_revision_id'] == 28
         # TODO - G.M - 2018-06-173 - check date format
         assert content['created']
         assert content['author']
@@ -154,16 +157,16 @@ class TestHtmlDocuments(FunctionalTest):
             status=200
         )
         revisions = res.json_body
-        assert len(revisions) == 2
+        assert len(revisions) == 3
         revision = revisions[0]
         assert revision['content_type'] == 'page'
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
-        assert revision['label'] == 'Tiramisu Recipe'
+        assert revision['label'] == 'Tiramisu Recipes !!!'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
-        assert revision['slug'] == 'tiramisu-recipe'
+        assert revision['slug'] == 'tiramisu-recipes'
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 6
@@ -176,6 +179,48 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['author']['user_id'] == 1
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Global manager'
+        revision = revisions[1]
+        assert revision['content_type'] == 'page'
+        assert revision['content_id'] == 6
+        assert revision['is_archived'] is False
+        assert revision['is_deleted'] is False
+        assert revision['label'] == 'Tiramisu Recipes !!!'
+        assert revision['parent_id'] == 3
+        assert revision['show_in_ui'] is True
+        assert revision['slug'] == 'tiramisu-recipes'
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == 2
+        assert revision['revision_id'] == 7
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comments_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 1
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Global manager'
+        revision = revisions[2]
+        assert revision['content_type'] == 'page'
+        assert revision['content_id'] == 6
+        assert revision['is_archived'] is False
+        assert revision['is_deleted'] is False
+        assert revision['label'] == 'Tiramisu Recipe'
+        assert revision['parent_id'] == 3
+        assert revision['show_in_ui'] is True
+        assert revision['slug'] == 'tiramisu-recipe'
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == 2
+        assert revision['revision_id'] == 27
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comments_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 3
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Bob i.'
 
     def test_api__set_html_document_status__ok_200__nominal_case(self) -> None:
         """
@@ -270,7 +315,7 @@ class TestThreads(FunctionalTest):
         assert content['slug'] == 'best-cakes'
         assert content['status'] == 'open'
         assert content['workspace_id'] == 2
-        assert content['current_revision_id'] == 8
+        assert content['current_revision_id'] == 26
         # TODO - G.M - 2018-06-173 - check date format
         assert content['created']
         assert content['author']
@@ -279,7 +324,10 @@ class TestThreads(FunctionalTest):
         assert content['author']['public_name'] == 'Global manager'
         # TODO - G.M - 2018-06-173 - check date format
         assert content['modified']
-        assert content['last_modifier'] == content['author']
+        assert content['last_modifier'] != content['author']
+        assert content['last_modifier']['user_id'] == 3
+        assert content['last_modifier']['public_name'] == 'Bob i.'
+        assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == 'What is the best cake ?'  # nopep8
 
     def test_api__update_thread__ok_200__nominal_case(self) -> None:
@@ -313,7 +361,7 @@ class TestThreads(FunctionalTest):
         assert content['slug'] == 'my-new-label'
         assert content['status'] == 'open'
         assert content['workspace_id'] == 2
-        assert content['current_revision_id'] == 26
+        assert content['current_revision_id'] == 28
         # TODO - G.M - 2018-06-173 - check date format
         assert content['created']
         assert content['author']
@@ -340,7 +388,7 @@ class TestThreads(FunctionalTest):
         assert content['slug'] == 'my-new-label'
         assert content['status'] == 'open'
         assert content['workspace_id'] == 2
-        assert content['current_revision_id'] == 26
+        assert content['current_revision_id'] == 28
         # TODO - G.M - 2018-06-173 - check date format
         assert content['created']
         assert content['author']
@@ -370,16 +418,16 @@ class TestThreads(FunctionalTest):
             status=200
         )
         revisions = res.json_body
-        assert len(revisions) == 1
+        assert len(revisions) == 2
         revision = revisions[0]
         assert revision['content_type'] == 'thread'
         assert revision['content_id'] == 7
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
-        assert revision['label'] == 'Best Cakes ?'
+        assert revision['label'] == 'Best Cake'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
-        assert revision['slug'] == 'best-cakes'
+        assert revision['slug'] == 'best-cake'
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 8
@@ -392,6 +440,27 @@ class TestThreads(FunctionalTest):
         assert revision['author']['user_id'] == 1
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Global manager'
+        revision = revisions[1]
+        assert revision['content_type'] == 'thread'
+        assert revision['content_id'] == 7
+        assert revision['is_archived'] is False
+        assert revision['is_deleted'] is False
+        assert revision['label'] == 'Best Cakes ?'
+        assert revision['parent_id'] == 3
+        assert revision['show_in_ui'] is True
+        assert revision['slug'] == 'best-cakes'
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == 2
+        assert revision['revision_id'] == 26
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comments_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 3
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Bob i.'
 
     def test_api__set_thread_status__ok_200__nominal_case(self) -> None:
         """
