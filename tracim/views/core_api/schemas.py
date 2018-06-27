@@ -336,7 +336,7 @@ class ContentCreationSchema(marshmallow.Schema):
         description='Title of the content to create'
     )
     content_type = marshmallow.fields.String(
-        example='htmlpage',
+        example='html-documents',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
 

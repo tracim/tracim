@@ -25,7 +25,7 @@ class TestApplicationEndpoint(FunctionalTest):
         res = res.json_body
         application = res[0]
         assert application['label'] == "Text Documents"
-        assert application['slug'] == 'contents/htmlpage'
+        assert application['slug'] == 'contents/html-documents'
         assert application['fa_icon'] == 'file-text-o'
         assert application['hexcolor'] == '#3f52e3'
         assert application['is_active'] is True

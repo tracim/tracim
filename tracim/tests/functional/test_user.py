@@ -48,9 +48,9 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['fa_icon'] == ""
 
         sidebar_entry = workspace['sidebar_entries'][2]
-        assert sidebar_entry['slug'] == 'contents/htmlpage'
+        assert sidebar_entry['slug'] == 'contents/html-documents'
         assert sidebar_entry['label'] == 'Text Documents'
-        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=htmlpage'  # nopep8
+        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=html-documents'  # nopep8
         assert sidebar_entry['hexcolor'] == "#3f52e3"
         assert sidebar_entry['fa_icon'] == "file-text-o"
 

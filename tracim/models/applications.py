@@ -79,19 +79,19 @@ markdownpluspage = Application(
     main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
 )
 
-htmlpage = Application(
+html_documents = Application(
     label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
-    slug='contents/htmlpage',
+    slug='contents/html-documents',
     fa_icon='file-text-o',
     hexcolor='#3f52e3',
     is_active=True,
     config={},
-    main_route='/#/workspaces/{workspace_id}/contents?type=htmlpage',
+    main_route='/#/workspaces/{workspace_id}/contents?type=html-documents',
 )
 # TODO - G.M - 08-06-2018 - This is hardcoded lists of app, make this dynamic.
 # List of applications
 applications = [
-    htmlpage,
+    html_documents,
     markdownpluspage,
     _file,
     thread,

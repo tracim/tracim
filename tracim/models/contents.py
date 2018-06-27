@@ -3,7 +3,7 @@ import typing
 from enum import Enum
 
 from tracim.exceptions import ContentStatusNotExist, ContentTypeNotExist
-from tracim.models.applications import htmlpage, _file, thread, markdownpluspage
+from tracim.models.applications import html_documents, _file, thread, markdownpluspage
 
 
 ####
@@ -159,10 +159,10 @@ markdownpluspage_type = NewContentType(
     available_statuses=CONTENT_DEFAULT_STATUS,
 )
 
-htmlpage_type = NewContentType(
+html_documents_type = NewContentType(
     slug='html-documents',
-    fa_icon=htmlpage.fa_icon,
-    hexcolor=htmlpage.hexcolor,
+    fa_icon=html_documents.fa_icon,
+    hexcolor=html_documents.hexcolor,
     label='Text Document',
     creation_label='Write a document',
     available_statuses=CONTENT_DEFAULT_STATUS,
@@ -182,7 +182,7 @@ CONTENT_DEFAULT_TYPE = [
     thread_type,
     file_type,
     markdownpluspage_type,
-    htmlpage_type,
+    html_documents_type,
     folder_type,
 ]
 
@@ -227,7 +227,7 @@ class ContentTypeLegacy(NewContentType):
 
     File = file_type.slug
     Thread = thread_type.slug
-    Page = htmlpage_type.slug
+    Page = html_documents_type.slug
     MarkdownPage = markdownpluspage_type.slug
 
     def __init__(self, slug: str):

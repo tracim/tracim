@@ -26,7 +26,7 @@ from tracim.exceptions import InsufficientUserWorkspaceRole
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.contents import ContentTypeLegacy as ContentType
-from tracim.models.contents import htmlpage_type
+from tracim.models.contents import html_documents_type
 from tracim.models.revision_protection import new_revision
 
 HTML_DOCUMENT_ENDPOINTS_TAG = 'HTML documents'
@@ -41,7 +41,7 @@ class HTMLDocumentController(Controller):
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([htmlpage_type])
+    @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(HtmlDocumentContentSchema())
     def get_html_document(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -66,7 +66,7 @@ class HTMLDocumentController(Controller):
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([htmlpage_type])
+    @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(HtmlDocumentModifySchema())
     @hapic.output_body(HtmlDocumentContentSchema())
@@ -104,7 +104,7 @@ class HTMLDocumentController(Controller):
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([htmlpage_type])
+    @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(HtmlDocumentRevisionSchema(many=True))
     def get_html_document_revisions(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -133,7 +133,7 @@ class HTMLDocumentController(Controller):
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([htmlpage_type])
+    @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
