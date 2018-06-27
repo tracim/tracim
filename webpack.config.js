@@ -10,7 +10,7 @@ module.exports = {
     : ['babel-polyfill', './src/index.dev.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: isProduction ? 'pageHtml.app.js' : 'pageHtml.app.dev.js',
+    filename: isProduction ? 'html-documents.app.js' : 'html-documents.app.dev.js',
     pathinfo: !isProduction,
     library: isProduction ? 'appPageHtml' : undefined,
     libraryTarget: isProduction ? 'var' : undefined

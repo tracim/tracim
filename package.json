@@ -49,6 +49,7 @@
     "globals": [
       "fetch",
       "history",
+      "btoa",
       "GLOBAL_renderApp",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"

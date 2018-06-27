@@ -14,20 +14,20 @@ import i18n from '../i18n.js'
 
 const debug = {
   config: {
-    name: 'PageHtml',
-    label: {
-      fr: 'Page Html',
-      en: 'Html page'
-    },
-    componentLeft: 'PageHtml',
-    componentRight: 'Timeline',
-    customClass: 'wsContentPageHtml',
-    icon: 'fa fa-file-text-o',
-    color: '#fdfdfd',
+    label: 'Text Document',
+    slug: 'page',
+    faIcon: 'file-text-o',
+    hexcolor: '#3f52e3',
+    creationLabel: 'Write a document',
     domContainer: 'appContainer',
-    mockApiUrl: 'http://localhost:3001'
+    apiUrl: 'localhost:6543/api/v2',
+    mockApiUrl: 'localhost:3001',
+    apiHeader: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+      // 'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    }
   },
-  contentAction: 'showContent',
   loggedUser: {
     id: 5,
     username: 'Smoi',
@@ -37,17 +37,31 @@ const debug = {
     avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
   },
   content: {
-    id: -1,
-    type: 'pageHtml',
-    title: 'Test debug pageHtml',
-    status: 'validated',
-    version: 'version n°1',
-    text: 'This is the default pageHtml content for debug purpose',
-    workspace: {
-      id: -1,
-      title: 'Test debug workspace',
-      ownerId: 5
-    }
+    author: {
+      avatar_url: null,
+      public_name: 'Global manager',
+      user_id: 1
+    },
+    content_id: -1,
+    content_type: 'page',
+    created: '2018-06-18T14:59:26Z',
+    current_revision_id: 11,
+    is_archived: false,
+    is_deleted: false,
+    label: 'Current Menu',
+    last_modifier: {
+      avatar_url: null,
+      public_name: 'Global manager',
+      user_id: 1
+    },
+    modified: '2018-06-18T14:59:26Z',
+    parent_id: 2,
+    raw_content: '<div>bonjour, je suis un lapin.</div>',
+    show_in_ui: true,
+    slug: 'current-menu',
+    status: 'open',
+    sub_content_types: ['thread', 'page', 'file', 'folder'],
+    workspace_id: 1
   },
   timeline: timelineDebugData
 }
@@ -56,7 +70,7 @@ class pageHtml extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'PageHtml',
+      appName: 'page',
       isVisible: true,
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
@@ -70,37 +84,67 @@ class pageHtml extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'PageHtml_showApp':
+      case 'page_showApp':
         this.setState({isVisible: true})
         break
-      case 'PageHtml_hideApp':
+      case 'page_hideApp':
         this.setState({isVisible: false})
         break
+      case 'page_reloadContent':
+        this.setState({content: data})
     }
   }
 
-  async componentDidMount () {
-    const { content, config } = this.state
-    if (content.id === '-1') return // debug case
+  componentDidMount () {
+    console.log('pageHtml did mount')
+    if (this.state.content.content_id === -1) return // debug case
 
-    const fetchResultPageHtml = await fetch(`${config.mockApiUrl}/workspace/${content.workspace.id}/content/${content.id}`, {
-      ...FETCH_CONFIG,
-      method: 'GET'
-    })
-    const fetchResultTimeline = await fetch(`${config.mockApiUrl}/workspace/${content.workspace.id}/content/${content.id}/timeline`, {
-      ...FETCH_CONFIG,
-      method: 'GET'
-    })
-
-    fetchResultPageHtml.json = await handleFetchResult(fetchResultPageHtml)
-    fetchResultTimeline.json = await handleFetchResult(fetchResultTimeline)
-
-    this.setState({
-      content: fetchResultPageHtml.json,
-      timeline: fetchResultTimeline.json
-    })
-
+    this.loadContent()
     // wysiwyg()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    console.log('pageHtml did update', prevState, this.state)
+    if (!prevState.content || !this.state.content) return
+
+    if (prevState.content.content_id !== this.state.content.content_id) {
+      this.loadContent()
+    }
+  }
+
+  loadContent = async () => {
+    console.log('loadContent')
+    const { content, config } = this.state
+
+    const fetchResultPageHtml = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}`, {
+      ...FETCH_CONFIG,
+      method: 'GET'
+    })
+    const fetchResultTimeline = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/comments`, {
+      ...FETCH_CONFIG,
+      method: 'GET'
+    })
+
+    // Promise.all([
+    //   handleFetchResult(fetchResultPageHtml),
+    //   handleFetchResult(fetchResultTimeline)
+    // ])
+    //   .then(([resPageHtml, resTimeline]) => {
+    //     this.setState({
+    //       content: resPageHtml,
+    //       timeline: resTimeline
+    //     })
+    //   })
+    handleFetchResult(fetchResultPageHtml)
+      .then(resPageHtml => this.setState({content: resPageHtml}))
+      .catch(e => console.log('Error loading content.', e))
+
+    handleFetchResult(fetchResultTimeline)
+      .then(resTimeline => this.setState({timeline: resTimeline}))
+      .catch(e => {
+        console.log('Error loading Timeline.', e)
+        this.setState({timeline: []})
+      })
   }
 
   handleClickBtnCloseApp = () => {
@@ -124,32 +168,32 @@ class pageHtml extends React.Component {
     if (!isVisible) return null
 
     return (
-      <PopinFixed customClass={`${config.customClass}`}>
+      <PopinFixed customClass={`${config.slug}`}>
         <PopinFixedHeader
-          customClass={`${config.customClass}`}
-          icon={config.icon}
-          name={content.title}
+          customClass={`${config.slug}`}
+          icon={config.faIcon}
+          name={content.label}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onChangeTitle={this.handleChangeTitle}
         />
 
         <PopinFixedOption
-          customClass={`${config.customClass}`}
+          customClass={`${config.slug}`}
           onClickNewVersionBtn={this.handleClickNewVersion}
           i18n={i18n}
         />
 
-        <PopinFixedContent customClass={`${config.customClass}__contentpage`}>
+        <PopinFixedContent customClass={`${config.slug}__contentpage`}>
           <PageHtmlComponent
             mode={this.state.mode}
             onClickCloseEditMode={this.handleCloseNewVersion}
-            version={content.version}
-            text={content.text}
-            key={'PageHtml'}
+            version={content.current_revision_id}
+            text={content.raw_content}
+            key={'html-documents'}
           />
 
           <Timeline
-            customClass={`${config.customClass}__contentpage`}
+            customClass={`${config.slug}__contentpage`}
             loggedUser={loggedUser}
             timelineData={timeline}
           />

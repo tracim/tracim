@@ -5,7 +5,7 @@ btncolor()
   box-shadow 0 0 1px 2px htmlColor
   color off-white
 
-.wsContentPageHtml
+.page
   width 1155px
   &__header
     background-color htmlColor
@@ -95,16 +95,16 @@ btncolor()
             background-color htmlColor
 
 .messagelistOpen
-  .wsContentPageHtml__contentpage__messagelist
+  .page__contentpage__messagelist
     flex 0
     min-height 0
 
 .received
-  .wsContentPageHtml__contentpage__messagelist__item__content
+  .page__contentpage__messagelist__item__content
     background-color htmlColor
 
 @media (min-width: max-xs) and (max-width: max-lg)
-  .wsContentPageHtml
+  .page
     &__contentpage
       display block
       overflow-Y scroll
@@ -131,19 +131,19 @@ btncolor()
               margin-left 15px
 
 @media (min-width: min-lg) and (max-width: max-lg)
-  .wsContentPageHtml
+  .page
     width 692px
     &__contentpage__texteditor__simpletext
       margin-left 15px
 
 @media (min-width: min-md) and (max-width: max-md)
-  .wsContentPageHtml
+  .page
     width 768px
     &__contentpage__texteditor__simpletext
       margin-left 25px
 
 @media (min-width: min-sm) and (max-width: max-sm)
-  .wsContentPageHtml
+  .page
     top 69px
     width 576px
     height calc(100% - 69px)
@@ -151,7 +151,7 @@ btncolor()
       margin-left 10px
 
 @media (max-width: max-xs)
-  .wsContentPageHtml
+  .page
     top 70px
     height calc(100% - 70px)
     width 100%
