@@ -20,7 +20,7 @@ class PopinFixedHeader extends React.Component {
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={icon} />
+          <i className={`fa fa-${icon}`} />
         </div>
 
         <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>

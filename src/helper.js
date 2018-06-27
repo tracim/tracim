@@ -12,6 +12,6 @@ export const libHandleFetchResult = fetchResult => {
     case 502:
     case 503:
     case 504:
-      return `Error: ${fetchResult.status}` // @TODO : handle errors from api result
+      return new Promise((resolve, reject) => reject(fetchResult)) // @TODO : handle errors from api result
   }
 }
