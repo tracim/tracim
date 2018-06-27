@@ -59,5 +59,4 @@ PopupCreateContent.defaultProps = {
   btnValidateLabel: ''
 }
 
-
 export default PopupCreateContent

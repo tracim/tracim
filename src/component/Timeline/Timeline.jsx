@@ -73,7 +73,7 @@ const Timeline = props => {
       <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor d-flex align-items-center justify-content-between flex-wrap')}>
 
         <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
-          <textarea placeholder='Taper votre message ici'/>
+          <textarea placeholder='Taper votre message ici' />
         </div>
 
         <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
