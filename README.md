@@ -152,6 +152,13 @@ For example, with default config:
     # launch your favorite web-browser
     firefox http://localhost:6543/api/v2/doc/
 
+## Roles, profile and access rights
+
+In Tracim, only some user can access to some informations, this is also true in
+Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
+what a specific user can do.
+
+
 CI
 ---
 
