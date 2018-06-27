@@ -124,7 +124,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         assert len(content_type['available_statuses']) == 4
 
         content_type = res[3]
-        assert content_type['slug'] == 'page'
+        assert content_type['slug'] == 'html-documents'
         assert content_type['fa_icon'] == 'file-text-o'
         assert content_type['hexcolor'] == '#3f52e3'
         assert content_type['label'] == 'Text Document'

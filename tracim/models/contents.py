@@ -160,7 +160,7 @@ markdownpluspage_type = NewContentType(
 )
 
 htmlpage_type = NewContentType(
-    slug='page',
+    slug='html-documents',
     fa_icon=htmlpage.fa_icon,
     hexcolor=htmlpage.hexcolor,
     label='Text Document',
@@ -231,6 +231,8 @@ class ContentTypeLegacy(NewContentType):
     MarkdownPage = markdownpluspage_type.slug
 
     def __init__(self, slug: str):
+        if slug == 'page':
+            slug = ContentTypeLegacy.Page
         for content_type in ALL_CONTENTS_DEFAULT_TYPES:
             if slug == content_type.slug:
                 super(ContentTypeLegacy, self).__init__(

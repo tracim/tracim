@@ -20,12 +20,12 @@ from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import UserIdPathSchema
 from tracim.views.core_api.schemas import WorkspaceDigestSchema
 
-USERS_ENDPOINTS_TAG = 'Users'
+USER_ENDPOINTS_TAG = 'Users'
 
 
 class UserController(Controller):
 
-    @hapic.with_api_doc(tags=[USERS_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UserDoesNotExist, HTTPStatus.NOT_FOUND)
