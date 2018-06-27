@@ -38,6 +38,9 @@ class TracimRequest(Request):
             decode_param_names,
             **kw
         )
+        # Current comment, found in request path
+        self._current_comment = None  # type: Content
+
         # Current content, found in request path
         self._current_content = None  # type: Content
 
@@ -120,6 +123,27 @@ class TracimRequest(Request):
             )
         self._current_content = content
 
+    @property
+    def current_comment(self) -> User:
+        """
+        Get current comment from path
+        """
+        if self._current_comment is None:
+            self._current_comment = self._get_current_comment(
+                self.current_user,
+                self.current_workspace,
+                self.current_content,
+                self
+                )
+        return self._current_comment
+
+    @current_comment.setter
+    def current_comment(self, content: Content) -> None:
+        if self._current_comment is not None:
+            raise ImmutableAttribute(
+                "Can't modify already setted current_content"
+            )
+        self._current_comment = content
     # TODO - G.M - 24-05-2018 - Find a better naming for this ?
     @property
     def candidate_user(self) -> User:
@@ -170,6 +194,44 @@ class TracimRequest(Request):
     ###
     # Utils for TracimRequest
     ###
+    def _get_current_comment(
+            self,
+            user: User,
+            workspace: Workspace,
+            content: Content,
+            request: 'TracimRequest'
+    ):
+        """
+        Get current content from request
+        :param user: User who want to check the workspace
+        :param request: pyramid request
+        :return: current content
+        """
+        comment_id = ''
+        try:
+            if 'comment_id' in request.matchdict:
+                comment_id = int(request.matchdict['comment_id'])
+            if not comment_id:
+                raise ContentNotFoundInTracimRequest('No comment_id property found in request')  # nopep8
+            api = ContentApi(
+                current_user=user,
+                session=request.dbsession,
+                config=request.registry.settings['CFG']
+            )
+            comment = api.get_one(
+                comment_id,
+                content_type=ContentType.Comment,
+                workspace=workspace,
+                parent=content,
+            )
+        except JSONDecodeError:
+            raise ContentNotFound('Bad json body')
+        except NoResultFound:
+            raise ContentNotFound(
+                'Comment {} does not exist '
+                'or is not visible for this user'.format(comment_id)
+            )
+        return comment
 
     def _get_current_content(
             self,

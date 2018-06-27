@@ -146,3 +146,35 @@ def require_content_types(content_types: typing.List['NewContentType']):
             raise ContentTypeNotAllowed()
         return wrapper
     return decorator
+
+
+def require_comment_ownership_or_role(
+        minimal_required_role_for_owner: int,
+        minimal_required_role_for_anyone: int,
+) -> None:
+    """
+    Decorator for view to restrict access of tracim request if role is
+    not high enough and user is not owner of the current_content
+    :param minimal_required_role_for_owner_access: minimal role for owner
+    of current_content to access to this view
+    :param minimal_required_role_for_anyone: minimal role for anyone to
+    access to this view.
+    :return:
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(self, context, request: 'TracimRequest'):
+            user = request.current_user
+            workspace = request.current_workspace
+            comment = request.current_comment
+            # INFO - G.M - 2018-06-178 - find minimal role required
+            if comment.owner.user_id == user.user_id:
+                minimal_required_role = minimal_required_role_for_owner
+            else:
+                minimal_required_role = minimal_required_role_for_anyone
+            # INFO - G.M - 2018-06-178 - normal role test
+            if workspace.get_user_role(user) >= minimal_required_role:
+                return func(self, context, request)
+            raise InsufficientUserWorkspaceRole()
+        return wrapper
+    return decorator

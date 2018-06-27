@@ -50,10 +50,10 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment['parent_id'] == 7
         assert comment['raw_content'] == '<p>You are right, but Kouign-amann are clearly better.</p>'  # nopep8
         assert comment['author']
-        assert comment['author']['user_id'] == 1
+        assert comment['author']['user_id'] == 4
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] == None
-        assert comment['author']['public_name'] == 'Global manager'
+        assert comment['author']['public_name'] == 'John Reader'
 
     def test_api__post_content_comment__ok_200__nominal_case(self) -> None:
         """
@@ -88,9 +88,9 @@ class TestCommentsEndpoint(FunctionalTest):
         assert len(res.json_body) == 4
         assert comment == res.json_body[3]
 
-    def test_api__delete_content_comment__ok_200__nominal_case(self) -> None:
+    def test_api__delete_content_comment__ok_200__workspace_manager_owner(self) -> None:
         """
-        Get alls comments of a content
+        delete comment (user is workspace_manager and owner)
         """
         self.testapp.authorization = (
             'Basic',
@@ -101,10 +101,10 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
         assert len(res.json_body) == 3
-        comment = res.json_body[2]
-        assert comment['content_id'] == 20
+        comment = res.json_body[0]
+        assert comment['content_id'] == 18
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p>You are right, but Kouign-amann are clearly better.</p>'   # nopep8
+        assert comment['raw_content'] == '<p> What is for you the best cake ever ? </br> I personnally vote for Chocolate cupcake !</p>'   # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -112,9 +112,155 @@ class TestCommentsEndpoint(FunctionalTest):
         assert comment['author']['public_name'] == 'Global manager'
 
         res = self.testapp.delete(
-            '/api/v2/workspaces/2/contents/7/comments/20',
+            '/api/v2/workspaces/2/contents/7/comments/18',
             status=204
         )
         res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
         assert len(res.json_body) == 2
-        assert not [content for content in res.json_body if content['content_id'] == 20]  # nopep8
+        assert not [content for content in res.json_body if content['content_id'] == 18]  # nopep8
+
+    def test_api__delete_content_comment__ok_200__workspace_manager(self) -> None:
+        """
+        delete comment (user is workspace_manager)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        assert len(res.json_body) == 3
+        comment = res.json_body[1]
+        assert comment['content_id'] == 19
+        assert comment['parent_id'] == 7
+        assert comment['raw_content'] == '<p>What about Apple Pie ? There are Awesome !</p>'   # nopep8
+        assert comment['author']
+        assert comment['author']['user_id'] == 3
+        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
+        assert comment['author']['avatar_url'] is None
+        assert comment['author']['public_name'] == 'Bob i.'
+
+        res = self.testapp.delete(
+            '/api/v2/workspaces/2/contents/7/comments/19',
+            status=204
+        )
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        assert len(res.json_body) == 2
+        assert not [content for content in res.json_body if content['content_id'] == 19]  # nopep8
+
+    def test_api__delete_content_comment__ok_200__content_manager_owner(self) -> None:
+        """
+        delete comment (user is content-manager and owner)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        assert len(res.json_body) == 3
+        comment = res.json_body[1]
+        assert comment['content_id'] == 19
+        assert comment['parent_id'] == 7
+        assert comment['raw_content'] == '<p>What about Apple Pie ? There are Awesome !</p>'   # nopep8
+        assert comment['author']
+        assert comment['author']['user_id'] == 3
+        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
+        assert comment['author']['avatar_url'] is None
+        assert comment['author']['public_name'] == 'Bob i.'
+
+        res = self.testapp.delete(
+            '/api/v2/workspaces/2/contents/7/comments/19',
+            status=204
+        )
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        assert len(res.json_body) == 2
+        assert not [content for content in res.json_body if content['content_id'] == 19]  # nopep8
+
+    def test_api__delete_content_comment__err_403__content_manager(self) -> None:
+        """
+        delete comment (user is content-manager)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        assert len(res.json_body) == 3
+        comment = res.json_body[2]
+        assert comment['content_id'] == 20
+        assert comment['parent_id'] == 7
+        assert comment['raw_content'] == '<p>You are right, but Kouign-amann are clearly better.</p>'   # nopep8
+        assert comment['author']
+        assert comment['author']['user_id'] == 4
+        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
+        assert comment['author']['avatar_url'] is None
+        assert comment['author']['public_name'] == 'John Reader'
+
+        res = self.testapp.delete(
+            '/api/v2/workspaces/2/contents/7/comments/20',
+            status=403
+        )
+
+    def test_api__delete_content_comment__err_403__reader_owner(self) -> None:
+        """
+        delete comment (user is reader and owner)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        assert len(res.json_body) == 3
+        comment = res.json_body[2]
+        assert comment['content_id'] == 20
+        assert comment['parent_id'] == 7
+        assert comment['raw_content'] == '<p>You are right, but Kouign-amann are clearly better.</p>'   # nopep8
+        assert comment['author']
+        assert comment['author']['user_id'] == 4
+        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
+        assert comment['author']['avatar_url'] is None
+        assert comment['author']['public_name'] == 'John Reader'
+
+        res = self.testapp.delete(
+            '/api/v2/workspaces/2/contents/7/comments/20',
+            status=403
+        )
+
+    def test_api__delete_content_comment__err_403__reader(self) -> None:
+        """
+        delete comment (user is reader)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        assert len(res.json_body) == 3
+        comment = res.json_body[2]
+        assert comment['content_id'] == 20
+        assert comment['parent_id'] == 7
+        assert comment['raw_content'] == '<p>You are right, but Kouign-amann are clearly better.</p>'   # nopep8
+        assert comment['author']
+        assert comment['author']['user_id'] == 4
+        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
+        assert comment['author']['avatar_url'] is None
+        assert comment['author']['public_name'] == 'John Reader'
+
+        res = self.testapp.delete(
+            '/api/v2/workspaces/2/contents/7/comments/20',
+            status=403
+        )

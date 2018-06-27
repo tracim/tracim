@@ -61,3 +61,12 @@ class Test(Fixture):
         bob.password = 'foobarbaz'
         self._session.add(bob)
         g2.users.append(bob)
+
+        g2 = self._session.query(models.Group).\
+            filter(models.Group.group_name == 'users').one()
+        lawrence = models.User()
+        lawrence.display_name = 'John Reader'
+        lawrence.email = 'john-the-reader@reader.local'
+        lawrence.password = 'read'
+        self._session.add(lawrence)
+        g2.users.append(lawrence)

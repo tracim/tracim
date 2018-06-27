@@ -1,6 +1,7 @@
 # coding=utf-8
 import transaction
 from pyramid.config import Configurator
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -10,6 +11,8 @@ from tracim import TracimRequest
 from tracim.extensions import hapic
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.workspace import WorkspaceApi
+from tracim.lib.utils.authorization import require_workspace_role
+from tracim.lib.utils.authorization import require_comment_ownership_or_role
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import CommentSchema
 from tracim.views.core_api.schemas import CommentsPathSchema
@@ -17,23 +20,24 @@ from tracim.views.core_api.schemas import SetCommentSchema
 from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.exceptions import WorkspaceNotFound
-from tracim.exceptions import InsufficientUserProfile
+from tracim.exceptions import InsufficientUserWorkspaceRole
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.revision_protection import new_revision
+from tracim.models.data import UserRoleInWorkspace
 
 COMMENT_ENDPOINTS_TAG = 'Comments'
 
 
 class CommentController(Controller):
-    pass
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
+    @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(CommentSchema(many=True),)
     def content_comments(self, context, request: TracimRequest, hapic_data=None):
@@ -60,9 +64,10 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetCommentSchema())
     @hapic.output_body(CommentSchema(),)
@@ -91,9 +96,13 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
+    @require_comment_ownership_or_role(
+        minimal_required_role_for_anyone=UserRoleInWorkspace.WORKSPACE_MANAGER,
+        minimal_required_role_for_owner=UserRoleInWorkspace.CONTRIBUTOR,
+    )
     @hapic.input_path(CommentsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_comment(self, context, request: TracimRequest, hapic_data=None):

@@ -23,6 +23,10 @@ class Content(Fixture):
         bob = self._session.query(models.User) \
             .filter(models.User.email == 'bob@fsf.local') \
             .one()
+        john_the_reader = self._session.query(models.User) \
+            .filter(models.User.email == 'john-the-reader@reader.local') \
+            .one()
+
         admin_workspace_api = WorkspaceApi(
             current_user=admin,
             session=self._session,
@@ -40,6 +44,11 @@ class Content(Fixture):
         )
         bob_content_api = ContentApi(
             current_user=bob,
+            session=self._session,
+            config=self._config
+        )
+        reader_content_api = ContentApi(
+            current_user=john_the_reader,
             session=self._session,
             config=self._config
         )
@@ -71,6 +80,12 @@ class Content(Fixture):
             user=bob,
             workspace=recipe_workspace,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+        )
+        role_api.create_one(
+            user=john_the_reader,
+            workspace=recipe_workspace,
+            role_level=UserRoleInWorkspace.READER,
             with_notif=False,
         )
         # Folders
@@ -273,7 +288,7 @@ class Content(Fixture):
             content='<p>What about Apple Pie ? There are Awesome !</p>',
             do_save=True,
         )
-        content_api.create_comment(
+        reader_content_api.create_comment(
             parent=best_cake_thread,
             content='<p>You are right, but Kouign-amann are clearly better.</p>',
             do_save=True,
