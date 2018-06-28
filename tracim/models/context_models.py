@@ -12,6 +12,7 @@ from tracim.models.data import ContentRevisionRO
 from tracim.models.data import Workspace, UserRoleInWorkspace
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
+from tracim.models.contents import ContentTypeLegacy as ContentType
 
 
 class MoveParams(object):
@@ -365,7 +366,11 @@ class ContentInContext(object):
 
     @property
     def content_type(self) -> str:
-        return self.content.type
+        content_type = ContentType(self.content.type)
+        if content_type:
+            return content_type.slug
+        else:
+            return None
 
     @property
     def sub_content_types(self) -> typing.List[str]:
@@ -470,7 +475,11 @@ class RevisionInContext(object):
 
     @property
     def content_type(self) -> str:
-        return self.revision.type
+        content_type = ContentType(self.revision.type)
+        if content_type:
+            return content_type.slug
+        else:
+            return None
 
     @property
     def sub_content_types(self) -> typing.List[str]:

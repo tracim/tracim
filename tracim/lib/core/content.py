@@ -104,6 +104,7 @@ class ContentApi(object):
         ContentType.Comment,
         ContentType.Thread,
         ContentType.Page,
+        ContentType.PageLegacy,
         ContentType.MarkdownPage,
     )
 

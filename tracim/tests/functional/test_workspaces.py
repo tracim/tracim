@@ -3,6 +3,7 @@
 Tests for /api/v2/workspaces subpath endpoints.
 """
 from tracim.tests import FunctionalTest
+from tracim.tests import set_html_document_slug_to_legacy
 from tracim.fixtures.content import Content as ContentFixtures
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 
@@ -273,6 +274,69 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
 
     # Root related
+    def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(self):
+        """
+        Check obtain workspace all root contents
+        """
+        set_html_document_slug_to_legacy(self.session_factory)
+        params = {
+            'parent_id': 0,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/3/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 4
+        content = res[1]
+        assert content['content_type'] == 'html-documents'
+        assert content['content_id'] == 15
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'New Fruit Salad'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'new-fruit-salad'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 3
+
+        content = res[2]
+        assert content['content_type'] == 'html-documents'
+        assert content['content_id'] == 16
+        assert content['is_archived'] is True
+        assert content['is_deleted'] is False
+        assert content['label'].startswith('Fruit Salad')
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'].startswith('fruit-salad')
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 3
+
+        content = res[3]
+        assert content['content_type'] == 'html-documents'
+        assert content['content_id'] == 17
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is True
+        assert content['label'].startswith('Bad Fruit Salad')
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'].startswith('bad-fruit-salad')
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_all_root_content(self):
         """

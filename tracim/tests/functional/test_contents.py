@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from tracim.tests import FunctionalTest
+from tracim.tests import set_html_document_slug_to_legacy
 from tracim.fixtures.content import Content as ContentFixtures
 from tracim.fixtures.users_and_groups import Base as BaseFixture
 
@@ -27,6 +28,48 @@ class TestHtmlDocuments(FunctionalTest):
             '/api/v2/workspaces/2/html-documents/7',
             status=400
         )   # nopep8
+
+    def test_api__get_html_document__ok_200__legacy_slug(self) -> None:
+        """
+        Get one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        set_html_document_slug_to_legacy(self.session_factory)
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/6',
+            status=200
+        )   # nopep8
+        content = res.json_body
+        assert content['content_type'] == 'html-documents'
+        assert content['content_id'] == 6
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Tiramisu Recipe'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'tiramisu-recipe'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 27
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] != content['author']
+        assert content['last_modifier']['user_id'] == 3
+        assert content['last_modifier']['public_name'] == 'Bob i.'
+        assert content['last_modifier']['avatar_url'] is None
+        assert content['raw_content'] == '<p>To cook a great Tiramisu, you need many ingredients.</p>'  # nopep8
 
     def test_api__get_html_document__ok_200__nominal_case(self) -> None:
         """
