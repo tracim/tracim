@@ -59,7 +59,7 @@ class Sidebar extends React.Component {
 
           <nav className='sidebar__navigation'>
             <ul className='sidebar__navigation__workspace'>
-              { workspaceList.map((ws, i) =>
+              { workspaceList.map(ws =>
                 <WorkspaceListItem
                   idWs={ws.id}
                   label={ws.label}

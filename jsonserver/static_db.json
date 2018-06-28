@@ -419,5 +419,34 @@
     },
     "role": "content_manager",
     "subscribed_to_notif": true
-  }]
+  }],
+  "putHtmlDoc": {
+    "author": {
+      "avatar_url": "/api/v2/assets/avatars/suri-cate.jpg",
+      "public_name": "Suri Cate",
+      "user_id": 3
+    },
+    "content_id": 6,
+    "content_type": "html-content",
+    "created": "2018-06-28T08:46:58.690Z",
+    "current_revision_id": 12,
+    "is_archived": false,
+    "is_deleted": false,
+    "label": "Intervention Report 12",
+    "last_modifier": {
+      "avatar_url": "/api/v2/assets/avatars/suri-cate.jpg",
+      "public_name": "Suri Cate",
+      "user_id": 3
+    },
+    "modified": "2018-06-28T08:46:58.690Z",
+    "parent_id": 34,
+    "raw_content": "string",
+    "show_in_ui": true,
+    "slug": "intervention-report-12",
+    "status": "closed-deprecated",
+    "sub_content_types": [
+      "string"
+    ],
+    "workspace_id": 19
+  }
 }

@@ -7,21 +7,25 @@ export function appFactory (WrappedComponent) {
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
+        domContainer: 'appContainer',
         apiUrl: FETCH_CONFIG.apiUrl,
-        mockApiUrl: FETCH_CONFIG.mockApiUrl
+        mockApiUrl: FETCH_CONFIG.mockApiUrl,
+        apiHeader: FETCH_CONFIG.headers
       },
       content
     })
 
-    renderCreateContentApp = (appConfig, user, folder) => GLOBAL_renderCreateContentApp({
+    renderCreateContentApp = (appConfig, user, idWorkspace, idfolder) => GLOBAL_renderCreateContentApp({
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
         domContainer: 'popupCreateContentContainer',
         apiUrl: FETCH_CONFIG.apiUrl,
-        mockApiUrl: FETCH_CONFIG.mockApiUrl
+        mockApiUrl: FETCH_CONFIG.mockApiUrl,
+        apiHeader: FETCH_CONFIG.headers
       },
-      folder
+      idWorkspace,
+      idfolder
     })
 
     emitEventApp = (type, data) => GLOBAL_dispatchEvent(type, data)

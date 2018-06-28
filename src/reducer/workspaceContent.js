@@ -7,16 +7,16 @@ export default function workspace (state = [], action) {
   switch (action.type) {
     case `Set/${WORKSPACE}/Content`:
       return action.workspaceContent.map(wsc => ({
-        id: wsc.id,
+        id: wsc.content_id,
         label: wsc.label,
         slug: wsc.slug,
-        type: wsc.content_type_slug,
-        workspaceId: wsc.workspace_id,
+        type: wsc.content_type,
+        idWorkspace: wsc.workspace_id,
         isArchived: wsc.is_archived,
         parentId: wsc.parent_id,
         isDeleted: wsc.is_deleted,
         showInUi: wsc.show_in_ui,
-        statusSlug: wsc.status_slug,
+        statusSlug: wsc.status,
         subContentTypeSlug: wsc.sub_content_type_slug
       }))
 

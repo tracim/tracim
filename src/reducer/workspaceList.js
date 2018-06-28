@@ -7,7 +7,7 @@ export function workspaceList (state = [], action) {
   switch (action.type) {
     case `Update/${WORKSPACE_LIST}`:
       return action.workspaceList.map(ws => ({
-        id: ws.id,
+        id: ws.workspace_id,
         label: ws.label,
         slug: ws.slug,
         description: ws.description,

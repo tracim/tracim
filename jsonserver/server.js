@@ -99,6 +99,10 @@ server.get('/workspace/:idws/contents/:idc', (req, res) => {
   }
 })
 
+server.put('/workspaces/:idws/html-documents/:idcts', (req, res) => {
+  return res.jsonp(jsonDb.putHtmlDoc)
+})
+
 server.get('/workspace/:idws/contents/:idc/timeline', (req, res) => {
   switch (req.params.idc) {
     case '1': // pageHtml
@@ -109,6 +113,11 @@ server.get('/workspace/:idws/contents/:idc/timeline', (req, res) => {
     case '6': // File
       return res.jsonp(jsonDb.timeline)
   }
+})
+
+server.post('/workspaces/:idws/contents', (req, res) => {
+  console.log(req.body)
+  return res.jsonp('gg')
 })
 
 server.use(router)

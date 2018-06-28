@@ -2,8 +2,9 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import FileItem from './ContentItem.jsx'
+// import FileItem from './ContentItem.jsx'
 // import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
+import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 
 class Folder extends React.Component {
@@ -26,11 +27,12 @@ class Folder extends React.Component {
 
   render () {
     const {
-      app,
+      availableApp,
       folderData,
-      onClickItem,
+      // onClickItem,
       onClickExtendedAction,
-      onClickFolder,
+      onClickCreateContent,
+      // onClickFolder,
       isLast,
       t
     } = this.props
@@ -66,85 +68,12 @@ class Folder extends React.Component {
                 {t('Folder.create')} ...
               </button>
 
-              {/* @TODO generate the subdropdown with available app from redux */}
-
               <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'folder')}>
-                  <div className='subdropdown__link__folder d-flex align-items-center'>
-                    <div className='subdropdown__link__folder__icon mr-3'>
-                      <i className='fa fa-fw fa-folder-o' />
-                    </div>
-                    <div className='subdropdown__link__folder__text'>
-                      Créer un dossier
-                    </div>
-                  </div>
-                </div>
-
-                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'PageHtml')}>
-                  <div className='subdropdown__link__apphtml d-flex align-items-center'>
-                    <div className='subdropdown__link__apphtml__icon mr-3'>
-                      <i className='fa fa-fw fa-file-text-o' />
-                    </div>
-                    <div className='subdropdown__link__apphtml__text'>
-                      Rédiger un document
-                    </div>
-                  </div>
-                </div>
-
-                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'File')}>
-                  <div className='subdropdown__link__appfile d-flex align-items-center'>
-                    <div className='subdropdown__link__appfile__icon mr-3'>
-                      <i className='fa fa-fw fa-file-image-o' />
-                    </div>
-                    <div className='subdropdown__link__appfile__text'>
-                      Importer un fichier
-                    </div>
-                  </div>
-                </div>
-
-                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'PageMarkdown')}>
-                  <div className='subdropdown__link__appmarkdown d-flex align-items-center'>
-                    <div className='subdropdown__link__appmarkdown__icon mr-3'>
-                      <i className='fa fa-fw fa-file-code-o' />
-                    </div>
-                    <div className='subdropdown__link__appmarkdown__text'>
-                      Rédiger un document markdown
-                    </div>
-                  </div>
-                </div>
-
-                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Thread')}>
-                  <div className='subdropdown__link__appthread d-flex align-items-center'>
-                    <div className='subdropdown__link__appthread__icon mr-3'>
-                      <i className='fa fa-fw fa-comments-o' />
-                    </div>
-                    <div className='subdropdown__link__appthread__text'>
-                      Lancer une discussion
-                    </div>
-                  </div>
-                </div>
-
-                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Task')}>
-                  <div className='subdropdown__link__apptask d-flex align-items-center'>
-                    <div className='subdropdown__link__apptask__icon mr-3'>
-                      <i className='fa fa-fw fa-list-ul' />
-                    </div>
-                    <div className='subdropdown__link__apptask__text'>
-                      Créer une tâche
-                    </div>
-                  </div>
-                </div>
-
-                <div className='subdropdown__link dropdown-item' onClick={e => this.handleClickCreateContent(e, folderData, 'Issue')}>
-                  <div className='subdropdown__link__appissue d-flex align-items-center'>
-                    <div className='subdropdown__link__appissue__icon mr-3'>
-                      <i className='fa fa-fw fa-ticket' />
-                    </div>
-                    <div className='subdropdown__link__appissue__text'>
-                      Ouvrir un ticket
-                    </div>
-                  </div>
-                </div>
+                <SubDropdownCreateButton
+                  idFolder={null}
+                  availableApp={availableApp}
+                  onClickCreateContent={onClickCreateContent}
+                />
               </div>
 
               <div className='d-none d-md-flex'>

@@ -26,7 +26,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
     -->
 
-    <script src='/app/pageHtml.app.js'></script>
+    <script src='/app/html-documents.app.js'></script>
     <script src='/app/thread.app.js'></script>
     <script src='/app/file.app.js'></script>
 
@@ -42,11 +42,11 @@
 
       getSelectedApp = name => {
         switch (name) {
-          case 'PageHtml':
-            return appPageHtml
-          case 'Thread':
+          case 'html-documents':
+            return appHtmlDocument
+          case 'thread':
             return appThread
-          case 'File':
+          case 'file':
             return appFile
         }
       }
@@ -54,10 +54,10 @@
       GLOBAL_renderApp = app => {
         console.log('GLOBAL_renderApp', app)
 
-        const selectedApp = getSelectedApp(app.config.name)
+        const selectedApp = getSelectedApp(app.config.slug)
 
         if (selectedApp.isRendered) {
-          GLOBAL_dispatchEvent({type: `${app.config.name}_showApp`, data: app})
+          GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app})
         } else {
           selectedApp.renderApp(app)
           selectedApp.isRendered = true
@@ -69,7 +69,7 @@
       GLOBAL_renderCreateContentApp = app => {
         console.log('GLOBAL_renderCreateContentApp', app)
 
-        getSelectedApp(app.config.name).renderPopupCreation(app)
+        getSelectedApp(app.config.slug).renderPopupCreation(app)
       }
 
       GLOBAL_dispatchEvent = ({ type, data }) => {

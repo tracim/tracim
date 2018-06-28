@@ -155,9 +155,9 @@ export const getWorkspaceList = idUser => dispatch => {
   })
 }
 
-export const getWorkspaceContentList = idWorkspace => dispatch => {
+export const getWorkspaceContentList = (idWorkspace, idParent) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idParent}`,
     param: {
       headers: {...FETCH_CONFIG.headers},
       method: 'GET'

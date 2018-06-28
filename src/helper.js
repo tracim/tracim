@@ -11,11 +11,11 @@ export const FETCH_CONFIG = {
 export const PAGE = {
   HOME: '/',
   WORKSPACE: {
-    DASHBOARD: (idws = ':idws') => `/workspaces/${idws}`,
+    DASHBOARD: (idws = ':idws') => `/workspaces/${idws}/dashboard`,
     NEW: '/workspaces/new',
     CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
     CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
-    CONTENT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}`,
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/workspaces/${idws}/${type}/${idcts}`,
     CONTENT_NEW: (idws = ':idws', ctstype = ':ctstype') => `/workspaces/${idws}/contents/${ctstype}/new`,
     CONTENT_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/edit`,
     CONTENT_TITLE_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/title/edit`,
