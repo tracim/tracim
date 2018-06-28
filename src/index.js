@@ -1,35 +1,36 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PageHtml from './container/PageHtml.jsx'
-import PopupCreatePageHtml from './container/PopupCreatePageHtml.jsx'
+import HtmlDocument from './container/HtmlDocument.jsx'
+import PopupCreateHtmlDocument from './container/PopupCreateHtmlDocument.jsx'
 
 require('./css/index.styl')
 
-/* data : {
-  loggedUser: {},
-  config: {
-    name: 'PageHtml',
-    label: {
-      fr: 'Document',
-      en: 'Document'
+/*
+  data : {
+    loggedUser: {},
+    config: {
+      name: 'HtmlDocument',
+      label: {
+        fr: 'Document',
+        en: 'Document'
+      },
+      customClass: 'wsContentHtmlDocument',
+      icon: 'fa fa-fw fa-file-text-o',
+      color: '#3f52e3',
+      domContainer: 'appContainer'
+      apiUrl: FETCH_CONFIG.apiUrl,
+      mockApiUrl: FETCH_CONFIG.mockApiUrl
     },
-    customClass: 'wsContentPageHtml',
-    icon: 'fa fa-fw fa-file-text-o',
-    color: '#3f52e3',
-    domContainer: 'appContainer'
-    apiUrl: FETCH_CONFIG.apiUrl,
-    mockApiUrl: FETCH_CONFIG.mockApiUrl
-  },
-  content || folder
-}
- */
+    content || folder
+  }
+*/
 
 const appInterface = {
-  name: 'PageHtml',
+  name: 'HtmlDocument',
   isRendered: false,
   renderApp: data => {
     return ReactDOM.render(
-      <PageHtml data={data} />
+      <HtmlDocument data={data} />
       , document.getElementById(data.config.domContainer)
     )
   },
@@ -38,7 +39,7 @@ const appInterface = {
   },
   renderPopupCreation: data => {
     return ReactDOM.render(
-      <PopupCreatePageHtml data={data} />
+      <PopupCreateHtmlDocument data={data} />
       , document.getElementById(data.config.domContainer)
     )
   }

@@ -1,14 +1,13 @@
 import React from 'react'
 import {
-  CardPopupCreateContent,
-  handleFetchResult
+  CardPopupCreateContent
 } from 'tracim_lib'
 import { FETCH_CONFIG } from '../helper.js'
 
 const debug = {
   config: {
     label: 'Text Document',
-    slug: 'page',
+    slug: 'html-documents',
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
@@ -33,7 +32,7 @@ const debug = {
   idFolder: null
 }
 
-class PopupCreatePageHtml extends React.Component {
+class PopupCreateHtmlDocument extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -101,4 +100,4 @@ class PopupCreatePageHtml extends React.Component {
   }
 }
 
-export default PopupCreatePageHtml
+export default PopupCreateHtmlDocument

@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PageHtml from './container/PageHtml.jsx'
-import PopupCreatePageHtml from './container/PopupCreatePageHtml.jsx'
+import HtmlDocument from './container/HtmlDocument.jsx'
+// import PopupCreateHtmlDocument from './container/PopupCreateHtmlDocument.jsx'
 
 require('./css/index.styl')
 
 ReactDOM.render(
-  <PageHtml data={undefined} />
+  <HtmlDocument data={undefined} />
   , document.getElementById('content')
 )
 

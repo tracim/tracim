@@ -12,7 +12,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'html-documents.app.js' : 'html-documents.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'appPageHtml' : undefined,
+    library: isProduction ? 'appHtmlDocument' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},
