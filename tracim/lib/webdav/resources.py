@@ -516,7 +516,8 @@ class FolderResource(WorkspaceResource):
         workspace_api = WorkspaceApi(
             current_user=self.user,
             session=self.session,
-            config=self.provider.app_config        )
+            config=self.provider.app_config,
+        )
         workspace = self.provider.get_workspace_from_path(
             normpath(destpath), workspace_api
         )
