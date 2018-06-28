@@ -457,6 +457,10 @@ class CommentSchema(marshmallow.Schema):
         example='<p>This is just an html comment !</p>'
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
+    created = marshmallow.fields.DateTime(
+        format='%Y-%m-%dT%H:%M:%SZ',
+        description='comment creation date',
+    )
 
 
 class ContentModifySchema(marshmallow.Schema):

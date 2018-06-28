@@ -44,6 +44,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] == None
         assert comment['author']['public_name'] == 'Bob i.'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         comment = res.json_body[2]
         assert comment['content_id'] == 20
@@ -54,6 +56,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] == None
         assert comment['author']['public_name'] == 'John Reader'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
     def test_api__post_content_comment__ok_200__nominal_case(self) -> None:
         """
@@ -83,6 +87,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] is None
         assert comment['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)  # nopep8
         assert len(res.json_body) == 4
@@ -110,6 +116,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] is None
         assert comment['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         res = self.testapp.delete(
             '/api/v2/workspaces/2/contents/7/comments/18',
@@ -141,6 +149,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] is None
         assert comment['author']['public_name'] == 'Bob i.'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         res = self.testapp.delete(
             '/api/v2/workspaces/2/contents/7/comments/19',
@@ -172,6 +182,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] is None
         assert comment['author']['public_name'] == 'Bob i.'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         res = self.testapp.delete(
             '/api/v2/workspaces/2/contents/7/comments/19',
@@ -203,6 +215,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] is None
         assert comment['author']['public_name'] == 'John Reader'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         res = self.testapp.delete(
             '/api/v2/workspaces/2/contents/7/comments/20',
@@ -231,6 +245,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] is None
         assert comment['author']['public_name'] == 'John Reader'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         res = self.testapp.delete(
             '/api/v2/workspaces/2/contents/7/comments/20',
@@ -259,6 +275,8 @@ class TestCommentsEndpoint(FunctionalTest):
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
         assert comment['author']['avatar_url'] is None
         assert comment['author']['public_name'] == 'John Reader'
+        # TODO - G.M - 2018-06-179 - better check for datetime
+        assert comment['created']
 
         res = self.testapp.delete(
             '/api/v2/workspaces/2/contents/7/comments/20',
