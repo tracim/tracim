@@ -2,13 +2,14 @@
 import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import OneOf
+from marshmallow.validate import Equal
 
 from tracim.lib.utils.utils import DATETIME_FORMAT
 from tracim.models.auth import Profile
-from tracim.models.contents import CONTENT_DEFAULT_TYPE
-from tracim.models.contents import CONTENT_DEFAULT_STATUS
 from tracim.models.contents import GlobalStatus
 from tracim.models.contents import open_status
+from tracim.models.contents import ContentTypeLegacy as ContentType
+from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
 from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentCreation
@@ -286,7 +287,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = marshmallow.fields.String(
         example='pagehtml',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=OneOf(ContentType.allowed_types()),
     )
     fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
@@ -338,7 +339,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type = marshmallow.fields.String(
         example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=OneOf(ContentType.allowed_types_for_folding()),  # nopep8
     )
 
     @post_load
@@ -360,17 +361,20 @@ class ContentDigestSchema(marshmallow.Schema):
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
         example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=OneOf(ContentType.allowed_types()),
     )
     sub_content_types = marshmallow.fields.List(
-        marshmallow.fields.String(),
+        marshmallow.fields.String(
+            example='html-content',
+            validate=OneOf(ContentType.allowed_types())
+        ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'
     )
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
+        validate=OneOf(ContentStatus.allowed_values()),
         description='this slug is found in content_type available statuses',
         default=open_status
     )
@@ -406,7 +410,7 @@ class ContentSchema(ContentDigestSchema):
 class ThreadContentSchema(ContentSchema):
     content_type = marshmallow.fields.Str(
         example='thread',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=Equal(ContentType('thread').slug)
     )
     raw_content = marshmallow.fields.String('Description of Thread')
 
@@ -414,7 +418,7 @@ class ThreadContentSchema(ContentSchema):
 class HtmlDocumentContentSchema(ContentSchema):
     content_type = marshmallow.fields.Str(
         example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=Equal(ContentType('html-documents').slug),
     )
     raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
 
@@ -436,7 +440,7 @@ class RevisionSchema(ContentDigestSchema):
 class ThreadRevisionSchema(RevisionSchema):
     content_type = marshmallow.fields.Str(
         example='thread',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=Equal(ContentType('thread').slug),
     )
     raw_content = marshmallow.fields.String('Description of Thread')
 
@@ -444,7 +448,7 @@ class ThreadRevisionSchema(RevisionSchema):
 class HtmlDocumentRevisionSchema(RevisionSchema):
     content_type = marshmallow.fields.Str(
         example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=Equal(ContentType('html-documents').slug),
     )
     raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
 
@@ -500,7 +504,7 @@ class SetCommentSchema(marshmallow.Schema):
 class SetContentStatusSchema(marshmallow.Schema):
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
+        validate=OneOf(ContentStatus.allowed_values()),
         description='this slug is found in content_type available statuses',
         default=open_status,
         required=True,

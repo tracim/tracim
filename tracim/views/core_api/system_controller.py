@@ -5,7 +5,7 @@ from tracim.exceptions import InsufficientUserProfile
 from tracim.lib.utils.authorization import require_profile
 from tracim.models import Group
 from tracim.models.applications import applications
-from tracim.models.contents import CONTENT_DEFAULT_TYPE
+from tracim.models.contents import ContentTypeLegacy as ContentType
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -42,8 +42,9 @@ class SystemController(Controller):
         """
         Get list of alls content types availables in this tracim instance.
         """
-
-        return CONTENT_DEFAULT_TYPE
+        content_types_slugs = ContentType.allowed_types_for_folding()
+        content_types = [ContentType(slug) for slug in content_types_slugs]
+        return content_types
 
     def bind(self, configurator: Configurator) -> None:
         """
