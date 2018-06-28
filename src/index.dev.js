@@ -19,7 +19,7 @@ import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent
 
 ReactDOM.render(
   <div>
-    <PopinFixed customClass={`${'randomClass'}`} style={{display: 'none'}}>
+    <PopinFixed customClass={`${'randomClass'}`}>
       <PopinFixedHeader
         customClass={`${'randomClass'}`}
         icon={'fa fa-file-word-o'}
@@ -34,7 +34,7 @@ ReactDOM.render(
           <Delimiter />
           <span>Here will be the app content. Style is handled by the app (obviously)</span>
           <BtnSwitch />
-          <TextAreaApp customClass={'randomClass'} />
+          <TextAreaApp customClass={'randomClass'} text={'woot'} />
         </div>
 
         <Timeline
@@ -48,15 +48,6 @@ ReactDOM.render(
         />
       </PopinFixedContent>
     </PopinFixed>
-
-    <CardPopupCreateContent
-      onClose={() => {}}
-      icon='fa-file-word-o'
-      color='#3f52e3'
-      title='Exemple of popup create content'
-      inputPlaceHolder='Exemple placeholder'
-      btnValidateLabel='Valider et créer'
-    />
   </div>
   , document.getElementById('content')
 )

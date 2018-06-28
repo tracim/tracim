@@ -6,31 +6,39 @@ class PopinFixedHeader extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      editTitle: false
+      editTitle: false,
+      editTitleValue: ''
     }
   }
 
-  handleClickChangeTitleBtn = () => this.setState(prevState => ({
-    editTitle: !prevState.editTitle
-  }))
+  componentDidUpdate (prevProps) {
+    if (prevProps.title !== this.props.title) this.setState({editTitleValue: this.props.title})
+  }
+
+  onChangeTitle = e => {
+    const newTitle = e.target.value
+    this.setState({editTitleValue: newTitle})
+  }
+
+  handleClickChangeTitleBtn = () => {
+    if (this.state.editTitle) this.props.onValidateChangeTitle(this.state.editTitleValue)
+
+    this.setState(prevState => ({editTitle: !prevState.editTitle}))
+  }
 
   render () {
-    const { customClass, icon, name, onChangeTitle, onClickCloseBtn } = this.props
+    const { customClass, faIcon, title, onClickCloseBtn } = this.props
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={`fa fa-${icon}`} />
+          <i className={`fa fa-${faIcon}`} />
         </div>
 
         <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>
-          {this.state.editTitle === false &&
-            <div>
-              {name}
-            </div>
-          }
-          {this.state.editTitle === true &&
-            <input onChange={onChangeTitle} />
+          {this.state.editTitle
+            ? <input value={this.state.editTitleValue} onChange={this.onChangeTitle} />
+            : <div>{title}</div>
           }
         </div>
 
@@ -38,7 +46,7 @@ class PopinFixedHeader extends React.Component {
           className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle`)}
           onClick={this.handleClickChangeTitleBtn}
         >
-          <i className='fa fa-pencil' />
+          {this.state.editTitle ? <i className='fa fa-check' /> : <i className='fa fa-pencil' />}
         </div>
 
         <div
@@ -55,15 +63,15 @@ class PopinFixedHeader extends React.Component {
 export default PopinFixedHeader
 
 PopinFixedHeader.propTypes = {
-  icon: PropTypes.string.isRequired,
+  faIcon: PropTypes.string.isRequired,
   onClickCloseBtn: PropTypes.func.isRequired,
   customClass: PropTypes.string,
-  name: PropTypes.string,
-  onChangeTitle: PropTypes.func
+  title: PropTypes.string,
+  onValidateChangeTitle: PropTypes.func
 }
 
 PopinFixedHeader.defaultProps = {
   customClass: '',
-  name: '',
+  title: '',
   onChangeTitle: () => {}
 }

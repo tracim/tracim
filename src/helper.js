@@ -1,8 +1,12 @@
-export const libHandleFetchResult = fetchResult => {
+export const libHandleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
     case 200:
     case 304:
-      return fetchResult.json()
+      const resultJson = await fetchResult.clone().json()
+      return new Promise((resolve, reject) => resolve({
+        apiResponse: fetchResult,
+        body: resultJson
+      }))
     case 204:
     case 400:
     case 404:
