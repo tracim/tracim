@@ -107,7 +107,7 @@ class SetContentStatus(object):
 
 class HTMLDocumentUpdate(object):
     """
-    Comment creation model
+    Html Document update model
     """
     def __init__(
             self,
@@ -120,7 +120,7 @@ class HTMLDocumentUpdate(object):
 
 class ThreadUpdate(object):
     """
-    Comment creation model
+    Thread update model
     """
     def __init__(
             self,
