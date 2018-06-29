@@ -8,6 +8,7 @@ export const libHandleFetchResult = async fetchResult => {
         body: resultJson
       }))
     case 204:
+      return fetchResult
     case 400:
     case 404:
     case 409:

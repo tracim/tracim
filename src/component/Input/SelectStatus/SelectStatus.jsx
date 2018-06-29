@@ -16,10 +16,11 @@ export const SelectStatus = props => {
         data-toggle='dropdown'
         aria-haspopup='true'
         aria-expanded='false'
+        style={{color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent'}}
       >
-        {props.selectedStatus.label}
+        {props.selectedStatus ? props.selectedStatus.label : ''}
         <div className='selectStatus__dropdownbtn__icon'>
-          <i className={`fa fa-${props.selectedStatus.faIcon}`} />
+          <i className={`fa fa-${props.selectedStatus ? props.selectedStatus.faIcon : ''}`} />
         </div>
       </button>
 
