@@ -143,3 +143,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 class EmptyRawContentNotAllowed(EmptyValueNotAllowed):
     pass
+
+
+class RoleDoesNotExist(TracimException):
+    pass

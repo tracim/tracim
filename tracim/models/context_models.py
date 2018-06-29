@@ -10,6 +10,7 @@ from tracim.models.auth import Profile
 from tracim.models.data import Content
 from tracim.models.data import ContentRevisionRO
 from tracim.models.data import Workspace, UserRoleInWorkspace
+from tracim.models.roles import WorkspaceRoles
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim.models.contents import ContentTypeLegacy as ContentType
@@ -295,7 +296,7 @@ class UserRoleWorkspaceInContext(object):
         'contributor', 'content-manager', 'workspace-manager'
         :return: user workspace role as slug.
         """
-        return UserRoleInWorkspace.SLUG[self.user_role.role]
+        return WorkspaceRoles.get_role_from_level(self.user_role.role).slug
 
     @property
     def user(self) -> UserInContext:
