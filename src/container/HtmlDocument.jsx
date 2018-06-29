@@ -114,14 +114,15 @@ class HtmlDocument extends React.Component {
       })
   }
 
-  saveEditHtmlDocument = (label, rawContent) => fetch(`${this.state.config.apiUrl}/workspaces/${this.state.content.workspace_id}/html-documents/${this.state.content.content_id}`, {
-    ...FETCH_CONFIG,
-    method: 'PUT',
-    body: JSON.stringify({
-      label: label,
-      raw_content: rawContent
+  saveEditHtmlDocument = (label, rawContent) =>
+    fetch(`${this.state.config.apiUrl}/workspaces/${this.state.content.workspace_id}/html-documents/${this.state.content.content_id}`, {
+      ...FETCH_CONFIG,
+      method: 'PUT',
+      body: JSON.stringify({
+        label: label,
+        raw_content: rawContent
+      })
     })
-  })
 
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
@@ -220,7 +221,7 @@ class HtmlDocument extends React.Component {
             mode={this.state.mode}
             onClickCloseEditMode={this.handleCloseNewVersion}
             onClickValidateBtn={this.handleSaveHtmlDocument}
-            version={content.current_revision_id}
+            version={timeline.filter(t => t.timelineType === 'revision').length}
             text={content.raw_content}
             onChangeText={this.handleChangeText}
             key={'html-documents'}

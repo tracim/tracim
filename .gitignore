@@ -2,7 +2,7 @@
 .idea/
 .git/
 node_modules/
-dist/pageHtml.app.js
-dist/pageHtml.app.js.map
-dist/pageHtml.app.dev.js
-dist/pageHtml.app.dev.js.map
+dist/html-documents.app.js
+dist/html-documents.app.js.map
+dist/html-documents.app.dev.js
+dist/html-documents.app.dev.js.map
