@@ -231,7 +231,10 @@ class WorkspaceMemberSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(example=3)
     workspace_id = marshmallow.fields.Int(example=4)
     user = marshmallow.fields.Nested(
-        UserSchema(only=('public_name', 'avatar_url'))
+        UserDigestSchema()
+    )
+    workspace = marshmallow.fields.Nested(
+        WorkspaceDigestSchema(exclude=('sidebar_entries',))
     )
 
     class Meta:
