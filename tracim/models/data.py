@@ -235,17 +235,17 @@ class ActionDescription(object):
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
-        'archiving': 'fa fa-archive',
-        'content-comment': 'fa-comment-o',
-        'creation': 'fa-magic',
-        'deletion': 'fa-trash',
-        'edition': 'fa-edit',
-        'revision': 'fa-history',
-        'status-update': 'fa-random',
-        'unarchiving': 'fa-file-archive-o',
-        'undeletion': 'fa-trash-o',
-        'move': 'fa-arrows',
-        'copy': 'fa-files-o',
+        'archiving': 'archive',
+        'content-comment': 'comment-o',
+        'creation': 'magic',
+        'deletion': 'trash',
+        'edition': 'edit',
+        'revision': 'history',
+        'status-update': 'random',
+        'unarchiving': 'file-archive-o',
+        'undeletion': 'trash-o',
+        'move': 'arrows',
+        'copy': 'files-o',
     }
     #
     # _LABELS = {
@@ -1488,7 +1488,7 @@ class VirtualEvent(object):
             delta_from_datetime = datetime.utcnow()
 
         delta = delta_from_datetime - self.created
-        
+
         if delta.days > 0:
             if delta.days >= 365:
                 aff = '%d year%s ago' % (delta.days/365, 's' if delta.days/365>=2 else '')

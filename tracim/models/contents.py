@@ -38,32 +38,32 @@ open_status = NewContentStatus(
     slug='open',
     global_status=GlobalStatus.OPEN.value,
     label='Open',
-    fa_icon='fa-square-o',
-    hexcolor='#000FF',
+    fa_icon='square-o',
+    hexcolor='#3f52e3',
 )
 
 closed_validated_status = NewContentStatus(
     slug='closed-validated',
     global_status=GlobalStatus.CLOSED.value,
     label='Validated',
-    fa_icon='fa-check-square-o',
-    hexcolor='#000FF',
+    fa_icon='check-square-o',
+    hexcolor='#008000',
 )
 
 closed_unvalidated_status = NewContentStatus(
     slug='closed-unvalidated',
     global_status=GlobalStatus.CLOSED.value,
     label='Cancelled',
-    fa_icon='fa-close',
-    hexcolor='#000FF',
+    fa_icon='close',
+    hexcolor='#f63434',
 )
 
 closed_deprecated_status = NewContentStatus(
     slug='closed-deprecated',
     global_status=GlobalStatus.CLOSED.value,
     label='Deprecated',
-    fa_icon='fa-warning',
-    hexcolor='#000FF',
+    fa_icon='warning',
+    hexcolor='#ababab',
 )
 
 
