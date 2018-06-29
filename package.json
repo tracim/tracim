@@ -50,6 +50,7 @@
       "fetch",
       "history",
       "btoa",
+      "wysiwyg",
       "GLOBAL_renderApp",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"
