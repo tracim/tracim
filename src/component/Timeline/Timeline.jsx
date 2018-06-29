@@ -69,7 +69,7 @@ const Timeline = props => {
               return <Revision
                 customClass={props.customClass}
                 createdAt={content.created}
-                number={content.revision_id}
+                number={props.timelineData.filter(c => c.timelineType === 'revision' && c.revision_id <= content.revision_id).length}
                 key={`revision_${content.revision_id}`}
               />
           }
