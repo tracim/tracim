@@ -299,6 +299,10 @@ class UserRoleWorkspaceInContext(object):
         return WorkspaceRoles.get_role_from_level(self.user_role.role).slug
 
     @property
+    def is_active(self) -> bool:
+        return self.user.is_active
+
+    @property
     def user(self) -> UserInContext:
         """
         User who has this role, with context data

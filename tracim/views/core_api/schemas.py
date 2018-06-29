@@ -236,6 +236,7 @@ class WorkspaceMemberSchema(marshmallow.Schema):
     workspace = marshmallow.fields.Nested(
         WorkspaceDigestSchema(exclude=('sidebar_entries',))
     )
+    is_active = marshmallow.fields.Bool()
 
     class Meta:
         description = 'Workspace Member information'
