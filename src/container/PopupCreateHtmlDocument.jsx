@@ -61,7 +61,7 @@ class PopupCreateHtmlDocument extends React.Component {
       method: 'POST',
       body: JSON.stringify({
         parent_id: this.state.idFolder,
-        content_type_slug: this.state.config.slug,
+        content_type: this.state.config.slug,
         label: this.state.newContentName
       })
     })
