@@ -1,15 +1,51 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { connect } from 'react-redux'
 import Sidebar from './Sidebar.jsx'
 import imgProfil from '../img/imgProfil.png'
+import {
+  getAppList,
+  getContentTypeList, getWorkspaceList
+} from '../action-creator.async.js'
+import {
+  setAppList,
+  setContentTypeList, setWorkspaceListIsOpenInSidebar, updateWorkspaceListData
+} from '../action-creator.sync.js'
 
-class Dashboard extends Component {
+class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt everytime
       displayNewMemberDashboard: false,
       displayNotifBtn: false,
       displayWebdavBtn: false,
       displayCalendarBtn: false
+    }
+  }
+
+  async componentDidMount () {
+    const { workspaceIdInUrl } = this.state
+    const { user, workspaceList, app, contentType, dispatch } = this.props
+
+    console.log('<Dashboard> componentDidMount')
+
+    if (app.length === 0) {
+      const fetchGetAppList = await dispatch(getAppList())
+      if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
+    }
+
+    if (contentType.length === 0) {
+      const fetchGetContentTypeList = await dispatch(getContentTypeList())
+      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
+    }
+
+    if (user.user_id !== -1 && workspaceList.length === 0) {
+      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user.user_id))
+
+      if (fetchGetWorkspaceList.status === 200) {
+        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].workspace_id, true))
+      }
     }
   }
 
@@ -551,4 +587,5 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard
+const mapStateToProps = ({ user, app, contentType, workspaceList }) => ({ user, app, contentType, workspaceList })
+export default connect(mapStateToProps)(Dashboard)

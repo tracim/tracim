@@ -15,7 +15,7 @@ export function appFactory (WrappedComponent) {
       content
     })
 
-    renderCreateContentApp = (appConfig, user, idWorkspace, idfolder) => GLOBAL_renderCreateContentApp({
+    renderCreateContentApp = (appConfig, user, idWorkspace, idFolder) => GLOBAL_renderCreateContentApp({
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
@@ -25,7 +25,7 @@ export function appFactory (WrappedComponent) {
         apiHeader: FETCH_CONFIG.headers
       },
       idWorkspace,
-      idfolder
+      idFolder
     })
 
     emitEventApp = (type, data) => GLOBAL_dispatchEvent(type, data)

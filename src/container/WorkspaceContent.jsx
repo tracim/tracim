@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import appFactory from '../appFactory.js'
 import { PAGE } from '../helper.js'
 import Sidebar from './Sidebar.jsx'
@@ -64,7 +64,7 @@ class WorkspaceContent extends React.Component {
     const { workspaceIdInUrl } = this.state
     const { user, workspaceList, app, contentType, match, location, dispatch } = this.props
 
-    console.log('componentDidMount')
+    console.log('<WorkspaceContent> componentDidMount')
 
     if (app.length === 0) {
       const fetchGetAppList = await dispatch(getAppList())
@@ -100,16 +100,25 @@ class WorkspaceContent extends React.Component {
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    console.log('componentDidUpdate')
+  async componentDidUpdate (prevProps, prevState) {
+    const { match, location, dispatch } = this.props
+
+    console.log('<WorkspaceContent> componentDidUpdate')
 
     if (this.state.workspaceIdInUrl === null) return
 
-    const idWorkspace = parseInt(this.props.match.params.idws)
+    const idWorkspace = parseInt(match.params.idws)
 
     if (isNaN(idWorkspace)) return
 
-    if (prevState.workspaceIdInUrl !== idWorkspace) this.setState({workspaceIdInUrl: idWorkspace})
+    if (prevState.workspaceIdInUrl !== idWorkspace) {
+      this.setState({workspaceIdInUrl: idWorkspace})
+
+      const wsContent = await dispatch(getWorkspaceContentList(idWorkspace, 0))
+
+      if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
+      else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+    }
 
     // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, idWorkspace))
   }
@@ -183,9 +192,7 @@ class WorkspaceContent extends React.Component {
       <div className='sidebarpagecontainer'>
         <Sidebar />
 
-        <Route path={`${match.url}/:type/:idcts`} render={() =>
-          <OpenContentApp idWorkspace={match.params.idws} appOpened={this.state.appOpened} updateAppOpened={this.handleUpdateAppOpened} />}
-        />
+        <OpenContentApp idWorkspace={match.params.idws} appOpened={this.state.appOpened} updateAppOpened={this.handleUpdateAppOpened} />
 
         <PageWrapper customeClass='workspace'>
           <PageTitle

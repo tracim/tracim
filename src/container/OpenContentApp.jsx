@@ -10,7 +10,8 @@ export class OpenContentApp extends React.Component {
     if (isNaN(idWorkspace)) return
 
     if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContent.id !== -1 && workspaceContent.length) {
-      // @TODO test validity of params, idcts isNaN and type includes list of available content type
+      if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
+
       const contentToOpen = {
         content_id: parseInt(match.params.idcts),
         workspace_id: parseInt(idWorkspace),

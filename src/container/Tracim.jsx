@@ -11,7 +11,8 @@ import WorkspaceContent from './WorkspaceContent.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route,
-  withRouter
+  withRouter,
+  Switch
 } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute.jsx'
 import { PAGE } from '../helper.js'
@@ -54,14 +55,13 @@ class Tracim extends React.Component {
             <div className='tracim__content'> {/* uses of <Switch> component in react router ? */}
               <Route path={PAGE.LOGIN} component={Login} />
 
-              <PrivateRoute exact path={PAGE.HOME} component={WorkspaceContent} />
+              <Switch>
+                <PrivateRoute path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
+                <PrivateRoute path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
+                <PrivateRoute path={PAGE.WORKSPACE.CONTENT(':idws', ':type?', ':idcts?')} component={WorkspaceContent} />
+              </Switch>
+
               <PrivateRoute path={PAGE.ACCOUNT} component={Account} />
-              {/* bellow, the '?' is important, it avoid to have to declare another route for CONTENT_LIST which could double match */}
-              {/* <PrivateRoute path={PAGE.WORKSPACE.CONTENT(':idws', ':type?', ':idcts?')} component={WorkspaceContent} /> */}
-
-              <Route path='/workspaces/:idws/' component={WorkspaceContent} />
-
-              <PrivateRoute exact path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
               <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
               <Footer />

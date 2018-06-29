@@ -15,7 +15,7 @@ export const PAGE = {
     NEW: '/workspaces/new',
     CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
     CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
-    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/workspaces/${idws}/${type}/${idcts}`,
+    CONTENT: (idws = ':idws', type = ':type?', idcts = ':idcts?') => `/workspaces/${idws}/${type}/${idcts}`,
     CONTENT_NEW: (idws = ':idws', ctstype = ':ctstype') => `/workspaces/${idws}/contents/${ctstype}/new`,
     CONTENT_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/edit`,
     CONTENT_TITLE_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/title/edit`,
