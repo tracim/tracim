@@ -70,12 +70,6 @@ class RoleApi(object):
         )
         return workspace
 
-    @classmethod
-    def create_role(cls) -> UserRoleInWorkspace:
-        role = UserRoleInWorkspace()
-
-        return role
-
     def __init__(
         self,
         session: Session,
@@ -107,7 +101,7 @@ class RoleApi(object):
         with_notif: bool,
         flush: bool=True
     ) -> UserRoleInWorkspace:
-        role = self.create_role()
+        role = UserRoleInWorkspace()
         role.user_id = user.user_id
         role.workspace = workspace
         role.role = role_level
