@@ -17,9 +17,9 @@ export const SelectStatus = props => {
         aria-haspopup='true'
         aria-expanded='false'
       >
-        {props.t('Input.SelectStatus.validated')}
+        {props.selectedStatus.label}
         <div className='selectStatus__dropdownbtn__icon'>
-          <i className='fa fa-check' />
+          <i className={`fa fa-${props.selectedStatus.faIcon}`} />
         </div>
       </button>
 
@@ -28,33 +28,20 @@ export const SelectStatus = props => {
 
         <div className='dropdown-divider' />
 
-        <button className='selectStatus__submenu__item current  dropdown-item' type='button'>
-          {props.t('Input.SelectStatus.ongoing')}
-          <div className='selectStatus__submenu__item__icon'>
-            <i className='fa fa-gears' />
-          </div>
-        </button>
-
-        <button className='selectStatus__submenu__item check dropdown-item' type='button'>
-          {props.t('Input.SelectStatus.validated')}
-          <div className='selectStatus__submenu__item__icon'>
-            <i className='fa fa-check' />
-          </div>
-        </button>
-
-        <button className='selectStatus__submenu__item invalid dropdown-item' type='button'>
-          {props.t('Input.SelectStatus.unvalidated')}
-          <div className='selectStatus__submenu__item__icon'>
-            <i className='fa fa-times' />
-          </div>
-        </button>
-
-        <button className='selectStatus__submenu__item ban dropdown-item' type='button'>
-          {props.t('Input.SelectStatus.obsolete')}
-          <div className='selectStatus__submenu__item__icon'>
-            <i className='fa fa-ban' />
-          </div>
-        </button>
+        {props.availableStatus.map(s =>
+          <button
+            className='selectStatus__submenu__item current dropdown-item'
+            type='button'
+            onClick={() => props.onChangeStatus(s.slug)}
+            key={`status_${s.slug}`}
+            style={{color: s.hexcolor}}
+          >
+            {s.label /* props.t('Input.SelectStatus.ongoing') */}
+            <div className='selectStatus__submenu__item__icon'>
+              <i className={`fa fa-${s.faIcon}`} />
+            </div>
+          </button>
+        )}
       </div>
     </div>
   )

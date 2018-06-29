@@ -3,9 +3,9 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import StatusContent from '../OptionComponent/StatusContent.jsx'
 import NewVersionBtn from '../OptionComponent/NewVersionBtn.jsx'
 import EditContent from '../OptionComponent/EditContent.jsx'
+import SelectStatus from '../Input/SelectStatus/SelectStatus.jsx'
 
 const PopinFixedOption = props => {
   translate.setI18n(props.i18n ? props.i18n : i18n) // mandatory to allow Apps to overrides trad
@@ -16,9 +16,16 @@ const PopinFixedOption = props => {
 
         <NewVersionBtn onClickNewVersionBtn={props.onClickNewVersionBtn} />
 
-        <StatusContent />
+        <SelectStatus
+          selectedStatus={props.selectedStatus}
+          availableStatus={props.availableStatus}
+          onChangeStatus={props.onChangeStatus}
+        />
 
-        <EditContent />
+        <EditContent
+          onClickArchiveBtn={props.onClickArchive}
+          onClickDeleteBtn={props.onClickDelete}
+        />
 
       </div>
     </div>
@@ -28,11 +35,15 @@ const PopinFixedOption = props => {
 export default translate()(PopinFixedOption)
 
 PopinFixedOption.propTypes = {
+  selectedStatus: PropTypes.object,
+  availableStatus: PropTypes.array,
   i18n: PropTypes.object, // translate resource to overrides default one,
-  onClickNewVersionBtn: PropTypes.func
+  onClickNewVersionBtn: PropTypes.func,
+  onChangeStatus: PropTypes.func
 }
 
 PopinFixedOption.defaultProps = {
+  availableStatus: [],
   i18n: {},
   onClickNewVersionBtn: () => {}
 }

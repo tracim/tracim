@@ -22,21 +22,60 @@ ReactDOM.render(
     <PopinFixed customClass={`${'randomClass'}`}>
       <PopinFixedHeader
         customClass={`${'randomClass'}`}
-        icon={'fa fa-file-word-o'}
+        faIcon={'fa fa-file-word-o'}
         name={'test exemple'}
         onClickCloseBtn={() => {}}
       />
 
-      <PopinFixedOption customClass={`${'randomClass'}`} />
+      <PopinFixedOption
+        customClass={`${'randomClass'}`}
+        onClickNewVersionBtn={() => {}}
+        selectedStatus={{
+          label: 'Open',
+          slug: 'open',
+          faIcon: 'square-o',
+          hexcolor: '#3f52e3',
+          globalStatus: 'open'
+        }}
+        availableStatus={[{
+          label: 'Open',
+          slug: 'open',
+          faIcon: 'square-o',
+          hexcolor: '#3f52e3',
+          globalStatus: 'open'
+        }, {
+          label: 'Validated',
+          slug: 'closed-validated',
+          faIcon: 'check-square-o',
+          hexcolor: '#008000',
+          globalStatus: 'closed'
+        }, {
+          label: 'Cancelled',
+          slug: 'closed-unvalidated',
+          faIcon: 'close',
+          hexcolor: '#f63434',
+          globalStatus: 'closed'
+        }, {
+          label: 'Deprecated',
+          slug: 'closed-deprecated',
+          faIcon: 'warning',
+          hexcolor: '#ababab',
+          globalStatus: 'closed'
+        }]}
+        onChangeStatus={newStatus => console.log('newStatus', newStatus)}
+        onClickArchive={() => console.log('btn archive clicked')}
+        onClickDelete={() => console.log('btn delete clicked')}
+      />
 
       <PopinFixedContent customClass={`${'randomClass'}__contentpage`}>
         <div>
           <Delimiter />
           <span>Here will be the app content. Style is handled by the app (obviously)</span>
           <BtnSwitch />
-          <TextAreaApp customClass={'randomClass'} text={'woot'} />
+          {/* <TextAreaApp customClass={'randomClass'} text={'woot'} /> */}
         </div>
 
+        {/*
         <Timeline
           customClass={`${'randomClass'}__contentpage`}
           loggedUser={{
@@ -46,6 +85,7 @@ ReactDOM.render(
           }}
           timelineData={TimelineDebugData}
         />
+        */}
       </PopinFixedContent>
     </PopinFixed>
   </div>
