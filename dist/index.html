@@ -20,38 +20,6 @@
   <script src='./html-documents.app.dev.js'></script>
 
   <script type='text/javascript'>
-    GLOBAL_renderApp = app => {
-      switch (app.appData.name) {
-        case 'PageHtml':
-          appPageHtml.renderApp('appContainer'); break
-        case 'Thread':
-          appThread.renderApp('appContainer'); break
-      }
-    }
-
-    GLOBAL_dispatchEvent = (data) => {
-      var event = new CustomEvent('appCustomEvent', {detail: data})
-      document.dispatchEvent(event)
-    }
-
-    GLOBAL_unmountApp = () => {
-      switch (appName) {
-        case 'PageHtml':
-          appPageHtml.hideApp('appContainer'); break
-        case 'Thread':
-          appThread.hideApp('appContainer'); break
-      }
-    }
-
-    // only usefull if app doesn't handle fileContent himself
-    GLOBAL_handleRequireRedraw = () => {
-      var rez = appA.destroyApp('app')
-      if (rez) GLOBAL_drawApp('redraw')
-      else console.log('Erreur, failed at destroying app')
-    }
-  </script>
-
-  <script type='text/javascript'>
     // appPageHtml.renderApp('content')
   </script>
 </body>

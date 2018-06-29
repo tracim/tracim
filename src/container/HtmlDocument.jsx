@@ -195,6 +195,45 @@ class HtmlDocument extends React.Component {
       })
   }
 
+  handleChangeStatus = async newStatus => {
+    const { config, content } = this.state
+
+    const fetchResultSaveEditStatus = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}/status`, {
+      ...FETCH_CONFIG,
+      method: 'PUT',
+      body: JSON.stringify({
+        status: newStatus
+      })
+    })
+
+    handleFetchResult(fetchResultSaveEditStatus)
+      .then(resSave => {
+        if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
+          console.warn('Error saving html-document comment. Result:', resSave, 'content:', content, 'config:', config)
+        } else {
+          this.loadContent()
+        }
+      })
+  }
+
+  handleClickArchive = async () => {
+    console.log('archive')
+    // const { config, content } = this.state
+    //
+    // const fetchResultArchive = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archive`, {
+    //   ...FETCH_CONFIG,
+    //   method: 'PUT'
+    // })
+  }
+  handleClickDelete = async () => {
+    console.log('delete')
+    // const { config, content } = this.state
+    // const fetchResultDelete = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/delete`, {
+    //   ...FETCH_CONFIG,
+    //   method: 'PUT'
+    // })
+  }
+
   render () {
     const { isVisible, loggedUser, content, timeline, newComment, config } = this.state
 
@@ -212,7 +251,12 @@ class HtmlDocument extends React.Component {
 
         <PopinFixedOption
           customClass={`${config.slug}`}
+          availableStatus={config.availableStatuses}
           onClickNewVersionBtn={this.handleClickNewVersion}
+          onChangeStatus={this.handleChangeStatus}
+          selectedStatus={config.availableStatuses.find(s => s.slug === content.status)} // peut être vide avant que api reponde
+          onClickArchive={this.handleClickArchive}
+          onClickDelete={this.handleClickDelete}
           i18n={i18n}
         />
 

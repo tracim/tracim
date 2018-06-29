@@ -27,7 +27,32 @@ export const debug = {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
       // 'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
-    }
+    },
+    availableStatuses: [{
+      label: 'Open',
+      slug: 'open',
+      faIcon: 'square-o',
+      hexcolor: '#3f52e3',
+      globalStatus: 'open'
+    }, {
+      label: 'Validated',
+      slug: 'closed-validated',
+      faIcon: 'check-square-o',
+      hexcolor: '#008000',
+      globalStatus: 'closed'
+    }, {
+      label: 'Cancelled',
+      slug: 'closed-unvalidated',
+      faIcon: 'close',
+      hexcolor: '#f63434',
+      globalStatus: 'closed'
+    }, {
+      label: 'Deprecated',
+      slug: 'closed-deprecated',
+      faIcon: 'warning',
+      hexcolor: '#ababab',
+      globalStatus: 'closed'
+    }]
   },
   loggedUser: { // @FIXME this object is outdated
     user_id: 5,
