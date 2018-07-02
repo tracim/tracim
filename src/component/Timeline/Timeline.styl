@@ -3,9 +3,9 @@
 .timeline
   display flex
   flex-direction column
-  margin 10px
+  margin 10px 10px 10px 5px
   border-radius 10px
-  height 100%
+  height calc(100% - 10px) // 10px => margin
   &__header
     flex 0 1 auto
     border-radius 10px 10px 0 0
@@ -54,7 +54,9 @@
       width 100%
       background-color lightGrey
       &__btn
-        padding 5px 25px
+        display flex
+        justify-content center
+        padding 5px 20px
         border-radius 5px
         width 145px
         color white
