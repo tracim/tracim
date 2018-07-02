@@ -92,8 +92,8 @@
     </script>
 
     <script type='text/javascript'>
-      $(document).ready(function () {
-        wysiwyg = function () {
+      (function () {
+        wysiwyg = function (selector, handleOnChange) {
           function base64EncodeAndTinyMceInsert (files) {
             for (var i = 0; i < files.length; i++) {
               if (files[i].size > 1000000)
@@ -126,9 +126,7 @@
           });
 
           tinymce.init({
-            /*editor_deselector : "notawysiwygtext", // class="notawysiwygtext" will not have tinyMCE
-            editor_selector : "wysiwygtext", // class="wysiwygtext" will.*/
-            selector: 'textarea',
+            selector: selector,
             // height: 130,
             // width: 530,
             menubar: false,
@@ -144,6 +142,10 @@
               '//www.tinymce.com/css/codepen.min.css'
             ],
             setup: function ($editor) {
+              $editor.on('change', function(e) {
+                handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
+              })
+
               //////////////////////////////////////////////
               // add custom btn to handle image by selecting them with system explorer
               $editor.addButton('customInsertImage', {
@@ -168,19 +170,17 @@
               //////////////////////////////////////////////
               // Handle drag & drop image into TinyMce by encoding them in base64 (to avoid uploading them somewhere and keep saving comment in string format)
               $editor
-              .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
-                e.preventDefault()
-                e.stopPropagation()
-              })
-              .on('drop', function(e) {
-                base64EncodeAndTinyMceInsert(e.dataTransfer.files)
-              })
+                .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                })
+                .on('drop', function(e) {
+                  base64EncodeAndTinyMceInsert(e.dataTransfer.files)
+                })
             }
-          });
+          })
         }
-
-        wysiwyg()
-      })
+      })()
     </script>
   </body>
 </html>
