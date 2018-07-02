@@ -13,7 +13,8 @@ from tracim import CFG
 from tracim.models.auth import User
 from tracim.models.auth import Group
 from sqlalchemy.orm.exc import NoResultFound
-from tracim.exceptions import WrongUserPassword, UserDoesNotExist
+from tracim.exceptions import UserDoesNotExist
+from tracim.exceptions import WrongUserPassword
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.context_models import UserInContext
 
@@ -68,7 +69,17 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc  # nopep8
         return user
 
+    def get_one_by_public_name(self, public_name: str) -> User:
+        """
+        Get one user by public_name
+        """
+        try:
+            user = self._base_query().filter(User.display_name == public_name).one()
+        except NoResultFound as exc:
+            raise UserDoesNotExist('User "{}" not found in database'.format(public_name)) from exc  # nopep8
+        return user
     # FIXME - G.M - 24-04-2018 - Duplicate method with get_one.
+
     def get_one_by_id(self, id: int) -> User:
         return self.get_one(user_id=id)
 
@@ -83,6 +94,19 @@ class UserApi(object):
     def get_all(self) -> typing.Iterable[User]:
         return self._session.query(User).order_by(User.display_name).all()
 
+    def find_one(self, user_email_or_public_name: str) -> User:
+        user = None
+        try:
+            user = self.get_one_by_email(email=user_email_or_public_name)
+        except UserDoesNotExist:
+            # INFO - G.M - 2018-07-183 - we discard this exception in order
+            # allow secondary check (public_name)
+            pass
+
+        if not user:
+            user = self.get_one_by_public_name(user_email_or_public_name)
+
+        return user
     # Check methods
 
     def user_with_email_exists(self, email: str) -> bool:

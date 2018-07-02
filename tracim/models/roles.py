@@ -28,7 +28,7 @@ class WorkspaceRoles(Enum):
         """ Return valid label associated to role"""
         # TODO - G.M - 2018-06-180 - Make this work correctly
         return self.slug
-    
+
     @classmethod
     def get_all_valid_role(cls) -> typing.List['WorkspaceRoles']:
         """

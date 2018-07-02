@@ -10,13 +10,16 @@ from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import WorkspaceMemberInvitation
 from tracim.models.context_models import WorkspaceUpdate
+from tracim.models.context_models import RoleUpdate
 from tracim.models.context_models import CommentCreation
 from tracim.models.context_models import TextBasedContentUpdate
 from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentPath
 from tracim.models.context_models import MoveParams
 from tracim.models.context_models import WorkspaceAndContentPath
+from tracim.models.context_models import WorkspaceAndUserPath
 from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
@@ -91,6 +94,15 @@ class ContentIdPathSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, required=True)
 
 
+class WorkspaceAndUserIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndUserPath(**data)
+
+
 class WorkspaceAndContentIdPathSchema(
     WorkspaceIdPathSchema,
     ContentIdPathSchema
@@ -106,6 +118,7 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
         description='id of a comment related to content content_id',
         required=True
     )
+
     @post_load
     def make_path_object(self, data):
         return CommentPath(**data)
@@ -148,6 +161,34 @@ class FilterContentQuerySchema(marshmallow.Schema):
     def make_content_filter(self, data):
         return ContentFilter(**data)
 ###
+
+
+class RoleUpdateSchema(marshmallow.Schema):
+    role = marshmallow.fields.String(
+        example='contributor',
+        validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+    )
+
+    @post_load
+    def make_role(self, data):
+        return RoleUpdate(**data)
+
+
+class WorkspaceMemberInviteSchema(RoleUpdateSchema):
+    user_id = marshmallow.fields.Int(
+        example=5,
+        default=None,
+        allow_none=True,
+    )
+    user_email_or_public_name = marshmallow.fields.String(
+        example='suri@cate.fr',
+        default=None,
+        allow_none=True,
+    )
+
+    @post_load
+    def make_role(self, data):
+        return WorkspaceMemberInvitation(**data)
 
 
 class BasicAuthSchema(marshmallow.Schema):

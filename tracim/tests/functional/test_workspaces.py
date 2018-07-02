@@ -307,6 +307,228 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
+    def test_api__create_workspace_member_role__ok_200__user_id(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': 2,
+            'user_email_or_public_name': None,
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id'] == 2
+        assert user_role_found['workspace_id'] == 1
+
+        res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        assert len(res) == 2
+        user_role = res[0]
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+        user_role = res[1]
+        assert user_role_found == user_role
+
+    def test_api__create_workspace_member_role__ok_200__user_email(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id'] == 2
+        assert user_role_found['workspace_id'] == 1
+
+        res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        assert len(res) == 2
+        user_role = res[0]
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+        user_role = res[1]
+        assert user_role_found == user_role
+
+    def test_api__create_workspace_member_role__ok_200__user_public_name(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': 'Lawrence L.',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id'] == 2
+        assert user_role_found['workspace_id'] == 1
+
+        res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        assert len(res) == 2
+        user_role = res[0]
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+        user_role = res[1]
+        assert user_role_found == user_role
+
+    def test_api__create_workspace_member_role__err_400__nothing(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': None,
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+
+    def test_api__create_workspace_member_role__err_400__wrong_user_id(self):
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': 47,
+            'user_email_or_public_name': None,
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+
+    def test_api__create_workspace_member_role__err_400__wrong_user_email_or_public_name(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': 'nothing@nothing.nothing',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=400,
+            params=params,
+        )
+
+    def test_api__update_workspace_member_role__ok_200__nominal_case(self):
+        """
+        Update worskpace member role
+        """
+        # before
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        assert len(res) == 1
+        user_role = res[0]
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+        # update workspace role
+        params = {
+            'role': 'content-manager',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/members/1',
+            status=200,
+            params=params,
+        )
+        user_role = res.json_body
+        assert user_role['role'] == 'content-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+        # after
+        res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        assert len(res) == 1
+        user_role = res[0]
+        assert user_role['role'] == 'content-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+
 
 class TestWorkspaceContents(FunctionalTest):
     """
@@ -364,7 +586,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
 
     # Root related
-    def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(self):
+    def test_api__get_workspace_content__ok_200__get_all_root_content__legacy_html_slug(self):  # nopep8
         """
         Check obtain workspace all root contents
         """

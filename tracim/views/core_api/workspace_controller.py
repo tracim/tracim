@@ -1,6 +1,10 @@
 import typing
 import transaction
 from pyramid.config import Configurator
+
+from tracim.lib.core.user import UserApi
+from tracim.models.roles import WorkspaceRoles
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -20,11 +24,15 @@ from tracim.models.data import ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
 from tracim.exceptions import EmptyLabelNotAllowed
+from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FilterContentQuerySchema
+from tracim.views.core_api.schemas import WorkspaceMemberInviteSchema
+from tracim.views.core_api.schemas import RoleUpdateSchema
 from tracim.views.core_api.schemas import WorkspaceCreationSchema
 from tracim.views.core_api.schemas import WorkspaceModifySchema
+from tracim.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim.views.core_api.schemas import ContentMoveSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.views.core_api.schemas import ContentCreationSchema
@@ -126,6 +134,83 @@ class WorkspaceController(Controller):
             rapi.get_user_role_workspace_with_context(user_role)
             for user_role in roles
         ]
+
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @hapic.input_path(WorkspaceAndUserIdPathSchema())
+    @hapic.input_body(RoleUpdateSchema())
+    @hapic.output_body(WorkspaceMemberSchema())
+    def update_workspaces_members_role(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None
+    ) -> UserRoleWorkspaceInContext:
+        """
+        Update Members to this workspace
+        """
+        app_config = request.registry.settings['CFG']
+        rapi = RoleApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+
+        role = rapi.get_one(
+            user_id=hapic_data.path.user_id,
+            workspace_id=hapic_data.path.workspace_id,
+        )
+        workspace_role = WorkspaceRoles.get_role_from_slug(hapic_data.body.role)
+        role = rapi.update_role(
+            role,
+            role_level=workspace_role.level
+        )
+        return rapi.get_user_role_workspace_with_context(role)
+
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.input_body(WorkspaceMemberInviteSchema())
+    @hapic.output_body(WorkspaceMemberSchema())
+    def create_workspaces_members_role(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None
+    ) -> UserRoleWorkspaceInContext:
+        """
+        Add Members to this workspace
+        """
+        app_config = request.registry.settings['CFG']
+        rapi = RoleApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        uapi = UserApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        if hapic_data.body.user_id is not None:
+            user = uapi.get_one(user_id=hapic_data.body.user_id)
+        elif hapic_data.body.user_email_or_public_name:
+            user = uapi.find_one(
+                user_email_or_public_name=hapic_data.body.user_email_or_public_name  # nopep8
+            )
+        else:
+            raise UserDoesNotExist(
+                'user_id or user_email_or_public_name should have '
+                'valid value.'
+            )
+        role = rapi.create_one(
+            user=user,
+            workspace=request.current_workspace,
+            role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
+            with_notif=False,
+            flush=True,
+        )
+        return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -388,6 +473,12 @@ class WorkspaceController(Controller):
         # Workspace Members (Roles)
         configurator.add_route('workspace_members', '/workspaces/{workspace_id}/members', request_method='GET')  # nopep8
         configurator.add_view(self.workspaces_members, route_name='workspace_members')  # nopep8
+        # Update Workspace Members roles
+        configurator.add_route('update_workspace_member', '/workspaces/{workspace_id}/members/{user_id}', request_method='PUT')  # nopep8
+        configurator.add_view(self.update_workspaces_members_role, route_name='update_workspace_member')  # nopep8
+        # Create Workspace Members roles
+        configurator.add_route('create_workspace_member', '/workspaces/{workspace_id}/members', request_method='POST')  # nopep8
+        configurator.add_view(self.create_workspaces_members_role, route_name='create_workspace_member')  # nopep8
         # Workspace Content
         configurator.add_route('workspace_content', '/workspaces/{workspace_id}/contents', request_method='GET')  # nopep8
         configurator.add_view(self.workspace_content, route_name='workspace_content')  # nopep8

@@ -3,6 +3,7 @@ import typing
 
 from tracim import CFG
 from tracim.models.context_models import UserRoleWorkspaceInContext
+from tracim.models.roles import WorkspaceRoles
 
 __author__ = 'damien'
 
@@ -92,6 +93,29 @@ class RoleApi(object):
 
     def get_one(self, user_id: int, workspace_id: int) -> UserRoleInWorkspace:
         return self._get_one_rsc(user_id, workspace_id).one()
+
+    def update_role(
+        self,
+        role: UserRoleInWorkspace,
+        role_level: int,
+        with_notif: typing.Optional[bool] = None,
+        save_now: bool=False,
+    ):
+        """
+        Update role of user in this workspace
+        :param role: UserRoleInWorkspace object
+        :param role_level: level of new role wanted
+        :param with_notif: is user notification enabled in this workspace ?
+        :param save_now: database flush
+        :return: updated role
+        """
+        role.role = role_level
+        if with_notif is not None:
+            role.do_notify == with_notif
+        if save_now:
+            self.save(role)
+
+        return role
 
     def create_one(
         self,

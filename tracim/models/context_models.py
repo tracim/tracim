@@ -9,7 +9,8 @@ from tracim.models import User
 from tracim.models.auth import Profile
 from tracim.models.data import Content
 from tracim.models.data import ContentRevisionRO
-from tracim.models.data import Workspace, UserRoleInWorkspace
+from tracim.models.data import Workspace
+from tracim.models.data import UserRoleInWorkspace
 from tracim.models.roles import WorkspaceRoles
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
@@ -44,6 +45,15 @@ class WorkspaceAndContentPath(object):
         self.workspace_id = workspace_id
 
 
+class WorkspaceAndUserPath(object):
+    """
+    Paths params with workspace id and user_id
+    """
+    def __init__(self, workspace_id: int, user_id: int):
+        self.workspace_id = workspace_id
+        self.user_id = workspace_id
+
+
 class CommentPath(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -74,6 +84,32 @@ class ContentFilter(object):
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
+
+
+class RoleUpdate(object):
+    """
+    Update role
+    """
+    def __init__(
+        self,
+        role: str,
+    ):
+        self.role = role
+
+
+class WorkspaceMemberInvitation(object):
+    """
+    Workspace Member Invitation
+    """
+    def __init__(
+        self,
+        user_id: int,
+        user_email_or_public_name: str,
+        role: str,
+    ):
+        self.role = role
+        self.user_email_or_public_name = user_email_or_public_name
+        self.user_id = user_id
 
 
 class WorkspaceUpdate(object):
