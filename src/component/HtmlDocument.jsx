@@ -4,7 +4,7 @@ import { MODE } from '../helper.js'
 
 const HtmlDocument = props => {
   return (
-    <div className='wsContentHtmlDocument__contentpage__textnote'>
+    <div className='wsContentHtmlDocument__contentpage__textnote html-documents__contentpage__textnote'>
       {props.mode === MODE.VIEW &&
         <div>
           <div className='html-documents__contentpage__textnote__latestversion' dangerouslySetInnerHTML={{__html: props.version}} />
@@ -14,7 +14,7 @@ const HtmlDocument = props => {
 
       {props.mode === MODE.EDIT &&
         <TextAreaApp
-          customClass={'wsContentHtmlDocument'}
+          customClass={'html-documents__editionmode'}
           onClickCancelBtn={props.onClickCloseEditMode}
           onClickValidateBtn={props.onClickValidateBtn}
           text={props.text}

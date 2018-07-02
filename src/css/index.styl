@@ -5,6 +5,10 @@ btncolor()
   box-shadow 0 0 1px 2px htmlColor
   color off-white
 
+btnState()
+  background-color darkHtmlColor
+  color off-white
+
 .html-documents
   width 1155px
   &__header
@@ -18,7 +22,9 @@ btncolor()
     border-color htmlColor
     color fontColor
     &:hover, &:focus, &:visited, &:active
-      btncolor()
+      btnState()
+      border-color darkHtmlColor
+      box-shadow none
   .optionicon
     &:hover, &:focus, &:active
       color htmlColor
@@ -27,16 +33,19 @@ btncolor()
       &:hover, &:focus, &:active, &visited, &:focus-within
         background-color htmlColor
         color off-white
-  &__cancel
-    border-color htmlColor
-    &:hover, &:focus, &:active, &:visited, &focus-within
+  &__editionmode
+    &__cancel
       border-color htmlColor
-      btncolor()
-  &__submit
-    border-color htmlColor
-    &:hover, &:focus, &:active, &:visited, &focus-within
+      color htmlColor
+      &:hover, &:focus, &:active, &:visited, &focus-within
+        border-color htmlColor
+        btncolor()
+    &__submit
       border-color htmlColor
-      btncolor()
+      color htmlColor
+      &:hover, &:focus, &:active, &:visited, &focus-within
+        border-color htmlColor
+        btncolor()
   &__contentpage
     &__textnote
       margin 10px
@@ -70,10 +79,8 @@ btncolor()
             margin-right 10px
             color darkGrey
             font-size 22px
-          &:hover
-            background-color darkHtmlColor
-          &:focus
-            background-color darkHtmlColor
+          &:hover, &:focus
+            btnState()
         &__date
           color fontColor
           font-size 17px
@@ -83,16 +90,15 @@ btncolor()
           color fontColor
           border-color htmlColor
           &:hover ,&:focus, &:visited, &:active
-            border-color htmlColor
-            btncolor()
+            btnState()
+            border-color darkHtmlColor
+            box-shadow none
       &__submit
         &__btn
-          border-color htmlColor
           background-color htmlColor
           color white
           &:hover, &:focus, &:visited, &:active
-            border-color htmlColor
-            background-color htmlColor
+            background-color darkHtmlColor
 
 .messagelistOpen
   .page__contentpage__messagelist
