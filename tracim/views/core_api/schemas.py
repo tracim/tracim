@@ -10,6 +10,7 @@ from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import WorkspaceUpdate
 from tracim.models.context_models import CommentCreation
 from tracim.models.context_models import TextBasedContentUpdate
 from tracim.models.context_models import SetContentStatus
@@ -171,6 +172,23 @@ class BasicAuthSchema(marshmallow.Schema):
 
 class LoginOutputHeaders(marshmallow.Schema):
     expire_after = marshmallow.fields.String()
+
+
+class WorkspaceModifySchema(marshmallow.Schema):
+    label = marshmallow.fields.String(
+        example='My Workspace',
+    )
+    description = marshmallow.fields.String(
+        example='A super description of my workspace.',
+    )
+
+    @post_load
+    def make_workspace_modifications(self, data):
+        return WorkspaceUpdate(**data)
+
+
+class WorkspaceCreationSchema(WorkspaceModifySchema):
+    pass
 
 
 class NoContentSchema(marshmallow.Schema):

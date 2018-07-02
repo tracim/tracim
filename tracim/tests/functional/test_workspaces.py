@@ -83,6 +83,91 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['hexcolor'] == "#757575"
         assert sidebar_entry['fa_icon'] == "calendar"
 
+    def test_api__update_workspace__ok_200__nominal_case(self) -> None:
+        """
+        Test update workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'superworkspace',
+            'description': 'mysuperdescription'
+        }
+        # Before
+        res = self.testapp.get(
+            '/api/v2/workspaces/1',
+            status=200
+        )
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace['workspace_id'] == 1
+        assert workspace['slug'] == 'business'
+        assert workspace['label'] == 'Business'
+        assert workspace['description'] == 'All importants documents'
+        assert len(workspace['sidebar_entries']) == 7
+
+        # modify workspace
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1',
+            status=200,
+            params=params,
+        )
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace['workspace_id'] == 1
+        assert workspace['slug'] == 'superworkspace'
+        assert workspace['label'] == 'superworkspace'
+        assert workspace['description'] == 'mysuperdescription'
+        assert len(workspace['sidebar_entries']) == 7
+
+        # after
+        res = self.testapp.get(
+            '/api/v2/workspaces/1',
+            status=200
+        )
+        assert res.json_body
+        workspace = res.json_body
+        assert workspace['workspace_id'] == 1
+        assert workspace['slug'] == 'superworkspace'
+        assert workspace['label'] == 'superworkspace'
+        assert workspace['description'] == 'mysuperdescription'
+        assert len(workspace['sidebar_entries']) == 7
+
+    def test_api__create_workspace__ok_200__nominal_case(self) -> None:
+        """
+        Test create workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'superworkspace',
+            'description': 'mysuperdescription'
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces',
+            status=200,
+            params=params,
+        )
+        assert res.json_body
+        workspace = res.json_body
+        workspace_id = res.json_body['workspace_id']
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace_2 = res.json_body
+        assert workspace == workspace_2
+
     def test_api__get_workspace__err_400__unallowed_user(self) -> None:
         """
         Check obtain workspace unreachable for user

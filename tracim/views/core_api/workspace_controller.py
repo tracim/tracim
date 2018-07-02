@@ -12,6 +12,8 @@ from tracim.lib.core.workspace import WorkspaceApi
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.userworkspace import RoleApi
 from tracim.lib.utils.authorization import require_workspace_role
+from tracim.lib.utils.authorization import require_profile
+from tracim.models import Group
 from tracim.lib.utils.authorization import require_candidate_workspace_role
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import ActionDescription
@@ -21,6 +23,8 @@ from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FilterContentQuerySchema
+from tracim.views.core_api.schemas import WorkspaceCreationSchema
+from tracim.views.core_api.schemas import WorkspaceModifySchema
 from tracim.views.core_api.schemas import ContentMoveSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.views.core_api.schemas import ContentCreationSchema
@@ -45,7 +49,6 @@ class WorkspaceController(Controller):
         """
         Get workspace informations
         """
-        wid = hapic_data.path['workspace_id']
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
@@ -53,6 +56,50 @@ class WorkspaceController(Controller):
             config=app_config,
         )
         return wapi.get_workspace_with_context(request.current_workspace)
+
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.input_body(WorkspaceModifySchema())
+    @hapic.output_body(WorkspaceSchema())
+    def update_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Update workspace informations
+        """
+        app_config = request.registry.settings['CFG']
+        wapi = WorkspaceApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        wapi.update_workspace(
+            request.current_workspace,
+            label=hapic_data.body.label,
+            description=hapic_data.body.description,
+            save_now=True,
+        )
+        return wapi.get_workspace_with_context(request.current_workspace)
+
+    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @require_profile(Group.TIM_MANAGER)
+    @hapic.input_body(WorkspaceCreationSchema())
+    @hapic.output_body(WorkspaceSchema())
+    def create_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        create workspace
+        """
+        app_config = request.registry.settings['CFG']
+        wapi = WorkspaceApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        workspace = wapi.create_workspace(
+            label=hapic_data.body.label,
+            description=hapic_data.body.description,
+            save_now=True,
+        )
+        return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -332,6 +379,12 @@ class WorkspaceController(Controller):
         # Workspace
         configurator.add_route('workspace', '/workspaces/{workspace_id}', request_method='GET')  # nopep8
         configurator.add_view(self.workspace, route_name='workspace')
+        # Create workspace
+        configurator.add_route('create_workspace', '/workspaces', request_method='POST')  # nopep8
+        configurator.add_view(self.create_workspace, route_name='create_workspace')  # nopep8
+        # Update Workspace
+        configurator.add_route('update_workspace', '/workspaces/{workspace_id}', request_method='PUT')  # nopep8
+        configurator.add_view(self.update_workspace, route_name='update_workspace')  # nopep8
         # Workspace Members (Roles)
         configurator.add_route('workspace_members', '/workspaces/{workspace_id}/members', request_method='GET')  # nopep8
         configurator.add_view(self.workspaces_members, route_name='workspace_members')  # nopep8

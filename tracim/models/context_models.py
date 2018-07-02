@@ -76,6 +76,19 @@ class ContentFilter(object):
         self.show_active = bool(show_active)
 
 
+class WorkspaceUpdate(object):
+    """
+    Update workspace
+    """
+    def __init__(
+        self,
+        label: str,
+        description: str,
+    ):
+        self.label = label
+        self.description = description
+
+
 class ContentCreation(object):
     """
     Content creation model

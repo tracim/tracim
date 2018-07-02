@@ -105,6 +105,29 @@ class WorkspaceApi(object):
 
         return workspace
 
+    def update_workspace(
+            self,
+            workspace: Workspace,
+            label: str,
+            description: str,
+            save_now: bool=False,
+    ) -> Workspace:
+        """
+        Update workspace
+        :param workspace: workspace to update
+        :param label: new label of workspace
+        :param description: new description
+        :param save_now: database flush
+        :return: updated workspace
+        """
+        workspace.label = label
+        workspace.description = description
+
+        if save_now:
+            self.save(workspace)
+
+        return workspace
+
     def get_one(self, id):
         return self._base_query().filter(Workspace.workspace_id == id).one()
 
