@@ -6,7 +6,8 @@ require('./TextAreaApp.styl')
 export const TextAreaApp = props =>
   <form className={`${props.customClass} editionmode`}>
     <textarea
-      className={`${props.customClass}__text editionmode__text wysiwygtext`}
+      id={props.id}
+      className={`${props.customClass}__text editionmode__text`}
       value={props.text}
       onChange={props.onChangeText}
     />
@@ -37,5 +38,6 @@ TextAreaApp.propTypes = {
   onChangeText: PropTypes.func.isRequired,
   onClickCancelBtn: PropTypes.func.isRequired,
   onClickValidateBtn: PropTypes.func.isRequired,
+  id: PropTypes.string,
   customClass: PropTypes.string
 }
