@@ -63,6 +63,8 @@ btnState()
     &__messagelist
       // min-height 300px
       &__item
+        &__avatar
+          background-color darkHtmlColor
         &__content
           color darkGrey
       &__version
@@ -101,12 +103,12 @@ btnState()
             background-color darkHtmlColor
 
 .messagelistOpen
-  .page__contentpage__messagelist
+  .timeline__messagelist
     flex 0
     min-height 0
 
 .received
-  .page__contentpage__messagelist__item__content
+  .timeline__messagelist__item__content
     background-color htmlColor
 
 @media (min-width: max-xs) and (max-width: max-lg)
