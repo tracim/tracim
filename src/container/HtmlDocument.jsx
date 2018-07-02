@@ -46,7 +46,7 @@ class HtmlDocument extends React.Component {
     if (this.state.content.content_id === -1) return // debug case
 
     this.loadContent()
-    wysiwyg()
+    // wysiwyg()
   }
 
   componentDidUpdate (prevProps, prevState) {
