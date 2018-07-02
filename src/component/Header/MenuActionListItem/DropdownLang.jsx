@@ -14,12 +14,12 @@ const DropdownLang = props => {
           aria-haspopup='true'
           aria-expanded='false'
         >
-          <img className='languagedropdown__btnlanguage__imgselected' src={activeLang.src} alt={activeLang.name} />
+          <img className='languagedropdown__btnlanguage__imgselected' src={activeLang.src} />
         </button>
         <div className='languagedropdown__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
           { props.langList.map((l, i) => l.active === false &&
             <div className='subdropdown__link dropdown-item' onClick={() => props.onChangeLang(l.id)} key={i}>
-              <img className='subdropdown__flag' src={l.src} alt={l.name} />
+              <img className='subdropdown__flag' src={l.src} />
             </div>
           )}
         </div>
