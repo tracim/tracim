@@ -7,7 +7,7 @@ const ContentItem = props => {
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug)
   return (
     <div className={classnames('content', 'align-items-center', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
-      <div className='content__type'>
+      <div className='content__type' style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-${props.faIcon}`} />
       </div>
 
