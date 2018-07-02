@@ -27,8 +27,8 @@
     -->
 
     <script src='/app/html-documents.app.js'></script>
-    <script src='/app/thread.app.js'></script>
-    <script src='/app/file.app.js'></script>
+    <!-- <script src='/app/thread.app.js'></script>
+    <script src='/app/file.app.js'></script> -->
 
     <script src="/dev/jquery-3.2.1.js"></script>
     <script src="/dev/popper-1.12.3.js"></script>
@@ -126,8 +126,10 @@
           });
 
           tinymce.init({
+            /*editor_deselector : "notawysiwygtext", // class="notawysiwygtext" will not have tinyMCE
+            editor_selector : "wysiwygtext", // class="wysiwygtext" will.*/
             selector: 'textarea',
-            height: 130,
+            // height: 130,
             // width: 530,
             menubar: false,
             resize: false,
