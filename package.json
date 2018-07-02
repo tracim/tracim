@@ -51,6 +51,7 @@
       "history",
       "btoa",
       "wysiwyg",
+      "tinymce",
       "GLOBAL_renderApp",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"

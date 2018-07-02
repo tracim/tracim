@@ -22,6 +22,7 @@ class HtmlDocument extends React.Component {
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
       newComment: '',
+      timelineWysiwyg: false,
       mode: MODE.VIEW
     }
 
@@ -43,21 +44,22 @@ class HtmlDocument extends React.Component {
 
   componentDidMount () {
     console.log('HtmlDocument did mount')
-    if (this.state.content.content_id === -1) return // debug case
 
     this.loadContent()
-    wysiwyg()
   }
 
   componentDidUpdate (prevProps, prevState) {
-    console.log('HtmlDocument did update', prevState, this.state)
-    if (!prevState.content || !this.state.content) return
+    const { state } = this
 
-    if (prevState.content.content_id !== this.state.content.content_id) {
-      this.loadContent()
-    }
+    console.log('HtmlDocument did update', prevState, state)
+    if (!prevState.content || !state.content) return
 
-    if (prevState.mode === MODE.VIEW && this.state.mode === MODE.EDIT) wysiwyg()
+    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+
+    if (state.mode === MODE.EDIT) wysiwyg('#wysiwygNewVersion', this.handleChangeText)
+
+    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
+    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
   }
 
   loadContent = async () => {
@@ -120,10 +122,7 @@ class HtmlDocument extends React.Component {
     fetch(`${this.state.config.apiUrl}/workspaces/${this.state.content.workspace_id}/html-documents/${this.state.content.content_id}`, {
       ...FETCH_CONFIG,
       method: 'PUT',
-      body: JSON.stringify({
-        label: label,
-        raw_content: rawContent
-      })
+      body: JSON.stringify({label: label, raw_content: rawContent})
     })
 
   handleClickBtnCloseApp = () => {
@@ -141,11 +140,10 @@ class HtmlDocument extends React.Component {
       })
   }
 
-  handleClickNewVersion = () => {
-    this.setState({ mode: MODE.EDIT })
-  }
+  handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
 
   handleCloseNewVersion = () => {
+    tinymce.remove('#wysiwygNewVersion')
     this.setState({ mode: MODE.VIEW })
   }
 
@@ -166,7 +164,7 @@ class HtmlDocument extends React.Component {
   }
 
   handleChangeText = e => {
-    const newText = e.target.value // because SyntheticEvent is pooled (react specificity
+    const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({content: {...prev.content, raw_content: newText}}))
   }
 
@@ -190,12 +188,15 @@ class HtmlDocument extends React.Component {
       .then(resSave => {
         if (resSave.apiResponse.status === 200) {
           this.setState({newComment: ''})
+          if (this.state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
           this.loadContent()
         } else {
           console.warn('Error saving html-document comment. Result:', resSave, 'content:', content, 'config:', config)
         }
       })
   }
+
+  handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
     const { config, content } = this.state
@@ -237,7 +238,7 @@ class HtmlDocument extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, config } = this.state
+    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config } = this.state
 
     if (!isVisible) return null
 
@@ -256,7 +257,7 @@ class HtmlDocument extends React.Component {
           availableStatus={config.availableStatuses}
           onClickNewVersionBtn={this.handleClickNewVersion}
           onChangeStatus={this.handleChangeStatus}
-          selectedStatus={config.availableStatuses.find(s => s.slug === content.status)} // peut être vide avant que api reponde
+          selectedStatus={config.availableStatuses.find(s => s.slug === content.status)} // might be empty while api hasn't responded yet
           onClickArchive={this.handleClickArchive}
           onClickDelete={this.handleClickDelete}
           i18n={i18n}
@@ -265,6 +266,7 @@ class HtmlDocument extends React.Component {
         <PopinFixedContent customClass={`${config.slug}__contentpage`}>
           <HtmlDocumentComponent
             mode={this.state.mode}
+            wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
             onClickValidateBtn={this.handleSaveHtmlDocument}
             version={timeline.filter(t => t.timelineType === 'revision').length}
@@ -278,8 +280,10 @@ class HtmlDocument extends React.Component {
             loggedUser={loggedUser}
             timelineData={timeline}
             newComment={newComment}
+            wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+            onClickWysiwygBtn={this.handleToggleWysiwyg}
           />
         </PopinFixedContent>
       </PopinFixed>

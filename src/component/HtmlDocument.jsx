@@ -14,6 +14,7 @@ const HtmlDocument = props => {
 
       {props.mode === MODE.EDIT &&
         <TextAreaApp
+          id={props.wysiwygNewVersion}
           customClass={'html-documents__editionmode'}
           onClickCancelBtn={props.onClickCloseEditMode}
           onClickValidateBtn={props.onClickValidateBtn}
