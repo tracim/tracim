@@ -27,14 +27,14 @@ class WorkspaceMenuEntry(object):
 dashboard_menu_entry = WorkspaceMenuEntry(
   slug='dashboard',
   label='Dashboard',
-  route='/workspaces/{workspace_id}/dashboard',
+  route='/#/workspaces/{workspace_id}/dashboard',
   hexcolor='#252525',
   fa_icon="",
 )
 all_content_menu_entry = WorkspaceMenuEntry(
   slug="contents/all",
   label="All Contents",
-  route="/workspaces/{workspace_id}/contents",
+  route="/#/workspaces/{workspace_id}/contents",
   hexcolor="#fdfdfd",
   fa_icon="",
 )

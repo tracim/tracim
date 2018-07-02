@@ -26,7 +26,7 @@ class Application(object):
         @param main_route: the route of the frontend "home" screen of
         the application. For exemple, if you have an application
         called "calendar", the main route will be something
-        like /workspace/{wid}/calendar.
+        like /#/workspace/{wid}/calendar.
         """
         self.label = label
         self.slug = slug
@@ -45,7 +45,7 @@ calendar = Application(
     hexcolor='#757575',
     is_active=True,
     config={},
-    main_route='/workspaces/{workspace_id}/calendar',
+    main_route='/#/workspaces/{workspace_id}/calendar',
 )
 
 thread = Application(
@@ -55,7 +55,7 @@ thread = Application(
     hexcolor='#ad4cf9',
     is_active=True,
     config={},
-    main_route='/workspaces/{workspace_id}/contents?type=thread',
+    main_route='/#/workspaces/{workspace_id}/contents?type=thread',
 
 )
 
@@ -66,7 +66,7 @@ _file = Application(
     hexcolor='#FF9900',
     is_active=True,
     config={},
-    main_route='/workspaces/{workspace_id}/contents?type=file',
+    main_route='/#/workspaces/{workspace_id}/contents?type=file',
 )
 
 markdownpluspage = Application(
@@ -76,7 +76,7 @@ markdownpluspage = Application(
     hexcolor='#f12d2d',
     is_active=True,
     config={},
-    main_route='/workspaces/{workspace_id}/contents?type=markdownpluspage',
+    main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
 )
 
 html_documents = Application(
@@ -86,7 +86,7 @@ html_documents = Application(
     hexcolor='#3f52e3',
     is_active=True,
     config={},
-    main_route='/workspaces/{workspace_id}/contents?type=html-documents',
+    main_route='/#/workspaces/{workspace_id}/contents?type=html-documents',
 )
 # TODO - G.M - 08-06-2018 - This is hardcoded lists of app, make this dynamic.
 # List of applications
