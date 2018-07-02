@@ -37,7 +37,7 @@ export function appFactory (WrappedComponent) {
           renderApp={this.renderApp}
           renderCreateContentApp={this.renderCreateContentApp}
           emitEventApp={this.emitEventApp}
-          hideApp={this.hideApp}
+          // hideApp={this.hideApp}
         />
       )
     }

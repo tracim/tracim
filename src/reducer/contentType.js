@@ -12,9 +12,9 @@ export function contentType (state = [], action) {
         availableStatuses: ct.available_statuses.map(as => ({
           label: as.label,
           slug: as.slug,
-          fa_icon: as.fa_icon,
+          faIcon: as.fa_icon,
           hexcolor: as.hexcolor,
-          global_status: as.global_status
+          globalStatus: as.global_status
         }))
       }))
 
