@@ -41,7 +41,7 @@ class HtmlDocument extends React.Component {
         this.setState({isVisible: false})
         break
       case 'html-documents_reloadContent':
-        this.setState({content: data})
+        this.setState(prev => ({content: {...prev.content, ...data}}))
     }
   }
 

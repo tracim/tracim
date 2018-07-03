@@ -34,7 +34,7 @@ const appInterface = {
       , document.getElementById(data.config.domContainer)
     )
   },
-  hideApp: domId => {
+  unmountApp: domId => {
     return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   },
   renderPopupCreation: data => {
