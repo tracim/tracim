@@ -28,7 +28,7 @@ export function appFactory (WrappedComponent) {
       idFolder
     })
 
-    emitEventApp = (type, data) => GLOBAL_dispatchEvent(type, data)
+    emitEventApp = (type, data) => GLOBAL_dispatchEvent({ type, data })
 
     render () {
       return (

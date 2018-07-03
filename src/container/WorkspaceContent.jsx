@@ -123,6 +123,10 @@ class WorkspaceContent extends React.Component {
     // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, idWorkspace))
   }
 
+  componentWillUnmount () {
+    this.props.emitEventApp('unmount_app')
+  }
+
   handleClickContentItem = content => {
     console.log('content clicked', content)
     this.props.history.push(`/workspaces/${content.idWorkspace}/${content.type}/${content.id}`)

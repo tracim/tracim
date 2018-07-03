@@ -78,7 +78,12 @@
 
         switch (type) {
           case 'hide_popupCreateContent':
-            getSelectedApp(data.name).hideApp('popupCreateContentContainer')
+            getSelectedApp(data.name).unmountApp('popupCreateContentContainer')
+            break
+          case 'unmount_app':
+            prevSelectedApp.unmountApp('appContainer')
+            prevSelectedApp.unmountApp('popupCreateContentContainer')
+            prevSelectedApp.isRendered = false
             break
         }
       }

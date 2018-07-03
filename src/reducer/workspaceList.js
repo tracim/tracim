@@ -3,6 +3,8 @@ import {
   USER_ROLE
 } from '../action-creator.sync.js'
 
+const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route
+
 export function workspaceList (state = [], action) {
   switch (action.type) {
     case `Update/${WORKSPACE_LIST}`:
@@ -13,7 +15,7 @@ export function workspaceList (state = [], action) {
         description: ws.description,
         sidebarEntry: ws.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
-          route: sbe.route,
+          route: handleRouteFromApi(sbe.route),
           faIcon: sbe.fa_icon,
           hexcolor: sbe.hexcolor,
           label: sbe.label
