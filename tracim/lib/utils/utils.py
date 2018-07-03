@@ -5,6 +5,7 @@ from rq import Queue
 
 from tracim.config import CFG
 
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
 

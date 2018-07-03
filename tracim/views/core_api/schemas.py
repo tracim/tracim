@@ -3,6 +3,7 @@ import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import OneOf
 
+from tracim.lib.utils.utils import DATETIME_FORMAT
 from tracim.models.auth import Profile
 from tracim.models.contents import CONTENT_DEFAULT_TYPE
 from tracim.models.contents import CONTENT_DEFAULT_STATUS
@@ -47,7 +48,7 @@ class UserSchema(UserDigestSchema):
         example='suri.cate@algoo.fr'
     )
     created = marshmallow.fields.DateTime(
-        format='%Y-%m-%dT%H:%M:%SZ',
+        format=DATETIME_FORMAT,
         description='User account creation date',
     )
     is_active = marshmallow.fields.Bool(
@@ -391,12 +392,12 @@ class ContentDigestSchema(marshmallow.Schema):
 class ContentSchema(ContentDigestSchema):
     current_revision_id = marshmallow.fields.Int(example=12)
     created = marshmallow.fields.DateTime(
-        format='%Y-%m-%dT%H:%M:%SZ',
+        format=DATETIME_FORMAT,
         description='Content creation date',
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
     modified = marshmallow.fields.DateTime(
-        format='%Y-%m-%dT%H:%M:%SZ',
+        format=DATETIME_FORMAT,
         description='date of last modification of content',
     )
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
@@ -426,7 +427,7 @@ class RevisionSchema(ContentDigestSchema):
     comment_ids = marshmallow.fields.List(marshmallow.fields.Int(example=4))
     revision_id = marshmallow.fields.Int(example=12)
     created = marshmallow.fields.DateTime(
-        format='%Y-%m-%dT%H:%M:%SZ',
+        format=DATETIME_FORMAT,
         description='Content creation date',
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
@@ -458,7 +459,7 @@ class CommentSchema(marshmallow.Schema):
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
-        format='%Y-%m-%dT%H:%M:%SZ',
+        format=DATETIME_FORMAT,
         description='comment creation date',
     )
 
