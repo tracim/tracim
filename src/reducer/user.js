@@ -23,7 +23,10 @@ const defaultUser = {
 export default function user (state = defaultUser, action) {
   switch (action.type) {
     case `Set/${USER_CONNECTED}`:
-      return action.user
+      return {
+        ...action.user,
+        avatar_url: 'https://www.algoo.fr/static/images/people_images/PERSO_SEUL.png' // @FIXME use avatar from api when db handles it
+      }
 
     case `Set/${USER_DISCONNECTED}`:
       return defaultUser
