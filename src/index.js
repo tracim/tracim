@@ -17,6 +17,10 @@ import libDelimiter from './component/Delimiter/Delimiter.jsx'
 import libCardPopup from './component/CardPopup/CardPopup.jsx'
 import libCardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
+import libNewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
+import libArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
+import libSelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
+
 export const langFr = fr
 export const langEn = en
 
@@ -36,3 +40,7 @@ export const Delimiter = libDelimiter
 
 export const CardPopup = libCardPopup
 export const CardPopupCreateContent = libCardPopupCreateContent
+
+export const NewVersionBtn = libNewVersionBtn
+export const ArchiveDeleteContent = libArchiveDeleteContent
+export const SelectStatus = libSelectStatus

@@ -17,6 +17,7 @@ export const SelectStatus = props => {
         aria-haspopup='true'
         aria-expanded='false'
         style={{color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent'}}
+        disabled={props.disabled}
       >
         {props.selectedStatus ? props.selectedStatus.label : ''}
         <div className='selectStatus__dropdownbtn__icon'>

@@ -48,8 +48,9 @@ class Timeline extends React.Component {
                 return <Revision
                   customClass={props.customClass}
                   createdAt={content.created}
-                  number={props.timelineData.filter(c => c.timelineType === 'revision' && c.revision_id <= content.revision_id).length}
+                  number={content.number}
                   key={`revision_${content.revision_id}`}
+                  onClickRevision={() => props.onClickRevisionBtn(content)}
                 />
             }
           })}
@@ -63,6 +64,7 @@ class Timeline extends React.Component {
               placeholder='Taper votre message ici'
               value={props.newComment}
               onChange={props.onChangeNewComment}
+              disabled={props.disableComment}
             />
           </div>
 
@@ -74,6 +76,7 @@ class Timeline extends React.Component {
                   `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn btn btn-outline-primary`
                 )}
                 onClick={props.onClickWysiwygBtn}
+                disabled={props.disableComment}
               >
                 {props.wysiwyg ? 'Text Simple' : 'Texte Avancé'}
               </button>
@@ -84,6 +87,7 @@ class Timeline extends React.Component {
                 type='button'
                 className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__texteditor__submit__btn btn')}
                 onClick={props.onClickValidateNewCommentBtn}
+                disabled={props.disableComment}
               >
                 Envoyer
                 <div
@@ -106,13 +110,16 @@ Timeline.propTypes = {
   newComment: PropTypes.string.isRequired,
   onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
+  disableComment: PropTypes.bool,
   customClass: PropTypes.string,
   loggedUser: PropTypes.object,
   wysiwyg: PropTypes.bool,
-  onClickWysiwygBtn: PropTypes.func
+  onClickWysiwygBtn: PropTypes.func,
+  onClickRevisionBtn: PropTypes.func
 }
 
 Timeline.defaultProps = {
+  disableComment: false,
   customClass: '',
   loggedUser: {
     id: '',
