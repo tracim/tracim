@@ -26,7 +26,8 @@ from tracim.exceptions import WorkspaceNotFound, ContentTypeNotAllowed
 from tracim.exceptions import InsufficientUserWorkspaceRole
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
-from tracim.models.context_models import ContentInContext, RevisionInContext
+from tracim.models.context_models import ContentInContext
+from tracim.models.context_models import RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import thread_type
 from tracim.models.revision_protection import new_revision

@@ -23,7 +23,8 @@ from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.lib.utils.authorization import require_content_types
 from tracim.lib.utils.authorization import require_workspace_role
-from tracim.exceptions import WorkspaceNotFound, ContentTypeNotAllowed
+from tracim.exceptions import WorkspaceNotFound
+from tracim.exceptions import ContentTypeNotAllowed
 from tracim.exceptions import InsufficientUserWorkspaceRole
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
