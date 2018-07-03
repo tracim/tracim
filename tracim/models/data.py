@@ -812,9 +812,9 @@ class Content(DeclarativeBase):
     # QUERY CONTENTS
 
     To query contents you will need to join your content query with ContentRevisionRO. Join
-    condition is available at tracim.lib.content.ContentApi#get_revision_join:
+    condition is available at tracim.lib.content.ContentApi#_get_revision_join:
 
-    content = DBSession.query(Content).join(ContentRevisionRO, ContentApi.get_revision_join())
+    content = DBSession.query(Content).join(ContentRevisionRO, ContentApi._get_revision_join())
                   .filter(Content.label == 'foo')
                   .one()
 

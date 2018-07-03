@@ -161,14 +161,14 @@ class ContentApi(object):
             self._show_deleted = previous_show_deleted
             self._show_temporary = previous_show_temporary
 
-    def get_content_in_context(self, content: Content):
+    def get_content_in_context(self, content: Content) -> ContentInContext:
         return ContentInContext(content, self._session, self._config)
 
-    def get_revision_in_context(self, revision: ContentRevisionRO):
+    def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:  # nopep8
         # TODO - G.M - 2018-06-173 - create revision in context object
         return RevisionInContext(revision, self._session, self._config)
     
-    def get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
+    def _get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
         Return the Content/ContentRevision query join condition
         :return: Content/ContentRevision query join condition
@@ -187,7 +187,7 @@ class ContentApi(object):
         :return: Content/ContentRevision Query
         """
         return self._session.query(Content)\
-            .join(ContentRevisionRO, self.get_revision_join())
+            .join(ContentRevisionRO, self._get_revision_join())
 
     @classmethod
     def sort_tree_items(
