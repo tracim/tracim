@@ -48,12 +48,15 @@ btnState()
         btncolor()
   &__contentpage
     &__textnote
-      margin 10px
+      margin 10px 5px 10px 10px
       border-radius 10px
       padding 25px
       height 100%
       background-color off-white
       &__latestversion
+        display flex
+        justify-content flex-end
+        align-items center
         text-align right
         opacity 0.7
       &__text
@@ -61,7 +64,7 @@ btnState()
       &__edition
         display none
     &__messagelist
-      // min-height 300px
+      min-height 300px
       &__item
         &__avatar
           background-color darkHtmlColor
