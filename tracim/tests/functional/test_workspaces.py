@@ -39,14 +39,14 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['label'] == 'Dashboard'
         assert sidebar_entry['route'] == '/#/workspaces/1/dashboard'  # nopep8
         assert sidebar_entry['hexcolor'] == "#252525"
-        assert sidebar_entry['fa_icon'] == ""
+        assert sidebar_entry['fa_icon'] == "signal"
 
         sidebar_entry = workspace['sidebar_entries'][1]
         assert sidebar_entry['slug'] == 'contents/all'
         assert sidebar_entry['label'] == 'All Contents'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents"  # nopep8
         assert sidebar_entry['hexcolor'] == "#fdfdfd"
-        assert sidebar_entry['fa_icon'] == ""
+        assert sidebar_entry['fa_icon'] == "th"
 
         sidebar_entry = workspace['sidebar_entries'][2]
         assert sidebar_entry['slug'] == 'contents/html-documents'
@@ -60,7 +60,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['label'] == 'Markdown Plus Documents'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=markdownpluspage"    # nopep8
         assert sidebar_entry['hexcolor'] == "#f12d2d"
-        assert sidebar_entry['fa_icon'] == "file-code"
+        assert sidebar_entry['fa_icon'] == "file-code-o"
 
         sidebar_entry = workspace['sidebar_entries'][4]
         assert sidebar_entry['slug'] == 'contents/files'
@@ -81,7 +81,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['label'] == 'Calendar'
         assert sidebar_entry['route'] == "/#/workspaces/1/calendar"  # nopep8
         assert sidebar_entry['hexcolor'] == "#757575"
-        assert sidebar_entry['fa_icon'] == "calendar-alt"
+        assert sidebar_entry['fa_icon'] == "calendar"
 
     def test_api__get_workspace__err_403__unallowed_user(self) -> None:
         """

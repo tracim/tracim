@@ -33,7 +33,7 @@ class TestApplicationEndpoint(FunctionalTest):
         application = res[1]
         assert application['label'] == "Markdown Plus Documents"
         assert application['slug'] == 'contents/markdownpluspage'
-        assert application['fa_icon'] == 'file-code'
+        assert application['fa_icon'] == 'file-code-o'
         assert application['hexcolor'] == '#f12d2d'
         assert application['is_active'] is True
         assert 'config' in application
@@ -54,7 +54,7 @@ class TestApplicationEndpoint(FunctionalTest):
         application = res[4]
         assert application['label'] == "Calendar"
         assert application['slug'] == 'calendar'
-        assert application['fa_icon'] == 'calendar-alt'
+        assert application['fa_icon'] == 'calendar'
         assert application['hexcolor'] == '#757575'
         assert application['is_active'] is True
         assert 'config' in application
@@ -116,7 +116,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
 
         content_type = res[2]
         assert content_type['slug'] == 'markdownpage'
-        assert content_type['fa_icon'] == 'file-code'
+        assert content_type['fa_icon'] == 'file-code-o'
         assert content_type['hexcolor'] == '#f12d2d'
         assert content_type['label'] == 'Rich Markdown File'
         assert content_type['creation_label'] == 'Create a Markdown document'
