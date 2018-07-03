@@ -39,7 +39,7 @@ class CommentController(Controller):
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(CommentSchema(many=True),)
+    @hapic.output_body(CommentSchema(many=True))
     def content_comments(self, context, request: TracimRequest, hapic_data=None):
         """
         Get all comments related to a content in asc order (first is the oldest)
@@ -70,7 +70,7 @@ class CommentController(Controller):
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetCommentSchema())
-    @hapic.output_body(CommentSchema(),)
+    @hapic.output_body(CommentSchema())
     def add_comment(self, context, request: TracimRequest, hapic_data=None):
         """
         Add new comment

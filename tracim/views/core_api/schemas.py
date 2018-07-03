@@ -2,7 +2,6 @@
 import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import OneOf
-from marshmallow.validate import Equal
 
 from tracim.lib.utils.utils import DATETIME_FORMAT
 from tracim.models.auth import Profile
@@ -11,15 +10,14 @@ from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
-from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentCreation
+from tracim.models.context_models import TextBasedContentUpdate
+from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentPath
 from tracim.models.context_models import MoveParams
 from tracim.models.context_models import WorkspaceAndContentPath
 from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
-from tracim.models.context_models import HTMLDocumentUpdate
-from tracim.models.context_models import ThreadUpdate
 from tracim.models.data import UserRoleInWorkspace
 
 
@@ -407,20 +405,15 @@ class ContentSchema(ContentDigestSchema):
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
 
-class ThreadContentSchema(ContentSchema):
-    content_type = marshmallow.fields.Str(
-        example='thread',
-        validate=Equal(ContentType('thread').slug)
+class TextBasedDataAbstractSchema(marshmallow.Schema):
+    raw_content = marshmallow.fields.String(
+        description='Content of the object, may be raw text or <b>html</b> for example'  # nopep8
     )
-    raw_content = marshmallow.fields.String('Description of Thread')
 
 
-class HtmlDocumentContentSchema(ContentSchema):
-    content_type = marshmallow.fields.Str(
-        example='html-documents',
-        validate=Equal(ContentType('html-documents').slug),
-    )
-    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
+class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
+    pass
+
 
 #####
 # Revision
@@ -437,23 +430,9 @@ class RevisionSchema(ContentDigestSchema):
     author = marshmallow.fields.Nested(UserDigestSchema)
 
 
-class ThreadRevisionSchema(RevisionSchema):
-    content_type = marshmallow.fields.Str(
-        example='thread',
-        validate=Equal(ContentType('thread').slug),
-    )
-    raw_content = marshmallow.fields.String('Description of Thread')
+class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
+    pass
 
-
-class HtmlDocumentRevisionSchema(RevisionSchema):
-    content_type = marshmallow.fields.Str(
-        example='html-documents',
-        validate=Equal(ContentType('html-documents').slug),
-    )
-    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
-
-
-####
 
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6)
@@ -468,37 +447,28 @@ class CommentSchema(marshmallow.Schema):
     )
 
 
-class ContentModifySchema(marshmallow.Schema):
+class SetCommentSchema(marshmallow.Schema):
+    raw_content = marshmallow.fields.String(
+        example='<p>This is just an html comment !</p>'
+    )
+
+    @post_load()
+    def create_comment(self, data):
+        return CommentCreation(**data)
+
+
+class ContentModifyAbstractSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
         example='contract for client XXX',
         description='New title of the content'
     )
 
 
-class HtmlDocumentModifySchema(ContentModifySchema):
-    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
+class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep8
 
     @post_load
-    def html_document_update(self, data):
-        return HTMLDocumentUpdate(**data)
-
-
-class ThreadModifySchema(ContentModifySchema):
-    raw_content = marshmallow.fields.String('Description of Thread')
-
-    @post_load
-    def thread_update(self, data):
-        return ThreadUpdate(**data)
-
-
-class SetCommentSchema(marshmallow.Schema):
-    raw_content = marshmallow.fields.String(
-        example='<p>This is just an html comment !</p>'
-    )
-
-    @post_load
-    def create_comment(self, data):
-        return CommentCreation(**data)
+    def text_based_content_update(self, data):
+        return TextBasedContentUpdate(**data)
 
 
 class SetContentStatusSchema(marshmallow.Schema):

@@ -15,10 +15,10 @@ from tracim import TracimRequest
 from tracim.extensions import hapic
 from tracim.lib.core.content import ContentApi
 from tracim.views.controllers import Controller
-from tracim.views.core_api.schemas import HtmlDocumentContentSchema
-from tracim.views.core_api.schemas import HtmlDocumentRevisionSchema
+from tracim.views.core_api.schemas import TextBasedContentSchema
+from tracim.views.core_api.schemas import TextBasedRevisionSchema
+from tracim.views.core_api.schemas import TextBasedContentModifySchema
 from tracim.views.core_api.schemas import SetContentStatusSchema
-from tracim.views.core_api.schemas import HtmlDocumentModifySchema
 from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.lib.utils.authorization import require_content_types
@@ -48,7 +48,7 @@ class HTMLDocumentController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(HtmlDocumentContentSchema())
+    @hapic.output_body(TextBasedContentSchema())
     def get_html_document(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         Get html document content
@@ -73,8 +73,8 @@ class HTMLDocumentController(Controller):
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(HtmlDocumentModifySchema())
-    @hapic.output_body(HtmlDocumentContentSchema())
+    @hapic.input_body(TextBasedContentModifySchema())
+    @hapic.output_body(TextBasedContentSchema())
     def update_html_document(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         update_html_document
@@ -111,7 +111,7 @@ class HTMLDocumentController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(HtmlDocumentRevisionSchema(many=True))
+    @hapic.output_body(TextBasedRevisionSchema(many=True))
     def get_html_document_revisions(
             self,
             context,

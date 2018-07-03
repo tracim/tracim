@@ -110,22 +110,9 @@ class SetContentStatus(object):
         self.status = status
 
 
-class HTMLDocumentUpdate(object):
+class TextBasedContentUpdate(object):
     """
-    Html Document update model
-    """
-    def __init__(
-            self,
-            label: str,
-            raw_content: str,
-    ) -> None:
-        self.label = label
-        self.raw_content = raw_content
-
-
-class ThreadUpdate(object):
-    """
-    Thread update model
+    TextBasedContent update model
     """
     def __init__(
             self,
