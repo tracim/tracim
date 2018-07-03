@@ -225,13 +225,13 @@ class TracimRequest(Request):
                 workspace=workspace,
                 parent=content,
             )
-        except JSONDecodeError:
-            raise ContentNotFound('Bad json body')
-        except NoResultFound:
+        except JSONDecodeError as exc:
+            raise ContentNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
             raise ContentNotFound(
                 'Comment {} does not exist '
                 'or is not visible for this user'.format(comment_id)
-            )
+            ) from exc
         return comment
 
     def _get_current_content(
@@ -258,13 +258,13 @@ class TracimRequest(Request):
                 config=request.registry.settings['CFG']
             )
             content = api.get_one(content_id=content_id, workspace=workspace, content_type=ContentType.Any)  # nopep8
-        except JSONDecodeError:
-            raise ContentNotFound('Bad json body')
-        except NoResultFound:
+        except JSONDecodeError as exc:
+            raise ContentNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
             raise ContentNotFound(
                 'Content {} does not exist '
                 'or is not visible for this user'.format(content_id)
-            )
+            ) from exc
         return content
 
     def _get_candidate_user(
@@ -278,7 +278,7 @@ class TracimRequest(Request):
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(None, session=request.dbsession, config=app_config)
-
+        login = ''
         try:
             login = None
             if 'user_id' in request.matchdict:
@@ -301,6 +301,7 @@ class TracimRequest(Request):
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(None, session=request.dbsession, config=app_config)
+        login = ''
         try:
             login = request.authenticated_userid
             if not login:
@@ -333,13 +334,13 @@ class TracimRequest(Request):
                 config=request.registry.settings['CFG']
             )
             workspace = wapi.get_one(workspace_id)
-        except JSONDecodeError:
-            raise WorkspaceNotFound('Bad json body')
-        except NoResultFound:
+        except JSONDecodeError as exc:
+            raise WorkspaceNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
             raise WorkspaceNotFound(
                 'Workspace {} does not exist '
                 'or is not visible for this user'.format(workspace_id)
-            )
+            ) from exc
         return workspace
 
     def _get_candidate_workspace(
@@ -365,11 +366,11 @@ class TracimRequest(Request):
                 config=request.registry.settings['CFG']
             )
             workspace = wapi.get_one(workspace_id)
-        except JSONDecodeError:
-            raise WorkspaceNotFound('Bad json body')
-        except NoResultFound:
+        except JSONDecodeError as exc:
+            raise WorkspaceNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
             raise WorkspaceNotFound(
                 'Workspace {} does not exist '
                 'or is not visible for this user'.format(workspace_id)
-            )
+            ) from exc
         return workspace
