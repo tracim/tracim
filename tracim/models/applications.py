@@ -41,7 +41,7 @@ class Application(object):
 calendar = Application(
     label='Calendar',
     slug='calendar',
-    fa_icon='calendar-alt',
+    fa_icon='calendar',
     hexcolor='#757575',
     is_active=True,
     config={},
@@ -72,7 +72,7 @@ _file = Application(
 markdownpluspage = Application(
     label='Markdown Plus Documents',  # TODO - G.M - 24-05-2018 - Check label
     slug='contents/markdownpluspage',
-    fa_icon='file-code',
+    fa_icon='file-code-o',
     hexcolor='#f12d2d',
     is_active=True,
     config={},
