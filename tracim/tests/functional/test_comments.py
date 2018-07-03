@@ -94,7 +94,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert len(res.json_body) == 4
         assert comment == res.json_body[3]
 
-    def test_api__delete_content_comment__ok_200__workspace_manager_owner(self) -> None:
+    def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:  # nopep8
         """
         delete comment (user is workspace_manager and owner)
         """
@@ -127,7 +127,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert len(res.json_body) == 2
         assert not [content for content in res.json_body if content['content_id'] == 18]  # nopep8
 
-    def test_api__delete_content_comment__ok_200__workspace_manager(self) -> None:
+    def test_api__delete_content_comment__ok_200__user_is_workspace_manager(self) -> None:  # nopep8
         """
         delete comment (user is workspace_manager)
         """
@@ -160,7 +160,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert len(res.json_body) == 2
         assert not [content for content in res.json_body if content['content_id'] == 19]  # nopep8
 
-    def test_api__delete_content_comment__ok_200__content_manager_owner(self) -> None:
+    def test_api__delete_content_comment__ok_200__user_is_owner_and_content_manager(self) -> None:   # nopep8
         """
         delete comment (user is content-manager and owner)
         """
@@ -193,7 +193,7 @@ class TestCommentsEndpoint(FunctionalTest):
         assert len(res.json_body) == 2
         assert not [content for content in res.json_body if content['content_id'] == 19]  # nopep8
 
-    def test_api__delete_content_comment__err_403__content_manager(self) -> None:
+    def test_api__delete_content_comment__err_403__user_is_content_manager(self) -> None:  # nopep8
         """
         delete comment (user is content-manager)
         """
@@ -204,7 +204,7 @@ class TestCommentsEndpoint(FunctionalTest):
                 'foobarbaz'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)
+        res = self.testapp.get('/api/v2/workspaces/2/contents/7/comments', status=200)  #  nopep8
         assert len(res.json_body) == 3
         comment = res.json_body[2]
         assert comment['content_id'] == 20
@@ -223,7 +223,7 @@ class TestCommentsEndpoint(FunctionalTest):
             status=403
         )
 
-    def test_api__delete_content_comment__err_403__reader_owner(self) -> None:
+    def test_api__delete_content_comment__err_403__user_is_owner_and_reader(self) -> None:
         """
         delete comment (user is reader and owner)
         """
@@ -253,7 +253,7 @@ class TestCommentsEndpoint(FunctionalTest):
             status=403
         )
 
-    def test_api__delete_content_comment__err_403__reader(self) -> None:
+    def test_api__delete_content_comment__err_403__user_is_reader(self) -> None:
         """
         delete comment (user is reader)
         """
