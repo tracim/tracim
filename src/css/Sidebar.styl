@@ -43,7 +43,7 @@ leftside()
   &__expand
     position absolute
     top 0
-    right -42px
+    right -43px
     display flex
     justify-content center
     align-items center
@@ -105,13 +105,13 @@ leftside()
           width 100%
           background-color fourthColor
           overflow hidden
+          & > li
+            display block
           &__dropdown
             display flex
             align-items center
-            border-top 1px solid secondColor
+            border-bottom 1px solid secondColor
             cursor pointer
-            &:nth-last-child(1)
-              border-bottom 1px solid secondColor
             &:hover
               background-color thirdColor
             &__showdropdown
@@ -124,6 +124,10 @@ leftside()
               padding 10px 15px
               min-width 50px
               leftside()
+            .dropdown__title
+              white-space nowrap
+              overflow hidden
+              text-overflow ellipsis
             &.activeFilter
               .dropdown__icon
                 background-color rgba(253, 253, 253, 0.8)
