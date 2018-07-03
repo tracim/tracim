@@ -61,7 +61,6 @@ class Header extends React.Component {
           <NavbarToggler />
 
           <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
-
             <MenuLinkList
               onClickFeature={this.handleClickFeature}
               onClickExplore={this.handleClickExplore}
@@ -73,21 +72,23 @@ class Header extends React.Component {
                 onChangeInput={this.handleChangeInput}
                 onClickSubmit={this.handleClickSubmit}
               />
+
               <MenuActionListItemDropdownLang
                 langList={lang}
                 onChangeLang={this.handleChangeLang}
               />
+
               <MenuActionListItemHelp
                 onClickHelp={this.handleClickHelp}
               />
+
+              <MenuActionListItemNotification />
+
               <MenuActionListItemMenuProfil
                 user={user}
                 onClickLogout={this.handleClickLogout}
               />
-
-              <MenuActionListItemNotification />
             </ul>
-
           </div>
         </nav>
       </header>

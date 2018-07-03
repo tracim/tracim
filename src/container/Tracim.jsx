@@ -52,7 +52,7 @@ class Tracim extends React.Component {
         { user.logged === undefined
           ? (<div />) // while we dont know if user is connected, display nothing but the header @TODO show loader
           : (
-            <div className='tracim__content'> {/* uses of <Switch> component in react router ? */}
+            <div className='tracim__content'>
               <Route path={PAGE.LOGIN} component={Login} />
 
               <Switch>
