@@ -50,7 +50,7 @@ class AcceptAllAuthorizationPolicy(object):
 # We prefer to use decorators
 
 
-def require_same_user_or_profile(group: int):
+def require_same_user_or_profile(group: int) -> typing.Callable:
     """
     Decorator for view to restrict access of tracim request if candidate user
     is distinct from authenticated user and not with high enough profile.
@@ -58,9 +58,9 @@ def require_same_user_or_profile(group: int):
     like Group.TIM_USER or Group.TIM_MANAGER
     :return:
     """
-    def decorator(func):
+    def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             auth_user = request.current_user
             candidate_user = request.candidate_user
             if auth_user.user_id == candidate_user.user_id or \
@@ -71,7 +71,7 @@ def require_same_user_or_profile(group: int):
     return decorator
 
 
-def require_profile(group: int):
+def require_profile(group: int) -> typing.Callable:
     """
     Decorator for view to restrict access of tracim request if profile is
     not high enough
@@ -79,9 +79,9 @@ def require_profile(group: int):
     like Group.TIM_USER or Group.TIM_MANAGER
     :return:
     """
-    def decorator(func):
+    def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             user = request.current_user
             if user.profile.id >= group:
                 return func(self, context, request)
@@ -90,7 +90,7 @@ def require_profile(group: int):
     return decorator
 
 
-def require_workspace_role(minimal_required_role: int):
+def require_workspace_role(minimal_required_role: int) -> typing.Callable:
     """
     Restricts access to endpoint to minimal role or raise an exception.
     Check role for current_workspace.
@@ -98,9 +98,9 @@ def require_workspace_role(minimal_required_role: int):
     UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
     :return: decorator
     """
-    def decorator(func):
+    def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             user = request.current_user
             workspace = request.current_workspace
             if workspace.get_user_role(user) >= minimal_required_role:
@@ -111,7 +111,7 @@ def require_workspace_role(minimal_required_role: int):
     return decorator
 
 
-def require_candidate_workspace_role(minimal_required_role: int):
+def require_candidate_workspace_role(minimal_required_role: int) -> typing.Callable:  # nopep8
     """
     Restricts access to endpoint to minimal role or raise an exception.
     Check role for candidate_workspace.
@@ -119,9 +119,9 @@ def require_candidate_workspace_role(minimal_required_role: int):
     UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
     :return: decorator
     """
-    def decorator(func):
+    def decorator(func: typing.Callable) -> typing.Callable:
 
-        def wrapper(self, context, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             user = request.current_user
             workspace = request.candidate_workspace
 
@@ -133,19 +133,19 @@ def require_candidate_workspace_role(minimal_required_role: int):
     return decorator
 
 
-def require_content_types(content_types: typing.List['NewContentType']):
+def require_content_types(content_types: typing.List['NewContentType']) -> typing.Callable:  # nopep8
     """
     Restricts access to specific file type or raise an exception.
     Check role for candidate_workspace.
     :param content_types: list of NewContentType object
     :return: decorator
     """
-    def decorator(func):
+    def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             content = request.current_content
             current_content_type_slug = ContentType(content.type).slug
-            content_types_slug = [content_type.slug for content_type in content_types]
+            content_types_slug = [content_type.slug for content_type in content_types]  # nopep8
             if current_content_type_slug in content_types_slug:
                 return func(self, context, request)
             raise ContentTypeNotAllowed()
@@ -156,19 +156,19 @@ def require_content_types(content_types: typing.List['NewContentType']):
 def require_comment_ownership_or_role(
         minimal_required_role_for_owner: int,
         minimal_required_role_for_anyone: int,
-) -> None:
+) -> typing.Callable:
     """
     Decorator for view to restrict access of tracim request if role is
     not high enough and user is not owner of the current_content
-    :param minimal_required_role_for_owner_access: minimal role for owner
+    :param minimal_required_role_for_owner: minimal role for owner
     of current_content to access to this view
     :param minimal_required_role_for_anyone: minimal role for anyone to
     access to this view.
     :return:
     """
-    def decorator(func):
+    def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
-        def wrapper(self, context, request: 'TracimRequest'):
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             user = request.current_user
             workspace = request.current_workspace
             comment = request.current_comment

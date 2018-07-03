@@ -69,7 +69,7 @@ class TracimRequest(Request):
         :return: Workspace of the request
         """
         if self._current_workspace is None:
-            self._current_workspace = self._get_current_workspace(self.current_user, self)
+            self._current_workspace = self._get_current_workspace(self.current_user, self)   # nopep8
         return self._current_workspace
 
     @current_workspace.setter
@@ -103,7 +103,7 @@ class TracimRequest(Request):
         self._current_user = user
 
     @property
-    def current_content(self) -> User:
+    def current_content(self) -> Content:
         """
         Get current  content from path
         """
@@ -124,7 +124,7 @@ class TracimRequest(Request):
         self._current_content = content
 
     @property
-    def current_comment(self) -> User:
+    def current_comment(self) -> Content:
         """
         Get current comment from path
         """
@@ -145,6 +145,7 @@ class TracimRequest(Request):
             )
         self._current_comment = content
     # TODO - G.M - 24-05-2018 - Find a better naming for this ?
+
     @property
     def candidate_user(self) -> User:
         """
@@ -200,7 +201,7 @@ class TracimRequest(Request):
             workspace: Workspace,
             content: Content,
             request: 'TracimRequest'
-    ):
+    ) -> Content:
         """
         Get current content from request
         :param user: User who want to check the workspace
@@ -238,7 +239,7 @@ class TracimRequest(Request):
             user: User,
             workspace: Workspace,
             request: 'TracimRequest'
-    ):
+    ) -> Content:
         """
         Get current content from request
         :param user: User who want to check the workspace
@@ -325,7 +326,7 @@ class TracimRequest(Request):
             if 'workspace_id' in request.matchdict:
                 workspace_id = request.matchdict['workspace_id']
             if not workspace_id:
-                raise WorkspaceNotFoundInTracimRequest('No workspace_id property found in request')
+                raise WorkspaceNotFoundInTracimRequest('No workspace_id property found in request')  # nopep8
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
@@ -357,7 +358,7 @@ class TracimRequest(Request):
             if 'new_workspace_id' in request.json_body:
                 workspace_id = request.json_body['new_workspace_id']
             if not workspace_id:
-                raise WorkspaceNotFoundInTracimRequest('No new_workspace_id property found in body')
+                raise WorkspaceNotFoundInTracimRequest('No new_workspace_id property found in body')  # nopep8
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
