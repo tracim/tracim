@@ -132,7 +132,7 @@ class Content(Fixture):
             content_type=ContentType.Page,
             workspace=recipe_workspace,
             parent=dessert_folder,
-            label='Tiramisu Recipes !!!',
+            label='Tiramisu Recipes!!!',
             do_save=True,
             do_notify=False,
         )
@@ -144,7 +144,7 @@ class Content(Fixture):
             content_api.update_content(
                 item=tiramisu_page,
                 new_content='<p>To cook a greet Tiramisu, you need many ingredients.</p>',  # nopep8
-                new_label='Tiramisu Recipes !!!',
+                new_label='Tiramisu Recipes!!!',
             )
             content_api.save(tiramisu_page)
 
@@ -280,12 +280,12 @@ class Content(Fixture):
 
         content_api.create_comment(
             parent=best_cake_thread,
-            content='<p> What is for you the best cake ever ? </br> I personnally vote for Chocolate cupcake !</p>',  # nopep8
+            content='<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>',  # nopep8
             do_save=True,
         )
         bob_content_api.create_comment(
             parent=best_cake_thread,
-            content='<p>What about Apple Pie ? There are Awesome !</p>',
+            content='<p>What about Apple Pie? There are Awesome!</p>',
             do_save=True,
         )
         reader_content_api.create_comment(

@@ -28,7 +28,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[0]
         assert comment['content_id'] == 18
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p> What is for you the best cake ever ? </br> I personnally vote for Chocolate cupcake !</p>'  # nopep8
+        assert comment['raw_content'] == '<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>'  # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -38,7 +38,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[1]
         assert comment['content_id'] == 19
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p>What about Apple Pie ? There are Awesome !</p>'  # nopep8
+        assert comment['raw_content'] == '<p>What about Apple Pie? There are Awesome!</p>'  # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -71,7 +71,7 @@ class TestCommentsEndpoint(FunctionalTest):
             )
         )
         params = {
-            'raw_content': 'I strongly disagree, Tiramisu win !'
+            'raw_content': 'I strongly disagree, Tiramisu win!'
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/2/contents/7/comments',
@@ -81,7 +81,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body
         assert comment['content_id']
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == 'I strongly disagree, Tiramisu win !'
+        assert comment['raw_content'] == 'I strongly disagree, Tiramisu win!'
         assert comment['author']
         assert comment['author']['user_id'] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -110,7 +110,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[0]
         assert comment['content_id'] == 18
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p> What is for you the best cake ever ? </br> I personnally vote for Chocolate cupcake !</p>'   # nopep8
+        assert comment['raw_content'] == '<p>What is for you the best cake ever? </br> I personnally vote for Chocolate cupcake!</p>'   # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 1
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -143,7 +143,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[1]
         assert comment['content_id'] == 19
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p>What about Apple Pie ? There are Awesome !</p>'   # nopep8
+        assert comment['raw_content'] == '<p>What about Apple Pie? There are Awesome!</p>'   # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
@@ -176,7 +176,7 @@ class TestCommentsEndpoint(FunctionalTest):
         comment = res.json_body[1]
         assert comment['content_id'] == 19
         assert comment['parent_id'] == 7
-        assert comment['raw_content'] == '<p>What about Apple Pie ? There are Awesome !</p>'   # nopep8
+        assert comment['raw_content'] == '<p>What about Apple Pie? There are Awesome!</p>'   # nopep8
         assert comment['author']
         assert comment['author']['user_id'] == 3
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url

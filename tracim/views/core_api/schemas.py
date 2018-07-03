@@ -415,7 +415,7 @@ class HtmlDocumentContentSchema(ContentSchema):
         example='html-content',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
-    raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
+    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
 
 #####
 # Revision
@@ -445,7 +445,7 @@ class HtmlDocumentRevisionSchema(RevisionSchema):
         example='html-content',
         validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
     )
-    raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
+    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
 
 
 ####
@@ -471,7 +471,7 @@ class ContentModifySchema(marshmallow.Schema):
 
 
 class HtmlDocumentModifySchema(ContentModifySchema):
-    raw_content = marshmallow.fields.String('<p>Html page Content !</p>')
+    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
 
     @post_load
     def html_document_update(self, data):

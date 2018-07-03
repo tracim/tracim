@@ -313,7 +313,7 @@ class TestWebDav(StandardTest):
         eq_(
             True,
             content_pie.is_deleted,
-            msg='Content should be deleted !'
+            msg='Content should be deleted!'
         )
 
         result = provider.getResourceInst(
@@ -392,7 +392,7 @@ class TestWebDav(StandardTest):
         eq_(
             False,
             content_new_file.is_deleted,
-            msg='Content should not be deleted !'
+            msg='Content should not be deleted!'
         )
         content_new_file_id = content_new_file.content_id
 
@@ -407,7 +407,7 @@ class TestWebDav(StandardTest):
         eq_(
             True,
             content_pie.is_deleted,
-            msg='Content should be deleted !'
+            msg='Content should be deleted!'
         )
 
         result = provider.getResourceInst(
@@ -441,7 +441,7 @@ class TestWebDav(StandardTest):
         eq_(
             True,
             content_pie.is_deleted,
-            msg='Content should be deleted !'
+            msg='Content should be deleted!'
         )
 
         # And an other file exist for this name
@@ -450,12 +450,12 @@ class TestWebDav(StandardTest):
             .order_by(Content.revision_id.desc()) \
             .first()
         assert content_new_new_file.content_id != content_new_file_id,\
-            'Contents ids should not be same !'
+            'Contents ids should not be same!'
 
         eq_(
             False,
             content_new_new_file.is_deleted,
-            msg='Content should not be deleted !'
+            msg='Content should not be deleted!'
         )
 
     def test_unit__rename_content__ok(self):

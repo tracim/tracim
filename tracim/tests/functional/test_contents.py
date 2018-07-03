@@ -206,7 +206,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
-        assert revision['label'] == 'Tiramisu Recipes !!!'
+        assert revision['label'] == 'Tiramisu Recipes!!!'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
         assert revision['slug'] == 'tiramisu-recipes'
@@ -227,7 +227,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
-        assert revision['label'] == 'Tiramisu Recipes !!!'
+        assert revision['label'] == 'Tiramisu Recipes!!!'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
         assert revision['slug'] == 'tiramisu-recipes'
