@@ -14,7 +14,7 @@ except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
 from tracim.models.contents import ContentTypeLegacy as ContentType
-from tracim.exceptions import InsufficientUserWorkspaceRole
+from tracim.exceptions import InsufficientUserRoleInWorkspace
 from tracim.exceptions import ContentTypeNotAllowed
 from tracim.exceptions import InsufficientUserProfile
 if TYPE_CHECKING:
@@ -105,7 +105,7 @@ def require_workspace_role(minimal_required_role: int) -> typing.Callable:
             workspace = request.current_workspace
             if workspace.get_user_role(user) >= minimal_required_role:
                 return func(self, context, request)
-            raise InsufficientUserWorkspaceRole()
+            raise InsufficientUserRoleInWorkspace()
 
         return wrapper
     return decorator
@@ -127,7 +127,7 @@ def require_candidate_workspace_role(minimal_required_role: int) -> typing.Calla
 
             if workspace.get_user_role(user) >= minimal_required_role:
                 return func(self, context, request)
-            raise InsufficientUserWorkspaceRole()
+            raise InsufficientUserRoleInWorkspace()
 
         return wrapper
     return decorator
@@ -180,6 +180,6 @@ def require_comment_ownership_or_role(
             # INFO - G.M - 2018-06-178 - normal role test
             if workspace.get_user_role(user) >= minimal_required_role:
                 return func(self, context, request)
-            raise InsufficientUserWorkspaceRole()
+            raise InsufficientUserRoleInWorkspace()
         return wrapper
     return decorator

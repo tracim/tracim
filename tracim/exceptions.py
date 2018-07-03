@@ -69,7 +69,7 @@ class WorkspaceNotFoundInTracimRequest(NotFound):
     pass
 
 
-class InsufficientUserWorkspaceRole(TracimException):
+class InsufficientUserRoleInWorkspace(TracimException):
     pass
 
 

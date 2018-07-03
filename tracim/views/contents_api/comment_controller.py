@@ -20,7 +20,7 @@ from tracim.views.core_api.schemas import SetCommentSchema
 from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.exceptions import WorkspaceNotFound
-from tracim.exceptions import InsufficientUserWorkspaceRole
+from tracim.exceptions import InsufficientUserRoleInWorkspace
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.contents import ContentTypeLegacy as ContentType
@@ -34,7 +34,7 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -64,7 +64,7 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
@@ -96,7 +96,7 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_comment_ownership_or_role(

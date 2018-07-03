@@ -25,7 +25,7 @@ from tracim.lib.utils.authorization import require_content_types
 from tracim.lib.utils.authorization import require_workspace_role
 from tracim.exceptions import WorkspaceNotFound
 from tracim.exceptions import ContentTypeNotAllowed
-from tracim.exceptions import InsufficientUserWorkspaceRole
+from tracim.exceptions import InsufficientUserRoleInWorkspace
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.context_models import ContentInContext
@@ -41,7 +41,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -67,7 +67,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
@@ -105,7 +105,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -139,7 +139,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
     @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserWorkspaceRole, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
