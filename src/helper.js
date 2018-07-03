@@ -10,7 +10,8 @@ export const FETCH_CONFIG = {
 
 export const MODE = {
   VIEW: 'view',
-  EDIT: 'edit'
+  EDIT: 'edit',
+  REVISION: 'revision'
 }
 
 export const debug = {

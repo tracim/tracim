@@ -6,7 +6,10 @@ import {
   PopinFixedHeader,
   PopinFixedOption,
   PopinFixedContent,
-  Timeline
+  Timeline,
+  NewVersionBtn,
+  ArchiveDeleteContent,
+  SelectStatus
 } from 'tracim_lib'
 import { FETCH_CONFIG, MODE, debug } from '../helper.js'
 import i18n from '../i18n.js'
@@ -88,15 +91,17 @@ class HtmlDocument extends React.Component {
     ])
       .then(([resComment, resRevision]) => {
         const resCommentWithProperDate = resComment.body.map(c => ({...c, created: (new Date(c.created)).toLocaleString()}))
+
         const revisionWithComment = resRevision.body
-          .map(r => ({
+          .map((r, i) => ({
             ...r,
             created: (new Date(r.created)).toLocaleString(),
             timelineType: 'revision',
             commentList: r.comments_ids.map(ci => ({
               timelineType: 'comment',
               ...resCommentWithProperDate.find(c => c.content_id === ci)
-            }))
+            })),
+            number: i + 1
           }))
           .reduce((acc, rev) => [
             ...acc,
@@ -107,8 +112,6 @@ class HtmlDocument extends React.Component {
               loggedUser: this.state.config.loggedUser
             }))
           ], [])
-
-        console.log(revisionWithComment)
 
         this.setState({timeline: revisionWithComment})
       })
@@ -204,9 +207,7 @@ class HtmlDocument extends React.Component {
     const fetchResultSaveEditStatus = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}/status`, {
       ...FETCH_CONFIG,
       method: 'PUT',
-      body: JSON.stringify({
-        status: newStatus
-      })
+      body: JSON.stringify({status: newStatus})
     })
 
     handleFetchResult(fetchResultSaveEditStatus)
@@ -228,6 +229,7 @@ class HtmlDocument extends React.Component {
     //   method: 'PUT'
     // })
   }
+
   handleClickDelete = async () => {
     console.log('delete')
     // const { config, content } = this.state
@@ -237,8 +239,21 @@ class HtmlDocument extends React.Component {
     // })
   }
 
+  handleClickShowRevision = revision => {
+    console.log('revision', revision)
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        label: revision.label,
+        raw_content: revision.raw_content,
+        number: revision.number
+      },
+      mode: MODE.REVISION
+    }))
+  }
+
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config } = this.state
+    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode } = this.state
 
     if (!isVisible) return null
 
@@ -252,24 +267,36 @@ class HtmlDocument extends React.Component {
           onValidateChangeTitle={this.handleSaveEditTitle}
         />
 
-        <PopinFixedOption
-          customClass={`${config.slug}`}
-          availableStatus={config.availableStatuses}
-          onClickNewVersionBtn={this.handleClickNewVersion}
-          onChangeStatus={this.handleChangeStatus}
-          selectedStatus={config.availableStatuses.find(s => s.slug === content.status)} // might be empty while api hasn't responded yet
-          onClickArchive={this.handleClickArchive}
-          onClickDelete={this.handleClickDelete}
-          i18n={i18n}
-        />
+        <PopinFixedOption customClass={`${config.slug}`} i18n={i18n}>
+          <div>
+            <NewVersionBtn onClickNewVersionBtn={this.handleClickNewVersion} disabled={mode === MODE.REVISION} />
+
+            <SelectStatus
+              selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
+              availableStatus={config.availableStatuses}
+              onChangeStatus={this.handleChangeStatus}
+              disabled={mode === MODE.REVISION}
+            />
+
+            <ArchiveDeleteContent
+              onClickArchiveBtn={this.handleClickArchive}
+              onClickDeleteBtn={this.handleClickDelete}
+              disabled={mode === MODE.REVISION}
+            />
+          </div>
+        </PopinFixedOption>
 
         <PopinFixedContent customClass={`${config.slug}__contentpage`}>
           <HtmlDocumentComponent
-            mode={this.state.mode}
+            mode={mode}
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
             onClickValidateBtn={this.handleSaveHtmlDocument}
-            version={timeline.filter(t => t.timelineType === 'revision').length}
+            version={
+              mode === MODE.REVISION
+                ? content.number
+                : timeline.filter(t => t.timelineType === 'revision').length
+            }
             text={content.raw_content}
             onChangeText={this.handleChangeText}
             key={'html-documents'}
@@ -280,10 +307,12 @@ class HtmlDocument extends React.Component {
             loggedUser={loggedUser}
             timelineData={timeline}
             newComment={newComment}
+            disableComment={mode === MODE.REVISION}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
+            onClickRevisionBtn={this.handleClickShowRevision}
           />
         </PopinFixedContent>
       </PopinFixed>
