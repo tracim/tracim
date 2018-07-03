@@ -215,7 +215,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['revision_id'] == 6
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision['comments_ids'] == []
+        assert revision['comment_ids'] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
         assert revision['author']
@@ -236,7 +236,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['revision_id'] == 7
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision['comments_ids'] == []
+        assert revision['comment_ids'] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
         assert revision['author']
@@ -257,7 +257,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['revision_id'] == 27
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision['comments_ids'] == []
+        assert revision['comment_ids'] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
         assert revision['author']
@@ -475,7 +475,7 @@ class TestThreads(FunctionalTest):
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 8
         assert revision['sub_content_types']
-        assert revision['comments_ids'] == [18, 19, 20]
+        assert revision['comment_ids'] == [18, 19, 20]
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
         assert revision['author']
@@ -495,7 +495,7 @@ class TestThreads(FunctionalTest):
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 26
         assert revision['sub_content_types']
-        assert revision['comments_ids'] == []
+        assert revision['comment_ids'] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
         assert revision['author']

@@ -423,7 +423,7 @@ class HtmlDocumentContentSchema(ContentSchema):
 
 
 class RevisionSchema(ContentDigestSchema):
-    comments_ids = marshmallow.fields.List(marshmallow.fields.Int(example=4))
+    comment_ids = marshmallow.fields.List(marshmallow.fields.Int(example=4))
     revision_id = marshmallow.fields.Int(example=12)
     created = marshmallow.fields.DateTime(
         format='%Y-%m-%dT%H:%M:%SZ',

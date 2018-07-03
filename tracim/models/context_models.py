@@ -555,10 +555,14 @@ class RevisionInContext(object):
             return None
 
     @property
-    def comments_ids(self) -> typing.List[int]:
+    def comment_ids(self) -> typing.List[int]:
+        """
+        Get list of ids of all current revision related comments
+        :return: list of comments ids
+        """
         comments = self.revision.node.get_comments()
         # INFO - G.M - 2018-06-177 - Get comments more recent than revision.
-        revisions_comments = [
+        revision_comments = [
             comment for comment in comments
             if comment.created > self.revision.updated
         ]
@@ -566,19 +570,18 @@ class RevisionInContext(object):
             # INFO - G.M - 2018-06-177 - if there is a revision more recent
             # than current remove comments from theses rev (comments older
             # than next_revision.)
-            revisions_comments = [
-                comment for comment in revisions_comments
+            revision_comments = [
+                comment for comment in revision_comments
                 if comment.created < self.next_revision.updated
             ]
         sorted_revision_comments = sorted(
-            revisions_comments,
+            revision_comments,
             key=lambda revision: revision.created
         )
-        comments_id = [
-            comments.content_id
-            for comments in sorted_revision_comments
-        ]
-        return comments_id
+        comment_ids = []
+        for comment in sorted_revision_comments:
+            comment_ids.append(comment.content_id)
+        return comment_ids
 
     # Context-related
     @property
