@@ -1,7 +1,8 @@
 # coding=utf-8
+import typing
+
 import transaction
 from pyramid.config import Configurator
-
 from tracim.models.data import UserRoleInWorkspace
 
 try:  # Python 3.5+
@@ -25,6 +26,7 @@ from tracim.exceptions import WorkspaceNotFound, ContentTypeNotAllowed
 from tracim.exceptions import InsufficientUserWorkspaceRole
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
+from tracim.models.context_models import ContentInContext, RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import thread_type
 from tracim.models.revision_protection import new_revision
@@ -44,7 +46,7 @@ class ThreadController(Controller):
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(ThreadContentSchema())
-    def get_thread(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def get_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         Get thread content
         """
@@ -70,7 +72,7 @@ class ThreadController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ThreadModifySchema())
     @hapic.output_body(ThreadContentSchema())
-    def update_thread(self, context, request: TracimRequest, hapic_data=None):
+    def update_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         update thread
         """
@@ -107,7 +109,12 @@ class ThreadController(Controller):
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(ThreadRevisionSchema(many=True))
-    def get_thread_revisions(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def get_thread_revisions(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None
+    ) -> typing.List[RevisionInContext]:
         """
         get thread revisions
         """
@@ -137,7 +144,7 @@ class ThreadController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
-    def set_thread_status(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def set_thread_status(self, context, request: TracimRequest, hapic_data=None) -> None:  # nopep8
         """
         set thread status
         """
@@ -163,7 +170,7 @@ class ThreadController(Controller):
             api.save(content)
         return
 
-    def bind(self, configurator: Configurator):
+    def bind(self, configurator: Configurator) -> None:
         # Get thread
         configurator.add_route(
             'thread',

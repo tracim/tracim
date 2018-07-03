@@ -1,4 +1,6 @@
 # coding=utf-8
+import typing
+
 import transaction
 from pyramid.config import Configurator
 
@@ -25,6 +27,8 @@ from tracim.exceptions import WorkspaceNotFound, ContentTypeNotAllowed
 from tracim.exceptions import InsufficientUserWorkspaceRole
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import AuthenticationFailed
+from tracim.models.context_models import ContentInContext
+from tracim.models.context_models import RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import html_documents_type
 from tracim.models.revision_protection import new_revision
@@ -44,7 +48,7 @@ class HTMLDocumentController(Controller):
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(HtmlDocumentContentSchema())
-    def get_html_document(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def get_html_document(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         Get html document content
         """
@@ -70,7 +74,7 @@ class HTMLDocumentController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(HtmlDocumentModifySchema())
     @hapic.output_body(HtmlDocumentContentSchema())
-    def update_html_document(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def update_html_document(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         update_html_document
         """
@@ -107,7 +111,12 @@ class HTMLDocumentController(Controller):
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(HtmlDocumentRevisionSchema(many=True))
-    def get_html_document_revisions(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def get_html_document_revisions(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None
+    ) -> typing.List[RevisionInContext]:
         """
         get html_document revisions
         """
@@ -137,7 +146,12 @@ class HTMLDocumentController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
-    def set_html_document_status(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    def set_html_document_status(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None
+    ) -> None:
         """
         set html_document status
         """
@@ -163,7 +177,7 @@ class HTMLDocumentController(Controller):
             api.save(content)
         return
 
-    def bind(self, configurator: Configurator):
+    def bind(self, configurator: Configurator) -> None:
         # Get html-document
         configurator.add_route(
             'html_document',
