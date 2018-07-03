@@ -2,8 +2,12 @@
 import typing
 from enum import Enum
 
-from tracim.exceptions import ContentStatusNotExist, ContentTypeNotExist
-from tracim.models.applications import html_documents, _file, thread, markdownpluspage
+from tracim.exceptions import ContentTypeNotExist
+from tracim.exceptions import ContentStatusNotExist
+from tracim.models.applications import html_documents
+from tracim.models.applications import _file
+from tracim.models.applications import thread
+from tracim.models.applications import markdownpluspage
 
 
 ####

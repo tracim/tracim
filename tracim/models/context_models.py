@@ -17,37 +17,42 @@ from tracim.models.contents import ContentTypeLegacy as ContentType
 
 class MoveParams(object):
     """
-    Json body params for move action
+    Json body params for move action model
     """
-    def __init__(self, new_parent_id: str, new_workspace_id: str = None):
+    def __init__(self, new_parent_id: str, new_workspace_id: str = None) -> None:  # nopep8
         self.new_parent_id = new_parent_id
         self.new_workspace_id = new_workspace_id
 
 
 class LoginCredentials(object):
     """
-    Login credentials model for login
+    Login credentials model for login model
     """
 
-    def __init__(self, email: str, password: str):
+    def __init__(self, email: str, password: str) -> None:
         self.email = email
         self.password = password
 
 
 class WorkspaceAndContentPath(object):
     """
-    Paths params with workspace id and content_id
+    Paths params with workspace id and content_id model
     """
-    def __init__(self, workspace_id: int, content_id: int):
+    def __init__(self, workspace_id: int, content_id: int) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
 
 
 class CommentPath(object):
     """
-    Paths params with workspace id and content_id
+    Paths params with workspace id and content_id and comment_id model
     """
-    def __init__(self, workspace_id: int, content_id: int, comment_id: int):
+    def __init__(
+        self,
+        workspace_id: int,
+        content_id: int,
+        comment_id: int
+    ) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.comment_id = comment_id
@@ -63,7 +68,7 @@ class ContentFilter(object):
             show_archived: int = 0,
             show_deleted: int = 0,
             show_active: int = 1,
-    ):
+    ) -> None:
         self.parent_id = parent_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
@@ -78,7 +83,7 @@ class ContentCreation(object):
             self,
             label: str,
             content_type: str,
-    ):
+    ) -> None:
         self.label = label
         self.content_type = content_type
 
@@ -90,7 +95,7 @@ class CommentCreation(object):
     def __init__(
             self,
             raw_content: str,
-    ):
+    ) -> None:
         self.raw_content = raw_content
 
 
@@ -101,7 +106,7 @@ class SetContentStatus(object):
     def __init__(
             self,
             status: str,
-    ):
+    ) -> None:
         self.status = status
 
 
@@ -113,7 +118,7 @@ class HTMLDocumentUpdate(object):
             self,
             label: str,
             raw_content: str,
-    ):
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
 
@@ -126,7 +131,7 @@ class ThreadUpdate(object):
             self,
             label: str,
             raw_content: str,
-    ):
+    ) -> None:
         self.label = label
         self.raw_content = raw_content
 
@@ -367,14 +372,11 @@ class ContentInContext(object):
     @property
     def content_type(self) -> str:
         content_type = ContentType(self.content.type)
-        if content_type:
-            return content_type.slug
-        else:
-            return None
+        return content_type.slug
 
     @property
     def sub_content_types(self) -> typing.List[str]:
-        return [_type.slug for _type in self.content.get_allowed_content_types()]
+        return [_type.slug for _type in self.content.get_allowed_content_types()]  # nopep8
 
     @property
     def status(self) -> str:
@@ -444,8 +446,9 @@ class RevisionInContext(object):
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content: ContentRevisionRO, dbsession: Session, config: CFG):
-        self.revision = content
+    def __init__(self, content_revision: ContentRevisionRO, dbsession: Session, config: CFG):
+        assert content_revision is not None
+        self.revision = content_revision
         self.dbsession = dbsession
         self.config = config
 
@@ -491,19 +494,19 @@ class RevisionInContext(object):
         return self.revision.status
 
     @property
-    def is_archived(self):
+    def is_archived(self) -> bool:
         return self.revision.is_archived
 
     @property
-    def is_deleted(self):
+    def is_deleted(self) -> bool:
         return self.revision.is_deleted
 
     @property
-    def raw_content(self):
+    def raw_content(self) -> str:
         return self.revision.description
 
     @property
-    def author(self):
+    def author(self) -> UserInContext:
         return UserInContext(
             dbsession=self.dbsession,
             config=self.config,
@@ -511,23 +514,27 @@ class RevisionInContext(object):
         )
 
     @property
-    def revision_id(self):
+    def revision_id(self) -> int:
         return self.revision.revision_id
 
     @property
-    def created(self):
+    def created(self) -> datetime:
         return self.updated
 
     @property
-    def modified(self):
+    def modified(self) -> datetime:
         return self.updated
 
     @property
-    def updated(self):
+    def updated(self) -> datetime:
         return self.revision.updated
 
     @property
-    def next_revision(self):
+    def next_revision(self) -> typing.Optional[ContentRevisionRO]:
+        """
+        Get next revision (later revision)
+        :return: next_revision
+        """
         next_revision = None
         revisions = self.revision.node.revisions
         # INFO - G.M - 2018-06-177 - Get revisions more recent that
@@ -548,7 +555,7 @@ class RevisionInContext(object):
             return None
 
     @property
-    def comments_ids(self):
+    def comments_ids(self) -> typing.List[int]:
         comments = self.revision.node.get_comments()
         # INFO - G.M - 2018-06-177 - Get comments more recent than revision.
         revisions_comments = [
@@ -575,7 +582,7 @@ class RevisionInContext(object):
 
     # Context-related
     @property
-    def show_in_ui(self):
+    def show_in_ui(self) -> bool:
         # TODO - G.M - 31-05-2018 - Enable Show_in_ui params
         # if false, then do not show content in the treeview.
         # This may his maybe used for specific contents or for sub-contents.
@@ -584,5 +591,5 @@ class RevisionInContext(object):
         return True
 
     @property
-    def slug(self):
+    def slug(self) -> str:
         return slugify(self.revision.label)

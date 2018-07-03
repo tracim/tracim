@@ -16,7 +16,8 @@ from tracim.lib.core.workspace import WorkspaceApi
 from tracim.lib.utils.authorization import JSONDecodeError
 
 from tracim.models import User
-from tracim.models.data import Workspace, Content
+from tracim.models.data import Workspace
+from tracim.models.data import Content
 
 
 class TracimRequest(Request):
@@ -205,6 +206,8 @@ class TracimRequest(Request):
         """
         Get current content from request
         :param user: User who want to check the workspace
+        :param workspace: Workspace of the content
+        :param content: comment is related to this content
         :param request: pyramid request
         :return: current content
         """
@@ -243,6 +246,7 @@ class TracimRequest(Request):
         """
         Get current content from request
         :param user: User who want to check the workspace
+        :param workspace: Workspace of the content
         :param request: pyramid request
         :return: current content
         """
