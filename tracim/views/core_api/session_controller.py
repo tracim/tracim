@@ -24,7 +24,7 @@ class SessionController(Controller):
     @hapic.with_api_doc(tags=[SESSION_ENDPOINTS_TAG])
     @hapic.input_headers(LoginOutputHeaders())
     @hapic.input_body(BasicAuthSchema())
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
     @hapic.output_body(UserSchema(),)

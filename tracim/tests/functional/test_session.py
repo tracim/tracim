@@ -59,14 +59,14 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
 
-    def test_api__try_login_enpoint__err_400__bad_password(self):
+    def test_api__try_login_enpoint__err_403__bad_password(self):
         params = {
             'email': 'admin@admin.admin',
             'password': 'bad_password',
         }
         res = self.testapp.post_json(
             '/api/v2/sessions/login',
-            status=400,
+            status=403,
             params=params,
         )
         assert isinstance(res.json, dict)
@@ -74,14 +74,14 @@ class TestLoginEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__try_login_enpoint__err_400__unregistered_user(self):
+    def test_api__try_login_enpoint__err_403__unregistered_user(self):
         params = {
             'email': 'unknown_user@unknown.unknown',
             'password': 'bad_password',
         }
         res = self.testapp.post_json(
             '/api/v2/sessions/login',
-            status=400,
+            status=403,
             params=params,
         )
         assert isinstance(res.json, dict)
