@@ -156,7 +156,7 @@ class Content(Fixture):
             do_save=False,
             do_notify=False,
         )
-        best_cake_thread.description = 'Which is the best cake ?'
+        best_cake_thread.description = 'Which is the best cake?'
         self._session.add(best_cake_thread)
         apple_pie_recipe = content_api.create(
             content_type=ContentType.File,
@@ -300,8 +300,8 @@ class Content(Fixture):
         ):
             bob_content_api.update_content(
                 item=best_cake_thread,
-                new_content='What is the best cake ?',
-                new_label='Best Cakes ?',
+                new_content='What is the best cake?',
+                new_label='Best Cakes?',
             )
             bob_content_api.save(best_cake_thread)
 

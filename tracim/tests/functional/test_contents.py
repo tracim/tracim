@@ -352,7 +352,7 @@ class TestThreads(FunctionalTest):
         assert content['content_id'] == 7
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
-        assert content['label'] == 'Best Cakes ?'
+        assert content['label'] == 'Best Cakes?'
         assert content['parent_id'] == 3
         assert content['show_in_ui'] is True
         assert content['slug'] == 'best-cakes'
@@ -371,7 +371,7 @@ class TestThreads(FunctionalTest):
         assert content['last_modifier']['user_id'] == 3
         assert content['last_modifier']['public_name'] == 'Bob i.'
         assert content['last_modifier']['avatar_url'] is None
-        assert content['raw_content'] == 'What is the best cake ?'  # nopep8
+        assert content['raw_content'] == 'What is the best cake?'  # nopep8
 
     def test_api__update_thread__ok_200__nominal_case(self) -> None:
         """
@@ -487,7 +487,7 @@ class TestThreads(FunctionalTest):
         assert revision['content_id'] == 7
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
-        assert revision['label'] == 'Best Cakes ?'
+        assert revision['label'] == 'Best Cakes?'
         assert revision['parent_id'] == 3
         assert revision['show_in_ui'] is True
         assert revision['slug'] == 'best-cakes'
