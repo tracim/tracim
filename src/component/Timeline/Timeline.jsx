@@ -12,7 +12,7 @@ class Timeline extends React.Component {
   }
 
   componentDidUpdate () {
-    this.scrollToBottom()
+    this.props.shouldScrollToBottom && this.scrollToBottom()
   }
 
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})
@@ -115,7 +115,8 @@ Timeline.propTypes = {
   loggedUser: PropTypes.object,
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
-  onClickRevisionBtn: PropTypes.func
+  onClickRevisionBtn: PropTypes.func,
+  shouldScrollToBottom: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -128,5 +129,6 @@ Timeline.defaultProps = {
   },
   timelineData: [],
   wysiwyg: false,
-  onClickWysiwygBtn: () => {}
+  onClickWysiwygBtn: () => {},
+  shouldScrollToBottom: true
 }
