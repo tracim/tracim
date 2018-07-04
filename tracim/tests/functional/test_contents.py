@@ -408,6 +408,26 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['content_id'] == 6
         assert content['status'] == 'closed-deprecated'
 
+    def test_api__set_html_document_status__err_400__wrong_status(self) -> None:
+        """
+        Get one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'unexistant-status',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6/status',
+            params=params,
+            status=400
+        )
+
 
 class TestThreads(FunctionalTest):
     """
@@ -746,3 +766,24 @@ class TestThreads(FunctionalTest):
         assert content['content_type'] == 'thread'
         assert content['content_id'] == 7
         assert content['status'] == 'closed-deprecated'
+
+    def test_api__set_thread_status__ok_400__wrong_status(self) -> None:
+        """
+        Set thread status
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'unexistant-status',
+        }
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7/status',
+            params=params,
+            status=400
+        )
