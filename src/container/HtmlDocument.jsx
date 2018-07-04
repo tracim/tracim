@@ -96,7 +96,7 @@ class HtmlDocument extends React.Component {
             ...r,
             created: (new Date(r.created)).toLocaleString(),
             timelineType: 'revision',
-            commentList: r.comments_ids.map(ci => ({
+            commentList: r.comment_ids.map(ci => ({
               timelineType: 'comment',
               ...resCommentWithProperDate.find(c => c.content_id === ci)
             })),
