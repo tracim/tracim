@@ -5,26 +5,6 @@ import PopupCreateHtmlDocument from './container/PopupCreateHtmlDocument.jsx'
 
 require('./css/index.styl')
 
-/*
-  data : {
-    loggedUser: {},
-    config: {
-      name: 'HtmlDocument',
-      label: {
-        fr: 'Document',
-        en: 'Document'
-      },
-      customClass: 'wsContentHtmlDocument',
-      icon: 'fa fa-fw fa-file-text-o',
-      color: '#3f52e3',
-      domContainer: 'appContainer'
-      apiUrl: FETCH_CONFIG.apiUrl,
-      mockApiUrl: FETCH_CONFIG.mockApiUrl
-    },
-    content || folder
-  }
-*/
-
 const appInterface = {
   name: 'HtmlDocument',
   isRendered: false,

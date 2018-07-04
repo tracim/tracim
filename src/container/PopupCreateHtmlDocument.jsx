@@ -36,7 +36,7 @@ class PopupCreateHtmlDocument extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'page',
+      appName: 'html-documents',
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
@@ -68,8 +68,6 @@ class PopupCreateHtmlDocument extends React.Component {
 
     if (fetchSaveNewHtmlDoc.status === 200) {
       const jsonSaveNewHtmlDoc = await fetchSaveNewHtmlDoc.json()
-
-      console.log(jsonSaveNewHtmlDoc)
 
       this.handleClose()
 
