@@ -11,7 +11,15 @@ import {
   ArchiveDeleteContent,
   SelectStatus
 } from 'tracim_lib'
-import { FETCH_CONFIG, MODE, debug } from '../helper.js'
+import { MODE, debug } from '../helper.js'
+import {
+  getHtmlDocContent,
+  getHtmlDocComment,
+  getHtmlDocRevision,
+  postHtmlDocNewComment,
+  putHtmlDocContent,
+  putHtmlDocStatus
+} from '../action.async.js'
 import i18n from '../i18n.js'
 
 class HtmlDocument extends React.Component {
@@ -68,26 +76,17 @@ class HtmlDocument extends React.Component {
   loadContent = async () => {
     const { content, config } = this.state
 
-    const fetchResultHtmlDocument = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}`, { // ${content.workspace_id} ${content.content_id}
-      ...FETCH_CONFIG,
-      method: 'GET'
-    })
-    const fetchResultComment = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/comments`, { // ${content.workspace_id} ${content.content_id}
-      ...FETCH_CONFIG,
-      method: 'GET'
-    })
-    const fetchResultRevision = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}/revisions`, { // ${content.workspace_id} ${content.content_id}
-      ...FETCH_CONFIG,
-      method: 'GET'
-    })
+    const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultComment = getHtmlDocComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    handleFetchResult(fetchResultHtmlDocument)
+    handleFetchResult(await fetchResultHtmlDocument)
       .then(resHtmlDocument => this.setState({content: resHtmlDocument.body}))
       .catch(e => console.log('Error loading content.', e))
 
     Promise.all([
-      handleFetchResult(fetchResultComment),
-      handleFetchResult(fetchResultRevision)
+      handleFetchResult(await fetchResultComment),
+      handleFetchResult(await fetchResultRevision)
     ])
       .then(([resComment, resRevision]) => {
         const resCommentWithProperDate = resComment.body.map(c => ({...c, created: (new Date(c.created)).toLocaleString()}))
@@ -121,25 +120,20 @@ class HtmlDocument extends React.Component {
       })
   }
 
-  saveEditHtmlDocument = (label, rawContent) =>
-    fetch(`${this.state.config.apiUrl}/workspaces/${this.state.content.workspace_id}/html-documents/${this.state.content.content_id}`, {
-      ...FETCH_CONFIG,
-      method: 'PUT',
-      body: JSON.stringify({label: label, raw_content: rawContent})
-    })
-
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}})
   }
 
   handleSaveEditTitle = async newTitle => {
-    const fetchResultSaveHtmlDoc = await this.saveEditHtmlDocument(newTitle, this.state.content.raw_content)
+    const { config, content } = this.state
 
-    handleFetchResult(fetchResultSaveHtmlDoc)
+    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+
+    handleFetchResult(await fetchResultSaveHtmlDoc)
       .then(resSave => {
         if (resSave.apiResponse.status === 200) this.loadContent()
-        else console.warn('Error saving html-document. Result:', resSave, 'content:', this.state.content, 'config:', this.state.config)
+        else console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
       })
   }
 
@@ -153,9 +147,9 @@ class HtmlDocument extends React.Component {
   handleSaveHtmlDocument = async () => {
     const { content, config } = this.state
 
-    const fetchResultSaveHtmlDoc = await this.saveEditHtmlDocument(content.label, content.raw_content)
+    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
 
-    handleFetchResult(fetchResultSaveHtmlDoc)
+    handleFetchResult(await fetchResultSaveHtmlDoc)
       .then(resSave => {
         if (resSave.apiResponse.status === 200) {
           this.handleCloseNewVersion()
@@ -179,15 +173,9 @@ class HtmlDocument extends React.Component {
   handleClickValidateNewCommentBtn = async () => {
     const { config, content, newComment } = this.state
 
-    const fetchResultSaveNewComment = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/comments`, {
-      ...FETCH_CONFIG,
-      method: 'POST',
-      body: JSON.stringify({
-        raw_content: newComment
-      })
-    })
+    const fetchResultSaveNewComment = await postHtmlDocNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
 
-    handleFetchResult(fetchResultSaveNewComment)
+    handleFetchResult(await fetchResultSaveNewComment)
       .then(resSave => {
         if (resSave.apiResponse.status === 200) {
           this.setState({newComment: ''})
@@ -204,13 +192,9 @@ class HtmlDocument extends React.Component {
   handleChangeStatus = async newStatus => {
     const { config, content } = this.state
 
-    const fetchResultSaveEditStatus = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}/status`, {
-      ...FETCH_CONFIG,
-      method: 'PUT',
-      body: JSON.stringify({status: newStatus})
-    })
+    const fetchResultSaveEditStatus = putHtmlDocStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
 
-    handleFetchResult(fetchResultSaveEditStatus)
+    handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
         if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
           console.warn('Error saving html-document comment. Result:', resSave, 'content:', content, 'config:', config)
