@@ -16,6 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy import desc
 from sqlalchemy import distinct
@@ -25,6 +26,7 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
+from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.lib.utils.utils import current_date_for_filename
 from tracim.models.revision_protection import new_revision
@@ -39,8 +41,8 @@ from tracim.models.data import RevisionReadStatus
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 from tracim.lib.utils.translation import fake_translator as _
+from tracim.models.context_models import RevisionInContext
 from tracim.models.context_models import ContentInContext
-
 
 __author__ = 'damien'
 
@@ -102,6 +104,7 @@ class ContentApi(object):
         ContentType.Comment,
         ContentType.Thread,
         ContentType.Page,
+        ContentType.PageLegacy,
         ContentType.MarkdownPage,
     )
 
@@ -158,10 +161,14 @@ class ContentApi(object):
             self._show_deleted = previous_show_deleted
             self._show_temporary = previous_show_temporary
 
-    def get_content_in_context(self, content: Content):
+    def get_content_in_context(self, content: Content) -> ContentInContext:
         return ContentInContext(content, self._session, self._config)
 
-    def get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
+    def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:  # nopep8
+        # TODO - G.M - 2018-06-173 - create revision in context object
+        return RevisionInContext(revision, self._session, self._config)
+    
+    def _get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
         Return the Content/ContentRevision query join condition
         :return: Content/ContentRevision query join condition
@@ -180,7 +187,7 @@ class ContentApi(object):
         :return: Content/ContentRevision Query
         """
         return self._session.query(Content)\
-            .join(ContentRevisionRO, self.get_revision_join())
+            .join(ContentRevisionRO, self._get_revision_join())
 
     @classmethod
     def sort_tree_items(
@@ -418,6 +425,8 @@ class ContentApi(object):
         item = Content()
         item.owner = self._user
         item.parent = parent
+        if parent and not workspace:
+            workspace = item.parent.workspace
         item.workspace = workspace
         item.type = ContentType.Comment
         item.description = content
@@ -449,15 +458,24 @@ class ContentApi(object):
 
         return content
 
-    def get_one(self, content_id: int, content_type: str, workspace: Workspace=None) -> Content:
+    def get_one(self, content_id: int, content_type: str, workspace: Workspace=None, parent: Content=None) -> Content:
 
         if not content_id:
             return None
 
-        if content_type==ContentType.Any:
-            return self._base_query(workspace).filter(Content.content_id==content_id).one()
+        base_request = self._base_query(workspace).filter(Content.content_id==content_id)
 
-        return self._base_query(workspace).filter(Content.content_id==content_id).filter(Content.type==content_type).one()
+        if content_type!=ContentType.Any:
+            base_request = base_request.filter(Content.type==content_type)
+
+        if parent:
+            base_request = base_request.filter(Content.parent_id==parent.content_id)  # nopep8
+
+        try:
+            content = base_request.one()
+        except NoResultFound as exc:
+            raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
+        return content
 
     def get_one_revision(self, revision_id: int = None) -> ContentRevisionRO:
         """

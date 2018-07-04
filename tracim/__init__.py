@@ -17,10 +17,13 @@ from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim.lib.webdav import WebdavAppFactory
 from tracim.views import BASE_API_V2
+from tracim.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
+from tracim.views.contents_api.threads_controller import ThreadController
 from tracim.views.core_api.session_controller import SessionController
 from tracim.views.core_api.system_controller import SystemController
 from tracim.views.core_api.user_controller import UserController
 from tracim.views.core_api.workspace_controller import WorkspaceController
+from tracim.views.contents_api.comment_controller import CommentController
 from tracim.views.errors import ErrorSchema
 from tracim.lib.utils.cors import add_cors_support
 
@@ -71,10 +74,17 @@ def web(global_config, **local_settings):
     system_controller = SystemController()
     user_controller = UserController()
     workspace_controller = WorkspaceController()
+    comment_controller = CommentController()
+    html_document_controller = HTMLDocumentController()
+    thread_controller = ThreadController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)  # nopep8
+    configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
+
     hapic.add_documentation_view(
         '/api/v2/doc',
         'Tracim v2 API',

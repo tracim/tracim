@@ -2,8 +2,12 @@
 import typing
 from enum import Enum
 
-from tracim.exceptions import ContentStatusNotExist, ContentTypeNotExist
-from tracim.models.applications import htmlpage, _file, thread, markdownpluspage
+from tracim.exceptions import ContentTypeNotExist
+from tracim.exceptions import ContentStatusNotExist
+from tracim.models.applications import html_documents
+from tracim.models.applications import _file
+from tracim.models.applications import thread
+from tracim.models.applications import markdownpluspage
 
 
 ####
@@ -38,32 +42,32 @@ open_status = NewContentStatus(
     slug='open',
     global_status=GlobalStatus.OPEN.value,
     label='Open',
-    fa_icon='fa-square-o',
-    hexcolor='#000FF',
+    fa_icon='square-o',
+    hexcolor='#3f52e3',
 )
 
 closed_validated_status = NewContentStatus(
     slug='closed-validated',
     global_status=GlobalStatus.CLOSED.value,
     label='Validated',
-    fa_icon='fa-check-square-o',
-    hexcolor='#000FF',
+    fa_icon='check-square-o',
+    hexcolor='#008000',
 )
 
 closed_unvalidated_status = NewContentStatus(
     slug='closed-unvalidated',
     global_status=GlobalStatus.CLOSED.value,
     label='Cancelled',
-    fa_icon='fa-close',
-    hexcolor='#000FF',
+    fa_icon='close',
+    hexcolor='#f63434',
 )
 
 closed_deprecated_status = NewContentStatus(
     slug='closed-deprecated',
     global_status=GlobalStatus.CLOSED.value,
     label='Deprecated',
-    fa_icon='fa-warning',
-    hexcolor='#000FF',
+    fa_icon='warning',
+    hexcolor='#ababab',
 )
 
 
@@ -159,10 +163,10 @@ markdownpluspage_type = NewContentType(
     available_statuses=CONTENT_DEFAULT_STATUS,
 )
 
-htmlpage_type = NewContentType(
-    slug='page',
-    fa_icon=htmlpage.fa_icon,
-    hexcolor=htmlpage.hexcolor,
+html_documents_type = NewContentType(
+    slug='html-documents',
+    fa_icon=html_documents.fa_icon,
+    hexcolor=html_documents.hexcolor,
     label='Text Document',
     creation_label='Write a document',
     available_statuses=CONTENT_DEFAULT_STATUS,
@@ -182,9 +186,36 @@ CONTENT_DEFAULT_TYPE = [
     thread_type,
     file_type,
     markdownpluspage_type,
-    htmlpage_type,
+    html_documents_type,
     folder_type,
 ]
+
+# TODO - G.M - 31-05-2018 - Set Better Event params
+event_type = NewContentType(
+    slug='event',
+    fa_icon=thread.fa_icon,
+    hexcolor=thread.hexcolor,
+    label='Event',
+    creation_label='Event',
+    available_statuses=CONTENT_DEFAULT_STATUS,
+)
+
+# TODO - G.M - 31-05-2018 - Set Better Event params
+comment_type = NewContentType(
+    slug='comment',
+    fa_icon=thread.fa_icon,
+    hexcolor=thread.hexcolor,
+    label='Comment',
+    creation_label='Comment',
+    available_statuses=CONTENT_DEFAULT_STATUS,
+)
+
+CONTENT_DEFAULT_TYPE_SPECIAL = [
+    event_type,
+    comment_type,
+]
+
+ALL_CONTENTS_DEFAULT_TYPES = CONTENT_DEFAULT_TYPE + CONTENT_DEFAULT_TYPE_SPECIAL
 
 
 class ContentTypeLegacy(NewContentType):
@@ -200,11 +231,14 @@ class ContentTypeLegacy(NewContentType):
 
     File = file_type.slug
     Thread = thread_type.slug
-    Page = htmlpage_type.slug
+    Page = html_documents_type.slug
+    PageLegacy = 'page'
     MarkdownPage = markdownpluspage_type.slug
 
     def __init__(self, slug: str):
-        for content_type in CONTENT_DEFAULT_TYPE:
+        if slug == 'page':
+            slug = ContentTypeLegacy.Page
+        for content_type in ALL_CONTENTS_DEFAULT_TYPES:
             if slug == content_type.slug:
                 super(ContentTypeLegacy, self).__init__(
                     slug=content_type.slug,
@@ -223,8 +257,7 @@ class ContentTypeLegacy(NewContentType):
 
     @classmethod
     def allowed_types(cls) -> typing.List[str]:
-        contents_types = [status.slug for status in CONTENT_DEFAULT_TYPE]
-        contents_types.extend([cls.Folder, cls.Event, cls.Comment])
+        contents_types = [status.slug for status in ALL_CONTENTS_DEFAULT_TYPES]
         return contents_types
 
     @classmethod
@@ -232,7 +265,6 @@ class ContentTypeLegacy(NewContentType):
         # This method is used for showing only "main"
         # types in the left-side treeview
         contents_types = [status.slug for status in CONTENT_DEFAULT_TYPE]
-        contents_types.extend([cls.Folder])
         return contents_types
 
     # TODO - G.M - 30-05-2018 - This method don't do anything.

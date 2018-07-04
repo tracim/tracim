@@ -8,37 +8,54 @@ from tracim import CFG
 from tracim.models import User
 from tracim.models.auth import Profile
 from tracim.models.data import Content
+from tracim.models.data import ContentRevisionRO
 from tracim.models.data import Workspace, UserRoleInWorkspace
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
+from tracim.models.contents import ContentTypeLegacy as ContentType
 
 
 class MoveParams(object):
     """
-    Json body params for move action
+    Json body params for move action model
     """
-    def __init__(self, new_parent_id: str, new_workspace_id: str = None):
+    def __init__(self, new_parent_id: str, new_workspace_id: str = None) -> None:  # nopep8
         self.new_parent_id = new_parent_id
         self.new_workspace_id = new_workspace_id
 
 
 class LoginCredentials(object):
     """
-    Login credentials model for login
+    Login credentials model for login model
     """
 
-    def __init__(self, email: str, password: str):
+    def __init__(self, email: str, password: str) -> None:
         self.email = email
         self.password = password
 
 
 class WorkspaceAndContentPath(object):
     """
-    Paths params with workspace id and content_id
+    Paths params with workspace id and content_id model
     """
-    def __init__(self, workspace_id: int, content_id: int):
+    def __init__(self, workspace_id: int, content_id: int) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
+
+
+class CommentPath(object):
+    """
+    Paths params with workspace id and content_id and comment_id model
+    """
+    def __init__(
+        self,
+        workspace_id: int,
+        content_id: int,
+        comment_id: int
+    ) -> None:
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.comment_id = comment_id
 
 
 class ContentFilter(object):
@@ -51,7 +68,7 @@ class ContentFilter(object):
             show_archived: int = 0,
             show_deleted: int = 0,
             show_active: int = 1,
-    ):
+    ) -> None:
         self.parent_id = parent_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
@@ -66,9 +83,57 @@ class ContentCreation(object):
             self,
             label: str,
             content_type: str,
-    ):
+    ) -> None:
         self.label = label
         self.content_type = content_type
+
+
+class CommentCreation(object):
+    """
+    Comment creation model
+    """
+    def __init__(
+            self,
+            raw_content: str,
+    ) -> None:
+        self.raw_content = raw_content
+
+
+class SetContentStatus(object):
+    """
+    Set content status
+    """
+    def __init__(
+            self,
+            status: str,
+    ) -> None:
+        self.status = status
+
+
+class HTMLDocumentUpdate(object):
+    """
+    Html Document update model
+    """
+    def __init__(
+            self,
+            label: str,
+            raw_content: str,
+    ) -> None:
+        self.label = label
+        self.raw_content = raw_content
+
+
+class ThreadUpdate(object):
+    """
+    Thread update model
+    """
+    def __init__(
+            self,
+            label: str,
+            raw_content: str,
+    ) -> None:
+        self.label = label
+        self.raw_content = raw_content
 
 
 class UserInContext(object):
@@ -306,11 +371,12 @@ class ContentInContext(object):
 
     @property
     def content_type(self) -> str:
-        return self.content.type
+        content_type = ContentType(self.content.type)
+        return content_type.slug
 
     @property
     def sub_content_types(self) -> typing.List[str]:
-        return [type.slug for type in self.content.get_allowed_content_types()]
+        return [_type.slug for _type in self.content.get_allowed_content_types()]  # nopep8
 
     @property
     def status(self) -> str:
@@ -324,8 +390,43 @@ class ContentInContext(object):
     def is_deleted(self):
         return self.content.is_deleted
 
-    # Context-related
+    @property
+    def raw_content(self):
+        return self.content.description
 
+    @property
+    def author(self):
+        return UserInContext(
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.first_revision.owner
+        )
+
+    @property
+    def current_revision_id(self):
+        return self.content.revision_id
+
+    @property
+    def created(self):
+        return self.content.created
+
+    @property
+    def modified(self):
+        return self.updated
+
+    @property
+    def updated(self):
+        return self.content.updated
+
+    @property
+    def last_modifier(self):
+        return UserInContext(
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.last_revision.owner
+        )
+
+    # Context-related
     @property
     def show_in_ui(self):
         # TODO - G.M - 31-05-2018 - Enable Show_in_ui params
@@ -338,3 +439,160 @@ class ContentInContext(object):
     @property
     def slug(self):
         return slugify(self.content.label)
+
+
+class RevisionInContext(object):
+    """
+    Interface to get Content data and Content data related to context.
+    """
+
+    def __init__(self, content_revision: ContentRevisionRO, dbsession: Session, config: CFG):
+        assert content_revision is not None
+        self.revision = content_revision
+        self.dbsession = dbsession
+        self.config = config
+
+    # Default
+    @property
+    def content_id(self) -> int:
+        return self.revision.content_id
+
+    @property
+    def id(self) -> int:
+        return self.content_id
+
+    @property
+    def parent_id(self) -> int:
+        """
+        Return parent_id of the content
+        """
+        return self.revision.parent_id
+
+    @property
+    def workspace_id(self) -> int:
+        return self.revision.workspace_id
+
+    @property
+    def label(self) -> str:
+        return self.revision.label
+
+    @property
+    def content_type(self) -> str:
+        content_type = ContentType(self.revision.type)
+        if content_type:
+            return content_type.slug
+        else:
+            return None
+
+    @property
+    def sub_content_types(self) -> typing.List[str]:
+        return [_type.slug for _type
+                in self.revision.node.get_allowed_content_types()]
+
+    @property
+    def status(self) -> str:
+        return self.revision.status
+
+    @property
+    def is_archived(self) -> bool:
+        return self.revision.is_archived
+
+    @property
+    def is_deleted(self) -> bool:
+        return self.revision.is_deleted
+
+    @property
+    def raw_content(self) -> str:
+        return self.revision.description
+
+    @property
+    def author(self) -> UserInContext:
+        return UserInContext(
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.revision.owner
+        )
+
+    @property
+    def revision_id(self) -> int:
+        return self.revision.revision_id
+
+    @property
+    def created(self) -> datetime:
+        return self.updated
+
+    @property
+    def modified(self) -> datetime:
+        return self.updated
+
+    @property
+    def updated(self) -> datetime:
+        return self.revision.updated
+
+    @property
+    def next_revision(self) -> typing.Optional[ContentRevisionRO]:
+        """
+        Get next revision (later revision)
+        :return: next_revision
+        """
+        next_revision = None
+        revisions = self.revision.node.revisions
+        # INFO - G.M - 2018-06-177 - Get revisions more recent that
+        # current one
+        next_revisions = [
+            revision for revision in revisions
+            if revision.revision_id > self.revision.revision_id
+        ]
+        if next_revisions:
+            # INFO - G.M - 2018-06-177 -sort revisions by date
+            sorted_next_revisions = sorted(
+                next_revisions,
+                key=lambda revision: revision.updated
+            )
+            # INFO - G.M - 2018-06-177 - return only next revision
+            return sorted_next_revisions[0]
+        else:
+            return None
+
+    @property
+    def comment_ids(self) -> typing.List[int]:
+        """
+        Get list of ids of all current revision related comments
+        :return: list of comments ids
+        """
+        comments = self.revision.node.get_comments()
+        # INFO - G.M - 2018-06-177 - Get comments more recent than revision.
+        revision_comments = [
+            comment for comment in comments
+            if comment.created > self.revision.updated
+        ]
+        if self.next_revision:
+            # INFO - G.M - 2018-06-177 - if there is a revision more recent
+            # than current remove comments from theses rev (comments older
+            # than next_revision.)
+            revision_comments = [
+                comment for comment in revision_comments
+                if comment.created < self.next_revision.updated
+            ]
+        sorted_revision_comments = sorted(
+            revision_comments,
+            key=lambda revision: revision.created
+        )
+        comment_ids = []
+        for comment in sorted_revision_comments:
+            comment_ids.append(comment.content_id)
+        return comment_ids
+
+    # Context-related
+    @property
+    def show_in_ui(self) -> bool:
+        # TODO - G.M - 31-05-2018 - Enable Show_in_ui params
+        # if false, then do not show content in the treeview.
+        # This may his maybe used for specific contents or for sub-contents.
+        # Default is True.
+        # In first version of the API, this field is always True
+        return True
+
+    @property
+    def slug(self) -> str:
+        return slugify(self.revision.label)

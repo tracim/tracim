@@ -235,17 +235,17 @@ class ActionDescription(object):
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
-        'archiving': 'fa fa-archive',
-        'content-comment': 'fa-comment-o',
-        'creation': 'fa-magic',
-        'deletion': 'fa-trash',
-        'edition': 'fa-edit',
-        'revision': 'fa-history',
-        'status-update': 'fa-random',
-        'unarchiving': 'fa-file-archive-o',
-        'undeletion': 'fa-trash-o',
-        'move': 'fa-arrows',
-        'copy': 'fa-files-o',
+        'archiving': 'archive',
+        'content-comment': 'comment-o',
+        'creation': 'magic',
+        'deletion': 'trash',
+        'edition': 'edit',
+        'revision': 'history',
+        'status-update': 'random',
+        'unarchiving': 'file-archive-o',
+        'undeletion': 'trash-o',
+        'move': 'arrows',
+        'copy': 'files-o',
     }
     #
     # _LABELS = {
@@ -598,6 +598,7 @@ class ContentRevisionRO(DeclarativeBase):
 
     revision_id = Column(Integer, primary_key=True)
     content_id = Column(Integer, ForeignKey('content.id'), nullable=False)
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
 
     label = Column(Unicode(1024), unique=False, nullable=False)
@@ -631,6 +632,7 @@ class ContentRevisionRO(DeclarativeBase):
     parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
 
     node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
     owner = relationship('User', remote_side=[User.user_id])
 
     """ List of column copied when make a new revision from another """
@@ -788,7 +790,7 @@ class ContentRevisionRO(DeclarativeBase):
             file_extension,
         )
 
-
+# TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
 Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
 Index('idx__content_revisions__parent_id', ContentRevisionRO.parent_id)
 
@@ -810,9 +812,9 @@ class Content(DeclarativeBase):
     # QUERY CONTENTS
 
     To query contents you will need to join your content query with ContentRevisionRO. Join
-    condition is available at tracim.lib.content.ContentApi#get_revision_join:
+    condition is available at tracim.lib.content.ContentApi#_get_revision_join:
 
-    content = DBSession.query(Content).join(ContentRevisionRO, ContentApi.get_revision_join())
+    content = DBSession.query(Content).join(ContentRevisionRO, ContentApi._get_revision_join())
                   .filter(Content.label == 'foo')
                   .one()
 
@@ -867,6 +869,8 @@ class Content(DeclarativeBase):
     def revision_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.revision_id
 
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
+    # and should be author of first revision.
     @hybrid_property
     def owner_id(self) -> int:
         return self.revision.owner_id
@@ -1113,6 +1117,8 @@ class Content(DeclarativeBase):
     def node(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.node
 
+    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
+    # and should be author of first revision.
     @hybrid_property
     def owner(self) -> User:
         return self.revision.owner
@@ -1482,7 +1488,7 @@ class VirtualEvent(object):
             delta_from_datetime = datetime.utcnow()
 
         delta = delta_from_datetime - self.created
-        
+
         if delta.days > 0:
             if delta.days >= 365:
                 aff = '%d year%s ago' % (delta.days/365, 's' if delta.days/365>=2 else '')

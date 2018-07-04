@@ -8,12 +8,15 @@ from depot.manager import DepotManager
 from pyramid import testing
 from sqlalchemy.exc import IntegrityError
 
-from tracim.command.database import InitializeDBCommand
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.workspace import WorkspaceApi
-from tracim.models import get_engine, DeclarativeBase, get_session_factory, \
-    get_tm_session
-from tracim.models.data import Workspace, ContentType
+from tracim.models import get_engine
+from tracim.models import DeclarativeBase
+from tracim.models import get_session_factory
+from tracim.models import get_tm_session
+from tracim.models.data import Workspace
+from tracim.models.data import ContentType
+from tracim.models.data import ContentRevisionRO
 from tracim.models.data import Content
 from tracim.lib.utils.logger import logger
 from tracim.fixtures import FixturesLoader
@@ -27,6 +30,28 @@ from webtest import TestApp
 def eq_(a, b, msg=None):
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
     assert a == b, msg or "%r != %r" % (a, b)
+
+# TODO - G.M - 2018-06-179 - Refactor slug change function
+#  as a kind of pytest fixture ?
+
+
+def set_html_document_slug_to_legacy(session_factory) -> None:
+    """
+    Simple function to help some functional test. This modify "html-documents"
+    type content in database to legacy "page" slug.
+    :param session_factory: session factory of the test
+    :return: Nothing.
+    """
+    dbsession = get_tm_session(
+        session_factory,
+        transaction.manager
+    )
+    content_query = dbsession.query(ContentRevisionRO).filter(ContentRevisionRO.type == 'page').filter(ContentRevisionRO.content_id == 6)  # nopep8
+    assert content_query.count() == 0
+    html_documents_query = dbsession.query(ContentRevisionRO).filter(ContentRevisionRO.type == 'html-documents')  # nopep8
+    html_documents_query.update({ContentRevisionRO.type: 'page'})
+    transaction.commit()
+    assert content_query.count() > 0
 
 
 class FunctionalTest(unittest.TestCase):

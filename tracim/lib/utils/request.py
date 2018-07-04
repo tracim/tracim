@@ -2,18 +2,22 @@
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import NotAuthenticated, ContentNotFound
+from tracim.exceptions import ContentNotFoundInTracimRequest
 from tracim.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim.exceptions import UserNotFoundInTracimRequest
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspaceNotFound
 from tracim.exceptions import ImmutableAttribute
+from tracim.models.contents import ContentTypeLegacy as ContentType
+from tracim.lib.core.content import ContentApi
 from tracim.lib.core.user import UserApi
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.lib.utils.authorization import JSONDecodeError
 
 from tracim.models import User
 from tracim.models.data import Workspace
+from tracim.models.data import Content
 
 
 class TracimRequest(Request):
@@ -35,6 +39,12 @@ class TracimRequest(Request):
             decode_param_names,
             **kw
         )
+        # Current comment, found in request path
+        self._current_comment = None  # type: Content
+
+        # Current content, found in request path
+        self._current_content = None  # type: Content
+
         # Current workspace, found in request path
         self._current_workspace = None  # type: Workspace
 
@@ -60,7 +70,7 @@ class TracimRequest(Request):
         :return: Workspace of the request
         """
         if self._current_workspace is None:
-            self._current_workspace = self._get_current_workspace(self.current_user, self)
+            self._current_workspace = self._get_current_workspace(self.current_user, self)   # nopep8
         return self._current_workspace
 
     @current_workspace.setter
@@ -93,7 +103,50 @@ class TracimRequest(Request):
             )
         self._current_user = user
 
+    @property
+    def current_content(self) -> Content:
+        """
+        Get current  content from path
+        """
+        if self._current_content is None:
+            self._current_content = self._get_current_content(
+                self.current_user,
+                self.current_workspace,
+                self
+                )
+        return self._current_content
+
+    @current_content.setter
+    def current_content(self, content: Content) -> None:
+        if self._current_content is not None:
+            raise ImmutableAttribute(
+                "Can't modify already setted current_content"
+            )
+        self._current_content = content
+
+    @property
+    def current_comment(self) -> Content:
+        """
+        Get current comment from path
+        """
+        if self._current_comment is None:
+            self._current_comment = self._get_current_comment(
+                self.current_user,
+                self.current_workspace,
+                self.current_content,
+                self
+                )
+        return self._current_comment
+
+    @current_comment.setter
+    def current_comment(self, content: Content) -> None:
+        if self._current_comment is not None:
+            raise ImmutableAttribute(
+                "Can't modify already setted current_content"
+            )
+        self._current_comment = content
     # TODO - G.M - 24-05-2018 - Find a better naming for this ?
+
     @property
     def candidate_user(self) -> User:
         """
@@ -132,7 +185,6 @@ class TracimRequest(Request):
         self._current_workspace = None
         self.dbsession.close()
 
-
     @candidate_user.setter
     def candidate_user(self, user: User) -> None:
         if self._candidate_user is not None:
@@ -144,6 +196,80 @@ class TracimRequest(Request):
     ###
     # Utils for TracimRequest
     ###
+    def _get_current_comment(
+            self,
+            user: User,
+            workspace: Workspace,
+            content: Content,
+            request: 'TracimRequest'
+    ) -> Content:
+        """
+        Get current content from request
+        :param user: User who want to check the workspace
+        :param workspace: Workspace of the content
+        :param content: comment is related to this content
+        :param request: pyramid request
+        :return: current content
+        """
+        comment_id = ''
+        try:
+            if 'comment_id' in request.matchdict:
+                comment_id = int(request.matchdict['comment_id'])
+            if not comment_id:
+                raise ContentNotFoundInTracimRequest('No comment_id property found in request')  # nopep8
+            api = ContentApi(
+                current_user=user,
+                session=request.dbsession,
+                config=request.registry.settings['CFG']
+            )
+            comment = api.get_one(
+                comment_id,
+                content_type=ContentType.Comment,
+                workspace=workspace,
+                parent=content,
+            )
+        except JSONDecodeError as exc:
+            raise ContentNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
+            raise ContentNotFound(
+                'Comment {} does not exist '
+                'or is not visible for this user'.format(comment_id)
+            ) from exc
+        return comment
+
+    def _get_current_content(
+            self,
+            user: User,
+            workspace: Workspace,
+            request: 'TracimRequest'
+    ) -> Content:
+        """
+        Get current content from request
+        :param user: User who want to check the workspace
+        :param workspace: Workspace of the content
+        :param request: pyramid request
+        :return: current content
+        """
+        content_id = ''
+        try:
+            if 'content_id' in request.matchdict:
+                content_id = int(request.matchdict['content_id'])
+            if not content_id:
+                raise ContentNotFoundInTracimRequest('No content_id property found in request')  # nopep8
+            api = ContentApi(
+                current_user=user,
+                session=request.dbsession,
+                config=request.registry.settings['CFG']
+            )
+            content = api.get_one(content_id=content_id, workspace=workspace, content_type=ContentType.Any)  # nopep8
+        except JSONDecodeError as exc:
+            raise ContentNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
+            raise ContentNotFound(
+                'Content {} does not exist '
+                'or is not visible for this user'.format(content_id)
+            ) from exc
+        return content
 
     def _get_candidate_user(
             self,
@@ -156,7 +282,7 @@ class TracimRequest(Request):
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(None, session=request.dbsession, config=app_config)
-
+        login = ''
         try:
             login = None
             if 'user_id' in request.matchdict:
@@ -179,6 +305,7 @@ class TracimRequest(Request):
         """
         app_config = request.registry.settings['CFG']
         uapi = UserApi(None, session=request.dbsession, config=app_config)
+        login = ''
         try:
             login = request.authenticated_userid
             if not login:
@@ -204,20 +331,20 @@ class TracimRequest(Request):
             if 'workspace_id' in request.matchdict:
                 workspace_id = request.matchdict['workspace_id']
             if not workspace_id:
-                raise WorkspaceNotFoundInTracimRequest('No workspace_id property found in request')
+                raise WorkspaceNotFoundInTracimRequest('No workspace_id property found in request')  # nopep8
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
                 config=request.registry.settings['CFG']
             )
             workspace = wapi.get_one(workspace_id)
-        except JSONDecodeError:
-            raise WorkspaceNotFound('Bad json body')
-        except NoResultFound:
+        except JSONDecodeError as exc:
+            raise WorkspaceNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
             raise WorkspaceNotFound(
                 'Workspace {} does not exist '
                 'or is not visible for this user'.format(workspace_id)
-            )
+            ) from exc
         return workspace
 
     def _get_candidate_workspace(
@@ -236,18 +363,18 @@ class TracimRequest(Request):
             if 'new_workspace_id' in request.json_body:
                 workspace_id = request.json_body['new_workspace_id']
             if not workspace_id:
-                raise WorkspaceNotFoundInTracimRequest('No new_workspace_id property found in body')
+                raise WorkspaceNotFoundInTracimRequest('No new_workspace_id property found in body')  # nopep8
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
                 config=request.registry.settings['CFG']
             )
             workspace = wapi.get_one(workspace_id)
-        except JSONDecodeError:
-            raise WorkspaceNotFound('Bad json body')
-        except NoResultFound:
+        except JSONDecodeError as exc:
+            raise WorkspaceNotFound('Invalid JSON content') from exc
+        except NoResultFound as exc:
             raise WorkspaceNotFound(
                 'Workspace {} does not exist '
                 'or is not visible for this user'.format(workspace_id)
-            )
+            ) from exc
         return workspace

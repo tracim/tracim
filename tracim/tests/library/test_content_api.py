@@ -2083,7 +2083,7 @@ class TestContentApi(DefaultTest):
             tm=transaction.manager,
             content=p2,
         ):
-            p2.description = 'What\'s up ?'
+            p2.description = 'What\'s up?'
 
         api.save(p1)
         api.save(p2)
@@ -2096,7 +2096,7 @@ class TestContentApi(DefaultTest):
         eq_(2, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'this is dummy label content').count())
         eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.description == 'This is some amazing test').count())
         eq_(2, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.label == 'Hey ! Jon !').count())
-        eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.description == 'What\'s up ?').count())
+        eq_(1, self.session.query(ContentRevisionRO).filter(ContentRevisionRO.description == 'What\'s up?').count())
 
         res = api.search(['dummy', 'jon'])
         eq_(2, len(res.all()))

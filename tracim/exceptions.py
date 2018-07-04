@@ -69,7 +69,7 @@ class WorkspaceNotFoundInTracimRequest(NotFound):
     pass
 
 
-class InsufficientUserWorkspaceRole(TracimException):
+class InsufficientUserRoleInWorkspace(TracimException):
     pass
 
 
@@ -114,6 +114,18 @@ class UserDoesNotExist(TracimException):
 
 
 class UserNotFoundInTracimRequest(TracimException):
+    pass
+
+
+class ContentNotFoundInTracimRequest(TracimException):
+    pass
+
+
+class ContentNotFound(TracimException):
+    pass
+
+
+class ContentTypeNotAllowed(TracimException):
     pass
 
 
