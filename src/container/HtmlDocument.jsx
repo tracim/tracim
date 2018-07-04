@@ -230,7 +230,8 @@ class HtmlDocument extends React.Component {
         ...prev.content,
         label: revision.label,
         raw_content: revision.raw_content,
-        number: revision.number
+        number: revision.number,
+        status: revision.status
       },
       mode: MODE.REVISION
     }))
@@ -314,6 +315,7 @@ class HtmlDocument extends React.Component {
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
+            shouldScrollToBottom={mode !== MODE.REVISION}
           />
         </PopinFixedContent>
       </PopinFixed>
