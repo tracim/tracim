@@ -138,6 +138,27 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['description'] == 'mysuperdescription'
         assert len(workspace['sidebar_entries']) == 7
 
+    def test_api__update_workspace__err_400__empty_label(self) -> None:
+        """
+        Test update workspace with empty label
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'description': 'mysuperdescription'
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1',
+            status=400,
+            params=params,
+        )
+
     def test_api__create_workspace__ok_200__nominal_case(self) -> None:
         """
         Test create workspace
@@ -167,6 +188,27 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         workspace_2 = res.json_body
         assert workspace == workspace_2
+
+    def test_api__create_workspace__err_400__empty_label(self) -> None:
+        """
+        Test create workspace with empty label
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'description': 'mysuperdescription'
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces',
+            status=400,
+            params=params,
+        )
 
     def test_api__get_workspace__err_400__unallowed_user(self) -> None:
         """
