@@ -49,7 +49,7 @@ class PopupCreateHtmlDocument extends React.Component {
   handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
 
   handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateContent',
+    type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
     data: {
       name: this.state.appName
     }
@@ -74,7 +74,7 @@ class PopupCreateHtmlDocument extends React.Component {
       this.handleClose()
 
       GLOBAL_dispatchEvent({
-        type: 'openContentUrl',
+        type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
         data: {
           idWorkspace: jsonSaveNewHtmlDoc.workspace_id,
           contentType: this.state.appName,
