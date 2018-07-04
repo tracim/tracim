@@ -12,7 +12,7 @@ export const TextAreaApp = props =>
       onChange={props.onChangeText}
     />
 
-    <div className={`${props.customClass}__button editionmode__button`}>
+    <div className={`${props.customClass}__button editionmode__button text-right`}>
       <button
         type='button'
         className={`${props.customClass}__cancel editionmode__button__cancel btn btn-outline-primary mr-3`}
