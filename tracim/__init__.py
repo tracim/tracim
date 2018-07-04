@@ -33,7 +33,9 @@ from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import InsufficientUserRoleInWorkspace
 from tracim.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim.exceptions import UserNotFoundInTracimRequest
+from tracim.exceptions import ContentNotFoundInTracimRequest
 from tracim.exceptions import WorkspaceNotFound
+from tracim.exceptions import ContentNotFound
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import AuthenticationFailed
 from tracim.exceptions import ContentTypeNotAllowed
@@ -83,8 +85,10 @@ def web(global_config, **local_settings):
     # Bad request
     context.handle_exception(WorkspaceNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
     context.handle_exception(UserNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
+    context.handle_exception(ContentNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
     context.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
     # Auth exception
     context.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
