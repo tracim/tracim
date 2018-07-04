@@ -32,7 +32,7 @@ btnState()
     .dropdown-item
       &:hover, &:focus, &:active, &visited, &:focus-within
         background-color htmlColor
-        color off-white
+        color off-white!important // @FIXME 04/07/2018 AC - we must use a plugin for this
   &__editionmode
     &__cancel
       border-color htmlColor
@@ -52,6 +52,7 @@ btnState()
       border-radius 10px
       padding 25px
       height 100%
+      overflow-y auto
       background-color off-white
       &__latestversion
         display flex
@@ -67,7 +68,8 @@ btnState()
       min-height 300px
       &__item
         &__avatar
-          background-color darkHtmlColor
+          border 1px solid darkHtmlColor
+          background-color off-white
         &__content
           color darkGrey
       &__version
@@ -113,6 +115,11 @@ btnState()
 .received
   .timeline__messagelist__item__content
     background-color htmlColor
+
+// .html-documents__editionmode
+//   div.mce-edit-area
+//     & > iframe
+//       height 100%!important
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .page
