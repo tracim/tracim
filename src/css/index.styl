@@ -29,6 +29,7 @@ btnState()
     &:hover, &:focus, &:active
       color htmlColor
   .selectStatus
+    margin-right 15px
     .dropdown-item
       &:hover, &:focus, &:active, &visited, &:focus-within
         background-color htmlColor
@@ -54,12 +55,15 @@ btnState()
       height 100%
       overflow-y auto
       background-color off-white
-      &__latestversion
+      &__version
         display flex
         justify-content flex-end
         align-items center
         text-align right
         opacity 0.7
+      &__lastversion
+        margin-left 15px
+        font-weight bold
       &__text
         font-size 14px
       &__edition
@@ -85,7 +89,7 @@ btnState()
           & > i
             margin-right 10px
             color darkGrey
-            font-size 22px
+            font-size 20px
           &:hover, &:focus
             btnState()
         &__date

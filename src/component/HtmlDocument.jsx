@@ -7,9 +7,14 @@ const HtmlDocument = props => {
     <div className='wsContentHtmlDocument__contentpage__textnote html-documents__contentpage__textnote'>
       {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
         <div>
-          <div className='html-documents__contentpage__textnote__latestversion'>
+          <div className='html-documents__contentpage__textnote__version'>
             version n°
-            <div dangerouslySetInnerHTML={{__html: props.version}} />
+            <div dangerouslySetInnerHTML={{__html: props.mode === MODE.VIEW ? props.lastVersion : props.version}} />
+            {props.mode === MODE.REVISION &&
+              <div className='html-documents__contentpage__textnote__lastversion'>
+                (dernière version : {props.lastVersion})
+              </div>
+            }
           </div>
           <div className='html-documents__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.text}} />
         </div>

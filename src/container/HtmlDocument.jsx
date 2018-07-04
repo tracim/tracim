@@ -230,10 +230,16 @@ class HtmlDocument extends React.Component {
         ...prev.content,
         label: revision.label,
         raw_content: revision.raw_content,
-        number: revision.number
+        number: revision.number,
+        status: revision.status
       },
       mode: MODE.REVISION
     }))
+  }
+
+  handleClickLastVersion = () => {
+    this.loadContent()
+    this.setState({mode: MODE.VIEW})
   }
 
   render () {
@@ -252,21 +258,36 @@ class HtmlDocument extends React.Component {
         />
 
         <PopinFixedOption customClass={`${config.slug}`} i18n={i18n}>
-          <div>
-            <NewVersionBtn onClickNewVersionBtn={this.handleClickNewVersion} disabled={mode === MODE.REVISION} />
+          <div /* this div in display flex, justify-content space-between */>
+            <div className='d-flex'>
+              <NewVersionBtn onClickNewVersionBtn={this.handleClickNewVersion} disabled={mode === MODE.REVISION} />
 
-            <SelectStatus
-              selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-              availableStatus={config.availableStatuses}
-              onChangeStatus={this.handleChangeStatus}
-              disabled={mode === MODE.REVISION}
-            />
+              {mode === MODE.REVISION &&
+                <button
+                  className='wsContentGeneric__option__menu__lastversion html-documents__lastversionbtn btn btn-default'
+                  onClick={this.handleClickLastVersion}
+                  style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
+                >
+                  <i className='fa fa-code-fork' />
+                  Dernière version
+                </button>
+              }
+            </div>
 
-            <ArchiveDeleteContent
-              onClickArchiveBtn={this.handleClickArchive}
-              onClickDeleteBtn={this.handleClickDelete}
-              disabled={mode === MODE.REVISION}
-            />
+            <div className='d-flex'>
+              <SelectStatus
+                selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
+                availableStatus={config.availableStatuses}
+                onChangeStatus={this.handleChangeStatus}
+                disabled={mode === MODE.REVISION}
+              />
+
+              <ArchiveDeleteContent
+                onClickArchiveBtn={this.handleClickArchive}
+                onClickDeleteBtn={this.handleClickDelete}
+                disabled={mode === MODE.REVISION}
+              />
+            </div>
           </div>
         </PopinFixedOption>
 
@@ -276,11 +297,8 @@ class HtmlDocument extends React.Component {
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
             onClickValidateBtn={this.handleSaveHtmlDocument}
-            version={
-              mode === MODE.REVISION
-                ? content.number
-                : timeline.filter(t => t.timelineType === 'revision').length
-            }
+            version={content.number}
+            lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
             text={content.raw_content}
             onChangeText={this.handleChangeText}
             key={'html-documents'}
@@ -297,6 +315,7 @@ class HtmlDocument extends React.Component {
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
+            shouldScrollToBottom={mode !== MODE.REVISION}
           />
         </PopinFixedContent>
       </PopinFixed>
