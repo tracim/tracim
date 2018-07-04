@@ -160,6 +160,38 @@ class TestHtmlDocuments(FunctionalTest):
             status=400
         )
 
+    def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one html document of a content, workspace id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/coucou/html-documents/6',
+            status=400
+        )
+
+    def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one html document of a content, content_id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/coucou',
+            status=400
+        )
+
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
         """
         Update(put) one html document of a content
@@ -466,6 +498,38 @@ class TestThreads(FunctionalTest):
         )
         res = self.testapp.get(
             '/api/v2/workspaces/40/threads/7',
+            status=400
+        )
+
+    def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one thread, workspace id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/coucou/threads/7',
+            status=400
+        )
+
+    def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one thread, content id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/threads/coucou',
             status=400
         )
 

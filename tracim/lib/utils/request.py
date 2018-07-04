@@ -214,6 +214,8 @@ class TracimRequest(Request):
         comment_id = ''
         try:
             if 'comment_id' in request.matchdict:
+                if not request.matchdict['comment_id'].isdecimal():
+                    raise ContentNotFoundInTracimRequest('comment_id is not a correct integer')  # nopep8
                 comment_id = int(request.matchdict['comment_id'])
             if not comment_id:
                 raise ContentNotFoundInTracimRequest('No comment_id property found in request')  # nopep8
@@ -228,8 +230,6 @@ class TracimRequest(Request):
                 workspace=workspace,
                 parent=content,
             )
-        except JSONDecodeError as exc:
-            raise ContentNotFound('Invalid JSON content') from exc
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Comment {} does not exist '
@@ -253,6 +253,8 @@ class TracimRequest(Request):
         content_id = ''
         try:
             if 'content_id' in request.matchdict:
+                if not request.matchdict['content_id'].isdecimal():
+                    raise ContentNotFoundInTracimRequest('content_id is not a correct integer')  # nopep8
                 content_id = int(request.matchdict['content_id'])
             if not content_id:
                 raise ContentNotFoundInTracimRequest('No content_id property found in request')  # nopep8
@@ -262,8 +264,6 @@ class TracimRequest(Request):
                 config=request.registry.settings['CFG']
             )
             content = api.get_one(content_id=content_id, workspace=workspace, content_type=ContentType.Any)  # nopep8
-        except JSONDecodeError as exc:
-            raise ContentNotFound('Invalid JSON content') from exc
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content {} does not exist '
@@ -286,7 +286,9 @@ class TracimRequest(Request):
         try:
             login = None
             if 'user_id' in request.matchdict:
-                login = request.matchdict['user_id']
+                if not request.matchdict['user_id'].isdecimal():
+                    raise UserNotFoundInTracimRequest('user_id is not a correct integer')  # nopep8
+                login = int(request.matchdict['user_id'])
             if not login:
                 raise UserNotFoundInTracimRequest('You request a candidate user but the context not permit to found one')  # nopep8
             user = uapi.get_one(login)
@@ -329,7 +331,9 @@ class TracimRequest(Request):
         workspace_id = ''
         try:
             if 'workspace_id' in request.matchdict:
-                workspace_id = request.matchdict['workspace_id']
+                if not request.matchdict['workspace_id'].isdecimal():
+                    raise WorkspaceNotFoundInTracimRequest('workspace_id is not a correct integer')  # nopep8
+                workspace_id = int(request.matchdict['workspace_id'])
             if not workspace_id:
                 raise WorkspaceNotFoundInTracimRequest('No workspace_id property found in request')  # nopep8
             wapi = WorkspaceApi(
@@ -338,8 +342,6 @@ class TracimRequest(Request):
                 config=request.registry.settings['CFG']
             )
             workspace = wapi.get_one(workspace_id)
-        except JSONDecodeError as exc:
-            raise WorkspaceNotFound('Invalid JSON content') from exc
         except NoResultFound as exc:
             raise WorkspaceNotFound(
                 'Workspace {} does not exist '
@@ -362,6 +364,11 @@ class TracimRequest(Request):
         try:
             if 'new_workspace_id' in request.json_body:
                 workspace_id = request.json_body['new_workspace_id']
+                if not isinstance(workspace_id, int):
+                    if workspace_id.isdecimal():
+                        workspace_id = int(workspace_id)
+                    else:
+                        raise WorkspaceNotFoundInTracimRequest('workspace_id is not a correct integer')  # nopep8
             if not workspace_id:
                 raise WorkspaceNotFoundInTracimRequest('No new_workspace_id property found in body')  # nopep8
             wapi = WorkspaceApi(
