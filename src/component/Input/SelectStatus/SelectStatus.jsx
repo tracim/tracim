@@ -40,7 +40,7 @@ export const SelectStatus = props => {
           >
             {s.label /* props.t('Input.SelectStatus.ongoing') */}
             <div className='selectStatus__submenu__item__icon'>
-              <i className={`fa fa-${s.faIcon}`} />
+              <i className={`fa fa-fw fa-${s.faIcon}`} />
             </div>
           </button>
         )}
