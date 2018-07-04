@@ -24,11 +24,9 @@ class SessionController(Controller):
     @hapic.with_api_doc(tags=[SESSION_ENDPOINTS_TAG])
     @hapic.input_headers(LoginOutputHeaders())
     @hapic.input_body(BasicAuthSchema())
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     # TODO - G.M - 17-04-2018 - fix output header ?
     # @hapic.output_headers()
     @hapic.output_body(UserSchema(),)
-    #@hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def login(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs user into the system
@@ -54,7 +52,6 @@ class SessionController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SESSION_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     @hapic.output_body(UserSchema(),)
     def whoami(self, context, request: TracimRequest, hapic_data=None):
         """

@@ -26,9 +26,6 @@ USER_ENDPOINTS_TAG = 'Users'
 class UserController(Controller):
 
     @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(UserDoesNotExist, HTTPStatus.NOT_FOUND)
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True),)

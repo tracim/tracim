@@ -40,9 +40,6 @@ WORKSPACE_ENDPOINTS_TAG = 'Workspaces'
 class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceSchema())
@@ -60,9 +57,6 @@ class WorkspaceController(Controller):
         return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
@@ -89,9 +83,6 @@ class WorkspaceController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(FilterContentQuerySchema())
@@ -125,9 +116,6 @@ class WorkspaceController(Controller):
         return contents
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
@@ -158,9 +146,6 @@ class WorkspaceController(Controller):
         return content
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
@@ -213,9 +198,6 @@ class WorkspaceController(Controller):
         return api.get_content_in_context(updated_content)
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -248,9 +230,6 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -284,9 +263,6 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -316,9 +292,6 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

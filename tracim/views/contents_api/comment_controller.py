@@ -33,10 +33,6 @@ COMMENT_ENDPOINTS_TAG = 'Comments'
 class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(CommentSchema(many=True))
@@ -63,10 +59,6 @@ class CommentController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetCommentSchema())
@@ -95,10 +87,6 @@ class CommentController(Controller):
         return api.get_content_in_context(comment)
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_comment_ownership_or_role(
         minimal_required_role_for_anyone=UserRoleInWorkspace.WORKSPACE_MANAGER,
         minimal_required_role_for_owner=UserRoleInWorkspace.CONTRIBUTOR,

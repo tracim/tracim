@@ -38,11 +38,6 @@ THREAD_ENDPOINTS_TAG = 'Threads'
 class ThreadController(Controller):
 
     @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -64,10 +59,6 @@ class ThreadController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -102,10 +93,6 @@ class ThreadController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -136,10 +123,6 @@ class ThreadController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
