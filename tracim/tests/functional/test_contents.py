@@ -192,6 +192,27 @@ class TestHtmlDocuments(FunctionalTest):
             status=400
         )
 
+    def test_api__update_html_document__err_400__empty_label(self) -> None:  # nopep8
+        """
+        Update(put) one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6',
+            params=params,
+            status=400
+        )
+
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
         """
         Update(put) one html document of a content
@@ -602,6 +623,27 @@ class TestThreads(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+    def test_api__update_thread__err_400__empty_label(self) -> None:
+        """
+        Update(put) thread
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7',
+            params=params,
+            status=400
+        )
 
     def test_api__get_thread_revisions__ok_200__nominal_case(
             self

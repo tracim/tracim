@@ -834,6 +834,48 @@ class TestWorkspaceContents(FunctionalTest):
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
         assert res.json_body in active_contents
 
+    def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:  # nopep8
+        """
+        Create generic content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'content_type': 'markdownpage',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=400
+        )
+
+    def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:  # nopep8
+        """
+        Create generic content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedContent',
+            'content_type': 'unexistent-content-type',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=400,
+        )
+
     def test_api_put_move_content__ok_200__nominal_case(self):
         """
         Move content

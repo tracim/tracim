@@ -11,16 +11,14 @@ from tracim import TracimRequest
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.lib.core.content import ContentApi
 from tracim.lib.core.userworkspace import RoleApi
-from tracim.lib.utils.authorization import require_workspace_role, \
-    require_candidate_workspace_role
+from tracim.lib.utils.authorization import require_workspace_role
+from tracim.lib.utils.authorization import require_candidate_workspace_role
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
-from tracim.exceptions import NotAuthenticated, InsufficientUserRoleInWorkspace
-from tracim.exceptions import WorkspaceNotFoundInTracimRequest
+from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import WorkspacesDoNotMatch
-from tracim.exceptions import WorkspaceNotFound
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FilterContentQuerySchema
 from tracim.views.core_api.schemas import ContentMoveSchema
@@ -117,6 +115,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
     @hapic.output_body(ContentDigestSchema())
@@ -125,7 +124,7 @@ class WorkspaceController(Controller):
             context,
             request: TracimRequest,
             hapic_data=None,
-    ) -> typing.List[ContentInContext]:
+    ) -> ContentInContext:
         """
         create a generic empty content
         """

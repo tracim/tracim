@@ -23,11 +23,7 @@ from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.lib.utils.authorization import require_content_types
 from tracim.lib.utils.authorization import require_workspace_role
-from tracim.exceptions import WorkspaceNotFound
-from tracim.exceptions import ContentTypeNotAllowed
-from tracim.exceptions import InsufficientUserRoleInWorkspace
-from tracim.exceptions import NotAuthenticated
-from tracim.exceptions import AuthenticationFailed
+from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.models.context_models import ContentInContext
 from tracim.models.context_models import RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
@@ -61,6 +57,7 @@ class HTMLDocumentController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

@@ -459,6 +459,7 @@ class SetCommentSchema(marshmallow.Schema):
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
+        required=True,
         example='contract for client XXX',
         description='New title of the content'
     )

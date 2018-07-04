@@ -131,3 +131,15 @@ class ContentTypeNotAllowed(TracimException):
 
 class WorkspacesDoNotMatch(TracimException):
     pass
+
+
+class EmptyValueNotAllowed(TracimException):
+    pass
+
+
+class EmptyLabelNotAllowed(EmptyValueNotAllowed):
+    pass
+
+
+class EmptyRawContentNotAllowed(EmptyValueNotAllowed):
+    pass

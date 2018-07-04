@@ -128,10 +128,20 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        item = api.create(ContentType.Folder, workspace, None,
-                          'not_deleted', True)
-        item2 = api.create(ContentType.Folder, workspace, None,
-                           'to_delete', True)
+        item = api.create(
+            content_type=ContentType.Folder,
+            workspace=workspace,
+            parent=None,
+            label='not_deleted',
+            do_save=True
+        )
+        item2 = api.create(
+            content_type=ContentType.Folder,
+            workspace=workspace,
+            parent=None,
+            label='to_delete',
+            do_save=True
+        )
         uid = user.user_id
         wid = workspace.workspace_id
         transaction.commit()
@@ -229,10 +239,20 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        item = api.create(ContentType.Folder, workspace, None,
-                          'not_archived', True)
-        item2 = api.create(ContentType.Folder, workspace, None,
-                           'to_archive', True)
+        item = api.create(
+            content_type=ContentType.Folder,
+            workspace=workspace,
+            parent=None,
+            label='not_archived',
+            do_save=True
+        )
+        item2 = api.create(
+            content_type=ContentType.Folder,
+            workspace=workspace,
+            parent=None,
+            label='to_archive',
+            do_save=True
+        )
         uid = user.user_id
         wid = workspace.workspace_id
         transaction.commit()
@@ -337,9 +357,20 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        item = api.create(ContentType.Folder, workspace, None,
-                          'thefolder', True)
-        item2 = api.create(ContentType.File, workspace, None, 'thefile', True)
+        item = api.create(
+            content_type=ContentType.Folder,
+            workspace=workspace,
+            parent=None,
+            label='thefolder',
+            do_save=True
+        )
+        item2 = api.create(
+            content_type=ContentType.File,
+            workspace=workspace,
+            parent=None,
+            label='thefile',
+            do_save=True
+        )
         uid = user.user_id
         wid = workspace.workspace_id
         transaction.commit()
@@ -1248,8 +1279,13 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        p = api.create(ContentType.Page, workspace, None,
-                       'this_is_a_page', True)
+        p = api.create(
+            content_type=ContentType.Page,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=True
+        )
 
         u1id = user1.user_id
         u2id = user2.user_id
@@ -1453,8 +1489,13 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        p = api.create(ContentType.File, workspace, None,
-                       'this_is_a_page', True)
+        p = api.create(
+            content_type=ContentType.File,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=True
+        )
 
         u1id = user1.user_id
         u2id = user2.user_id
@@ -1666,8 +1707,13 @@ class TestContentApi(DefaultTest):
             show_archived=True,
             config=self.app_config,
         )
-        p = api.create(ContentType.File, workspace, None,
-                       'this_is_a_page', True)
+        p = api.create(
+            content_type=ContentType.File,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=True
+        )
 
         u1id = user1.user_id
         u2id = user2.user_id
@@ -1822,8 +1868,13 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             show_deleted=True,
         )
-        p = api.create(ContentType.File, workspace, None,
-                       'this_is_a_page', True)
+        p = api.create(
+            content_type=ContentType.File,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=True
+        )
 
         u1id = user1.user_id
         u2id = user2.user_id
@@ -2065,11 +2116,27 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        a = api.create(ContentType.Folder, workspace, None,
-                       'this is randomized folder', True)
-        p1 = api.create(ContentType.Page, workspace, a,
-                        'this is dummy label content', True)
-        p2 = api.create(ContentType.Page, workspace, a, 'Hey ! Jon !', True)
+        a = api.create(
+            content_type=ContentType.Folder,
+            workspace=workspace,
+            parent=None,
+            label='this is randomized folder',
+            do_save=True
+        )
+        p1 = api.create(
+            content_type=ContentType.Page,
+            workspace=workspace,
+            parent=a,
+            label='this is dummy label content',
+            do_save=True
+        )
+        p2 = api.create(
+            content_type=ContentType.Page,
+            workspace=workspace,
+            parent=a,
+            label='Hey ! Jon !',
+            do_save=True
+        )
 
         with new_revision(
             session=self.session,

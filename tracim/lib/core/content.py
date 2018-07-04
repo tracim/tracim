@@ -5,7 +5,6 @@ import datetime
 import re
 import typing
 from operator import itemgetter
-from operator import not_
 
 import transaction
 from sqlalchemy import func
@@ -25,7 +24,8 @@ from sqlalchemy.sql.elements import and_
 
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
-from tracim.exceptions import SameValueError
+from tracim.exceptions import SameValueError, EmptyRawContentNotAllowed
+from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.lib.utils.utils import current_date_for_filename
@@ -393,18 +393,26 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         assert content_type in ContentType.allowed_types()
 
         if content_type == ContentType.Folder and not label:
             label = self.generate_folder_label(workspace, parent)
 
         content = Content()
+        if label:
+            content.label = label
+        elif filename:
+            # TODO - G.M - 2018-07-04 - File_name setting automatically
+            # set label and file_extension
+            content.file_name = label
+        else:
+            raise EmptyLabelNotAllowed()
+
         content.owner = self._user
         content.parent = parent
         content.workspace = workspace
         content.type = content_type
-        content.label = label
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
 
@@ -419,9 +427,10 @@ class ContentApi(object):
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
         return content
 
-
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
-        assert parent  and parent.type!=ContentType.Folder
+        assert parent and parent.type != ContentType.Folder
+        if not content:
+            raise EmptyRawContentNotAllowed()
         item = Content()
         item.owner = self._user
         item.parent = parent
@@ -972,6 +981,8 @@ class ContentApi(object):
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
             # Internatization disabled in libcontent for now.
             raise SameValueError('The content did not changed')
+        if not new_label:
+            raise EmptyLabelNotAllowed()
         item.owner = self._user
         item.label = new_label
         item.description = new_content if new_content else item.description # TODO: convert urls into links
