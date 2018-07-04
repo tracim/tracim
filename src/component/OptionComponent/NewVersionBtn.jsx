@@ -3,7 +3,7 @@ import React from 'react'
 const NewVersionBtn = props => {
   return (
     <button
-      className='wsContentGeneric__option__menu__addversion newversionbtn btn btn-outline-primary mr-auto'
+      className='wsContentGeneric__option__menu__addversion newversionbtn btn btn-outline-primary'
       onClick={props.onClickNewVersionBtn}
       disabled={props.disabled}
     >

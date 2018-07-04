@@ -57,11 +57,22 @@
     &__menu
       & > div
         display flex
+        flex-flow row
+        justify-content space-between
         align-items center
       &__addversion
         display flex
         align-items center
         cursor pointer
+      &__lastversion
+        display flex
+        align-items center
+        cursor pointer
+        margin-left 15px
+        & > i
+          margin-right 10px
+          color darkGrey
+          font-size 22px
       &__action
         font-size 18px
         background-color transparent
