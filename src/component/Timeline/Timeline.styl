@@ -29,8 +29,8 @@
         top 40px
         left -20px
         border-radius 50%
-        width 50px
-        height 50px
+        width 45px
+        height 45px
         & > img
           width 45px
           height 45px
@@ -74,7 +74,7 @@
     flex 1 0 auto
     margin 20px
     &__textinput
-      width 70%
+      width 100%
       & > textarea
         border-radius 5px
         border 1.5px solid grey
@@ -83,10 +83,12 @@
         width 100%
     &__wrapper
       display flex
-      flex-direction column
-      justify-content center
+      align-items center
+      justify-content flex-end
+      margin-top 10px
+    &__advancedtext
+      margin-right 15px
     &__submit
-      margin 10px 0
       &__btn
         display inline-block
         cursor pointer
@@ -97,26 +99,16 @@
 .received
   text-align right
   .timeline__messagelist__item
+    &__wrapper
+      display flex
+      flex-direction row-reverse
     &__avatar
-      left 93%
+      left 20px
     &__createhour
       margin-left 0
       margin-right 35px
     &__content
       color white
-
-.activeAdvancedText
-  .timeline
-    &__texteditor
-      padding 10px
-      &__textinput
-        width 100%
-      &__wrapper
-        flex-direction row
-        align-items center
-        width 100%
-      &__advancedtext
-        margin-right 20px
 
 
 /**** MEDIA 576px & 1199px ****/

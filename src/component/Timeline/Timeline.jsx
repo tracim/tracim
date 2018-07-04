@@ -57,7 +57,7 @@ class Timeline extends React.Component {
           <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
         </ul>
 
-        <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor d-flex align-items-center justify-content-between flex-wrap')}>
+        <form className={classnames(`${props.customClass}__texteditor`, 'timeline__texteditor')}>
           <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__texteditor__textinput')}>
             <textarea
               id='wysiwygTimelineComment'
@@ -82,7 +82,7 @@ class Timeline extends React.Component {
               </button>
             </div>
 
-            <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit mb-2')}>
+            <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
               <button
                 type='button'
                 className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__texteditor__submit__btn btn')}
