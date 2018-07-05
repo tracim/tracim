@@ -21,8 +21,8 @@
     <script src='/tracim.app.entry.js'></script>
 
     <script src='/app/html-documents.app.js'></script>
-    <!-- <script src='/app/thread.app.js'></script>
-    <script src='/app/file.app.js'></script> -->
+    <script src='/app/thread.app.js'></script>
+    <!-- <script src='/app/file.app.js'></script> -->
 
     <script src="/dev/jquery-3.2.1.js"></script>
     <script src="/dev/popper-1.12.3.js"></script>
@@ -51,7 +51,7 @@
         const selectedApp = getSelectedApp(app.config.slug)
 
         if (selectedApp.isRendered) {
-          GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app})
+          GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app}) // handled by html-documents:src/container/HtmlDocument.jsx
         } else {
           selectedApp.renderApp(app)
           selectedApp.isRendered = true

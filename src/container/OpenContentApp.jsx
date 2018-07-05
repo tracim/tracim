@@ -29,7 +29,7 @@ export class OpenContentApp extends React.Component {
         this.props.updateAppOpened(true)
       } else {
         GLOBAL_dispatchEvent({
-          type: 'html-documents_reloadContent',
+          type: 'html-documents_reloadContent', // handled by html-documents:src/container/HtmlDocument.jsx
           data: contentToOpen
         })
       }

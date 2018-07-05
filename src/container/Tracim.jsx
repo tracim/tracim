@@ -55,6 +55,8 @@ class Tracim extends React.Component {
             <div className='tracim__content'>
               <Route path={PAGE.LOGIN} component={Login} />
 
+              <PrivateRoute exact path='/' component={WorkspaceContent} />
+
               <Switch>
                 <PrivateRoute path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
                 <PrivateRoute path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
