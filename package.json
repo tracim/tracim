@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
+    "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9872 -- webpack-dev-server --watch --colors --inline --hot --progress",
     "build": "NODE_ENV=production webpack -p",
+    "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -47,8 +49,12 @@
     "globals": [
       "fetch",
       "history",
+      "btoa",
+      "wysiwyg",
+      "tinymce",
       "GLOBAL_renderApp",
-      "GLOBAL_unmountApp"
+      "GLOBAL_unmountApp",
+      "GLOBAL_dispatchEvent"
     ],
     "parser": "babel-eslint",
     "ignore": []
