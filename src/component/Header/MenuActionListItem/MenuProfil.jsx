@@ -8,7 +8,7 @@ const MenuProfil = props => {
     ? (
       <li className='header__menu__rightside__itemprofil'>
         <div className='profilgroup dropdown'>
-          <button className='profilgroup__name btn btn-secondary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+          <button className='profilgroup__name btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
             <img className='profilgroup__name__imgprofil' src={props.user.avatar_url} />
             <div className='profilgroup__name__text'>
               {props.user.name}
