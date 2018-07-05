@@ -15,7 +15,8 @@ import {
   getThreadContent,
   getThreadComment,
   postThreadNewComment,
-  putThreadStatus
+  putThreadStatus,
+  putThreadContent
 } from '../action.async.js'
 
 class Thread extends React.Component {
@@ -91,6 +92,18 @@ class Thread extends React.Component {
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
   }
 
+  handleSaveEditTitle = async newTitle => {
+    const { config, content } = this.state
+
+    const fetchResultSaveThread = putThreadContent(config.apiUrl, content.workspace_id, content.content_id, newTitle)
+
+    handleFetchResult(await fetchResultSaveThread)
+      .then(resSave => {
+        if (resSave.apiResponse.status === 200) this.loadContent()
+        else console.warn('Error saving threads. Result:', resSave, 'content:', content, 'config:', config)
+      })
+  }
+
   handleChangeNewComment = e => {
     const newComment = e.target.value
     this.setState({newComment})
@@ -146,6 +159,7 @@ class Thread extends React.Component {
           faIcon={config.faIcon}
           title={content.label}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          onValidateChangeTitle={this.handleSaveEditTitle}
         />
 
         <PopinFixedOption customClass={`wsContentThread`} i18n={i18n}>

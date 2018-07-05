@@ -40,3 +40,13 @@ export const postThreadContent = (apiUrl, idWorkspace, idFolder, contentType, ne
       label: newContentName
     })
   })
+
+export const putThreadContent = (apiUrl, idWorkspace, idContent, label) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}`, {
+    ...FETCH_CONFIG,
+    method: 'PUT',
+    body: JSON.stringify({
+      label: label,
+      raw_content: '' // threads have no content
+    })
+  })
