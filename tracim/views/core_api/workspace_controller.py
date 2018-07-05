@@ -290,7 +290,7 @@ class WorkspaceController(Controller):
             context,
             request: TracimRequest,
             hapic_data=None,
-    ) -> typing.List[ContentInContext]:
+    ) -> ContentInContext:
         """
         move a content
         """
@@ -339,7 +339,7 @@ class WorkspaceController(Controller):
             context,
             request: TracimRequest,
             hapic_data=None,
-    ) -> typing.List[ContentInContext]:
+    ) -> None:
         """
         delete a content
         """
@@ -371,7 +371,7 @@ class WorkspaceController(Controller):
             context,
             request: TracimRequest,
             hapic_data=None,
-    ) -> typing.List[ContentInContext]:
+    ) -> None:
         """
         undelete a content
         """
@@ -404,7 +404,7 @@ class WorkspaceController(Controller):
             context,
             request: TracimRequest,
             hapic_data=None,
-    ) -> typing.List[ContentInContext]:
+    ) -> None:
         """
         archive a content
         """
@@ -415,7 +415,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=ContentType.Any)
+        content = api.get_one(path_data.content_id, content_type=ContentType.Any)  # nopep8
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
@@ -433,7 +433,7 @@ class WorkspaceController(Controller):
             context,
             request: TracimRequest,
             hapic_data=None,
-    ) -> typing.List[ContentInContext]:
+    ) -> None:
         """
         unarchive a content
         """
