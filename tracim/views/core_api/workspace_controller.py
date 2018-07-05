@@ -30,6 +30,7 @@ from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FilterContentQuerySchema
+from tracim.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim.views.core_api.schemas import WorkspaceMemberInviteSchema
 from tracim.views.core_api.schemas import RoleUpdateSchema
 from tracim.views.core_api.schemas import WorkspaceCreationSchema
@@ -176,7 +177,7 @@ class WorkspaceController(Controller):
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceMemberInviteSchema())
-    @hapic.output_body(WorkspaceMemberSchema())
+    @hapic.output_body(WorkspaceMemberCreationSchema())
     def create_workspaces_members_role(
             self,
             context,
@@ -186,6 +187,8 @@ class WorkspaceController(Controller):
         """
         Add Members to this workspace
         """
+        newly_created = False
+        email_sent = False
         app_config = request.registry.settings['CFG']
         rapi = RoleApi(
             current_user=request.current_user,
@@ -211,6 +214,7 @@ class WorkspaceController(Controller):
                     hapic_data.body.user_email_or_public_name,
                     do_notify=False
                 )  # nopep8
+                newly_created = True
             except EmailValidationFailed:
                 raise UserCreationFailed('no valid mail given')
         role = rapi.create_one(
@@ -220,7 +224,11 @@ class WorkspaceController(Controller):
             with_notif=False,
             flush=True,
         )
-        return rapi.get_user_role_workspace_with_context(role)
+        return rapi.get_user_role_workspace_with_context(
+            role,
+            newly_created=newly_created,
+            email_sent=email_sent,
+        )
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)

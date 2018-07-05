@@ -301,6 +301,20 @@ class WorkspaceMemberSchema(marshmallow.Schema):
         description = 'Workspace Member information'
 
 
+class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
+    newly_created = marshmallow.fields.Bool(
+        exemple=False,
+        description='Is the user completely new '
+                    '(and account was just created) or not ?',
+    )
+    email_sent = marshmallow.fields.Bool(
+        exemple=False,
+        description='Has an email been sent to user to inform him about '
+                    'this new workspace registration and eventually his account'
+                    'creation'
+    )
+
+
 class ApplicationConfigSchema(marshmallow.Schema):
     pass
     #  TODO - G.M - 24-05-2018 - Set this

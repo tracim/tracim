@@ -310,10 +310,16 @@ class UserRoleWorkspaceInContext(object):
             user_role: UserRoleInWorkspace,
             dbsession: Session,
             config: CFG,
+            # Extended params
+            newly_created:bool = None,
+            email_sent: bool = None
     )-> None:
         self.user_role = user_role
         self.dbsession = dbsession
         self.config = config
+        # Extended params
+        self.newly_created = newly_created
+        self.email_sent = email_sent
 
     @property
     def user_id(self) -> int:

@@ -58,7 +58,9 @@ class RoleApi(object):
 
     def get_user_role_workspace_with_context(
             self,
-            user_role: UserRoleInWorkspace
+            user_role: UserRoleInWorkspace,
+            newly_created:bool = None,
+            email_sent: bool = None,
     ) -> UserRoleWorkspaceInContext:
         """
         Return WorkspaceInContext object from Workspace
@@ -68,6 +70,8 @@ class RoleApi(object):
             user_role=user_role,
             dbsession=self._session,
             config=self._config,
+            newly_created=newly_created,
+            email_sent=email_sent,
         )
         return workspace
 

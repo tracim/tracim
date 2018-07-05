@@ -376,6 +376,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['role'] == 'content-manager'
         assert user_role_found['user_id'] == 2
         assert user_role_found['workspace_id'] == 1
+        assert user_role_found['newly_created'] is False
+        assert user_role_found['email_sent'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -384,7 +386,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
         user_role = res[1]
-        assert user_role_found == user_role
+        assert user_role_found['role'] == user_role['role']
+        assert user_role_found['user_id'] == user_role['user_id']
+        assert user_role_found['workspace_id'] == user_role['workspace_id']
 
     def test_api__create_workspace_member_role__ok_200__user_email(self):
         """
@@ -413,6 +417,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['role'] == 'content-manager'
         assert user_role_found['user_id'] == 2
         assert user_role_found['workspace_id'] == 1
+        assert user_role_found['newly_created'] is False
+        assert user_role_found['email_sent'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -421,7 +427,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
         user_role = res[1]
-        assert user_role_found == user_role
+        assert user_role_found['role'] == user_role['role']
+        assert user_role_found['user_id'] == user_role['user_id']
+        assert user_role_found['workspace_id'] == user_role['workspace_id']
 
     def test_api__create_workspace_member_role__ok_200__user_public_name(self):
         """
@@ -450,6 +458,8 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['role'] == 'content-manager'
         assert user_role_found['user_id'] == 2
         assert user_role_found['workspace_id'] == 1
+        assert user_role_found['newly_created'] is False
+        assert user_role_found['email_sent'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -458,7 +468,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
         user_role = res[1]
-        assert user_role_found == user_role
+        assert user_role_found['role'] == user_role['role']
+        assert user_role_found['user_id'] == user_role['user_id']
+        assert user_role_found['workspace_id'] == user_role['workspace_id']
 
     def test_api__create_workspace_member_role__err_400__nothing(self):
         """
@@ -531,6 +543,25 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             status=200,
             params=params,
         )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id']
+        user_id = user_role_found['user_id']
+        assert user_role_found['workspace_id'] == 1
+        assert user_role_found['newly_created'] is True
+        assert user_role_found['email_sent'] is False
+
+        res = self.testapp.get('/api/v2/workspaces/1/members',
+                               status=200).json_body  # nopep8
+        assert len(res) == 2
+        user_role = res[0]
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+        user_role = res[1]
+        assert user_role_found['role'] == user_role['role']
+        assert user_role_found['user_id'] == user_role['user_id']
+        assert user_role_found['workspace_id'] == user_role['workspace_id']
 
     def test_api__update_workspace_member_role__ok_200__nominal_case(self):
         """
