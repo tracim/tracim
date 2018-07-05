@@ -508,7 +508,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             params=params,
         )
 
-    def test_api__create_workspace_member_role__err_400__wrong_user_email_or_public_name(self):  # nopep8
+    def test_api__create_workspace_member_role__ok_200__new_user(self):  # nopep8
         """
         Create workspace member role
         :return:
@@ -528,7 +528,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
-            status=400,
+            status=200,
             params=params,
         )
 

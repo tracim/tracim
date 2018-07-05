@@ -5,7 +5,7 @@ from smtplib import SMTPException
 import transaction
 import typing as typing
 
-from tracim.exceptions import NotificationNotSend
+from tracim.exceptions import NotificationNotSend, EmailValidationFailed
 from tracim.lib.mail_notifier.notifier import get_email_manager
 from sqlalchemy.orm import Session
 
@@ -17,6 +17,7 @@ from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WrongUserPassword
 from tracim.exceptions import AuthenticationFailed
 from tracim.models.context_models import UserInContext
+from tracim.models.context_models import TypeUser
 
 
 class UserApi(object):
@@ -94,19 +95,40 @@ class UserApi(object):
     def get_all(self) -> typing.Iterable[User]:
         return self._session.query(User).order_by(User.display_name).all()
 
-    def find_one(self, user_email_or_public_name: str) -> User:
+    def find(
+            self,
+            user_id: int=None,
+            email: str=None,
+            public_name: str=None
+    ) -> typing.Tuple[TypeUser, User]:
+        """
+        Find existing user from all theses params.
+        Check is made in this order: user_id, email, public_name
+        If no user found raise UserDoesNotExist exception
+        """
         user = None
-        try:
-            user = self.get_one_by_email(email=user_email_or_public_name)
-        except UserDoesNotExist:
-            # INFO - G.M - 2018-07-183 - we discard this exception in order
-            # allow secondary check (public_name)
-            pass
 
-        if not user:
-            user = self.get_one_by_public_name(user_email_or_public_name)
+        if user_id:
+            try:
+                user = self.get_one(user_id)
+                return TypeUser.USER_ID, user
+            except UserDoesNotExist:
+                pass
+        if email:
+            try:
+                user = self.get_one_by_email(email)
+                return TypeUser.EMAIL, user
+            except UserDoesNotExist:
+                pass
+        if public_name:
+            try:
+                user = self.get_one_by_public_name(public_name)
+                return TypeUser.PUBLIC_NAME, user
+            except UserDoesNotExist:
+                pass
 
-        return user
+        raise UserDoesNotExist('User not found with any of given params.')
+
     # Check methods
 
     def user_with_email_exists(self, email: str) -> bool:
@@ -136,6 +158,15 @@ class UserApi(object):
 
     # Actions
 
+    def _check_email(self, email: str) -> bool:
+        # TODO - G.M - 2018-07-05 - find a better way to check email
+        if not email:
+            return False
+        email = email.split('@')
+        if len(email) != 2:
+            return False
+        return True
+
     def update(
             self,
             user: User,
@@ -149,6 +180,9 @@ class UserApi(object):
             user.display_name = name
 
         if email is not None:
+            email_exist = self._check_email(email)
+            if not email_exist:
+                raise EmailValidationFailed('Email given form {} is uncorrect'.format(email))  # nopep8
             user.email = email
 
         if password is not None:
@@ -200,7 +234,11 @@ class UserApi(object):
         """Previous create_user method"""
         user = User()
 
+        email_exist = self._check_email(email)
+        if not email_exist:
+            raise EmailValidationFailed('Email given form {} is uncorrect'.format(email))  # nopep8
         user.email = email
+        user.display_name = email.split('@')[0]
 
         for group in groups:
             user.groups.append(group)

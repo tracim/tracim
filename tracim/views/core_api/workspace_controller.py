@@ -24,6 +24,8 @@ from tracim.models.data import ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
 from tracim.exceptions import EmptyLabelNotAllowed
+from tracim.exceptions import EmailValidationFailed
+from tracim.exceptions import UserCreationFailed
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.views.controllers import Controller
@@ -170,6 +172,7 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.handle_exception(UserCreationFailed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceMemberInviteSchema())
@@ -194,17 +197,22 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        if hapic_data.body.user_id is not None:
-            user = uapi.get_one(user_id=hapic_data.body.user_id)
-        elif hapic_data.body.user_email_or_public_name:
-            user = uapi.find_one(
-                user_email_or_public_name=hapic_data.body.user_email_or_public_name  # nopep8
+        try:
+            _, user = uapi.find(
+                user_id=hapic_data.body.user_id,
+                email=hapic_data.body.user_email_or_public_name,
+                public_name=hapic_data.body.user_email_or_public_name
             )
-        else:
-            raise UserDoesNotExist(
-                'user_id or user_email_or_public_name should have '
-                'valid value.'
-            )
+        except UserDoesNotExist:
+            try:
+                # TODO - G.M - 2018-07-05 - [UserCreation] Reenable email
+                # notification for creation
+                user = uapi.create_user(
+                    hapic_data.body.user_email_or_public_name,
+                    do_notify=False
+                )  # nopep8
+            except EmailValidationFailed:
+                raise UserCreationFailed('no valid mail given')
         role = rapi.create_one(
             user=user,
             workspace=request.current_workspace,

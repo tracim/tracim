@@ -1,6 +1,7 @@
 # coding=utf-8
 import typing
 from datetime import datetime
+from enum import Enum
 
 from slugify import slugify
 from sqlalchemy.orm import Session
@@ -171,6 +172,13 @@ class TextBasedContentUpdate(object):
     ) -> None:
         self.label = label
         self.raw_content = raw_content
+
+
+class TypeUser(Enum):
+    """Params used to find user"""
+    USER_ID = 'found_id'
+    EMAIL = 'found_email'
+    PUBLIC_NAME = 'found_public_name'
 
 
 class UserInContext(object):

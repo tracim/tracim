@@ -147,3 +147,11 @@ class EmptyRawContentNotAllowed(EmptyValueNotAllowed):
 
 class RoleDoesNotExist(TracimException):
     pass
+
+
+class EmailValidationFailed(TracimException):
+    pass
+
+
+class UserCreationFailed(TracimException):
+    pass
