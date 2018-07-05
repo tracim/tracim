@@ -27,12 +27,17 @@ btnState()
     margin 0
   .thread
     &__contentpage
+      &__messagelist
+        &__item__avatar
+          border 1px solid darkenThread
+          background-color off-white
       &__texteditor
         flex 0 0 auto
         &__advancedtext
           &__btn
             color fontColor
             border-color threadColor
+            cursor pointer
             &:hover ,&:focus, &:visited, &:active
               btnState()
               border-color darkenThread
