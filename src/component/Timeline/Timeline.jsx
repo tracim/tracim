@@ -27,9 +27,11 @@ class Timeline extends React.Component {
 
     return (
       <div className='timeline'>
-        <div className={classnames(`${props.customClass}__header`, 'timeline__header')}>
-          Timeline
-        </div>
+        {props.showHeader &&
+          <div className={classnames(`${props.customClass}__header`, 'timeline__header')}>
+            Timeline
+          </div>
+        }
 
         <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}>
           {props.timelineData.map(content => {
@@ -116,7 +118,8 @@ Timeline.propTypes = {
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
-  shouldScrollToBottom: PropTypes.bool
+  shouldScrollToBottom: PropTypes.bool,
+  showHeader: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -130,5 +133,6 @@ Timeline.defaultProps = {
   timelineData: [],
   wysiwyg: false,
   onClickWysiwygBtn: () => {},
-  shouldScrollToBottom: true
+  shouldScrollToBottom: true,
+  showHeader: true
 }
