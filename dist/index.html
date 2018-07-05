@@ -28,8 +28,8 @@
     <script src="/dev/popper-1.12.3.js"></script>
     <script src="/dev/bootstrap-4.0.0-beta.2.js"></script>
 
-    <script type="text/javascript" src="/asset/tinymce/jquery.tinymce.min.js"></script>
-    <script type="text/javascript" src="/asset/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/asset/tinymce/js/tinymce/jquery.tinymce.min.js"></script>
+    <script type="text/javascript" src="/asset/tinymce/js/tinymce/tinymce.min.js"></script>
 
     <script type='text/javascript'>
       let prevSelectedApp = {name: ''} // default value
@@ -126,20 +126,12 @@
 
           tinymce.init({
             selector: selector,
-            // height: 130,
-            // width: 530,
             menubar: false,
             resize: false,
-            plugins: [
-              'advlist autolink lists link image charmap print preview anchor textcolor',
-              'searchreplace visualblocks code fullscreen',
-              'insertdatetime media table contextmenu paste code help'
-            ],
+            skin: "lightgray",
+            plugins:'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
             toolbar: 'insert | formatselect | bold italic underline strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | table | code ',
-            content_css: [
-              '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-              '//www.tinymce.com/css/codepen.min.css'
-            ],
+            content_style: "div {height: 100%;}",
             setup: function ($editor) {
               $editor.on('change', function(e) {
                 handleOnChange({target: {value: $editor.getContent()}}) // target.value to emulate a js event so the react handler can expect one
