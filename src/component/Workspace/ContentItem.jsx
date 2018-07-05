@@ -8,7 +8,7 @@ const ContentItem = props => {
   return (
     <div className={classnames('content', 'align-items-center', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
-        <i className={`fa fa-${props.faIcon}`} />
+        <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
 
       <div className='content__name'>
@@ -23,7 +23,7 @@ const ContentItem = props => {
 
       <div className={classnames('content__status d-flex align-items-center justify-content-start')} style={{color: status.hexcolor}}>
         <div className='content__status__icon d-block '>
-          <i className={`fa fa-${status.faIcon}`} />
+          <i className={`fa fa-fw fa-${status.fa_icon}`} />
         </div>
         <div className='content__status__text d-none d-xl-block'>
           {status.label}

@@ -8,7 +8,7 @@ const DropdownLang = props => {
       <div className='header__menu__rightside__itemlanguage__languagedropdown dropdown'>
         <button
           type='button'
-          className='languagedropdown__btnlanguage btnnavbar btn btn-secondary dropdown-toggle'
+          className='languagedropdown__btnlanguage btnnavbar btn btn-outline-primary dropdown-toggle'
           id='headerDropdownMenuButton'
           data-toggle='dropdown'
           aria-haspopup='true'

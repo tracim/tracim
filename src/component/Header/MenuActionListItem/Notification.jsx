@@ -7,7 +7,7 @@ const Notification = props => {
       <div className='header__menu__rightside__itemnotification__timeline dropdown'>
         <button
           type='button'
-          className='timeline__btnnotif btnnavbar btn btn-secondary dropdown-toggle'
+          className='timeline__btnnotif btnnavbar btn btn-outline-primary dropdown-toggle'
           id='headerNotificationBtn'
           data-toggle='dropdown'
           aria-haspopup='true'

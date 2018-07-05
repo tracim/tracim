@@ -16,7 +16,8 @@ a
   &:hover, &:focus, &:active, &:visited, &:focus-within
     background-color hover-button
     border-color hover-button
-    box-shadow 0 0 1px 2px secondColor
+    box-shadow none
+    outline none
 
 .btn-outline-primary
   color fontColor
@@ -25,22 +26,29 @@ a
   &:hover, &:focus, &:active, &:visited, &:focus-within
     background-color hover-button
     border-color hover-button
-    box-shadow 0 0 1px 2px secondColor
+    box-shadow none
+    outline none
 
 .btn-primary.active, .btn-primary:active, .show>.btn-primary.dropdown-toggle
   background-color hover-button
   border-color hover-button
-  box-shadow 0 0 1px 2px secondColor
+  box-shadow none
 
 .btn-outline-primary.active, .btn-outline-primary:active, .show>.btn-outline-primary.dropdown-toggle
   background-color hover-button
   border-color hover-button
-  box-shadow 0 0 1px 2px secondColor
+  box-shadow none
+  outline none
 
 .dropdown-item
-  &:hover, &:focus, &:visited, &:focus-within
+  &:hover, &:focus
     background-color thirdColor
     color off-white
+    box-shadow none
+    outline none
+
+.btn.disabled, .btn:disabled
+  cursor not-allowed
 
 .sidebarpagecontainer
   display flex
