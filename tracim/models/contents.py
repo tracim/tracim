@@ -251,6 +251,16 @@ class ContentTypeLegacy(NewContentType):
                 return
         raise ContentTypeNotExist()
 
+    def alias(self) -> typing.List[str]:
+        """ Get all alias of a content, useful for legacy code convertion"""
+        # TODO - G.M - 2018-07-05 - Remove this legacy compat code
+        # when possible.
+        page_alias = [self.Page, self.PageLegacy]
+        if self.slug in page_alias:
+            return page_alias
+        else:
+            return [self.slug]
+
     @classmethod
     def all(cls) -> typing.List[str]:
         return cls.allowed_types()

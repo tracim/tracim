@@ -715,11 +715,13 @@ class ContentApi(object):
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         if not content_type:
             content_type = ContentType.Any
-
         resultset = self._base_query(workspace)
 
         if content_type!=ContentType.Any:
-            resultset = resultset.filter(Content.type==content_type)
+            # INFO - G.M - 2018-07-05 - convert with
+            #  content type object to support legacy slug
+            content_type_object = ContentType(content_type)
+            resultset = resultset.filter(Content.type.in_(content_type_object.alias()))
 
         if parent_id:
             resultset = resultset.filter(Content.parent_id==parent_id)
