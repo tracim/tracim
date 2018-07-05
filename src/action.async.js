@@ -45,3 +45,14 @@ export const putHtmlDocStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
       status: newStatus
     })
   })
+
+export const postHtmlDocContent = (apiUrl, idWorkspace, idFolder, contentType, newContentName) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
+    ...FETCH_CONFIG,
+    method: 'POST',
+    body: JSON.stringify({
+      parent_id: idFolder,
+      content_type: contentType,
+      label: newContentName
+    })
+  })

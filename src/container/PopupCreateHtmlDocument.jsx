@@ -1,10 +1,10 @@
 import React from 'react'
 import {
-  CardPopupCreateContent
+  CardPopupCreateContent, handleFetchResult
 } from 'tracim_lib'
-import { FETCH_CONFIG } from '../helper.js'
+import { postHtmlDocContent } from '../action.async.js'
 
-const debug = {
+const debug = { // outdated
   config: {
     label: 'Text Document',
     slug: 'html-documents',
@@ -43,7 +43,6 @@ class PopupCreateHtmlDocument extends React.Component {
       idFolder: props.data ? props.data.idFolder : debug.idFolder,
       newContentName: ''
     }
-    this.handleValidate = this.handleValidate.bind(this)
   }
 
   handleChangeNewContentName = e => this.setState({newContentName: e.target.value})
@@ -55,31 +54,26 @@ class PopupCreateHtmlDocument extends React.Component {
     }
   })
 
-  async handleValidate () {
-    const fetchSaveNewHtmlDoc = await fetch(`${this.state.config.apiUrl}/workspaces/${this.state.idWorkspace}/contents`, {
-      ...FETCH_CONFIG,
-      method: 'POST',
-      body: JSON.stringify({
-        parent_id: this.state.idFolder,
-        content_type: this.state.config.slug,
-        label: this.state.newContentName
-      })
-    })
+  handleValidate = async () => {
+    const { config, appName, idWorkspace, idFolder, newContentName } = this.state
 
-    if (fetchSaveNewHtmlDoc.status === 200) {
-      const jsonSaveNewHtmlDoc = await fetchSaveNewHtmlDoc.json()
+    const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
 
-      this.handleClose()
+    handleFetchResult(await fetchSaveNewHtmlDoc)
+      .then(resSave => {
+        if (resSave.apiResponse.status === 200) {
+          this.handleClose()
 
-      GLOBAL_dispatchEvent({
-        type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
-        data: {
-          idWorkspace: jsonSaveNewHtmlDoc.workspace_id,
-          contentType: this.state.appName,
-          idContent: jsonSaveNewHtmlDoc.id
+          GLOBAL_dispatchEvent({
+            type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
+            data: {
+              idWorkspace: resSave.body.workspace_id,
+              contentType: appName,
+              idContent: resSave.body.content_id
+            }
+          })
         }
       })
-    }
   }
 
   render () {
