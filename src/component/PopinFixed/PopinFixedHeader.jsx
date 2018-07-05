@@ -37,7 +37,7 @@ class PopinFixedHeader extends React.Component {
 
         <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>
           {this.state.editTitle
-            ? <input value={this.state.editTitleValue} onChange={this.onChangeTitle} />
+            ? <input className='wsContentGeneric__header__title__editiontitle editiontitle' value={this.state.editTitleValue} onChange={this.onChangeTitle} />
             : <div>{title}</div>
           }
         </div>
