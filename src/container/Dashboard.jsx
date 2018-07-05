@@ -538,7 +538,7 @@ class Dashboard extends React.Component {
                   <div>
                     <div className='dashboard__moreinfo__webdav__information genericBtnInfoDashboard__info'>
                       <div className='dashboard__moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
-                        Lorem ipsum dolore dolore laborum exercitation et deserunt ad ullamco nostrud dolore magna in proident elit amet do eu ut officia anim magna dolore adipisicing aliqua qui reprehenderit laborum labore tempor consectetur ut pariatur deserunt nostrud.
+                        Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur. Chaque fois qu'un document est déposé, celui-ci sera copié sur votre ordinateur. Consulter tous les documents d'un espace de travail sans passer par le logiciel.
                       </div>
 
                       <div className='dashboard__moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
@@ -568,7 +568,7 @@ class Dashboard extends React.Component {
                     <div>
                       <div className='dashboard__moreinfo__calendar__information genericBtnInfoDashboard__info'>
                         <div className='dashboard__moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
-                          Lorem ipsum dolore dolore laborum exercitation et deserunt ad ullamco nostrud dolore magna in proident elit amet do eu ut officia anim magna dolore adipisicing aliqua qui reprehenderit laborum labore tempor consectetur ut pariatur deserunt nostrud.
+                          Chaque espace de travail possède son propre calendrier indépendant des autres. Les groupes peuvent s’organiser avec ses propres deadlines, l’information est simplifiée et centralisée dans chaque espace de travail.
                         </div>
 
                         <div className='dashboard__moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>
