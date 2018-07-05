@@ -68,11 +68,13 @@ class ContentFilter(object):
             show_archived: int = 0,
             show_deleted: int = 0,
             show_active: int = 1,
+            content_type: str = None,
     ) -> None:
         self.parent_id = parent_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
+        self.content_type = content_type
 
 
 class ContentCreation(object):

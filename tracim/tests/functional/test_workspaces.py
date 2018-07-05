@@ -241,6 +241,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 3
         content = res[0]
         assert content['content_id'] == 1
+        assert content['content_type'] == 'folder'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Tools'
@@ -252,6 +253,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         content = res[1]
         assert content['content_id'] == 2
+        assert content['content_type'] == 'folder'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Menus'
@@ -263,6 +265,37 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         content = res[2]
         assert content['content_id'] == 11
+        assert content['content_type'] == 'html-documents'
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Current Menu'
+        assert content['parent_id'] == 2
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'current-menu'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 1
+
+    def test_api__get_workspace_content__ok_200__get_default_html_documents(self):
+        """
+        Check obtain workspace contents with defaults filters + content_filter
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'content_type': 'html-documents',
+        }
+        res = self.testapp.get('/api/v2/workspaces/1/contents', status=200, params=params).json_body   # nopep8
+        assert len(res) == 1
+        content = res[0]
+        assert content
+        assert content['content_id'] == 11
+        assert content['content_type'] == 'html-documents'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Current Menu'
@@ -549,6 +582,7 @@ class TestWorkspaceContents(FunctionalTest):
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
+            'content_type': 'any'
         }
         self.testapp.authorization = (
             'Basic',

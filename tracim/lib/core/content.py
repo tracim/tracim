@@ -713,8 +713,8 @@ class ContentApi(object):
 
     def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-        assert content_type is not None# DYN_REMOVE
-        assert isinstance(content_type, str) # DYN_REMOVE
+        if not content_type:
+            content_type = ContentType.Any
 
         resultset = self._base_query(workspace)
 

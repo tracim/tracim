@@ -261,6 +261,15 @@ class ContentTypeLegacy(NewContentType):
         return contents_types
 
     @classmethod
+    def allowed_type_values(cls) -> typing.List[str]:
+        """
+        All content type slug + special values like any
+        """
+        content_types = cls.allowed_types()
+        content_types.append(ContentTypeLegacy.Any)
+        return content_types
+
+    @classmethod
     def allowed_types_for_folding(cls):
         # This method is used for showing only "main"
         # types in the left-side treeview
