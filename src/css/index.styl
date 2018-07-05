@@ -72,7 +72,7 @@ btnState()
       &__edition
         display none
     &__messagelist
-      min-height 300px
+      min-height 70px
       &__item
         &__avatar
           border 1px solid darkHtmlColor
@@ -80,7 +80,6 @@ btnState()
         &__content
           color darkGrey
       &__version
-        margin-top 40px
         background-color grey-hover
         &__btn
           padding 5px 25px
@@ -123,10 +122,22 @@ btnState()
   .timeline__messagelist__item__content
     background-color htmlColor
 
-// .html-documents__editionmode
-//   div.mce-edit-area
-//     & > iframe
-//       height 100%!important
+.popupCreateContent
+  .cardPopup
+    &__header
+      background-color htmlColor
+  .createcontent
+    &__contentname
+      color htmlColor
+    &__form
+      &__button
+        & > button
+          border-color htmlColor
+          background-color htmlColor
+          &:hover, &:active, &:visited &:focus
+            background-color darkHtmlColor
+            box-shadow none
+
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .page
