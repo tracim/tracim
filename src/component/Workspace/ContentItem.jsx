@@ -21,12 +21,10 @@ const ContentItem = props => {
         <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
       </div>
 
-      <div className={classnames('content__status d-flex align-items-center justify-content-start')} style={{color: status.hexcolor}}>
-        <div className='content__status__icon d-block '>
-          <i className={`fa fa-fw fa-${status.fa_icon}`} />
-        </div>
+      <div className={classnames('content__status')} style={{color: status.hexcolor}}>
         <div className='content__status__text d-none d-xl-block'>
           {status.label}
+          <i className={`fa fa-fw fa-${status.faIcon}`} />
         </div>
       </div>
     </div>
