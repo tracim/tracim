@@ -67,12 +67,12 @@ class Thread extends React.Component {
   }
 
   loadContent = async () => {
-    const { content, config } = this.state
+    const { loggedUser, content, config } = this.state
 
     if (content.content_id === '-1') return // debug case
 
-    const fetchResultThread = getThreadContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultThreadComment = getThreadComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultThread = getThreadContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultThreadComment = getThreadComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
 
     Promise.all([
       handleFetchResult(await fetchResultThread),
@@ -95,9 +95,9 @@ class Thread extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { config, content } = this.state
+    const { loggedUser, config, content } = this.state
 
-    const fetchResultSaveThread = putThreadContent(config.apiUrl, content.workspace_id, content.content_id, newTitle)
+    const fetchResultSaveThread = putThreadContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newTitle)
 
     handleFetchResult(await fetchResultSaveThread)
       .then(resSave => {
@@ -112,9 +112,9 @@ class Thread extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { config, content, newComment } = this.state
+    const { loggedUser, config, content, newComment } = this.state
 
-    const fetchResultSaveNewComment = await postThreadNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
+    const fetchResultSaveNewComment = await postThreadNewComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newComment)
 
     handleFetchResult(await fetchResultSaveNewComment)
       .then(resSave => {
@@ -131,9 +131,9 @@ class Thread extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { config, content } = this.state
+    const { loggedUser, config, content } = this.state
 
-    const fetchResultSaveEditStatus = putThreadStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    const fetchResultSaveEditStatus = putThreadStatus(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newStatus)
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
