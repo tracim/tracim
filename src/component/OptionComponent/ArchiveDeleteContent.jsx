@@ -8,6 +8,7 @@ const ArchiveDeleteContent = props => {
         className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block'
         onClick={props.onClickArchiveBtn}
         disabled={props.disabled}
+        title='Archiver'
       >
         <i className='fa fa-fw fa-archive' />
       </button>
@@ -16,6 +17,7 @@ const ArchiveDeleteContent = props => {
         className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block'
         onClick={props.onClickDeleteBtn}
         disabled={props.disabled}
+        title='Supprimer'
       >
         <i className='fa fa-fw fa-trash' />
       </button>

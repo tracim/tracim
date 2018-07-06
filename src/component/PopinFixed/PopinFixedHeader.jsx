@@ -46,7 +46,7 @@ class PopinFixedHeader extends React.Component {
           className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle`)}
           onClick={this.handleClickChangeTitleBtn}
         >
-          {this.state.editTitle ? <i className='fa fa-check' /> : <i className='fa fa-pencil' />}
+          {this.state.editTitle ? <i className='fa fa-check' title='Valider le Titre' /> : <i className='fa fa-pencil' title='Modifier le Titre' />}
         </div>
 
         <div

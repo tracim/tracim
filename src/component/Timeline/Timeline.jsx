@@ -80,7 +80,7 @@ class Timeline extends React.Component {
                 onClick={props.onClickWysiwygBtn}
                 disabled={props.disableComment}
               >
-                {props.wysiwyg ? 'Text Simple' : 'Texte Avancé'}
+                {props.wysiwyg ? 'Texte Simple' : 'Texte Avancé'}
               </button>
             </div>
 

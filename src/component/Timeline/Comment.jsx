@@ -5,8 +5,8 @@ const Comment = props => (
   <li className={classnames(
     `${props.customClass}__messagelist__item`,
     'timeline__messagelist__item', {
-      'sended': props.fromMe,
-      'received': !props.fromMe
+      'received': props.fromMe, // @FIXME : invert names of class (received should be !fromMe)
+      'sended': !props.fromMe
     }
   )}>
     <div className={classnames(`${props.customClass}__messagelist__item__wrapper`, 'timeline__messagelist__item__wrapper')}>

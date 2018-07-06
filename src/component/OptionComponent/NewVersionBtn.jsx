@@ -7,7 +7,7 @@ const NewVersionBtn = props => {
       onClick={props.onClickNewVersionBtn}
       disabled={props.disabled}
     >
-      Nouvelle version
+      Modifier
       <i className='fa fa-plus-circle ml-3' />
     </button>
   )
