@@ -80,7 +80,7 @@ class Dashboard extends React.Component {
                 <div className='dashboard__header__acces' />
               </div>
               <div className='dashboard__header__advancedmode mr-3'>
-                <button type='button' className='btn btn-primary'>Activer édition avancé</button>
+                <button type='button' className='btn btn-primary disabled'>Activer édition avancé</button>
               </div>
             </div>
 
@@ -129,9 +129,9 @@ class Dashboard extends React.Component {
                         Abonné(e)
                       </button>
                       <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item'>Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item disabled'>Abonné(e)
                         </div>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item'>Non Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item disabled'>Non Abonné(e)
                         </div>
                       </div>
                     </div>
@@ -512,7 +512,7 @@ class Dashboard extends React.Component {
                         </ul>
                       </div>
                       <div className='dashboard__memberlist__form__submitbtn'>
-                        <button className='btn btn-outline-primary'>Valider</button>
+                        <button className='btn btn-outline-primary disabled'>Valider</button>
                       </div>
                     </form>
                   }
@@ -538,7 +538,7 @@ class Dashboard extends React.Component {
                   <div>
                     <div className='dashboard__moreinfo__webdav__information genericBtnInfoDashboard__info'>
                       <div className='dashboard__moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
-                        Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur. Chaque fois qu'un document est déposé, celui-ci sera copié sur votre ordinateur. Consulter tous les documents d'un espace de travail sans passer par le logiciel.
+                        Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur via le poste de travail, sans passer par le logiciel.
                       </div>
 
                       <div className='dashboard__moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
@@ -568,7 +568,7 @@ class Dashboard extends React.Component {
                     <div>
                       <div className='dashboard__moreinfo__calendar__information genericBtnInfoDashboard__info'>
                         <div className='dashboard__moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
-                          Chaque espace de travail possède son propre calendrier indépendant des autres. Les groupes peuvent s’organiser avec ses propres deadlines, l’information est simplifiée et centralisée dans chaque espace de travail.
+                          Chaque espace de travail possède son propre calendrier.
                         </div>
 
                         <div className='dashboard__moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>

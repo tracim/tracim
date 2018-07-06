@@ -8,6 +8,7 @@ const Search = props => {
       <div className='header__menu__rightside__itemsearch__search input-group'>
         <input
           type='text'
+          readonly
           className='search__input form-control'
           placeholder={`${props.t('Header.Search')}...`}
           aria-describedby='headerInputSearch'

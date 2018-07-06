@@ -7,7 +7,8 @@ const PageTitle = props => {
     <div className={classnames(props.parentClass, props.customClass, 'pageTitleGeneric')}>
       <div className={classnames(`${props.parentClass}__title`, 'pageTitleGeneric__title d-flex align-items-center')}>
         <div className='pageTitleGeneric__title__icon mr-3'>
-          <i className='fa fa-fw fa-th' />
+          <i className='fa fa-fw fa-th mr-3' />
+          Liste des Contenus
         </div>
         {props.title}
       </div>

@@ -47,6 +47,14 @@ a
     box-shadow none
     outline none
 
+.btn-primary.disabled, .btn-primary:disabled
+  background-color thirdColor
+  border-color transparent
+  color off-white
+
+.btn-outline-primary.disabled, .btn-outline-primary:disabled
+  color fontColor
+
 .btn.disabled, .btn:disabled
   cursor not-allowed
 
@@ -56,7 +64,7 @@ a
   min-height calc(100% - 50px)
 
 .pageWrapperGeneric
-  width calc(100% - 300px) // 300px => width of the sidebar
+  width calc(100% - 300px) // 300px => width of the sidebar + margin
   &__header
     display flex
   &__content
