@@ -97,8 +97,8 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
       method: 'POST',
       body: JSON.stringify({
         email: login,
-        password: password,
-        remember_me: rememberMe
+        password: password
+        // remember_me: rememberMe
       })
     },
     actionName: USER_LOGIN,
@@ -118,11 +118,14 @@ export const postUserLogout = () => async dispatch => {
   })
 }
 
-export const getUserIsConnected = () => async dispatch => {
+export const getUserIsConnected = user => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
     param: {
-      headers: {...FETCH_CONFIG.headers},
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
       method: 'GET'
     },
     actionName: USER_CONNECTED,
@@ -143,11 +146,14 @@ export const getUserRole = user => async dispatch => {
   if (fetchGetUserRole.status === 200) dispatch(setUserRole(fetchGetUserRole.json))
 }
 
-export const getWorkspaceList = idUser => dispatch => {
+export const getWorkspaceList = user => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces`,
     param: {
-      headers: {...FETCH_CONFIG.headers},
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
       method: 'GET'
     },
     actionName: WORKSPACE_LIST,
@@ -155,11 +161,14 @@ export const getWorkspaceList = idUser => dispatch => {
   })
 }
 
-export const getWorkspaceContentList = (idWorkspace, idParent) => dispatch => {
+export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idParent}`,
     param: {
-      headers: {...FETCH_CONFIG.headers},
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
       method: 'GET'
     },
     actionName: WORKSPACE,
@@ -192,23 +201,31 @@ export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
   if (fetchGetFolderContent.status === 200) dispatch(setFolderData(idFolder, fetchGetFolderContent.json))
 }
 
-export const getAppList = () => dispatch => {
+export const getAppList = user => dispatch => {
+  console.log(user)
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/applications`,
     param: {
-      headers: {...FETCH_CONFIG.headers},
-      method: 'GET'
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET',
+      'Authorization': 'Basic ' + user.auth
     },
     actionName: APP_LIST,
     dispatch
   })
 }
 
-export const getContentTypeList = () => dispatch => {
+export const getContentTypeList = user => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/content_types`,
     param: {
-      headers: {...FETCH_CONFIG.headers},
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
       method: 'GET'
     },
     actionName: CONTENT_TYPE_LIST,

@@ -20,6 +20,7 @@ import {
 import {
   postUserLogout
 } from '../action-creator.async.js'
+import Cookies from 'js-cookie'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -42,8 +43,14 @@ class Header extends React.Component {
     const { dispatch, t } = this.props
 
     const fetchPostUserLogout = await dispatch(postUserLogout())
-    if (fetchPostUserLogout.status === 204) dispatch(setUserDisconnected())
-    else dispatch(newFlashMessage(t('Login.logout_error', 'danger')))
+    if (fetchPostUserLogout.status === 204) {
+      Cookies.remove('user_login')
+      Cookies.remove('user_auth')
+
+      dispatch(setUserDisconnected())
+    } else {
+      dispatch(newFlashMessage(t('Login.logout_error', 'danger')))
+    }
   }
 
   render () {

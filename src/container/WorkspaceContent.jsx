@@ -47,14 +47,16 @@ class WorkspaceContent extends React.Component {
   }
 
   customEventReducer = ({ detail: { type, data } }) => {
-    console.log(type, data)
     switch (type) {
       case 'openContentUrl':
+        console.log('<WorkspaceContent>', type, data)
         this.props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent))
         break
       case 'appClosed':
+        console.log('<WorkspaceContent>', type, data, this.state.workspaceIdInUrl)
+        if (this.state.workspaceIdInUrl === null) return // @FIXME: find out why when app is closed, workspaceInUrl is null then has it's proper value
         this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(this.state.workspaceIdInUrl))
-        this.setState({appOpened: false})
+        this.setState({appOpenedType: false})
         break
     }
   }
@@ -66,12 +68,12 @@ class WorkspaceContent extends React.Component {
     console.log('<WorkspaceContent> componentDidMount')
 
     if (app.length === 0) {
-      const fetchGetAppList = await dispatch(getAppList())
+      const fetchGetAppList = await dispatch(getAppList(user))
       if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
     }
 
     if (contentType.length === 0) {
-      const fetchGetContentTypeList = await dispatch(getContentTypeList())
+      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
       if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
     }
 
@@ -79,7 +81,7 @@ class WorkspaceContent extends React.Component {
     if (match.params.idws !== undefined) wsToLoad = match.params.idws
 
     if (user.user_id !== -1 && workspaceList.length === 0) {
-      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user.user_id))
+      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
 
       if (fetchGetWorkspaceList.status === 200) {
         dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
@@ -93,14 +95,14 @@ class WorkspaceContent extends React.Component {
 
     if (wsToLoad === null) return // ws already loaded
 
-    const wsContent = await dispatch(getWorkspaceContentList(wsToLoad, 0))
+    const wsContent = await dispatch(getWorkspaceContentList(user, wsToLoad, 0))
 
     if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    const { match, location, dispatch } = this.props
+    const { user, match, location, dispatch } = this.props
 
     console.log('<WorkspaceContent> componentDidUpdate')
 
@@ -113,7 +115,7 @@ class WorkspaceContent extends React.Component {
     if (prevState.workspaceIdInUrl !== idWorkspace) {
       this.setState({workspaceIdInUrl: idWorkspace})
 
-      const wsContent = await dispatch(getWorkspaceContentList(idWorkspace, 0))
+      const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
 
       if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
       else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
@@ -173,7 +175,7 @@ class WorkspaceContent extends React.Component {
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
   render () {
-    const { workspaceContent, contentType, match } = this.props
+    const { workspaceContent, contentType } = this.props
 
     const filterWorkspaceContent = (contentList, filter) => {
       return filter.length === 0
@@ -189,14 +191,13 @@ class WorkspaceContent extends React.Component {
     const filteredWorkspaceContent = workspaceContent.length > 0
       ? filterWorkspaceContent(workspaceContent, urlFilter ? [urlFilter] : [])
       : []
-    console.log('workspaceContent => filteredWorkspaceContent', filteredWorkspaceContent, 'urlFilter', urlFilter)
 
     return (
       <div className='sidebarpagecontainer'>
         <Sidebar />
 
         <OpenContentApp
-          idWorkspace={match.params.idws}
+          idWorkspace={this.state.workspaceIdInUrl}
           appOpenedType={this.state.appOpenedType}
           updateAppOpenedType={this.handleUpdateAppOpenedType}
         />

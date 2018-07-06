@@ -1,8 +1,7 @@
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    'Content-Type': 'application/json'
   },
   apiUrl: 'http://localhost:6543/api/v2',
   mockApiUrl: 'http://localhost:3001'

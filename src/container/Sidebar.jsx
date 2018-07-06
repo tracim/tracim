@@ -23,7 +23,7 @@ class Sidebar extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     console.log('<Sidebar> Did Update')
-    if (this.props.match.params.idws === undefined) return
+    if (this.props.match.params.idws === undefined || isNaN(this.props.match.params.idws)) return
 
     const newWorkspaceId = parseInt(this.props.match.params.idws)
     if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
