@@ -36,14 +36,16 @@ class Thread extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: action }) => { // action: { type: '', data: {} }
-    switch (action.type) {
-      case 'Thread_showApp':
+  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    switch (type) {
+      case 'thread_showApp':
         this.setState({isVisible: true})
         break
-      case 'Thread_hideApp':
+      case 'thread_hideApp':
         this.setState({isVisible: false})
         break
+      case 'thread_reloadContent':
+        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
     }
   }
 
@@ -135,7 +137,7 @@ class Thread extends React.Component {
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
-        if (resSave.apiResponse.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
+        if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
           console.warn('Error saving thread comment. Result:', resSave, 'content:', content, 'config:', config)
         } else {
           this.loadContent()
