@@ -80,7 +80,7 @@ class Dashboard extends React.Component {
                 <div className='dashboard__header__acces' />
               </div>
               <div className='dashboard__header__advancedmode mr-3'>
-                <button type='button' className='btn btn-primary disabled'>Activer édition avancé</button>
+                <button type='button' className='btn btn-primary' disabled>Activer édition avancé</button>
               </div>
             </div>
 
@@ -129,9 +129,9 @@ class Dashboard extends React.Component {
                         Abonné(e)
                       </button>
                       <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item disabled'>Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item' disabled>Abonné(e)
                         </div>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item disabled'>Non Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item' disabled>Non Abonné(e)
                         </div>
                       </div>
                     </div>
@@ -512,7 +512,7 @@ class Dashboard extends React.Component {
                         </ul>
                       </div>
                       <div className='dashboard__memberlist__form__submitbtn'>
-                        <button className='btn btn-outline-primary disabled'>Valider</button>
+                        <button className='btn btn-outline-primary' disabled>Valider</button>
                       </div>
                     </form>
                   }
