@@ -49,7 +49,7 @@ class HtmlDocument extends React.Component {
         this.setState({isVisible: false})
         break
       case 'html-documents_reloadContent':
-        this.setState(prev => ({content: {...prev.content, ...data}}))
+        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
     }
   }
 
@@ -196,7 +196,7 @@ class HtmlDocument extends React.Component {
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
-        if (resSave.apiResponse.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
+        if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
           console.warn('Error saving html-document comment. Result:', resSave, 'content:', content, 'config:', config)
         } else {
           this.loadContent()
