@@ -9,14 +9,15 @@ import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
-import InputCheckbox from '../component/common/Input/InputCheckbox.jsx'
+// import InputCheckbox from '../component/common/Input/InputCheckbox.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import LoginBtnForgotPw from '../component/Login/LoginBtnForgotPw.jsx'
 import {
   newFlashMessage,
   setUserConnected
 } from '../action-creator.sync.js'
-import {PAGE} from '../helper.js'
+import { PAGE } from '../helper.js'
+import Cookies from 'js-cookie'
 
 class Login extends React.Component {
   constructor (props) {
@@ -43,9 +44,18 @@ class Login extends React.Component {
     const { inputLogin, inputPassword, inputRememberMe } = this.state
 
     const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
+    const userAuth = btoa(`${inputLogin.value}:${inputPassword.value}`)
 
     if (fetchPostUserLogin.status === 200) {
-      dispatch(setUserConnected({...fetchPostUserLogin.json, logged: true}))
+      dispatch(setUserConnected({
+        ...fetchPostUserLogin.json,
+        auth: userAuth,
+        logged: true
+      }))
+
+      Cookies.set('user_login', inputLogin.value)
+      Cookies.set('user_auth', userAuth)
+
       history.push(PAGE.HOME)
     } else if (fetchPostUserLogin.status === 400) {
       dispatch(newFlashMessage(t('Login.fail'), 'danger'))
@@ -95,6 +105,7 @@ class Login extends React.Component {
 
                       <div className='row mt-4 mb-4'>
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                          {/*
                           <InputCheckbox
                             parentClassName='connection__form__rememberme'
                             customClass=''
@@ -102,6 +113,7 @@ class Login extends React.Component {
                             checked={this.state.inputRememberMe}
                             onChange={this.handleChangeRememberMe}
                           />
+                          */}
                         </div>
 
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-sm-right'>

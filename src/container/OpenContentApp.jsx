@@ -27,7 +27,7 @@ export class OpenContentApp extends React.Component {
         })
       } else { // open another app
         // if another app is already visible, hide it
-        if (appOpenedType !== false) GLOBAL_dispatchEvent(`${appOpenedType}_hideApp`)
+        if (appOpenedType !== false) GLOBAL_dispatchEvent({type: `${appOpenedType}_hideApp`})
         // open app
         renderApp(
           contentType.find(ct => ct.slug === contentToOpen.type),

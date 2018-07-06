@@ -30,17 +30,17 @@ class Dashboard extends React.Component {
     console.log('<Dashboard> componentDidMount')
 
     if (app.length === 0) {
-      const fetchGetAppList = await dispatch(getAppList())
+      const fetchGetAppList = await dispatch(getAppList(user))
       if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
     }
 
     if (contentType.length === 0) {
-      const fetchGetContentTypeList = await dispatch(getContentTypeList())
+      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
       if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
     }
 
     if (user.user_id !== -1 && workspaceList.length === 0) {
-      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user.user_id))
+      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
 
       if (fetchGetWorkspaceList.status === 200) {
         dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))

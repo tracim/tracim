@@ -42,6 +42,8 @@
             return appThread
           case 'file':
             return appFile
+          default:
+            return null
         }
       }
 
@@ -74,13 +76,15 @@
       }
 
       GLOBAL_eventReducer = ({ detail: { type, data } }) => {
-        console.log('GLOBAL_eventReducer', type, data)
-
         switch (type) {
           case 'hide_popupCreateContent':
+            console.log('GLOBAL_eventReducer', type, data)
             getSelectedApp(data.name).unmountApp('popupCreateContentContainer')
             break
           case 'unmount_app':
+            console.log('GLOBAL_eventReducer', type, data)
+            if (prevSelectedApp.name === '') return
+
             prevSelectedApp.unmountApp('appContainer')
             prevSelectedApp.unmountApp('popupCreateContentContainer')
             prevSelectedApp.isRendered = false

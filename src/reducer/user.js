@@ -6,7 +6,7 @@ import {
 
 const defaultUser = {
   user_id: -1,
-  logged: undefined, // undefined avoid to be redirected to /login while whoami ep has not responded yet
+  logged: false, // undefined avoid to be redirected to /login while whoami ep has not responded yet
   timezone: '',
   profile: {
     id: 1,
