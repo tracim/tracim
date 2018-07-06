@@ -3,6 +3,8 @@ import typing
 
 import transaction
 from pyramid.config import Configurator
+
+from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.models.data import UserRoleInWorkspace
 
 try:  # Python 3.5+
@@ -17,15 +19,11 @@ from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FileContentSchema
 from tracim.views.core_api.schemas import FileRevisionSchema
 from tracim.views.core_api.schemas import SetContentStatusSchema
-from tracim.views.core_api.schemas import FileModifySchema
+from tracim.views.core_api.schemas import FileContentModifySchema
 from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.lib.utils.authorization import require_content_types
 from tracim.lib.utils.authorization import require_workspace_role
-from tracim.exceptions import WorkspaceNotFound, ContentTypeNotAllowed
-from tracim.exceptions import InsufficientUserRoleInWorkspace
-from tracim.exceptions import NotAuthenticated
-from tracim.exceptions import AuthenticationFailed
 from tracim.models.context_models import ContentInContext
 from tracim.models.context_models import RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
@@ -37,17 +35,65 @@ FILE_ENDPOINTS_TAG = 'Files'
 
 class FileController(Controller):
 
+    # # File data
+    # @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    # @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    # @require_content_types([file_type])
+    # @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    # #@hapic.input_files()
+    # @hapic.output_file([])
+    # def upload_file(self, context, request: TracimRequest, hapic_data=None):
+    #     # TODO - G.M - 2018-07-05 - Do this endpoint
+    #     app_config = request.registry.settings['CFG']
+    #     api = ContentApi(
+    #         current_user=request.current_user,
+    #         session=request.dbsession,
+    #         config=app_config,
+    #     )
+    #     content = api.get_one(
+    #         hapic_data.path.content_id,
+    #         content_type=ContentType.Any
+    #     )
+    #     file = request.POST['files']
+    #     api.update_file_data(
+    #         content,
+    #         new_filename=file.filename,
+    #         new_mimetype=file.type,
+    #         new_content=file.file,
+    #     )
+    #     return content.depot_file
+    #
+    # @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    # @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    # @require_content_types([file_type])
+    # @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    # @hapic.output_file([])
+    # def download_file(self, context, request: TracimRequest, hapic_data=None):
+    #     # TODO - G.M - 2018-07-05 - Do this endpoint
+    #     app_config = request.registry.settings['CFG']
+    #     api = ContentApi(
+    #         current_user=request.current_user,
+    #         session=request.dbsession,
+    #         config=app_config,
+    #     )
+    #     content = api.get_one(
+    #         hapic_data.path.content_id,
+    #         content_type=ContentType.Any
+    #     )
+    #     return content.depot_file
+
+    # Previews
+    # def get_file_preview(self):
+    #     # TODO - G.M - 2018-07-05 - Do this endpoint
+    #     pass
+    
+    # File infos
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(FileContentSchema())
-    def get_file(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
+    def get_file_infos(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         Get thread content
         """
@@ -64,16 +110,13 @@ class FileController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(FileModifySchema())
+    @hapic.input_body(FileContentModifySchema())
     @hapic.output_body(FileContentSchema())
-    def update_file(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
+    def update_file_info(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
         """
         update thread
         """
@@ -102,10 +145,6 @@ class FileController(Controller):
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -136,10 +175,7 @@ class FileController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -172,22 +208,37 @@ class FileController(Controller):
         return
 
     def bind(self, configurator: Configurator) -> None:
-        # Get file
+        # Get file info
         configurator.add_route(
-            'file',
+            'file_info',
             '/workspaces/{workspace_id}/files/{content_id}',
             request_method='GET'
         )
-        configurator.add_view(self.get_file, route_name='file')  # nopep8
+        configurator.add_view(self.get_file_infos, route_name='file_info')  # nopep8
 
         # update file
         configurator.add_route(
-            'update_file',
+            'update_file_info',
             '/workspaces/{workspace_id}/files/{content_id}',
             request_method='PUT'
         )  # nopep8
-        configurator.add_view(self.update_file, route_name='update_file')  # nopep8
+        configurator.add_view(self.update_file_info, route_name='update_file_info')  # nopep8
 
+        # # upload new file data
+        # configurator.add_route(
+        #     'upload_file',
+        #     '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
+        #     request_method='PUT'
+        # )
+        # configurator.add_view(self.upload_file, route_name='upload_file')  # nopep8
+        #
+        # # download file data
+        # configurator.add_route(
+        #     'download_file',
+        #     '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
+        #     request_method='GET'
+        # )
+        # configurator.add_view(self.download_file, route_name='download_file')  # nopep8
         # get file revisions
         configurator.add_route(
             'file_revisions',

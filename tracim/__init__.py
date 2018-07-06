@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -27,6 +29,7 @@ from tracim.views.core_api.system_controller import SystemController
 from tracim.views.core_api.user_controller import UserController
 from tracim.views.core_api.workspace_controller import WorkspaceController
 from tracim.views.contents_api.comment_controller import CommentController
+from tracim.views.contents_api.file_controller import FileController
 from tracim.views.errors import ErrorSchema
 from tracim.exceptions import NotAuthenticated
 from tracim.exceptions import InsufficientUserProfile
@@ -107,6 +110,7 @@ def web(global_config, **local_settings):
     comment_controller = CommentController()
     html_document_controller = HTMLDocumentController()
     thread_controller = ThreadController()
+    file_controller = FileController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -114,6 +118,7 @@ def web(global_config, **local_settings):
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)  # nopep8
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
 
     hapic.add_documentation_view(
         '/api/v2/doc',

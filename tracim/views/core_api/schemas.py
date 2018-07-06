@@ -411,9 +411,18 @@ class TextBasedDataAbstractSchema(marshmallow.Schema):
     )
 
 
+class FileInfoAbstractSchema(marshmallow.Schema):
+    raw_content = marshmallow.fields.String(
+        description='raw text or html description of the file'
+    )
+
+
 class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
     pass
 
+
+class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
+    pass
 
 #####
 # Revision
@@ -431,6 +440,10 @@ class RevisionSchema(ContentDigestSchema):
 
 
 class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
+    pass
+
+
+class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
 
 
@@ -470,6 +483,10 @@ class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbs
     @post_load
     def text_based_content_update(self, data):
         return TextBasedContentUpdate(**data)
+
+
+class FileContentModifySchema(TextBasedContentModifySchema):
+    pass
 
 
 class SetContentStatusSchema(marshmallow.Schema):

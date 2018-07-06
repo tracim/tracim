@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+import transaction
+from depot.io.utils import FileIntent
+
+from tracim import models
+from tracim.lib.core.content import ContentApi
+from tracim.lib.core.workspace import WorkspaceApi
+from tracim.models.data import ContentType
+from tracim.models import get_tm_session
 from tracim.tests import FunctionalTest
 from tracim.tests import set_html_document_slug_to_legacy
 from tracim.fixtures.content import Content as ContentFixtures
@@ -424,6 +432,513 @@ class TestHtmlDocuments(FunctionalTest):
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6/status',
+            params=params,
+            status=400
+        )
+
+
+class TestFiles(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/files/{content_id}
+    endpoint
+    """
+
+    fixtures = [BaseFixture, ContentFixtures]
+
+    def test_api__get_file__ok_200__nominal_case(self) -> None:
+        """
+        Get one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Test_file'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'test-file'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p>description</p>'  # nopep8
+
+    def test_api__get_files__err_400__wrong_content_type(self) -> None:
+        """
+        Get one file of a content content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/files/6',
+            status=400
+        )
+
+    def test_api__get_file__err_400__content_does_not_exist(self) -> None:  # nopep8
+        """
+        Get one file (content 170 does not exist in db
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/170',
+            status=400
+        )
+
+    def test_api__get_file__err_400__content_not_in_workspace(self) -> None:  # nopep8
+        """
+        Get one file (content 9 is in workspace 2)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/9',
+            status=400
+        )
+
+    def test_api__get_file__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+        """
+        Get one file (Workspace 40 does not exist)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/40/files/9',
+            status=400
+        )
+
+    def test_api__get_file__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one file, workspace id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/coucou/files/9',
+            status=400
+        )
+
+    def test_api__get_file__err_400__content_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one file, content_id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/files/coucou',
+            status=400
+        )
+
+    def test_api__update_file_info_err_400__empty_label(self) -> None:  # nopep8
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+
+    def test_api__update_file_info__ok_200__nominal_case(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+    def test_api__get_file_revisions__ok_200__nominal_case(
+            self
+    ) -> None:
+        """
+        Get file revisions
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/revisions'.format(test_file.content_id),
+            status=200
+        )
+        revisions = res.json_body
+        assert len(revisions) == 1
+        revision = revisions[0]
+        assert revision['content_type'] == 'file'
+        assert revision['content_id'] == test_file.content_id
+        assert revision['is_archived'] is False
+        assert revision['is_deleted'] is False
+        assert revision['label'] == 'Test_file'
+        assert revision['parent_id'] == 1
+        assert revision['show_in_ui'] is True
+        assert revision['slug'] == 'test-file'
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == 1
+        assert revision['revision_id']
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comment_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 1
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Global manager'
+
+    def test_api__set_file_status__ok_200__nominal_case(self) -> None:
+        """
+        set file status
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'closed-deprecated',
+        }
+
+        # before
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['status'] == 'open'
+
+        # set status
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}/status'.format(test_file.content_id),
+            params=params,
+            status=204
+        )
+
+        # after
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['status'] == 'closed-deprecated'
+
+    def test_api__set_file_status__err_400__wrong_status(self) -> None:
+        """
+        set file status
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'unexistant-status',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/files/6/status',
             params=params,
             status=400
         )
