@@ -1,35 +1,50 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const getHtmlDocContent = (apiUrl, idWorkspace, idContent) =>
+export const getHtmlDocContent = (user, apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}`, {
-    ...FETCH_CONFIG,
+    headers: {
+      ...FETCH_CONFIG.headers,
+      'Authorization': 'Basic ' + user.auth
+    },
     method: 'GET'
   })
 
-export const getHtmlDocComment = (apiUrl, idWorkspace, idContent) =>
+export const getHtmlDocComment = (user, apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
-    ...FETCH_CONFIG,
+    headers: {
+      ...FETCH_CONFIG.headers,
+      'Authorization': 'Basic ' + user.auth
+    },
     method: 'GET'
   })
 
-export const getHtmlDocRevision = (apiUrl, idWorkspace, idContent) =>
+export const getHtmlDocRevision = (user, apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}/revisions`, {
-    ...FETCH_CONFIG,
+    headers: {
+      ...FETCH_CONFIG.headers,
+      'Authorization': 'Basic ' + user.auth
+    },
     method: 'GET'
   })
 
-export const postHtmlDocNewComment = (apiUrl, idWorkspace, idContent, newComment) =>
+export const postHtmlDocNewComment = (user, apiUrl, idWorkspace, idContent, newComment) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
-    ...FETCH_CONFIG,
+    headers: {
+      ...FETCH_CONFIG.headers,
+      'Authorization': 'Basic ' + user.auth
+    },
     method: 'POST',
     body: JSON.stringify({
       raw_content: newComment
     })
   })
 
-export const putHtmlDocContent = (apiUrl, idWorkspace, idContent, label, newContent) =>
+export const putHtmlDocContent = (user, apiUrl, idWorkspace, idContent, label, newContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}`, {
-    ...FETCH_CONFIG,
+    headers: {
+      ...FETCH_CONFIG.headers,
+      'Authorization': 'Basic ' + user.auth
+    },
     method: 'PUT',
     body: JSON.stringify({
       label: label,
@@ -37,18 +52,24 @@ export const putHtmlDocContent = (apiUrl, idWorkspace, idContent, label, newCont
     })
   })
 
-export const putHtmlDocStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
+export const putHtmlDocStatus = (user, apiUrl, idWorkspace, idContent, newStatus) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/html-documents/${idContent}/status`, {
-    ...FETCH_CONFIG,
+    headers: {
+      ...FETCH_CONFIG.headers,
+      'Authorization': 'Basic ' + user.auth
+    },
     method: 'PUT',
     body: JSON.stringify({
       status: newStatus
     })
   })
 
-export const postHtmlDocContent = (apiUrl, idWorkspace, idFolder, contentType, newContentName) =>
+export const postHtmlDocContent = (user, apiUrl, idWorkspace, idFolder, contentType, newContentName) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
-    ...FETCH_CONFIG,
+    headers: {
+      ...FETCH_CONFIG.headers,
+      'Authorization': 'Basic ' + user.auth
+    },
     method: 'POST',
     body: JSON.stringify({
       parent_id: idFolder,

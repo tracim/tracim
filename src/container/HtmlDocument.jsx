@@ -74,11 +74,11 @@ class HtmlDocument extends React.Component {
   }
 
   loadContent = async () => {
-    const { content, config } = this.state
+    const { loggedUser, content, config } = this.state
 
-    const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getHtmlDocComment(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultHtmlDocument = getHtmlDocContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultComment = getHtmlDocComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getHtmlDocRevision(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
 
     handleFetchResult(await fetchResultHtmlDocument)
       .then(resHtmlDocument => this.setState({content: resHtmlDocument.body}))
@@ -126,9 +126,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { config, content } = this.state
+    const { loggedUser, config, content } = this.state
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveHtmlDoc = putHtmlDocContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
 
     handleFetchResult(await fetchResultSaveHtmlDoc)
       .then(resSave => {
@@ -145,9 +145,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveHtmlDocument = async () => {
-    const { content, config } = this.state
+    const { loggedUser, content, config } = this.state
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
+    const fetchResultSaveHtmlDoc = putHtmlDocContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
 
     handleFetchResult(await fetchResultSaveHtmlDoc)
       .then(resSave => {
@@ -171,9 +171,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { config, content, newComment } = this.state
+    const { loggedUser, config, content, newComment } = this.state
 
-    const fetchResultSaveNewComment = await postHtmlDocNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
+    const fetchResultSaveNewComment = await postHtmlDocNewComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newComment)
 
     handleFetchResult(await fetchResultSaveNewComment)
       .then(resSave => {
@@ -190,9 +190,9 @@ class HtmlDocument extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { config, content } = this.state
+    const { loggedUser, config, content } = this.state
 
-    const fetchResultSaveEditStatus = putHtmlDocStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    const fetchResultSaveEditStatus = putHtmlDocStatus(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newStatus)
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
