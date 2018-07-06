@@ -1,124 +1,75 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
-bgandcolor()
-  border-color threadColor
-  color off-white
-  background-color threadColor
-
-bgandcolorhover()
-  border-color darkenThread
+btnState()
   background-color darkenThread
-  box-shadow shadow-all-side-thread
+  color off-white
 
 .wsContentThread
   width 1100px
   &__header
-    color white
+    // color white
     background-color threadColor
     &__editionmode
       display none
     &__icon
       .fa-comments-o
         color white
-  &__option
-    &__menu
-      .selectStatus
-        margin-right 15px
-  &__app
-    display flex
-    flex-flow column
-    width 100%
-    &__messagelist
-      flex 1 1 auto
-      margin 0
-      padding 15px 35px
-      list-style none
-      overflow-y auto
-      background-color off-white
-      &__item
-        &__avatar
-          position relative
-          top 40px
-          left -20px
-          & > img
-            width 45px
-            height 45px
-            border-radius 25px
-        &__createhour
-          margin-left 35px
-          opacity 0.7
-          font-size 14px
-        &__content
-          display inline-block
-          border 1px solid grey
-          border-radius 5px
-          padding 15px
+  .selectStatus
+    margin-right 15px
+    .dropdown-item
+      &:hover, &:focus, &:active, &visited, &:focus-within
+        background-color threadColor
+        color off-white!important // @FIXME 04/07/2018 AC - we must use a plugin for this
+  .optionicon
+    &:hover, &:focus, &:active
+      color threadColor
+  .timeline
+    margin 0
+  .thread
+    &__contentpage
+      &__messagelist
+        &__item__avatar
+          border 1px solid darkenThread
           background-color off-white
-          font-size 15px
-    &__texteditor
-      flex 0 1 auto
-      border-top 1px solid grey
-      padding 35px 20px
-      &__textinput
-        width 85%
-        & > textarea
-          border-radius 5px
-          border 1.5px solid grey
-          padding 5px
-          height 80px
-          width 100%
-      &__wrapper
-        display flex
-        flex-direction column
-        justify-content center
-      &__advancedtext
-        &__btn
-          border-color threadColor
-          color threadColor
-          cursor pointer
-          &:hover, &:focus
-            bgandcolorhover()
-      &__submit
-        &__btn
-          display flex
-          cursor pointer
-          bgandcolor()
-          width 118px
-          &:hover, &:focus
-            bgandcolorhover()
+      &__texteditor
+        flex 0 0 auto
+        &__advancedtext
+          &__btn
+            color fontColor
+            border-color threadColor
+            cursor pointer
+            &:hover ,&:focus, &:visited, &:active
+              btnState()
+              border-color darkenThread
+              box-shadow none
+        &__submit
+          &__btn
+            background-color threadColor
+            color white
+            &:hover, &:focus, &:visited, &:active
+              background-color darkenThread
+
 
 .received
-  text-align right
-  .wsContentGeneric__messagelist__item
-    &__avatar
-      left 20px
-    &__createhour
-      margin-left 0
-      margin-right 35px
-    &__content
-      color white
-      background-color threadColor
+  .timeline__messagelist__item__content
+    background-color threadColor
 
-.activeEditionTitle
-  .wsContentThread
+.popupCreateContent
+  .cardPopup
     &__header
-      &__editionmode
-        display block
-      &__title
-        display none
+      background-color threadColor
+  .createcontent
+    &__contentname
+      color threadColor
+    &__form
+      &__button
+        & > button
+          border-color threadColor
+          background-color threadColor
+          &:hover, &:active, &:visited &:focus
+            background-color darkenThread
+            box-shadow none
 
-.activeAdvancedText
-  .wsContentThread__app
-    &__texteditor
-      padding 10px
-      height 500px
-      &__textinput
-        width 100%
-      &__wrapper
-        flex-direction row
-        width 100%
-      &__advancedtext
-        margin-right 20px
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .wsContentThread
@@ -127,15 +78,11 @@ bgandcolorhover()
 @media (min-width: min-md) and (max-width: max-md)
   .wsContentThread
     width 700px
-    &__app__texteditor__textinput
-      width 75%
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .wsContentThread
     top 69px
     width 500px
-    &__app__texteditor__textinput
-      width 70%
 
 @media (max-width: max-xs)
   .wsContentThread
@@ -143,8 +90,3 @@ bgandcolorhover()
     width 100%
     box-shadow none
     z-index 1
-    &__app
-      &__texteditor
-        padding 55px 20px 30px 20px
-        &__textinput
-          width 60%
