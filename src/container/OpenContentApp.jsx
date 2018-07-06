@@ -5,7 +5,7 @@ import appFactory from '../appFactory.js'
 
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
-    const { idWorkspace, appOpened, user, workspaceContent, contentType, renderApp, match } = this.props
+    const { idWorkspace, appOpenedType, user, workspaceContent, contentType, renderApp, match } = this.props
 
     if (isNaN(idWorkspace)) return
 
@@ -20,18 +20,21 @@ export class OpenContentApp extends React.Component {
 
       console.log('contentToOpen', contentToOpen)
 
-      if (!appOpened) {
+      if (appOpenedType === contentToOpen.type) { // app already open
+        GLOBAL_dispatchEvent({
+          type: `${contentToOpen.type}_reloadContent`, // handled by html-documents:src/container/HtmlDocument.jsx
+          data: contentToOpen
+        })
+      } else { // open another app
+        // if another app is already visible, hide it
+        if (appOpenedType !== false) GLOBAL_dispatchEvent(`${appOpenedType}_hideApp`)
+        // open app
         renderApp(
           contentType.find(ct => ct.slug === contentToOpen.type),
           user,
           contentToOpen
         )
-        this.props.updateAppOpened(true)
-      } else {
-        GLOBAL_dispatchEvent({
-          type: 'html-documents_reloadContent', // handled by html-documents:src/container/HtmlDocument.jsx
-          data: contentToOpen
-        })
+        this.props.updateAppOpenedType(contentToOpen.type)
       }
     }
   }

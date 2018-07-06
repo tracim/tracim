@@ -16,7 +16,6 @@ import {
   getAppList,
   getContentTypeList,
   getWorkspaceContentList,
-  // getWorkspaceContent,
   getFolderContent,
   getWorkspaceList
 } from '../action-creator.async.js'
@@ -41,7 +40,7 @@ class WorkspaceContent extends React.Component {
         folder: undefined
       },
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt everytime
-      appOpened: false
+      appOpenedType: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -171,7 +170,7 @@ class WorkspaceContent extends React.Component {
     )
   }
 
-  handleUpdateAppOpened = opened => this.setState({appOpened: opened})
+  handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
   render () {
     const { workspaceContent, contentType, match } = this.props
@@ -196,7 +195,11 @@ class WorkspaceContent extends React.Component {
       <div className='sidebarpagecontainer'>
         <Sidebar />
 
-        <OpenContentApp idWorkspace={match.params.idws} appOpened={this.state.appOpened} updateAppOpened={this.handleUpdateAppOpened} />
+        <OpenContentApp
+          idWorkspace={match.params.idws}
+          appOpenedType={this.state.appOpenedType}
+          updateAppOpenedType={this.handleUpdateAppOpenedType}
+        />
 
         <PageWrapper customeClass='workspace'>
           <PageTitle
