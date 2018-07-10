@@ -18,7 +18,7 @@ export class OpenContentApp extends React.Component {
         type: match.params.type
       }
 
-      console.log('contentToOpen', contentToOpen)
+      console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
       if (appOpenedType === contentToOpen.type) { // app already open
         GLOBAL_dispatchEvent({
@@ -40,13 +40,13 @@ export class OpenContentApp extends React.Component {
   }
 
   componentDidMount () {
-    console.log('OpenContentApp did Mount', this.props)
+    console.log('%c<OpenContentApp> did Mount', 'color: #dcae84', this.props)
 
     this.openContentApp()
   }
 
   componentDidUpdate () {
-    console.log('OpenContentApp did Update', this.props)
+    console.log('%c<OpenContentApp> did Update', 'color: #dcae84', this.props)
 
     this.openContentApp()
   }

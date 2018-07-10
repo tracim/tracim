@@ -46,15 +46,20 @@ class WorkspaceContent extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  customEventReducer = ({ detail: { type, data } }) => {
+  customEventReducer = async ({ detail: { type, data } }) => {
     switch (type) {
+      case 'refreshContentList':
+        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
+        this.loadContentList(this.state.workspaceIdInUrl)
+        break
+
       case 'openContentUrl':
-        console.log('<WorkspaceContent>', type, data)
+        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
         this.props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent))
         break
+
       case 'appClosed':
-        console.log('<WorkspaceContent>', type, data, this.state.workspaceIdInUrl)
-        if (this.state.workspaceIdInUrl === null) return // @FIXME: find out why when app is closed, workspaceInUrl is null then has it's proper value
+        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, this.state.workspaceIdInUrl)
         this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(this.state.workspaceIdInUrl))
         this.setState({appOpenedType: false})
         break
@@ -63,9 +68,9 @@ class WorkspaceContent extends React.Component {
 
   async componentDidMount () {
     const { workspaceIdInUrl } = this.state
-    const { user, workspaceList, app, contentType, match, location, dispatch } = this.props
+    const { user, workspaceList, app, contentType, match, dispatch } = this.props
 
-    console.log('<WorkspaceContent> componentDidMount')
+    console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
 
     if (app.length === 0) {
       const fetchGetAppList = await dispatch(getAppList(user))
@@ -95,30 +100,21 @@ class WorkspaceContent extends React.Component {
 
     if (wsToLoad === null) return // ws already loaded
 
-    const wsContent = await dispatch(getWorkspaceContentList(user, wsToLoad, 0))
-
-    if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
-    else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+    this.loadContentList(wsToLoad)
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    const { user, match, location, dispatch } = this.props
-
-    console.log('<WorkspaceContent> componentDidUpdate')
+    console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838')
 
     if (this.state.workspaceIdInUrl === null) return
 
-    const idWorkspace = parseInt(match.params.idws)
+    const idWorkspace = parseInt(this.props.match.params.idws)
 
     if (isNaN(idWorkspace)) return
 
     if (prevState.workspaceIdInUrl !== idWorkspace) {
       this.setState({workspaceIdInUrl: idWorkspace})
-
-      const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
-
-      if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
-      else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+      this.loadContentList(idWorkspace)
     }
 
     // if (user.user_id !== -1 && prevProps.user.id !== user.id) dispatch(getWorkspaceList(user.user_id, idWorkspace))
@@ -126,36 +122,46 @@ class WorkspaceContent extends React.Component {
 
   componentWillUnmount () {
     this.props.emitEventApp('unmount_app')
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  loadContentList = async idWorkspace => {
+    const { user, location, dispatch } = this.props
+
+    const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
+
+    if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
+    else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
   handleClickContentItem = content => {
-    console.log('content clicked', content)
+    console.log('%c<WorkspaceContent> content clicked', 'color: #c17838', content)
     this.props.history.push(`/workspaces/${content.idWorkspace}/${content.type}/${content.id}`)
   }
 
   handleClickEditContentItem = (e, content) => {
     e.stopPropagation()
-    console.log('edit nyi', content)
+    console.log('%c<WorkspaceContent> edit nyi', 'color: #c17838', content)
   }
 
   handleClickMoveContentItem = (e, content) => {
     e.stopPropagation()
-    console.log('move nyi', content)
+    console.log('%c<WorkspaceContent> move nyi', 'color: #c17838', content)
   }
 
   handleClickDownloadContentItem = (e, content) => {
     e.stopPropagation()
-    console.log('download nyi', content)
+    console.log('%c<WorkspaceContent> download nyi', 'color: #c17838', content)
   }
 
   handleClickArchiveContentItem = (e, content) => {
     e.stopPropagation()
-    console.log('archive nyi', content)
+    console.log('%c<WorkspaceContent> archive nyi', 'color: #c17838', content)
   }
 
   handleClickDeleteContentItem = (e, content) => {
     e.stopPropagation()
-    console.log('delete nyi', content)
+    console.log('%c<WorkspaceContent> delete nyi', 'color: #c17838', content)
   }
 
   handleClickFolder = folderId => {

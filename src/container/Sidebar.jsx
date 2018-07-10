@@ -22,7 +22,7 @@ class Sidebar extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    console.log('<Sidebar> Did Update')
+    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
     if (this.props.match.params.idws === undefined || isNaN(this.props.match.params.idws)) return
 
     const newWorkspaceId = parseInt(this.props.match.params.idws)
