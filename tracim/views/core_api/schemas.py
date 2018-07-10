@@ -339,6 +339,11 @@ class ContentCreationSchema(marshmallow.Schema):
         example='html-documents',
         validate=OneOf(ContentType.allowed_types_for_folding()),  # nopep8
     )
+    parent_id = marshmallow.fields.Integer(
+        example=35,
+        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.'
+    )
+
 
     @post_load
     def make_content_filter(self, data):
