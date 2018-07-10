@@ -32,8 +32,6 @@ class Tracim extends React.Component {
       auth: Cookies.get('user_auth')
     }
 
-    if (userFromCookies.email === undefined || userFromCookies.auth === undefined) return
-
     const fetchGetUserIsConnected = await dispatch(getUserIsConnected(userFromCookies))
     switch (fetchGetUserIsConnected.status) {
       case 200:
@@ -46,14 +44,14 @@ class Tracim extends React.Component {
       case 401:
         dispatch(setUserConnected({logged: false})); break
       default:
-        dispatch(setUserConnected({logged: undefined})); break
+        dispatch(setUserConnected({logged: null})); break
     }
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
 
   render () {
-    const { flashMessage, t } = this.props
+    const { flashMessage, user, t } = this.props
 
     return (
       <div className='tracim'>

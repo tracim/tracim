@@ -9,8 +9,10 @@ import { Route, Redirect, withRouter } from 'react-router-dom'
 // "You should not use <Route component> and <Route render> in the same route; <Route render> will be ignored
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={props => rest.user.logged
-    ? <Component {...props} />
-    : <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+    ? <Component {...props} /> // user logged, return composant
+    : rest.user.logged === null
+      ? <div /> // dont know if user logged yet (waiting for api to respond), do nothing @TODO display loader
+      : <Redirect to={{pathname: '/login', state: {from: props.location}}} /> // // user not logged, redirect to login page
   } />
 )
 
