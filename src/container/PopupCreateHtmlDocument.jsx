@@ -65,6 +65,10 @@ class PopupCreateHtmlDocument extends React.Component {
           this.handleClose()
 
           GLOBAL_dispatchEvent({
+            type: 'refreshContentList'
+          })
+
+          GLOBAL_dispatchEvent({
             type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
             data: {
               idWorkspace: resSave.body.workspace_id,

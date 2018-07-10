@@ -43,18 +43,21 @@ class HtmlDocument extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
       case 'html-documents_showApp':
+        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         break
       case 'html-documents_hideApp':
+        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
       case 'html-documents_reloadContent':
+        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
     }
   }
 
   componentDidMount () {
-    console.log('HtmlDocument did mount')
+    console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
   }
@@ -62,7 +65,8 @@ class HtmlDocument extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('HtmlDocument did update', prevState, state)
+    console.log('%c<HtmlDocument> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) this.loadContent()
@@ -71,6 +75,11 @@ class HtmlDocument extends React.Component {
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
+  }
+
+  componentWillUnmount () {
+    console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   loadContent = async () => {
@@ -132,8 +141,12 @@ class HtmlDocument extends React.Component {
 
     handleFetchResult(await fetchResultSaveHtmlDoc)
       .then(resSave => {
-        if (resSave.apiResponse.status === 200) this.loadContent()
-        else console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
+        if (resSave.apiResponse.status === 200) {
+          this.loadContent()
+          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        } else {
+          console.warn('Error saving html-document. Result:', resSave, 'content:', content, 'config:', config)
+        }
       })
   }
 
@@ -224,7 +237,6 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickShowRevision = revision => {
-    console.log('revision', revision)
     this.setState(prev => ({
       content: {
         ...prev.content,
