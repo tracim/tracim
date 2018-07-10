@@ -39,31 +39,40 @@ class Thread extends React.Component {
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
       case 'thread_showApp':
+        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         break
       case 'thread_hideApp':
+        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
       case 'thread_reloadContent':
+        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
     }
   }
 
   componentDidMount () {
-    console.log('Thread did Mount')
+    console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
     this.loadContent()
   }
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('Thread did Update', prevState, state)
+    console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`, prevState, state)
+
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) this.loadContent()
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
+  }
+
+  componentWillUnmount () {
+    console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   loadContent = async () => {
