@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
+import Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import MenuLinkList from '../component/Header/MenuLinkList.jsx'
-// import MenuActionList from '../component/Header/MenuActionList.jsx'
 import MenuActionListItemSearch from '../component/Header/MenuActionListItem/Search.jsx'
 import MenuActionListItemDropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
 import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
@@ -20,7 +20,7 @@ import {
 import {
   postUserLogout
 } from '../action-creator.async.js'
-import Cookies from 'js-cookie'
+import { COOKIE } from '../helper.js'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -44,8 +44,8 @@ class Header extends React.Component {
 
     const fetchPostUserLogout = await dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      Cookies.remove('user_login')
-      Cookies.remove('user_auth')
+      Cookies.remove(COOKIE.USER_LOGIN)
+      Cookies.remove(COOKIE.USER_AUTH)
 
       dispatch(setUserDisconnected())
     } else {

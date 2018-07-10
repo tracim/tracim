@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 import { translate } from 'react-i18next'
+import Cookies from 'js-cookie'
 import LoginLogo from '../component/Login/LoginLogo.jsx'
 import LoginLogoImg from '../img/logoTracimWhite.svg'
 import { postUserLogin } from '../action-creator.async.js'
@@ -9,15 +10,13 @@ import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
-// import InputCheckbox from '../component/common/Input/InputCheckbox.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import LoginBtnForgotPw from '../component/Login/LoginBtnForgotPw.jsx'
 import {
   newFlashMessage,
   setUserConnected
 } from '../action-creator.sync.js'
-import { PAGE } from '../helper.js'
-import Cookies from 'js-cookie'
+import { COOKIE, PAGE } from '../helper.js'
 
 class Login extends React.Component {
   constructor (props) {
@@ -53,8 +52,8 @@ class Login extends React.Component {
         logged: true
       }))
 
-      Cookies.set('user_login', inputLogin.value)
-      Cookies.set('user_auth', userAuth)
+      Cookies.set(COOKIE.USER_LOGIN, inputLogin.value)
+      Cookies.set(COOKIE.USER_AUTH, userAuth)
 
       history.push(PAGE.HOME)
     } else if (fetchPostUserLogin.status === 400) {

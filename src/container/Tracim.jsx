@@ -13,7 +13,7 @@ import {
   Route, withRouter, Switch
 } from 'react-router-dom'
 import PrivateRoute from './PrivateRoute.jsx'
-import { PAGE } from '../helper.js'
+import { COOKIE, PAGE } from '../helper.js'
 import {
   getUserIsConnected
 } from '../action-creator.async.js'
@@ -28,8 +28,8 @@ class Tracim extends React.Component {
     const { dispatch } = this.props
 
     const userFromCookies = {
-      email: Cookies.get('user_login'),
-      auth: Cookies.get('user_auth')
+      email: Cookies.get(COOKIE.USER_LOGIN),
+      auth: Cookies.get(COOKIE.USER_AUTH)
     }
 
     const fetchGetUserIsConnected = await dispatch(getUserIsConnected(userFromCookies))
@@ -51,7 +51,7 @@ class Tracim extends React.Component {
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
 
   render () {
-    const { flashMessage, user, t } = this.props
+    const { flashMessage, t } = this.props
 
     return (
       <div className='tracim'>

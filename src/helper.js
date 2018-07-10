@@ -7,6 +7,11 @@ export const FETCH_CONFIG = {
   mockApiUrl: 'http://localhost:3001'
 }
 
+export const COOKIE = {
+  USER_LOGIN: 'user_login',
+  USER_AUTH: 'user_auth'
+}
+
 export const PAGE = {
   HOME: '/',
   WORKSPACE: {
