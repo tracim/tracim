@@ -1,15 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import appFactory from '../appFactory.js'
+import appFactory from '../../appFactory.js'
 
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
     const { idWorkspace, appOpenedType, user, workspaceContent, contentType, renderApp, match } = this.props
 
-    if (isNaN(idWorkspace)) return
+    if (isNaN(idWorkspace) || idWorkspace === -1) return
 
-    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContent.id !== -1 && workspaceContent.length) {
+    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContent.length) {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
       const contentToOpen = {
