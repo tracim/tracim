@@ -37,12 +37,18 @@ class Sidebar extends React.Component {
     this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
   }
 
+  // not used, right now, link on sidebar filters is a <Link>
   handleClickContentFilter = (idWs, filter) => {
     const { workspace, history } = this.props
 
     const newFilter = workspace.filter.includes(filter) ? [] : [filter] // use an array to allow multiple filters (NYI)
 
+    console.log('wtf')
     history.push(`${PAGE.WORKSPACE.CONTENT_LIST(idWs)}?type=${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
+
+    // obviously, it's ugly to use custom event to tell WorkspaceContent to refresh, but since WorkspaceContent
+    // will end up being an App, it'll have to be that way. So it's fine
+    GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
   }
 
   handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
@@ -70,7 +76,7 @@ class Sidebar extends React.Component {
                   isOpenInSidebar={ws.isOpenInSidebar}
                   onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
                   onClickAllContent={this.handleClickAllContent}
-                  onClickContentFilter={this.handleClickContentFilter}
+                  // onClickContentFilter={this.handleClickContentFilter}
                   key={ws.id}
                 />
               )}

@@ -112,7 +112,10 @@ class WorkspaceContent extends React.Component {
 
     if (isNaN(idWorkspace)) return
 
-    if (prevState.workspaceIdInUrl !== idWorkspace) {
+    const prevFilter = qs.parse(prevProps.location.search).type
+    const currentFilter = qs.parse(this.props.location.search).type
+
+    if (prevState.workspaceIdInUrl !== idWorkspace || prevFilter !== currentFilter) {
       this.setState({workspaceIdInUrl: idWorkspace})
       this.loadContentList(idWorkspace)
     }
