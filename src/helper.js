@@ -16,7 +16,7 @@ export const PAGE = {
   HOME: '/',
   WORKSPACE: {
     DASHBOARD: (idws = ':idws') => `/workspaces/${idws}/dashboard`,
-    NEW: '/workspaces/new',
+    NEW: (idws, type) => `/workspaces/${idws}/${type}/new`,
     CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
     CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
     CONTENT: (idws = ':idws', type = ':type?', idcts = ':idcts?') => `/workspaces/${idws}/${type}/${idcts}`,

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
 import { PAGE } from '../helper.js'
 import Sidebar from './Sidebar.jsx'
@@ -11,7 +11,8 @@ import PageWrapper from '../component/common/layout/PageWrapper.jsx'
 import PageTitle from '../component/common/layout/PageTitle.jsx'
 import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
-import OpenContentApp from './OpenContentApp.jsx'
+import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
+import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
 import {
   getAppList,
   getContentTypeList,
@@ -59,6 +60,7 @@ class WorkspaceContent extends React.Component {
         break
 
       case 'appClosed':
+      case 'hide_popupCreateContent':
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, this.state.workspaceIdInUrl)
         this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(this.state.workspaceIdInUrl))
         this.setState({appOpenedType: false})
@@ -173,12 +175,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickCreateContent = (e, idFolder, contentType) => {
     e.stopPropagation()
-    this.props.renderCreateContentApp(
-      this.props.contentType.find(ct => ct.slug === contentType),
-      this.props.user,
-      this.props.match.params.idws,
-      idFolder
-    )
+    this.props.history.push(`${PAGE.WORKSPACE.NEW(this.state.workspaceIdInUrl, contentType, idFolder)}?parent_id=${idFolder}`)
   }
 
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
@@ -206,10 +203,19 @@ class WorkspaceContent extends React.Component {
         <Sidebar />
 
         <OpenContentApp
+          // automatically open the app for the idContent in url
           idWorkspace={this.state.workspaceIdInUrl}
           appOpenedType={this.state.appOpenedType}
           updateAppOpenedType={this.handleUpdateAppOpenedType}
         />
+
+        <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
+          <OpenCreateContentApp
+            // automatically open the popup create content of the app in url
+            idWorkspace={this.state.workspaceIdInUrl}
+            appOpenedType={this.state.appOpenedType}
+          />
+        } />
 
         <PageWrapper customeClass='workspace'>
           <PageTitle
@@ -219,7 +225,7 @@ class WorkspaceContent extends React.Component {
           >
             <DropdownCreateButton
               parentClass='workspace__header__btnaddworkspace'
-              idFolder={null}
+              idFolder={null} // null because it is workspace root content
               onClickCreateContent={this.handleClickCreateContent}
               availableApp={contentType}
             />

@@ -65,6 +65,13 @@
       GLOBAL_renderCreateContentApp = app => {
         console.log('%cGLOBAL_renderCreateContentApp', 'color: #5cebeb', app)
 
+        const selectedApp = getSelectedApp(app.config.slug)
+
+        if (!selectedApp) {
+          console.log('Error in GLOBAL_renderCreateContentApp, selectedApp is undefined', app)
+          return
+        }
+
         getSelectedApp(app.config.slug).renderPopupCreation(app)
       }
 

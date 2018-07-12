@@ -24,7 +24,7 @@ const DropdownCreateButton = props => {
         aria-labelledby='dropdownCreateBtn'
       >
         <SubDropdownCreateButton
-          idFolder={null}
+          idFolder={props.idFolder}
           availableApp={props.availableApp}
           onClickCreateContent={props.onClickCreateContent}
         />
