@@ -2,7 +2,10 @@
 import typing
 
 import transaction
+from depot.io.local import LocalStoredFile
+from depot.manager import DepotManager
 from pyramid.config import Configurator
+from pyramid.response import FileResponse, FileIter
 
 from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.models.data import UserRoleInWorkspace
@@ -35,52 +38,66 @@ FILE_ENDPOINTS_TAG = 'Files'
 
 class FileController(Controller):
 
-    # # File data
-    # @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    # @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    # @require_content_types([file_type])
-    # @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    # #@hapic.input_files()
-    # @hapic.output_file([])
-    # def upload_file(self, context, request: TracimRequest, hapic_data=None):
-    #     # TODO - G.M - 2018-07-05 - Do this endpoint
-    #     app_config = request.registry.settings['CFG']
-    #     api = ContentApi(
-    #         current_user=request.current_user,
-    #         session=request.dbsession,
-    #         config=app_config,
-    #     )
-    #     content = api.get_one(
-    #         hapic_data.path.content_id,
-    #         content_type=ContentType.Any
-    #     )
-    #     file = request.POST['files']
-    #     api.update_file_data(
-    #         content,
-    #         new_filename=file.filename,
-    #         new_mimetype=file.type,
-    #         new_content=file.file,
-    #     )
-    #     return content.depot_file
-    #
-    # @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    # @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    # @require_content_types([file_type])
-    # @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    # @hapic.output_file([])
-    # def download_file(self, context, request: TracimRequest, hapic_data=None):
-    #     # TODO - G.M - 2018-07-05 - Do this endpoint
-    #     app_config = request.registry.settings['CFG']
-    #     api = ContentApi(
-    #         current_user=request.current_user,
-    #         session=request.dbsession,
-    #         config=app_config,
-    #     )
-    #     content = api.get_one(
-    #         hapic_data.path.content_id,
-    #         content_type=ContentType.Any
-    #     )
-    #     return content.depot_file
+    # File data
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @require_content_types([file_type])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    #@hapic.input_files()
+    @hapic.output_file([])
+    def upload_file(self, context, request: TracimRequest, hapic_data=None):
+        # TODO - G.M - 2018-07-05 - Do this endpoint
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        file = request.POST['files']
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.update_file_data(
+                content,
+                new_filename=file.filename,
+                new_mimetype=file.type,
+                new_content=file.file,
+            )
+        file = DepotManager.get().get(content.depot_file)
+        response = request.response
+        response.content_type = file.content_type
+        response.app_iter = FileIter(file)
+        return response
+
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @require_content_types([file_type])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_file([])
+    def download_file(self, context, request: TracimRequest, hapic_data=None):
+        # TODO - G.M - 2018-07-05 - Do this endpoint
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        file = DepotManager.get().get(content.depot_file)
+        response = request.response
+        response.content_type = file.content_type
+        response.app_iter = FileIter(file)
+        return response
+
 
     # Previews
     # def get_file_preview(self):
@@ -224,21 +241,21 @@ class FileController(Controller):
         )  # nopep8
         configurator.add_view(self.update_file_info, route_name='update_file_info')  # nopep8
 
-        # # upload new file data
-        # configurator.add_route(
-        #     'upload_file',
-        #     '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
-        #     request_method='PUT'
-        # )
-        # configurator.add_view(self.upload_file, route_name='upload_file')  # nopep8
-        #
-        # # download file data
-        # configurator.add_route(
-        #     'download_file',
-        #     '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
-        #     request_method='GET'
-        # )
-        # configurator.add_view(self.download_file, route_name='download_file')  # nopep8
+        # upload new file data
+        configurator.add_route(
+            'upload_file',
+            '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
+            request_method='PUT'
+        )
+        configurator.add_view(self.upload_file, route_name='upload_file')  # nopep8
+
+        # download file data
+        configurator.add_route(
+            'download_file',
+            '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.download_file, route_name='download_file')  # nopep8
         # get file revisions
         configurator.add_route(
             'file_revisions',
