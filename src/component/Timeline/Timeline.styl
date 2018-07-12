@@ -116,50 +116,16 @@
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result
 
-
-/**** MEDIA 576px & 1199px ****/
-
-@media (min-width: min-sm) and (max-width: max-lg)
-
+@media (min-width: min-lg) and (max-width: max-lg)
   .timeline
-    &__messagelist
-      min-height 350px
-      max-height 700px
-      &__item
-        margin-right 55px
+    margin 0
 
-/**** MEDIA 576px & 767px ****/
-
-@media (min-width: min-sm) and (max-width: max-sm)
-
+@media (min-width: min-sm) and (max-width: max-md)
   .timeline
-    &__messagelist__item
-      margin-right 35px
-    &__texteditor
-      display flex
-      align-items center
-      &__wysiwyg
-        width 70%
-        & > textarea
-          border-radius 5px
-          height 40px
-      &__submit
-        width 30%
-        margin-left 10px
-
-/**** MEDIA 575px ****/
+    display block
+    margin 0
 
 @media (max-width: max-xs)
-
   .timeline
-    &__texteditor
-      display flex
-      align-items center
-      &__wysiwyg
-        width 70%
-        & > textarea
-          border-radius 5px
-          height 40px
-      &__submit
-        width 30%
-        margin-left 10px
+    display block
+    margin 0
