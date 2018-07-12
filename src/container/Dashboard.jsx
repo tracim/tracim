@@ -434,9 +434,8 @@ class Dashboard extends React.Component {
                     <form className='dashboard__memberlist__form'>
                       <div
                         className='dashboard__memberlist__form__close d-flex justify-content-end'
-                        onClick={this.handleToggleNewMemberDashboard}
                       >
-                        <i className='fa fa-times' />
+                        <i className='fa fa-times' onClick={this.handleToggleNewMemberDashboard} />
                       </div>
                       <div className='dashboard__memberlist__form__member'>
                         <div className='dashboard__memberlist__form__member__name'>
@@ -521,7 +520,7 @@ class Dashboard extends React.Component {
             </div>
 
             <div className='dashboard__moreinfo'>
-              <div className='dashboard__moreinfo__webdav genericBtnInfoDashboard mr-5'>
+              <div className='dashboard__moreinfo__webdav genericBtnInfoDashboard'>
                 <div
                   className='dashboard__moreinfo__webdav__btn genericBtnInfoDashboard__btn'
                   onClick={this.handleToggleWebdavBtn}

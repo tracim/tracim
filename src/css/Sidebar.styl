@@ -6,7 +6,7 @@
   border-top-width 2px
   padding 11px 15px
   background-color blue
-  z-index 2
+  z-index 5
   &__icon
     font-size 18px
     text-align center
@@ -27,6 +27,10 @@ sidebar-animate-speed = 0.5s
 .sidebarSticky
   position sticky
   top 87px
+  display flex
+  flex-direction column
+  justify-content space-between
+  height 100%
 
 leftside()
   height 100%
@@ -37,13 +41,13 @@ leftside()
   position relative
   transition all sidebar-animate-speed
   width sidebar-width
-  z-index 4
+  z-index 5
   &.sidebarclose
     width 0
   &__expand
     position absolute
     top 0
-    right -43px
+    right -42px
     display flex
     justify-content center
     align-items center
@@ -131,6 +135,17 @@ leftside()
             &.activeFilter
               .dropdown__icon
                 background-color rgba(253, 253, 253, 0.8)
+  &__footer
+    &__text
+      color off-white
+      font-size 14px
+      &__link
+        & > a
+          color off-white
+          font-size 14px
+          &:hover
+            text-decoration underline
+            color fourthColor
 
 /***** MEDIA 992px and 1199px ******/
 

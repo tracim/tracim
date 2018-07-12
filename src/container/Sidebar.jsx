@@ -88,6 +88,15 @@ class Sidebar extends React.Component {
               {t('Sidebar.create_new_workspace')}
             </button>
           </div>
+
+          <div className='sidebar__footer mb-2'>
+            <div className='sidebar__footer__text d-flex align-items-end justify-content-center'>
+              Copyright - 2013 - 2018
+              <div className='sidebar__footer__text__link'>
+                <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )

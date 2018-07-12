@@ -91,7 +91,6 @@ folderopen()
       white-space nowrap
       text-overflow ellipsis
       overflow hidden
-      width 400px
       font-size 17px
       color darkGrey
     &__button
@@ -128,6 +127,11 @@ folderopen()
         & > i
           margin-right 3px
 
+@media (min-width: min-sm) and (max-width: max-md)
+
+  .folder__header__button
+    display none
+
 @media (max-width: max-xs)
   .folder
     &__header
@@ -137,4 +141,6 @@ folderopen()
           font-size 20px
         &__text
           font-size 15px
+      &__button
+        display none
 

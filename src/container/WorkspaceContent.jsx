@@ -274,7 +274,7 @@ class WorkspaceContent extends React.Component {
             </div>
 
             <DropdownCreateButton
-              customClass='workspace__content__button mb-5'
+              customClass='workspace__content__button'
               idFolder={null}
               onClickCreateContent={this.handleClickCreateContent}
               availableApp={contentType}
