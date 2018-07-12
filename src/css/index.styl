@@ -9,7 +9,7 @@ btnState()
   color off-white
 
 .html-documents
-  width 1155px
+  width 70%
   &__header
     background-color htmlColor
     &__editionmode
@@ -138,87 +138,32 @@ btnState()
             box-shadow none
 
 
-@media (min-width: max-xs) and (max-width: max-lg)
-  .page
+@media (min-width: min-sm) and (max-width: max-lg)
+  .html-documents
     &__contentpage
-      display block
-      overflow-Y scroll
+      &__content
+        margin 10px
       &__textnote
-        margin-right 10px
-        padding 10px 20px
-        width auto
-        overflow-Y hidden
-        &__latestversion
-          padding-top 10px
-      &__wrapper
-        width auto
-      &__texteditor
-        &__simpletext
-          display inline-flex
-          width 60%
-        &__submit
-          display inline-flex
-          margin 10px 0
-          &__btn
-            display flex
-            margin-left 35px
-            &__icon
-              margin-left 15px
-
-@media (min-width: min-lg) and (max-width: max-lg)
-  .page
-    width 692px
-    &__contentpage__texteditor__simpletext
-      margin-left 15px
+        margin 0
 
 @media (min-width: min-md) and (max-width: max-md)
-  .page
-    width 768px
-    &__contentpage__texteditor__simpletext
-      margin-left 25px
+
+  .html-documents
+    top 68px
 
 @media (min-width: min-sm) and (max-width: max-sm)
-  .page
-    top 69px
-    width 576px
-    height calc(100% - 69px)
-    &__contentpage__texteditor__simpletext
-      margin-left 10px
+
+  .html-documents
+    top 68px
+    width 100%
 
 @media (max-width: max-xs)
-  .page
-    top 70px
-    height calc(100% - 70px)
+
+  .html-documents
+    top 68px
     width 100%
-    box-shadow none
     &__contentpage
-      display block
-      overflow-Y scroll
+      &__content
+        margin 10px
       &__textnote
-        margin-right 10px
-        width auto
-        overflow-Y hidden
-        font-size 15px
-      &__wrapper
-        width auto
-      &__messagelist
-        &__item
-          padding 0 35px 20px 30px
-        &__version
-          &__btn
-            font-size 17px
-            vertical-align middle
-          &__dateversion
-            font-size 15px
-      &__texteditor
-        &__simpletext
-          margin 10px 0
-          display flex
-          width 95%
-          margin-left 10px
-        &__submit
-          &__btn
-            display flex
-            margin 0 auto
-            &__icon
-              margin-left 10px
+        margin 0
