@@ -314,6 +314,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 6
+        assert revision['revision_type'] == 'creation'
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
         assert revision['comment_ids'] == []
@@ -335,6 +336,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 7
+        assert revision['revision_type'] == 'edition'
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
         assert revision['comment_ids'] == []
@@ -356,6 +358,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 27
+        assert revision['revision_type'] == 'edition'
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
         assert revision['comment_ids'] == []
@@ -697,6 +700,7 @@ class TestThreads(FunctionalTest):
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 8
         assert revision['sub_content_types']
+        assert revision['revision_type'] == 'creation'
         assert revision['comment_ids'] == [18, 19, 20]
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
@@ -716,6 +720,7 @@ class TestThreads(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 26
+        assert revision['revision_type'] == 'edition'
         assert revision['sub_content_types']
         assert revision['comment_ids'] == []
         # TODO - G.M - 2018-06-173 - check date format
