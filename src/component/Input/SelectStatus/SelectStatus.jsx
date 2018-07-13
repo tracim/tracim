@@ -19,6 +19,7 @@ export const SelectStatus = props => {
         style={{color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent'}}
         disabled={props.disabled}
       >
+        <span className='selectStatus__dropdownbtn__label'>Status :</span>
         {props.selectedStatus ? props.selectedStatus.label : ''}
         <div className='selectStatus__dropdownbtn__icon'>
           <i className={`fa fa-${props.selectedStatus ? props.selectedStatus.faIcon : ''}`} />

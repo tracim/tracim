@@ -85,13 +85,22 @@
     display flex
     flex-wrap wrap
     // 209 = wsContentGeneric:top wsContentGeneric__header:height - wsContentGeneric__option:height
+    width 200% // to allow transform translateX of right part
     height calc(100% - 209px)
     &__left
-      width 55%
-      height calc(100% - 20px) // 20px => margin of timeline
-    &__right
-      width 45%
+      transition width 0.4s ease
+      width 25%
       height calc(100% - 10px) // 10px => margin of timeline
+    &__right
+      transition width 0.4s ease
+      width calc(25% - 10px)
+      height calc(100% - 10px) // 10px => margin of timeline
+
+.rightPartClose
+  .wsContentGeneric__content__left
+    width calc(50% - 50px)
+  //.wsContentGeneric__content__right
+  //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
 
 @media (min-width: min-sm) and (max-width: max-lg)
 

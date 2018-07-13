@@ -18,7 +18,7 @@ import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
 ReactDOM.render(
-  <div>
+  <div style={{width: '1200px'}}>
     <PopinFixed customClass={`${'randomClass'}`}>
       <PopinFixedHeader
         customClass={`${'randomClass'}`}
@@ -75,17 +75,26 @@ ReactDOM.render(
           {/* <TextAreaApp customClass={'randomClass'} text={'woot'} /> */}
         </div>
 
-        {/*
         <Timeline
           customClass={`${'randomClass'}__contentpage`}
           loggedUser={{
-            id: 1,
-            name: 'smoi',
-            avatar: 'https://www.algoo.fr/static/images/algoo_images/algoo-logo.jpg'
+            user_id: 5,
+            username: 'Smoi',
+            firstname: 'Côme',
+            lastname: 'Stoilenom',
+            email: 'osef@algoo.fr',
+            avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
           }}
           timelineData={TimelineDebugData}
+          newComment={''}
+          disableComment={false}
+          wysiwyg={false}
+          onChangeNewComment={() => {}}
+          onClickValidateNewCommentBtn={() => {}}
+          onClickWysiwygBtn={() => {}}
+          onClickRevisionBtn={() => {}}
+          shouldScrollToBottom={true}
         />
-        */}
       </PopinFixedContent>
     </PopinFixed>
   </div>

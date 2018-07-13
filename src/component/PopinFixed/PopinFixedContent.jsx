@@ -2,24 +2,48 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
-const PopinFixedContent = props => {
-  return props.children.length === 2
-    ? (
-      <div className={classnames('wsContentGeneric__content', `${props.customClass}__content`)}>
-        <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
-          {props.children[0]}
-        </div>
+class PopinFixedContent extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      rightPartOpen: false
+    }
+  }
 
-        <div className={classnames('wsContentGeneric__content__right', `${props.customClass}__content__right`)}>
-          {props.children[1]}
+  componentDidMount () {
+    if (this.props.showRightPartOnLoad) this.setState({rightPartOpen: true})
+  }
+
+  handleToggleRightPart = () => {
+    this.setState(prev => ({rightPartOpen: !prev.rightPartOpen}))
+  }
+
+  render () {
+    return this.props.children.length === 2
+      ? (
+        <div className={classnames(
+          'wsContentGeneric__content',
+          `${this.props.customClass}__content`,
+          {'rightPartOpen': this.state.rightPartOpen, 'rightPartClose': !this.state.rightPartOpen}
+        )}>
+          <div className={classnames('wsContentGeneric__content__left', `${this.props.customClass}__content__left`)}>
+            {this.props.children[0]}
+          </div>
+
+          <div className={classnames('wsContentGeneric__content__right', `${this.props.customClass}__content__right`)}>
+            {React.cloneElement(this.props.children[1], {
+              toggleRightPart: this.handleToggleRightPart,
+              rightPartOpen: this.state.rightPartOpen
+            })}
+          </div>
         </div>
-      </div>
-    )
-    : (
-      <div className={classnames('wsContentGeneric__content', `${props.customClass}__content`)}>
-        { props.children }
-      </div>
-    )
+      )
+      : (
+        <div className={classnames('wsContentGeneric__content', `${this.props.customClass}__content`)}>
+          {this.props.children}
+        </div>
+      )
+  }
 }
 
 export default PopinFixedContent
