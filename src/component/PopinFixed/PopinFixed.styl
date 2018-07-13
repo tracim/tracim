@@ -7,7 +7,7 @@
   border 1px solid grey
   height 100%
   background-color lightGrey
-  box-shadow shadow-page
+  box-shadow shadow-right
   z-index 4
   &.visible
     visibility visible
@@ -107,24 +107,28 @@
   .wsContentGeneric__content
     overflow-Y auto
     &__left
+      margin-bottom 20px
       width 100%
-      margin-bottom 50px
+      height auto
+      &__textnote
+        height auto
+        overflow-y hidden
     &__right
       width 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
   .wsContentGeneric
-    top 70px
+    top 68px
 
 @media (max-width: max-xs)
 
   .wsContentGeneric
-    top 70px
+    top 68  px
     &__content
       overflow-Y auto
       &__left
         width 100%
-        margin-bottom 50px
+        margin-bottom 20px
       &__right
         width 100%
