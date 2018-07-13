@@ -67,7 +67,7 @@ class Timeline extends React.Component {
             <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
               <textarea
                 id='wysiwygTimelineComment'
-                placeholder='Taper votre message ici'
+                placeholder='Taper votre commentaire ici'
                 value={props.newComment}
                 onChange={props.onChangeNewComment}
                 disabled={props.disableComment}
