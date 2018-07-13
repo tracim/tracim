@@ -32,6 +32,7 @@ from tracim.models.context_models import RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import file_type
 from tracim.models.revision_protection import new_revision
+from preview_generator.manager import PreviewManager
 
 FILE_ENDPOINTS_TAG = 'Files'
 
@@ -44,7 +45,7 @@ class FileController(Controller):
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     #@hapic.input_files()
-    @hapic.output_file([])
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def upload_file(self, context, request: TracimRequest, hapic_data=None):
         # TODO - G.M - 2018-07-05 - Do this endpoint
         app_config = request.registry.settings['CFG']
@@ -69,14 +70,11 @@ class FileController(Controller):
                 new_mimetype=file.type,
                 new_content=file.file,
             )
-        file = DepotManager.get().get(content.depot_file)
-        response = request.response
-        response.content_type = file.content_type
-        response.app_iter = FileIter(file)
-        return response
+
+        return
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
@@ -100,10 +98,31 @@ class FileController(Controller):
 
 
     # Previews
-    # def get_file_preview(self):
-    #     # TODO - G.M - 2018-07-05 - Do this endpoint
-    #     pass
-    
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @require_content_types([file_type])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    #@hapic.output_file([])
+    def get_file_preview_info(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        # TODO - G.M - 2018-07-05 - Do this endpoint
+        app_config = request.registry.settings['CFG']
+        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        file_path = api.get_one_revision_filepath(content.revision_id)
+        return {
+            'nb_pages': preview_manager.get_page_nb(file_path),
+            'pdf_preview': preview_manager.has_pdf_preview(file_path),
+            'mimetype':  preview_manager.get_mimetype(file_path),
+        }
+
     # File infos
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -264,10 +283,18 @@ class FileController(Controller):
         )
         configurator.add_view(self.get_file_revisions, route_name='file_revisions')  # nopep8
 
-        # get file revisions
+        # get file status
         configurator.add_route(
             'set_file_status',
             '/workspaces/{workspace_id}/files/{content_id}/status',  # nopep8
             request_method='PUT'
         )
         configurator.add_view(self.set_file_status, route_name='set_file_status')  # nopep8
+
+        # get preview info
+        configurator.add_route(
+            'preview_info',
+            '/workspaces/{workspace_id}/files/{content_id}/preview/info',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.get_file_preview_info, route_name='preview_info')  # nopep8
