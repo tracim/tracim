@@ -72,6 +72,7 @@ class PopupCreateHtmlDocument extends React.Component {
               idWorkspace: resSave.body.workspace_id,
               contentType: appName,
               idContent: resSave.body.content_id
+              // will be open in edit mode because revision.length === 1
             }
           })
         }

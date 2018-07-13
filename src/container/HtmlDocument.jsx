@@ -10,7 +10,7 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus
-} from 'tracim_lib'
+} from 'tracim_lib/src/index.js'
 import { MODE, debug } from '../helper.js'
 import {
   getHtmlDocContent,
@@ -71,7 +71,10 @@ class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) this.loadContent()
 
-    if (state.mode === MODE.EDIT) wysiwyg('#wysiwygNewVersion', this.handleChangeText)
+    if (state.mode === MODE.EDIT) {
+      tinymce.remove('#wysiwygNewVersion')
+      wysiwyg('#wysiwygNewVersion', this.handleChangeText)
+    }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', this.handleChangeNewComment)
     else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
@@ -240,6 +243,18 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickShowRevision = revision => {
+    const { mode, timeline } = this.state
+
+    const revisionArray = timeline.filter(t => t.timelineType === 'revision')
+    const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
+
+    if (mode === MODE.REVISION && isLastRevision) {
+      this.handleClickLastVersion()
+      return
+    }
+
+    if (mode === MODE.VIEW && isLastRevision) return
+
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -275,7 +290,7 @@ class HtmlDocument extends React.Component {
         <PopinFixedOption customClass={`${config.slug}`} i18n={i18n}>
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              <NewVersionBtn onClickNewVersionBtn={this.handleClickNewVersion} disabled={mode === MODE.REVISION} />
+              <NewVersionBtn onClickNewVersionBtn={this.handleClickNewVersion} disabled={mode !== MODE.VIEW} />
 
               {mode === MODE.REVISION &&
                 <button
@@ -306,7 +321,10 @@ class HtmlDocument extends React.Component {
           </div>
         </PopinFixedOption>
 
-        <PopinFixedContent customClass={`${config.slug}__contentpage`}>
+        <PopinFixedContent
+          customClass={`${config.slug}__contentpage`}
+          showRightPartOnLoad={mode === MODE.VIEW}
+        >
           <HtmlDocumentComponent
             mode={mode}
             wysiwygNewVersion={'wysiwygNewVersion'}

@@ -16,6 +16,7 @@ const HtmlDocument = props => {
               </div>
             }
           </div>
+          {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
           <div className='html-documents__contentpage__textnote__text' dangerouslySetInnerHTML={{__html: props.text}} />
         </div>
       }
