@@ -47,7 +47,6 @@ class FileController(Controller):
     #@hapic.input_files()
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def upload_file(self, context, request: TracimRequest, hapic_data=None):
-        # TODO - G.M - 2018-07-05 - Do this endpoint
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -79,7 +78,6 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def download_file(self, context, request: TracimRequest, hapic_data=None):
-        # TODO - G.M - 2018-07-05 - Do this endpoint
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -96,32 +94,90 @@ class FileController(Controller):
         response.app_iter = FileIter(file)
         return response
 
-
-    # Previews
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    #@hapic.output_file([])
-    def get_file_preview_info(self, context, request: TracimRequest, hapic_data=None):  # nopep8
-        # TODO - G.M - 2018-07-05 - Do this endpoint
-        app_config = request.registry.settings['CFG']
-        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
-        api = ContentApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,
-        )
-        content = api.get_one(
-            hapic_data.path.content_id,
-            content_type=ContentType.Any
-        )
-        file_path = api.get_one_revision_filepath(content.revision_id)
-        return {
-            'nb_pages': preview_manager.get_page_nb(file_path),
-            'pdf_preview': preview_manager.has_pdf_preview(file_path),
-            'mimetype':  preview_manager.get_mimetype(file_path),
-        }
+    @hapic.output_file([])
+    def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    # preview
+    # pdf
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([file_type])
+    @hapic.output_file([])
+    def preview_pdf(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([file_type])
+    @hapic.output_file([])
+    def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([file_type])
+    @hapic.output_file([])
+    def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    # jpg
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([file_type])
+    @hapic.output_file([])
+    def preview_jpg(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([file_type])
+    @hapic.output_file([])
+    def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([file_type])
+    @hapic.output_file([])
+    def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([file_type])
+    @hapic.output_file([])
+    def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
+        raise NotImplemented()
+
+    # @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
+    # @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    # @require_content_types([file_type])
+    # @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    # #@hapic.output_file([])
+    # def get_file_preview_info(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    #     # TODO - G.M - 2018-07-05 - Do this endpoint
+    #     app_config = request.registry.settings['CFG']
+    #     preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+    #     api = ContentApi(
+    #         current_user=request.current_user,
+    #         session=request.dbsession,
+    #         config=app_config,
+    #     )
+    #     content = api.get_one(
+    #         hapic_data.path.content_id,
+    #         content_type=ContentType.Any
+    #     )
+    #     file_path = api.get_one_revision_filepath(content.revision_id)
+    #     return {
+    #         'nb_pages': preview_manager.get_page_nb(file_path),
+    #         'pdf_preview': preview_manager.has_pdf_preview(file_path),
+    #         'mimetype':  preview_manager.get_mimetype(file_path),
+    #     }
 
     # File infos
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
@@ -244,6 +300,8 @@ class FileController(Controller):
         return
 
     def bind(self, configurator: Configurator) -> None:
+
+        # file info #
         # Get file info
         configurator.add_route(
             'file_info',
@@ -251,7 +309,6 @@ class FileController(Controller):
             request_method='GET'
         )
         configurator.add_view(self.get_file_infos, route_name='file_info')  # nopep8
-
         # update file
         configurator.add_route(
             'update_file_info',
@@ -260,21 +317,80 @@ class FileController(Controller):
         )  # nopep8
         configurator.add_view(self.update_file_info, route_name='update_file_info')  # nopep8
 
-        # upload new file data
+        # raw file #
+        # upload raw file
         configurator.add_route(
             'upload_file',
-            '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/raw',  # nopep8
             request_method='PUT'
         )
         configurator.add_view(self.upload_file, route_name='upload_file')  # nopep8
-
-        # download file data
+        # download raw file
         configurator.add_route(
             'download_file',
-            '/workspaces/{workspace_id}/files/{content_id}/file_data',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/raw',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.download_file, route_name='download_file')  # nopep8
+        # download raw file of revision
+        configurator.add_route(
+            'download_revision',
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{content_revision}/raw',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.download_revisions_file, route_name='download_revision')  # nopep8
+
+        # previews #
+        # get preview pdf full
+        configurator.add_route(
+            'preview_pdf_full',
+            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.preview_pdf_full, route_name='preview_pdf_full')  # nopep8
+        # get preview pdf
+        configurator.add_route(
+            'preview_pdf',
+            '/workspaces/{workspace_id}/files/{content_id}/preview/pdf',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.preview_pdf, route_name='preview_pdf')  # nopep8
+        # get preview jpg allowed dims
+        configurator.add_route(
+            'allowed_dim_preview_jpg',
+            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/allowed_dims',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.allowed_dim_preview_jpg, route_name='allowed_dim_preview_jpg')  # nopep8
+        # get preview jpg
+        configurator.add_route(
+            'preview_jpg',
+            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.preview_jpg, route_name='preview_jpg')  # nopep8
+        # get preview jpg with size
+        configurator.add_route(
+            'sized_preview_jpg',
+            '/workspaces/{workspace_id}/files/{content_id}/preview/jpg/{width}x{height}',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.sized_preview_jpg, route_name='sized_preview_jpg')  # nopep8
+        # get jpg preview for revision
+        configurator.add_route(
+            'sized_preview_jpg_revision',
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.sized_preview_jpg_revision, route_name='sized_preview_jpg_revision')  # nopep8
+        # get jpg preview for revision
+        configurator.add_route(
+            'preview_pdf_revision',
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.preview_pdf_revision, route_name='preview_pdf_revision')  # nopep8
+        # others #
         # get file revisions
         configurator.add_route(
             'file_revisions',
@@ -290,11 +406,3 @@ class FileController(Controller):
             request_method='PUT'
         )
         configurator.add_view(self.set_file_status, route_name='set_file_status')  # nopep8
-
-        # get preview info
-        configurator.add_route(
-            'preview_info',
-            '/workspaces/{workspace_id}/files/{content_id}/preview/info',  # nopep8
-            request_method='GET'
-        )
-        configurator.add_view(self.get_file_preview_info, route_name='preview_info')  # nopep8
