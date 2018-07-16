@@ -167,6 +167,35 @@ class FilterContentQuerySchema(marshmallow.Schema):
     @post_load
     def make_content_filter(self, data):
         return ContentFilter(**data)
+
+
+class PaginationSchema(marshmallow.Schema):
+    nb_elem = marshmallow.fields.Int(
+        example=2,
+        default=0,
+        description='if 0 or not set, return all elements, else return only '
+                    'the first nb_elem (according to offset)',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+    offset = marshmallow.fields.Int(
+        example=5,
+        default=0,
+        description='if 0 or not set, do not set offset, else set offset for'
+                    'query',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+
+
+class ExtendedFilterQuerySchema(FilterContentQuerySchema, PaginationSchema):
+    workspace_id = marshmallow.fields.Int(
+        example=2,
+        default=0,
+        description='allow to filter items in a workspace.'
+                    ' If not set,'
+                    'then return contents from all known workspace',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+
 ###
 
 

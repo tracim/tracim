@@ -64,15 +64,32 @@ class ContentFilter(object):
     """
     def __init__(
             self,
+            workspace_id: int = None,
             parent_id: int = None,
             show_archived: int = 0,
             show_deleted: int = 0,
             show_active: int = 1,
+            nb_elem: typing.Optional[int] = None,
+            offset: typing.Optional[int] = None,
     ) -> None:
+        # 0 is same as None here
+        if parent_id == 0:
+            parent_id = None
+        if workspace_id == 0:
+            workspace_id = None
+        if offset == 0:
+            offset = None
+        if nb_elem == 0:
+            nb_elem = None
+
         self.parent_id = parent_id
+        self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
+        self.nb_elem = nb_elem
+        self.offset = offset
+        self.content_type = ContentType.Any
 
 
 class ContentCreation(object):

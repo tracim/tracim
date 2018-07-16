@@ -789,7 +789,7 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> typing.List[Content]:
+    def get_last_active(self, parent_id: typing.Optional[int], content_type: str, workspace: Workspace=None, limit=10, offset=1) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
@@ -805,26 +805,27 @@ class ContentApi(object):
         if parent_id:
             resultset = resultset.filter(Content.parent_id==parent_id)
 
-        result = []
-        for item in resultset:
-            new_item = None
-            if ContentType.Comment == item.type:
-                new_item = item.parent
-            else:
-                new_item = item
+        resultset = resultset.slice(start=offset, stop=limit)
+        # result = []
+        # for item in resultset:
+        #     new_item = None
+        #     if ContentType.Comment == item.type:
+        #         new_item = item.parent
+        #     else:
+        #         new_item = item
+        #
+        #     # INFO - D.A. - 2015-05-20
+        #     # We do not want to show only one item if the last 10 items are
+        #     # comments about one thread for example
+        #     if new_item not in result:
+        #         result.append(new_item)
+        #
+        #     if len(result) >= limit:
+        #         break
 
-            # INFO - D.A. - 2015-05-20
-            # We do not want to show only one item if the last 10 items are
-            # comments about one thread for example
-            if new_item not in result:
-                result.append(new_item)
+        return resultset.all()
 
-            if len(result) >= limit:
-                break
-
-        return result
-
-    def get_last_unread(self, parent_id: int, content_type: str,
+    def get_last_unread(self, parent_id: typing.Optional[int], content_type: str,
                         workspace: Workspace=None, limit=10) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
