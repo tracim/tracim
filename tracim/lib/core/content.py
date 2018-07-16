@@ -394,22 +394,23 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', label_is_filename: bool = False, do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+        # TODO - G.M - 2018-07-16 - raise Exception instead of assert
         assert content_type in ContentType.allowed_types()
+        assert not (label and filename)
 
         if content_type == ContentType.Folder and not label:
             label = self.generate_folder_label(workspace, parent)
 
         content = Content()
 
-        if label_is_filename:
+        if filename:
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
             content.file_name = label
         elif label:
             content.label = label
-
-        if not content.label:
+        else:
             if content_type == ContentType.Comment:
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
@@ -442,7 +443,7 @@ class ContentApi(object):
         item = Content()
         item.owner = self._user
         item.parent = parent
-        if parent and not workspace:
+        if not workspace:
             workspace = item.parent.workspace
         item.workspace = workspace
         item.type = ContentType.Comment
@@ -490,6 +491,11 @@ class ContentApi(object):
         try:
             content = base_request.one()
         except NoResultFound as exc:
+            # TODO - G.M - 2018-07-16 - Add better support for all different
+            # error case who can happened here
+            # like content doesn't exist, wrong parent, wrong content_type, wrong workspace,
+            # wrong access to this workspace, wrong base filter according
+            # to content_status.
             raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
         return content
 
