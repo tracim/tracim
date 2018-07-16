@@ -393,21 +393,28 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', label_is_filename: bool = False, do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         assert content_type in ContentType.allowed_types()
 
         if content_type == ContentType.Folder and not label:
             label = self.generate_folder_label(workspace, parent)
 
         content = Content()
-        if label:
-            content.label = label
-        elif filename:
-            # TODO - G.M - 2018-07-04 - File_name setting automatically
+
+        if label_is_filename:
+            # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
             content.file_name = label
-        else:
-            raise EmptyLabelNotAllowed()
+        elif label:
+            content.label = label
+
+        if not content.label:
+            if content_type == ContentType.Comment:
+                # INFO - G.M - 2018-07-16 - Default label for comments is
+                # empty string.
+                content.label = ''
+            else:
+                raise EmptyLabelNotAllowed('Content of this type should have a valid label')  # nopep8
 
         content.owner = self._user
         content.parent = parent
