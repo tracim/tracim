@@ -24,7 +24,8 @@ from sqlalchemy.sql.elements import and_
 
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
-from tracim.exceptions import SameValueError, EmptyRawContentNotAllowed
+from tracim.exceptions import SameValueError
+from tracim.exceptions import EmptyCommentContentNotAllowed
 from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
@@ -437,7 +438,7 @@ class ContentApi(object):
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
         assert parent and parent.type != ContentType.Folder
         if not content:
-            raise EmptyRawContentNotAllowed()
+            raise EmptyCommentContentNotAllowed()
         item = Content()
         item.owner = self._user
         item.parent = parent
@@ -452,7 +453,6 @@ class ContentApi(object):
         if do_save:
             self.save(item, ActionDescription.COMMENT)
         return item
-
 
     def get_one_from_revision(self, content_id: int, content_type: str, workspace: Workspace=None, revision_id=None) -> Content:
         """

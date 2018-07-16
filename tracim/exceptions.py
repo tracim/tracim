@@ -160,5 +160,5 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
 
 
-class EmptyRawContentNotAllowed(EmptyValueNotAllowed):
+class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
     pass
