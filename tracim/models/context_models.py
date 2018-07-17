@@ -53,6 +53,29 @@ class WorkspaceAndContentRevisionPath(object):
         self.workspace_id = workspace_id
 
 
+class ContentPreviewSizedPath(object):
+    """
+    Paths params with workspace id and content_id, width, heigth
+    """
+    def __init__(self, workspace_id: int, content_id: int, width: int, height: int) -> None:  # nopep8
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.width = width
+        self.height = height
+
+
+class RevisionPreviewSizedPath(object):
+    """
+    Paths params with workspace id and content_id, revision_id width, heigth
+    """
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int, width: int, height: int) -> None:  # nopep8
+        self.content_id = content_id
+        self.revision_id = revision_id
+        self.workspace_id = workspace_id
+        self.width = width
+        self.height = height
+
+
 class CommentPath(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -66,6 +89,17 @@ class CommentPath(object):
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.comment_id = comment_id
+
+
+class PageQuery(object):
+    """
+    Page query model
+    """
+    def __init__(
+            self,
+            page: int = 0
+    ):
+        self.page = page
 
 
 class ContentFilter(object):

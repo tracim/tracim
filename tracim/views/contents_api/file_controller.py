@@ -20,6 +20,9 @@ from tracim.extensions import hapic
 from tracim.lib.core.content import ContentApi
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FileContentSchema
+from tracim.views.core_api.schemas import ContentPreviewSizedPathSchema
+from tracim.views.core_api.schemas import RevisionPreviewSizedPathSchema
+from tracim.views.core_api.schemas import PageQuerySchema
 from tracim.views.core_api.schemas import WorkspaceAndContentRevisionIdPathSchema  # nopep8
 from tracim.views.core_api.schemas import FileRevisionSchema
 from tracim.views.core_api.schemas import SetContentStatusSchema
@@ -126,45 +129,177 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.input_query(PageQuerySchema())
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def preview_pdf(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+        app_config = request.registry.settings['CFG']
+        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        file_path = api.get_one_revision_filepath(content.revision_id)
+        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
+            raise Exception('page {page} of content {content_id} does not exist'.format(
+                page=hapic_data.query.page,
+                content_id=content.content_id),
+            )
+        pdf_preview_path = preview_manager.get_pdf_preview(file_path, page=hapic_data.query.page)  # nopep8
+        return FileResponse(pdf_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+        app_config = request.registry.settings['CFG']
+        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        file_path = api.get_one_revision_filepath(content.revision_id)
+        pdf_preview_path = preview_manager.get_pdf_preview(file_path)
+        return FileResponse(pdf_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
+    @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+        app_config = request.registry.settings['CFG']
+        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id,
+            content=content
+        )
+        file_path = api.get_one_revision_filepath(revision.revision_id)
+        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
+            raise Exception('page {page} of content {content_id} does not exist'.format(
+                page=hapic_data.query.page,
+                content_id=content.content_id),
+            )
+        pdf_preview_path = preview_manager.get_pdf_preview(file_path, page=hapic_data.query.page)  # nopep8
+        return FileResponse(pdf_preview_path)
 
     # jpg
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def preview_jpg(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+        app_config = request.registry.settings['CFG']
+        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        file_path = api.get_one_revision_filepath(content.revision_id)
+        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
+            raise Exception('page {page} of content {content_id} does not exist'.format(
+                page=hapic_data.query.page,
+                content_id=content.content_id),
+            )
+        jpg_preview_path = preview_manager.get_jpeg_preview(file_path, page=hapic_data.query.page)  # nopep8
+        return FileResponse(jpg_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.input_query(PageQuerySchema())
+    @hapic.input_path(ContentPreviewSizedPathSchema())
     @hapic.output_file([])
     def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+        app_config = request.registry.settings['CFG']
+        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        file_path = api.get_one_revision_filepath(content.revision_id)
+        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
+            raise Exception('page {page} of content {content_id} does not exist'.format(
+                page=hapic_data.query.page,
+                content_id=content.content_id),
+            )
+        jpg_preview_path = preview_manager.get_jpeg_preview(
+            file_path,
+            page=hapic_data.query.page,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
+        )
+        return FileResponse(jpg_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.input_path(RevisionPreviewSizedPathSchema())
+    @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+        app_config = request.registry.settings['CFG']
+        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id,
+            content=content
+        )
+        file_path = api.get_one_revision_filepath(revision.revision_id)
+        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
+            raise Exception('page {page} of content {content_id} does not exist'.format(
+                page=hapic_data.query.page,
+                content_id=content.content_id),
+            )
+        jpg_preview_path = preview_manager.get_jpeg_preview(
+            file_path,
+            page=hapic_data.query.page,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
+        )
+        return FileResponse(jpg_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)

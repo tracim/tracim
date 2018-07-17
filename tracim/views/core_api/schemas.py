@@ -1,7 +1,7 @@
 # coding=utf-8
 import marshmallow
 from marshmallow import post_load
-from marshmallow.validate import OneOf
+from marshmallow.validate import OneOf, Range
 
 from tracim.lib.utils.utils import DATETIME_FORMAT
 from tracim.models.auth import Profile
@@ -10,6 +10,9 @@ from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import ContentPreviewSizedPath
+from tracim.models.context_models import RevisionPreviewSizedPath
+from tracim.models.context_models import PageQuery
 from tracim.models.context_models import WorkspaceAndContentRevisionPath
 from tracim.models.context_models import CommentCreation
 from tracim.models.context_models import TextBasedContentUpdate
@@ -90,6 +93,7 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
 class ContentIdPathSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, required=True)
 
+
 class RevisionIdPathSchema(marshmallow.Schema):
     revision_id = marshmallow.fields.Int(example=6, required=True)
 
@@ -103,6 +107,11 @@ class WorkspaceAndContentIdPathSchema(
         return WorkspaceAndContentPath(**data)
 
 
+class WidthAndHeightPathSchema(marshmallow.Schema):
+    width = marshmallow.fields.Int(example=256)
+    height = marshmallow.fields.Int(example=256)
+
+
 class WorkspaceAndContentRevisionIdPathSchema(
     WorkspaceIdPathSchema,
     ContentIdPathSchema,
@@ -111,6 +120,24 @@ class WorkspaceAndContentRevisionIdPathSchema(
     @post_load
     def make_path_object(self, data):
         return WorkspaceAndContentRevisionPath(**data)
+
+
+class ContentPreviewSizedPathSchema(
+    WorkspaceAndContentIdPathSchema,
+    WidthAndHeightPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return ContentPreviewSizedPath(**data)
+
+
+class RevisionPreviewSizedPathSchema(
+    WorkspaceAndContentRevisionIdPathSchema,
+    WidthAndHeightPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return RevisionPreviewSizedPath(**data)
 
 
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
@@ -122,6 +149,19 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     @post_load
     def make_path_object(self, data):
         return CommentPath(**data)
+
+
+class PageQuerySchema(marshmallow.Schema):
+    page = marshmallow.fields.Int(
+        example=2,
+        default=0,
+        description='allow to show a specific page of a pdf file',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+
+    @post_load
+    def make_page_query(self, data):
+        return PageQuery(**data)
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
