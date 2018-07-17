@@ -110,8 +110,12 @@ class Thread extends React.Component {
 
     handleFetchResult(await fetchResultSaveThread)
       .then(resSave => {
-        if (resSave.apiResponse.status === 200) this.loadContent()
-        else console.warn('Error saving threads. Result:', resSave, 'content:', content, 'config:', config)
+        if (resSave.apiResponse.status === 200) {
+          this.loadContent()
+          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        } else {
+          console.warn('Error saving threads. Result:', resSave, 'content:', content, 'config:', config)
+        }
       })
   }
 
@@ -164,16 +168,24 @@ class Thread extends React.Component {
     if (!isVisible) return null
 
     return (
-      <PopinFixed customClass={`wsContentThread`}>
+      <PopinFixed
+        customClass={config.slug}
+        customColor={config.hexcolor}
+      >
         <PopinFixedHeader
-          customClass={`wsContentThread`}
+          customClass={`${config.slug}__contentpage`}
+          customColor={config.hexcolor}
           faIcon={config.faIcon}
           title={content.label}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
         />
 
-        <PopinFixedOption customClass={`wsContentThread`} i18n={i18n}>
+        <PopinFixedOption
+          customClass={`${config.slug}__contentpage`}
+          customColor={config.hexcolor}
+          i18n={i18n}
+        >
           <div className='justify-content-end'>
             <SelectStatus
               selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
@@ -183,6 +195,7 @@ class Thread extends React.Component {
             />
 
             <ArchiveDeleteContent
+              customColor={config.hexcolor}
               onClickArchiveBtn={this.handleClickArchive}
               onClickDeleteBtn={this.handleClickDelete}
               disabled={false}
@@ -190,9 +203,12 @@ class Thread extends React.Component {
           </div>
         </PopinFixedOption>
 
-        <PopinFixedContent customClass={`${config.customClass}__contentpage`}>
+        <PopinFixedContent
+          customClass={`${config.slug}__contentpage`}
+        >
           <Timeline
             customClass={`${config.slug}__contentpage`}
+            customColor={config.hexcolor}
             loggedUser={loggedUser}
             timelineData={listMessage}
             newComment={newComment}

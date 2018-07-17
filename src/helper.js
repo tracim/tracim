@@ -10,7 +10,7 @@ export const debug = { // copied from html-documents => outdated
     label: 'Thread',
     slug: 'thread',
     faIcon: 'comments-o',
-    hexcolor: '#65c7f2',
+    hexcolor: '#ad4cf9',
     creationLabel: 'Write a thread',
     domContainer: 'appContainer',
     apiUrl: 'http://localhost:6543/api/v2',

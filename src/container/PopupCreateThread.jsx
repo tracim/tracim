@@ -65,6 +65,8 @@ class PopupCreateHtmlDocument extends React.Component {
         if (resSave.apiResponse.status === 200) {
           this.handleClose()
 
+          GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+
           GLOBAL_dispatchEvent({
             type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
             data: {

@@ -1,14 +1,8 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
-btnState()
-  background-color darkenThread
-  color off-white
-
-.wsContentThread
+.thread
   width 1100px
   &__header
-    // color white
-    background-color threadColor
     &__editionmode
       display none
     &__icon
@@ -16,60 +10,18 @@ btnState()
         color white
   .selectStatus
     margin-right 15px
-    .dropdown-item
-      &:hover, &:focus, &:active, &visited, &:focus-within
-        background-color threadColor
-        color off-white!important // @FIXME 04/07/2018 AC - we must use a plugin for this
-  .optionicon
-    &:hover, &:focus, &:active
-      color threadColor
   .timeline
     margin 0
   .thread
     &__contentpage
+      &__content
+        width 100%
       &__messagelist
         &__item__avatar
           border 1px solid darkenThread
           background-color off-white
       &__texteditor
         flex 0 0 auto
-        &__advancedtext
-          &__btn
-            color fontColor
-            border-color threadColor
-            cursor pointer
-            &:hover ,&:focus, &:visited, &:active
-              btnState()
-              border-color darkenThread
-              box-shadow none
-        &__submit
-          &__btn
-            background-color threadColor
-            color white
-            &:hover, &:focus, &:visited, &:active
-              background-color darkenThread
-
-
-.received
-  .timeline__messagelist__item__content
-    background-color threadColor
-
-.popupCreateContent
-  .cardPopup
-    &__header
-      background-color threadColor
-  .createcontent
-    &__contentname
-      color threadColor
-    &__form
-      &__button
-        & > button
-          border-color threadColor
-          background-color threadColor
-          &:hover, &:active, &:visited &:focus
-            background-color darkenThread
-            box-shadow none
-
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .wsContentThread
