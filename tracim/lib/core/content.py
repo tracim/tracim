@@ -1149,7 +1149,10 @@ class ContentApi(object):
             .filter(ContentRevisionRO.content_id==content.content_id).all()
 
         for revision in revisions:
-            del revision.read_by[self._user]
+            try:
+                del revision.read_by[self._user]
+            except KeyError:
+                pass
 
         for child in content.get_valid_children():
             self.mark_unread(child, do_flush=False)

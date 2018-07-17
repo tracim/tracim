@@ -3,7 +3,6 @@ from pyramid.config import Configurator
 from tracim.lib.core.content import ContentApi
 from tracim.lib.utils.authorization import require_same_user_or_profile
 from tracim.models import Group
-from tracim.models.context_models import WorkspaceInContext
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -15,6 +14,9 @@ from tracim import hapic, TracimRequest
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import UserIdPathSchema
+from tracim.views.core_api.schemas import NoContentSchema
+from tracim.views.core_api.schemas import UserWorkspaceIdPathSchema
+from tracim.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import UserContentDigestSchema
 from tracim.views.core_api.schemas import ExtendedFilterQuerySchema
 from tracim.views.core_api.schemas import WorkspaceDigestSchema
@@ -35,7 +37,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings['CFG']
         wapi = WorkspaceApi(
-            current_user=request.current_user,  # User
+            current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
@@ -58,7 +60,7 @@ class UserController(Controller):
         app_config = request.registry.settings['CFG']
         content_filter = hapic_data.query
         api = ContentApi(
-            current_user=request.current_user,  # User
+            current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
             show_archived=content_filter.show_archived,
@@ -66,7 +68,7 @@ class UserController(Controller):
             show_active=content_filter.show_active,
         )
         wapi = WorkspaceApi(
-            current_user=request.current_user,  # User
+            current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
@@ -85,6 +87,57 @@ class UserController(Controller):
             for content in last_actives
         ]
 
+    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def set_content_as_read(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        set user_read status of content to read
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        api.mark_read(request.current_content, do_flush=True)
+        return
+
+    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def set_content_as_unread(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        set user_read status of content to unread
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        api.mark_unread(request.current_content, do_flush=True)
+        return
+
+    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserWorkspaceIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def set_workspace_as_read(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        set user_read status of all content of workspace to read
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        api.mark_read__workspace(request.current_workspace)
+        return
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -98,3 +151,13 @@ class UserController(Controller):
         # last active content for user
         configurator.add_route('last_active_content', '/users/{user_id}/contents/actives', request_method='GET')  # nopep8
         configurator.add_view(self.last_active_content, route_name='last_active_content')  # nopep8
+
+        # set content as read/unread
+        configurator.add_route('read_content', '/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read', request_method='PUT')  # nopep8
+        configurator.add_view(self.set_content_as_read, route_name='read_content')  # nopep8
+        configurator.add_route('unread_content', '/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread', request_method='PUT')  # nopep8
+        configurator.add_view(self.set_content_as_unread, route_name='unread_content')  # nopep8
+
+        # set workspace as read
+        configurator.add_route('read_workspace', '/users/{user_id}/workspaces/{workspace_id}/read', request_method='PUT')  # nopep8
+        configurator.add_view(self.set_workspace_as_read, route_name='read_workspace')  # nopep8

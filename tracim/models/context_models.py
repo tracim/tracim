@@ -43,6 +43,25 @@ class WorkspaceAndContentPath(object):
         self.workspace_id = workspace_id
 
 
+class UserWorkspacePath(object):
+    """
+    Paths params with user_id and workspace id model
+    """
+    def __init__(self, user_id: int, workspace_id: int) -> None:
+        self.workspace_id = workspace_id
+        self.user_id = workspace_id
+
+
+class UserWorkspaceAndContentPath(object):
+    """
+    Paths params with user_id, workspace id and content_id model
+    """
+    def __init__(self, user_id: int, workspace_id: int, content_id: int) -> None:  # nopep8
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.user_id = user_id
+
+
 class CommentPath(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -435,7 +454,7 @@ class ContentInContext(object):
     @property
     def read_by_user(self):
         assert self._user
-        return self.content.has_new_information_for(self._user)
+        return not self.content.has_new_information_for(self._user)
 
 
 class RevisionInContext(object):

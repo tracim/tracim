@@ -11,6 +11,8 @@ from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import UserWorkspacePath
+from tracim.models.context_models import UserWorkspaceAndContentPath
 from tracim.models.context_models import CommentCreation
 from tracim.models.context_models import TextBasedContentUpdate
 from tracim.models.context_models import SetContentStatus
@@ -113,6 +115,25 @@ class WorkspaceAndContentIdPathSchema(
     @post_load
     def make_path_object(self, data):
         return WorkspaceAndContentPath(**data)
+
+
+class UserWorkspaceAndContentIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema,
+    ContentIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return UserWorkspaceAndContentPath(**data)
+
+
+class UserWorkspaceIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return UserWorkspacePath(**data)
 
 
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
