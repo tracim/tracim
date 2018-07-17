@@ -27,10 +27,10 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, faIcon, title, onClickCloseBtn } = this.props
+    const { customClass, customColor, faIcon, title, onClickCloseBtn } = this.props
 
     return (
-      <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
+      <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{backgroundColor: customColor}}>
         <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
           <i className={`fa fa-${faIcon}`} />
         </div>
@@ -66,12 +66,14 @@ PopinFixedHeader.propTypes = {
   faIcon: PropTypes.string.isRequired,
   onClickCloseBtn: PropTypes.func.isRequired,
   customClass: PropTypes.string,
+  customColor: PropTypes.string,
   title: PropTypes.string,
   onValidateChangeTitle: PropTypes.func
 }
 
 PopinFixedHeader.defaultProps = {
   customClass: '',
+  customColor: '',
   title: '',
   onChangeTitle: () => {}
 }

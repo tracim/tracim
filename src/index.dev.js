@@ -17,6 +17,9 @@ import Delimiter from './component/Delimiter/Delimiter.jsx'
 import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
+import NewVersionButton from './component/OptionComponent/NewVersionBtn.jsx'
+import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
+
 ReactDOM.render(
   <div style={{width: '1200px'}}>
     <PopinFixed customClass={`${'randomClass'}`}>
@@ -69,6 +72,8 @@ ReactDOM.render(
 
       <PopinFixedContent customClass={`${'randomClass'}__contentpage`}>
         <div>
+          <NewVersionButton customColor='#3f52e3' />
+          <ArchiveDeleteContent customColor='#3f52e3' />
           <Delimiter />
           <span>Here will be the app content. Style is handled by the app (obviously)</span>
           <BtnSwitch />
@@ -77,8 +82,9 @@ ReactDOM.render(
 
         <Timeline
           customClass={`${'randomClass'}__contentpage`}
+          customColor={'#3f52e3'}
           loggedUser={{
-            user_id: 5,
+            user_id: 1,
             username: 'Smoi',
             firstname: 'Côme',
             lastname: 'Stoilenom',

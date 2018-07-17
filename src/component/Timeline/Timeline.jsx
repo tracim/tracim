@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import Radium from 'radium'
+import color from 'color'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 
@@ -43,6 +45,7 @@ class Timeline extends React.Component {
                 case 'comment':
                   return <Comment
                     customClass={props.customClass}
+                    customColor={props.customColor}
                     avatar={content.author.avatar_url}
                     createdAt={content.created}
                     text={content.raw_content}
@@ -53,6 +56,7 @@ class Timeline extends React.Component {
                 case 'revision':
                   return <Revision
                     customClass={props.customClass}
+                    customColor={props.customColor}
                     createdAt={content.created}
                     number={content.number}
                     key={`revision_${content.revision_id}`}
@@ -79,10 +83,20 @@ class Timeline extends React.Component {
                 <button
                   type='button'
                   className={classnames(
-                    `${props.customClass}__texteditor__advancedtext__btn timeline__body__texteditor__advancedtext__btn btn btn-outline-primary`
+                    `${props.customClass}__texteditor__advancedtext__btn timeline__body__texteditor__advancedtext__btn btn`
                   )}
                   onClick={props.onClickWysiwygBtn}
                   disabled={props.disableComment}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#333',
+                    borderColor: props.customColor,
+                    ':hover': {
+                      backgroundColor: props.customColor,
+                      color: '#fdfdfd'
+                    }
+                  }}
+                  key={'timeline__comment__advancedtext'}
                 >
                   {props.wysiwyg ? 'Texte Simple' : 'Texte Avancé'}
                 </button>
@@ -94,6 +108,14 @@ class Timeline extends React.Component {
                   className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__body__texteditor__submit__btn btn')}
                   onClick={props.onClickValidateNewCommentBtn}
                   disabled={props.disableComment}
+                  style={{
+                    backgroundColor: props.customColor,
+                    color: '#fdfdfd',
+                    ':hover': {
+                      backgroundColor: color(props.customColor).darken(0.15).hexString()
+                    }
+                  }}
+                  key={'timeline__comment__send'}
                 >
                   Envoyer
                   <div
@@ -110,7 +132,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default Timeline
+export default Radium(Timeline)
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
@@ -119,6 +141,7 @@ Timeline.propTypes = {
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
   disableComment: PropTypes.bool,
   customClass: PropTypes.string,
+  customColor: PropTypes.string,
   loggedUser: PropTypes.object,
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
@@ -130,6 +153,7 @@ Timeline.propTypes = {
 Timeline.defaultProps = {
   disableComment: false,
   customClass: '',
+  customColor: '',
   loggedUser: {
     id: '',
     name: '',

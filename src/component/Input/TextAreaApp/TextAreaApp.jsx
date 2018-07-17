@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Radium from 'radium'
 
 require('./TextAreaApp.styl')
 
@@ -15,23 +16,43 @@ export const TextAreaApp = props =>
     <div className={`${props.customClass}__button editionmode__button`}>
       <button
         type='button'
-        className={`${props.customClass}__cancel editionmode__button__cancel btn btn-outline-primary mr-3`}
+        className={`${props.customClass}__cancel editionmode__button__cancel btn mr-3`}
         onClick={props.onClickCancelBtn}
+        style={{
+          backgroundColor: '#fdfdfd',
+          color: props.customColor,
+          borderColor: props.customColor,
+          ':hover': {
+            backgroundColor: props.customColor,
+            color: '#fdfdfd'
+          }
+        }}
+        key='TextAreaApp__cancel'
       >
         Annuler
       </button>
 
       <button
         type='button'
-        className={`${props.customClass}__submit editionmode__button__submit btn btn-outline-primary`}
+        className={`${props.customClass}__submit editionmode__button__submit btn`}
         onClick={props.onClickValidateBtn}
+        style={{
+          backgroundColor: '#fdfdfd',
+          color: props.customColor,
+          borderColor: props.customColor,
+          ':hover': {
+            backgroundColor: props.customColor,
+            color: '#fdfdfd'
+          }
+        }}
+        key='TextAreaApp__validate'
       >
         Valider
       </button>
     </div>
   </form>
 
-export default TextAreaApp
+export default Radium(TextAreaApp)
 
 TextAreaApp.propTypes = {
   text: PropTypes.string.isRequired,
@@ -39,5 +60,6 @@ TextAreaApp.propTypes = {
   onClickCancelBtn: PropTypes.func.isRequired,
   onClickValidateBtn: PropTypes.func.isRequired,
   id: PropTypes.string,
-  customClass: PropTypes.string
+  customClass: PropTypes.string,
+  customColor: PropTypes.string
 }
