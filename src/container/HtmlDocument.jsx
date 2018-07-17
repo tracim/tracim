@@ -278,23 +278,35 @@ class HtmlDocument extends React.Component {
     if (!isVisible) return null
 
     return (
-      <PopinFixed customClass={`${config.slug}`}>
+      <PopinFixed
+        customClass={`${config.slug}`}
+        customColor={config.hexcolor}
+      >
         <PopinFixedHeader
           customClass={`${config.slug}`}
+          customColor={config.hexcolor}
           faIcon={config.faIcon}
           title={content.label}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
         />
 
-        <PopinFixedOption customClass={`${config.slug}`} i18n={i18n}>
+        <PopinFixedOption
+          customColor={config.hexcolor}
+          customClass={`${config.slug}`}
+          i18n={i18n}
+        >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              <NewVersionBtn onClickNewVersionBtn={this.handleClickNewVersion} disabled={mode !== MODE.VIEW} />
+              <NewVersionBtn
+                customColor={config.hexcolor}
+                onClickNewVersionBtn={this.handleClickNewVersion}
+                disabled={mode !== MODE.VIEW}
+              />
 
               {mode === MODE.REVISION &&
                 <button
-                  className='wsContentGeneric__option__menu__lastversion html-documents__lastversionbtn btn btn-default'
+                  className='wsContentGeneric__option__menu__lastversion html-documents__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
                 >
@@ -313,6 +325,7 @@ class HtmlDocument extends React.Component {
               />
 
               <ArchiveDeleteContent
+                customColor={config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}
                 onClickDeleteBtn={this.handleClickDelete}
                 disabled={mode === MODE.REVISION}
@@ -327,6 +340,7 @@ class HtmlDocument extends React.Component {
         >
           <HtmlDocumentComponent
             mode={mode}
+            customColor={config.hexcolor}
             wysiwygNewVersion={'wysiwygNewVersion'}
             onClickCloseEditMode={this.handleCloseNewVersion}
             onClickValidateBtn={this.handleSaveHtmlDocument}
@@ -339,6 +353,7 @@ class HtmlDocument extends React.Component {
 
           <Timeline
             customClass={`${config.slug}__contentpage`}
+            customColor={config.hexcolor}
             loggedUser={loggedUser}
             timelineData={timeline}
             newComment={newComment}

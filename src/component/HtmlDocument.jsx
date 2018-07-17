@@ -25,6 +25,7 @@ const HtmlDocument = props => {
         <TextAreaApp
           id={props.wysiwygNewVersion}
           customClass={'html-documents__editionmode'}
+          customColor={props.customColor}
           onClickCancelBtn={props.onClickCloseEditMode}
           onClickValidateBtn={props.onClickValidateBtn}
           text={props.text}

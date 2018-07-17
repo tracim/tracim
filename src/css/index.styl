@@ -1,54 +1,18 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
-btncolor()
-  background-color htmlColor
-  color off-white
-
-btnState()
-  background-color darkHtmlColor
-  color off-white
-
 .html-documents
   width 70%
   &__header
-    background-color htmlColor
     &__editionmode
       display none
     &__icon
       .fa-file-text-o
         color white
-  .newversionbtn
-    border-color htmlColor
-    color fontColor
-    &:hover, &:focus, &:visited, &:active
-      btnState()
-      border-color darkHtmlColor
-      box-shadow none
   &__lastversionbtn
     & > i
       font-size 20px
-  .optionicon
-    &:hover, &:focus, &:active
-      color htmlColor
   .selectStatus
     margin-right 15px
-    .dropdown-item
-      &:hover, &:focus, &:active, &visited, &:focus-within
-        background-color htmlColor
-        color off-white!important // @FIXME 04/07/2018 AC - we must use a plugin for this
-  &__editionmode
-    &__cancel
-      border-color htmlColor
-      color htmlColor
-      &:hover, &:focus, &:active, &:visited, &focus-within
-        border-color htmlColor
-        btncolor()
-    &__submit
-      border-color htmlColor
-      color htmlColor
-      &:hover, &:focus, &:active, &:visited, &focus-within
-        border-color htmlColor
-        btncolor()
   &__contentpage
     &__textnote
       margin 10px 5px 10px 10px
@@ -86,31 +50,13 @@ btnState()
           width 145px
           color white
           font-size 17px
-          background-color htmlColor
           & > i
             margin-right 10px
             color darkGrey
             font-size 20px
-          &:hover, &:focus
-            btnState()
         &__date
           color fontColor
           font-size 17px
-    &__texteditor
-      &__advancedtext
-        &__btn
-          color fontColor
-          border-color htmlColor
-          &:hover ,&:focus, &:visited, &:active
-            btnState()
-            border-color darkHtmlColor
-            box-shadow none
-      &__submit
-        &__btn
-          background-color htmlColor
-          color white
-          &:hover, &:focus, &:visited, &:active
-            background-color darkHtmlColor
 
 .messagelistOpen
   .timeline__messagelist
@@ -120,23 +66,6 @@ btnState()
 .received
   .timeline__messagelist__item__content
     background-color htmlColor
-
-.popupCreateContent
-  .cardPopup
-    &__header
-      background-color htmlColor
-  .createcontent
-    &__contentname
-      color htmlColor
-    &__form
-      &__button
-        & > button
-          border-color htmlColor
-          background-color htmlColor
-          &:hover, &:active, &:visited &:focus
-            background-color darkHtmlColor
-            box-shadow none
-
 
 @media (min-width: min-sm) and (max-width: max-lg)
   .html-documents
