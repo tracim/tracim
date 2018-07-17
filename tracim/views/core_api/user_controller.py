@@ -42,7 +42,7 @@ class UserController(Controller):
         
         workspaces = wapi.get_all_for_user(request.candidate_user)
         return [
-            WorkspaceInContext(workspace, request.dbsession, app_config)
+            wapi.get_workspace_with_context(workspace)
             for workspace in workspaces
         ]
 
