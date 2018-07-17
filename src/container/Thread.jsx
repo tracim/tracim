@@ -218,7 +218,7 @@ class Thread extends React.Component {
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={() => {}}
-            shouldScrollToBottom={false}
+            shouldScrollToBottom
             showHeader={false}
           />
         </PopinFixedContent>

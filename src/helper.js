@@ -47,7 +47,7 @@ export const debug = { // copied from html-documents => outdated
     }]
   },
   loggedUser: { // @FIXME this object is outdated
-    user_id: 5,
+    user_id: 1,
     username: 'Smoi',
     firstname: 'Côme',
     lastname: 'Stoilenom',

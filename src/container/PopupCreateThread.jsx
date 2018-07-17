@@ -10,7 +10,7 @@ const debug = { // outdated
     label: 'Thread',
     slug: 'thread',
     faIcon: 'file-text-o',
-    hexcolor: '#3f52e3',
+    hexcolor: '#ad4cf9',
     creationLabel: 'Write a thread',
     domContainer: 'appContainer',
     apiUrl: 'http://localhost:3001',
@@ -22,7 +22,7 @@ const debug = { // outdated
     }
   },
   loggedUser: {
-    id: 5,
+    id: 1,
     username: 'Smoi',
     firstname: 'Côme',
     lastname: 'Stoilenom',
@@ -85,7 +85,7 @@ class PopupCreateHtmlDocument extends React.Component {
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         label={this.state.config.label} // @TODO get the lang of user
-        hexcolor={this.state.config.hexcolor}
+        customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}
         onChangeContentName={this.handleChangeNewContentName}

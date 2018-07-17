@@ -1,7 +1,7 @@
 @import "../../node_modules/tracim_lib/src/css/Variable.styl"
 
 .thread
-  width 1100px
+  width 70%
   &__header
     &__editionmode
       display none
@@ -23,22 +23,12 @@
       &__texteditor
         flex 0 0 auto
 
-@media (min-width: min-lg) and (max-width: max-lg)
-  .wsContentThread
-    width 900px
-
-@media (min-width: min-md) and (max-width: max-md)
-  .wsContentThread
-    width 700px
-
 @media (min-width: min-sm) and (max-width: max-sm)
-  .wsContentThread
-    top 69px
-    width 500px
+  .thread
+    top 68px
+    width 100%
 
 @media (max-width: max-xs)
-  .wsContentThread
-    top 69px
+  .thread
+    top 68px
     width 100%
-    box-shadow none
-    z-index 1
