@@ -175,11 +175,11 @@ class FilterContentQuerySchema(marshmallow.Schema):
 
 
 class PaginationSchema(marshmallow.Schema):
-    nb_elem = marshmallow.fields.Int(
+    limit = marshmallow.fields.Int(
         example=2,
         default=0,
         description='if 0 or not set, return all elements, else return only '
-                    'the first nb_elem (according to offset)',
+                    'the first limit elem (according to offset)',
         validate=Range(min=0, error="Value must be positive or 0"),
     )
     offset = marshmallow.fields.Int(

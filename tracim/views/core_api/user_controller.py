@@ -56,10 +56,14 @@ class UserController(Controller):
         Get last_active_content for user
         """
         app_config = request.registry.settings['CFG']
+        content_filter = hapic_data.query
         api = ContentApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
             config=app_config,
+            show_archived=content_filter.show_archived,
+            show_deleted=content_filter.show_deleted,
+            show_active=content_filter.show_active,
         )
         wapi = WorkspaceApi(
             current_user=request.current_user,  # User
@@ -67,14 +71,14 @@ class UserController(Controller):
             config=app_config,
         )
         workspace = None
-        if 'workspace_id' in hapic_data.body:
-            workspace = wapi.get_one(hapic_data.body.workspace_id)
+        if content_filter.workspace_id:
+            workspace = wapi.get_one(content_filter.workspace_id)
         last_actives = api.get_last_active(
-            parent_id=hapic_data.body.parent_id,
-            content_type=hapic_data.body.content_type,
+            parent_id=content_filter.parent_id,
+            content_type=content_filter.content_type or ContentType.Any,
             workspace=workspace,
-            offset=None,
-            limit=None,
+            offset=content_filter.offset or None,
+            limit=content_filter.limit or None,
         )
         return [
             api.get_content_in_context(content) for content in last_actives

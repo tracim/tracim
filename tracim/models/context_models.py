@@ -71,24 +71,14 @@ class ContentFilter(object):
             show_active: int = 1,
             content_type: str = None,
             offset: int = None,
-            nb_elem: int = None,
+            limit: int = None,
     ) -> None:
-        # 0 is same as None here
-        if parent_id == 0:
-            parent_id = None
-        if workspace_id == 0:
-            workspace_id = None
-        if offset == 0:
-            offset = None
-        if nb_elem == 0:
-            nb_elem = None
-
         self.parent_id = parent_id
         self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
-        self.nb_elem = nb_elem
+        self.limit = limit
         self.offset = offset
         self.content_type = content_type
 
