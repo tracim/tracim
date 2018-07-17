@@ -71,7 +71,7 @@ class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) this.loadContent()
 
-    if (state.mode === MODE.EDIT) {
+    if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
       tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', this.handleChangeText)
     }
