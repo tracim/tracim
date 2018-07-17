@@ -34,6 +34,67 @@ class LoginCredentials(object):
         self.password = password
 
 
+class SetEmail(object):
+    """
+    Just an email
+    """
+    def __init__(self, loggedin_user_password: str, email: str) -> None:
+        self.loggedin_user_password = loggedin_user_password
+        self.email = email
+
+
+class SetPassword(object):
+    """
+    Just an password
+    """
+    def __init__(self,
+        loggedin_user_password: str,
+        new_password: str,
+        new_password2: str
+    ) -> None:
+        self.loggedin_user_password = loggedin_user_password
+        self.new_password = new_password
+        self.new_password2 = new_password2
+
+
+class UserInfos(object):
+    """
+    Just some user infos
+    """
+    def __init__(self, timezone: str, public_name: str) -> None:
+        self.timezone = timezone
+        self.public_name = public_name
+
+
+class UserProfile(object):
+    """
+    Just some user infos
+    """
+    def __init__(self, profile: str) -> None:
+        self.profile = profile
+
+
+class UserCreation(object):
+    """
+    Just some user infos
+    """
+    def __init__(
+            self,
+            email: str,
+            password: str,
+            public_name: str,
+            timezone: str,
+            profile: str,
+            email_notification: str,
+    ) -> None:
+        self.email = email
+        self.password = password
+        self.public_name = public_name
+        self.timezone = timezone
+        self.profile = profile
+        self.email_notification = email_notification
+
+
 class WorkspaceAndContentPath(object):
     """
     Paths params with workspace id and content_id model

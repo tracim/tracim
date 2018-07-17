@@ -118,9 +118,10 @@ class UserApi(object):
             name: str=None,
             email: str=None,
             password: str=None,
-            timezone: str='',
+            timezone: str=None,
+            groups: typing.Optional[typing.List[Group]]=None,
             do_save=True,
-    ) -> None:
+    ) -> User:
         if name is not None:
             user.display_name = name
 
@@ -130,10 +131,23 @@ class UserApi(object):
         if password is not None:
             user.password = password
 
-        user.timezone = timezone
+        if timezone is not None:
+            user.timezone = timezone
+
+        if groups is not None:
+            # INFO - G.M - 2018-07-18 - Delete old groups
+            for group in user.groups:
+                if group not in groups:
+                    user.groups.remove(group)
+            # INFO - G.M - 2018-07-18 - add new groups
+            for group in groups:
+                if group not in user.groups:
+                    user.groups.append(group)
 
         if do_save:
             self.save(user)
+
+        return user
 
     def create_user(
         self,
@@ -187,6 +201,16 @@ class UserApi(object):
             self._session.flush()
 
         return user
+
+    def enable(self, user: User, do_save=False):
+        user.is_active = True
+        if do_save:
+            self.save(user)
+
+    def disable(self, user:User, do_save=False):
+        user.is_active = False
+        if do_save:
+            self.save(user)
 
     def save(self, user: User):
         self._session.flush()

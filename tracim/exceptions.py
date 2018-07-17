@@ -140,6 +140,7 @@ class InvalidWorkspaceId(InvalidId):
 class InvalidUserId(InvalidId):
     pass
 
+
 class ContentNotFound(TracimException):
     pass
 
@@ -149,6 +150,10 @@ class ContentTypeNotAllowed(TracimException):
 
 
 class WorkspacesDoNotMatch(TracimException):
+    pass
+
+
+class PasswordDoNotMatch(TracimException):
     pass
 
 
