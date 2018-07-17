@@ -31,6 +31,7 @@ class HtmlDocument extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
+      rawContentBeforeEdit: '',
       timeline: props.data ? [] : [], // debug.timeline,
       newComment: '',
       timelineWysiwyg: false,
@@ -156,11 +157,20 @@ class HtmlDocument extends React.Component {
       })
   }
 
-  handleClickNewVersion = () => this.setState({ mode: MODE.EDIT })
+  handleClickNewVersion = () => this.setState(prev => ({
+    rawContentBeforeEdit: prev.content.raw_content,
+    mode: MODE.EDIT
+  }))
 
   handleCloseNewVersion = () => {
     tinymce.remove('#wysiwygNewVersion')
-    this.setState({ mode: MODE.VIEW })
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        raw_content: prev.rawContentBeforeEdit
+      },
+      mode: MODE.VIEW
+    }))
   }
 
   handleSaveHtmlDocument = async () => {
