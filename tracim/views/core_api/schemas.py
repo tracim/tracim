@@ -10,6 +10,7 @@ from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import WorkspaceAndContentRevisionPath
 from tracim.models.context_models import CommentCreation
 from tracim.models.context_models import TextBasedContentUpdate
 from tracim.models.context_models import SetContentStatus
@@ -89,6 +90,9 @@ class WorkspaceIdPathSchema(marshmallow.Schema):
 class ContentIdPathSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, required=True)
 
+class RevisionIdPathSchema(marshmallow.Schema):
+    revision_id = marshmallow.fields.Int(example=6, required=True)
+
 
 class WorkspaceAndContentIdPathSchema(
     WorkspaceIdPathSchema,
@@ -97,6 +101,16 @@ class WorkspaceAndContentIdPathSchema(
     @post_load
     def make_path_object(self, data):
         return WorkspaceAndContentPath(**data)
+
+
+class WorkspaceAndContentRevisionIdPathSchema(
+    WorkspaceIdPathSchema,
+    ContentIdPathSchema,
+    RevisionIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndContentRevisionPath(**data)
 
 
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):

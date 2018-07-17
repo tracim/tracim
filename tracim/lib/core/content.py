@@ -24,7 +24,9 @@ from sqlalchemy.sql.elements import and_
 
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
-from tracim.exceptions import SameValueError, EmptyRawContentNotAllowed
+from tracim.exceptions import SameValueError
+from tracim.exceptions import EmptyRawContentNotAllowed
+from tracim.exceptions import RevisionDoesNotMatchThisContent
 from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
@@ -486,16 +488,24 @@ class ContentApi(object):
             raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
         return content
 
-    def get_one_revision(self, revision_id: int = None) -> ContentRevisionRO:
+    def get_one_revision(self, revision_id: int = None, content: Content= None) -> ContentRevisionRO:  # nopep8
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
+        :param content: The content related to the revision, if None do not
+        check if revision is related to this content.
         :return: An item Content linked with the correct revision
         """
         assert revision_id is not None# DYN_REMOVE
 
         revision = self._session.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id).one()
-
+        if content and revision.content_id != content.content_id:
+            raise RevisionDoesNotMatchThisContent(
+                'revision {revision_id} is not a revision of content {content_id}'.format(  # nopep8
+                    revision_id=revision.revision_id,
+                    content_id=content.content_id,
+                    )
+            )
         return revision
 
     # INFO - A.P - 2017-07-03 - python file object getter

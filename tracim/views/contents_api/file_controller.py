@@ -20,6 +20,7 @@ from tracim.extensions import hapic
 from tracim.lib.core.content import ContentApi
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FileContentSchema
+from tracim.views.core_api.schemas import WorkspaceAndContentRevisionIdPathSchema  # nopep8
 from tracim.views.core_api.schemas import FileRevisionSchema
 from tracim.views.core_api.schemas import SetContentStatusSchema
 from tracim.views.core_api.schemas import FileContentModifySchema
@@ -97,10 +98,28 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.output_file([])
-    def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+    def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=ContentType.Any
+        )
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id,
+            content=content
+        )
+        file = DepotManager.get().get(revision.depot_file)
+        response = request.response
+        response.content_type = file.content_type
+        response.app_iter = FileIter(file)
+        return response
 
     # preview
     # pdf
@@ -335,7 +354,7 @@ class FileController(Controller):
         # download raw file of revision
         configurator.add_route(
             'download_revision',
-            '/workspaces/{workspace_id}/files/{content_id}/revisions/{content_revision}/raw',  # nopep8
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw',  # nopep8
             request_method='GET'
         )
         configurator.add_view(self.download_revisions_file, route_name='download_revision')  # nopep8

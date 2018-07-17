@@ -43,6 +43,16 @@ class WorkspaceAndContentPath(object):
         self.workspace_id = workspace_id
 
 
+class WorkspaceAndContentRevisionPath(object):
+    """
+    Paths params with workspace id and content_id model
+    """
+    def __init__(self, workspace_id: int, content_id: int, revision_id) -> None:
+        self.content_id = content_id
+        self.revision_id = revision_id
+        self.workspace_id = workspace_id
+
+
 class CommentPath(object):
     """
     Paths params with workspace id and content_id and comment_id model
