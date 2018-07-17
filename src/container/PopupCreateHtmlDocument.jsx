@@ -13,7 +13,6 @@ const debug = { // outdated
     creationLabel: 'Write a document',
     domContainer: 'appContainer',
     apiUrl: 'http://localhost:3001',
-    mockApiUrl: 'http://localhost:8071',
     apiHeader: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -85,7 +84,7 @@ class PopupCreateHtmlDocument extends React.Component {
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         label={this.state.config.label} // @TODO get the lang of user
-        hexcolor={this.state.config.hexcolor}
+        customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}
         onChangeContentName={this.handleChangeNewContentName}
