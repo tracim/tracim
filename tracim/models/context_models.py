@@ -69,8 +69,9 @@ class ContentFilter(object):
             show_archived: int = 0,
             show_deleted: int = 0,
             show_active: int = 1,
-            nb_elem: typing.Optional[int] = None,
-            offset: typing.Optional[int] = None,
+            content_type: str = None,
+            offset: int = None,
+            nb_elem: int = None,
     ) -> None:
         # 0 is same as None here
         if parent_id == 0:
@@ -89,7 +90,7 @@ class ContentFilter(object):
         self.show_active = bool(show_active)
         self.nb_elem = nb_elem
         self.offset = offset
-        self.content_type = ContentType.Any
+        self.content_type = content_type
 
 
 class ContentCreation(object):

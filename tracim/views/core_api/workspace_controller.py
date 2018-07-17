@@ -107,6 +107,7 @@ class WorkspaceController(Controller):
         contents = api.get_all(
             parent_id=content_filter.parent_id,
             workspace=request.current_workspace,
+            content_type=content_filter.content_type,
         )
         contents = [
             api.get_content_in_context(content) for content in contents

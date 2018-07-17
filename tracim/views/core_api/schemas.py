@@ -163,6 +163,11 @@ class FilterContentQuerySchema(marshmallow.Schema):
                     'to allow to show only archived documents',
         validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
+    content_type = marshmallow.fields.String(
+        example=ContentType.Any,
+        default=ContentType.Any,
+        validate=OneOf(ContentType.allowed_type_values())
+    )
 
     @post_load
     def make_content_filter(self, data):
