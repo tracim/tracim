@@ -7,7 +7,7 @@ const qs = require('query-string')
 
 export class OpenCreateContentApp extends React.Component {
   openCreateContentApp = () => {
-    const { idWorkspace, appOpenedType, user, contentType, renderCreateContentApp, match, location } = this.props
+    const { idWorkspace, user, contentType, renderCreateContentApp, match, location } = this.props
 
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 

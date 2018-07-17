@@ -8,7 +8,10 @@ import { Link } from 'react-router-dom'
 const WorkspaceListItem = props => {
   return (
     <li className='sidebar__navigation__workspace__item'>
-      <div className='sidebar__navigation__workspace__item__wrapper' onClick={props.onClickTitle}>
+      <div
+        className='sidebar__navigation__workspace__item__wrapper primaryColorBg primaryColorBgDarkenHover primaryColorBorder'
+        onClick={props.onClickTitle}
+      >
         <div className='sidebar__navigation__workspace__item__number'>
           {props.label.substring(0, 2).toUpperCase()}
         </div>
@@ -33,13 +36,15 @@ const WorkspaceListItem = props => {
               key={aa.slug}
             >
               <Link to={aa.route}>
-                <div className={classnames('sidebar__navigation__workspace__item__submenu__dropdown', {'activeFilter': props.activeFilterList.includes(aa.slug)})}>
+                <div className={classnames(
+                  'sidebar__navigation__workspace__item__submenu__dropdown primaryColorBgLighten primaryColorBgHover primaryColorBorderDarken',
+                  {'activeFilter': props.activeFilterList.includes(aa.slug)}
+                )}>
                   <div className='dropdown__icon'>
                     <i className={classnames(`fa fa-${aa.faIcon}`)} style={{backgroudColor: aa.hexcolor}} />
                   </div>
 
                   <div className='sidebar__navigation__workspace__item__submenu__dropdown__showdropdown'>
-
                     <div className='dropdown__title' id='navbarDropdown'>
                       <div className='dropdown__title__text'>
                         {aa.label/* [props.lang.id] */}

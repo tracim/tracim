@@ -4,7 +4,7 @@ export const FETCH_CONFIG = {
     'Content-Type': 'application/json'
   },
   apiUrl: 'http://localhost:6543/api/v2',
-  mockApiUrl: 'http://localhost:3001'
+  mockApiUrl: 'http://localhost:3001' // @todo: better to use one url only and use proxy on mock api to point to real api (if implemented)
 }
 
 export const COOKIE = {
@@ -19,7 +19,7 @@ export const PAGE = {
     NEW: (idws, type) => `/workspaces/${idws}/${type}/new`,
     CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
     CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
-    CONTENT: (idws = ':idws', type = ':type?', idcts = ':idcts?') => `/workspaces/${idws}/${type}/${idcts}`,
+    CONTENT: (idws = ':idws', type = ':type?', idcts = ':idcts?') => `/workspaces/${idws}/${type}/${idcts}`, // @TODO add /contents/ in url and remove <Switch> in <Tracim>
     // CONTENT_NEW: (idws = ':idws', ctstype = ':ctstype') => `/workspaces/${idws}/contents/${ctstype}/new`,
     // CONTENT_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/edit`,
     // CONTENT_TITLE_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/title/edit`,

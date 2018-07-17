@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import Footer from '../component/Footer.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import Dashboard from './Dashboard.jsx'
@@ -71,9 +70,6 @@ class Tracim extends React.Component {
 
           <PrivateRoute path={PAGE.ACCOUNT} component={Account} />
           <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
-
-          {/* <Footer /> */}
-
         </div>
 
       </div>

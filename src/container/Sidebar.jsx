@@ -43,7 +43,6 @@ class Sidebar extends React.Component {
 
     const newFilter = workspace.filter.includes(filter) ? [] : [filter] // use an array to allow multiple filters (NYI)
 
-    console.log('wtf')
     history.push(`${PAGE.WORKSPACE.CONTENT_LIST(idWs)}?type=${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
 
     // obviously, it's ugly to use custom event to tell WorkspaceContent to refresh, but since WorkspaceContent
@@ -58,9 +57,9 @@ class Sidebar extends React.Component {
     const { activeLang, workspaceList, t } = this.props
 
     return (
-      <div className={classnames('sidebar', {'sidebarclose': sidebarClose})}>
+      <div className={classnames('sidebar primaryColorBgDarken', {'sidebarclose': sidebarClose})}>
         <div className='sidebarSticky'>
-          <div className='sidebar__expand' onClick={this.handleClickToggleSidebar}>
+          <div className='sidebar__expand primaryColorBg.darken' onClick={this.handleClickToggleSidebar}>
             <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
           </div>
 

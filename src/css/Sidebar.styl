@@ -1,26 +1,3 @@
-.sidebar-expandbar
-  position absolute
-  left 0
-  display none
-  border 1px solid thirdColor
-  border-top-width 2px
-  padding 11px 15px
-  background-color blue
-  z-index 5
-  &__icon
-    font-size 18px
-    text-align center
-    cursor pointer
-    &:hover
-      color white
-
-.sidebar
-  min-height 100%
-  background-color secondColor
-  background-image url('../img/applat.png')
-  background-repeat repeat
-  z-index 1
-
 sidebar-width = 280px
 sidebar-animate-speed = 0.5s
 
@@ -41,6 +18,9 @@ leftside()
   position relative
   transition all sidebar-animate-speed
   width sidebar-width
+  min-height 100%
+  background-image url('../img/applat.png')
+  background-repeat repeat
   z-index 5
   &.sidebarclose
     width 0
@@ -55,7 +35,6 @@ leftside()
     border-bottom-right-radius 15px
     padding 8px 15px
     cursor pointer
-    background-color thirdColor
     color white
     transition all sidebar-animate-speed
   &__btnnewworkspace
@@ -80,13 +59,10 @@ leftside()
         &__wrapper
           display flex
           align-items center
-          border-bottom 1px solid secondColor
+          border-bottom 1px solid
           width 100%
           height 100%
-          background-color thirdColor
           cursor pointer
-          &:hover
-            background-color fifthColor
         &__number
           display flex
           leftside()
@@ -107,17 +83,14 @@ leftside()
           margin 0
           padding 0
           width 100%
-          background-color fourthColor
           overflow hidden
           & > li
             display block
           &__dropdown
             display flex
             align-items center
-            border-bottom 1px solid secondColor
+            border-bottom 1px solid
             cursor pointer
-            &:hover
-              background-color thirdColor
             &__showdropdown
               display flex
               justify-content space-between
@@ -132,6 +105,7 @@ leftside()
               white-space nowrap
               overflow hidden
               text-overflow ellipsis
+              // color off-white
             &.activeFilter
               .dropdown__icon
                 background-color rgba(253, 253, 253, 0.8)

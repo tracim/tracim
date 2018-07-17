@@ -40,7 +40,7 @@ class WorkspaceContent extends React.Component {
         type: undefined,
         folder: undefined
       },
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt everytime
+      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
       appOpenedType: false
     }
 
@@ -74,7 +74,7 @@ class WorkspaceContent extends React.Component {
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
 
-    if (app.length === 0) {
+    if (app.length === 0) { // @fixme shouldn't this be done by <Sidebar> ?
       const fetchGetAppList = await dispatch(getAppList(user))
       if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
     }
