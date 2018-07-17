@@ -335,10 +335,11 @@ class ContentInContext(object):
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content: Content, dbsession: Session, config: CFG):
+    def __init__(self, content: Content, dbsession: Session, config: CFG, user: User=None):  # nopep8
         self.content = content
         self.dbsession = dbsession
         self.config = config
+        self._user = user
 
     # Default
     @property
@@ -430,6 +431,11 @@ class ContentInContext(object):
     @property
     def slug(self):
         return slugify(self.content.label)
+
+    @property
+    def read_by_user(self):
+        assert self._user
+        return self.content.has_new_information_for(self._user)
 
 
 class RevisionInContext(object):

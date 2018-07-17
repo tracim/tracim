@@ -163,7 +163,7 @@ class ContentApi(object):
             self._show_temporary = previous_show_temporary
 
     def get_content_in_context(self, content: Content) -> ContentInContext:
-        return ContentInContext(content, self._session, self._config)
+        return ContentInContext(content, self._session, self._config, self._user)  # nopep8
 
     def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:  # nopep8
         # TODO - G.M - 2018-06-173 - create revision in context object

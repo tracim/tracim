@@ -458,6 +458,8 @@ class ContentDigestSchema(marshmallow.Schema):
     )
 
 
+class UserContentDigestSchema(ContentDigestSchema):
+    read_by_user = marshmallow.fields.Bool(example=False, default=False)
 #####
 # Content
 #####

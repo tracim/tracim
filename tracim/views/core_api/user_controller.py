@@ -15,7 +15,7 @@ from tracim import hapic, TracimRequest
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import UserIdPathSchema
-from tracim.views.core_api.schemas import ContentDigestSchema
+from tracim.views.core_api.schemas import UserContentDigestSchema
 from tracim.views.core_api.schemas import ExtendedFilterQuerySchema
 from tracim.views.core_api.schemas import WorkspaceDigestSchema
 from tracim.models.contents import ContentTypeLegacy as ContentType
@@ -50,7 +50,7 @@ class UserController(Controller):
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(ExtendedFilterQuerySchema())
-    @hapic.output_body(ContentDigestSchema(many=True))
+    @hapic.output_body(UserContentDigestSchema(many=True))
     def last_active_content(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Get last_active_content for user
@@ -81,7 +81,8 @@ class UserController(Controller):
             limit=content_filter.limit or None,
         )
         return [
-            api.get_content_in_context(content) for content in last_actives
+            api.get_content_in_context(content)
+            for content in last_actives
         ]
 
     def bind(self, configurator: Configurator) -> None:
