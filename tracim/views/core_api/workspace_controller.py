@@ -18,7 +18,7 @@ from tracim.models.data import ActionDescription
 from tracim.models.context_models import UserRoleWorkspaceInContext
 from tracim.models.context_models import ContentInContext
 from tracim.exceptions import EmptyLabelNotAllowed
-from tracim.exceptions import ContentNotFoundFound
+from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.exceptions import ParentNotFound
 from tracim.views.controllers import Controller
