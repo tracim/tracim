@@ -810,39 +810,49 @@ class ContentApi(object):
 
     def get_last_active(
             self,
-            parent_id: typing.Optional[int],
-            content_type: str,
             workspace: Workspace=None,
             limit: typing.Optional[int]=None,
-            offset: typing.Optional[int]= None,
+            before_datetime: typing.Optional[datetime.datetime]= None,
     ) -> typing.List[Content]:
+        """
+        get contents list sorted by last update
+        (last modification of content itself or one of this comment)
+        :param workspace: Workspace to check
+        :param limit: maximum number of elements to return
+        :param before_datetime: date from where we check older content.
+        :return: list of content
+        """
 
         resultset = self._get_all_query(
-            parent_id=parent_id,
-            content_type=content_type,
             workspace=workspace,
         )
         resultset = resultset.order_by(desc(Content.updated))
-        resultset = resultset.slice(start=offset, stop=limit)
 
-        # result = []
-        # for item in resultset:
-        #     new_item = None
-        #     if ContentType.Comment == item.type:
-        #         new_item = item.parent
-        #     else:
-        #         new_item = item
-        #
-        #     # INFO - D.A. - 2015-05-20
-        #     # We do not want to show only one item if the last 10 items are
-        #     # comments about one thread for example
-        #     if new_item not in result:
-        #         result.append(new_item)
-        #
-        #     if len(result) >= limit:
-        #         break
+        active_contents = []
+        too_recent_content = []
+        for content in resultset:
+            related_active_content = None
+            if ContentType.Comment == content.type:
+                related_active_content = content.parent
+            else:
+                related_active_content = content
 
-        return resultset.all()
+            if not before_datetime:
+                before_datetime = datetime.datetime.now()
+            # INFO - D.A. - 2015-05-20
+            # We do not want to show only one item if the last 10 items are
+            # comments about one thread for example
+            if related_active_content not in active_contents and related_active_content not in too_recent_content:  # nopep8
+                # we verify that content is old enough
+                if content.updated < before_datetime:
+                    active_contents.append(related_active_content)
+                else:
+                    too_recent_content.append(related_active_content)
+
+            if limit and len(active_contents) >= limit:
+                break
+
+        return active_contents
 
     def get_last_unread(self, parent_id: typing.Optional[int], content_type: str,
                         workspace: Workspace=None, limit=10) -> typing.List[Content]:
