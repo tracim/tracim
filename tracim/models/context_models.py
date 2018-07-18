@@ -406,10 +406,6 @@ class ContentInContext(object):
         return self.content.content_id
 
     @property
-    def id(self) -> int:
-        return self.content_id
-
-    @property
     def parent_id(self) -> int:
         """
         Return parent_id of the content
@@ -511,10 +507,6 @@ class RevisionInContext(object):
     @property
     def content_id(self) -> int:
         return self.revision.content_id
-
-    @property
-    def id(self) -> int:
-        return self.content_id
 
     @property
     def parent_id(self) -> int:

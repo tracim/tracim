@@ -2,7 +2,12 @@
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim.exceptions import NotAuthenticated, ContentNotFound
+from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import ContentNotFound
+from tracim.exceptions import InvalidUserId
+from tracim.exceptions import InvalidWorkspaceId
+from tracim.exceptions import InvalidContentId
+from tracim.exceptions import InvalidCommentId
 from tracim.exceptions import ContentNotFoundInTracimRequest
 from tracim.exceptions import WorkspaceNotFoundInTracimRequest
 from tracim.exceptions import UserNotFoundInTracimRequest
@@ -214,8 +219,9 @@ class TracimRequest(Request):
         comment_id = ''
         try:
             if 'comment_id' in request.matchdict:
-                if not request.matchdict['comment_id'].isdecimal():
-                    raise ContentNotFoundInTracimRequest('comment_id is not a correct integer')  # nopep8
+                comment_id_str = request.matchdict['content_id']
+                if not isinstance(comment_id_str, str) or not comment_id_str.isdecimal():  # nopep8
+                    raise InvalidCommentId('comment_id is not a correct integer')  # nopep8
                 comment_id = int(request.matchdict['comment_id'])
             if not comment_id:
                 raise ContentNotFoundInTracimRequest('No comment_id property found in request')  # nopep8
@@ -253,8 +259,9 @@ class TracimRequest(Request):
         content_id = ''
         try:
             if 'content_id' in request.matchdict:
-                if not request.matchdict['content_id'].isdecimal():
-                    raise ContentNotFoundInTracimRequest('content_id is not a correct integer')  # nopep8
+                content_id_str = request.matchdict['content_id']
+                if not isinstance(content_id_str, str) or not content_id_str.isdecimal():  # nopep8
+                    raise InvalidContentId('content_id is not a correct integer')  # nopep8
                 content_id = int(request.matchdict['content_id'])
             if not content_id:
                 raise ContentNotFoundInTracimRequest('No content_id property found in request')  # nopep8
@@ -286,8 +293,9 @@ class TracimRequest(Request):
         try:
             login = None
             if 'user_id' in request.matchdict:
-                if not request.matchdict['user_id'].isdecimal():
-                    raise UserNotFoundInTracimRequest('user_id is not a correct integer')  # nopep8
+                user_id_str = request.matchdict['user_id']
+                if not isinstance(user_id_str, str) or not user_id_str.isdecimal():
+                    raise InvalidUserId('user_id is not a correct integer')  # nopep8
                 login = int(request.matchdict['user_id'])
             if not login:
                 raise UserNotFoundInTracimRequest('You request a candidate user but the context not permit to found one')  # nopep8
@@ -331,8 +339,9 @@ class TracimRequest(Request):
         workspace_id = ''
         try:
             if 'workspace_id' in request.matchdict:
-                if not request.matchdict['workspace_id'].isdecimal():
-                    raise WorkspaceNotFoundInTracimRequest('workspace_id is not a correct integer')  # nopep8
+                workspace_id_str = request.matchdict['workspace_id']
+                if not isinstance(workspace_id_str, str) or not workspace_id_str.isdecimal():  # nopep8
+                    raise InvalidWorkspaceId('workspace_id is not a correct integer')  # nopep8
                 workspace_id = int(request.matchdict['workspace_id'])
             if not workspace_id:
                 raise WorkspaceNotFoundInTracimRequest('No workspace_id property found in request')  # nopep8
@@ -368,7 +377,7 @@ class TracimRequest(Request):
                     if workspace_id.isdecimal():
                         workspace_id = int(workspace_id)
                     else:
-                        raise WorkspaceNotFoundInTracimRequest('workspace_id is not a correct integer')  # nopep8
+                        raise InvalidWorkspaceId('workspace_id is not a correct integer')  # nopep8
             if not workspace_id:
                 raise WorkspaceNotFoundInTracimRequest('No new_workspace_id property found in body')  # nopep8
             wapi = WorkspaceApi(

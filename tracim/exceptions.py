@@ -121,6 +121,25 @@ class ContentNotFoundInTracimRequest(TracimException):
     pass
 
 
+class InvalidId(TracimException):
+    pass
+
+
+class InvalidContentId(InvalidId):
+    pass
+
+
+class InvalidCommentId(InvalidId):
+    pass
+
+
+class InvalidWorkspaceId(InvalidId):
+    pass
+
+
+class InvalidUserId(InvalidId):
+    pass
+
 class ContentNotFound(TracimException):
     pass
 
@@ -141,7 +160,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
     pass
 
 
-class EmptyRawContentNotAllowed(EmptyValueNotAllowed):
+class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
     pass
 
 
