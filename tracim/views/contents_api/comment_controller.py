@@ -19,10 +19,7 @@ from tracim.views.core_api.schemas import CommentsPathSchema
 from tracim.views.core_api.schemas import SetCommentSchema
 from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
-from tracim.exceptions import WorkspaceNotFound, EmptyRawContentNotAllowed
-from tracim.exceptions import InsufficientUserRoleInWorkspace
-from tracim.exceptions import NotAuthenticated
-from tracim.exceptions import AuthenticationFailed
+from tracim.exceptions import EmptyCommentContentNotAllowed
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.revision_protection import new_revision
 from tracim.models.data import UserRoleInWorkspace
@@ -59,7 +56,7 @@ class CommentController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
-    @hapic.handle_exception(EmptyRawContentNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)  # nopep8
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetCommentSchema())
