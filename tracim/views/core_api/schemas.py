@@ -195,7 +195,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
         return ContentFilter(**data)
 
 
-class PaginationSchema(marshmallow.Schema):
+class ActiveContentFilterQuerySchema(marshmallow.Schema):
     limit = marshmallow.fields.Int(
         example=2,
         default=0,
@@ -203,23 +203,18 @@ class PaginationSchema(marshmallow.Schema):
                     'the first limit elem (according to offset)',
         validate=Range(min=0, error="Value must be positive or 0"),
     )
-    offset = marshmallow.fields.Int(
-        example=5,
-        default=0,
-        description='if 0 or not set, do not set offset, else set offset for'
-                    'query',
-        validate=Range(min=0, error="Value must be positive or 0"),
+    before_datetime = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description='return only content lastly updated before this date',
     )
 
 
-class ExtendedFilterQuerySchema(FilterContentQuerySchema, PaginationSchema):
-    workspace_id = marshmallow.fields.Int(
-        example=2,
-        default=0,
-        description='allow to filter items in a workspace.'
-                    ' If not set,'
-                    'then return contents from all known workspace',
-        validate=Range(min=0, error="Value must be positive or 0"),
+class ContentIdsQuerySchema(marshmallow.Schema):
+    contents_ids = marshmallow.fields.List(
+        marshmallow.fields.Int(
+            example=6,
+            validate=Range(min=1, error="Value must be greater than 0"),
+        )
     )
 
 ###
@@ -479,7 +474,11 @@ class ContentDigestSchema(marshmallow.Schema):
     )
 
 
-class UserContentDigestSchema(ContentDigestSchema):
+class ReadStatusSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(
+        example=6,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
     read_by_user = marshmallow.fields.Bool(example=False, default=False)
 #####
 # Content

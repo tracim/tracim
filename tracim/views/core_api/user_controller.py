@@ -13,12 +13,13 @@ from tracim import hapic, TracimRequest
 
 from tracim.lib.core.workspace import WorkspaceApi
 from tracim.views.controllers import Controller
-from tracim.views.core_api.schemas import UserIdPathSchema
+from tracim.views.core_api.schemas import UserIdPathSchema, ReadStatusSchema, \
+    ContentIdsQuerySchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
-from tracim.views.core_api.schemas import UserContentDigestSchema
-from tracim.views.core_api.schemas import ExtendedFilterQuerySchema
+from tracim.views.core_api.schemas import ContentDigestSchema
+from tracim.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim.views.core_api.schemas import WorkspaceDigestSchema
 from tracim.models.contents import ContentTypeLegacy as ContentType
 
@@ -51,57 +52,60 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_query(ExtendedFilterQuerySchema())
-    @hapic.output_body(UserContentDigestSchema(many=True))
+    @hapic.input_query(ActiveContentFilterQuerySchema())
+    @hapic.output_body(ContentDigestSchema(many=True))
     def last_active_content(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
         Get last_active_content for user
         """
-        app_config = request.registry.settings['CFG']
-        content_filter = hapic_data.query
-        api = ContentApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-            show_archived=content_filter.show_archived,
-            show_deleted=content_filter.show_deleted,
-            show_active=content_filter.show_active,
-        )
-        wapi = WorkspaceApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        workspace = None
-        if content_filter.workspace_id:
-            workspace = wapi.get_one(content_filter.workspace_id)
-        last_actives = api.get_last_active(
-            parent_id=content_filter.parent_id,
-            content_type=content_filter.content_type or ContentType.Any,
-            workspace=workspace,
-            offset=content_filter.offset or None,
-            limit=content_filter.limit or None,
-        )
-        return [
-            api.get_content_in_context(content)
-            for content in last_actives
-        ]
+        raise NotImplemented()
+        # app_config = request.registry.settings['CFG']
+        # content_filter = hapic_data.query
+        # api = ContentApi(
+        #     current_user=request.candidate_user,  # User
+        #     session=request.dbsession,
+        #     config=app_config,
+        #     show_archived=content_filter.show_archived,
+        #     show_deleted=content_filter.show_deleted,
+        #     show_active=content_filter.show_active,
+        # )
+        # wapi = WorkspaceApi(
+        #     current_user=request.candidate_user,  # User
+        #     session=request.dbsession,
+        #     config=app_config,
+        # )
+        # workspace = None
+        # if content_filter.workspace_id:
+        #     workspace = wapi.get_one(content_filter.workspace_id)
+        # last_actives = api.get_last_active(
+        #     parent_id=content_filter.parent_id,
+        #     content_type=content_filter.content_type or ContentType.Any,
+        #     workspace=workspace,
+        #     offset=content_filter.offset or None,
+        #     limit=content_filter.limit or None,
+        # )
+        # return [
+        #     api.get_content_in_context(content)
+        #     for content in last_actives
+        # ]
 
     @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
-    @hapic.output_body(UserContentDigestSchema())  # nopep8
-    def user_content(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+    @hapic.input_query(ContentIdsQuerySchema())
+    @hapic.output_body(ReadStatusSchema(many=True))  # nopep8
+    def contents_read_status(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
-        set user_read status of content to unread
+        get user_read status of contents
         """
-        app_config = request.registry.settings['CFG']
-        api = ContentApi(
-            current_user=request.candidate_user,
-            session=request.dbsession,
-            config=app_config,
-        )
-        return api.get_content_in_context(request.current_content)
+        raise NotImplemented()
+        # app_config = request.registry.settings['CFG']
+        # api = ContentApi(
+        #     current_user=request.candidate_user,
+        #     session=request.dbsession,
+        #     config=app_config,
+        # )
+        # return api.get_content_in_context(request.current_content)
 
     @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
     @require_same_user_or_profile(Group.TIM_ADMIN)
@@ -165,10 +169,10 @@ class UserController(Controller):
         configurator.add_view(self.user_workspace, route_name='user_workspace')
 
         # user content
-        configurator.add_route('user_content', '/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}', request_method='GET')  # nopep8
-        configurator.add_view(self.user_content, route_name='user_content')
+        configurator.add_route('contents_read_status', '/users/{user_id}/workspaces/{workspace_id}/contents/read_status', request_method='GET')  # nopep8
+        configurator.add_view(self.contents_read_status, route_name='contents_read_status')  # nopep8
         # last active content for user
-        configurator.add_route('last_active_content', '/users/{user_id}/contents/actives', request_method='GET')  # nopep8
+        configurator.add_route('last_active_content', '/users/{user_id}/workspaces/{workspace_id}/contents/recently_active', request_method='GET')  # nopep8
         configurator.add_view(self.last_active_content, route_name='last_active_content')  # nopep8
 
         # set content as read/unread
