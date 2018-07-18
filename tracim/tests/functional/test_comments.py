@@ -113,6 +113,7 @@ class TestCommentsEndpoint(FunctionalTest):
             params=params,
             status=400
         )
+
     def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:  # nopep8
         """
         delete comment (user is workspace_manager and owner)
