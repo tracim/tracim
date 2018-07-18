@@ -5,7 +5,8 @@ from smtplib import SMTPException
 import transaction
 import typing as typing
 
-from tracim.exceptions import NotificationNotSend, EmailValidationFailed
+from tracim.exceptions import NotificationNotSend
+from tracim.exceptions import EmailValidationFailed
 from tracim.lib.mail_notifier.notifier import get_email_manager
 from sqlalchemy.orm import Session
 
