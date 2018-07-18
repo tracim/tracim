@@ -19,7 +19,8 @@ from tracim.models.context_models import MoveParams
 from tracim.models.context_models import WorkspaceAndContentPath
 from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
-from tracim.models.data import UserRoleInWorkspace, ActionDescription
+from tracim.models.data import UserRoleInWorkspace
+from tracim.models.data import ActionDescription
 
 
 class UserDigestSchema(marshmallow.Schema):
