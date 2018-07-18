@@ -94,6 +94,26 @@ class TestCommentsEndpoint(FunctionalTest):
         assert len(res.json_body) == 4
         assert comment == res.json_body[3]
 
+    def test_api__post_content_comment__err_400__empty_raw_content(self) -> None:
+        """
+        Get alls comments of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'raw_content': ''
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/2/contents/7/comments',
+            params=params,
+            status=400
+        )
+
     def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:  # nopep8
         """
         delete comment (user is workspace_manager and owner)

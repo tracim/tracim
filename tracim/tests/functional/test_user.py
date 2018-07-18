@@ -118,7 +118,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_user_workspaces__err_404__user_does_not_exist(self):
+    def test_api__get_user_workspaces__err_400__user_does_not_exist(self):
         """
         Check obtain all workspaces reachables for one user who does
         not exist
@@ -131,7 +131,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/users/5/workspaces', status=404)
+        res = self.testapp.get('/api/v2/users/5/workspaces', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()

@@ -5,7 +5,6 @@ import datetime
 import re
 import typing
 from operator import itemgetter
-from operator import not_
 
 import transaction
 from sqlalchemy import func
@@ -26,6 +25,8 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
+from tracim.exceptions import EmptyCommentContentNotAllowed
+from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
 from tracim.lib.utils.utils import current_date_for_filename
@@ -393,18 +394,34 @@ class ContentApi(object):
 
         return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label:str ='', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+        # TODO - G.M - 2018-07-16 - raise Exception instead of assert
         assert content_type in ContentType.allowed_types()
+        assert not (label and filename)
 
         if content_type == ContentType.Folder and not label:
             label = self.generate_folder_label(workspace, parent)
 
         content = Content()
+
+        if filename:
+            # INFO - G.M - 2018-07-04 - File_name setting automatically
+            # set label and file_extension
+            content.file_name = label
+        elif label:
+            content.label = label
+        else:
+            if content_type == ContentType.Comment:
+                # INFO - G.M - 2018-07-16 - Default label for comments is
+                # empty string.
+                content.label = ''
+            else:
+                raise EmptyLabelNotAllowed('Content of this type should have a valid label')  # nopep8
+
         content.owner = self._user
         content.parent = parent
         content.workspace = workspace
         content.type = content_type
-        content.label = label
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
 
@@ -419,13 +436,14 @@ class ContentApi(object):
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
         return content
 
-
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
-        assert parent  and parent.type!=ContentType.Folder
+        assert parent and parent.type != ContentType.Folder
+        if not content:
+            raise EmptyCommentContentNotAllowed()
         item = Content()
         item.owner = self._user
         item.parent = parent
-        if parent and not workspace:
+        if not workspace:
             workspace = item.parent.workspace
         item.workspace = workspace
         item.type = ContentType.Comment
@@ -436,7 +454,6 @@ class ContentApi(object):
         if do_save:
             self.save(item, ActionDescription.COMMENT)
         return item
-
 
     def get_one_from_revision(self, content_id: int, content_type: str, workspace: Workspace=None, revision_id=None) -> Content:
         """
@@ -474,6 +491,11 @@ class ContentApi(object):
         try:
             content = base_request.one()
         except NoResultFound as exc:
+            # TODO - G.M - 2018-07-16 - Add better support for all different
+            # error case who can happened here
+            # like content doesn't exist, wrong parent, wrong content_type, wrong workspace,
+            # wrong access to this workspace, wrong base filter according
+            # to content_status.
             raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
         return content
 
@@ -972,6 +994,8 @@ class ContentApi(object):
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
             # Internatization disabled in libcontent for now.
             raise SameValueError('The content did not changed')
+        if not new_label:
+            raise EmptyLabelNotAllowed()
         item.owner = self._user
         item.label = new_label
         item.description = new_content if new_content else item.description # TODO: convert urls into links

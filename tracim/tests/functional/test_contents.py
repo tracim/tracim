@@ -13,22 +13,6 @@ class TestHtmlDocuments(FunctionalTest):
 
     fixtures = [BaseFixture, ContentFixtures]
 
-    def test_api__get_html_document__err_400__wrong_content_type(self) -> None:
-        """
-        Get one html document of a content
-        """
-        self.testapp.authorization = (
-            'Basic',
-            (
-                'admin@admin.admin',
-                'admin@admin.admin'
-            )
-        )
-        res = self.testapp.get(
-            '/api/v2/workspaces/2/html-documents/7',
-            status=400
-        )   # nopep8
-
     def test_api__get_html_document__ok_200__legacy_slug(self) -> None:
         """
         Get one html document of a content
@@ -44,7 +28,7 @@ class TestHtmlDocuments(FunctionalTest):
         res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/6',
             status=200
-        )   # nopep8
+        )
         content = res.json_body
         assert content['content_type'] == 'html-documents'
         assert content['content_id'] == 6
@@ -85,7 +69,7 @@ class TestHtmlDocuments(FunctionalTest):
         res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/6',
             status=200
-        )   # nopep8
+        )
         content = res.json_body
         assert content['content_type'] == 'html-documents'
         assert content['content_id'] == 6
@@ -111,6 +95,123 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier']['public_name'] == 'Bob i.'
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == '<p>To cook a great Tiramisu, you need many ingredients.</p>'  # nopep8
+
+    def test_api__get_html_document__err_400__wrong_content_type(self) -> None:
+        """
+        Get one html document of a content content 7 is not html_document
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/7',
+            status=400
+        )
+
+    def test_api__get_html_document__err_400__content_does_not_exist(self) -> None:  # nopep8
+        """
+        Get one html document of a content (content 170 does not exist in db
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/170',
+            status=400
+        )
+
+    def test_api__get_html_document__err_400__content_not_in_workspace(self) -> None:  # nopep8
+        """
+        Get one html document of a content (content 6 is in workspace 2)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/html-documents/6',
+            status=400
+        )
+
+    def test_api__get_html_document__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+        """
+        Get one html document of a content (Workspace 40 does not exist)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/40/html-documents/6',
+            status=400
+        )
+
+    def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one html document of a content, workspace id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/coucou/html-documents/6',
+            status=400
+        )
+
+    def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one html document of a content, content_id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/coucou',
+            status=400
+        )
+
+    def test_api__update_html_document__err_400__empty_label(self) -> None:  # nopep8
+        """
+        Update(put) one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6',
+            params=params,
+            status=400
+        )
 
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
         """
@@ -158,7 +259,7 @@ class TestHtmlDocuments(FunctionalTest):
         res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/6',
             status=200
-        )   # nopep8
+        )
         content = res.json_body
         assert content['content_type'] == 'html-documents'
         assert content['content_id'] == 6
@@ -284,7 +385,7 @@ class TestHtmlDocuments(FunctionalTest):
         res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/6',
             status=200
-        )   # nopep8
+        )
         content = res.json_body
         assert content['content_type'] == 'html-documents'
         assert content['content_id'] == 6
@@ -301,11 +402,31 @@ class TestHtmlDocuments(FunctionalTest):
         res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/6',
             status=200
-        )   # nopep8
+        )
         content = res.json_body
         assert content['content_type'] == 'html-documents'
         assert content['content_id'] == 6
         assert content['status'] == 'closed-deprecated'
+
+    def test_api__set_html_document_status__err_400__wrong_status(self) -> None:
+        """
+        Get one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'unexistant-status',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6/status',
+            params=params,
+            status=400
+        )
 
 
 class TestThreads(FunctionalTest):
@@ -330,7 +451,7 @@ class TestThreads(FunctionalTest):
         res = self.testapp.get(
             '/api/v2/workspaces/2/threads/6',
             status=400
-        )   # nopep8
+        )
 
     def test_api__get_thread__ok_200__nominal_case(self) -> None:
         """
@@ -373,9 +494,89 @@ class TestThreads(FunctionalTest):
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == 'What is the best cake?'  # nopep8
 
+    def test_api__get_thread__err_400__content_does_not_exist(self) -> None:
+        """
+        Get one thread (content 170 does not exist)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/threads/170',
+            status=400
+        )
+
+    def test_api__get_thread__err_400__content_not_in_workspace(self) -> None:
+        """
+        Get one thread(content 7 is in workspace 2)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/threads/7',
+            status=400
+        )
+
+    def test_api__get_thread__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+        """
+        Get one thread (Workspace 40 does not exist)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/40/threads/7',
+            status=400
+        )
+
+    def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one thread, workspace id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/coucou/threads/7',
+            status=400
+        )
+
+    def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one thread, content id is not int
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/threads/coucou',
+            status=400
+        )
+
     def test_api__update_thread__ok_200__nominal_case(self) -> None:
         """
-        Update(put) one html document of a content
+        Update(put) thread
         """
         self.testapp.authorization = (
             'Basic',
@@ -443,11 +644,32 @@ class TestThreads(FunctionalTest):
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
 
+    def test_api__update_thread__err_400__empty_label(self) -> None:
+        """
+        Update(put) thread
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7',
+            params=params,
+            status=400
+        )
+
     def test_api__get_thread_revisions__ok_200__nominal_case(
             self
     ) -> None:
         """
-        Get one html document of a content
+        Get threads revisions
         """
         self.testapp.authorization = (
             'Basic',
@@ -505,7 +727,7 @@ class TestThreads(FunctionalTest):
 
     def test_api__set_thread_status__ok_200__nominal_case(self) -> None:
         """
-        Get one html document of a content
+        Set thread status
         """
         self.testapp.authorization = (
             'Basic',
@@ -544,3 +766,24 @@ class TestThreads(FunctionalTest):
         assert content['content_type'] == 'thread'
         assert content['content_id'] == 7
         assert content['status'] == 'closed-deprecated'
+
+    def test_api__set_thread_status__ok_400__wrong_status(self) -> None:
+        """
+        Set thread status
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'unexistant-status',
+        }
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7/status',
+            params=params,
+            status=400
+        )

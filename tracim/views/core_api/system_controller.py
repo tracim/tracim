@@ -5,7 +5,7 @@ from tracim.exceptions import InsufficientUserProfile
 from tracim.lib.utils.authorization import require_profile
 from tracim.models import Group
 from tracim.models.applications import applications
-from tracim.models.contents import CONTENT_DEFAULT_TYPE
+from tracim.models.contents import ContentTypeLegacy as ContentType
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -20,11 +20,10 @@ from tracim.views.core_api.schemas import ContentTypeSchema
 
 SYSTEM_ENDPOINTS_TAG = 'System'
 
+
 class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SYSTEM_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @require_profile(Group.TIM_USER)
     @hapic.output_body(ApplicationSchema(many=True),)
     def applications(self, context, request: TracimRequest, hapic_data=None):
@@ -34,16 +33,15 @@ class SystemController(Controller):
         return applications
 
     @hapic.with_api_doc(tags=[SYSTEM_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     @require_profile(Group.TIM_USER)
     @hapic.output_body(ContentTypeSchema(many=True),)
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of alls content types availables in this tracim instance.
         """
-
-        return CONTENT_DEFAULT_TYPE
+        content_types_slugs = ContentType.allowed_types_for_folding()
+        content_types = [ContentType(slug) for slug in content_types_slugs]
+        return content_types
 
     def bind(self, configurator: Configurator) -> None:
         """

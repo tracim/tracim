@@ -110,22 +110,9 @@ class SetContentStatus(object):
         self.status = status
 
 
-class HTMLDocumentUpdate(object):
+class TextBasedContentUpdate(object):
     """
-    Html Document update model
-    """
-    def __init__(
-            self,
-            label: str,
-            raw_content: str,
-    ) -> None:
-        self.label = label
-        self.raw_content = raw_content
-
-
-class ThreadUpdate(object):
-    """
-    Thread update model
+    TextBasedContent update model
     """
     def __init__(
             self,
@@ -351,10 +338,6 @@ class ContentInContext(object):
         return self.content.content_id
 
     @property
-    def id(self) -> int:
-        return self.content_id
-
-    @property
     def parent_id(self) -> int:
         """
         Return parent_id of the content
@@ -456,10 +439,6 @@ class RevisionInContext(object):
     @property
     def content_id(self) -> int:
         return self.revision.content_id
-
-    @property
-    def id(self) -> int:
-        return self.content_id
 
     @property
     def parent_id(self) -> int:

@@ -19,10 +19,7 @@ from tracim.views.core_api.schemas import CommentsPathSchema
 from tracim.views.core_api.schemas import SetCommentSchema
 from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
-from tracim.exceptions import WorkspaceNotFound
-from tracim.exceptions import InsufficientUserRoleInWorkspace
-from tracim.exceptions import NotAuthenticated
-from tracim.exceptions import AuthenticationFailed
+from tracim.exceptions import EmptyCommentContentNotAllowed
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.revision_protection import new_revision
 from tracim.models.data import UserRoleInWorkspace
@@ -33,13 +30,9 @@ COMMENT_ENDPOINTS_TAG = 'Comments'
 class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(CommentSchema(many=True),)
+    @hapic.output_body(CommentSchema(many=True))
     def content_comments(self, context, request: TracimRequest, hapic_data=None):
         """
         Get all comments related to a content in asc order (first is the oldest)
@@ -63,14 +56,11 @@ class CommentController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)  # nopep8
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetCommentSchema())
-    @hapic.output_body(CommentSchema(),)
+    @hapic.output_body(CommentSchema())
     def add_comment(self, context, request: TracimRequest, hapic_data=None):
         """
         Add new comment
@@ -95,10 +85,6 @@ class CommentController(Controller):
         return api.get_content_in_context(comment)
 
     @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
-    @hapic.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
-    @hapic.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.FORBIDDEN)
-    @hapic.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     @require_comment_ownership_or_role(
         minimal_required_role_for_anyone=UserRoleInWorkspace.WORKSPACE_MANAGER,
         minimal_required_role_for_owner=UserRoleInWorkspace.CONTRIBUTOR,

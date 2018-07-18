@@ -2,23 +2,23 @@
 import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import OneOf
+from marshmallow.validate import Range
 
 from tracim.lib.utils.utils import DATETIME_FORMAT
 from tracim.models.auth import Profile
-from tracim.models.contents import CONTENT_DEFAULT_TYPE
-from tracim.models.contents import CONTENT_DEFAULT_STATUS
 from tracim.models.contents import GlobalStatus
 from tracim.models.contents import open_status
+from tracim.models.contents import ContentTypeLegacy as ContentType
+from tracim.models.contents import ContentStatusLegacy as ContentStatus
 from tracim.models.context_models import ContentCreation
-from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentCreation
+from tracim.models.context_models import TextBasedContentUpdate
+from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentPath
 from tracim.models.context_models import MoveParams
 from tracim.models.context_models import WorkspaceAndContentPath
 from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
-from tracim.models.context_models import HTMLDocumentUpdate
-from tracim.models.context_models import ThreadUpdate
 from tracim.models.data import UserRoleInWorkspace
 
 
@@ -80,15 +80,30 @@ class UserSchema(UserDigestSchema):
 
 
 class UserIdPathSchema(marshmallow.Schema):
-    user_id = marshmallow.fields.Int(example=3, required=True)
+    user_id = marshmallow.fields.Int(
+        example=3,
+        required=True,
+        description='id of a valid user',
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
 
 
 class WorkspaceIdPathSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4, required=True)
+    workspace_id = marshmallow.fields.Int(
+        example=4,
+        required=True,
+        description='id of a valid workspace',
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
 
 
 class ContentIdPathSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, required=True)
+    content_id = marshmallow.fields.Int(
+        example=6,
+        required=True,
+        description='id of a valid content',
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
 
 
 class WorkspaceAndContentIdPathSchema(
@@ -103,8 +118,9 @@ class WorkspaceAndContentIdPathSchema(
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     comment_id = marshmallow.fields.Int(
         example=6,
-        description='id of a comment related to content content_id',
-        required=True
+        description='id of a valid comment related to content content_id',
+        required=True,
+        validate=Range(min=1, error="Value must be greater than 0"),
     )
     @post_load
     def make_path_object(self, data):
@@ -119,19 +135,22 @@ class FilterContentQuerySchema(marshmallow.Schema):
                     ' If not set, then return all contents.'
                     ' If set to 0, then return root contents.'
                     ' If set to another value, return all contents'
-                    ' directly included in the folder parent_id'
+                    ' directly included in the folder parent_id',
+        validate=Range(min=0, error="Value must be positive or 0"),
     )
     show_archived = marshmallow.fields.Int(
         example=0,
         default=0,
         description='if set to 1, then show archived contents.'
-                    ' Default is 0 - hide archived content'
+                    ' Default is 0 - hide archived content',
+        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
     show_deleted = marshmallow.fields.Int(
         example=0,
         default=0,
         description='if set to 1, then show deleted contents.'
-                    ' Default is 0 - hide deleted content'
+                    ' Default is 0 - hide deleted content',
+        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
     show_active = marshmallow.fields.Int(
         example=1,
@@ -141,7 +160,8 @@ class FilterContentQuerySchema(marshmallow.Schema):
                     ' Note: active content are content '
                     'that is neither archived nor deleted. '
                     'The reason for this parameter to exist is for example '
-                    'to allow to show only archived documents'
+                    'to allow to show only archived documents',
+        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
 
     @post_load
@@ -205,7 +225,10 @@ class WorkspaceMenuEntrySchema(marshmallow.Schema):
 
 
 class WorkspaceDigestSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4)
+    workspace_id = marshmallow.fields.Int(
+        example=4,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
     slug = marshmallow.fields.String(example='intranet')
     label = marshmallow.fields.String(example='Intranet')
     sidebar_entries = marshmallow.fields.Nested(
@@ -229,8 +252,14 @@ class WorkspaceMemberSchema(marshmallow.Schema):
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
     )
-    user_id = marshmallow.fields.Int(example=3)
-    workspace_id = marshmallow.fields.Int(example=4)
+    user_id = marshmallow.fields.Int(
+        example=3,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
+    workspace_id = marshmallow.fields.Int(
+        example=4,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
     user = marshmallow.fields.Nested(
         UserSchema(only=('public_name', 'avatar_url'))
     )
@@ -286,7 +315,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = marshmallow.fields.String(
         example='pagehtml',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=OneOf(ContentType.allowed_types()),
     )
     fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
@@ -319,11 +348,13 @@ class ContentMoveSchema(marshmallow.Schema):
         description='id of the new parent content id.',
         allow_none=True,
         required=True,
+        validate=Range(min=0, error="Value must be positive or 0"),
     )
     new_workspace_id = marshmallow.fields.Int(
         example=2,
         description='id of the new workspace id.',
-        required=True
+        required=True,
+        validate=Range(min=1, error="Value must be greater than 0"),
     )
 
     @post_load
@@ -338,7 +369,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type = marshmallow.fields.String(
         example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=OneOf(ContentType.allowed_types_for_folding()),  # nopep8
     )
 
     @post_load
@@ -347,30 +378,38 @@ class ContentCreationSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6)
+    content_id = marshmallow.fields.Int(
+        example=6,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
     slug = marshmallow.fields.Str(example='intervention-report-12')
     parent_id = marshmallow.fields.Int(
         example=34,
         allow_none=True,
-        default=None
+        default=None,
+        validate=Range(min=0, error="Value must be positive or 0"),
     )
     workspace_id = marshmallow.fields.Int(
         example=19,
+        validate=Range(min=1, error="Value must be greater than 0"),
     )
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
         example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+        validate=OneOf(ContentType.allowed_types()),
     )
     sub_content_types = marshmallow.fields.List(
-        marshmallow.fields.String(),
+        marshmallow.fields.String(
+            example='html-content',
+            validate=OneOf(ContentType.allowed_types())
+        ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
                     'set it to empty list in other cases'
     )
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
+        validate=OneOf(ContentStatus.allowed_values()),
         description='this slug is found in content_type available statuses',
         default=open_status
     )
@@ -403,20 +442,15 @@ class ContentSchema(ContentDigestSchema):
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
 
-class ThreadContentSchema(ContentSchema):
-    content_type = marshmallow.fields.Str(
-        example='thread',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
+class TextBasedDataAbstractSchema(marshmallow.Schema):
+    raw_content = marshmallow.fields.String(
+        description='Content of the object, may be raw text or <b>html</b> for example'  # nopep8
     )
-    raw_content = marshmallow.fields.String('Description of Thread')
 
 
-class HtmlDocumentContentSchema(ContentSchema):
-    content_type = marshmallow.fields.Str(
-        example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
-    )
-    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
+class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
+    pass
+
 
 #####
 # Revision
@@ -424,8 +458,16 @@ class HtmlDocumentContentSchema(ContentSchema):
 
 
 class RevisionSchema(ContentDigestSchema):
-    comment_ids = marshmallow.fields.List(marshmallow.fields.Int(example=4))
-    revision_id = marshmallow.fields.Int(example=12)
+    comment_ids = marshmallow.fields.List(
+        marshmallow.fields.Int(
+            example=4,
+            validate=Range(min=1, error="Value must be greater than 0"),
+        )
+    )
+    revision_id = marshmallow.fields.Int(
+        example=12,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
         description='Content creation date',
@@ -433,27 +475,19 @@ class RevisionSchema(ContentDigestSchema):
     author = marshmallow.fields.Nested(UserDigestSchema)
 
 
-class ThreadRevisionSchema(RevisionSchema):
-    content_type = marshmallow.fields.Str(
-        example='thread',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
-    )
-    raw_content = marshmallow.fields.String('Description of Thread')
+class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
+    pass
 
-
-class HtmlDocumentRevisionSchema(RevisionSchema):
-    content_type = marshmallow.fields.Str(
-        example='html-documents',
-        validate=OneOf([content.slug for content in CONTENT_DEFAULT_TYPE]),
-    )
-    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
-
-
-####
 
 class CommentSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6)
-    parent_id = marshmallow.fields.Int(example=34)
+    content_id = marshmallow.fields.Int(
+        example=6,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
+    parent_id = marshmallow.fields.Int(
+        example=34,
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
     raw_content = marshmallow.fields.String(
         example='<p>This is just an html comment !</p>'
     )
@@ -464,43 +498,35 @@ class CommentSchema(marshmallow.Schema):
     )
 
 
-class ContentModifySchema(marshmallow.Schema):
-    label = marshmallow.fields.String(
-        example='contract for client XXX',
-        description='New title of the content'
-    )
-
-
-class HtmlDocumentModifySchema(ContentModifySchema):
-    raw_content = marshmallow.fields.String('<p>Html page Content!</p>')
-
-    @post_load
-    def html_document_update(self, data):
-        return HTMLDocumentUpdate(**data)
-
-
-class ThreadModifySchema(ContentModifySchema):
-    raw_content = marshmallow.fields.String('Description of Thread')
-
-    @post_load
-    def thread_update(self, data):
-        return ThreadUpdate(**data)
-
-
 class SetCommentSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
         example='<p>This is just an html comment !</p>'
     )
 
-    @post_load
+    @post_load()
     def create_comment(self, data):
         return CommentCreation(**data)
+
+
+class ContentModifyAbstractSchema(marshmallow.Schema):
+    label = marshmallow.fields.String(
+        required=True,
+        example='contract for client XXX',
+        description='New title of the content'
+    )
+
+
+class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep8
+
+    @post_load
+    def text_based_content_update(self, data):
+        return TextBasedContentUpdate(**data)
 
 
 class SetContentStatusSchema(marshmallow.Schema):
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf([status.slug for status in CONTENT_DEFAULT_STATUS]),
+        validate=OneOf(ContentStatus.allowed_values()),
         description='this slug is found in content_type available statuses',
         default=open_status,
         required=True,

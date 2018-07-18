@@ -83,7 +83,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['hexcolor'] == "#757575"
         assert sidebar_entry['fa_icon'] == "calendar"
 
-    def test_api__get_workspace__err_403__unallowed_user(self) -> None:
+    def test_api__get_workspace__err_400__unallowed_user(self) -> None:
         """
         Check obtain workspace unreachable for user
         """
@@ -94,7 +94,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
                 'foobarbaz'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/1', status=403)
+        res = self.testapp.get('/api/v2/workspaces/1', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
@@ -117,7 +117,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace__err_403__workspace_does_not_exist(self) -> None:  # nopep8
+    def test_api__get_workspace__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
         Check obtain workspace who does not exist with an existing user.
         """
@@ -128,7 +128,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/5', status=403)
+        res = self.testapp.get('/api/v2/workspaces/5', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
@@ -164,7 +164,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # by correct value when avatar feature will be enabled
         assert user_role['user']['avatar_url'] is None
 
-    def test_api__get_workspace_members__err_403__unallowed_user(self):
+    def test_api__get_workspace_members__err_400__unallowed_user(self):
         """
         Check obtain workspace members list with an unreachable workspace for
         user
@@ -176,7 +176,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 'foobarbaz'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/3/members', status=403)
+        res = self.testapp.get('/api/v2/workspaces/3/members', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
@@ -199,7 +199,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace_members__err_403__workspace_does_not_exist(self):  # nopep8
+    def test_api__get_workspace_members__err_400__workspace_does_not_exist(self):  # nopep8
         """
         Check obtain workspace members list with an existing user but
         an unexisting workspace
@@ -211,7 +211,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/5/members', status=403)
+        res = self.testapp.get('/api/v2/workspaces/5/members', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
@@ -739,7 +739,7 @@ class TestWorkspaceContents(FunctionalTest):
 
     # Error case
 
-    def test_api__get_workspace_content__err_403__unallowed_user(self):
+    def test_api__get_workspace_content__err_400__unallowed_user(self):
         """
         Check obtain workspace content list with an unreachable workspace for
         user
@@ -751,7 +751,7 @@ class TestWorkspaceContents(FunctionalTest):
                 'foobarbaz'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/3/contents', status=403)
+        res = self.testapp.get('/api/v2/workspaces/3/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
@@ -774,7 +774,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
-    def test_api__get_workspace_content__err_403__workspace_does_not_exist(self):  # nopep8
+    def test_api__get_workspace_content__err_400__workspace_does_not_exist(self):  # nopep8
         """
         Check obtain workspace contents list with an existing user but
         an unexisting workspace
@@ -786,7 +786,7 @@ class TestWorkspaceContents(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/workspaces/5/contents', status=403)
+        res = self.testapp.get('/api/v2/workspaces/5/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
@@ -833,6 +833,48 @@ class TestWorkspaceContents(FunctionalTest):
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
         assert res.json_body in active_contents
+
+    def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:  # nopep8
+        """
+        Create generic content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'content_type': 'markdownpage',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=400
+        )
+
+    def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:  # nopep8
+        """
+        Create generic content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedContent',
+            'content_type': 'unexistent-content-type',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=400,
+        )
 
     def test_api_put_move_content__ok_200__nominal_case(self):
         """

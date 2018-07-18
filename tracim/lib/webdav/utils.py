@@ -176,6 +176,7 @@ class FakeFileStream(object):
         is_temporary = self._file_name.startswith('.~') or self._file_name.startswith('~')
 
         file = self._api.create(
+            filename=self._file_name,
             content_type=ContentType.File,
             workspace=self._workspace,
             parent=self._parent,

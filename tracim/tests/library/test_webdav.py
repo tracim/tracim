@@ -95,6 +95,7 @@ class TestWebDav(StandardTest):
                        self.session,
                        self.app_config
                        ).get_one_by_email(email)
+
     def _put_new_text_file(
             self,
             provider,

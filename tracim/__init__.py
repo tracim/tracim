@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-import json
-import time
+try:  # Python 3.5+
+    from http import HTTPStatus
+except ImportError:
+    from http import client as HTTPStatus
 
 from pyramid.config import Configurator
 from pyramid.authentication import BasicAuthAuthenticationPolicy
@@ -15,6 +17,7 @@ from tracim.lib.utils.authentification import basic_auth_check_credentials
 from tracim.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim.lib.utils.authorization import TRACIM_DEFAULT_PERM
+from tracim.lib.utils.cors import add_cors_support
 from tracim.lib.webdav import WebdavAppFactory
 from tracim.views import BASE_API_V2
 from tracim.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
@@ -25,7 +28,18 @@ from tracim.views.core_api.user_controller import UserController
 from tracim.views.core_api.workspace_controller import WorkspaceController
 from tracim.views.contents_api.comment_controller import CommentController
 from tracim.views.errors import ErrorSchema
-from tracim.lib.utils.cors import add_cors_support
+from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import InvalidId
+from tracim.exceptions import InsufficientUserProfile
+from tracim.exceptions import InsufficientUserRoleInWorkspace
+from tracim.exceptions import WorkspaceNotFoundInTracimRequest
+from tracim.exceptions import UserNotFoundInTracimRequest
+from tracim.exceptions import ContentNotFoundInTracimRequest
+from tracim.exceptions import WorkspaceNotFound
+from tracim.exceptions import ContentNotFound
+from tracim.exceptions import UserDoesNotExist
+from tracim.exceptions import AuthenticationFailed
+from tracim.exceptions import ContentTypeNotAllowed
 
 
 def web(global_config, **local_settings):
@@ -66,9 +80,27 @@ def web(global_config, **local_settings):
         debug=app_config.DEBUG,
     )
     hapic.set_context(context)
-    context.handle_exception(NotFound, 404)
-    context.handle_exception(OperationalError, 500)
-    context.handle_exception(Exception, 500)
+    # INFO - G.M - 2018-07-04 - global-context exceptions
+    # Not found
+    context.handle_exception(NotFound, HTTPStatus.NOT_FOUND)
+    # Bad request
+    context.handle_exception(WorkspaceNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
+    context.handle_exception(UserNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
+    context.handle_exception(ContentNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
+    context.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(InvalidId, HTTPStatus.BAD_REQUEST)
+    # Auth exception
+    context.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
+    context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
+    context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)  # nopep8
+    context.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
+    # Internal server error
+    context.handle_exception(OperationalError, HTTPStatus.INTERNAL_SERVER_ERROR)
+    context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)
+
     # Add controllers
     session_controller = SessionController()
     system_controller = SystemController()
