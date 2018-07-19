@@ -813,6 +813,7 @@ class ContentApi(object):
             workspace: Workspace=None,
             limit: typing.Optional[int]=None,
             before_datetime: typing.Optional[datetime.datetime]= None,
+            content_ids: typing.Optional[typing.List[int]] = None,
     ) -> typing.List[Content]:
         """
         get contents list sorted by last update
@@ -820,12 +821,25 @@ class ContentApi(object):
         :param workspace: Workspace to check
         :param limit: maximum number of elements to return
         :param before_datetime: date from where we check older content.
+        :param content_ids: restrict selection to some content ids and
+        related Comments
         :return: list of content
         """
 
         resultset = self._get_all_query(
             workspace=workspace,
         )
+        if content_ids:
+            resultset.filter(
+                or_(
+                    Content.content_id.in_(content_ids),
+                    and_(
+                        Content.parent_id.in_(content_ids),
+                        Content.type == ContentType.Comment
+                    )
+                )
+            )
+
         resultset = resultset.order_by(desc(Content.updated))
 
         active_contents = []

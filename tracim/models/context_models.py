@@ -102,6 +102,24 @@ class ContentFilter(object):
         self.content_type = content_type
 
 
+class ActiveContentFilter(object):
+    def __init__(
+            self,
+            limit: int = None,
+            before_datetime: datetime = None,
+    ):
+        self.limit = limit
+        self.before_datetime = before_datetime
+
+
+class ContentIdsQuery(object):
+    def __init__(
+            self,
+            contents_ids: typing.List[int] = None,
+    ):
+        self.contents_ids = contents_ids
+
+
 class ContentCreation(object):
     """
     Content creation model

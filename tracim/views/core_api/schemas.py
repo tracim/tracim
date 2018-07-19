@@ -10,7 +10,8 @@ from tracim.models.contents import GlobalStatus
 from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
-from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import ContentCreation, ActiveContentFilter, \
+    ContentIdsQuery
 from tracim.models.context_models import UserWorkspacePath
 from tracim.models.context_models import UserWorkspaceAndContentPath
 from tracim.models.context_models import CommentCreation
@@ -207,6 +208,9 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
         format=DATETIME_FORMAT,
         description='return only content lastly updated before this date',
     )
+    @post_load
+    def make_content_filter(self, data):
+        return ActiveContentFilter(**data)
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
@@ -216,6 +220,9 @@ class ContentIdsQuerySchema(marshmallow.Schema):
             validate=Range(min=1, error="Value must be greater than 0"),
         )
     )
+    @post_load
+    def make_contents_ids(self, data):
+        return ContentIdsQuery(**data)
 
 ###
 
