@@ -854,62 +854,65 @@ class ContentApi(object):
 
         return active_contents
 
-    def get_last_unread(self, parent_id: typing.Optional[int], content_type: str,
-                        workspace: Workspace=None, limit=10) -> typing.List[Content]:
-        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-        assert content_type is not None# DYN_REMOVE
-        assert isinstance(content_type, str) # DYN_REMOVE
-
-        read_revision_ids = self._session.query(RevisionReadStatus.revision_id) \
-            .filter(RevisionReadStatus.user_id==self._user_id)
-
-        not_read_revisions = self._revisions_base_query(workspace) \
-            .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
-            .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
-            .filter(Workspace.is_deleted.is_(False)) \
-            .subquery()
-
-        not_read_content_ids_query = self._session.query(
-            distinct(not_read_revisions.c.content_id)
-        )
-        not_read_content_ids = list(map(
-            itemgetter(0),
-            not_read_content_ids_query,
-        ))
-
-        not_read_contents = self._base_query(workspace) \
-            .filter(Content.content_id.in_(not_read_content_ids)) \
-            .order_by(desc(Content.updated))
-
-        if content_type != ContentType.Any:
-            not_read_contents = not_read_contents.filter(
-                Content.type==content_type)
-        else:
-            not_read_contents = not_read_contents.filter(
-                Content.type!=ContentType.Folder)
-
-        if parent_id:
-            not_read_contents = not_read_contents.filter(
-                Content.parent_id==parent_id)
-
-        result = []
-        for item in not_read_contents:
-            new_item = None
-            if ContentType.Comment == item.type:
-                new_item = item.parent
-            else:
-                new_item = item
-
-            # INFO - D.A. - 2015-05-20
-            # We do not want to show only one item if the last 10 items are
-            # comments about one thread for example
-            if new_item not in result:
-                result.append(new_item)
-
-            if len(result) >= limit:
-                break
-
-        return result
+    # TODO - G.M - 2018-07-19 - Find a way to update this method to something
+    # usable and efficient for tracim v2 to get content with read/unread status
+    # instead of relying on has_new_information_for()
+    # def get_last_unread(self, parent_id: typing.Optional[int], content_type: str,
+    #                     workspace: Workspace=None, limit=10) -> typing.List[Content]:
+    #     assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
+    #     assert content_type is not None# DYN_REMOVE
+    #     assert isinstance(content_type, str) # DYN_REMOVE
+    #
+    #     read_revision_ids = self._session.query(RevisionReadStatus.revision_id) \
+    #         .filter(RevisionReadStatus.user_id==self._user_id)
+    #
+    #     not_read_revisions = self._revisions_base_query(workspace) \
+    #         .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
+    #         .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
+    #         .filter(Workspace.is_deleted.is_(False)) \
+    #         .subquery()
+    #
+    #     not_read_content_ids_query = self._session.query(
+    #         distinct(not_read_revisions.c.content_id)
+    #     )
+    #     not_read_content_ids = list(map(
+    #         itemgetter(0),
+    #         not_read_content_ids_query,
+    #     ))
+    #
+    #     not_read_contents = self._base_query(workspace) \
+    #         .filter(Content.content_id.in_(not_read_content_ids)) \
+    #         .order_by(desc(Content.updated))
+    #
+    #     if content_type != ContentType.Any:
+    #         not_read_contents = not_read_contents.filter(
+    #             Content.type==content_type)
+    #     else:
+    #         not_read_contents = not_read_contents.filter(
+    #             Content.type!=ContentType.Folder)
+    #
+    #     if parent_id:
+    #         not_read_contents = not_read_contents.filter(
+    #             Content.parent_id==parent_id)
+    #
+    #     result = []
+    #     for item in not_read_contents:
+    #         new_item = None
+    #         if ContentType.Comment == item.type:
+    #             new_item = item.parent
+    #         else:
+    #             new_item = item
+    #
+    #         # INFO - D.A. - 2015-05-20
+    #         # We do not want to show only one item if the last 10 items are
+    #         # comments about one thread for example
+    #         if new_item not in result:
+    #             result.append(new_item)
+    #
+    #         if len(result) >= limit:
+    #             break
+    #
+    #     return result
 
     def set_allowed_content(self, folder: Content, allowed_content_dict:dict):
         """
@@ -1088,11 +1091,7 @@ class ContentApi(object):
                        do_flush: bool=True,
                        recursive: bool=True
                        ):
-
-        itemset = self.get_last_unread(None, ContentType.Any)
-
-        for item in itemset:
-            self.mark_read(item, read_datetime, do_flush, recursive)
+        return self.mark_read__workspace(None, read_datetime, do_flush, recursive) # nopep8
 
     def mark_read__workspace(self,
                        workspace : Workspace,
@@ -1100,11 +1099,10 @@ class ContentApi(object):
                        do_flush: bool=True,
                        recursive: bool=True
                        ):
-
-        itemset = self.get_last_unread(None, ContentType.Any, workspace)
-
+        itemset = self.get_last_active(workspace)
         for item in itemset:
-            self.mark_read(item, read_datetime, do_flush, recursive)
+            if item.type != ContentType.Folder and item.has_new_information_for(self._user):
+                self.mark_read(item, read_datetime, do_flush, recursive)
 
     def mark_read(self, content: Content,
                   read_datetime: datetime=None,
