@@ -162,3 +162,6 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
     pass
+
+class ParentNotFound(NotFound):
+    pass
