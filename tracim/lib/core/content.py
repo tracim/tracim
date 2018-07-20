@@ -734,7 +734,7 @@ class ContentApi(object):
             # INFO - G.M - 2018-07-05 - convert with
             #  content type object to support legacy slug
             content_type_object = ContentType(content_type)
-            resultset = resultset.filter(Content.type.in_(content_type_object.alias()))
+            resultset = resultset.filter(Content.type.in_(content_type_object.get_slug_aliases()))
 
         if parent_id:
             resultset = resultset.filter(Content.parent_id==parent_id)
