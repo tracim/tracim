@@ -2122,6 +2122,81 @@ class TestContentApi(DefaultTest):
         # folder subcontent modification does not change folder order
         assert last_actives[6] == main_folder
 
+    def test_unit__get_last_active__ok__workspace_filter_workspace_content_ids(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=self.session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+
+        selected_contents = [
+            firstly_created_but_recently_commented,
+            firstly_created_but_recently_updated,
+            firstly_created,
+            main_folder,
+        ]
+        content_ids = [content.content_id for content in selected_contents]
+        last_actives = api.get_last_active(
+            workspace=workspace,
+            content_ids=content_ids,
+        )
+        assert len(last_actives) == 4
+        # comment is newest than page2
+        assert last_actives[0] == firstly_created_but_recently_commented
+        assert secondly_created_but_not_commented not in last_actives
+        # last updated content is newer than other one despite creation
+        # of the other is more recent
+        assert last_actives[1] == firstly_created_but_recently_updated
+        assert secondly_created_but_not_updated not in last_actives
+        # creation order is inverted here as last created is last active
+        assert secondly_created not in last_actives
+        assert last_actives[2] == firstly_created
+        # folder subcontent modification does not change folder order
+        assert last_actives[3] == main_folder
+
     def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(self):  # nopep8
         uapi = UserApi(
             session=self.session,

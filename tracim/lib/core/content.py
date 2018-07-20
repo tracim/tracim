@@ -830,7 +830,7 @@ class ContentApi(object):
             workspace=workspace,
         )
         if content_ids:
-            resultset.filter(
+            resultset = resultset.filter(
                 or_(
                     Content.content_id.in_(content_ids),
                     and_(
