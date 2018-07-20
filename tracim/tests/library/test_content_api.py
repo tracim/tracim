@@ -2036,7 +2036,7 @@ class TestContentApi(DefaultTest):
         secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
 
-        content_workspace_2 = api.create(ContentType.Page, workspace,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2 ,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
         last_actives = api.get_last_active()
         assert len(last_actives) == 9
         # workspace_2 content
