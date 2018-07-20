@@ -1115,7 +1115,7 @@ class ContentApi(object):
                        ):
         itemset = self.get_last_active(workspace)
         for item in itemset:
-            if item.type != ContentType.Folder and item.has_new_information_for(self._user):
+            if item.has_new_information_for(self._user):
                 self.mark_read(item, read_datetime, do_flush, recursive)
 
     def mark_read(self, content: Content,
