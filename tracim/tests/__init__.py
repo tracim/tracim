@@ -25,7 +25,8 @@ from tracim.config import CFG
 from tracim.extensions import hapic
 from tracim import web
 from webtest import TestApp
-
+from io import BytesIO
+from PIL import Image
 
 def eq_(a, b, msg=None):
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
@@ -52,6 +53,15 @@ def set_html_document_slug_to_legacy(session_factory) -> None:
     html_documents_query.update({ContentRevisionRO.type: 'page'})
     transaction.commit()
     assert content_query.count() > 0
+
+
+def create_test_image():
+    file = BytesIO()
+    image = Image.new('RGBA', size=(1000, 1000), color=(0, 0, 0))
+    image.save(file, 'png')
+    file.name = 'test_image.png'
+    file.seek(0)
+    return file
 
 
 class FunctionalTest(unittest.TestCase):

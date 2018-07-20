@@ -49,7 +49,8 @@ tests_require = [
     'pytest-cov',
     'pep8',
     'mypy',
-    'requests'
+    'requests',
+    'Pillow'
 ]
 
 mysql_require = [
