@@ -242,7 +242,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
 
 class TestUserReadStatusEndpoint(FunctionalTest):
-
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status # nopep8
+    """
     def test_api__get_read_status__ok__200__all(self):
 
         # init DB
@@ -434,7 +436,9 @@ class TestUserReadStatusEndpoint(FunctionalTest):
 
 
 class TestUserSetContentAsRead(FunctionalTest):
-
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read  # nopep8
+    """
     def test_api_set_content_as_read__ok__200__nominal_case(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -488,13 +492,69 @@ class TestUserSetContentAsRead(FunctionalTest):
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is True
 
-    @pytest.mark.xfail(reason='To be done')
     def test_api_set_content_as_read__ok__200__with_comments(self):
-        raise NotImplemented()
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
+        api.mark_unread(firstly_created)
+        api.mark_unread(comments)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=admin.user_id,
+            )
+        )
+        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200)  # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+
+        # comment is also set as read
+        assert comments.has_new_information_for(admin) is False
 
 
 class TestUserSetContentAsUnread(FunctionalTest):
-
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread  # nopep8
+    """
     def test_api_set_content_as_unread__ok__200__nominal_case(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -548,12 +608,68 @@ class TestUserSetContentAsUnread(FunctionalTest):
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is False
 
-    @pytest.mark.xfail(reason='To be done')
     def test_api_set_content_as_unread__ok__200__with_comments(self):
-        raise NotImplemented()
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created, 'juste a super comment', True)  # nopep8
+        api.mark_read(firstly_created)
+        api.mark_read(comments)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=admin.user_id,
+            )
+        )
+        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200)  # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+
+        assert comments.has_new_information_for(admin) is True
+
 
 class TestUserSetWorkspaceAsRead(FunctionalTest):
-
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/read
+    """
     def test_api_set_content_as_read__ok__200__nominal_case(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
