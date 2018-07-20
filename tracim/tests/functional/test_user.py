@@ -4,6 +4,7 @@ Tests for /api/v2/users subpath endpoints.
 """
 from time import sleep
 
+import pytest
 import transaction
 
 from tracim import models
@@ -239,6 +240,197 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         assert res[0]['content_id'] == firstly_created_but_recently_updated.content_id
         assert res[1]['content_id'] == secondly_created_but_not_updated.content_id
 
+
+class TestUserReadStatusEndpoint(FunctionalTest):
+
+    def test_api__get_read_status__ok__200__all(self):
+
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        res = res.json_body
+        assert len(res) == 7
+        for elem in res:
+            assert isinstance(elem['content_id'], int)
+            assert isinstance(elem['read_by_user'], bool)
+        # comment is newest than page2
+        assert res[0]['content_id'] == firstly_created_but_recently_commented.content_id
+        assert res[1]['content_id'] == secondly_created_but_not_commented.content_id
+        # last updated content is newer than other one despite creation
+        # of the other is more recent
+        assert res[2]['content_id'] == firstly_created_but_recently_updated.content_id
+        assert res[3]['content_id'] == secondly_created_but_not_updated.content_id
+        # creation order is inverted here as last created is last active
+        assert res[4]['content_id'] == secondly_created.content_id
+        assert res[5]['content_id'] == firstly_created.content_id
+        # folder subcontent modification does not change folder order
+        assert res[6]['content_id'] == main_folder.content_id
+
+    @pytest.mark.xfail(reason='List of item in path bug need to be fixed')
+    def test_api__get_read_status__ok__200__nominal_case(self):
+
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        selected_contents_id = [
+            firstly_created_but_recently_commented.content_id,
+            firstly_created_but_recently_updated.content_id,
+            firstly_created.content_id,
+            main_folder.content_id,
+        ]
+
+        content_id_str = '[{0},{1},{2},{3}]'.format(
+            selected_contents_id[0],
+            selected_contents_id[1],
+            selected_contents_id[2],
+            selected_contents_id[3],
+        )
+        params = {
+            'contents_ids': content_id_str
+        }
+        res = self.testapp.get(
+            '/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id),  # nopep8
+            status=200,
+            params=params
+        )
+        res = res.json_body
+        assert len(res) == 4
+        for elem in res:
+            assert isinstance(elem['content_id'], int)
+            assert isinstance(elem['read_by_user'], bool)
+        # comment is newest than page2
+        assert res[0]['content_id'] == firstly_created_but_recently_commented.content_id
+        assert res[1]['content_id'] == secondly_created_but_not_commented.content_id
+        # last updated content is newer than other one despite creation
+        # of the other is more recent
+        assert res[2]['content_id'] == firstly_created_but_recently_updated.content_id
+        assert res[3]['content_id'] == secondly_created_but_not_updated.content_id
+        # creation order is inverted here as last created is last active
+        assert res[4]['content_id'] == secondly_created.content_id
+        assert res[5]['content_id'] == firstly_created.content_id
+        # folder subcontent modification does not change folder order
+        assert res[6]['content_id'] == main_folder.content_id
 
 class TestUserWorkspaceEndpoint(FunctionalTest):
     """
