@@ -36,6 +36,7 @@ from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import file_type
 from tracim.models.revision_protection import new_revision
 from tracim.exceptions import EmptyLabelNotAllowed
+from tracim.exceptions import PageOfPreviewNotFound
 from tracim.exceptions import PreviewDimNotAllowed
 
 FILE_ENDPOINTS_TAG = 'Files'
@@ -130,6 +131,7 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
@@ -204,6 +206,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
@@ -231,6 +234,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(ContentPreviewSizedPathSchema())
@@ -258,6 +262,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(RevisionPreviewSizedPathSchema())
     @hapic.input_query(PageQuerySchema())

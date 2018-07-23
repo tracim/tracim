@@ -748,7 +748,7 @@ class ContentApi(object):
                     content_id=content_id
                 ),
             )
-        jpg_preview_path = self.preview_manager.get_jpeg_preview(
+        jpg_preview_path = self.preview_manager.get_pdf_preview(
             file_path,
             page=page
         )
@@ -769,6 +769,7 @@ class ContentApi(object):
             self._config.PREVIEW_JPG_RESTRICTED_DIMS,
             self._config.PREVIEW_JPG_ALLOWED_DIMS,
         )
+
     def get_jpg_preview_path(
         self,
         content_id: int,
