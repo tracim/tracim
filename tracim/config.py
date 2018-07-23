@@ -411,6 +411,25 @@ class CFG(object):
         #     self.RADICALE_CLIENT_BASE_URL_HOST,
         #     self.RADICALE_CLIENT_BASE_URL_PREFIX,
         # )
+        preview_jpg_allowed_sizes = settings.get('preview.jpg.allowed_sizes', '')  # nopep8
+        self.PREVIEW_JPG_ALLOWED_SIZES = []
+        if preview_jpg_allowed_sizes:
+            for size in preview_jpg_allowed_sizes.split(','):
+                parts = preview_jpg_allowed_sizes.split('x')
+                assert len(parts) == 2
+                width, height = parts
+                assert width.is_decimal()
+                assert height.is_decimal()
+                size = PreviewSize(int(width), int(height))
+                self.PREVIEW_JPG_ALLOWED_SIZES.append(size)
+
+            self.PREVIEW_JPG_RESTRICTED_SIZES = asbool(settings.get(
+                'preview.jpg.restricted_sizes', False
+            ))
+        if not self.PREVIEW_JPG_ALLOWED_SIZES:
+            size = PreviewSize(256, 256)
+            self.PREVIEW_JPG_ALLOWED_SIZES.append(size)
+
 
     def configure_filedepot(self):
         depot_storage_name = self.DEPOT_STORAGE_NAME
@@ -427,3 +446,10 @@ class CFG(object):
 
         TREEVIEW_FOLDERS = 'folders'
         TREEVIEW_ALL = 'all'
+
+
+class PreviewSize(object):
+
+    def __init__(self, width: int, height: int) -> None:
+        self.width = width
+        self.height = height

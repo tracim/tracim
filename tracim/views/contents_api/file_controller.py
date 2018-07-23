@@ -2,7 +2,6 @@
 import typing
 
 import transaction
-from depot.io.local import LocalStoredFile
 from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
@@ -37,7 +36,6 @@ from tracim.models.context_models import RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import file_type
 from tracim.models.revision_protection import new_revision
-from preview_generator.manager import PreviewManager
 
 FILE_ENDPOINTS_TAG = 'Files'
 
@@ -136,7 +134,6 @@ class FileController(Controller):
     @hapic.output_file([])
     def preview_pdf(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -146,13 +143,11 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=ContentType.Any
         )
-        file_path = api.get_one_revision_filepath(content.revision_id)
-        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
-            raise Exception('page {page} of content {content_id} does not exist'.format(
-                page=hapic_data.query.page,
-                content_id=content.content_id),
-            )
-        pdf_preview_path = preview_manager.get_pdf_preview(file_path, page=hapic_data.query.page)  # nopep8
+        pdf_preview_path = api.get_pdf_preview_path(
+            content.content_id,
+            content.revision_id,
+            page=hapic_data.query.page
+        )
         return FileResponse(pdf_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
@@ -163,7 +158,6 @@ class FileController(Controller):
     @hapic.output_file([])
     def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -173,8 +167,7 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=ContentType.Any
         )
-        file_path = api.get_one_revision_filepath(content.revision_id)
-        pdf_preview_path = preview_manager.get_pdf_preview(file_path)
+        pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
         return FileResponse(pdf_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
@@ -186,7 +179,6 @@ class FileController(Controller):
     @hapic.output_file([])
     def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -200,13 +192,11 @@ class FileController(Controller):
             revision_id=hapic_data.path.revision_id,
             content=content
         )
-        file_path = api.get_one_revision_filepath(revision.revision_id)
-        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
-            raise Exception('page {page} of content {content_id} does not exist'.format(
-                page=hapic_data.query.page,
-                content_id=content.content_id),
-            )
-        pdf_preview_path = preview_manager.get_pdf_preview(file_path, page=hapic_data.query.page)  # nopep8
+        pdf_preview_path = api.get_pdf_preview_path(
+            revision.content_id,
+            revision.revision_id,
+            page=hapic_data.query.page
+        )
         return FileResponse(pdf_preview_path)
 
     # jpg
@@ -218,7 +208,6 @@ class FileController(Controller):
     @hapic.output_file([])
     def preview_jpg(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -228,13 +217,11 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=ContentType.Any
         )
-        file_path = api.get_one_revision_filepath(content.revision_id)
-        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
-            raise Exception('page {page} of content {content_id} does not exist'.format(
-                page=hapic_data.query.page,
-                content_id=content.content_id),
-            )
-        jpg_preview_path = preview_manager.get_jpeg_preview(file_path, page=hapic_data.query.page)  # nopep8
+        jpg_preview_path = api.get_jpg_preview_path(
+            content_id=content.content_id,
+            revision_id=content.revision_id,
+            page=hapic_data.query.page
+        )
         return FileResponse(jpg_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
@@ -245,7 +232,6 @@ class FileController(Controller):
     @hapic.output_file([])
     def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -255,17 +241,12 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=ContentType.Any
         )
-        file_path = api.get_one_revision_filepath(content.revision_id)
-        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
-            raise Exception('page {page} of content {content_id} does not exist'.format(
-                page=hapic_data.query.page,
-                content_id=content.content_id),
-            )
-        jpg_preview_path = preview_manager.get_jpeg_preview(
-            file_path,
+        jpg_preview_path = api.get_jpg_preview_path(
+            content_id=content.content_id,
+            revision_id=content.revision_id,
             page=hapic_data.query.page,
-            width=hapic_data.path.width,
             height=hapic_data.path.height,
+            width=hapic_data.path.width,
         )
         return FileResponse(jpg_preview_path)
 
@@ -277,7 +258,6 @@ class FileController(Controller):
     @hapic.output_file([])
     def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings['CFG']
-        preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -291,17 +271,12 @@ class FileController(Controller):
             revision_id=hapic_data.path.revision_id,
             content=content
         )
-        file_path = api.get_one_revision_filepath(revision.revision_id)
-        if hapic_data.query.page >= preview_manager.get_page_nb(file_path):
-            raise Exception('page {page} of content {content_id} does not exist'.format(
-                page=hapic_data.query.page,
-                content_id=content.content_id),
-            )
-        jpg_preview_path = preview_manager.get_jpeg_preview(
-            file_path,
+        jpg_preview_path = api.get_jpg_preview_path(
+            content_id=content.content_id,
+            revision_id=revision.revision_id,
             page=hapic_data.query.page,
-            width=hapic_data.path.width,
             height=hapic_data.path.height,
+            width=hapic_data.path.width,
         )
         return FileResponse(jpg_preview_path)
 

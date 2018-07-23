@@ -7,6 +7,7 @@ import typing
 from operator import itemgetter
 
 import transaction
+from preview_generator.manager import PreviewManager
 from sqlalchemy import func
 from sqlalchemy.orm import Query
 from depot.manager import DepotManager
@@ -25,6 +26,8 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
+from tracim.exceptions import PageOfPreviewNotFound
+from tracim.exceptions import PreviewSizeNotAllowed
 from tracim.exceptions import EmptyRawContentNotAllowed
 from tracim.exceptions import RevisionDoesNotMatchThisContent
 from tracim.exceptions import EmptyLabelNotAllowed
@@ -134,6 +137,7 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
+        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
 
     @contextmanager
     def show(
@@ -720,6 +724,94 @@ class ContentApi(object):
                 label_filter,
             ),
         ))
+
+    def get_pdf_preview_path(
+            self,
+            content_id: int,
+            revision_id: int,
+            page: int
+    ) -> str:
+        """
+        Get pdf preview of revision of content
+        :param content_id: id of content
+        :param revision_id: id of content revision
+        :param page: page number of the preview, useful for multipage content
+        :return: preview_path as string
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        if page >= self.preview_manager.get_page_nb(file_path):
+            raise PageOfPreviewNotFound(
+                'page {page} of content {content_id} does not exist'.format(
+                    page=page,
+                    content_id=content_id
+                ),
+            )
+        jpg_preview_path = self.preview_manager.get_jpeg_preview(
+            file_path,
+            page=page
+        )
+        return jpg_preview_path
+
+    def get_full_pdf_preview_path(self, revision_id: int) -> str:
+        """
+        Get full(multiple page) pdf preview of revision of content
+        :param revision_id: id of revision
+        :return: path of the full pdf preview of this revision
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        return pdf_preview_path
+
+    def get_jpg_preview_path(
+        self,
+        content_id: int,
+        revision_id: int,
+        page: int,
+        width: int = None,
+        height: int = None,
+    ) -> str:
+        """
+        Get jpg preview of revision of content
+        :param content_id: id of content
+        :param revision_id: id of content revision
+        :param page: page number of the preview, useful for multipage content
+        :param width: width in pixel
+        :param height: height in pixel
+        :return: preview_path as string
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        if page >= self.preview_manager.get_page_nb(file_path):
+            raise Exception(
+                'page {page} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
+                    page=page,
+                    revision_id=revision_id,
+                    content_id=content_id,
+                ),
+            )
+        if not width and not height:
+            width = self._config.PREVIEW_JPG_ALLOWED_SIZES[0].width
+            height = self._config.PREVIEW_JPG_ALLOWED_SIZES[0].height
+
+        allowed_size = False
+        for preview_size in self._config.PREVIEW_JPG_ALLOWED_SIZES:
+            if width == preview_size.width and height == preview_size.height:
+                allowed_size = True
+                break
+
+        if not allowed_size and self._config.PREVIEW_JPG_RESTRICTED_SIZES:
+            raise PreviewSizeNotAllowed(
+                'Size {width}x{height} is not allowed for jpeg preview'.format(
+                    width=width,
+                    height=height,
+                )
+            )
+        jpg_preview_path = self.preview_manager.get_jpeg_preview(
+            file_path,
+            page=page,
+            width=width,
+            height=height,
+        )
+        return jpg_preview_path
 
     def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE

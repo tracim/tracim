@@ -1110,7 +1110,7 @@ class TestFiles(FunctionalTest):
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(self) -> None:
         """
-        Set one file of a content
+        get 256x256 preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -1165,7 +1165,7 @@ class TestFiles(FunctionalTest):
 
     def test_api__get_full_pdf_preview__ok__200__nominal_case(self) -> None:
         """
-        Set one file of a content
+        get full pdf preview of a txt file
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -1228,7 +1228,7 @@ class TestFiles(FunctionalTest):
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:
         """
-        Set one file of a content
+       get full pdf preview of a png image -> error UnavailablePreviewType
         """
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \

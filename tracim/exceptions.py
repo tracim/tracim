@@ -147,3 +147,10 @@ class EmptyRawContentNotAllowed(EmptyValueNotAllowed):
 
 class RevisionDoesNotMatchThisContent(TracimException):
     pass
+
+
+class PageOfPreviewNotFound(NotFound):
+    pass
+
+class PreviewSizeNotAllowed(TracimException):
+    pass
