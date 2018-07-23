@@ -308,31 +308,6 @@ class FileController(Controller):
     def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
         raise NotImplemented()
 
-    # @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
-    # @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    # @require_content_types([file_type])
-    # @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    # #@hapic.output_file([])
-    # def get_file_preview_info(self, context, request: TracimRequest, hapic_data=None):  # nopep8
-    #     # TODO - G.M - 2018-07-05 - Do this endpoint
-    #     app_config = request.registry.settings['CFG']
-    #     preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
-    #     api = ContentApi(
-    #         current_user=request.current_user,
-    #         session=request.dbsession,
-    #         config=app_config,
-    #     )
-    #     content = api.get_one(
-    #         hapic_data.path.content_id,
-    #         content_type=ContentType.Any
-    #     )
-    #     file_path = api.get_one_revision_filepath(content.revision_id)
-    #     return {
-    #         'nb_pages': preview_manager.get_page_nb(file_path),
-    #         'pdf_preview': preview_manager.has_pdf_preview(file_path),
-    #         'mimetype':  preview_manager.get_mimetype(file_path),
-    #     }
-
     # File infos
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
