@@ -1080,8 +1080,14 @@ class TestFiles(FunctionalTest):
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
-            do_save=True,
+            do_save=False,
             do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
         )
         dbsession.flush()
         transaction.commit()
@@ -1097,7 +1103,7 @@ class TestFiles(FunctionalTest):
         res = self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
-                ('files',image.name, image.getvalue())
+                ('files', image.name, image.getvalue())
             ],
             status=204,
         )
@@ -1156,6 +1162,79 @@ class TestFiles(FunctionalTest):
         )
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id), # nopep8
+            status=200
+        )
+        assert res.body != image.getvalue()
+        assert res.content_type == 'image/jpeg'
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 256, 256 == new_image.size
+
+    def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:
+        """
+        get 256x256 revision preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        revision_id = int(test_file.revision_id)
+        image = create_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(
+                content_id=content_id,
+                revision_id=revision_id,
+            ),
+            status=200
+        )
+        assert res.content_type == 'text/plain'
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256'.format(
+                content_id=content_id,
+                revision_id=revision_id,
+            ),
             status=200
         )
         assert res.body != image.getvalue()
