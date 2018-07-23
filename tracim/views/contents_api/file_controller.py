@@ -4,6 +4,7 @@ import typing
 import transaction
 from depot.io.local import LocalStoredFile
 from depot.manager import DepotManager
+from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 from pyramid.response import FileResponse, FileIter
 
@@ -129,6 +130,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
@@ -156,6 +158,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):
@@ -177,6 +180,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])

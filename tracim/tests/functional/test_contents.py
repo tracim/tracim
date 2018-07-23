@@ -1226,8 +1226,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'application/pdf'
 
-    @pytest.mark.xfail(reason='TODO')
-    def test_api__get_full_pdf_preview__err__400__jpg_UnavailablePreviewType(self) -> None:
+    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:
         """
         Set one file of a content
         """
@@ -1275,9 +1274,8 @@ class TestFiles(FunctionalTest):
         )
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id), # nopep8
-            status=200
+            status=400
         )
-        assert res.content_type == ''
 
 
 class TestThreads(FunctionalTest):
