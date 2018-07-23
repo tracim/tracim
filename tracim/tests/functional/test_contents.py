@@ -1055,6 +1055,58 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
 
+    def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        dbsession.flush()
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        content_id = int(test_file.content_id)
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims'.format(content_id),
+            status=200,
+        )
+        res = res.json_body
+        assert res['restricted'] == True
+        assert len(res['dimensions']) == 1
+        dim = res['dimensions'][0]
+        assert dim['width'] == 256
+        assert dim['height'] == 256
+
     def test_api__get_jpeg_preview__ok__200__nominal_case(self) -> None:
         """
         Set one file of a content
@@ -1168,6 +1220,57 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
+
+    def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(self) -> None:
+        """
+        get 256x256 preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files',image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg/512x512'.format(content_id),  # nopep8
+            status=400
+        )
 
     def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:
         """

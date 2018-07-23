@@ -5,6 +5,7 @@ from datetime import datetime
 from slugify import slugify
 from sqlalchemy.orm import Session
 from tracim import CFG
+from tracim.config import PreviewDim
 from tracim.models import User
 from tracim.models.auth import Profile
 from tracim.models.data import Content
@@ -13,6 +14,17 @@ from tracim.models.data import Workspace, UserRoleInWorkspace
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim.models.contents import ContentTypeLegacy as ContentType
+
+
+class PreviewAllowedDim(object):
+
+    def __init__(
+            self,
+            restricted:bool,
+            dimensions: typing.List[PreviewDim]
+    ) -> None:
+        self.restricted = restricted
+        self.dimensions = dimensions
 
 
 class MoveParams(object):

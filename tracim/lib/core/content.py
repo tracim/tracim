@@ -23,11 +23,12 @@ from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
 
+from tracim.config import PreviewDim
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
 from tracim.exceptions import PageOfPreviewNotFound
-from tracim.exceptions import PreviewSizeNotAllowed
+from tracim.exceptions import PreviewDimNotAllowed
 from tracim.exceptions import EmptyRawContentNotAllowed
 from tracim.exceptions import RevisionDoesNotMatchThisContent
 from tracim.exceptions import EmptyLabelNotAllowed
@@ -46,7 +47,8 @@ from tracim.models.data import RevisionReadStatus
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 from tracim.lib.utils.translation import fake_translator as _
-from tracim.models.context_models import RevisionInContext
+from tracim.models.context_models import RevisionInContext, \
+    PreviewAllowedDim
 from tracim.models.context_models import ContentInContext
 
 __author__ = 'damien'
@@ -762,6 +764,11 @@ class ContentApi(object):
         pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
         return pdf_preview_path
 
+    def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:
+        return PreviewAllowedDim(
+            self._config.PREVIEW_JPG_RESTRICTED_DIMS,
+            self._config.PREVIEW_JPG_ALLOWED_DIMS,
+        )
     def get_jpg_preview_path(
         self,
         content_id: int,
@@ -789,17 +796,17 @@ class ContentApi(object):
                 ),
             )
         if not width and not height:
-            width = self._config.PREVIEW_JPG_ALLOWED_SIZES[0].width
-            height = self._config.PREVIEW_JPG_ALLOWED_SIZES[0].height
+            width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
+            height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
 
-        allowed_size = False
-        for preview_size in self._config.PREVIEW_JPG_ALLOWED_SIZES:
-            if width == preview_size.width and height == preview_size.height:
-                allowed_size = True
+        allowed_dim = False
+        for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
+            if width == preview_dim.width and height == preview_dim.height:
+                allowed_dim = True
                 break
 
-        if not allowed_size and self._config.PREVIEW_JPG_RESTRICTED_SIZES:
-            raise PreviewSizeNotAllowed(
+        if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
+            raise PreviewDimNotAllowed(
                 'Size {width}x{height} is not allowed for jpeg preview'.format(
                     width=width,
                     height=height,

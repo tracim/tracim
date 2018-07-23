@@ -112,6 +112,19 @@ class WidthAndHeightPathSchema(marshmallow.Schema):
     height = marshmallow.fields.Int(example=256)
 
 
+class AllowedJpgPreviewSizesSchema(marshmallow.Schema):
+    width = marshmallow.fields.Int(example=256)
+    height = marshmallow.fields.Int(example=256)
+
+
+class AllowedJpgPreviewDimSchema(marshmallow.Schema):
+    restricted = marshmallow.fields.Bool()
+    dimensions = marshmallow.fields.Nested(
+        AllowedJpgPreviewSizesSchema,
+        many=True
+    )
+
+
 class WorkspaceAndContentRevisionIdPathSchema(
     WorkspaceIdPathSchema,
     ContentIdPathSchema,

@@ -7,9 +7,6 @@ from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 from pyramid.response import FileResponse, FileIter
 
-from tracim.exceptions import EmptyLabelNotAllowed
-from tracim.models.data import UserRoleInWorkspace
-
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -20,6 +17,7 @@ from tracim.extensions import hapic
 from tracim.lib.core.content import ContentApi
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FileContentSchema
+from tracim.views.core_api.schemas import AllowedJpgPreviewDimSchema
 from tracim.views.core_api.schemas import ContentPreviewSizedPathSchema
 from tracim.views.core_api.schemas import RevisionPreviewSizedPathSchema
 from tracim.views.core_api.schemas import PageQuerySchema
@@ -31,11 +29,14 @@ from tracim.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim.views.core_api.schemas import NoContentSchema
 from tracim.lib.utils.authorization import require_content_types
 from tracim.lib.utils.authorization import require_workspace_role
+from tracim.models.data import UserRoleInWorkspace
 from tracim.models.context_models import ContentInContext
 from tracim.models.context_models import RevisionInContext
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import file_type
 from tracim.models.revision_protection import new_revision
+from tracim.exceptions import EmptyLabelNotAllowed
+from tracim.exceptions import PreviewDimNotAllowed
 
 FILE_ENDPOINTS_TAG = 'Files'
 
@@ -217,16 +218,20 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=ContentType.Any
         )
+        allowed_dim = api.get_jpg_preview_allowed_dim()
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=content.revision_id,
-            page=hapic_data.query.page
+            page=hapic_data.query.page,
+            width=allowed_dim.dimensions[0].width,
+            height=allowed_dim.dimensions[0].height,
         )
         return FileResponse(jpg_preview_path)
 
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(ContentPreviewSizedPathSchema())
     @hapic.output_file([])
@@ -253,6 +258,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
+    @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(RevisionPreviewSizedPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
@@ -283,9 +289,16 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([file_type])
-    @hapic.output_file([])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(AllowedJpgPreviewDimSchema())
     def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
-        raise NotImplemented()
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        return api.get_jpg_preview_allowed_dim()
 
     # File infos
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])

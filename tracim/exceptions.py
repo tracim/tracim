@@ -152,5 +152,6 @@ class RevisionDoesNotMatchThisContent(TracimException):
 class PageOfPreviewNotFound(NotFound):
     pass
 
-class PreviewSizeNotAllowed(TracimException):
+
+class PreviewDimNotAllowed(TracimException):
     pass
