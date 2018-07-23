@@ -175,6 +175,17 @@ wsgidav.config_path = %(here)s/wsgidav.conf
 ## Do not set http:// prefix.
 # wsgidav.client.base_url = 127.0.0.1:<WSGIDAV_PORT>
 
+### Preview
+## You can parametrized allowed jpg preview dimension list, if not set, default
+## is 256x256. First {width}x{length} items is default preview dimensions.
+## all items should be separated by ',' and you should be really careful to do
+## set anything else than '{int}x{int}' item and ', ' separator
+# preview.jpg.allowed_dims = 256x256,1000x1000
+## Preview dimensions can be set as restricted, if set as restricted, access
+## endpoint to  to get any other preview dimensions than allowed_dims will
+## return error
+# preview.jpg.restricted_dims = True
+
 ###
 # wsgi server configuration
 ###
