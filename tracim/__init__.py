@@ -32,6 +32,7 @@ from tracim.views.contents_api.comment_controller import CommentController
 from tracim.views.contents_api.file_controller import FileController
 from tracim.views.errors import ErrorSchema
 from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import InvalidId
 from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import InsufficientUserRoleInWorkspace
 from tracim.exceptions import WorkspaceNotFoundInTracimRequest
@@ -93,6 +94,7 @@ def web(global_config, **local_settings):
     context.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(InvalidId, HTTPStatus.BAD_REQUEST)
     # Auth exception
     context.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
     context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)

@@ -506,7 +506,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        c = api.create(ContentType.Folder, workspace, None, 'parent', True)
+        c = api.create(ContentType.Folder, workspace, None, 'parent', '', True)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -546,7 +546,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        c = api.create(ContentType.Folder, workspace, None, 'parent', True)
+        c = api.create(ContentType.Folder, workspace, None, 'parent', '', True)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -656,6 +656,7 @@ class TestContentApi(DefaultTest):
             workspace,
             None,
             'folder a',
+            '',
             True
         )
         with self.session.no_autoflush:
@@ -692,6 +693,7 @@ class TestContentApi(DefaultTest):
             workspace2,
             None,
             'folder b',
+            '',
             True
         )
 
@@ -775,6 +777,7 @@ class TestContentApi(DefaultTest):
             workspace,
             None,
             'folder a',
+            '',
             True
         )
         with self.session.no_autoflush:
@@ -811,6 +814,7 @@ class TestContentApi(DefaultTest):
             workspace2,
             None,
             'folder b',
+            '',
             True
         )
         api2.copy(
@@ -891,6 +895,7 @@ class TestContentApi(DefaultTest):
             workspace,
             None,
             'folder a',
+            '',
             True
         )
         with self.session.no_autoflush:
@@ -2008,9 +2013,9 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         a = api.create(ContentType.Folder, workspace, None,
-                       'this is randomized folder', True)
+                       'this is randomized folder', '', True)
         p = api.create(ContentType.Page, workspace, a,
-                       'this is randomized label content', True)
+                       'this is randomized label content', '', True)
 
         with new_revision(
             session=self.session,
@@ -2064,9 +2069,9 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         a = api.create(ContentType.Folder, workspace, None,
-                       'this is randomized folder', True)
+                       'this is randomized folder', '', True)
         p = api.create(ContentType.Page, workspace, a,
-                       'this is dummy label content', True)
+                       'this is dummy label content', '', True)
 
         with new_revision(
             tm=transaction.manager,
