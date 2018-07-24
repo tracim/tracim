@@ -10,7 +10,7 @@ addons:
     packages:
     - libreoffice
     - imagemagick
-
+    - libmagickwand-dev
 services:
   - docker
   - redis-server
