@@ -12,7 +12,8 @@ from tracim.lib.core.workspace import WorkspaceApi
 from tracim.models.data import ContentType
 from tracim.models import get_tm_session
 from tracim.models.revision_protection import new_revision
-from tracim.tests import FunctionalTest, create_test_image
+from tracim.tests import FunctionalTest
+from tracim.tests import create_1000px_png_test_image
 from tracim.tests import set_html_document_slug_to_legacy
 from tracim.fixtures.content import Content as ContentFixtures
 from tracim.fixtures.users_and_groups import Base as BaseFixture
@@ -1032,7 +1033,7 @@ class TestFiles(FunctionalTest):
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        image = create_test_image()
+        image = create_1000px_png_test_image()
         self.testapp.authorization = (
             'Basic',
             (
@@ -1144,7 +1145,7 @@ class TestFiles(FunctionalTest):
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        image = create_test_image()
+        image = create_1000px_png_test_image()
         self.testapp.authorization = (
             'Basic',
             (
@@ -1197,7 +1198,7 @@ class TestFiles(FunctionalTest):
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        image = create_test_image()
+        image = create_1000px_png_test_image()
         self.testapp.authorization = (
             'Basic',
             (
@@ -1252,7 +1253,7 @@ class TestFiles(FunctionalTest):
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        image = create_test_image()
+        image = create_1000px_png_test_image()
         self.testapp.authorization = (
             'Basic',
             (
@@ -1310,7 +1311,7 @@ class TestFiles(FunctionalTest):
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
-        image = create_test_image()
+        image = create_1000px_png_test_image()
         self.testapp.authorization = (
             'Basic',
             (
@@ -1439,7 +1440,7 @@ class TestFiles(FunctionalTest):
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        image = create_test_image()
+        image = create_1000px_png_test_image()
         self.testapp.authorization = (
             'Basic',
             (
@@ -1626,7 +1627,7 @@ class TestFiles(FunctionalTest):
         transaction.commit()
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
-        image = create_test_image()
+        image = create_1000px_png_test_image()
         self.testapp.authorization = (
             'Basic',
             (

@@ -55,7 +55,7 @@ def set_html_document_slug_to_legacy(session_factory) -> None:
     assert content_query.count() > 0
 
 
-def create_test_image():
+def create_1000px_png_test_image():
     file = BytesIO()
     image = Image.new('RGBA', size=(1000, 1000), color=(0, 0, 0))
     image.save(file, 'png')
