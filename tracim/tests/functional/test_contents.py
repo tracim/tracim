@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import io
 
-import pytest
 import transaction
 from PIL import Image
 from depot.io.utils import FileIntent
@@ -121,7 +120,7 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/html-documents/7',
             status=400
         )
@@ -137,7 +136,7 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/html-documents/170',
             status=400
         )
@@ -153,7 +152,7 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/1/html-documents/6',
             status=400
         )
@@ -169,7 +168,7 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/40/html-documents/6',
             status=400
         )
@@ -185,7 +184,7 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/coucou/html-documents/6',
             status=400
         )
@@ -201,7 +200,7 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/html-documents/coucou',
             status=400
         )
@@ -221,7 +220,7 @@ class TestHtmlDocuments(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6',
             params=params,
             status=400
@@ -406,7 +405,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['status'] == 'open'
 
         # set status
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6/status',
             params=params,
             status=204
@@ -436,7 +435,7 @@ class TestHtmlDocuments(FunctionalTest):
         params = {
             'status': 'unexistant-status',
         }
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6/status',
             params=params,
             status=400
@@ -534,7 +533,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/files/6',
             status=400
         )
@@ -550,7 +549,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/1/files/170',
             status=400
         )
@@ -566,7 +565,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/1/files/9',
             status=400
         )
@@ -582,7 +581,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/40/files/9',
             status=400
         )
@@ -598,7 +597,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/coucou/files/9',
             status=400
         )
@@ -614,7 +613,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/files/coucou',
             status=400
         )
@@ -668,7 +667,7 @@ class TestFiles(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
             params=params,
             status=400
@@ -826,7 +825,7 @@ class TestFiles(FunctionalTest):
             )
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/revisions'.format(test_file.content_id),
+            '/api/v2/workspaces/1/files/{}/revisions'.format(test_file.content_id),  # nopep8
             status=200
         )
         revisions = res.json_body
@@ -913,7 +912,7 @@ class TestFiles(FunctionalTest):
         assert content['status'] == 'open'
 
         # set status
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/1/files/{}/status'.format(test_file.content_id),
             params=params,
             status=204
@@ -943,7 +942,7 @@ class TestFiles(FunctionalTest):
         params = {
             'status': 'unexistant-status',
         }
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/2/files/6/status',
             params=params,
             status=400
@@ -1041,10 +1040,10 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
-                ('files',image.name, image.getvalue())
+                ('files', image.name, image.getvalue())
             ],
             status=204,
         )
@@ -1098,11 +1097,11 @@ class TestFiles(FunctionalTest):
         )
         content_id = int(test_file.content_id)
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims'.format(content_id),
+            '/api/v2/workspaces/1/files/{}/preview/jpg/allowed_dims'.format(content_id),  # nopep8
             status=200,
         )
         res = res.json_body
-        assert res['restricted'] == True
+        assert res['restricted'] is True
         assert len(res['dimensions']) == 1
         dim = res['dimensions'][0]
         assert dim['width'] == 256
@@ -1153,7 +1152,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
                 ('files', image.name, image.getvalue())
@@ -1206,15 +1205,15 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
-                ('files',image.name, image.getvalue())
+                ('files', image.name, image.getvalue())
             ],
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id), # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id),  # nopep8
             status=200
         )
         assert res.body != image.getvalue()
@@ -1222,7 +1221,7 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
-    def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(self) -> None:
+    def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(self) -> None:  # nopep8
         """
         get 256x256 preview of a txt file
         """
@@ -1261,19 +1260,19 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
-                ('files',image.name, image.getvalue())
+                ('files', image.name, image.getvalue())
             ],
             status=204,
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/jpg/512x512'.format(content_id),  # nopep8
             status=400
         )
 
-    def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:
+    def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:  # nopep8
         """
         get 256x256 revision preview of a txt file
         """
@@ -1319,7 +1318,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
                 ('files', image.name, image.getvalue())
@@ -1327,7 +1326,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
             ),
@@ -1335,7 +1334,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'text/plain'
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256'.format(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
             ),
@@ -1385,7 +1384,7 @@ class TestFiles(FunctionalTest):
                 'Test_file.txt',
                 'text/plain',
             )
-            content_api.update_content(test_file, 'Test_file', '<p>description</p>')
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -1396,7 +1395,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
@@ -1404,12 +1403,12 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id), # nopep8
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
             status=200
         )
         assert res.content_type == 'application/pdf'
 
-    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:
+    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:  # nopep8
         """
        get full pdf preview of a png image -> error UnavailablePreviewType
         """
@@ -1448,15 +1447,15 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
-                ('files',image.name, image.getvalue())
+                ('files', image.name, image.getvalue())
             ],
             status=204,
         )
-        res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id), # nopep8
+        self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
             status=400
         )
 
@@ -1499,7 +1498,7 @@ class TestFiles(FunctionalTest):
                 'Test_file.txt',
                 'text/plain',
             )
-            content_api.update_content(test_file, 'Test_file', '<p>description</p>')
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -1510,7 +1509,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
@@ -1525,7 +1524,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.content_type == 'application/pdf'
 
-    def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:
+    def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:  # nopep8
         """
         get full pdf preview of a txt file
         """
@@ -1564,7 +1563,7 @@ class TestFiles(FunctionalTest):
                 'Test_file.txt',
                 'text/plain',
             )
-            content_api.update_content(test_file, 'Test_file', '<p>description</p>')
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -1575,7 +1574,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
                 ('files', test_file.file_name, test_file.depot_file.file.read())
@@ -1583,7 +1582,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         params = {'page': 1}
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
             status=400,
             params=params,
@@ -1635,7 +1634,7 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.put(
+        self.testapp.put(
             '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
             upload_files=[
                 ('files', image.name, image.getvalue())
@@ -1643,7 +1642,7 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
             ),
@@ -1652,9 +1651,10 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'text/plain'
         params = {'page': 0}
         res = self.testapp.get(
-            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf'.format(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf'.format(  # nopep8
                 content_id=content_id,
                 revision_id=revision_id,
+                params=params,
             ),
             status=200
         )
@@ -1680,7 +1680,7 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/threads/6',
             status=400
         )
@@ -1737,7 +1737,7 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/threads/170',
             status=400
         )
@@ -1753,7 +1753,7 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/1/threads/7',
             status=400
         )
@@ -1769,7 +1769,7 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/40/threads/7',
             status=400
         )
@@ -1785,7 +1785,7 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/coucou/threads/7',
             status=400
         )
@@ -1801,7 +1801,7 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v2/workspaces/2/threads/coucou',
             status=400
         )
@@ -1891,7 +1891,7 @@ class TestThreads(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7',
             params=params,
             status=400
@@ -1983,7 +1983,7 @@ class TestThreads(FunctionalTest):
         assert content['status'] == 'open'
 
         # set status
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7/status',
             params=params,
             status=204
@@ -2014,7 +2014,7 @@ class TestThreads(FunctionalTest):
             'status': 'unexistant-status',
         }
 
-        res = self.testapp.put_json(
+        self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7/status',
             params=params,
             status=400
