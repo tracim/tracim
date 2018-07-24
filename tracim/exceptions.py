@@ -174,3 +174,7 @@ class EmailValidationFailed(TracimException):
 
 class UserCreationFailed(TracimException):
     pass
+
+
+class ParentNotFound(NotFound):
+    pass

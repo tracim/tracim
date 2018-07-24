@@ -1219,6 +1219,49 @@ class TestWorkspaceContents(FunctionalTest):
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
         assert res.json_body in active_contents
 
+    def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
+        """
+        Create generic content in folder
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'GenericCreatedContent',
+            'content_type': 'markdownpage',
+            'parent_id': 10,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        assert res
+        assert res.json_body
+        assert res.json_body['status'] == 'open'
+        assert res.json_body['content_id']
+        assert res.json_body['content_type'] == 'markdownpage'
+        assert res.json_body['is_archived'] is False
+        assert res.json_body['is_deleted'] is False
+        assert res.json_body['workspace_id'] == 1
+        assert res.json_body['slug'] == 'genericcreatedcontent'
+        assert res.json_body['parent_id'] == 10
+        assert res.json_body['show_in_ui'] is True
+        assert res.json_body['sub_content_types']
+        params_active = {
+            'parent_id': 10,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
+        active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
+        assert res.json_body in active_contents
+
     def test_api__post_content_create_generic_content__err_400__empty_label(self) -> None:  # nopep8
         """
         Create generic content

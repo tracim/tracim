@@ -27,7 +27,9 @@ from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import EmailValidationFailed
 from tracim.exceptions import UserCreationFailed
 from tracim.exceptions import UserDoesNotExist
+from tracim.exceptions import ContentNotFound
 from tracim.exceptions import WorkspacesDoNotMatch
+from tracim.exceptions import ParentNotFound
 from tracim.views.controllers import Controller
 from tracim.views.core_api.schemas import FilterContentQuerySchema
 from tracim.views.core_api.schemas import WorkspaceMemberCreationSchema
@@ -283,12 +285,21 @@ class WorkspaceController(Controller):
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
-            config=app_config,
+            config=app_config
         )
+        parent = None
+        if creation_data.parent_id:
+            try:
+                parent = api.get_one(content_id=creation_data.parent_id, content_type=ContentType.Any)  # nopep8
+            except ContentNotFound as exc:
+                raise ParentNotFound(
+                    'Parent with content_id {} not found'.format(creation_data.parent_id)
+                ) from exc
         content = api.create(
             label=creation_data.label,
             content_type=creation_data.content_type,
             workspace=request.current_workspace,
+            parent=parent,
         )
         api.save(content, ActionDescription.CREATION)
         content = api.get_content_in_context(content)
