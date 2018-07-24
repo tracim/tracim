@@ -46,13 +46,14 @@ from tracim.models.data import RevisionReadStatus
 from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 from tracim.lib.utils.translation import fake_translator as _
-from tracim.models.context_models import RevisionInContext, \
-    PreviewAllowedDim
+from tracim.models.context_models import RevisionInContext
+from tracim.models.context_models import PreviewAllowedDim
 from tracim.models.context_models import ContentInContext
 
 __author__ = 'damien'
 
 
+# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
 def compare_content_for_sorting_by_type_and_name(
         content1: Content,
         content2: Content
@@ -91,7 +92,7 @@ def compare_content_for_sorting_by_type_and_name(
         else:
             return 0
 
-
+# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
 def compare_tree_items_for_sorting_by_type_and_name(
         item1: NodeTreeItem,
         item2: NodeTreeItem
@@ -196,6 +197,7 @@ class ContentApi(object):
         return self._session.query(Content)\
             .join(ContentRevisionRO, self._get_revision_join())
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
     def sort_tree_items(
         cls,
@@ -211,6 +213,7 @@ class ContentApi(object):
 
         return content_list
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
     def sort_content(
         cls,
@@ -645,6 +648,7 @@ class ContentApi(object):
             )\
             .one()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
             self,
             path_labels: [str],
@@ -776,6 +780,9 @@ class ContentApi(object):
         return pdf_preview_path
 
     def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:
+        """
+        Get jpg preview allowed dimensions and strict bool param.
+        """
         return PreviewAllowedDim(
             self._config.PREVIEW_JPG_RESTRICTED_DIMS,
             self._config.PREVIEW_JPG_ALLOWED_DIMS,
@@ -887,6 +894,7 @@ class ContentApi(object):
 
         return resultset.all()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
         assert content_type is not None# DYN_REMOVE
 
@@ -1340,6 +1348,7 @@ class ContentApi(object):
 
         return ContentType.sorted(content_types)
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def exclude_unavailable(
         self,
         contents: typing.List[Content],
@@ -1353,6 +1362,7 @@ class ContentApi(object):
                 contents.remove(content)
         return contents
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def content_under_deleted(self, content: Content) -> bool:
         if content.parent:
             if content.parent.is_deleted:
@@ -1361,6 +1371,7 @@ class ContentApi(object):
                 return self.content_under_deleted(content.parent)
         return False
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def content_under_archived(self, content: Content) -> bool:
         if content.parent:
             if content.parent.is_archived:
@@ -1369,6 +1380,7 @@ class ContentApi(object):
                 return self.content_under_archived(content.parent)
         return False
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def find_one_by_unique_property(
             self,
             property_name: str,
@@ -1397,6 +1409,7 @@ class ContentApi(object):
         )
         return query.one()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def generate_folder_label(
             self,
             workspace: Workspace,
