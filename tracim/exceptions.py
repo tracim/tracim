@@ -171,3 +171,7 @@ class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
 
 class UserNotActive(TracimException):
     pass
+
+
+class NoUserSetted(TracimException):
+    pass

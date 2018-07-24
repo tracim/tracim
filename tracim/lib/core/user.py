@@ -10,6 +10,8 @@ from tracim import CFG
 from tracim.models.auth import User
 from tracim.models.auth import Group
 from tracim.exceptions import WrongUserPassword
+from tracim.exceptions import NoUserSetted
+from tracim.exceptions import PasswordDoNotMatch
 from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import AuthenticationFailed
 from tracim.exceptions import NotificationNotSend
@@ -113,6 +115,72 @@ class UserApi(object):
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
 
     # Actions
+    def set_password(
+            self,
+            user: User,
+            loggedin_user_password: str,
+            new_password: str,
+            new_password2: str,
+            do_save: bool=True
+    ):
+        """
+        Set User password if loggedin user password is correct
+        and both new_password are the same.
+        :param user: User who need password changed
+        :param loggedin_user_password: cleartext password of logged user (not
+        same as user)
+        :param new_password: new password for user
+        :param new_password2: should be same as new_password
+        :param do_save: should we save new user password ?
+        :return:
+        """
+        if not self._user:
+            raise NoUserSetted('Current User should be set in UserApi to use this method')  # nopep8
+        if not self._user.validate_password(loggedin_user_password):  # nopep8
+            raise WrongUserPassword(
+                'Wrong password for authenticated user {}'. format(self._user.user_id)  # nopep8
+            )
+        if new_password != new_password2:
+            raise PasswordDoNotMatch('Passwords given are different')
+
+        self.update(
+            user=user,
+            password=new_password,
+            do_save=do_save,
+        )
+        if do_save:
+            # TODO - G.M - 2018-07-24 - Check why commit is needed here
+            transaction.commit()
+        return user
+
+    def set_email(
+            self,
+            user: User,
+            loggedin_user_password: str,
+            email: str,
+            do_save: bool = True
+    ):
+        """
+        Set email address of user if loggedin user password is correct
+        :param user: User who need email changed
+        :param loggedin_user_password: cleartext password of logged user (not
+        same as user)
+        :param email:
+        :param do_save:
+        :return:
+        """
+        if not self._user:
+            raise NoUserSetted('Current User should be set in UserApi to use this method')  # nopep8
+        if not self._user.validate_password(loggedin_user_password):  # nopep8
+            raise WrongUserPassword(
+                'Wrong password for authenticated user {}'. format(self._user.user_id)  # nopep8
+            )
+        self.update(
+            user=user,
+            email=email,
+            do_save=do_save,
+        )
+        return user
 
     def update(
             self,

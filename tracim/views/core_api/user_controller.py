@@ -79,19 +79,16 @@ class UserController(Controller):
         """
         Set user Email
         """
-        if not request.current_user.validate_password(hapic_data.body.loggedin_user_password):  # nopep8
-            raise WrongUserPassword(
-                'Wrong password for authenticated user {}'. format(request.current_user.user_id)  # nopep8
-            )
         app_config = request.registry.settings['CFG']
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        user = uapi.update(
+        user = uapi.set_email(
             request.candidate_user,
-            email=hapic_data.body.email,
+            hapic_data.body.loggedin_user_password,
+            hapic_data.body.email,
             do_save=True
         )
         return uapi.get_user_with_context(user)
@@ -107,26 +104,19 @@ class UserController(Controller):
         """
         Set user password
         """
-        if not request.current_user.validate_password(hapic_data.body.loggedin_user_password):  # nopep8
-            raise WrongUserPassword(
-                'Wrong password for authenticated user {}'. format(request.current_user.user_id)  # nopep8
-            )
-        if hapic_data.body.new_password != hapic_data.body.new_password2:
-            raise PasswordDoNotMatch('Passwords given are different')
         app_config = request.registry.settings['CFG']
         uapi = UserApi(
             current_user=request.current_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        uapi.update(
+        uapi.set_password(
             request.candidate_user,
-            password=hapic_data.body.new_password,
+            hapic_data.body.loggedin_user_password,
+            hapic_data.body.new_password,
+            hapic_data.body.new_password2,
             do_save=True
         )
-        uapi.save(request.candidate_user)
-        # TODO - G.M - 2018-07-24 - Check why commit is needed here
-        transaction.commit()
         return
 
     @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
