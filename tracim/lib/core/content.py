@@ -963,7 +963,11 @@ class ContentApi(object):
         self.save(item, do_notify=False)
 
         for child in item.children:
-            with new_revision(child):
+            with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=child
+            ):
                 self.move_recursively(child, item, new_workspace)
         return
 
