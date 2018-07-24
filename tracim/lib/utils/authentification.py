@@ -32,6 +32,7 @@ def basic_auth_check_credentials(
     user = _get_basic_auth_unsafe_user(request)
     if not user \
             or user.email != login \
+            or not user.is_active \
             or not user.validate_password(cleartext_password):
         return None
     return []

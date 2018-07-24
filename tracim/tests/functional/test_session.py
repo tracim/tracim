@@ -1,8 +1,13 @@
 # coding=utf-8
 import datetime
 import pytest
+import transaction
 from sqlalchemy.exc import OperationalError
 
+from tracim import models
+from tracim.lib.core.group import GroupApi
+from tracim.lib.core.user import UserApi
+from tracim.models import get_tm_session
 from tracim.tests import FunctionalTest
 from tracim.tests import FunctionalTestNoDB
 
@@ -58,6 +63,45 @@ class TestLoginEndpoint(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+
+    def test_api__try_login_enpoint__err_401__user_not_activated(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.disable(test_user)
+        transaction.commit()
+
+        params = {
+            'email': 'test@test.test',
+            'password': 'test@test.test',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/sessions/login',
+            params=params,
+            status=403,
+        )
 
     def test_api__try_login_enpoint__err_403__bad_password(self):
         params = {
@@ -116,6 +160,44 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+
+    def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.disable(test_user)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+
+        res = self.testapp.get('/api/v2/sessions/whoami', status=401)
 
     def test_api__try_whoami_enpoint__err_401__unauthenticated(self):
         self.testapp.authorization = (

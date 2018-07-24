@@ -167,3 +167,7 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
     pass
+
+
+class UserNotActive(TracimException):
+    pass

@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-import threading
 from smtplib import SMTPException
 
 import transaction
 import typing as typing
-
-from tracim.exceptions import NotificationNotSend
-from tracim.lib.mail_notifier.notifier import get_email_manager
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim import CFG
 from tracim.models.auth import User
 from tracim.models.auth import Group
-from sqlalchemy.orm.exc import NoResultFound
-from tracim.exceptions import WrongUserPassword, UserDoesNotExist
+from tracim.exceptions import WrongUserPassword
+from tracim.exceptions import UserDoesNotExist
 from tracim.exceptions import AuthenticationFailed
+from tracim.exceptions import NotificationNotSend
+from tracim.exceptions import UserNotActive
 from tracim.models.context_models import UserInContext
+from tracim.lib.mail_notifier.notifier import get_email_manager
 
 
 class UserApi(object):
@@ -103,6 +103,8 @@ class UserApi(object):
         """
         try:
             user = self.get_one_by_email(email)
+            if not user.is_active:
+                raise UserNotActive('User "{}" is not active'.format(email))
             if user.validate_password(password):
                 return user
             else:

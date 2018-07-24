@@ -29,6 +29,7 @@ from tracim.views.core_api.workspace_controller import WorkspaceController
 from tracim.views.contents_api.comment_controller import CommentController
 from tracim.views.errors import ErrorSchema
 from tracim.exceptions import NotAuthenticated
+from tracim.exceptions import UserNotActive
 from tracim.exceptions import InvalidId
 from tracim.exceptions import InsufficientUserProfile
 from tracim.exceptions import InsufficientUserRoleInWorkspace
@@ -94,6 +95,7 @@ def web(global_config, **local_settings):
     context.handle_exception(InvalidId, HTTPStatus.BAD_REQUEST)
     # Auth exception
     context.handle_exception(NotAuthenticated, HTTPStatus.UNAUTHORIZED)
+    context.handle_exception(UserNotActive, HTTPStatus.FORBIDDEN)
     context.handle_exception(AuthenticationFailed, HTTPStatus.FORBIDDEN)
     context.handle_exception(InsufficientUserRoleInWorkspace, HTTPStatus.FORBIDDEN)  # nopep8
     context.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
