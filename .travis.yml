@@ -9,6 +9,7 @@ addons:
   apt:
     packages:
     - libreoffice
+    - imagemagick
 
 services:
   - docker
