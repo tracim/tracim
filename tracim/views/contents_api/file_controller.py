@@ -43,15 +43,22 @@ FILE_ENDPOINTS_TAG = 'Files'
 
 
 class FileController(Controller):
+    """
+    Endpoints for File Content
+    """
 
     # File data
     @hapic.with_api_doc(tags=[FILE_ENDPOINTS_TAG])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    #@hapic.input_files()
+    # TODO - G.M - 2018-07-24 - Use hapic for input file
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def upload_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Upload a new version of raw file of content. This will create a new
+        revision.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -83,6 +90,9 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def download_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Download raw file of last revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -105,6 +115,9 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.output_file([])
     def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Download raw file for specific revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -136,6 +149,9 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def preview_pdf(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Obtain a specific page pdf preview of last revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -159,7 +175,10 @@ class FileController(Controller):
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
-    def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):
+    def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Obtain a full pdf preview (all page) of last revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -180,7 +199,10 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
-    def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):
+    def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Obtain a specific page pdf preview of a specific revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -211,6 +233,9 @@ class FileController(Controller):
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def preview_jpg(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Obtain normally sied jpg preview of last revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -239,7 +264,10 @@ class FileController(Controller):
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(ContentPreviewSizedPathSchema())
     @hapic.output_file([])
-    def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
+    def sized_preview_jpg(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Obtain resized jpg preview of last revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -267,7 +295,10 @@ class FileController(Controller):
     @hapic.input_path(RevisionPreviewSizedPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
-    def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):
+    def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Obtain resized jpg preview of a specific revision of content.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -296,7 +327,11 @@ class FileController(Controller):
     @require_content_types([file_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(AllowedJpgPreviewDimSchema())
-    def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):
+    def allowed_dim_preview_jpg(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Get allowed dimensions of jpg preview. If restricted is true,
+        only those dimensions are strictly accepted.
+        """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
             current_user=request.current_user,
@@ -426,6 +461,9 @@ class FileController(Controller):
         return
 
     def bind(self, configurator: Configurator) -> None:
+        """
+        Add route to configurator.
+        """
 
         # file info #
         # Get file info
