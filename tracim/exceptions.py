@@ -175,3 +175,7 @@ class UserNotActive(TracimException):
 
 class NoUserSetted(TracimException):
     pass
+
+
+class ParentNotFound(NotFound):
+    pass

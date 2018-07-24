@@ -144,9 +144,11 @@ class ContentCreation(object):
             self,
             label: str,
             content_type: str,
+            parent_id: typing.Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
+        self.parent_id = parent_id
 
 
 class CommentCreation(object):
