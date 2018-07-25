@@ -8,7 +8,7 @@ require('./css/index.styl')
 const appInterface = {
   name: 'Thread',
   isRendered: false,
-  renderApp: data => {
+  renderAppFull: data => {
     return ReactDOM.render(
       <Thread data={data} />
       , document.getElementById(data.config.domContainer)
@@ -17,7 +17,7 @@ const appInterface = {
   unmountApp: domId => {
     return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   },
-  renderPopupCreation: data => {
+  renderAppPopupCreation: data => {
     return ReactDOM.render(
       <PopupCreateThread data={data} />
       , document.getElementById(data.config.domContainer)
