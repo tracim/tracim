@@ -1,0 +1,98 @@
+@import "../../node_modules/tracim_lib/src/css/Variable.styl"
+
+.html-documents
+  width 70%
+  &__header
+    &__editionmode
+      display none
+    &__icon
+      .fa-file-text-o
+        color white
+  &__lastversionbtn
+    & > i
+      font-size 20px
+  .selectStatus
+    margin-right 15px
+  &__contentpage
+    &__textnote
+      margin 10px 5px 10px 10px
+      border-radius 10px
+      padding 25px
+      height 100%
+      overflow-y auto
+      background-color off-white
+      &__version
+        display flex
+        justify-content flex-end
+        align-items center
+        text-align right
+        opacity 0.7
+      &__lastversion
+        margin-left 15px
+        font-weight bold
+      &__text
+        font-size 14px
+      &__edition
+        display none
+    &__messagelist
+      min-height 70px
+      &__item
+        &__avatar
+          border 1px solid darkHtmlColor
+          background-color off-white
+        &__content
+          color darkGrey
+      &__version
+        background-color grey-hover
+        &__btn
+          padding 5px 25px
+          border-radius 5px
+          width 145px
+          color white
+          font-size 17px
+          & > i
+            margin-right 10px
+            color darkGrey
+            font-size 20px
+        &__date
+          color fontColor
+          font-size 17px
+
+.messagelistOpen
+  .timeline__messagelist
+    flex 0
+    min-height 0
+
+.received
+  .timeline__messagelist__item__content
+    background-color htmlColor
+
+@media (min-width: min-sm) and (max-width: max-lg)
+  .html-documents
+    &__contentpage
+      &__content
+        margin 10px
+      &__textnote
+        margin 0
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .html-documents
+    top 68px
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .html-documents
+    top 68px
+    width 100%
+
+@media (max-width: max-xs)
+
+  .html-documents
+    top 68px
+    width 100%
+    &__contentpage
+      &__content
+        margin 10px
+      &__textnote
+        margin 0
