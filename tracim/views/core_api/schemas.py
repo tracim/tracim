@@ -20,6 +20,7 @@ from tracim.models.context_models import WorkspaceAndContentPath
 from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
+from tracim.models.data import ActionDescription
 
 
 class UserDigestSchema(marshmallow.Schema):
@@ -472,6 +473,10 @@ class RevisionSchema(ContentDigestSchema):
     revision_id = marshmallow.fields.Int(
         example=12,
         validate=Range(min=1, error="Value must be greater than 0"),
+    )
+    revision_type = marshmallow.fields.String(
+        example=ActionDescription.CREATION,
+        validate=OneOf(ActionDescription.allowed_values()),
     )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,

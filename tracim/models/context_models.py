@@ -458,6 +458,10 @@ class RevisionInContext(object):
         return self.revision.label
 
     @property
+    def revision_type(self) -> str:
+        return self.revision.revision_type
+
+    @property
     def content_type(self) -> str:
         content_type = ContentType(self.revision.type)
         if content_type:
