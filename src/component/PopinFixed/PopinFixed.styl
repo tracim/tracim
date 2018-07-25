@@ -1,0 +1,134 @@
+@import '../../css/Variable.styl'
+
+.wsContentGeneric
+  position fixed
+  top 85px
+  right 0
+  border 1px solid grey
+  height 100%
+  background-color lightGrey
+  box-shadow shadow-right
+  z-index 4
+  &.visible
+    visibility visible
+  &__header
+    display flex
+    align-items center
+    padding 15px
+    height 64px
+    &__icon
+      margin-right 15px
+      font-size 22px
+      color white
+    &__title
+      margin-right 15px
+      border-radius 5px
+      width 100%
+      color white
+      text-overflow ellipsis
+      overflow hidden
+      white-space nowrap
+      & > input
+        padding-left 5px
+    &__edittitle
+      margin 0 15px
+      border 1px solid transparent
+      border-radius 5px
+      padding 2px 8px
+      color white
+      font-size 17px
+      cursor pointer
+      &:hover
+        border-color white
+      .fa-pencil
+        color off-white
+    &__close
+      border 1px solid white
+      border-radius 5px
+      padding 2px 5px
+      cursor pointer
+      & > i
+        color white
+        font-size 20px
+  &__option
+    border-bottom 1px solid grey
+    padding 10px
+    height 58px
+    background-color off-white
+    &__menu
+      & > div
+        display flex
+        flex-flow row
+        justify-content space-between
+        align-items center
+      &__addversion
+        display flex
+        align-items center
+        cursor pointer
+      &__lastversion
+        display flex
+        align-items center
+        cursor pointer
+        margin-left 15px
+        & > i
+          margin-right 10px
+          color darkGrey
+          font-size 22px
+      &__action
+        font-size 18px
+        background-color transparent
+        border none
+        cursor pointer
+        &:hover , &:focus
+          color blue
+  &__content
+    display flex
+    flex-wrap wrap
+    // 209 = wsContentGeneric:top wsContentGeneric__header:height - wsContentGeneric__option:height
+    width 200% // to allow transform translateX of right part
+    height calc(100% - 209px)
+    &__left
+      transition width 0.4s ease
+      width 25%
+      height calc(100% - 10px) // 10px => margin of timeline
+    &__right
+      transition width 0.4s ease
+      width calc(25% - 10px)
+      height calc(100% - 10px) // 10px => margin of timeline
+
+.rightPartClose
+  .wsContentGeneric__content__left
+    width calc(50% - 50px)
+  //.wsContentGeneric__content__right
+  //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
+
+@media (min-width: min-sm) and (max-width: max-lg)
+
+  .wsContentGeneric__content
+    overflow-Y auto
+    &__left
+      margin-bottom 20px
+      width 100%
+      height auto
+      &__textnote
+        height auto
+        overflow-y hidden
+    &__right
+      width 100%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .wsContentGeneric
+    top 68px
+
+@media (max-width: max-xs)
+
+  .wsContentGeneric
+    top 68  px
+    &__content
+      overflow-Y auto
+      &__left
+        width 100%
+        margin-bottom 20px
+      &__right
+        width 100%
