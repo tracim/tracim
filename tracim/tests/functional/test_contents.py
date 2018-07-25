@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+import transaction
+
+from tracim import models
+from tracim.lib.core.content import ContentApi
+from tracim.lib.core.workspace import WorkspaceApi
+from tracim.models import get_tm_session
+from tracim.models.contents import ContentTypeLegacy as ContentType
+from tracim.models.revision_protection import new_revision
 import io
 
 import transaction
@@ -327,6 +335,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 6
+        assert revision['revision_type'] == 'creation'
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
         assert revision['comment_ids'] == []
@@ -348,6 +357,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 7
+        assert revision['revision_type'] == 'edition'
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
         assert revision['comment_ids'] == []
@@ -369,6 +379,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 27
+        assert revision['revision_type'] == 'edition'
         assert revision['sub_content_types']
         # TODO - G.M - 2018-06-173 - Test with real comments
         assert revision['comment_ids'] == []
@@ -1929,6 +1940,7 @@ class TestThreads(FunctionalTest):
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 8
         assert revision['sub_content_types']
+        assert revision['revision_type'] == 'creation'
         assert revision['comment_ids'] == [18, 19, 20]
         # TODO - G.M - 2018-06-173 - check date format
         assert revision['created']
@@ -1948,6 +1960,7 @@ class TestThreads(FunctionalTest):
         assert revision['status'] == 'open'
         assert revision['workspace_id'] == 2
         assert revision['revision_id'] == 26
+        assert revision['revision_type'] == 'edition'
         assert revision['sub_content_types']
         assert revision['comment_ids'] == []
         # TODO - G.M - 2018-06-173 - check date format
@@ -1956,6 +1969,106 @@ class TestThreads(FunctionalTest):
         assert revision['author']['user_id'] == 3
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Bob i.'
+
+    def test_api__get_thread_revisions__ok_200__most_revision_type(self) -> None:
+        """
+        get threads revisions
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_thread = content_api.create(
+            content_type=ContentType.Thread,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test Thread',
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=test_thread,
+        ):
+            content_api.update_content(
+                test_thread,
+                new_label='test_thread_updated',
+                new_content='Just a test'
+            )
+        content_api.save(test_thread)
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=test_thread,
+        ):
+            content_api.archive(test_thread)
+        content_api.save(test_thread)
+
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=test_thread,
+        ):
+            content_api.unarchive(test_thread)
+        content_api.save(test_thread)
+
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=test_thread,
+        ):
+            content_api.delete(test_thread)
+        content_api.save(test_thread)
+
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=test_thread,
+        ):
+            content_api.undelete(test_thread)
+        content_api.save(test_thread)
+        dbsession.flush()
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/threads/{}/revisions'.format(test_thread.content_id),  # nopep8
+            status=200
+        )
+        revisions = res.json_body
+        assert len(revisions) == 6
+        for revision in revisions:
+            revision['content_type'] == 'thread'
+            revision['workspace_id'] == 1
+            revision['content_id'] == test_thread.content_id
+        revision = revisions[0]
+        revision['revision_type'] == 'creation'
+        revision = revisions[1]
+        revision['revision_type'] == 'archiving'
+        revision = revisions[2]
+        revision['revision_type'] == 'unarchiving'
+        revision = revisions[3]
+        revision['revision_type'] == 'deletion'
+        revision = revisions[4]
+        revision['revision_type'] == 'undeletion'
 
     def test_api__set_thread_status__ok_200__nominal_case(self) -> None:
         """
