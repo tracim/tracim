@@ -7,12 +7,12 @@ const qs = require('query-string')
 
 export class OpenCreateContentApp extends React.Component {
   openCreateContentApp = () => {
-    const { idWorkspace, user, contentType, renderCreateContentApp, match, location } = this.props
+    const { idWorkspace, user, contentType, renderAppPopupCreation, match, location } = this.props
 
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 
     if (['idws', 'type'].every(p => p in match.params) && contentType.map(c => c.slug).includes(match.params.type)) {
-      renderCreateContentApp(
+      renderAppPopupCreation(
         contentType.find(ct => ct.slug === match.params.type),
         user,
         idWorkspace,

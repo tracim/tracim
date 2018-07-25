@@ -15,33 +15,36 @@
   }
 
   //@TODO make a file action.tracimCustomEvent.js that will contains all customEvent that tracim_frontend call
+  // => pb with that is that appInterface cant use import since it is not part of the build webpack
+  // use module.export and require
+  // doesn't work, cant resolve a file outside of the build dir
 
-  GLOBAL_renderApp = app => { //@TODO renderAppFull
-    console.log('%cGLOBAL_renderApp', 'color: #5cebeb', app)
+  GLOBAL_renderAppFull = app => {
+    console.log('%cGLOBAL_renderAppFull', 'color: #5cebeb', app)
 
     const selectedApp = getSelectedApp(app.config.slug)
 
     if (selectedApp.isRendered) {
       GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app}) // handled by html-documents:src/container/HtmlDocument.jsx
     } else {
-      selectedApp.renderApp(app)
+      selectedApp.renderAppFull(app)
       selectedApp.isRendered = true
       prevSelectedApp.isRendered = false
       prevSelectedApp = selectedApp
     }
   }
 
-  GLOBAL_renderCreateContentApp = app => { //@TODO renderAppPopupCreation
-    console.log('%cGLOBAL_renderCreateContentApp', 'color: #5cebeb', app)
+  GLOBAL_renderAppPopupCreation = app => {
+    console.log('%cGLOBAL_renderAppPopupCreation', 'color: #5cebeb', app)
 
     const selectedApp = getSelectedApp(app.config.slug)
 
     if (!selectedApp) {
-      console.log('Error in GLOBAL_renderCreateContentApp, selectedApp is undefined', app)
+      console.log('Error in GLOBAL_renderAppPopupCreation, selectedApp is undefined', app)
       return
     }
 
-    getSelectedApp(app.config.slug).renderPopupCreation(app)
+    getSelectedApp(app.config.slug).renderAppPopupCreation(app)
   }
 
   GLOBAL_dispatchEvent = ({type, data}) => {

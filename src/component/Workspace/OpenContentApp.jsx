@@ -5,7 +5,7 @@ import appFactory from '../../appFactory.js'
 
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
-    const { idWorkspace, appOpenedType, user, workspaceContent, contentType, renderApp, match } = this.props
+    const { idWorkspace, appOpenedType, user, workspaceContent, contentType, renderAppFull, match } = this.props
 
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 
@@ -29,7 +29,7 @@ export class OpenContentApp extends React.Component {
         // if another app is already visible, hide it
         if (appOpenedType !== false) GLOBAL_dispatchEvent({type: `${appOpenedType}_hideApp`})
         // open app
-        renderApp(
+        renderAppFull(
           contentType.find(ct => ct.slug === contentToOpen.type),
           user,
           contentToOpen

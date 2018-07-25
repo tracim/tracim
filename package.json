@@ -61,8 +61,8 @@
       "fetch",
       "btoa",
       "history",
-      "GLOBAL_renderApp",
-      "GLOBAL_renderCreateContentApp",
+      "GLOBAL_renderAppFull",
+      "GLOBAL_renderAppPopupCreation",
       "GLOBAL_dispatchEvent",
       "GLOBAL_hideApp"
     ],

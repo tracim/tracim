@@ -3,7 +3,7 @@ import { FETCH_CONFIG } from './helper.js'
 
 export function appFactory (WrappedComponent) {
   return class AppFactory extends React.Component {
-    renderApp = (appConfig, user, content) => GLOBAL_renderApp({
+    renderAppFull = (appConfig, user, content) => GLOBAL_renderAppFull({
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
@@ -15,7 +15,7 @@ export function appFactory (WrappedComponent) {
       content
     })
 
-    renderCreateContentApp = (appConfig, user, idWorkspace, idFolder) => GLOBAL_renderCreateContentApp({
+    renderAppPopupCreation = (appConfig, user, idWorkspace, idFolder) => GLOBAL_renderAppPopupCreation({
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
@@ -34,8 +34,8 @@ export function appFactory (WrappedComponent) {
       return (
         <WrappedComponent
           {...this.props}
-          renderApp={this.renderApp}
-          renderCreateContentApp={this.renderCreateContentApp}
+          renderAppFull={this.renderAppFull}
+          renderAppPopupCreation={this.renderAppPopupCreation}
           emitEventApp={this.emitEventApp}
           // hideApp={this.hideApp}
         />
