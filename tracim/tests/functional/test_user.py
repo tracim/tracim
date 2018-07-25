@@ -121,6 +121,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[6]['content_id'] == main_folder.content_id
 
+    @pytest.mark.skip('Test should be fixed')
     def test_api__get_recently_active_content__ok__200__limit_2_multiple(self):
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
         # anymore to fix datetime lack of precision.
