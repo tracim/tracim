@@ -52,7 +52,7 @@
       "btoa",
       "wysiwyg",
       "tinymce",
-      "GLOBAL_renderApp",
+      "GLOBAL_renderAppFull",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent"
     ],

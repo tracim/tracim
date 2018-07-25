@@ -12,7 +12,7 @@ require('./css/index.styl')
 const appInterface = {
   name: 'HtmlDocument',
   isRendered: false,
-  renderApp: data => { // renderAppFull
+  renderAppFull: data => {
     return ReactDOM.render(
       <HtmlDocument data={data} />
       , document.getElementById(data.config.domContainer)
@@ -21,7 +21,7 @@ const appInterface = {
   unmountApp: domId => {
     return ReactDOM.unmountComponentAtNode(document.getElementById(domId)) // returns bool
   },
-  renderPopupCreation: data => { // renderAppPopupCreation
+  renderAppPopupCreation: data => {
     return ReactDOM.render(
       <PopupCreateHtmlDocument data={data} />
       , document.getElementById(data.config.domContainer)
