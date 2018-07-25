@@ -1,0 +1,54 @@
+.currentColor
+  color currentColor
+
+.validateColor
+  color validateColor
+
+.cancelColor
+  color cancelColor
+
+.outdateColor
+  color outdateColor
+
+.content
+  display flex
+  align-items center
+  padding 10px 0
+  border-bottom 0
+  width 100%
+  cursor pointer
+  &:hover
+    background-color hover-theme
+  &__type
+    flex-grow 0
+    padding 0 25px
+    font-size 30px
+    text-align center
+  &__name
+    display flex
+    align-items center
+    justify-content space-between
+    flex-grow 2
+    flex-shrink 2
+    &__text
+      margin-right 10px
+      font-size 17px
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+  &__status
+    width 180px
+    padding 0 15px
+    text-align center
+    &__text
+      margin-left 15px
+      font-size 20px
+    &__icon
+      font-size 30px
+
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .content
+    border-right 1px solid grey
+    &__name__icons
+        margin-top 5px

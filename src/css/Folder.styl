@@ -1,0 +1,146 @@
+// -----------------------------------------------------
+// border management for Workspace container
+border-style = 1px solid secondColor
+.folder__header
+  border border-style
+.folder + .content, .content + .content
+  border-bottom 0
+.folder__content > .content, .folder__content > .folder
+  border-bottom 0
+.folder:not(.active).item-last
+  border-bottom border-style
+.content
+  border border-style
+  &.item-last
+    border-bottom border-style
+// @Info: the very last line of file or folder has it's border bottom added in js
+// -----------------------------------------------------
+
+// .folder > .folder__content > .file, .folder > .folder__content > .extandedaction
+//   padding-right 7px
+
+folderclose()
+  height 0
+  visibility hidden
+  opacity 0
+
+folderopen()
+  height 100%
+  opacity 1
+  visibility visible
+  transition opacity 0.3s
+
+.folder
+  padding-left 30px
+  & > .folder__header
+    folderopen()
+  & > .folder__content
+    folderclose()
+    & > .file, > .folder
+      folderclose()
+  &.active
+    & > .folder__header
+      .folder__header__triangleborder
+        display block
+        &__triangle
+          display block
+    & > .folder__content
+      folderopen()
+      & > .file, > .folder
+        folderopen()
+  &__header
+    position relative
+    display flex
+    align-items center
+    margin-left -30px
+    border-bottom 0
+    padding 10px 0
+    background-color lightGrey
+    cursor pointer
+    &:hover
+      background-color hover-theme
+      .folder__header__triangleborder__triangle
+        border-color hover-theme transparent transparent transparent
+    &__triangleborder
+      display none
+      position absolute
+      bottom -25px
+      left -1px
+      border-style solid
+      border-width 25px 30px 0 30px
+      border-color secondColor transparent transparent transparent
+      z-index 1
+      &__triangle
+        display none
+        position absolute
+        top -26px
+        left -30px
+        border-style solid
+        border-width 25px 30px 0 30px
+        border-color lightGrey transparent transparent transparent
+    &__icon
+      flex-grow 0
+      padding 0 25px
+      font-size 30px
+      color darkGrey
+      text-align center
+    &__name
+      flex-grow 2
+      flex-shrink 2
+      margin 0 15px 0 0
+      white-space nowrap
+      text-overflow ellipsis
+      overflow hidden
+      font-size 17px
+      color darkGrey
+    &__button
+      flex-grow 0
+      &__advancedbtn
+        position relative
+      &__addbtn
+        display flex
+        margin auto 0
+        cursor pointer
+        &:hover > .folder__header__name__addbtn__text
+          color white
+        .addbtn
+          &__text
+            margin-right 40px
+            font-size 17px
+            &::after
+              margin-left 20px
+          &__subdropdown
+            padding 0
+    &__status
+      flex-grow 0
+      padding 0 15px
+      width 180px
+    &__contenttype
+      display flex
+      justify-content flex-end
+      &__text
+        font-size 17px
+        color darkBlue
+      &__icon
+        font-size 17px
+        color darkBlue
+        & > i
+          margin-right 3px
+
+@media (min-width: min-sm) and (max-width: max-md)
+
+  .folder__header__button
+    display none
+
+@media (max-width: max-xs)
+  .folder
+    &__header
+      &__name
+        &__icon
+          padding 14px 15px
+          font-size 20px
+        &__text
+          font-size 15px
+      &__button
+        display none
+

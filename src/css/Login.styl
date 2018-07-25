@@ -1,0 +1,97 @@
+.loginpage
+  padding-top 85px // 85 = header height
+  min-height calc(100% - 50px)
+  background secondColor url('../img/tracimLogoAsBg.png') no-repeat 25% 3px
+  background-size contain
+  width 100%
+  &__logo
+    margin 0 auto
+    padding 50px 0
+    width 170px
+  &__connection
+    border none
+    box-shadow shadow-right
+    margin-bottom 50px
+    .connection__header
+      background-color thirdColor
+      color #FFF
+      font-size 25px
+  .connection__form
+    width 70%
+    margin 0 auto
+    &__rememberme
+      &__label
+        font-size 13px
+    &__groupemail
+      position relative
+      &__icon
+        position absolute
+        top 6px
+        left 10px
+        width 20px
+      &__input
+        padding-left 45px
+    &__groupepw
+      position relative
+      &__icon
+        font-size 20px
+        width 20px
+        position absolute
+        top 5px
+        left 8px
+      &__input
+        padding-left 45px
+    &__btnsubmit
+      width 150px
+      background-color green
+      border none
+      cursor pointer
+      display block
+      margin 0 auto
+      &:hover
+        background-color btnCallAction-hover
+      &:focus
+        box-shadow shadow-all-side-green
+    &__pwforgot
+      cursor pointer
+      font-size 13px
+      margin-top 3px
+      &:hover::after
+        content ' '
+        position absolute
+        top 20px
+        right 15px
+        width 130px
+        padding-bottom 2px
+        border-bottom 1px solid darkGrey
+
+@media (min-width: min-lg) and (max-width: max-lg)
+  .loginpage__content
+    .connection__form
+      width 100%
+
+@media (min-width: min-md) and (max-width: max-md)
+  .loginpage__content
+    .connection__form
+      width 95%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .loginpage__content
+    padding-top 69px
+    display block
+    .connection__form
+      width 90%
+
+@media (max-width: max-xs)
+  .loginpage__content
+    padding-top 69px
+    background-size cover
+    display block
+    &__connection
+      margin-top 90px
+    &__logo
+      display none
+    .connection__form
+      width 95%
+    .connection__form__pwforgot:hover::after
+      content normal
