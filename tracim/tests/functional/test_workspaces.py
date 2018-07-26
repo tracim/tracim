@@ -2,6 +2,15 @@
 """
 Tests for /api/v2/workspaces subpath endpoints.
 """
+
+import transaction
+from depot.io.utils import FileIntent
+
+from tracim import models
+from tracim.lib.core.content import ContentApi
+from tracim.lib.core.workspace import WorkspaceApi
+from tracim.models import get_tm_session
+from tracim.models.data import ContentType
 from tracim.tests import FunctionalTest
 from tracim.tests import set_html_document_slug_to_legacy
 from tracim.fixtures.content import Content as ContentFixtures
@@ -241,6 +250,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 3
         content = res[0]
         assert content['content_id'] == 1
+        assert content['content_type'] == 'folder'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Tools'
@@ -252,6 +262,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         content = res[1]
         assert content['content_id'] == 2
+        assert content['content_type'] == 'folder'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Menus'
@@ -263,6 +274,37 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['workspace_id'] == 1
         content = res[2]
         assert content['content_id'] == 11
+        assert content['content_type'] == 'html-documents'
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Current Menu'
+        assert content['parent_id'] == 2
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'current-menu'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 1
+
+    def test_api__get_workspace_content__ok_200__get_default_html_documents(self):
+        """
+        Check obtain workspace contents with defaults filters + content_filter
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'content_type': 'html-documents',
+        }
+        res = self.testapp.get('/api/v2/workspaces/1/contents', status=200, params=params).json_body   # nopep8
+        assert len(res) == 1
+        content = res[0]
+        assert content
+        assert content['content_id'] == 11
+        assert content['content_type'] == 'html-documents'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
         assert content['label'] == 'Current Menu'
@@ -539,6 +581,210 @@ class TestWorkspaceContents(FunctionalTest):
         assert res == []
 
     # Folder related
+    def test_api__get_workspace_content__ok_200__get_all_filter_content_thread(self):
+        # prepare data
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_thread = content_api.create(
+            content_type=ContentType.Thread,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test Thread',
+            do_save=False,
+            do_notify=False,
+        )
+        test_thread.description = 'Thread description'
+        dbsession.add(test_thread)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        test_page_legacy = content_api.create(
+            content_type=ContentType.Page,
+            workspace=business_workspace,
+            label='test_page',
+            do_save=False,
+            do_notify=False,
+        )
+        test_page_legacy.type = ContentType.PageLegacy
+        content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
+        test_html_document = content_api.create(
+            content_type=ContentType.Page,
+            workspace=business_workspace,
+            label='test_html_page',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_content(test_html_document, 'test_page', '<p>HTML_DOCUMENT</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+        # test-itself
+        params = {
+            'parent_id': 1,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+            'content_type': 'thread',
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body
+        assert len(res) == 1
+        content = res[0]
+        assert content['content_type'] == 'thread'
+        assert content['content_id']
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Test Thread'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'test-thread'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 1
+
+    def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):  # nopep8
+        # prepare data
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        test_thread = content_api.create(
+            content_type=ContentType.Thread,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test Thread',
+            do_save=False,
+            do_notify=False,
+        )
+        test_thread.description = 'Thread description'
+        dbsession.add(test_thread)
+        test_file = content_api.create(
+            content_type=ContentType.File,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        test_page_legacy = content_api.create(
+            content_type=ContentType.Page,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='test_page',
+            do_save=False,
+            do_notify=False,
+        )
+        test_page_legacy.type = ContentType.PageLegacy
+        content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
+        test_html_document = content_api.create(
+            content_type=ContentType.Page,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='test_html_page',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_content(test_html_document, 'test_html_page', '<p>HTML_DOCUMENT</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+        # test-itself
+        params = {
+            'parent_id': 1,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+            'content_type': 'html-documents',
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/contents',
+            status=200,
+            params=params,
+        ).json_body
+        assert len(res) == 2
+        content = res[0]
+        assert content['content_type'] == 'html-documents'
+        assert content['content_id']
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'test_page'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'test-page'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 1
+        content = res[1]
+        assert content['content_type'] == 'html-documents'
+        assert content['content_id']
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'test_html_page'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'test-html-page'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'thread', 'html-documents', 'folder', 'file'}  # nopep8
+        assert content['workspace_id'] == 1
+        assert res[0]['content_id'] != res[1]['content_id']
 
     def test_api__get_workspace_content__ok_200__get_all_folder_content(self):
         """
@@ -549,6 +795,7 @@ class TestWorkspaceContents(FunctionalTest):
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
+            'content_type': 'any'
         }
         self.testapp.authorization = (
             'Basic',
