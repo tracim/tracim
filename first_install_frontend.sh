@@ -1,23 +1,18 @@
 #!/bin/bash
 
+. bash_library.sh # source bash_library.sh
+
 windoz=""
 if  [[ $1 = "-w" ]]; then
     windoz="windoz"
 fi
 
-BROWN='\033[0;33m'
-NC='\033[0m' # No Color
-
-function log {
-    echo -e "\n${BROWN}>> $ $1${NC}\n"
-}
-
 log "cd frontend_lib"
 cd frontend_lib
 log "npm i"
 npm i
-log "npm link"
-npm link
+log "sudo npm link"
+sudo npm link
 log "npm run buildtracimlib$windoz"
 npm run buildtracimlib$windoz
 cd -
