@@ -1,0 +1,35 @@
+matrix:
+  include:
+    - sudo: false
+      language: python
+      python:
+        - "3.4"
+        - "3.5"
+        - "3.6"
+
+      addons:
+        apt:
+          packages:
+          - libreoffice
+          - imagemagick
+          - libmagickwand-dev
+          - ghostscript
+      services:
+        - docker
+        - redis-server
+
+      before_install:
+        - docker pull mailhog/mailhog
+        - docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+        - cd backend
+      install:
+        - pip install --upgrade pip setuptools
+        - pip install -e ".[testing]"
+        - pip install pytest-cov
+        - pip install python-coveralls
+
+      script:
+       - py.test --cov tracim_backend
+
+      after_success:
+        - coveralls
