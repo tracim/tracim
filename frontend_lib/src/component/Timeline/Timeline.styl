@@ -9,16 +9,16 @@
   height 100%
   &__header
     display flex
-    width 50px
+    flex-direction column
     border-radius 10px 0 0 10px
-    padding 15px
+    width 50px
     background-color grey-hover
-    text-align center
     font-size 20px
     color darkGrey
     cursor pointer
-    &__text
-      margin auto 0 auto -25px
+    &__icon
+      text-align center
+    &__title
       transform rotate(-90deg)
   &__body
     display flex
@@ -79,9 +79,9 @@
         &__date
           color fontColor
           font-size 17px
-          margin auto 0
+          margin auto 15px
     &__texteditor
-      flex 1 0 auto
+      flex 0 1 auto
       margin 20px
       &__textinput
         width 100%
@@ -136,3 +136,5 @@
   .timeline
     display block
     margin 0
+    &__messagelist__version__date
+      font-size 15px
