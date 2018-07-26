@@ -28,8 +28,6 @@ matrix:
         - pip install pytest-cov
         - pip install python-coveralls
 
-      before_script:
-       - cd backend
       script:
        - py.test --cov tracim_backend
 
