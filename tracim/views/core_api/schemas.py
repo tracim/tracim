@@ -14,6 +14,11 @@ from tracim.models.context_models import ActiveContentFilter
 from tracim.models.context_models import ContentIdsQuery
 from tracim.models.context_models import UserWorkspaceAndContentPath
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import UserCreation
+from tracim.models.context_models import SetEmail
+from tracim.models.context_models import SetPassword
+from tracim.models.context_models import UserInfos
+from tracim.models.context_models import UserProfile
 from tracim.models.context_models import ContentPreviewSizedPath
 from tracim.models.context_models import RevisionPreviewSizedPath
 from tracim.models.context_models import PageQuery
@@ -65,11 +70,11 @@ class UserSchema(UserDigestSchema):
     )
     is_active = marshmallow.fields.Bool(
         example=True,
-         # TODO - G.M - Explains this value.
+        description='Is user account activated ?'
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
-        example="Paris/Europe",
+        example="Europe/Paris",
     )
     # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
     caldav_url = marshmallow.fields.Url(
@@ -88,8 +93,77 @@ class UserSchema(UserDigestSchema):
     class Meta:
         description = 'User account of Tracim'
 
-# Path Schemas
 
+class LoggedInUserPasswordSchema(marshmallow.Schema):
+    loggedin_user_password = marshmallow.fields.String(
+        required=True,
+    )
+
+
+class SetEmailSchema(LoggedInUserPasswordSchema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+
+    @post_load
+    def create_set_email_object(self, data):
+        return SetEmail(**data)
+
+
+class SetPasswordSchema(LoggedInUserPasswordSchema):
+    new_password = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+    new_password2 = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+
+    @post_load
+    def create_set_password_object(self, data):
+        return SetPassword(**data)
+
+
+class UserInfosSchema(marshmallow.Schema):
+    timezone = marshmallow.fields.String(
+        example="Europe/Paris",
+        required=True,
+    )
+    public_name = marshmallow.fields.String(
+        example='Suri Cate',
+        required=True,
+    )
+
+    @post_load
+    def create_user_info_object(self, data):
+        return UserInfos(**data)
+
+
+class UserProfileSchema(marshmallow.Schema):
+    profile = marshmallow.fields.String(
+        attribute='profile',
+        validate=OneOf(Profile._NAME),
+        example='managers',
+    )
+    @post_load
+    def create_user_profile(self, data):
+        return UserProfile(**data)
+
+
+class UserCreationSchema(
+    SetEmailSchema,
+    SetPasswordSchema,
+    UserInfosSchema,
+    UserProfileSchema
+):
+    @post_load
+    def create_user(self, data):
+        return UserCreation(**data)
+
+
+# Path Schemas
 
 class UserIdPathSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(
@@ -305,6 +379,7 @@ class ContentIdsQuerySchema(marshmallow.Schema):
     @post_load
     def make_contents_ids(self, data):
         return ContentIdsQuery(**data)
+
 
 ###
 

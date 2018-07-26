@@ -140,6 +140,7 @@ class InvalidWorkspaceId(InvalidId):
 class InvalidUserId(InvalidId):
     pass
 
+
 class ContentNotFound(TracimException):
     pass
 
@@ -152,6 +153,10 @@ class WorkspacesDoNotMatch(TracimException):
     pass
 
 
+class PasswordDoNotMatch(TracimException):
+    pass
+
+
 class EmptyValueNotAllowed(TracimException):
     pass
 
@@ -161,6 +166,14 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
+    pass
+
+
+class UserNotActive(TracimException):
+    pass
+
+
+class NoUserSetted(TracimException):
     pass
 
 

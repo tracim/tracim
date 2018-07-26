@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import pytest
-from sqlalchemy.orm.exc import NoResultFound
-
 import transaction
 
-from tracim.exceptions import UserDoesNotExist, AuthenticationFailed
+from tracim.exceptions import AuthenticationFailed
+from tracim.exceptions import UserDoesNotExist
+from tracim.exceptions import UserNotActive
+from tracim.lib.core.group import GroupApi
 from tracim.lib.core.user import UserApi
 from tracim.models import User
 from tracim.models.context_models import UserInContext
@@ -170,6 +171,31 @@ class TestUserApi(DefaultTest):
         user = api.authenticate_user('admin@admin.admin', 'admin@admin.admin')
         assert isinstance(user, User)
         assert user.email == 'admin@admin.admin'
+
+    def test_unit__authenticate_user___err__user_not_active(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        gapi = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = api.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        api.disable(user)
+        with pytest.raises(UserNotActive):
+            api.authenticate_user('test@test.test', 'test@test.test')
 
     def test_unit__authenticate_user___err__wrong_password(self):
         api = UserApi(
