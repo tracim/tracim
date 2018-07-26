@@ -7,6 +7,7 @@ import typing
 from operator import itemgetter
 
 import transaction
+from preview_generator.manager import PreviewManager
 from sqlalchemy import func
 from sqlalchemy.orm import Query
 from depot.manager import DepotManager
@@ -25,6 +26,9 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
+from tracim.exceptions import PageOfPreviewNotFound
+from tracim.exceptions import PreviewDimNotAllowed
+from tracim.exceptions import RevisionDoesNotMatchThisContent
 from tracim.exceptions import EmptyCommentContentNotAllowed
 from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import ContentNotFound
@@ -43,11 +47,13 @@ from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 from tracim.lib.utils.translation import fake_translator as _
 from tracim.models.context_models import RevisionInContext
+from tracim.models.context_models import PreviewAllowedDim
 from tracim.models.context_models import ContentInContext
 
 __author__ = 'damien'
 
 
+# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
 def compare_content_for_sorting_by_type_and_name(
         content1: Content,
         content2: Content
@@ -86,7 +92,7 @@ def compare_content_for_sorting_by_type_and_name(
         else:
             return 0
 
-
+# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
 def compare_tree_items_for_sorting_by_type_and_name(
         item1: NodeTreeItem,
         item2: NodeTreeItem
@@ -133,6 +139,7 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
+        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
 
     @contextmanager
     def show(
@@ -163,7 +170,7 @@ class ContentApi(object):
             self._show_temporary = previous_show_temporary
 
     def get_content_in_context(self, content: Content) -> ContentInContext:
-        return ContentInContext(content, self._session, self._config)
+        return ContentInContext(content, self._session, self._config, self._user)  # nopep8
 
     def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:  # nopep8
         # TODO - G.M - 2018-06-173 - create revision in context object
@@ -190,6 +197,7 @@ class ContentApi(object):
         return self._session.query(Content)\
             .join(ContentRevisionRO, self._get_revision_join())
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
     def sort_tree_items(
         cls,
@@ -205,6 +213,7 @@ class ContentApi(object):
 
         return content_list
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
     def sort_content(
         cls,
@@ -343,56 +352,57 @@ class ContentApi(object):
     ) -> Query:
         return self._base_query(workspace)
 
-    def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> typing.List[Content]:
-        """
-        This method returns child items (folders or items) for left bar treeview.
-
-        :param parent:
-        :param workspace:
-        :param filter_by_allowed_content_types:
-        :param removed_item_ids:
-        :param allowed_node_types: This parameter allow to hide folders for which the given type of content is not allowed.
-               For example, if you want to move a Page from a folder to another, you should show only folders that accept pages
-        :return:
-        """
-        filter_by_allowed_content_types = filter_by_allowed_content_types or []  # FDV
-        removed_item_ids = removed_item_ids or []  # FDV
-
-        if not allowed_node_types:
-            allowed_node_types = [ContentType.Folder]
-        elif allowed_node_types==ContentType.Any:
-            allowed_node_types = ContentType.all()
-
-        parent_id = parent.content_id if parent else None
-        folders = self._base_query(workspace).\
-            filter(Content.parent_id==parent_id).\
-            filter(Content.type.in_(allowed_node_types)).\
-            filter(Content.content_id.notin_(removed_item_ids)).\
-            all()
-
-        if not filter_by_allowed_content_types or \
-                        len(filter_by_allowed_content_types)<=0:
-            # Standard case for the left treeview: we want to show all contents
-            # in the left treeview... so we still filter because for example
-            # comments must not appear in the treeview
-            return [folder for folder in folders \
-                    if folder.type in ContentType.allowed_types_for_folding()]
-
-        # Now this is a case of Folders only (used for moving content)
-        # When moving a content, you must get only folders that allow to be filled
-        # with the type of content you want to move
-        result = []
-        for folder in folders:
-            for allowed_content_type in filter_by_allowed_content_types:
-
-                is_folder = folder.type == ContentType.Folder
-                content_type__allowed = folder.properties['allowed_content'][allowed_content_type] == True
-
-                if is_folder and content_type__allowed:
-                    result.append(folder)
-                    break
-
-        return result
+    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
+    # def get_child_folders(self, parent: Content=None, workspace: Workspace=None, filter_by_allowed_content_types: list=[], removed_item_ids: list=[], allowed_node_types=None) -> typing.List[Content]:
+    #     """
+    #     This method returns child items (folders or items) for left bar treeview.
+    # 
+    #     :param parent:
+    #     :param workspace:
+    #     :param filter_by_allowed_content_types:
+    #     :param removed_item_ids:
+    #     :param allowed_node_types: This parameter allow to hide folders for which the given type of content is not allowed.
+    #            For example, if you want to move a Page from a folder to another, you should show only folders that accept pages
+    #     :return:
+    #     """
+    #     filter_by_allowed_content_types = filter_by_allowed_content_types or []  # FDV
+    #     removed_item_ids = removed_item_ids or []  # FDV
+    # 
+    #     if not allowed_node_types:
+    #         allowed_node_types = [ContentType.Folder]
+    #     elif allowed_node_types==ContentType.Any:
+    #         allowed_node_types = ContentType.all()
+    # 
+    #     parent_id = parent.content_id if parent else None
+    #     folders = self._base_query(workspace).\
+    #         filter(Content.parent_id==parent_id).\
+    #         filter(Content.type.in_(allowed_node_types)).\
+    #         filter(Content.content_id.notin_(removed_item_ids)).\
+    #         all()
+    # 
+    #     if not filter_by_allowed_content_types or \
+    #                     len(filter_by_allowed_content_types)<=0:
+    #         # Standard case for the left treeview: we want to show all contents
+    #         # in the left treeview... so we still filter because for example
+    #         # comments must not appear in the treeview
+    #         return [folder for folder in folders \
+    #                 if folder.type in ContentType.allowed_types_for_folding()]
+    # 
+    #     # Now this is a case of Folders only (used for moving content)
+    #     # When moving a content, you must get only folders that allow to be filled
+    #     # with the type of content you want to move
+    #     result = []
+    #     for folder in folders:
+    #         for allowed_content_type in filter_by_allowed_content_types:
+    # 
+    #             is_folder = folder.type == ContentType.Folder
+    #             content_type__allowed = folder.properties['allowed_content'][allowed_content_type] == True
+    # 
+    #             if is_folder and content_type__allowed:
+    #                 result.append(folder)
+    #                 break
+    # 
+    #     return result
 
     def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
@@ -499,16 +509,24 @@ class ContentApi(object):
             raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
         return content
 
-    def get_one_revision(self, revision_id: int = None) -> ContentRevisionRO:
+    def get_one_revision(self, revision_id: int = None, content: Content= None) -> ContentRevisionRO:  # nopep8
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
+        :param content: The content related to the revision, if None do not
+        check if revision is related to this content.
         :return: An item Content linked with the correct revision
         """
         assert revision_id is not None# DYN_REMOVE
 
         revision = self._session.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id).one()
-
+        if content and revision.content_id != content.content_id:
+            raise RevisionDoesNotMatchThisContent(
+                'revision {revision_id} is not a revision of content {content_id}'.format(  # nopep8
+                    revision_id=revision.revision_id,
+                    content_id=content.content_id,
+                    )
+            )
         return revision
 
     # INFO - A.P - 2017-07-03 - python file object getter
@@ -631,6 +649,7 @@ class ContentApi(object):
             )\
             .one()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
             self,
             path_labels: [str],
@@ -724,42 +743,157 @@ class ContentApi(object):
             ),
         ))
 
-    def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
-        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-        assert content_type is not None# DYN_REMOVE
-        assert isinstance(content_type, str) # DYN_REMOVE
 
+    def get_pdf_preview_path(
+            self,
+            content_id: int,
+            revision_id: int,
+            page: int
+    ) -> str:
+        """
+        Get pdf preview of revision of content
+        :param content_id: id of content
+        :param revision_id: id of content revision
+        :param page: page number of the preview, useful for multipage content
+        :return: preview_path as string
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        if page >= self.preview_manager.get_page_nb(file_path):
+            raise PageOfPreviewNotFound(
+                'page {page} of content {content_id} does not exist'.format(
+                    page=page,
+                    content_id=content_id
+                ),
+            )
+        jpg_preview_path = self.preview_manager.get_pdf_preview(
+            file_path,
+            page=page
+        )
+        return jpg_preview_path
+
+    def get_full_pdf_preview_path(self, revision_id: int) -> str:
+        """
+        Get full(multiple page) pdf preview of revision of content
+        :param revision_id: id of revision
+        :return: path of the full pdf preview of this revision
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        return pdf_preview_path
+
+    def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:
+        """
+        Get jpg preview allowed dimensions and strict bool param.
+        """
+        return PreviewAllowedDim(
+            self._config.PREVIEW_JPG_RESTRICTED_DIMS,
+            self._config.PREVIEW_JPG_ALLOWED_DIMS,
+        )
+
+    def get_jpg_preview_path(
+        self,
+        content_id: int,
+        revision_id: int,
+        page: int,
+        width: int = None,
+        height: int = None,
+    ) -> str:
+        """
+        Get jpg preview of revision of content
+        :param content_id: id of content
+        :param revision_id: id of content revision
+        :param page: page number of the preview, useful for multipage content
+        :param width: width in pixel
+        :param height: height in pixel
+        :return: preview_path as string
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        if page >= self.preview_manager.get_page_nb(file_path):
+            raise Exception(
+                'page {page} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
+                    page=page,
+                    revision_id=revision_id,
+                    content_id=content_id,
+                ),
+            )
+        if not width and not height:
+            width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
+            height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
+
+        allowed_dim = False
+        for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
+            if width == preview_dim.width and height == preview_dim.height:
+                allowed_dim = True
+                break
+
+        if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
+            raise PreviewDimNotAllowed(
+                'Size {width}x{height} is not allowed for jpeg preview'.format(
+                    width=width,
+                    height=height,
+                )
+            )
+        jpg_preview_path = self.preview_manager.get_jpeg_preview(
+            file_path,
+            page=page,
+            width=width,
+            height=height,
+        )
+        return jpg_preview_path
+
+    def _get_all_query(
+        self,
+        parent_id: int = None,
+        content_type: str = ContentType.Any,
+        workspace: Workspace = None
+    ) -> Query:
+        """
+        Extended filter for better "get all data" query
+        :param parent_id: filter by parent_id
+        :param content_type: filter by content_type slug
+        :param workspace: filter by workspace
+        :return:
+        """
+        assert parent_id is None or isinstance(parent_id, int)
+        assert content_type is not None
         resultset = self._base_query(workspace)
 
         if content_type!=ContentType.Any:
-            resultset = resultset.filter(Content.type==content_type)
+            # INFO - G.M - 2018-07-05 - convert with
+            #  content type object to support legacy slug
+            content_type_object = ContentType(content_type)
+            resultset = resultset.filter(Content.type.in_(content_type_object.get_slug_aliases()))
 
         if parent_id:
             resultset = resultset.filter(Content.parent_id==parent_id)
         if parent_id == 0 or parent_id is False:
             resultset = resultset.filter(Content.parent_id == None)
-        # parent_id == None give all contents
 
-        return resultset.all()
+        return resultset
 
-    def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
-        """
-        Return parent_id childs of given content_types
-        :param parent_id: parent id
-        :param content_types: list of types
-        :param workspace: workspace filter
-        :return: list of content
-        """
-        resultset = self._base_query(workspace)
-        resultset = resultset.filter(Content.type.in_(content_types))
+    def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
+        return self._get_all_query(parent_id, content_type, workspace).all()
 
-        if parent_id:
-            resultset = resultset.filter(Content.parent_id==parent_id)
-        if parent_id is False:
-            resultset = resultset.filter(Content.parent_id == None)
+    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
+    # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
+    #     """
+    #     Return parent_id childs of given content_types
+    #     :param parent_id: parent id
+    #     :param content_types: list of types
+    #     :param workspace: workspace filter
+    #     :return: list of content
+    #     """
+    #     resultset = self._base_query(workspace)
+    #     resultset = resultset.filter(Content.type.in_(content_types))
+    #
+    #     if parent_id:
+    #         resultset = resultset.filter(Content.parent_id==parent_id)
+    #     if parent_id is False:
+    #         resultset = resultset.filter(Content.parent_id == None)
+    #
+    #     return resultset.all()
 
-        return resultset.all()
-
+    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # TODO find an other name to filter on is_deleted / is_archived
     def get_all_with_filter(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
@@ -779,6 +913,7 @@ class ContentApi(object):
 
         return resultset.all()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
         assert content_type is not None# DYN_REMOVE
 
@@ -839,47 +974,136 @@ class ContentApi(object):
             .filter(Workspace.is_deleted.is_(False)) \
             .subquery()
 
-        not_read_content_ids_query = self._session.query(
-            distinct(not_read_revisions.c.content_id)
+    # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
+    # def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
+    #     assert content_type is not None# DYN_REMOVE
+    #
+    #     resultset = self._base_query(workspace)
+    #
+    #     if content_type != ContentType.Any:
+    #         resultset = resultset.filter(Content.type==content_type)
+    #
+    #     return resultset.all()
+
+    def get_last_active(
+            self,
+            workspace: Workspace=None,
+            limit: typing.Optional[int]=None,
+            before_datetime: typing.Optional[datetime.datetime]= None,
+            content_ids: typing.Optional[typing.List[int]] = None,
+    ) -> typing.List[Content]:
+        """
+        get contents list sorted by last update
+        (last modification of content itself or one of this comment)
+        :param workspace: Workspace to check
+        :param limit: maximum number of elements to return
+        :param before_datetime: date from where we check older content.
+        :param content_ids: restrict selection to some content ids and
+        related Comments
+        :return: list of content
+        """
+
+        resultset = self._get_all_query(
+            workspace=workspace,
         )
-        not_read_content_ids = list(map(
-            itemgetter(0),
-            not_read_content_ids_query,
-        ))
+        if content_ids:
+            resultset = resultset.filter(
+                or_(
+                    Content.content_id.in_(content_ids),
+                    and_(
+                        Content.parent_id.in_(content_ids),
+                        Content.type == ContentType.Comment
+                    )
+                )
+            )
 
-        not_read_contents = self._base_query(workspace) \
-            .filter(Content.content_id.in_(not_read_content_ids)) \
-            .order_by(desc(Content.updated))
+        resultset = resultset.order_by(desc(Content.updated))
 
-        if content_type != ContentType.Any:
-            not_read_contents = not_read_contents.filter(
-                Content.type==content_type)
-        else:
-            not_read_contents = not_read_contents.filter(
-                Content.type!=ContentType.Folder)
-
-        if parent_id:
-            not_read_contents = not_read_contents.filter(
-                Content.parent_id==parent_id)
-
-        result = []
-        for item in not_read_contents:
-            new_item = None
-            if ContentType.Comment == item.type:
-                new_item = item.parent
+        active_contents = []
+        too_recent_content = []
+        for content in resultset:
+            related_active_content = None
+            if ContentType.Comment == content.type:
+                related_active_content = content.parent
             else:
-                new_item = item
+                related_active_content = content
 
+            if not before_datetime:
+                before_datetime = datetime.datetime.now()
             # INFO - D.A. - 2015-05-20
             # We do not want to show only one item if the last 10 items are
             # comments about one thread for example
-            if new_item not in result:
-                result.append(new_item)
+            if related_active_content not in active_contents and related_active_content not in too_recent_content:  # nopep8
+                # we verify that content is old enough
+                if content.updated < before_datetime:
+                    active_contents.append(related_active_content)
+                else:
+                    too_recent_content.append(related_active_content)
 
-            if len(result) >= limit:
+            if limit and len(active_contents) >= limit:
                 break
 
-        return result
+        return active_contents
+
+    # TODO - G.M - 2018-07-19 - Find a way to update this method to something
+    # usable and efficient for tracim v2 to get content with read/unread status
+    # instead of relying on has_new_information_for()
+    # def get_last_unread(self, parent_id: typing.Optional[int], content_type: str,
+    #                     workspace: Workspace=None, limit=10) -> typing.List[Content]:
+    #     assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
+    #     assert content_type is not None# DYN_REMOVE
+    #     assert isinstance(content_type, str) # DYN_REMOVE
+    #
+    #     read_revision_ids = self._session.query(RevisionReadStatus.revision_id) \
+    #         .filter(RevisionReadStatus.user_id==self._user_id)
+    #
+    #     not_read_revisions = self._revisions_base_query(workspace) \
+    #         .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
+    #         .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
+    #         .filter(Workspace.is_deleted.is_(False)) \
+    #         .subquery()
+    #
+    #     not_read_content_ids_query = self._session.query(
+    #         distinct(not_read_revisions.c.content_id)
+    #     )
+    #     not_read_content_ids = list(map(
+    #         itemgetter(0),
+    #         not_read_content_ids_query,
+    #     ))
+    #
+    #     not_read_contents = self._base_query(workspace) \
+    #         .filter(Content.content_id.in_(not_read_content_ids)) \
+    #         .order_by(desc(Content.updated))
+    #
+    #     if content_type != ContentType.Any:
+    #         not_read_contents = not_read_contents.filter(
+    #             Content.type==content_type)
+    #     else:
+    #         not_read_contents = not_read_contents.filter(
+    #             Content.type!=ContentType.Folder)
+    #
+    #     if parent_id:
+    #         not_read_contents = not_read_contents.filter(
+    #             Content.parent_id==parent_id)
+    #
+    #     result = []
+    #     for item in not_read_contents:
+    #         new_item = None
+    #         if ContentType.Comment == item.type:
+    #             new_item = item.parent
+    #         else:
+    #             new_item = item
+    #
+    #         # INFO - D.A. - 2015-05-20
+    #         # We do not want to show only one item if the last 10 items are
+    #         # comments about one thread for example
+    #         if new_item not in result:
+    #             result.append(new_item)
+    #
+    #         if len(result) >= limit:
+    #             break
+    #
+    #     return result
 
     def set_allowed_content(self, folder: Content, allowed_content_dict:dict):
         """
@@ -985,7 +1209,11 @@ class ContentApi(object):
         self.save(item, do_notify=False)
 
         for child in item.children:
-            with new_revision(child):
+            with new_revision(
+                session=self._session,
+                tm=transaction.manager,
+                content=child
+            ):
                 self.move_recursively(child, item, new_workspace)
         return
 
@@ -1058,11 +1286,7 @@ class ContentApi(object):
                        do_flush: bool=True,
                        recursive: bool=True
                        ):
-
-        itemset = self.get_last_unread(None, ContentType.Any)
-
-        for item in itemset:
-            self.mark_read(item, read_datetime, do_flush, recursive)
+        return self.mark_read__workspace(None, read_datetime, do_flush, recursive) # nopep8
 
     def mark_read__workspace(self,
                        workspace : Workspace,
@@ -1070,11 +1294,10 @@ class ContentApi(object):
                        do_flush: bool=True,
                        recursive: bool=True
                        ):
-
-        itemset = self.get_last_unread(None, ContentType.Any, workspace)
-
+        itemset = self.get_last_active(workspace)
         for item in itemset:
-            self.mark_read(item, read_datetime, do_flush, recursive)
+            if item.has_new_information_for(self._user):
+                self.mark_read(item, read_datetime, do_flush, recursive)
 
     def mark_read(self, content: Content,
                   read_datetime: datetime=None,
@@ -1129,7 +1352,10 @@ class ContentApi(object):
             .filter(ContentRevisionRO.content_id==content.content_id).all()
 
         for revision in revisions:
-            del revision.read_by[self._user]
+            try:
+                del revision.read_by[self._user]
+            except KeyError:
+                pass
 
         for child in content.get_valid_children():
             self.mark_unread(child, do_flush=False)
@@ -1232,6 +1458,7 @@ class ContentApi(object):
 
         return ContentType.sorted(content_types)
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def exclude_unavailable(
         self,
         contents: typing.List[Content],
@@ -1245,6 +1472,7 @@ class ContentApi(object):
                 contents.remove(content)
         return contents
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def content_under_deleted(self, content: Content) -> bool:
         if content.parent:
             if content.parent.is_deleted:
@@ -1253,6 +1481,7 @@ class ContentApi(object):
                 return self.content_under_deleted(content.parent)
         return False
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def content_under_archived(self, content: Content) -> bool:
         if content.parent:
             if content.parent.is_archived:
@@ -1261,6 +1490,7 @@ class ContentApi(object):
                 return self.content_under_archived(content.parent)
         return False
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def find_one_by_unique_property(
             self,
             property_name: str,
@@ -1289,6 +1519,7 @@ class ContentApi(object):
         )
         return query.one()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def generate_folder_label(
             self,
             workspace: Workspace,

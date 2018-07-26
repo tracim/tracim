@@ -10,21 +10,33 @@ from tracim.models.contents import GlobalStatus
 from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
+from tracim.models.context_models import ActiveContentFilter
+from tracim.models.context_models import ContentIdsQuery
+from tracim.models.context_models import UserWorkspaceAndContentPath
 from tracim.models.context_models import ContentCreation
 from tracim.models.context_models import UserCreation
 from tracim.models.context_models import SetEmail
 from tracim.models.context_models import SetPassword
 from tracim.models.context_models import UserInfos
 from tracim.models.context_models import UserProfile
+from tracim.models.context_models import ContentPreviewSizedPath
+from tracim.models.context_models import RevisionPreviewSizedPath
+from tracim.models.context_models import PageQuery
+from tracim.models.context_models import WorkspaceAndContentRevisionPath
+from tracim.models.context_models import WorkspaceMemberInvitation
+from tracim.models.context_models import WorkspaceUpdate
+from tracim.models.context_models import RoleUpdate
 from tracim.models.context_models import CommentCreation
 from tracim.models.context_models import TextBasedContentUpdate
 from tracim.models.context_models import SetContentStatus
 from tracim.models.context_models import CommentPath
 from tracim.models.context_models import MoveParams
 from tracim.models.context_models import WorkspaceAndContentPath
+from tracim.models.context_models import WorkspaceAndUserPath
 from tracim.models.context_models import ContentFilter
 from tracim.models.context_models import LoginCredentials
 from tracim.models.data import UserRoleInWorkspace
+from tracim.models.data import ActionDescription
 
 
 class UserDigestSchema(marshmallow.Schema):
@@ -180,6 +192,19 @@ class ContentIdPathSchema(marshmallow.Schema):
     )
 
 
+class RevisionIdPathSchema(marshmallow.Schema):
+    revision_id = marshmallow.fields.Int(example=6, required=True)
+
+
+class WorkspaceAndUserIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndUserPath(**data)
+
+
 class WorkspaceAndContentIdPathSchema(
     WorkspaceIdPathSchema,
     ContentIdPathSchema
@@ -187,6 +212,71 @@ class WorkspaceAndContentIdPathSchema(
     @post_load
     def make_path_object(self, data):
         return WorkspaceAndContentPath(**data)
+
+
+class WidthAndHeightPathSchema(marshmallow.Schema):
+    width = marshmallow.fields.Int(example=256)
+    height = marshmallow.fields.Int(example=256)
+
+
+class AllowedJpgPreviewSizesSchema(marshmallow.Schema):
+    width = marshmallow.fields.Int(example=256)
+    height = marshmallow.fields.Int(example=256)
+
+
+class AllowedJpgPreviewDimSchema(marshmallow.Schema):
+    restricted = marshmallow.fields.Bool()
+    dimensions = marshmallow.fields.Nested(
+        AllowedJpgPreviewSizesSchema,
+        many=True
+    )
+
+
+class WorkspaceAndContentRevisionIdPathSchema(
+    WorkspaceIdPathSchema,
+    ContentIdPathSchema,
+    RevisionIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndContentRevisionPath(**data)
+
+
+class ContentPreviewSizedPathSchema(
+    WorkspaceAndContentIdPathSchema,
+    WidthAndHeightPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return ContentPreviewSizedPath(**data)
+
+
+class RevisionPreviewSizedPathSchema(
+    WorkspaceAndContentRevisionIdPathSchema,
+    WidthAndHeightPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return RevisionPreviewSizedPath(**data)
+
+
+class UserWorkspaceAndContentIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema,
+    ContentIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return UserWorkspaceAndContentPath(**data)
+
+
+class UserWorkspaceIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndUserPath(**data)
 
 
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
@@ -200,6 +290,19 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     @post_load
     def make_path_object(self, data):
         return CommentPath(**data)
+
+
+class PageQuerySchema(marshmallow.Schema):
+    page = marshmallow.fields.Int(
+        example=2,
+        default=0,
+        description='allow to show a specific page of a pdf file',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+
+    @post_load
+    def make_page_query(self, data):
+        return PageQuery(**data)
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
@@ -238,12 +341,75 @@ class FilterContentQuerySchema(marshmallow.Schema):
                     'to allow to show only archived documents',
         validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
+    content_type = marshmallow.fields.String(
+        example=ContentType.Any,
+        default=ContentType.Any,
+        validate=OneOf(ContentType.allowed_type_values())
+    )
 
     @post_load
     def make_content_filter(self, data):
         return ContentFilter(**data)
 
+
+class ActiveContentFilterQuerySchema(marshmallow.Schema):
+    limit = marshmallow.fields.Int(
+        example=2,
+        default=0,
+        description='if 0 or not set, return all elements, else return only '
+                    'the first limit elem (according to offset)',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+    before_datetime = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description='return only content lastly updated before this date',
+    )
+    @post_load
+    def make_content_filter(self, data):
+        return ActiveContentFilter(**data)
+
+
+class ContentIdsQuerySchema(marshmallow.Schema):
+    contents_ids = marshmallow.fields.List(
+        marshmallow.fields.Int(
+            example=6,
+            validate=Range(min=1, error="Value must be greater than 0"),
+        )
+    )
+    @post_load
+    def make_contents_ids(self, data):
+        return ContentIdsQuery(**data)
+
+
 ###
+
+
+class RoleUpdateSchema(marshmallow.Schema):
+    role = marshmallow.fields.String(
+        example='contributor',
+        validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+    )
+
+    @post_load
+    def make_role(self, data):
+        return RoleUpdate(**data)
+
+
+class WorkspaceMemberInviteSchema(RoleUpdateSchema):
+    user_id = marshmallow.fields.Int(
+        example=5,
+        default=None,
+        allow_none=True,
+    )
+    user_email_or_public_name = marshmallow.fields.String(
+        example='suri@cate.fr',
+        default=None,
+        allow_none=True,
+    )
+
+    @post_load
+    def make_role(self, data):
+        return WorkspaceMemberInvitation(**data)
 
 
 class BasicAuthSchema(marshmallow.Schema):
@@ -268,6 +434,23 @@ class BasicAuthSchema(marshmallow.Schema):
 
 class LoginOutputHeaders(marshmallow.Schema):
     expire_after = marshmallow.fields.String()
+
+
+class WorkspaceModifySchema(marshmallow.Schema):
+    label = marshmallow.fields.String(
+        example='My Workspace',
+    )
+    description = marshmallow.fields.String(
+        example='A super description of my workspace.',
+    )
+
+    @post_load
+    def make_workspace_modifications(self, data):
+        return WorkspaceUpdate(**data)
+
+
+class WorkspaceCreationSchema(WorkspaceModifySchema):
+    pass
 
 
 class NoContentSchema(marshmallow.Schema):
@@ -337,11 +520,29 @@ class WorkspaceMemberSchema(marshmallow.Schema):
         validate=Range(min=1, error="Value must be greater than 0"),
     )
     user = marshmallow.fields.Nested(
-        UserSchema(only=('public_name', 'avatar_url'))
+        UserDigestSchema()
     )
+    workspace = marshmallow.fields.Nested(
+        WorkspaceDigestSchema(exclude=('sidebar_entries',))
+    )
+    is_active = marshmallow.fields.Bool()
 
     class Meta:
         description = 'Workspace Member information'
+
+
+class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
+    newly_created = marshmallow.fields.Bool(
+        exemple=False,
+        description='Is the user completely new '
+                    '(and account was just created) or not ?',
+    )
+    email_sent = marshmallow.fields.Bool(
+        exemple=False,
+        description='Has an email been sent to user to inform him about '
+                    'this new workspace registration and eventually his account'
+                    'creation'
+    )
 
 
 class ApplicationConfigSchema(marshmallow.Schema):
@@ -505,6 +706,12 @@ class ContentDigestSchema(marshmallow.Schema):
     )
 
 
+class ReadStatusSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(
+        example=6,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
+    read_by_user = marshmallow.fields.Bool(example=False, default=False)
 #####
 # Content
 #####
@@ -529,9 +736,18 @@ class TextBasedDataAbstractSchema(marshmallow.Schema):
     )
 
 
+class FileInfoAbstractSchema(marshmallow.Schema):
+    raw_content = marshmallow.fields.String(
+        description='raw text or html description of the file'
+    )
+
+
 class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
     pass
 
+
+class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
+    pass
 
 #####
 # Revision
@@ -549,6 +765,10 @@ class RevisionSchema(ContentDigestSchema):
         example=12,
         validate=Range(min=1, error="Value must be greater than 0"),
     )
+    revision_type = marshmallow.fields.String(
+        example=ActionDescription.CREATION,
+        validate=OneOf(ActionDescription.allowed_values()),
+    )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
         description='Content creation date',
@@ -557,6 +777,10 @@ class RevisionSchema(ContentDigestSchema):
 
 
 class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
+    pass
+
+
+class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
 
 
@@ -602,6 +826,10 @@ class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbs
     @post_load
     def text_based_content_update(self, data):
         return TextBasedContentUpdate(**data)
+
+
+class FileContentModifySchema(TextBasedContentModifySchema):
+    pass
 
 
 class SetContentStatusSchema(marshmallow.Schema):

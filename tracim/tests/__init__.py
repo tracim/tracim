@@ -25,6 +25,8 @@ from tracim.config import CFG
 from tracim.extensions import hapic
 from tracim import web
 from webtest import TestApp
+from io import BytesIO
+from PIL import Image
 
 
 def eq_(a, b, msg=None):
@@ -54,6 +56,15 @@ def set_html_document_slug_to_legacy(session_factory) -> None:
     assert content_query.count() > 0
 
 
+def create_1000px_png_test_image():
+    file = BytesIO()
+    image = Image.new('RGBA', size=(1000, 1000), color=(0, 0, 0))
+    image.save(file, 'png')
+    file.name = 'test_image.png'
+    file.seek(0)
+    return file
+
+
 class FunctionalTest(unittest.TestCase):
 
     fixtures = [BaseFixture]
@@ -68,7 +79,8 @@ class FunctionalTest(unittest.TestCase):
             'depot_storage_dir': '/tmp/test/depot',
             'depot_storage_name': 'test',
             'preview_cache_dir': '/tmp/test/preview_cache',
-
+            'preview.jpg.restricted_dims': True,
+            'email.notification.activated': 'false',
         }
         hapic.reset_context()
         self.engine = get_engine(self.settings)

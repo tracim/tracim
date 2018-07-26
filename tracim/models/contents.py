@@ -251,6 +251,19 @@ class ContentTypeLegacy(NewContentType):
                 return
         raise ContentTypeNotExist()
 
+    def get_slug_aliases(self) -> typing.List[str]:
+        """
+        Get all slug aliases of a content,
+        useful for legacy code convertion
+        """
+        # TODO - G.M - 2018-07-05 - Remove this legacy compat code
+        # when possible.
+        page_alias = [self.Page, self.PageLegacy]
+        if self.slug in page_alias:
+            return page_alias
+        else:
+            return [self.slug]
+
     @classmethod
     def all(cls) -> typing.List[str]:
         return cls.allowed_types()
@@ -259,6 +272,15 @@ class ContentTypeLegacy(NewContentType):
     def allowed_types(cls) -> typing.List[str]:
         contents_types = [status.slug for status in ALL_CONTENTS_DEFAULT_TYPES]
         return contents_types
+
+    @classmethod
+    def allowed_type_values(cls) -> typing.List[str]:
+        """
+        All content type slug + special values like any
+        """
+        content_types = cls.allowed_types()
+        content_types.append(ContentTypeLegacy.Any)
+        return content_types
 
     @classmethod
     def allowed_types_for_folding(cls):

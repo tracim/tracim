@@ -177,5 +177,29 @@ class NoUserSetted(TracimException):
     pass
 
 
+class RoleDoesNotExist(TracimException):
+    pass
+
+
+class EmailValidationFailed(TracimException):
+    pass
+
+
+class UserCreationFailed(TracimException):
+    pass
+
+
 class ParentNotFound(NotFound):
+    pass
+
+
+class RevisionDoesNotMatchThisContent(TracimException):
+    pass
+
+
+class PageOfPreviewNotFound(NotFound):
+    pass
+
+
+class PreviewDimNotAllowed(TracimException):
     pass

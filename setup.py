@@ -35,6 +35,7 @@ requires = [
     'filedepot',
     'babel',
     'python-slugify',
+    'preview-generator',
     # mail-notifier
     'mako',
     'lxml',
@@ -48,7 +49,8 @@ tests_require = [
     'pytest-cov',
     'pep8',
     'mypy',
-    'requests'
+    'requests',
+    'Pillow'
 ]
 
 mysql_require = [
