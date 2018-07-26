@@ -79,10 +79,8 @@ class Account extends React.Component {
         case 'personalData':
           return <PersonalData />
 
-        {/*
-          case 'calendar':
-            return <Calendar user={this.props.user} />
-        */}
+        // case 'calendar':
+        //   return <Calendar user={this.props.user} />
 
         case 'notification':
           return <Notification
