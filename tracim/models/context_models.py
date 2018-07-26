@@ -128,9 +128,11 @@ class ContentCreation(object):
             self,
             label: str,
             content_type: str,
+            parent_id: typing.Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
+        self.parent_id = parent_id
 
 
 class CommentCreation(object):
@@ -505,6 +507,10 @@ class RevisionInContext(object):
     @property
     def label(self) -> str:
         return self.revision.label
+
+    @property
+    def revision_type(self) -> str:
+        return self.revision.revision_type
 
     @property
     def content_type(self) -> str:

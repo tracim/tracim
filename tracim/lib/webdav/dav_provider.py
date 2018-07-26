@@ -70,7 +70,12 @@ class Provider(DAVProvider):
 
         # If the requested path is the root, then we return a RootResource resource
         if path == root_path:
-            return resources.RootResource(path, environ, user=user, session=session)
+            return resources.RootResource(
+                path=path,
+                environ=environ,
+                user=user,
+                session=session
+            )
 
         workspace_api = WorkspaceApi(
             current_user=user,
@@ -111,10 +116,24 @@ class Provider(DAVProvider):
 
         # Easy cases : path either end with /.deleted, /.archived or /.history, then we return corresponding resources
         if path.endswith(SpecialFolderExtension.Archived) and self._show_archive:
-            return resources.ArchivedFolderResource(path, environ, workspace, content)
+            return resources.ArchivedFolderResource(
+                path=path,
+                environ=environ,
+                workspace=workspace,
+                user=user,
+                content=content,
+                session=session,
+            )
 
         if path.endswith(SpecialFolderExtension.Deleted) and self._show_delete:
-            return resources.DeletedFolderResource(path, environ, workspace, content)
+            return resources.DeletedFolderResource(
+                path=path,
+                environ=environ,
+                workspace=workspace,
+                user=user,
+                content=content,
+                session=session,
+            )
 
         if path.endswith(SpecialFolderExtension.History) and self._show_history:
             is_deleted_folder = re.search(r'/\.deleted/\.history$', path) is not None
@@ -124,7 +143,15 @@ class Provider(DAVProvider):
                 else HistoryType.Archived if is_archived_folder \
                 else HistoryType.Standard
 
-            return resources.HistoryFolderResource(path, environ, workspace, content, type)
+            return resources.HistoryFolderResource(
+                path=path,
+                environ=environ,
+                workspace=workspace,
+                user=user,
+                content=content,
+                session=session,
+                type=type
+            )
 
         # Now that's more complicated, we're trying to find out if the path end with /.history/file_name
         is_history_file_folder = re.search(r'/\.history/([^/]+)$', path) is not None
@@ -133,9 +160,10 @@ class Provider(DAVProvider):
             return resources.HistoryFileFolderResource(
                 path=path,
                 environ=environ,
-                content=content
+                user=user,
+                content=content,
+                session=session,
             )
-
         # And here next step :
         is_history_file = re.search(r'/\.history/[^/]+/\((\d+) - [a-zA-Z]+\) .+', path) is not None
 
@@ -147,9 +175,23 @@ class Provider(DAVProvider):
             content = self.get_content_from_revision(content_revision, content_api)
 
             if content.type == ContentType.File:
-                return resources.HistoryFileResource(path, environ, content, content_revision)
+                return resources.HistoryFileResource(
+                    path=path,
+                    environ=environ,
+                    user=user,
+                    content=content,
+                    content_revision=content_revision,
+                    session=session,
+                )
             else:
-                return resources.HistoryOtherFile(path, environ, content, content_revision)
+                return resources.HistoryOtherFile(
+                    path=path,
+                    environ=environ,
+                    user=user,
+                    content=content,
+                    content_revision=content_revision,
+                    session=session,
+                )
 
         # And if we're still going, the client is asking for a standard Folder/File/Page/Thread so we check the type7
         # and return the corresponding resource
