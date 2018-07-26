@@ -37,7 +37,7 @@ export const Notification = props => {
                 <td>
                   <div className='notification__table__role'>
                     <div className='notification__table__role__icon'>
-                      <i className={`fa ${getRole(ws.role).icon}`} />
+                      <i className={`fa fa-fw ${getRole(ws.role).icon}`} />
                     </div>
                     <div className='notification__table__role__text d-none d-sm-flex'>
                       {props.t(getRole(ws.role).translationKey)}

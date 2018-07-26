@@ -56,7 +56,6 @@ settingText()
     justify-content center
     align-items center
     flex-wrap wrap
-    border 1px solid grey
     padding 25px
     font-size 18px
     &__wrapper
@@ -143,15 +142,15 @@ settingText()
       .calendar
         &__text
           settingText()
-        &__title
-          margin 15px 0
-          font-size 18px
         &__link
           display inline-block
           border 1px solid grey
           border-radius 5px
           padding 10px 25px
-        &__timezone
+      .timezone
+        &__text
+          settingText()
+        &__time
           margin 15px 0 30px 0
           &__select
             max-width 300px

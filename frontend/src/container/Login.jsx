@@ -65,7 +65,7 @@ class Login extends React.Component {
     if (this.props.user.logged) return <Redirect to={{pathname: '/'}} />
     else {
       return (
-        <section className='loginpage'>
+        <section className='loginpage primaryColorBg'>
           <div className='container-fluid'>
 
             <LoginLogo customClass='loginpage__logo' logoSrc={LoginLogoImg} />
@@ -126,7 +126,7 @@ class Login extends React.Component {
                       <Button
                         htmlType='button'
                         bootstrapType='primary'
-                        customClass='connection__form__btnsubmit'
+                        customClass='connection__form__btnsubmit ml-auto'
                         label='Connexion'
                         onClick={this.handleClickSubmit}
                       />
@@ -138,6 +138,13 @@ class Login extends React.Component {
             </div>
 
           </div>
+
+          <footer className='loginpage__footer'>
+            <div className='loginpage__footer__text whiteFontColor'>
+              copyright © 2013 - 2018 tracim project.
+           </div>
+          </footer>
+
         </section>
       )
     }
