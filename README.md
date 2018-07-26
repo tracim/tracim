@@ -20,6 +20,13 @@ on Debian Stretch (9) with sudo:
     sudo apt install git
     sudo apt install python3 python3-venv python3-dev python3-pip
     sudo apt install redis-server
+    sudo apt install zlib1g-dev libjpeg-dev
+    sudo apt install imagemagick libmagickwand-dev ghostscript
+
+for better preview support:
+
+    sudo apt install libreoffice # most office documents file and text format
+    sudo apt install inkscape # for .svg files.
 
 ### Get the source ###
 

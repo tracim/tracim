@@ -6,6 +6,7 @@ from enum import Enum
 from slugify import slugify
 from sqlalchemy.orm import Session
 from tracim import CFG
+from tracim.config import PreviewDim
 from tracim.models import User
 from tracim.models.auth import Profile
 from tracim.models.data import Content
@@ -16,6 +17,17 @@ from tracim.models.roles import WorkspaceRoles
 from tracim.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim.models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim.models.contents import ContentTypeLegacy as ContentType
+
+
+class PreviewAllowedDim(object):
+
+    def __init__(
+            self,
+            restricted:bool,
+            dimensions: typing.List[PreviewDim]
+    ) -> None:
+        self.restricted = restricted
+        self.dimensions = dimensions
 
 
 class MoveParams(object):
@@ -44,6 +56,39 @@ class WorkspaceAndContentPath(object):
     def __init__(self, workspace_id: int, content_id: int) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
+
+
+class WorkspaceAndContentRevisionPath(object):
+    """
+    Paths params with workspace id and content_id model
+    """
+    def __init__(self, workspace_id: int, content_id: int, revision_id) -> None:
+        self.content_id = content_id
+        self.revision_id = revision_id
+        self.workspace_id = workspace_id
+
+
+class ContentPreviewSizedPath(object):
+    """
+    Paths params with workspace id and content_id, width, heigth
+    """
+    def __init__(self, workspace_id: int, content_id: int, width: int, height: int) -> None:  # nopep8
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.width = width
+        self.height = height
+
+
+class RevisionPreviewSizedPath(object):
+    """
+    Paths params with workspace id and content_id, revision_id width, heigth
+    """
+    def __init__(self, workspace_id: int, content_id: int, revision_id: int, width: int, height: int) -> None:  # nopep8
+        self.content_id = content_id
+        self.revision_id = revision_id
+        self.workspace_id = workspace_id
+        self.width = width
+        self.height = height
 
 
 class WorkspaceAndUserPath(object):
@@ -78,6 +123,17 @@ class CommentPath(object):
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.comment_id = comment_id
+
+
+class PageQuery(object):
+    """
+    Page query model
+    """
+    def __init__(
+            self,
+            page: int = 0
+    ):
+        self.page = page
 
 
 class ContentFilter(object):

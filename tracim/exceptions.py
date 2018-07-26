@@ -178,3 +178,15 @@ class UserCreationFailed(TracimException):
 
 class ParentNotFound(NotFound):
     pass
+
+
+class RevisionDoesNotMatchThisContent(TracimException):
+    pass
+
+
+class PageOfPreviewNotFound(NotFound):
+    pass
+
+
+class PreviewDimNotAllowed(TracimException):
+    pass

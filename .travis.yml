@@ -5,6 +5,13 @@ python:
   - "3.5"
   - "3.6"
 
+addons:
+  apt:
+    packages:
+    - libreoffice
+    - imagemagick
+    - libmagickwand-dev
+    - ghostscript
 services:
   - docker
   - redis-server

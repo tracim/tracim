@@ -7,6 +7,7 @@ import typing
 from operator import itemgetter
 
 import transaction
+from preview_generator.manager import PreviewManager
 from sqlalchemy import func
 from sqlalchemy.orm import Query
 from depot.manager import DepotManager
@@ -25,6 +26,9 @@ from sqlalchemy.sql.elements import and_
 from tracim.lib.utils.utils import cmp_to_key
 from tracim.lib.core.notifications import NotifierFactory
 from tracim.exceptions import SameValueError
+from tracim.exceptions import PageOfPreviewNotFound
+from tracim.exceptions import PreviewDimNotAllowed
+from tracim.exceptions import RevisionDoesNotMatchThisContent
 from tracim.exceptions import EmptyCommentContentNotAllowed
 from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.exceptions import ContentNotFound
@@ -43,11 +47,13 @@ from tracim.models.data import UserRoleInWorkspace
 from tracim.models.data import Workspace
 from tracim.lib.utils.translation import fake_translator as _
 from tracim.models.context_models import RevisionInContext
+from tracim.models.context_models import PreviewAllowedDim
 from tracim.models.context_models import ContentInContext
 
 __author__ = 'damien'
 
 
+# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
 def compare_content_for_sorting_by_type_and_name(
         content1: Content,
         content2: Content
@@ -86,7 +92,7 @@ def compare_content_for_sorting_by_type_and_name(
         else:
             return 0
 
-
+# TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
 def compare_tree_items_for_sorting_by_type_and_name(
         item1: NodeTreeItem,
         item2: NodeTreeItem
@@ -133,6 +139,7 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
+        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
 
     @contextmanager
     def show(
@@ -190,6 +197,7 @@ class ContentApi(object):
         return self._session.query(Content)\
             .join(ContentRevisionRO, self._get_revision_join())
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
     def sort_tree_items(
         cls,
@@ -205,6 +213,7 @@ class ContentApi(object):
 
         return content_list
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     @classmethod
     def sort_content(
         cls,
@@ -500,16 +509,24 @@ class ContentApi(object):
             raise ContentNotFound('Content "{}" not found in database'.format(content_id)) from exc  # nopep8
         return content
 
-    def get_one_revision(self, revision_id: int = None) -> ContentRevisionRO:
+    def get_one_revision(self, revision_id: int = None, content: Content= None) -> ContentRevisionRO:  # nopep8
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
+        :param content: The content related to the revision, if None do not
+        check if revision is related to this content.
         :return: An item Content linked with the correct revision
         """
         assert revision_id is not None# DYN_REMOVE
 
         revision = self._session.query(ContentRevisionRO).filter(ContentRevisionRO.revision_id == revision_id).one()
-
+        if content and revision.content_id != content.content_id:
+            raise RevisionDoesNotMatchThisContent(
+                'revision {revision_id} is not a revision of content {content_id}'.format(  # nopep8
+                    revision_id=revision.revision_id,
+                    content_id=content.content_id,
+                    )
+            )
         return revision
 
     # INFO - A.P - 2017-07-03 - python file object getter
@@ -632,6 +649,7 @@ class ContentApi(object):
             )\
             .one()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def get_folder_with_workspace_path_labels(
             self,
             path_labels: [str],
@@ -725,6 +743,104 @@ class ContentApi(object):
             ),
         ))
 
+
+    def get_pdf_preview_path(
+            self,
+            content_id: int,
+            revision_id: int,
+            page: int
+    ) -> str:
+        """
+        Get pdf preview of revision of content
+        :param content_id: id of content
+        :param revision_id: id of content revision
+        :param page: page number of the preview, useful for multipage content
+        :return: preview_path as string
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        if page >= self.preview_manager.get_page_nb(file_path):
+            raise PageOfPreviewNotFound(
+                'page {page} of content {content_id} does not exist'.format(
+                    page=page,
+                    content_id=content_id
+                ),
+            )
+        jpg_preview_path = self.preview_manager.get_pdf_preview(
+            file_path,
+            page=page
+        )
+        return jpg_preview_path
+
+    def get_full_pdf_preview_path(self, revision_id: int) -> str:
+        """
+        Get full(multiple page) pdf preview of revision of content
+        :param revision_id: id of revision
+        :return: path of the full pdf preview of this revision
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        return pdf_preview_path
+
+    def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:
+        """
+        Get jpg preview allowed dimensions and strict bool param.
+        """
+        return PreviewAllowedDim(
+            self._config.PREVIEW_JPG_RESTRICTED_DIMS,
+            self._config.PREVIEW_JPG_ALLOWED_DIMS,
+        )
+
+    def get_jpg_preview_path(
+        self,
+        content_id: int,
+        revision_id: int,
+        page: int,
+        width: int = None,
+        height: int = None,
+    ) -> str:
+        """
+        Get jpg preview of revision of content
+        :param content_id: id of content
+        :param revision_id: id of content revision
+        :param page: page number of the preview, useful for multipage content
+        :param width: width in pixel
+        :param height: height in pixel
+        :return: preview_path as string
+        """
+        file_path = self.get_one_revision_filepath(revision_id)
+        if page >= self.preview_manager.get_page_nb(file_path):
+            raise Exception(
+                'page {page} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
+                    page=page,
+                    revision_id=revision_id,
+                    content_id=content_id,
+                ),
+            )
+        if not width and not height:
+            width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
+            height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
+
+        allowed_dim = False
+        for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
+            if width == preview_dim.width and height == preview_dim.height:
+                allowed_dim = True
+                break
+
+        if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
+            raise PreviewDimNotAllowed(
+                'Size {width}x{height} is not allowed for jpeg preview'.format(
+                    width=width,
+                    height=height,
+                )
+            )
+        jpg_preview_path = self.preview_manager.get_jpeg_preview(
+            file_path,
+            page=page,
+            width=width,
+            height=height,
+        )
+        return jpg_preview_path
+
     def _get_all_query(
         self,
         parent_id: int = None,
@@ -796,6 +912,67 @@ class ContentApi(object):
         resultset = resultset.filter(Content.parent_id==parent_id)
 
         return resultset.all()
+
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
+    def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
+        assert content_type is not None# DYN_REMOVE
+
+        resultset = self._base_query(workspace)
+
+        if content_type != ContentType.Any:
+            resultset = resultset.filter(Content.type==content_type)
+
+        return resultset.all()
+
+    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> typing.List[Content]:
+        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
+        assert content_type is not None# DYN_REMOVE
+        assert isinstance(content_type, str) # DYN_REMOVE
+
+        resultset = self._base_query(workspace) \
+            .filter(Content.workspace_id == Workspace.workspace_id) \
+            .filter(Workspace.is_deleted.is_(False)) \
+            .order_by(desc(Content.updated))
+
+        if content_type!=ContentType.Any:
+            resultset = resultset.filter(Content.type==content_type)
+
+        if parent_id:
+            resultset = resultset.filter(Content.parent_id==parent_id)
+
+        result = []
+        for item in resultset:
+            new_item = None
+            if ContentType.Comment == item.type:
+                new_item = item.parent
+            else:
+                new_item = item
+
+            # INFO - D.A. - 2015-05-20
+            # We do not want to show only one item if the last 10 items are
+            # comments about one thread for example
+            if new_item not in result:
+                result.append(new_item)
+
+            if len(result) >= limit:
+                break
+
+        return result
+
+    def get_last_unread(self, parent_id: int, content_type: str,
+                        workspace: Workspace=None, limit=10) -> typing.List[Content]:
+        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
+        assert content_type is not None# DYN_REMOVE
+        assert isinstance(content_type, str) # DYN_REMOVE
+
+        read_revision_ids = self._session.query(RevisionReadStatus.revision_id) \
+            .filter(RevisionReadStatus.user_id==self._user_id)
+
+        not_read_revisions = self._revisions_base_query(workspace) \
+            .filter(~ContentRevisionRO.revision_id.in_(read_revision_ids)) \
+            .filter(ContentRevisionRO.workspace_id == Workspace.workspace_id) \
+            .filter(Workspace.is_deleted.is_(False)) \
+            .subquery()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_all_without_exception(self, content_type: str, workspace: Workspace=None) -> typing.List[Content]:
@@ -1281,6 +1458,7 @@ class ContentApi(object):
 
         return ContentType.sorted(content_types)
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def exclude_unavailable(
         self,
         contents: typing.List[Content],
@@ -1294,6 +1472,7 @@ class ContentApi(object):
                 contents.remove(content)
         return contents
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def content_under_deleted(self, content: Content) -> bool:
         if content.parent:
             if content.parent.is_deleted:
@@ -1302,6 +1481,7 @@ class ContentApi(object):
                 return self.content_under_deleted(content.parent)
         return False
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def content_under_archived(self, content: Content) -> bool:
         if content.parent:
             if content.parent.is_archived:
@@ -1310,6 +1490,7 @@ class ContentApi(object):
                 return self.content_under_archived(content.parent)
         return False
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def find_one_by_unique_property(
             self,
             property_name: str,
@@ -1338,6 +1519,7 @@ class ContentApi(object):
         )
         return query.one()
 
+    # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def generate_folder_label(
             self,
             workspace: Workspace,

@@ -14,6 +14,10 @@ from tracim.models.context_models import ActiveContentFilter
 from tracim.models.context_models import ContentIdsQuery
 from tracim.models.context_models import UserWorkspaceAndContentPath
 from tracim.models.context_models import ContentCreation
+from tracim.models.context_models import ContentPreviewSizedPath
+from tracim.models.context_models import RevisionPreviewSizedPath
+from tracim.models.context_models import PageQuery
+from tracim.models.context_models import WorkspaceAndContentRevisionPath
 from tracim.models.context_models import WorkspaceMemberInvitation
 from tracim.models.context_models import WorkspaceUpdate
 from tracim.models.context_models import RoleUpdate
@@ -114,6 +118,10 @@ class ContentIdPathSchema(marshmallow.Schema):
     )
 
 
+class RevisionIdPathSchema(marshmallow.Schema):
+    revision_id = marshmallow.fields.Int(example=6, required=True)
+
+
 class WorkspaceAndUserIdPathSchema(
     UserIdPathSchema,
     WorkspaceIdPathSchema
@@ -130,6 +138,52 @@ class WorkspaceAndContentIdPathSchema(
     @post_load
     def make_path_object(self, data):
         return WorkspaceAndContentPath(**data)
+
+
+class WidthAndHeightPathSchema(marshmallow.Schema):
+    width = marshmallow.fields.Int(example=256)
+    height = marshmallow.fields.Int(example=256)
+
+
+class AllowedJpgPreviewSizesSchema(marshmallow.Schema):
+    width = marshmallow.fields.Int(example=256)
+    height = marshmallow.fields.Int(example=256)
+
+
+class AllowedJpgPreviewDimSchema(marshmallow.Schema):
+    restricted = marshmallow.fields.Bool()
+    dimensions = marshmallow.fields.Nested(
+        AllowedJpgPreviewSizesSchema,
+        many=True
+    )
+
+
+class WorkspaceAndContentRevisionIdPathSchema(
+    WorkspaceIdPathSchema,
+    ContentIdPathSchema,
+    RevisionIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndContentRevisionPath(**data)
+
+
+class ContentPreviewSizedPathSchema(
+    WorkspaceAndContentIdPathSchema,
+    WidthAndHeightPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return ContentPreviewSizedPath(**data)
+
+
+class RevisionPreviewSizedPathSchema(
+    WorkspaceAndContentRevisionIdPathSchema,
+    WidthAndHeightPathSchema
+):
+    @post_load
+    def make_path_object(self, data):
+        return RevisionPreviewSizedPath(**data)
 
 
 class UserWorkspaceAndContentIdPathSchema(
@@ -162,6 +216,19 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     @post_load
     def make_path_object(self, data):
         return CommentPath(**data)
+
+
+class PageQuerySchema(marshmallow.Schema):
+    page = marshmallow.fields.Int(
+        example=2,
+        default=0,
+        description='allow to show a specific page of a pdf file',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+
+    @post_load
+    def make_page_query(self, data):
+        return PageQuery(**data)
 
 
 class FilterContentQuerySchema(marshmallow.Schema):
@@ -594,9 +661,18 @@ class TextBasedDataAbstractSchema(marshmallow.Schema):
     )
 
 
+class FileInfoAbstractSchema(marshmallow.Schema):
+    raw_content = marshmallow.fields.String(
+        description='raw text or html description of the file'
+    )
+
+
 class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
     pass
 
+
+class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
+    pass
 
 #####
 # Revision
@@ -626,6 +702,10 @@ class RevisionSchema(ContentDigestSchema):
 
 
 class TextBasedRevisionSchema(RevisionSchema, TextBasedDataAbstractSchema):
+    pass
+
+
+class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
 
 
@@ -671,6 +751,10 @@ class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbs
     @post_load
     def text_based_content_update(self, data):
         return TextBasedContentUpdate(**data)
+
+
+class FileContentModifySchema(TextBasedContentModifySchema):
+    pass
 
 
 class SetContentStatusSchema(marshmallow.Schema):
