@@ -86,7 +86,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
-    @hapic.input_query(ContentIdsQuerySchema())
+    @hapic.input_query(ContentIdsQuerySchema(), as_list=['contents_ids'])
     @hapic.output_body(ReadStatusSchema(many=True))  # nopep8
     def contents_read_status(self, context, request: TracimRequest, hapic_data=None):  # nopep8
         """
@@ -117,7 +117,6 @@ class UserController(Controller):
             api.get_content_in_context(content)
             for content in last_actives
         ]
-
 
     @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
     @require_same_user_or_profile(Group.TIM_ADMIN)

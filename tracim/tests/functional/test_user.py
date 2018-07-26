@@ -330,7 +330,6 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[6]['content_id'] == main_folder.content_id
 
-    @pytest.mark.xfail(reason='List of item in path bug need to be fixed')
     def test_api__get_read_status__ok__200__nominal_case(self):
 
         # init DB
@@ -402,20 +401,16 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created.content_id,
             main_folder.content_id,
         ]
-
-        content_id_str = '[{0},{1},{2},{3}]'.format(
-            selected_contents_id[0],
-            selected_contents_id[1],
-            selected_contents_id[2],
-            selected_contents_id[3],
+        url = '/api/v2/users/1/workspaces/{workspace_id}/contents/read_status?contents_ids={cid1}&contents_ids={cid2}&contents_ids={cid3}&contents_ids={cid4}'.format(  # nopep8
+              workspace_id=workspace.workspace_id,
+              cid1=selected_contents_id[0],
+              cid2=selected_contents_id[1],
+              cid3=selected_contents_id[2],
+              cid4=selected_contents_id[3],
         )
-        params = {
-            'contents_ids': content_id_str
-        }
         res = self.testapp.get(
-            '/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id),  # nopep8
+            url=url,
             status=200,
-            params=params
         )
         res = res.json_body
         assert len(res) == 4
@@ -424,16 +419,13 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             assert isinstance(elem['read_by_user'], bool)
         # comment is newest than page2
         assert res[0]['content_id'] == firstly_created_but_recently_commented.content_id
-        assert res[1]['content_id'] == secondly_created_but_not_commented.content_id
         # last updated content is newer than other one despite creation
         # of the other is more recent
-        assert res[2]['content_id'] == firstly_created_but_recently_updated.content_id
-        assert res[3]['content_id'] == secondly_created_but_not_updated.content_id
+        assert res[1]['content_id'] == firstly_created_but_recently_updated.content_id
         # creation order is inverted here as last created is last active
-        assert res[4]['content_id'] == secondly_created.content_id
-        assert res[5]['content_id'] == firstly_created.content_id
+        assert res[2]['content_id'] == firstly_created.content_id
         # folder subcontent modification does not change folder order
-        assert res[6]['content_id'] == main_folder.content_id
+        assert res[3]['content_id'] == main_folder.content_id
 
 
 class TestUserSetContentAsRead(FunctionalTest):
