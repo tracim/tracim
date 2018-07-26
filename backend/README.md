@@ -1,7 +1,3 @@
-[![Build Status](https://travis-ci.org/tracim/tracim_backend.svg?branch=master)](https://travis-ci.org/tracim/tracim_backend)
-[![Coverage Status](https://coveralls.io/repos/github/tracim/tracim_backend/badge.svg?branch=master)](https://coveralls.io/github/tracim/tracim_backend?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim_backend/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tracim/tracim_backend/?branch=master)
-
 tracim_backend
 ==============
 
@@ -32,11 +28,11 @@ for better preview support:
 
 get source from github:
 
-    git clone https://github.com/tracim/tracim_backend.git
+    git clone https://github.com/tracim/tracim_v2.git
 
-go to *tracim_backend* directory:
+go to *backend* subdirectory:
 
-    cd tracim_backend
+    cd backend
 
 ### Setup Python Virtualenv ###
 
@@ -164,11 +160,3 @@ For example, with default config:
 In Tracim, only some user can access to some informations, this is also true in
 Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
 what a specific user can do.
-
-
-CI
----
-
-* Code quality: https://scrutinizer-ci.com/g/tracim/tracim_backend/
-* Test validation: https://travis-ci.org/tracim/tracim_backend
-* Code coverage: https://coveralls.io/github/tracim/tracim_backend
