@@ -10,7 +10,7 @@ import {
   Timeline,
   SelectStatus,
   ArchiveDeleteContent
-} from 'tracim_lib'
+} from 'tracim_frontend_lib'
 import {
   getThreadContent,
   getThreadComment,

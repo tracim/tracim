@@ -21,3 +21,11 @@ log "npm run build$windoz # for frontend_app_html-document"
 npm run build$windoz
 log "cp dist/html-document.app.js"
 cp dist/html-document.app.js ../frontend/dist/app
+cd -
+
+log "cd frontend_app_thread"
+cd frontend_app_thread
+log "npm run build$windoz # for frontend_app_thread"
+npm run build$windoz
+log "cp dist/thread.app.js"
+cp dist/thread.app.js ../frontend/dist/app

@@ -2,7 +2,7 @@ import React from 'react'
 import {
   CardPopupCreateContent,
   handleFetchResult
-} from 'tracim_lib'
+} from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
 
 const debug = { // outdated
