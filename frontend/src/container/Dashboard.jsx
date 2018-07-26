@@ -80,7 +80,7 @@ class Dashboard extends React.Component {
                 <div className='dashboard__header__acces' />
               </div>
               <div className='dashboard__header__advancedmode mr-3'>
-                <button type='button' className='btn btn-primary' disabled>Activer édition avancé</button>
+                <button type='button' className='btn btn-primary'>Activer édition avancé</button>
               </div>
             </div>
 
@@ -129,9 +129,9 @@ class Dashboard extends React.Component {
                         Abonné(e)
                       </button>
                       <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item' disabled>Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item'>Abonné(e)
                         </div>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item' disabled>Non Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item'>Non Abonné(e)
                         </div>
                       </div>
                     </div>
@@ -140,8 +140,8 @@ class Dashboard extends React.Component {
               </div>
             </div>
 
-            <div className='dashboard__calltoaction'>
-              <div className='dashboard__calltoaction__button btnaction thread'>
+            <div className='dashboard__calltoaction justify-content-xl-center'>
+              <div className='dashboard__calltoaction__button btnaction btnthread'>
                 <div className='dashboard__calltoaction__button__text'>
                   <div className='dashboard__calltoaction__button__text__icon'>
                     <i className='fa fa-comments-o' />
@@ -174,27 +174,29 @@ class Dashboard extends React.Component {
                 </div>
               </div>
 
-              <div className='dashboard__calltoaction__button btnaction visioconf'>
-                <div className='dashboard__calltoaction__button__text'>
-                  <div className='dashboard__calltoaction__button__text__icon'>
-                    <i className='fa fa-video-camera' />
-                  </div>
-                  <div className='dashboard__calltoaction__button__text__title'>
-                    Débuter une visioconférence
+              {/*
+                <div className='dashboard__calltoaction__button btnaction visioconf'>
+                  <div className='dashboard__calltoaction__button__text'>
+                    <div className='dashboard__calltoaction__button__text__icon'>
+                      <i className='fa fa-video-camera' />
+                    </div>
+                    <div className='dashboard__calltoaction__button__text__title'>
+                      Débuter une visioconférence
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className='dashboard__calltoaction__button btnaction calendar'>
-                <div className='dashboard__calltoaction__button__text'>
-                  <div className='dashboard__calltoaction__button__text__icon'>
-                    <i className='fa fa-calendar' />
-                  </div>
-                  <div className='dashboard__calltoaction__button__text__title'>
-                    Voir le Calendrier
+                <div className='dashboard__calltoaction__button btnaction calendar'>
+                  <div className='dashboard__calltoaction__button__text'>
+                    <div className='dashboard__calltoaction__button__text__icon'>
+                      <i className='fa fa-calendar' />
+                    </div>
+                    <div className='dashboard__calltoaction__button__text__title'>
+                      Voir le Calendrier
+                    </div>
                   </div>
                 </div>
-              </div>
+              */ }
 
               <div className='dashboard__calltoaction__button btnaction explore'>
                 <div className='dashboard__calltoaction__button__text'>
@@ -511,7 +513,7 @@ class Dashboard extends React.Component {
                         </ul>
                       </div>
                       <div className='dashboard__memberlist__form__submitbtn'>
-                        <button className='btn btn-outline-primary' disabled>Valider</button>
+                        <button className='btn btn-outline-primary'>Valider</button>
                       </div>
                     </form>
                   }

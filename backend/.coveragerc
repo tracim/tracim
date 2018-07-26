@@ -1,0 +1,6 @@
+[run]
+source = tracim
+omit = tracim/test*
+
+[report]
+omit = tests/*

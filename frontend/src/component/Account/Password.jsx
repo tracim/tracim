@@ -4,7 +4,7 @@ export const Password = props => {
   return (
     <div className='account__userpreference__setting__personaldata'>
       <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
-        Information du compte
+        Changer de mot de passe
       </div>
 
       <div className='personaldata__text ml-2 ml-sm-0'>

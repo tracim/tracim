@@ -34,7 +34,15 @@ class Timeline extends React.Component {
             className={classnames(`${props.customClass}__header`, 'timeline__header')}
             onClick={props.toggleRightPart}
           >
-            <span className='timeline__header__text'>Timeline</span>
+            <div className='timeline__header__icon mt-3 mb-auto'>
+              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
+            </div>
+            <div className='timeline__header__title'>
+              Timeline
+            </div>
+            <div className='timeline__header__icon mb-3 mt-auto'>
+              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
+            </div>
           </div>
         }
 
@@ -71,7 +79,7 @@ class Timeline extends React.Component {
             <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
               <textarea
                 id='wysiwygTimelineComment'
-                placeholder='Taper votre commentaire ici'
+                placeholder='Votre message ...'
                 value={props.newComment}
                 onChange={props.onChangeNewComment}
                 disabled={props.disableComment}
@@ -147,7 +155,8 @@ Timeline.propTypes = {
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
   shouldScrollToBottom: PropTypes.bool,
-  showHeader: PropTypes.bool
+  showHeader: PropTypes.bool,
+  rightPartOpen: PropTypes.bool // irrelevent if showHeader in false
 }
 
 Timeline.defaultProps = {
@@ -163,5 +172,6 @@ Timeline.defaultProps = {
   wysiwyg: false,
   onClickWysiwygBtn: () => {},
   shouldScrollToBottom: true,
-  showHeader: true
+  showHeader: true,
+  rightPartOpen: false
 }

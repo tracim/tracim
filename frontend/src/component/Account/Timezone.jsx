@@ -6,20 +6,20 @@ export const Timezone = props => {
   const handleChangeTimezone = selectedTimezone => props.onChangeTimezone(props.timezone.find(t => t.place === selectedTimezone.place))
 
   return (
-    <div className='account__userpreference__setting__calendar'>
+    <div className='account__userpreference__setting__timezone'>
 
-      <div className='calendar__title ml-2 ml-sm-0'>
-        Changer de Fuseau Horaire :
+      <div className='timezone__title subTitle ml-2 ml-sm-0'>
+        Changer de Fuseau Horaire
       </div>
 
-      <div className='calendar__text ml-2 ml-sm-0'>
+      <div className='timezone__text ml-2 ml-sm-0'>
         NYI
       </div>
 
-      <div className='calendar__timezone ml-2 ml-sm-0 dropdown'>
+      <div className='timezone__time ml-2 ml-sm-0 dropdown'>
         <Select
           name='timezoneSelect'
-          className='calendar__timezone__select'
+          className='timezone__time__select'
           value={props.timezoneUser}
           labelKey='place'
           valueKey='place'

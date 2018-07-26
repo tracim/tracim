@@ -59,7 +59,7 @@ class Sidebar extends React.Component {
     return (
       <div className={classnames('sidebar primaryColorBgDarken', {'sidebarclose': sidebarClose})}>
         <div className='sidebarSticky'>
-          <div className='sidebar__expand primaryColorBg.darken' onClick={this.handleClickToggleSidebar}>
+          <div className='sidebar__expand primaryColorBg whiteColorBorder' onClick={this.handleClickToggleSidebar}>
             <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
           </div>
 
@@ -83,13 +83,13 @@ class Sidebar extends React.Component {
           </nav>
 
           <div className='sidebar__btnnewworkspace'>
-            <button className='sidebar__btnnewworkspace__btn btn btn-primary mb-5' disabled>
+            <button className='sidebar__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'>
               {t('Sidebar.create_new_workspace')}
             </button>
           </div>
 
           <div className='sidebar__footer mb-2'>
-            <div className='sidebar__footer__text d-flex align-items-end justify-content-center'>
+            <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
               Copyright - 2013 - 2018
               <div className='sidebar__footer__text__link'>
                 <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>

@@ -27,11 +27,12 @@ leftside()
   &__expand
     position absolute
     top 0
-    right -42px
+    right -43px
     display flex
     justify-content center
     align-items center
-    border-left 1px solid off-white
+    border-left-width 1px
+    border-left-style solid
     border-bottom-right-radius 15px
     padding 8px 15px
     cursor pointer
@@ -44,11 +45,6 @@ leftside()
       display block
       margin 0 auto
       padding 15px 30px
-      background-color thirdColor
-      border-color thirdColor
-      &:hover, &:focus, &:active, &:visited
-        background-color fifthColor
-        border-color fifthColor
   &__navigation
     padding 0
     overflow hidden
@@ -111,7 +107,6 @@ leftside()
                 background-color rgba(253, 253, 253, 0.8)
   &__footer
     &__text
-      color off-white
       font-size 14px
       &__link
         & > a
