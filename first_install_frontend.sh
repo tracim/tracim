@@ -1,8 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+windoz=""
+if  [[ $1 = "-w" ]]; then
+    windoz="windoz"
+fi
+
 function log {
-    echo ""
-    echo ">> $ $1"
-    echo ""
+    echo -e "\n>> $ $1\n"
 }
 
 log "cd frontend_lib"
@@ -11,8 +15,8 @@ log "npm i"
 npm i
 log "npm link"
 npm link
-log "npm run buildtracimlib"
-npm run buildtracimlib
+log "npm run buildtracimlib$windoz"
+npm run buildtracimlib$windoz
 cd -
 
 log "cd frontend_app_html-document"
@@ -21,8 +25,8 @@ log "npm i"
 npm i
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib
-log "npm run build # for frontend_app_html-document"
-npm run build
+log "npm run build$windoz # for frontend_app_html-document"
+npm run build$windoz
 log "cp dist/html-document.app.js"
 cp dist/html-document.app.js ../frontend/dist/app
 cd -
@@ -33,5 +37,10 @@ log "npm i"
 npm i
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib
-log "npm run servdev-dashboard # for frontend"
-npm run servdev-dashboard
+if [[ $1 = "-w" ]]; then
+    log "npm run servdev # for frontend"
+    npm run servdev
+else
+    log "npm run servdev-dashboard # for frontend"
+    npm run servdev-dashboard
+fi
