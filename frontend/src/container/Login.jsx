@@ -142,7 +142,7 @@ class Login extends React.Component {
           <footer className='loginpage__footer'>
             <div className='loginpage__footer__text whiteFontColor'>
               copyright © 2013 - 2018 tracim project.
-           </div>
+            </div>
           </footer>
 
         </section>
