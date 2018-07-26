@@ -29,6 +29,18 @@ log "cp dist/html-document.app.js"
 cp dist/html-document.app.js ../frontend/dist/app
 cd -
 
+log "cd frontend_app_thread"
+cd frontend_app_thread
+log "npm i"
+npm i
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib
+log "npm run build$windoz # for frontend_app_thread"
+npm run build$windoz
+log "cp dist/thread.app.js"
+cp dist/thread.app.js ../frontend/dist/app
+cd -
+
 log "cd frontend"
 cd frontend
 log "npm i"
