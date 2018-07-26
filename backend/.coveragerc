@@ -1,6 +1,6 @@
 [run]
-source = tracim
-omit = tracim/test*
+source = tracim_backend
+omit = tracim_backend/test*
 
 [report]
 omit = tests/*

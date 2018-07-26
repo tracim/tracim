@@ -98,19 +98,19 @@ setup(
     install_requires=requires,
     entry_points={
         'paste.app_factory': [
-            'main = tracim:web',
-            'webdav = tracim:webdav'
+            'main = tracim_backend:web',
+            'webdav = tracim_backend:webdav'
         ],
         'console_scripts': [
-            'tracimcli = tracim.command:main',
+            'tracimcli = tracim_backend.command:main',
         ],
         'tracimcli': [
-            'test = tracim.command:TestTracimCommand',
-            'user_create = tracim.command.user:CreateUserCommand',
-            'user_update = tracim.command.user:UpdateUserCommand',
-            'db_init = tracim.command.database:InitializeDBCommand',
-            'db_delete = tracim.command.database:DeleteDBCommand',
-            'webdav start = tracim.command.webdav:WebdavRunnerCommand',
+            'test = tracim_backend.command:TestTracimCommand',
+            'user_create = tracim_backend.command.user:CreateUserCommand',
+            'user_update = tracim_backend.command.user:UpdateUserCommand',
+            'db_init = tracim_backend.command.database:InitializeDBCommand',
+            'db_delete = tracim_backend.command.database:DeleteDBCommand',
+            'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
         ]
     },
 )

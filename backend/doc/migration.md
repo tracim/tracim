@@ -31,6 +31,6 @@ and active the Tracim virtualenv:
 ### Creating new schema migration ###
 
 This creates a new auto-generated python migration file 
-in `tracim/migration/versions/` ending by `migration_label.py`:
+in `tracim_backend/migration/versions/` ending by `migration_label.py`:
 
     alembic -c development.ini revision --autogenerate -m "migration label"

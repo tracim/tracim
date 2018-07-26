@@ -110,10 +110,10 @@ email.notification.from.email = noreply+{user_id}@trac.im
 email.notification.from.default_label = Tracim Notifications
 email.notification.reply_to.email = reply+{content_id}@trac.im
 email.notification.references.email = thread+{content_id}@trac.im
-email.notification.content_update.template.html = %(here)s/tracim/templates/mail/content_update_body_html.mak
-email.notification.content_update.template.text = %(here)s/tracim/templates/mail/content_update_body_text.mak
-email.notification.created_account.template.html = %(here)s/tracim/templates/mail/created_account_body_html.mak
-email.notification.created_account.template.text = %(here)s/tracim/templates/mail/created_account_body_text.mak
+email.notification.content_update.template.html = %(here)s/tracim_backend/templates/mail/content_update_body_html.mak
+email.notification.content_update.template.text = %(here)s/tracim_backend/templates/mail/content_update_body_text.mak
+email.notification.created_account.template.html = %(here)s/tracim_backend/templates/mail/created_account_body_html.mak
+email.notification.created_account.template.text = %(here)s/tracim_backend/templates/mail/created_account_body_text.mak
 # Note: items between { and } are variable names. Do not remove / rename them
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Created account
@@ -196,7 +196,7 @@ listen = localhost:6543
 
 [alembic]
 # path to migration scripts
-script_location = tracim/migration
+script_location = tracim_backend/migration
 
 # template used to generate migration files
 # file_template = %%(rev)s_%%(slug)s

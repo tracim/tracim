@@ -2,7 +2,7 @@
 import plaster
 import pyramid.paster
 
-from tracim.lib.webdav import WebdavAppFactory
+from tracim_backend.lib.webdav import WebdavAppFactory
 
 
 def web_app(config_uri):
