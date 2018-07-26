@@ -55,6 +55,16 @@ class WorkspaceAndUserPath(object):
         self.user_id = workspace_id
 
 
+class UserWorkspaceAndContentPath(object):
+    """
+    Paths params with user_id, workspace id and content_id model
+    """
+    def __init__(self, user_id: int, workspace_id: int, content_id: int) -> None:  # nopep8
+        self.content_id = content_id
+        self.workspace_id = workspace_id
+        self.user_id = user_id
+
+
 class CommentPath(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -76,17 +86,41 @@ class ContentFilter(object):
     """
     def __init__(
             self,
+            workspace_id: int = None,
             parent_id: int = None,
             show_archived: int = 0,
             show_deleted: int = 0,
             show_active: int = 1,
             content_type: str = None,
+            offset: int = None,
+            limit: int = None,
     ) -> None:
         self.parent_id = parent_id
+        self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
+        self.limit = limit
+        self.offset = offset
         self.content_type = content_type
+
+
+class ActiveContentFilter(object):
+    def __init__(
+            self,
+            limit: int = None,
+            before_datetime: datetime = None,
+    ):
+        self.limit = limit
+        self.before_datetime = before_datetime
+
+
+class ContentIdsQuery(object):
+    def __init__(
+            self,
+            contents_ids: typing.List[int] = None,
+    ):
+        self.contents_ids = contents_ids
 
 
 class RoleUpdate(object):
@@ -315,7 +349,7 @@ class UserRoleWorkspaceInContext(object):
             dbsession: Session,
             config: CFG,
             # Extended params
-            newly_created:bool = None,
+            newly_created: bool = None,
             email_sent: bool = None
     )-> None:
         self.user_role = user_role
@@ -399,10 +433,11 @@ class ContentInContext(object):
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content: Content, dbsession: Session, config: CFG):
+    def __init__(self, content: Content, dbsession: Session, config: CFG, user: User=None):  # nopep8
         self.content = content
         self.dbsession = dbsession
         self.config = config
+        self._user = user
 
     # Default
     @property
@@ -494,6 +529,11 @@ class ContentInContext(object):
     @property
     def slug(self):
         return slugify(self.content.label)
+
+    @property
+    def read_by_user(self):
+        assert self._user
+        return not self.content.has_new_information_for(self._user)
 
 
 class RevisionInContext(object):

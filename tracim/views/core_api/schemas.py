@@ -10,6 +10,9 @@ from tracim.models.contents import GlobalStatus
 from tracim.models.contents import open_status
 from tracim.models.contents import ContentTypeLegacy as ContentType
 from tracim.models.contents import ContentStatusLegacy as ContentStatus
+from tracim.models.context_models import ActiveContentFilter
+from tracim.models.context_models import ContentIdsQuery
+from tracim.models.context_models import UserWorkspaceAndContentPath
 from tracim.models.context_models import ContentCreation
 from tracim.models.context_models import WorkspaceMemberInvitation
 from tracim.models.context_models import WorkspaceUpdate
@@ -129,6 +132,25 @@ class WorkspaceAndContentIdPathSchema(
         return WorkspaceAndContentPath(**data)
 
 
+class UserWorkspaceAndContentIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema,
+    ContentIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return UserWorkspaceAndContentPath(**data)
+
+
+class UserWorkspaceIdPathSchema(
+    UserIdPathSchema,
+    WorkspaceIdPathSchema,
+):
+    @post_load
+    def make_path_object(self, data):
+        return WorkspaceAndUserPath(**data)
+
+
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     comment_id = marshmallow.fields.Int(
         example=6,
@@ -187,6 +209,36 @@ class FilterContentQuerySchema(marshmallow.Schema):
     @post_load
     def make_content_filter(self, data):
         return ContentFilter(**data)
+
+
+class ActiveContentFilterQuerySchema(marshmallow.Schema):
+    limit = marshmallow.fields.Int(
+        example=2,
+        default=0,
+        description='if 0 or not set, return all elements, else return only '
+                    'the first limit elem (according to offset)',
+        validate=Range(min=0, error="Value must be positive or 0"),
+    )
+    before_datetime = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description='return only content lastly updated before this date',
+    )
+    @post_load
+    def make_content_filter(self, data):
+        return ActiveContentFilter(**data)
+
+
+class ContentIdsQuerySchema(marshmallow.Schema):
+    contents_ids = marshmallow.fields.List(
+        marshmallow.fields.Int(
+            example=6,
+            validate=Range(min=1, error="Value must be greater than 0"),
+        )
+    )
+    @post_load
+    def make_contents_ids(self, data):
+        return ContentIdsQuery(**data)
+
 ###
 
 
@@ -512,6 +564,12 @@ class ContentDigestSchema(marshmallow.Schema):
     )
 
 
+class ReadStatusSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(
+        example=6,
+        validate=Range(min=1, error="Value must be greater than 0"),
+    )
+    read_by_user = marshmallow.fields.Bool(example=False, default=False)
 #####
 # Content
 #####

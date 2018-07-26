@@ -1256,7 +1256,23 @@ class Content(DeclarativeBase):
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
 
+    def get_simple_last_activity_date(self) -> datetime_root.datetime:
+        """
+        Get last activity_date, comments_included. Do not search recursively
+        in revision or children.
+        :return:
+        """
+        last_revision_date = self.updated
+        for comment in self.get_comments():
+            if comment.updated > last_revision_date:
+                last_revision_date = comment.updated
+        return last_revision_date
+
     def get_last_activity_date(self) -> datetime_root.datetime:
+        """
+        Get last activity date with complete recursive search
+        :return:
+        """
         last_revision_date = self.updated
         for revision in self.revisions:
             if revision.updated > last_revision_date:
