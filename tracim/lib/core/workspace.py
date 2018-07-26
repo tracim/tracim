@@ -5,6 +5,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 
 from tracim import CFG
+from tracim.exceptions import EmptyLabelNotAllowed
 from tracim.lib.utils.translation import fake_translator as _
 
 from tracim.lib.core.userworkspace import RoleApi
@@ -69,7 +70,7 @@ class WorkspaceApi(object):
             save_now: bool=False,
     ) -> Workspace:
         if not label:
-            label = self.generate_label()
+            raise EmptyLabelNotAllowed('Workspace label cannot be empty')
 
         workspace = Workspace()
         workspace.label = label
@@ -102,6 +103,31 @@ class WorkspaceApi(object):
         #     self._ensure_calendar_exist(workspace)
         # else:
         #     self._disable_calendar(workspace)
+
+        return workspace
+
+    def update_workspace(
+            self,
+            workspace: Workspace,
+            label: str,
+            description: str,
+            save_now: bool=False,
+    ) -> Workspace:
+        """
+        Update workspace
+        :param workspace: workspace to update
+        :param label: new label of workspace
+        :param description: new description
+        :param save_now: database flush
+        :return: updated workspace
+        """
+        if not label:
+            raise EmptyLabelNotAllowed('Workspace label cannot be empty')
+        workspace.label = label
+        workspace.description = description
+
+        if save_now:
+            self.save(workspace)
 
         return workspace
 

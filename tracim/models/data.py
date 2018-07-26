@@ -30,6 +30,7 @@ from tracim.lib.utils.translation import get_locale
 from tracim.exceptions import ContentRevisionUpdateError
 from tracim.models.meta import DeclarativeBase
 from tracim.models.auth import User
+from tracim.models.roles import WorkspaceRoles
 
 DEFAULT_PROPERTIES = dict(
     allowed_content=dict(
@@ -124,26 +125,27 @@ class UserRoleInWorkspace(DeclarativeBase):
     workspace = relationship('Workspace', remote_side=[Workspace.workspace_id], backref='roles', lazy='joined')
     user = relationship('User', remote_side=[User.user_id], backref='roles')
 
-    NOT_APPLICABLE = 0
-    READER = 1
-    CONTRIBUTOR = 2
-    CONTENT_MANAGER = 4
-    WORKSPACE_MANAGER = 8
+    NOT_APPLICABLE = WorkspaceRoles.NOT_APPLICABLE.level
+    READER = WorkspaceRoles.READER.level
+    CONTRIBUTOR = WorkspaceRoles.CONTRIBUTOR.level
+    CONTENT_MANAGER = WorkspaceRoles.CONTENT_MANAGER.level
+    WORKSPACE_MANAGER = WorkspaceRoles.WORKSPACE_MANAGER.level
 
-    SLUG = {
-        NOT_APPLICABLE: 'not-applicable',
-        READER: 'reader',
-        CONTRIBUTOR: 'contributor',
-        CONTENT_MANAGER: 'content-manager',
-        WORKSPACE_MANAGER: 'workspace-manager',
-    }
+    # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+    # SLUG = {
+    #     NOT_APPLICABLE: 'not-applicable',
+    #     READER: 'reader',
+    #     CONTRIBUTOR: 'contributor',
+    #     CONTENT_MANAGER: 'content-manager',
+    #     WORKSPACE_MANAGER: 'workspace-manager',
+    # }
 
-    LABEL = dict()
-    LABEL[0] = l_('N/A')
-    LABEL[1] = l_('Reader')
-    LABEL[2] = l_('Contributor')
-    LABEL[4] = l_('Content Manager')
-    LABEL[8] = l_('Workspace Manager')
+    # LABEL = dict()
+    # LABEL[0] = l_('N/A')
+    # LABEL[1] = l_('Reader')
+    # LABEL[2] = l_('Contributor')
+    # LABEL[4] = l_('Content Manager')
+    # LABEL[8] = l_('Workspace Manager')
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     #
     # STYLE = dict()
@@ -170,20 +172,18 @@ class UserRoleInWorkspace(DeclarativeBase):
     #     return UserRoleInWorkspace.STYLE[self.role]
     #
 
+    def role_object(self):
+        return WorkspaceRoles.get_role_from_level(level=self.role)
+
     def role_as_label(self):
-        return UserRoleInWorkspace.LABEL[self.role]
+        return self.role_object().label
 
     @classmethod
     def get_all_role_values(cls) -> typing.List[int]:
         """
         Return all valid role value
         """
-        return [
-            UserRoleInWorkspace.READER,
-            UserRoleInWorkspace.CONTRIBUTOR,
-            UserRoleInWorkspace.CONTENT_MANAGER,
-            UserRoleInWorkspace.WORKSPACE_MANAGER
-        ]
+        return [role.level for role in WorkspaceRoles.get_all_valid_role()]
 
     @classmethod
     def get_all_role_slug(cls) -> typing.List[str]:
@@ -193,13 +193,12 @@ class UserRoleInWorkspace(DeclarativeBase):
         # INFO - G.M - 25-05-2018 - Be carefull, as long as this method
         # and get_all_role_values are both used for API, this method should
         # return item in the same order as get_all_role_values
-        return [cls.SLUG[value] for value in cls.get_all_role_values()]
+        return [role.slug for role in WorkspaceRoles.get_all_valid_role()]
 
-
-class RoleType(object):
-    def __init__(self, role_id):
-        self.role_type_id = role_id
-        # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+# TODO - G.M - 10-04-2018 - [Cleanup] Drop this
+# class RoleType(object):
+#     def __init__(self, role_id):
+#         self.role_type_id = role_id
         # self.fa_icon = UserRoleInWorkspace.ICON[role_id]
         # self.role_label = UserRoleInWorkspace.LABEL[role_id]
         # self.css_style = UserRoleInWorkspace.STYLE[role_id]

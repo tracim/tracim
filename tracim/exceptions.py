@@ -163,5 +163,18 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
     pass
 
+
+class RoleDoesNotExist(TracimException):
+    pass
+
+
+class EmailValidationFailed(TracimException):
+    pass
+
+
+class UserCreationFailed(TracimException):
+    pass
+
+
 class ParentNotFound(NotFound):
     pass
