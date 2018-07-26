@@ -105,7 +105,7 @@ to stop them:
 
 run tracim_backend web api:
 
-    pserve developement.ini
+    pserve development.ini
 
 run wsgidav server:
 
