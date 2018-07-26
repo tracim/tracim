@@ -10,6 +10,7 @@
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build": "NODE_ENV=production webpack -p",
     "buildtracimlib": "NODE_ENV=production webpack -p && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.js",
+    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack -p && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
