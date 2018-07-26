@@ -10,7 +10,8 @@ const NewVersionBtn = props => {
       style={{
         backgroundColor: '#fdfdfd',
         color: '#333',
-        border: '1px solid',
+        borderWidth: '1px',
+        borderStyle: 'solid',
         borderColor: props.customColor,
         ':hover': {
           backgroundColor: props.customColor,

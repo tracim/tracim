@@ -1,4 +1,4 @@
 .idea/
-frontend/dist/app
+frontend/dist/app/html-document.app.js
 frontend_app_html-document/dist/html-document.app.js
 frontend_lib/dist/tracim_frontend_lib.js
