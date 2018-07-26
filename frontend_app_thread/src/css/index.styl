@@ -1,0 +1,34 @@
+@import "../../node_modules/tracim_lib/src/css/Variable.styl"
+
+.thread
+  width 70%
+  &__header
+    &__editionmode
+      display none
+    &__icon
+      .fa-comments-o
+        color white
+  .selectStatus
+    margin-right 15px
+  .timeline
+    margin 0
+  .thread
+    &__contentpage
+      &__content
+        width 100%
+      &__messagelist
+        &__item__avatar
+          border 1px solid darkenThread
+          background-color off-white
+      &__texteditor
+        flex 0 0 auto
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .thread
+    top 68px
+    width 100%
+
+@media (max-width: max-xs)
+  .thread
+    top 68px
+    width 100%
