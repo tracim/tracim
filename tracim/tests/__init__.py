@@ -28,6 +28,7 @@ from webtest import TestApp
 from io import BytesIO
 from PIL import Image
 
+
 def eq_(a, b, msg=None):
     # TODO - G.M - 05-04-2018 - Remove this when all old nose code is removed
     assert a == b, msg or "%r != %r" % (a, b)
@@ -79,7 +80,7 @@ class FunctionalTest(unittest.TestCase):
             'depot_storage_name': 'test',
             'preview_cache_dir': '/tmp/test/preview_cache',
             'preview.jpg.restricted_dims': True,
-
+            'email.notification.activated': 'false',
         }
         hapic.reset_context()
         self.engine = get_engine(self.settings)

@@ -22,7 +22,7 @@ class TestUserApi(DefaultTest):
         )
         u = api.create_minimal_user('bob@bob')
         assert u.email == 'bob@bob'
-        assert u.display_name is None
+        assert u.display_name == 'bob'
 
     def test_unit__create_minimal_user_and_update__ok__nominal_case(self):
         api = UserApi(
