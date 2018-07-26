@@ -68,6 +68,7 @@ class FunctionalTest(unittest.TestCase):
             'depot_storage_dir': '/tmp/test/depot',
             'depot_storage_name': 'test',
             'preview_cache_dir': '/tmp/test/preview_cache',
+            'email.notification.activated': 'false',
 
         }
         hapic.reset_context()
