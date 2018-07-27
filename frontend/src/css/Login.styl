@@ -19,8 +19,6 @@
       color #FFF
       font-size 25px
   .connection__form
-    margin 0 auto
-    width 70%
     &__rememberme
       &__label
         font-size 13px
@@ -66,8 +64,11 @@
         content ' '
         width 130px
   &__footer
-    text-align center
+    position fixed
+    top 95%
+    left calc(50% - 152px) // 152px => width of the text / 2
     &__text
+      width 305px
       font-size 17px
 
 @media (min-width: min-lg) and (max-width: max-lg)

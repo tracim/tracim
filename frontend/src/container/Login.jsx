@@ -71,7 +71,7 @@ class Login extends React.Component {
             <LoginLogo customClass='loginpage__logo' logoSrc={LoginLogoImg} />
 
             <div className='row justify-content-center'>
-              <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-5'>
+              <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
 
                 <Card customClass='loginpage__connection'>
                   <CardHeader customClass='connection__header text-center'>{'Connexion'}</CardHeader>
