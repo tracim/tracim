@@ -30,12 +30,12 @@ from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.models.contents import html_documents_type
 from tracim_backend.models.revision_protection import new_revision
 
-HTML_DOCUMENT_ENDPOINTS_TAG = 'HTML documents'
+SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS = 'HTML documents'
 
 
 class HTMLDocumentController(Controller):
 
-    @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -56,7 +56,7 @@ class HTMLDocumentController(Controller):
         )
         return api.get_content_in_context(content)
 
-    @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([html_documents_type])
@@ -91,7 +91,7 @@ class HTMLDocumentController(Controller):
             api.save(content)
         return api.get_content_in_context(content)
 
-    @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -121,7 +121,7 @@ class HTMLDocumentController(Controller):
             for revision in revisions
         ]
 
-    @hapic.with_api_doc(tags=[HTML_DOCUMENT_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([html_documents_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

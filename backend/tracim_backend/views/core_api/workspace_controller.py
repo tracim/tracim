@@ -49,12 +49,12 @@ from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.models.revision_protection import new_revision
 
-WORKSPACE_ENDPOINTS_TAG = 'Workspaces'
+SWAGGER_TAG_WORKSPACE_ENDPOINTS = 'Workspaces'
 
 
 class WorkspaceController(Controller):
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceSchema())
@@ -70,7 +70,7 @@ class WorkspaceController(Controller):
         )
         return wapi.get_workspace_with_context(request.current_workspace)
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -94,7 +94,7 @@ class WorkspaceController(Controller):
         )
         return wapi.get_workspace_with_context(request.current_workspace)
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_MANAGER)
     @hapic.input_body(WorkspaceCreationSchema())
@@ -116,7 +116,7 @@ class WorkspaceController(Controller):
         )
         return wapi.get_workspace_with_context(workspace)
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
@@ -142,7 +142,7 @@ class WorkspaceController(Controller):
             for user_role in roles
         ]
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
@@ -174,7 +174,7 @@ class WorkspaceController(Controller):
         )
         return rapi.get_user_role_workspace_with_context(role)
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(UserCreationFailed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -232,7 +232,7 @@ class WorkspaceController(Controller):
             email_sent=email_sent,
         )
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(FilterContentQuerySchema())
@@ -266,7 +266,7 @@ class WorkspaceController(Controller):
         ]
         return contents
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -306,7 +306,7 @@ class WorkspaceController(Controller):
         content = api.get_content_in_context(content)
         return content
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
@@ -358,7 +358,7 @@ class WorkspaceController(Controller):
         )
         return api.get_content_in_context(updated_content)
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -390,7 +390,7 @@ class WorkspaceController(Controller):
             api.delete(content)
         return
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -423,7 +423,7 @@ class WorkspaceController(Controller):
             api.undelete(content)
         return
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -452,7 +452,7 @@ class WorkspaceController(Controller):
             api.archive(content)
         return
 
-    @hapic.with_api_doc(tags=[WORKSPACE_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

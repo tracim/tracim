@@ -18,12 +18,12 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 
-SYSTEM_ENDPOINTS_TAG = 'System'
+SWAGGER_TAG_SYSTEM_ENDPOINTS = 'System'
 
 
 class SystemController(Controller):
 
-    @hapic.with_api_doc(tags=[SYSTEM_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @require_profile(Group.TIM_USER)
     @hapic.output_body(ApplicationSchema(many=True),)
     def applications(self, context, request: TracimRequest, hapic_data=None):
@@ -32,7 +32,7 @@ class SystemController(Controller):
         """
         return applications
 
-    @hapic.with_api_doc(tags=[SYSTEM_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @require_profile(Group.TIM_USER)
     @hapic.output_body(ContentTypeSchema(many=True),)
     def content_types(self, context, request: TracimRequest, hapic_data=None):
