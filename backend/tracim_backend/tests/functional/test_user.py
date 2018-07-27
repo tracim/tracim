@@ -121,7 +121,6 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[6]['content_id'] == main_folder.content_id
 
-    @pytest.mark.skip('Test should be fixed')
     def test_api__get_recently_active_content__ok__200__limit_2_multiple(self):
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
         # anymore to fix datetime lack of precision.
@@ -160,17 +159,13 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             config=self.app_config,
         )
         main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
-        sleep(1)
         main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
         firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        sleep(1)
         secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
         firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        sleep(1)
         secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
-        sleep(1)
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -180,11 +175,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        sleep(1)
         secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
-        sleep(1)
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        sleep(1)
         content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
         dbsession.flush()
         transaction.commit()
@@ -227,7 +219,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         params = {
             'limit': 2,
-            'before_datetime': secondly_created_but_not_commented.get_last_activity_date().strftime('%Y-%m-%dT%H:%M:%SZ'),  # nopep8
+            'before_content_id': secondly_created_but_not_commented.content_id,  # nopep8
         }
         res = self.testapp.get(
             '/api/v2/users/1/workspaces/{}/contents/recently_active'.format(workspace.workspace_id),  # nopep8
