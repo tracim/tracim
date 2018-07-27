@@ -63,29 +63,33 @@ class Sidebar extends React.Component {
             <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
           </div>
 
-          <nav className='sidebar__navigation'>
-            <ul className='sidebar__navigation__workspace'>
-              { workspaceList.map(ws =>
-                <WorkspaceListItem
-                  idWs={ws.id}
-                  label={ws.label}
-                  allowedApp={ws.sidebarEntry}
-                  lang={activeLang}
-                  activeFilterList={ws.id === workspaceIdInUrl ? [qs.parse(this.props.location.search).type] : []}
-                  isOpenInSidebar={ws.isOpenInSidebar}
-                  onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
-                  onClickAllContent={this.handleClickAllContent}
-                  // onClickContentFilter={this.handleClickContentFilter}
-                  key={ws.id}
-                />
-              )}
-            </ul>
-          </nav>
+          <div className='sidebar__wrapper'>
 
-          <div className='sidebar__btnnewworkspace'>
-            <button className='sidebar__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'>
-              {t('Sidebar.create_new_workspace')}
-            </button>
+            <nav className='sidebar__navigation'>
+              <ul className='sidebar__navigation__workspace'>
+                { workspaceList.map(ws =>
+                  <WorkspaceListItem
+                    idWs={ws.id}
+                    label={ws.label}
+                    allowedApp={ws.sidebarEntry}
+                    lang={activeLang}
+                    activeFilterList={ws.id === workspaceIdInUrl ? [qs.parse(this.props.location.search).type] : []}
+                    isOpenInSidebar={ws.isOpenInSidebar}
+                    onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
+                    onClickAllContent={this.handleClickAllContent}
+                    // onClickContentFilter={this.handleClickContentFilter}
+                    key={ws.id}
+                  />
+                )}
+              </ul>
+            </nav>
+
+            <div className='sidebar__btnnewworkspace'>
+              <button className='sidebar__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'>
+                {t('Sidebar.create_new_workspace')}
+              </button>
+            </div>
+
           </div>
 
           <div className='sidebar__footer mb-2'>
