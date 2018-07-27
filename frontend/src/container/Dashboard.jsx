@@ -414,7 +414,10 @@ class Dashboard extends React.Component {
                         </li>
                       </ul>
 
-                      <div className='dashboard__memberlist__btnadd'>
+                      <div
+                        className='dashboard__memberlist__btnadd'
+                        onClick={this.handleToggleNewMemberDashboard}
+                      >
                         <div className='dashboard__memberlist__btnadd__button'>
                           <div className='dashboard__memberlist__btnadd__button__avatar'>
                             <div className='dashboard__memberlist__btnadd__button__avatar__icon'>
@@ -423,7 +426,7 @@ class Dashboard extends React.Component {
                           </div>
                           <div
                             className='dashboard__memberlist__btnadd__button__text'
-                            onClick={this.handleToggleNewMemberDashboard}
+
                           >
                              Ajouter un membre
                           </div>
