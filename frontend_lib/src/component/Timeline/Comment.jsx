@@ -35,12 +35,8 @@ const Comment = props => {
       <div
         className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__body__messagelist__item__content')}
         style={props.fromMe ? styleSent : styleReceived}
-
-      >
-        <div className='timeline__body__messagelist__item__content__text'>
-          {props.text}
-        </div>
-      </div>
+        dangerouslySetInnerHTML={{__html: props.text}}
+      />
     </li>
   )
 }
