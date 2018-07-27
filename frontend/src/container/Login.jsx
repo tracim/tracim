@@ -57,7 +57,7 @@ class Login extends React.Component {
 
       history.push(PAGE.HOME)
     } else if (fetchPostUserLogin.status === 400) {
-      dispatch(newFlashMessage(t('Login.fail'), 'danger'))
+      dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
     }
   }
 

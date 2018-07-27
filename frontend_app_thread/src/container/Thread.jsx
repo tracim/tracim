@@ -2,6 +2,7 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
 import {
+  addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
@@ -32,6 +33,9 @@ class Thread extends React.Component {
       newComment: '',
       timelineWysiwyg: false
     }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, props.data ? props.data.config.translation : debug.config.translation)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }

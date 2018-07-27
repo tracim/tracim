@@ -44,6 +44,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "i18next-scanner": "^2.6.1",
     "webpack-dashboard": "^1.1.1",
     "webpack-dev-server": "^2.9.2"
   },

@@ -49,7 +49,7 @@ class Header extends React.Component {
 
       dispatch(setUserDisconnected())
     } else {
-      dispatch(newFlashMessage(t('Login.logout_error', 'danger')))
+      dispatch(newFlashMessage(t('Disconnection error', 'danger')))
     }
   }
 

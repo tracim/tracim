@@ -10,6 +10,7 @@
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -- webpack-dev-server --watch --colors --inline --hot --progress",
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build": "NODE_ENV=production webpack -p",
+    "build-translation": "node i18next.scanner.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -52,6 +53,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "i18next-scanner": "^2.6.1",
     "json-server": "^0.12.0",
     "webpack-dashboard": "^1.0.2",
     "webpack-dev-server": "^2.9.2"
