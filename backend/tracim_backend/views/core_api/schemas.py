@@ -650,12 +650,15 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
-        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.'
+        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.', # nopep8
+        allow_none=True,
+        default=None,
+        validate=Range(min=1, error="Value must be positive"),
     )
 
 
     @post_load
-    def make_content_filter(self, data):
+    def make_content_creation(self, data):
         return ContentCreation(**data)
 
 
