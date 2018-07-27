@@ -26,14 +26,21 @@ const Comment = props => {
         </div>
       </div>
       <div
-        className={classnames(`${props.customClass}__messagelist__item__createhour`, 'timeline__body__messagelist__item__createhour')}>
-        {props.createdAt}
+        className={classnames(`${props.customClass}__messagelist__item__authorandhour`, 'timeline__body__messagelist__item__authorandhour')}>
+          <div className='mr-5'>
+            {props.createdAt}
+          </div>
+          {props.author}
       </div>
       <div
         className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__body__messagelist__item__content')}
         style={props.fromMe ? styleSent : styleReceived}
-        dangerouslySetInnerHTML={{__html: props.text}}
-      />
+
+      >
+        <div className='timeline__body__messagelist__item__content__text'>
+          {props.text}
+        </div>
+      </div>
     </li>
   )
 }

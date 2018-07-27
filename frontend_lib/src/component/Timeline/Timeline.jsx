@@ -54,6 +54,7 @@ class Timeline extends React.Component {
                   return <Comment
                     customClass={props.customClass}
                     customColor={props.customColor}
+                    author={content.author.public_name}
                     avatar={content.author.avatar_url}
                     createdAt={content.created}
                     text={content.raw_content}
