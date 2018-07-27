@@ -51,7 +51,19 @@ export const debug = {
       faIcon: 'warning',
       hexcolor: '#ababab',
       globalStatus: 'closed'
-    }]
+    }],
+    translation: {
+      en: {
+        translation: {
+          'Last version': 'Last version debug en'
+        }
+      },
+      fr: {
+        translation: {
+          'Last version': 'Dernière version debug fr'
+        }
+      }
+    }
   },
   loggedUser: { // @FIXME this object is outdated
     user_id: 5,

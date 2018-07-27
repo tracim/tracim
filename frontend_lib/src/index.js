@@ -1,4 +1,6 @@
-import { libHandleFetchResult } from './helper.js'
+import { libAddAllResourceI18n, libHandleFetchResult } from './helper.js'
+
+// fr and en are deprecated
 import fr from './translate/fr.js'
 import en from './translate/en.js'
 
@@ -23,6 +25,8 @@ import libSelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 
 export const langFr = fr
 export const langEn = en
+
+export const addAllResourceI18n = libAddAllResourceI18n
 
 export const handleFetchResult = libHandleFetchResult
 

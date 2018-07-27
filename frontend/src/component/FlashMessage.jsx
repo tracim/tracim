@@ -22,7 +22,7 @@ const FlashMessage = props => {
 
               <div className='flashmessage__container__content__text'>
                 <div className='flashmessage__container__content__text__title'>
-                  {props.t('FlashMessage.error')}
+                  {props.t('Error')}
                 </div>
                 <div className='flashmessage__container__content__text__paragraph'>
                   {props.flashMessage[0].message}

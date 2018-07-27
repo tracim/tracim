@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  addAllResourceI18n,
   CardPopupCreateContent,
   handleFetchResult
 } from 'tracim_frontend_lib'
@@ -19,6 +20,14 @@ const debug = { // outdated
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    },
+    translation: {
+      en: {
+        translation: {}
+      },
+      fr: {
+        translation: {}
+      }
     }
   },
   loggedUser: {
@@ -44,6 +53,9 @@ class PopupCreateHtmlDocument extends React.Component {
       idFolder: props.data ? props.data.idFolder : debug.idFolder,
       newContentName: ''
     }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, props.data ? props.data.config.translation : debug.config.translation)
   }
 
   handleChangeNewContentName = e => this.setState({newContentName: e.target.value})

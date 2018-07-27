@@ -18,6 +18,14 @@ log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib
 cd -
 
+log "cd frontend_app_thread"
+cd frontend_app_thread
+log "npm i"
+npm i
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib
+cd -
+
 log "cd frontend"
 cd frontend
 log "npm i"

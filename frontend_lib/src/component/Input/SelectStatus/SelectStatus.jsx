@@ -27,7 +27,7 @@ export const SelectStatus = props => {
       </button>
 
       <div className='selectStatus__submenu dropdown-menu' aria-labelledby='dropdownMenu2'>
-        <h6 className='dropdown-header'>{props.t('Input.SelectStatus.file_status')}</h6>
+        <h6 className='dropdown-header'>{props.t('File status')}</h6>
 
         <div className='dropdown-divider' />
 
@@ -39,7 +39,7 @@ export const SelectStatus = props => {
             key={`status_${s.slug}`}
             style={{color: s.hexcolor}}
           >
-            {s.label /* props.t('Input.SelectStatus.ongoing') */}
+            {s.label}
             <div className='selectStatus__submenu__item__icon'>
               <i className={`fa fa-fw fa-${s.faIcon}`} />
             </div>

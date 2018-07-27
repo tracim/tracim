@@ -1,6 +1,9 @@
 import React from 'react'
 import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
+import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
 import {
+  addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
@@ -20,13 +23,12 @@ import {
   putHtmlDocContent,
   putHtmlDocStatus
 } from '../action.async.js'
-import i18n from '../i18n.js'
 
 class HtmlDocument extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'html-documents',
+      appName: 'html-document',
       isVisible: true,
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
@@ -37,6 +39,9 @@ class HtmlDocument extends React.Component {
       timelineWysiwyg: false,
       mode: MODE.VIEW
     }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, props.data ? props.data.config.translation : debug.config.translation)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
@@ -284,6 +289,7 @@ class HtmlDocument extends React.Component {
 
   render () {
     const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode } = this.state
+    const { t } = this.props
 
     if (!isVisible) return null
 
@@ -321,7 +327,7 @@ class HtmlDocument extends React.Component {
                   style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
                 >
                   <i className='fa fa-code-fork' />
-                  Dernière version
+                  {t('Last version')}
                 </button>
               }
             </div>
@@ -381,4 +387,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default HtmlDocument
+export default translate()(HtmlDocument)

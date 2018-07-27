@@ -3,6 +3,8 @@ import {
   CardPopupCreateContent, handleFetchResult
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
+import {addAllResourceForI18n, addAllResourceI18n} from '../../../frontend_lib'
+import i18n from '../i18n.js'
 
 const debug = { // outdated
   config: {
@@ -42,6 +44,9 @@ class PopupCreateHtmlDocument extends React.Component {
       idFolder: props.data ? props.data.idFolder : debug.idFolder,
       newContentName: ''
     }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, props.data ? props.data.config.translation : debug.config.translation)
   }
 
   handleChangeNewContentName = e => this.setState({newContentName: e.target.value})

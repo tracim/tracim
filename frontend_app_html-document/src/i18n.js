@@ -1,8 +1,5 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import { langFr, langEn } from 'tracim_frontend_lib'
-import fr from './translate/fr.js'
-import en from './translate/en.js'
 
 i18n
   .use(reactI18nextModule)
@@ -18,14 +15,7 @@ i18n
     react: {
       wait: true
     },
-    resources: {
-      en: {
-        translation: {...langEn.translation, ...en.translation}
-      },
-      fr: {
-        translation: {...langFr.translation, ...fr.translation}
-      }
-    }
+    resources: {} // init with empty resources, they will come from frontend in app constructor
   })
 
 export default i18n
