@@ -29,12 +29,12 @@ from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.models.contents import thread_type
 from tracim_backend.models.revision_protection import new_revision
 
-THREAD_ENDPOINTS_TAG = 'Threads'
+SWAGGER_TAG__THREAD_ENDPOINTS = 'Threads'
 
 
 class ThreadController(Controller):
 
-    @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__THREAD_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -55,7 +55,7 @@ class ThreadController(Controller):
         )
         return api.get_content_in_context(content)
 
-    @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__THREAD_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([thread_type])
@@ -90,7 +90,7 @@ class ThreadController(Controller):
             api.save(content)
         return api.get_content_in_context(content)
 
-    @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__THREAD_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -120,7 +120,7 @@ class ThreadController(Controller):
             for revision in revisions
         ]
 
-    @hapic.with_api_doc(tags=[THREAD_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__THREAD_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([thread_type])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

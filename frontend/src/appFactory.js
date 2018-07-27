@@ -25,7 +25,7 @@ export function appFactory (WrappedComponent) {
         apiHeader: FETCH_CONFIG.headers // should this be used by app ? right now, apps have their own headers
       },
       idWorkspace,
-      idFolder
+      idFolder: idFolder === 'null' ? null : idFolder
     })
 
     emitEventApp = (type, data) => GLOBAL_dispatchEvent({ type, data })

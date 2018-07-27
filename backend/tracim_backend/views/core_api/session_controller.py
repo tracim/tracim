@@ -16,12 +16,12 @@ from tracim_backend.views.core_api.schemas import BasicAuthSchema
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import AuthenticationFailed
 
-SESSION_ENDPOINTS_TAG = 'Session'
+SWAGGER_TAG__SESSION_ENDPOINTS = 'Session'
 
 
 class SessionController(Controller):
 
-    @hapic.with_api_doc(tags=[SESSION_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])
     @hapic.input_headers(LoginOutputHeaders())
     @hapic.input_body(BasicAuthSchema())
     # TODO - G.M - 17-04-2018 - fix output header ?
@@ -42,7 +42,7 @@ class SessionController(Controller):
         user = uapi.authenticate_user(login.email, login.password)
         return uapi.get_user_with_context(user)
 
-    @hapic.with_api_doc(tags=[SESSION_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def logout(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -51,7 +51,7 @@ class SessionController(Controller):
 
         return
 
-    @hapic.with_api_doc(tags=[SESSION_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])
     @hapic.output_body(UserSchema(),)
     def whoami(self, context, request: TracimRequest, hapic_data=None):
         """

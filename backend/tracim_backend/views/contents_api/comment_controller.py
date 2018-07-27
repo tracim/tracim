@@ -24,12 +24,12 @@ from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.data import UserRoleInWorkspace
 
-COMMENT_ENDPOINTS_TAG = 'Comments'
+SWAGGER_TAG__COMMENT_ENDPOINTS = 'Comments'
 
 
 class CommentController(Controller):
 
-    @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COMMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(CommentSchema(many=True))
@@ -55,7 +55,7 @@ class CommentController(Controller):
                 for comment in comments
         ]
 
-    @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COMMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)  # nopep8
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -84,7 +84,7 @@ class CommentController(Controller):
         )
         return api.get_content_in_context(comment)
 
-    @hapic.with_api_doc(tags=[COMMENT_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COMMENT_ENDPOINTS])
     @require_comment_ownership_or_role(
         minimal_required_role_for_anyone=UserRoleInWorkspace.WORKSPACE_MANAGER,
         minimal_required_role_for_owner=UserRoleInWorkspace.CONTRIBUTOR,

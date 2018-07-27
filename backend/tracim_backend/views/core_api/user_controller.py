@@ -32,12 +32,12 @@ from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 
-USER_ENDPOINTS_TAG = 'Users'
+SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 
 
 class UserController(Controller):
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(WorkspaceDigestSchema(many=True),)
@@ -58,7 +58,7 @@ class UserController(Controller):
             for workspace in workspaces
         ]
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserSchema())
@@ -74,7 +74,7 @@ class UserController(Controller):
         )
         return uapi.get_user_with_context(request.candidate_user)
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_body(SetEmailSchema())
@@ -98,7 +98,7 @@ class UserController(Controller):
         )
         return uapi.get_user_with_context(user)
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
     @require_same_user_or_profile(Group.TIM_ADMIN)
@@ -124,7 +124,7 @@ class UserController(Controller):
         )
         return
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_body(UserInfosSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -147,7 +147,7 @@ class UserController(Controller):
         )
         return uapi.get_user_with_context(user)
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(UserCreationSchema())
@@ -179,7 +179,7 @@ class UserController(Controller):
         )
         return uapi.get_user_with_context(user)
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -196,7 +196,7 @@ class UserController(Controller):
         uapi.enable(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -213,7 +213,7 @@ class UserController(Controller):
         uapi.disable(user=request.candidate_user, do_save=True)
         return
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(UserProfileSchema())
@@ -241,7 +241,7 @@ class UserController(Controller):
         )
         return
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ActiveContentFilterQuerySchema())
@@ -275,7 +275,7 @@ class UserController(Controller):
             for content in last_actives
         ]
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ContentIdsQuerySchema(), as_list=['contents_ids'])
@@ -310,7 +310,7 @@ class UserController(Controller):
             for content in last_actives
         ]
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -327,7 +327,7 @@ class UserController(Controller):
         api.mark_read(request.current_content, do_flush=True)
         return
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -344,7 +344,7 @@ class UserController(Controller):
         api.mark_unread(request.current_content, do_flush=True)
         return
 
-    @hapic.with_api_doc(tags=[USER_ENDPOINTS_TAG])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
