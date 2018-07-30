@@ -2,12 +2,12 @@
   "Create your own collaborative workspaces on trac.im": "Créer votre propre espace de travail sur trac.im",
   "Copyright 2013 - 2017": "Copyright 2013 - 2017",
   "Disconnection error": "Erreur de déconnexion",
-  "Create new workspace": "Créer un espace de travail",
   "Error": "Erreur",
   "Email or password invalid": "Email ou mot de passe invalid",
   "Type": "Type",
   "Document's name": "Nom du document",
   "Status": "Statut",
   "Create in folder...": "Créer dans le dossier ...",
-  "Search...": "Rechercher ..."
+  "Search...": "Rechercher ...",
+  "Create a workspace": "Créer un espace de travail"
 }
