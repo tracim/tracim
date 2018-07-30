@@ -1774,6 +1774,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             status=204,
         )
         # Check After
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
         user = uapi.get_one(user_id)
         assert not user.validate_password('pass')
         assert user.validate_password('mynewpassword')
@@ -1828,6 +1834,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             '/api/v2/users/{}/password'.format(user_id),
             params=params,
             status=403,
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
         )
         # Check After
         user = uapi.get_one(user_id)
@@ -1887,6 +1899,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             status=400,
         )
         # Check After
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
         user = uapi.get_one(user_id)
         assert user.validate_password('pass')
         assert not user.validate_password('mynewpassword')
@@ -1944,6 +1962,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             status=204,
         )
         # Check After
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
         user = uapi.get_one(user_id)
         assert not user.validate_password('pass')
         assert user.validate_password('mynewpassword')

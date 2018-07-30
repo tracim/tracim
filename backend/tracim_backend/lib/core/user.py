@@ -234,7 +234,7 @@ class UserApi(object):
         )
         if do_save:
             # TODO - G.M - 2018-07-24 - Check why commit is needed here
-            transaction.commit()
+            self.save(user)
         return user
 
     def set_email(
