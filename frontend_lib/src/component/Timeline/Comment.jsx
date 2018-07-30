@@ -26,10 +26,12 @@ const Comment = props => {
         </div>
       </div>
       <div className={classnames(`${props.customClass}__messagelist__item__authorandhour`, 'timeline__body__messagelist__item__authorandhour')}>
-        <div className='mr-5'>
+        <div className={classnames(`${props.customClass}__messagelist__item__authorandhour__author`, 'timeline__body__messagelist__item__authorandhour__author')}>
+          {props.author}
+        </div>
+        <div className={classnames(`${props.customClass}__messagelist__item__authorandhour__date`, 'timeline__body__messagelist__item__authorandhour__date')}>
           {props.createdAt}
         </div>
-        {props.author}
       </div>
       <div
         className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__body__messagelist__item__content')}

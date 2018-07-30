@@ -86,7 +86,7 @@ class Sidebar extends React.Component {
 
             <div className='sidebar__btnnewworkspace'>
               <button className='sidebar__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'>
-                {t('Create new workspace')}
+                {t('Create a workspace')}
               </button>
             </div>
 
