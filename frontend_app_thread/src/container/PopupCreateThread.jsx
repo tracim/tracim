@@ -122,6 +122,7 @@ class PopupCreateThread extends React.Component {
         contentName={this.state.newContentName}
         onChangeContentName={this.handleChangeNewContentName}
         btnValidateLabel={this.props.t('Validate and create')}
+        inputPlaceholder={this.props.t("Topic's subject")}
       />
     )
   }
