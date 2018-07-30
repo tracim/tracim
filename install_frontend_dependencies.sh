@@ -2,6 +2,8 @@
 
 . bash_library.sh # source bash_library.sh
 
+# install Tracim Lib
+
 log "cd frontend_lib"
 cd frontend_lib
 log "npm i"
@@ -9,6 +11,8 @@ npm i
 log "sudo npm link"
 sudo npm link
 cd -
+
+# install app Html Document
 
 log "cd frontend_app_html-document"
 cd frontend_app_html-document
@@ -18,6 +22,8 @@ log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib
 cd -
 
+# install app Thread
+
 log "cd frontend_app_thread"
 cd frontend_app_thread
 log "npm i"
@@ -25,6 +31,8 @@ npm i
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib
 cd -
+
+# install Tracim Frontend
 
 log "cd frontend"
 cd frontend
