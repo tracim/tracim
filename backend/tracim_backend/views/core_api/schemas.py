@@ -645,7 +645,7 @@ class ContentCreationSchema(marshmallow.Schema):
         description='Title of the content to create'
     )
     content_type = marshmallow.fields.String(
-        example='html-documents',
+        example='html-document',
         validate=OneOf(ContentType.allowed_types_for_folding()),  # nopep8
     )
     parent_id = marshmallow.fields.Integer(
@@ -677,7 +677,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
-        example='html-documents',
+        example='html-document',
         validate=OneOf(ContentType.allowed_types()),
     )
     sub_content_types = marshmallow.fields.List(
