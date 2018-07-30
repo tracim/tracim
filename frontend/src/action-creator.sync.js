@@ -15,10 +15,12 @@ export const USER_DATA = 'User/Data'
 export const USER_ROLE = 'User/Role'
 export const USER_CONNECTED = 'User/Connected'
 export const USER_DISCONNECTED = 'User/Disconnected'
+export const USER_LANG = 'User/Lang'
 export const setUserConnected = user => ({ type: `Set/${USER_CONNECTED}`, user })
 export const setUserDisconnected = () => ({ type: `Set/${USER_DISCONNECTED}` })
 export const updateUserData = userData => ({ type: `Update/${USER_DATA}`, data: userData })
 export const setUserRole = userRole => ({ type: `Set/${USER_ROLE}`, userRole }) // this actually update workspaceList state
+export const setUserLang = lang => ({ type: `Set/${USER_LANG}`, lang })
 export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNotif) =>
   ({ type: `Update/${USER_ROLE}/SubscriptionNotif`, workspaceId, subscriptionNotif })
 
@@ -41,4 +43,3 @@ export const setContentTypeList = contentTypeList => ({ type: `Set/${CONTENT_TYP
 
 export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `Update/${LANG}`, langList })
-export const setLangActive = langId => ({ type: `Set/${LANG}/Active`, langId })

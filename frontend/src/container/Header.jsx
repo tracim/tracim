@@ -14,7 +14,7 @@ import MenuActionListItemNotification from '../component/Header/MenuActionListIt
 import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
-  setLangActive,
+  setUserLang,
   setUserDisconnected
 } from '../action-creator.sync.js'
 import {
@@ -33,7 +33,7 @@ class Header extends React.Component {
   handleClickSubmit = () => {}
 
   handleChangeLang = langId => {
-    this.props.dispatch(setLangActive(langId))
+    this.props.dispatch(setUserLang(langId))
     i18n.changeLanguage(langId)
   }
 
@@ -82,6 +82,7 @@ class Header extends React.Component {
 
               <MenuActionListItemDropdownLang
                 langList={lang}
+                idLangActive={user.lang}
                 onChangeLang={this.handleChangeLang}
               />
 

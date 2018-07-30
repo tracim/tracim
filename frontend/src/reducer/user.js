@@ -1,12 +1,14 @@
 import {
   USER_CONNECTED,
   USER_DISCONNECTED,
-  USER_DATA
+  USER_DATA,
+  USER_LANG
 } from '../action-creator.sync.js'
 
 const defaultUser = {
   user_id: -1,
   logged: null, // null avoid to be redirected to /login while whoami ep has not responded yet
+  auth: '',
   timezone: '',
   profile: {
     id: 1,
@@ -17,13 +19,15 @@ const defaultUser = {
   caldav_url: null,
   avatar_url: null,
   created: '',
-  display_name: ''
+  public_name: '',
+  lang: 'en' // @FIXME Côme - 2018/07/30 - remove this line when api returns the lang (https://github.com/tracim/tracim/issues/734)
 }
 
 export default function user (state = defaultUser, action) {
   switch (action.type) {
     case `Set/${USER_CONNECTED}`:
       return {
+        ...state,
         ...action.user,
         avatar_url: 'https://www.algoo.fr/static/images/people_images/PERSO_SEUL.png' // @FIXME use avatar from api when db handles it
       }
@@ -33,6 +37,9 @@ export default function user (state = defaultUser, action) {
 
     case `Update/${USER_DATA}`:
       return {...state, ...action.data}
+
+    case `Set/${USER_LANG}`:
+      return {...state, lang: action.lang}
 
     default:
       return state

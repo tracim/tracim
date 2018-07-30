@@ -2,8 +2,6 @@ import React from 'react'
 import { FETCH_CONFIG } from './helper.js'
 import i18n from './i18n.js'
 
-console.log('appFactory', i18n)
-
 export function appFactory (WrappedComponent) {
   return class AppFactory extends React.Component {
     renderAppFull = (appConfig, user, content) => GLOBAL_renderAppFull({
