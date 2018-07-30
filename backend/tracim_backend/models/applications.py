@@ -50,7 +50,7 @@ calendar = Application(
 
 thread = Application(
     label='Threads',
-    slug='contents/threads',
+    slug='contents/thread',
     fa_icon='comments-o',
     hexcolor='#ad4cf9',
     is_active=True,
@@ -61,7 +61,7 @@ thread = Application(
 
 _file = Application(
     label='Files',
-    slug='contents/files',
+    slug='contents/file',
     fa_icon='paperclip',
     hexcolor='#FF9900',
     is_active=True,
@@ -81,12 +81,12 @@ markdownpluspage = Application(
 
 html_documents = Application(
     label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
-    slug='contents/html-documents',
+    slug='contents/html-document',
     fa_icon='file-text-o',
     hexcolor='#3f52e3',
     is_active=True,
     config={},
-    main_route='/#/workspaces/{workspace_id}/contents?type=html-documents',
+    main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
 )
 # TODO - G.M - 08-06-2018 - This is hardcoded lists of app, make this dynamic.
 # List of applications

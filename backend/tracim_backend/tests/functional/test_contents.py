@@ -51,7 +51,7 @@ class TestHtmlDocuments(FunctionalTest):
             status=200
         )
         content = res.json_body
-        assert content['content_type'] == 'html-documents'
+        assert content['content_type'] == 'html-document'
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -92,7 +92,7 @@ class TestHtmlDocuments(FunctionalTest):
             status=200
         )
         content = res.json_body
-        assert content['content_type'] == 'html-documents'
+        assert content['content_type'] == 'html-document'
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -255,7 +255,7 @@ class TestHtmlDocuments(FunctionalTest):
             status=200
         )
         content = res.json_body
-        assert content['content_type'] == 'html-documents'
+        assert content['content_type'] == 'html-document'
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -282,7 +282,7 @@ class TestHtmlDocuments(FunctionalTest):
             status=200
         )
         content = res.json_body
-        assert content['content_type'] == 'html-documents'
+        assert content['content_type'] == 'html-document'
         assert content['content_id'] == 6
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
@@ -324,7 +324,7 @@ class TestHtmlDocuments(FunctionalTest):
         revisions = res.json_body
         assert len(revisions) == 3
         revision = revisions[0]
-        assert revision['content_type'] == 'html-documents'
+        assert revision['content_type'] == 'html-document'
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
@@ -346,7 +346,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Global manager'
         revision = revisions[1]
-        assert revision['content_type'] == 'html-documents'
+        assert revision['content_type'] == 'html-document'
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
@@ -368,7 +368,7 @@ class TestHtmlDocuments(FunctionalTest):
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Global manager'
         revision = revisions[2]
-        assert revision['content_type'] == 'html-documents'
+        assert revision['content_type'] == 'html-document'
         assert revision['content_id'] == 6
         assert revision['is_archived'] is False
         assert revision['is_deleted'] is False
@@ -411,7 +411,7 @@ class TestHtmlDocuments(FunctionalTest):
             status=200
         )
         content = res.json_body
-        assert content['content_type'] == 'html-documents'
+        assert content['content_type'] == 'html-document'
         assert content['content_id'] == 6
         assert content['status'] == 'open'
 
@@ -428,7 +428,7 @@ class TestHtmlDocuments(FunctionalTest):
             status=200
         )
         content = res.json_body
-        assert content['content_type'] == 'html-documents'
+        assert content['content_type'] == 'html-document'
         assert content['content_id'] == 6
         assert content['status'] == 'closed-deprecated'
 

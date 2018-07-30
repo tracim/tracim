@@ -762,9 +762,9 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['fa_icon'] == "th"
 
         sidebar_entry = workspace['sidebar_entries'][2]
-        assert sidebar_entry['slug'] == 'contents/html-documents'
+        assert sidebar_entry['slug'] == 'contents/html-document'
         assert sidebar_entry['label'] == 'Text Documents'
-        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=html-documents'  # nopep8
+        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=html-document'  # nopep8
         assert sidebar_entry['hexcolor'] == "#3f52e3"
         assert sidebar_entry['fa_icon'] == "file-text-o"
 
@@ -776,14 +776,14 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['fa_icon'] == "file-code-o"
 
         sidebar_entry = workspace['sidebar_entries'][4]
-        assert sidebar_entry['slug'] == 'contents/files'
+        assert sidebar_entry['slug'] == 'contents/file'
         assert sidebar_entry['label'] == 'Files'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=file"  # nopep8
         assert sidebar_entry['hexcolor'] == "#FF9900"
         assert sidebar_entry['fa_icon'] == "paperclip"
 
         sidebar_entry = workspace['sidebar_entries'][5]
-        assert sidebar_entry['slug'] == 'contents/threads'
+        assert sidebar_entry['slug'] == 'contents/thread'
         assert sidebar_entry['label'] == 'Threads'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
         assert sidebar_entry['hexcolor'] == "#ad4cf9"

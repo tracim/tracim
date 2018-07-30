@@ -164,7 +164,7 @@ markdownpluspage_type = NewContentType(
 )
 
 html_documents_type = NewContentType(
-    slug='html-documents',
+    slug='html-document',
     fa_icon=html_documents.fa_icon,
     hexcolor=html_documents.hexcolor,
     label='Text Document',
