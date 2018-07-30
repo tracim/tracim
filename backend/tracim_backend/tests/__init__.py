@@ -50,7 +50,7 @@ def set_html_document_slug_to_legacy(session_factory) -> None:
     )
     content_query = dbsession.query(ContentRevisionRO).filter(ContentRevisionRO.type == 'page').filter(ContentRevisionRO.content_id == 6)  # nopep8
     assert content_query.count() == 0
-    html_documents_query = dbsession.query(ContentRevisionRO).filter(ContentRevisionRO.type == 'html-documents')  # nopep8
+    html_documents_query = dbsession.query(ContentRevisionRO).filter(ContentRevisionRO.type == 'html-document')  # nopep8
     html_documents_query.update({ContentRevisionRO.type: 'page'})
     transaction.commit()
     assert content_query.count() > 0
