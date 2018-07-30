@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import i18n from '../i18n.js'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
@@ -21,7 +22,7 @@ import {
 import {
   postUserLogout
 } from '../action-creator.async.js'
-import { COOKIE } from '../helper.js'
+import { COOKIE, PAGE } from '../helper.js'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -42,7 +43,7 @@ class Header extends React.Component {
   handleClickHelp = () => {}
 
   handleClickLogout = async () => {
-    const { dispatch, t } = this.props
+    const { history, dispatch, t } = this.props
 
     const fetchPostUserLogout = await dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
@@ -50,6 +51,7 @@ class Header extends React.Component {
       Cookies.remove(COOKIE.USER_AUTH)
 
       dispatch(setUserDisconnected())
+      history.push(PAGE.LOGIN)
     } else {
       dispatch(newFlashMessage(t('Disconnection error', 'danger')))
     }
@@ -107,4 +109,4 @@ class Header extends React.Component {
 }
 
 const mapStateToProps = ({ lang, user }) => ({ lang, user })
-export default connect(mapStateToProps)(translate()(appFactory(Header)))
+export default withRouter(connect(mapStateToProps)(translate()(appFactory(Header))))
