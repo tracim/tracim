@@ -27,10 +27,6 @@ export const SelectStatus = props => {
       </button>
 
       <div className='selectStatus__submenu dropdown-menu' aria-labelledby='dropdownMenu2'>
-        <h6 className='dropdown-header'>{props.t('File status')}</h6>
-
-        <div className='dropdown-divider' />
-
         {props.availableStatus.map(s =>
           <button
             className='selectStatus__submenu__item current dropdown-item'
