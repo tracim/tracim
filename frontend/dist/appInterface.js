@@ -3,7 +3,7 @@
 
   getSelectedApp = name => {
     switch (name) {
-      case 'html-documents':
+      case 'html-document':
         return appHtmlDocument
       case 'thread':
         return appThread

@@ -6,7 +6,7 @@ import PopupCreateThread from './container/PopupCreateThread.jsx'
 require('./css/index.styl')
 
 const appInterface = {
-  name: 'Thread',
+  name: 'thread',
   isRendered: false,
   renderAppFull: data => {
     return ReactDOM.render(

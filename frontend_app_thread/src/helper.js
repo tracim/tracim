@@ -5,7 +5,7 @@ export const FETCH_CONFIG = {
   }
 }
 
-export const debug = { // copied from html-documents => outdated
+export const debug = { // copied from html-document => outdated
   config: {
     label: 'Thread',
     slug: 'thread',
@@ -78,7 +78,7 @@ export const debug = { // copied from html-documents => outdated
     show_in_ui: true,
     slug: 'current-menu',
     status: 'open',
-    sub_content_types: ['thread', 'html-documents', 'file', 'folder'],
+    sub_content_types: ['thread', 'html-document', 'file', 'folder'],
     workspace_id: 1
   },
   timeline: [] // timelineDebugData

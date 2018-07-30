@@ -41,24 +41,36 @@ class HtmlDocument extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, props.data ? props.data.config.translation : debug.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation)
+    i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'html-documents_showApp':
+      case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         break
-      case 'html-documents_hideApp':
+      case 'html-document_hideApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case 'html-documents_reloadContent':
+      case 'html-document_reloadContent':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        break
+      case 'allApp_changeLang':
+        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        break
     }
   }
 
@@ -322,7 +334,7 @@ class HtmlDocument extends React.Component {
 
               {mode === MODE.REVISION &&
                 <button
-                  className='wsContentGeneric__option__menu__lastversion html-documents__lastversionbtn btn'
+                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
                 >
@@ -364,7 +376,7 @@ class HtmlDocument extends React.Component {
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
             text={content.raw_content}
             onChangeText={this.handleChangeText}
-            key={'html-documents'}
+            key={'html-document'}
           />
 
           <Timeline

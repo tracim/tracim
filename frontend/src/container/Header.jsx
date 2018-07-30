@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import i18n from '../i18n.js'
+import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
 import Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
@@ -32,9 +33,10 @@ class Header extends React.Component {
   handleChangeInput = e => this.setState({inputSearchValue: e.target.value})
   handleClickSubmit = () => {}
 
-  handleChangeLang = langId => {
-    this.props.dispatch(setUserLang(langId))
-    i18n.changeLanguage(langId)
+  handleChangeLang = idLang => {
+    this.props.dispatch(setUserLang(idLang))
+    i18n.changeLanguage(idLang)
+    this.props.emitEventApp('allApp_changeLang', idLang)
   }
 
   handleClickHelp = () => {}
@@ -105,4 +107,4 @@ class Header extends React.Component {
 }
 
 const mapStateToProps = ({ lang, user }) => ({ lang, user })
-export default connect(mapStateToProps)(translate()(Header))
+export default connect(mapStateToProps)(translate()(appFactory(Header)))

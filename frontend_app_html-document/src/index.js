@@ -10,7 +10,7 @@ import PopupCreateHtmlDocument from './container/PopupCreateHtmlDocument.jsx'
 require('./css/index.styl')
 
 const appInterface = {
-  name: 'HtmlDocument',
+  name: 'html-document',
   isRendered: false,
   renderAppFull: data => {
     return ReactDOM.render(

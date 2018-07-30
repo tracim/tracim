@@ -24,7 +24,8 @@ export function appFactory (WrappedComponent) {
         domContainer: 'popupCreateContentContainer',
         apiUrl: FETCH_CONFIG.apiUrl,
         mockApiUrl: FETCH_CONFIG.mockApiUrl,
-        apiHeader: FETCH_CONFIG.headers // should this be used by app ? right now, apps have their own headers
+        apiHeader: FETCH_CONFIG.headers, // should this be used by app ? right now, apps have their own headers
+        translation: i18n.store.data
       },
       idWorkspace,
       idFolder: idFolder === 'null' ? null : idFolder

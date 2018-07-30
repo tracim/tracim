@@ -22,7 +22,7 @@ export class OpenContentApp extends React.Component {
 
       if (appOpenedType === contentToOpen.type) { // app already open
         GLOBAL_dispatchEvent({
-          type: `${contentToOpen.type}_reloadContent`, // handled by html-documents:src/container/HtmlDocument.jsx
+          type: `${contentToOpen.type}_reloadContent`, // handled by html-document:src/container/HtmlDocument.jsx
           data: contentToOpen
         })
       } else { // open another app

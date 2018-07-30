@@ -35,7 +35,8 @@ class Thread extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    addAllResourceI18n(i18n, props.data ? props.data.config.translation : debug.config.translation)
+    addAllResourceI18n(i18n, this.state.config.translation)
+    i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
@@ -53,6 +54,17 @@ class Thread extends React.Component {
       case 'thread_reloadContent':
         console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        break
+      case 'allApp_changeLang':
+        console.log('%c<Thread> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        break
     }
   }
 
