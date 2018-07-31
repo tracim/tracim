@@ -25,7 +25,7 @@ from sqlalchemy.sql.elements import and_
 
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.core.notifications import NotifierFactory
-from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import SameValueError, UnallowedSubContent
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -408,12 +408,30 @@ class ContentApi(object):
 
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
-        assert content_type_slug in CONTENT_TYPES.query_allowed_types_slugs()
         assert content_type_slug != CONTENT_TYPES.Any_SLUG
         assert not (label and filename)
 
         if content_type_slug == CONTENT_TYPES.Folder.slug and not label:
             label = self.generate_folder_label(workspace, parent)
+
+        if not workspace:
+            workspace = parent.workspace
+
+        content_type = CONTENT_TYPES.get_one_by_slug(content_type_slug)
+        if parent:
+            if content_type.slug not in parent.properties['allowed_content'] or not parent.properties['allowed_content'][content_type.slug]:
+                raise UnallowedSubContent(' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(  # nopep8
+                    subcontent_type=content_type.slug,
+                    content_id=parent.content_id,
+                ))
+
+        if content_type.slug not in workspace.get_allowed_content_types():
+            raise UnallowedSubContent(
+                ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
+                    subcontent_type=content_type.slug,
+                    content_id=workspace.workspace_id,
+                )
+            )
 
         content = Content()
 
@@ -433,8 +451,9 @@ class ContentApi(object):
 
         content.owner = self._user
         content.parent = parent
+
         content.workspace = workspace
-        content.type = content_type_slug
+        content.type = content_type.slug
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
 
@@ -450,6 +469,7 @@ class ContentApi(object):
         return content
 
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
+        # TODO: check parent allowed_type and workspace allowed_ type
         assert parent and parent.type != CONTENT_TYPES.Folder.slug
         if not content:
             raise EmptyCommentContentNotAllowed()

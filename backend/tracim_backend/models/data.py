@@ -87,7 +87,7 @@ class Workspace(DeclarativeBase):
 
     def get_allowed_content_types(self):
         # @see Content.get_allowed_content_types()
-        return CONTENT_TYPES.endpoint_allowed_types_slug()
+        return CONTENT_TYPES.extended_endpoint_allowed_types_slug()
 
     def get_valid_children(
             self,

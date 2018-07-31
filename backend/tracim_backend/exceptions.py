@@ -203,3 +203,7 @@ class PageOfPreviewNotFound(NotFound):
 
 class PreviewDimNotAllowed(TracimException):
     pass
+
+
+class UnallowedSubContent(TracimException):
+    pass

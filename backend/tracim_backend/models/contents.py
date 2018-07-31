@@ -228,6 +228,7 @@ class ContentTypeList(object):
         """
         content_types = self._content_types.copy()
         content_types.extend(self._special_contents_types)
+        content_types.append(self.Event)
         for item in content_types:
             if item.slug == slug or (item.slug_alias and slug in item.slug_alias):  # nopep8
                 return item
