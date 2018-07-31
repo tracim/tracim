@@ -8,7 +8,7 @@ const FileItemHeader = props => {
         {props.t('Type')}
       </div>
       <div className='content__header__name'>
-        {props.t("Title")}
+        {props.t('Title')}
       </div>
       <div className='content__header__status'>
         {props.t('Status')}
