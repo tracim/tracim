@@ -106,7 +106,7 @@ CONTENT_STATUS = ContentStatusList(
 # ContentType
 
 
-class NewContentType(object):
+class ContentType(object):
     """
     Future ContentType object class
     """
@@ -118,7 +118,7 @@ class NewContentType(object):
             label: str,
             creation_label: str,
             available_statuses: typing.List[ContentStatus],
-
+            slug_alias: typing.List[str] = None,
     ):
         self.slug = slug
         self.fa_icon = fa_icon
@@ -126,9 +126,10 @@ class NewContentType(object):
         self.label = label
         self.creation_label = creation_label
         self.available_statuses = available_statuses
+        self.slug_alias = slug_alias
 
 
-thread_type = NewContentType(
+thread_type = ContentType(
     slug='thread',
     fa_icon=thread.fa_icon,
     hexcolor=thread.hexcolor,
@@ -137,7 +138,7 @@ thread_type = NewContentType(
     available_statuses=CONTENT_STATUS.allowed(),
 )
 
-file_type = NewContentType(
+file_type = ContentType(
     slug='file',
     fa_icon=_file.fa_icon,
     hexcolor=_file.hexcolor,
@@ -146,7 +147,7 @@ file_type = NewContentType(
     available_statuses=CONTENT_STATUS.allowed(),
 )
 
-markdownpluspage_type = NewContentType(
+markdownpluspage_type = ContentType(
     slug='markdownpage',
     fa_icon=markdownpluspage.fa_icon,
     hexcolor=markdownpluspage.hexcolor,
@@ -155,17 +156,18 @@ markdownpluspage_type = NewContentType(
     available_statuses=CONTENT_STATUS.allowed(),
 )
 
-html_documents_type = NewContentType(
+html_documents_type = ContentType(
     slug='html-documents',
     fa_icon=html_documents.fa_icon,
     hexcolor=html_documents.hexcolor,
     label='Text Document',
     creation_label='Write a document',
     available_statuses=CONTENT_STATUS.allowed(),
+    slug_alias=['page']
 )
 
 # TODO - G.M - 31-05-2018 - Set Better folder params
-folder_type = NewContentType(
+folder_type = ContentType(
     slug='folder',
     fa_icon=thread.fa_icon,
     hexcolor=thread.hexcolor,
@@ -174,16 +176,9 @@ folder_type = NewContentType(
     available_statuses=CONTENT_STATUS.allowed(),
 )
 
-CONTENT_DEFAULT_TYPE = [
-    thread_type,
-    file_type,
-    markdownpluspage_type,
-    html_documents_type,
-    folder_type,
-]
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
-event_type = NewContentType(
+event_type = ContentType(
     slug='event',
     fa_icon=thread.fa_icon,
     hexcolor=thread.hexcolor,
@@ -193,7 +188,7 @@ event_type = NewContentType(
 )
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
-comment_type = NewContentType(
+comment_type = ContentType(
     slug='comment',
     fa_icon=thread.fa_icon,
     hexcolor=thread.hexcolor,
@@ -202,93 +197,54 @@ comment_type = NewContentType(
     available_statuses=CONTENT_STATUS.allowed(),
 )
 
-CONTENT_DEFAULT_TYPE_SPECIAL = [
-    event_type,
-    comment_type,
-]
 
-ALL_CONTENTS_DEFAULT_TYPES = CONTENT_DEFAULT_TYPE + CONTENT_DEFAULT_TYPE_SPECIAL
-
-
-class ContentTypeLegacy(NewContentType):
+class ContentTypeList(object):
     """
-    Temporary remplacement object for Legacy ContentType Object
+    ContentType List
     """
+    Any_SLUG = 'any'
+    Folder = folder_type
+    Comment = comment_type
+    Event = event_type
+    File = file_type
+    Page = html_documents_type
+    Thread = thread_type
 
-    # special type
-    Any = 'any'
-    Folder = 'folder'
-    Event = 'event'
-    Comment = 'comment'
+    def __init__(self, extend_content_status: typing.List[ContentType]):
+        self._content_types = [self.Folder]
+        self._content_types.extend(extend_content_status)
+        self._special_contents_types = [self.Comment]
+        self._extra_slugs = [self.Any_SLUG]
 
-    File = file_type.slug
-    Thread = thread_type.slug
-    Page = html_documents_type.slug
-    PageLegacy = 'page'
-    MarkdownPage = markdownpluspage_type.slug
-
-    def __init__(self, slug: str):
-        if slug == 'page':
-            slug = ContentTypeLegacy.Page
-        for content_type in ALL_CONTENTS_DEFAULT_TYPES:
-            if slug == content_type.slug:
-                super(ContentTypeLegacy, self).__init__(
-                    slug=content_type.slug,
-                    fa_icon=content_type.fa_icon,
-                    hexcolor=content_type.hexcolor,
-                    label=content_type.label,
-                    creation_label=content_type.creation_label,
-                    available_statuses=content_type.available_statuses
-                )
-                return
+    def get_one_by_slug(self, slug: str):
+        content_types = self._content_types.copy()
+        content_types.extend(self._special_contents_types)
+        for item in content_types:
+            if item.slug == slug or (item.slug_alias and slug in item.slug_alias):  # nopep8
+                return item
         raise ContentTypeNotExist()
 
-    def get_slug_aliases(self) -> typing.List[str]:
-        """
-        Get all slug aliases of a content,
-        useful for legacy code convertion
-        """
-        # TODO - G.M - 2018-07-05 - Remove this legacy compat code
-        # when possible.
-        page_alias = [self.Page, self.PageLegacy]
-        if self.slug in page_alias:
-            return page_alias
-        else:
-            return [self.slug]
+    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+        allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
+        return allowed_type_slug
 
-    @classmethod
-    def all(cls) -> typing.List[str]:
-        return cls.allowed_types()
+    def query_allowed_types_slugs(self) -> typing.List[str]:
+        allowed_types_slug = []
+        for content_type in self._content_types:
+            allowed_types_slug.append(content_type.slug)
+            if content_type.slug_alias:
+                allowed_types_slug.extend(content_type.slug_alias)
+        for content_type in self._special_contents_types:
+            allowed_types_slug.append(content_type.slug)
+        allowed_types_slug.extend(self._extra_slugs)
+        return allowed_types_slug
 
-    @classmethod
-    def allowed_types(cls) -> typing.List[str]:
-        contents_types = [status.slug for status in ALL_CONTENTS_DEFAULT_TYPES]
-        return contents_types
 
-    @classmethod
-    def allowed_type_values(cls) -> typing.List[str]:
-        """
-        All content type slug + special values like any
-        """
-        content_types = cls.allowed_types()
-        content_types.append(ContentTypeLegacy.Any)
-        return content_types
-
-    @classmethod
-    def allowed_types_for_folding(cls):
-        # This method is used for showing only "main"
-        # types in the left-side treeview
-        contents_types = [status.slug for status in CONTENT_DEFAULT_TYPE]
-        return contents_types
-
-    # TODO - G.M - 30-05-2018 - This method don't do anything.
-    @classmethod
-    def sorted(cls, types: ['ContentType']) -> ['ContentType']:
-        return types
-
-    @property
-    def id(self):
-        return self.slug
-
-    def toDict(self):
-        raise NotImplementedError()
+CONTENT_TYPES = ContentTypeList(
+    [
+        thread_type,
+        file_type,
+        markdownpluspage_type,
+        html_documents_type,
+    ]
+)

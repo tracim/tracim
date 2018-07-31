@@ -19,9 +19,9 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models import User
 from tracim_backend.models.auth import User
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.lib.utils.translation import fake_translator as l_, \
     fake_translator as _
@@ -233,8 +233,8 @@ class EmailManager(object):
             config=self.config,
             show_archived=True,
             show_deleted=True,
-        ).get_one(event_content_id, ContentType.Any)
-        main_content = content.parent if content.type == ContentType.Comment else content
+        ).get_one(event_content_id, CONTENT_TYPES.Any_SLUG)
+        main_content = content.parent if content.type == CONTENT_TYPES.Comment.slug else content
         notifiable_roles = WorkspaceApi(
             current_user=user,
             session=self.session,
@@ -455,20 +455,20 @@ class EmailManager(object):
             content_text = content.description
             call_to_action_text = l_('View online')
 
-            if ContentType.Thread == content.type:
+            if CONTENT_TYPES.Thread.slug == content.type:
                 call_to_action_text = l_('Answer')
                 content_intro = l_('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + \
                                content.get_last_comment_from(actor).description
 
-            elif ContentType.File == content.type:
+            elif CONTENT_TYPES.File.slug == content.type:
                 content_intro = l_('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
                 if content.description:
                     content_text = content.description
                 else:
                     content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
-            elif ContentType.Page == content.type:
+            elif CONTENT_TYPES.Page.slug == content.type:
                 content_intro = l_('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
                 content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
@@ -476,11 +476,11 @@ class EmailManager(object):
             content_text = content.description
             call_to_action_text = l_('View online')
 
-            if ContentType.File == content.type:
+            if CONTENT_TYPES.File.slug == content.type:
                 content_intro = l_('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
                 content_text = ''
 
-            elif ContentType.Page == content.type:
+            elif CONTENT_TYPES.Page.slug == content.type:
                 content_intro = l_('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
@@ -490,7 +490,7 @@ class EmailManager(object):
                     title_diff + \
                     htmldiff(previous_revision.description, content.description)
 
-            elif ContentType.Thread == content.type:
+            elif CONTENT_TYPES.Thread.slug == content.type:
                 content_intro = l_('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
@@ -503,7 +503,7 @@ class EmailManager(object):
         elif ActionDescription.EDITION == action:
             call_to_action_text = l_('View online')
 
-            if ContentType.File == content.type:
+            if CONTENT_TYPES.File.slug == content.type:
                 content_intro = l_('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
                     content.description

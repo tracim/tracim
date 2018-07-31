@@ -3,8 +3,9 @@ from urllib.parse import urlparse
 from paste.deploy.converters import asbool
 from tracim_backend.lib.utils.logger import logger
 from depot.manager import DepotManager
+from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.models.data import ActionDescription
 
-from tracim_backend.models.data import ActionDescription, ContentType
 
 
 class CFG(object):
@@ -145,11 +146,11 @@ class CFG(object):
         ]
 
         self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
-            ContentType.Page,
-            ContentType.Thread,
-            ContentType.File,
-            ContentType.Comment,
-            # ContentType.Folder -- Folder is skipped
+            CONTENT_TYPES.Page.slug,
+            CONTENT_TYPES.Thread.slug,
+            CONTENT_TYPES.File.slug,
+            CONTENT_TYPES.Comment.slug,
+            # CONTENT_TYPES.Folder.slug -- Folder is skipped
         ]
         if settings.get('email.notification.from'):
             raise Exception(

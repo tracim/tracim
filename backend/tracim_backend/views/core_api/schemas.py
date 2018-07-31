@@ -6,9 +6,10 @@ from marshmallow.validate import Range
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.contents import GlobalStatus, CONTENT_STATUS
+from tracim_backend.models.contents import GlobalStatus
+from tracim_backend.models.contents import CONTENT_STATUS
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import open_status
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
@@ -341,9 +342,9 @@ class FilterContentQuerySchema(marshmallow.Schema):
         validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
     content_type = marshmallow.fields.String(
-        example=ContentType.Any,
-        default=ContentType.Any,
-        validate=OneOf(ContentType.allowed_type_values())
+        example=CONTENT_TYPES.Any_SLUG,
+        default=CONTENT_TYPES.Any_SLUG,
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
     )
 
     @post_load
@@ -591,7 +592,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = marshmallow.fields.String(
         example='pagehtml',
-        validate=OneOf(ContentType.allowed_types()),
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
     )
     fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
@@ -645,7 +646,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type = marshmallow.fields.String(
         example='html-documents',
-        validate=OneOf(ContentType.allowed_types_for_folding()),  # nopep8
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),  # nopep8
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -677,12 +678,12 @@ class ContentDigestSchema(marshmallow.Schema):
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
         example='html-documents',
-        validate=OneOf(ContentType.allowed_types()),
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
     )
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=OneOf(ContentType.allowed_types())
+            validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '

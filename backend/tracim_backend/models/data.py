@@ -96,7 +96,7 @@ class Workspace(DeclarativeBase):
 
     def get_allowed_content_types(self):
         # @see Content.get_allowed_content_types()
-        return [ContentType('folder')]
+        return CONTENT_TYPES.endpoint_allowed_types_slug()
 
     def get_valid_children(
             self,
@@ -293,7 +293,7 @@ class ActionDescription(object):
 
 from tracim_backend.models.contents import CONTENT_STATUS
 from tracim_backend.models.contents import ContentStatus
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
 # is lost .
 
@@ -352,9 +352,9 @@ from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 #         # self.icon = ContentStatus._ICONS[id]
 #         # self.css = ContentStatus._CSS[id]
 #         #
-#         # if type==ContentType.Thread:
+#         # if type==CONTENT_TYPES.Thread.slug:
 #         #     self.label = ContentStatus._LABELS_THREAD[id]
-#         # elif type==ContentType.File:
+#         # elif type==CONTENT_TYPES.File.slug:
 #         #     self.label = ContentStatus._LABELS_FILE[id]
 #         # else:
 #         #     self.label = ContentStatus._LABELS[id]
@@ -500,13 +500,13 @@ from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 #     #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
 #     #     # Make this code dynamic loading data types
 #     #
-#     #     if content.type==ContentType.Folder:
+#     #     if content.type==CONTENT_TYPES.Folder.slug:
 #     #         return '/workspaces/{}/folders/{}'.format(content.workspace_id, content.content_id)
-#     #     elif content.type==ContentType.File:
+#     #     elif content.type==CONTENT_TYPES.File.slug:
 #     #         return '/workspaces/{}/folders/{}/files/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-#     #     elif content.type==ContentType.Thread:
+#     #     elif content.type==CONTENT_TYPES.Thread.slug:
 #     #         return '/workspaces/{}/folders/{}/threads/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-#     #     elif content.type==ContentType.Page:
+#     #     elif content.type==CONTENT_TYPES.Page.slug:
 #     #         return '/workspaces/{}/folders/{}/pages/{}'.format(content.workspace_id, content.parent_id, content.content_id)
 #     #
 #     # @classmethod
@@ -545,7 +545,7 @@ class ContentChecker(object):
 
     @classmethod
     def check_properties(cls, item):
-        if item.type == ContentType.Folder:
+        if item.type == CONTENT_TYPES.Folder.slug:
             properties = item.properties
             if 'allowed_content' not in properties.keys():
                 return False
@@ -559,7 +559,7 @@ class ContentChecker(object):
                 return False
             return True
 
-        if item.type == ContentType.Event:
+        if item.type == CONTENT_TYPES.Event.slug:
             properties = item.properties
             if 'name' not in properties.keys():
                 return False
@@ -573,7 +573,7 @@ class ContentChecker(object):
 
         # TODO - G.M - 15-03-2018 - Choose only correct Content-type for origin
         # Only content who can be copied need this
-        if item.type == ContentType.Any:
+        if item.type == CONTENT_TYPES.Any_SLUG:
             properties = item.properties
             if 'origin' in properties.keys():
                 return True
@@ -581,7 +581,7 @@ class ContentChecker(object):
 
     @classmethod
     def reset_properties(cls, item):
-        if item.type == ContentType.Folder:
+        if item.type == CONTENT_TYPES.Folder.slug:
             item.properties = DEFAULT_PROPERTIES
             return
 
@@ -780,9 +780,9 @@ class ContentRevisionRO(DeclarativeBase):
     def get_label_as_file(self):
         file_extension = self.file_extension or ''
 
-        if self.type == ContentType.Thread:
+        if self.type == CONTENT_TYPES.Thread.slug:
             file_extension = '.html'
-        elif self.type == ContentType.Page:
+        elif self.type == CONTENT_TYPES.Page.slug:
             file_extension = '.html'
 
         return '{0}{1}'.format(
@@ -1228,10 +1228,10 @@ class Content(DeclarativeBase):
         return format_timedelta(delta_from_datetime - datetime_object,
                                 locale=get_locale())
 
-    def get_child_nb(self, content_type: ContentType, content_status = ''):
+    def get_child_nb(self, content_type: str, content_status = ''):
         child_nb = 0
         for child in self.get_valid_children():
-            if child.type == content_type or content_type == ContentType.Any:
+            if child.type == content_type or content_type.slug == CONTENT_TYPES.Any_SLUG:
                 if not content_status:
                     child_nb = child_nb+1
                 elif content_status==child.status:
@@ -1306,7 +1306,7 @@ class Content(DeclarativeBase):
     def get_comments(self):
         children = []
         for child in self.children:
-            if ContentType.Comment==child.type and not child.is_deleted and not child.is_archived:
+            if CONTENT_TYPES.Comment.slug == child.type and not child.is_deleted and not child.is_archived:
                 children.append(child.node)
         return children
 
@@ -1347,13 +1347,13 @@ class Content(DeclarativeBase):
             allowed_types = self.properties['allowed_content']
             for type_label, is_allowed in allowed_types.items():
                 if is_allowed:
-                    types.append(ContentType(type_label))
+                    types.append(CONTENT_TYPES.get_one_by_slug(type_label))
         except Exception as e:
             print(e.__str__())
             print('----- /*\ *****')
             raise ValueError('Not allowed content property')
 
-        return ContentType.sorted(types)
+        return types
 
     def get_history(self, drop_empty_revision=False) -> '[VirtualEvent]':
         events = []
@@ -1446,10 +1446,9 @@ class VirtualEvent(object):
 
     @classmethod
     def create_from_content(cls, content: Content):
-        content_type = ContentType(content.type)
 
         label = content.get_label()
-        if content.type == ContentType.Comment:
+        if content.type == CONTENT_TYPES.Comment.slug:
             # TODO - G.M  - 10-04-2018 - [Cleanup] Remove label param
             # from this object ?
             label = l_('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
@@ -1457,7 +1456,7 @@ class VirtualEvent(object):
         return VirtualEvent(id=content.content_id,
                             created=content.created,
                             owner=content.owner,
-                            type=content_type,
+                            type=ActionDescription(content.revision_type),
                             label=label,
                             content=content.description,
                             ref_object=content)

@@ -35,12 +35,14 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.contents import CONTENT_STATUS
+from tracim_backend.models.contents import ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentType
+
 from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -75,10 +77,10 @@ def compare_content_for_sorting_by_type_and_name(
     else:
         # TODO - D.A. - 2014-12-02 - Manage Content Types Dynamically
         content_type_order = [
-            ContentType.Folder,
-            ContentType.Page,
-            ContentType.Thread,
-            ContentType.File,
+            CONTENT_TYPES.Folder.slug,
+            CONTENT_TYPES.Page.slug,
+            CONTENT_TYPES.Thread.slug,
+            CONTENT_TYPES.File.slug,
         ]
 
         content_1_type_index = content_type_order.index(content1.type)
@@ -105,15 +107,15 @@ class ContentApi(object):
     SEARCH_SEPARATORS = ',| '
     SEARCH_DEFAULT_RESULT_NB = 50
 
-    DISPLAYABLE_CONTENTS = (
-        ContentType.Folder,
-        ContentType.File,
-        ContentType.Comment,
-        ContentType.Thread,
-        ContentType.Page,
-        ContentType.PageLegacy,
-        ContentType.MarkdownPage,
-    )
+    # DISPLAYABLE_CONTENTS = (
+    #     CONTENT_TYPES.Folder.slug,
+    #     CONTENT_TYPES.File.slug,
+    #     CONTENT_TYPES.Comment.slug,
+    #     CONTENT_TYPES.Thread.slug,
+    #     CONTENT_TYPES.Page.slug,
+    #     CONTENT_TYPES.Page.slugLegacy,
+    #     ContentType.MarkdownPage,
+    # )
 
     def __init__(
             self,
@@ -230,7 +232,7 @@ class ContentApi(object):
 
         # Exclude non displayable types
         if not self._force_show_all_types:
-            result = result.filter(Content.type.in_(self.DISPLAYABLE_CONTENTS))
+            result = result.filter(Content.type.in_(CONTENT_TYPES.query_allowed_types_slugs()))
 
         if workspace:
             result = result.filter(Content.workspace_id == workspace.workspace_id)
@@ -369,8 +371,8 @@ class ContentApi(object):
     #     removed_item_ids = removed_item_ids or []  # FDV
     # 
     #     if not allowed_node_types:
-    #         allowed_node_types = [ContentType.Folder]
-    #     elif allowed_node_types==ContentType.Any:
+    #         allowed_node_types = [CONTENT_TYPES.Folder.slug]
+    #     elif allowed_node_types==CONTENT_TYPES.Any_SLUG:
     #         allowed_node_types = ContentType.all()
     # 
     #     parent_id = parent.content_id if parent else None
@@ -395,7 +397,7 @@ class ContentApi(object):
     #     for folder in folders:
     #         for allowed_content_type in filter_by_allowed_content_types:
     # 
-    #             is_folder = folder.type == ContentType.Folder
+    #             is_folder = folder.type == CONTENT_TYPES.Folder.slug
     #             content_type__allowed = folder.properties['allowed_content'][allowed_content_type] == True
     # 
     #             if is_folder and content_type__allowed:
@@ -404,12 +406,13 @@ class ContentApi(object):
     # 
     #     return result
 
-    def create(self, content_type: str, workspace: Workspace, parent: Content=None, label: str ='', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
+    def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
-        assert content_type in ContentType.allowed_types()
+        assert content_type_slug in CONTENT_TYPES.query_allowed_types_slugs()
+        assert content_type_slug != CONTENT_TYPES.Any_SLUG
         assert not (label and filename)
 
-        if content_type == ContentType.Folder and not label:
+        if content_type_slug == CONTENT_TYPES.Folder.slug and not label:
             label = self.generate_folder_label(workspace, parent)
 
         content = Content()
@@ -421,7 +424,7 @@ class ContentApi(object):
         elif label:
             content.label = label
         else:
-            if content_type == ContentType.Comment:
+            if content_type_slug == CONTENT_TYPES.Comment.slug:
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ''
@@ -431,13 +434,13 @@ class ContentApi(object):
         content.owner = self._user
         content.parent = parent
         content.workspace = workspace
-        content.type = content_type
+        content.type = content_type_slug
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
 
         if content.type in (
-                ContentType.Page,
-                ContentType.Thread,
+                CONTENT_TYPES.Page.slug,
+                CONTENT_TYPES.Thread.slug,
         ):
             content.file_extension = '.html'
 
@@ -447,7 +450,7 @@ class ContentApi(object):
         return content
 
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
-        assert parent and parent.type != ContentType.Folder
+        assert parent and parent.type != CONTENT_TYPES.Folder.slug
         if not content:
             raise EmptyCommentContentNotAllowed()
         item = Content()
@@ -456,7 +459,7 @@ class ContentApi(object):
         if not workspace:
             workspace = item.parent.workspace
         item.workspace = workspace
-        item.type = ContentType.Comment
+        item.type = CONTENT_TYPES.Comment.slug
         item.description = content
         item.label = ''
         item.revision_type = ActionDescription.COMMENT
@@ -492,7 +495,7 @@ class ContentApi(object):
 
         base_request = self._base_query(workspace).filter(Content.content_id==content_id)
 
-        if content_type!=ContentType.Any:
+        if content_type!=CONTENT_TYPES.Any_SLUG:
             base_request = base_request.filter(Content.type==content_type)
 
         if parent:
@@ -577,20 +580,20 @@ class ContentApi(object):
         return query.filter(
             or_(
                 and_(
-                    Content.type == ContentType.File,
+                    Content.type == CONTENT_TYPES.File.slug,
                     Content.label == file_name,
                     Content.file_extension == file_extension,
                 ),
                 and_(
-                    Content.type == ContentType.Thread,
+                    Content.type == CONTENT_TYPES.Thread.slug,
                     Content.label == file_name,
                 ),
                 and_(
-                    Content.type == ContentType.Page,
+                    Content.type == CONTENT_TYPES.Page.slug,
                     Content.label == file_name,
                 ),
                 and_(
-                    Content.type == ContentType.Folder,
+                    Content.type == CONTENT_TYPES.Folder.slug,
                     Content.label == content_label,
                 ),
             )
@@ -671,7 +674,7 @@ class ContentApi(object):
             # Filter query on label
             folder_query = query \
                 .filter(
-                    Content.type == ContentType.Folder,
+                    Content.type == CONTENT_TYPES.Folder.slug,
                     Content.label == label,
                     Content.workspace_id == workspace.workspace_id,
                 )
@@ -723,22 +726,22 @@ class ContentApi(object):
 
         return query.filter(or_(
             and_(
-                Content.type == ContentType.File,
+                Content.type == CONTENT_TYPES.File.slug,
                 file_name_filter,
                 file_extension_filter,
             ),
             and_(
-                Content.type == ContentType.Thread,
+                Content.type == CONTENT_TYPES.Thread.slug,
                 file_name_filter,
                 file_extension_filter,
             ),
             and_(
-                Content.type == ContentType.Page,
+                Content.type == CONTENT_TYPES.Page.slug,
                 file_name_filter,
                 file_extension_filter,
             ),
             and_(
-                Content.type == ContentType.Folder,
+                Content.type == CONTENT_TYPES.Folder.slug,
                 label_filter,
             ),
         ))
@@ -844,25 +847,28 @@ class ContentApi(object):
     def _get_all_query(
         self,
         parent_id: int = None,
-        content_type: str = ContentType.Any,
+        content_type_slug: str = CONTENT_TYPES.Any_SLUG,
         workspace: Workspace = None
     ) -> Query:
         """
         Extended filter for better "get all data" query
         :param parent_id: filter by parent_id
-        :param content_type: filter by content_type slug
+        :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
         :return:
         """
         assert parent_id is None or isinstance(parent_id, int)
-        assert content_type is not None
+        assert content_type_slug is not None
         resultset = self._base_query(workspace)
 
-        if content_type!=ContentType.Any:
+        if content_type_slug != CONTENT_TYPES.Any_SLUG:
             # INFO - G.M - 2018-07-05 - convert with
             #  content type object to support legacy slug
-            content_type_object = ContentType(content_type)
-            resultset = resultset.filter(Content.type.in_(content_type_object.get_slug_aliases()))
+            content_type_object = CONTENT_TYPES.get_one_by_slug(content_type_slug)
+            all_slug_alias = [content_type_object.slug]
+            if content_type_object.slug_alias:
+                all_slug_alias.extend(content_type_object.slug_alias)
+            resultset = resultset.filter(Content.type.in_(all_slug_alias))
 
         if parent_id:
             resultset = resultset.filter(Content.parent_id==parent_id)
@@ -871,7 +877,7 @@ class ContentApi(object):
 
         return resultset
 
-    def get_all(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
+    def get_all(self, parent_id: int=None, content_type: str=CONTENT_TYPES.Any_SLUG, workspace: Workspace=None) -> typing.List[Content]:
         return self._get_all_query(parent_id, content_type, workspace).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
@@ -895,14 +901,14 @@ class ContentApi(object):
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # TODO find an other name to filter on is_deleted / is_archived
-    def get_all_with_filter(self, parent_id: int=None, content_type: str=ContentType.Any, workspace: Workspace=None) -> typing.List[Content]:
+    def get_all_with_filter(self, parent_id: int=None, content_type: str=CONTENT_TYPES.Any_SLUG, workspace: Workspace=None) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
         assert content_type is not None# DYN_REMOVE
         assert isinstance(content_type, str) # DYN_REMOVE
 
         resultset = self._base_query(workspace)
 
-        if content_type != ContentType.Any:
+        if content_type != CONTENT_TYPES.Any_SLUG:
             resultset = resultset.filter(Content.type==content_type)
 
         resultset = resultset.filter(Content.is_deleted == self._show_deleted)
@@ -919,7 +925,7 @@ class ContentApi(object):
 
         resultset = self._base_query(workspace)
 
-        if content_type != ContentType.Any:
+        if content_type != CONTENT_TYPES.Any_SLUG:
             resultset = resultset.filter(Content.type==content_type)
 
         return resultset.all()
@@ -934,7 +940,7 @@ class ContentApi(object):
             .filter(Workspace.is_deleted.is_(False)) \
             .order_by(desc(Content.updated))
 
-        if content_type!=ContentType.Any:
+        if content_type!=CONTENT_TYPES.Any_SLUG:
             resultset = resultset.filter(Content.type==content_type)
 
         if parent_id:
@@ -943,7 +949,7 @@ class ContentApi(object):
         result = []
         for item in resultset:
             new_item = None
-            if ContentType.Comment == item.type:
+            if CONTENT_TYPES.Comment.slug == item.type:
                 new_item = item.parent
             else:
                 new_item = item
@@ -980,7 +986,7 @@ class ContentApi(object):
     #
     #     resultset = self._base_query(workspace)
     #
-    #     if content_type != ContentType.Any:
+    #     if content_type != CONTENT_TYPES.Any_SLUG:
     #         resultset = resultset.filter(Content.type==content_type)
     #
     #     return resultset.all()
@@ -1012,7 +1018,7 @@ class ContentApi(object):
                     Content.content_id.in_(content_ids),
                     and_(
                         Content.parent_id.in_(content_ids),
-                        Content.type == ContentType.Comment
+                        Content.type == CONTENT_TYPES.Comment.slug
                     )
                 )
             )
@@ -1023,7 +1029,7 @@ class ContentApi(object):
         too_recent_content = []
         for content in resultset:
             related_active_content = None
-            if ContentType.Comment == content.type:
+            if CONTENT_TYPES.Comment.slug == content.type:
                 related_active_content = content.parent
             else:
                 related_active_content = content
@@ -1075,12 +1081,12 @@ class ContentApi(object):
     #         .filter(Content.content_id.in_(not_read_content_ids)) \
     #         .order_by(desc(Content.updated))
     #
-    #     if content_type != ContentType.Any:
+    #     if content_type != CONTENT_TYPES.Any_SLUG:
     #         not_read_contents = not_read_contents.filter(
     #             Content.type==content_type)
     #     else:
     #         not_read_contents = not_read_contents.filter(
-    #             Content.type!=ContentType.Folder)
+    #             Content.type!=CONTENT_TYPES.Folder.slug)
     #
     #     if parent_id:
     #         not_read_contents = not_read_contents.filter(
@@ -1089,7 +1095,7 @@ class ContentApi(object):
     #     result = []
     #     for item in not_read_contents:
     #         new_item = None
-    #         if ContentType.Comment == item.type:
+    #         if CONTENT_TYPES.Comment.slug == item.type:
     #             new_item = item.parent
     #         else:
     #             new_item = item
@@ -1331,7 +1337,7 @@ class ContentApi(object):
                 self.mark_read(child, read_datetime=read_datetime,
                                do_flush=False)
 
-            if ContentType.Comment == content.type:
+            if CONTENT_TYPES.Comment.slug == content.type:
                 self.mark_read(content.parent, read_datetime=read_datetime,
                                do_flush=False, recursive=False)
                 for comment in content.parent.get_comments():
@@ -1451,12 +1457,12 @@ class ContentApi(object):
         return title_keyworded_items
 
     def get_all_types(self) -> typing.List[ContentType]:
-        labels = ContentType.all()
+        labels = CONTENT_TYPES.endpoint_allowed_types_slug()
         content_types = []
         for label in labels:
-            content_types.append(ContentType(label))
+            content_types.append(CONTENT_TYPES.get_one_by_slug(label))
 
-        return ContentType.sorted(content_types)
+        return content_types
 
     # TODO - G.M - 2018-07-24 - [Cleanup] Is this method already needed ?
     def exclude_unavailable(
