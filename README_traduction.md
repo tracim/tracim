@@ -1,12 +1,12 @@
-## Tracim internationalization
+# Tracim internationalization
 
-### How to for Frontend part
+## How to for Frontend part
 
 In each frontend repo (frontend, frontend_app_..., frontend_lib), there is a folder i18next.scanner that holds every translation files in JSON.
 
 ___
 
-#### I have found a translation error, how do I fix it ?
+### I have found a translation error, how do I fix it ?
 
 **If the error is in any language other than english:**
 
@@ -32,15 +32,15 @@ This will add your new key in the translation files and remove the old one.
 
 ___
 
-#### I have found an untranslated key in a language, how do I fix it ?
+### I have found an untranslated key in a language, how do I fix it ?
 
-It means you have found an english text although you have selected another language. 
+It means you have found an english text even though you have selected another language. 
 
-Do task a) and b) in the according .json file. In folder i18next.scanner.
+Do task a) and b) in the according .json file, in folder i18next.scanner.
 
 ___
 
-#### I have found untranslated key in a language but the key does not appear in the .json file.
+### I have found an untranslated key in a language but the key does not appear in the .json file.
 
 Do step 3).
 
@@ -57,12 +57,13 @@ Exemple: `<div>My untranslated key</div>` will become `<div>{this.props.t('My un
 III) Check that `t` in available in your component, meanings your component must be wraped in the `translate()` higher order function
 
 ``` javascript
+import React from 'react'
 import { translate } from 'react-i18next'
 
 class MyComponent extends React.Component {
-    render () {
-        return (<div>{this.props.t('My untranslated key')}</div>)
-    }
+  render () {
+    return (<div>{this.props.t('My untranslated key')}</div>)
+  }
 }
 
 export default translate()(MyComponent)
