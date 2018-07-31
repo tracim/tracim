@@ -86,9 +86,11 @@ class ContentStatusList(object):
         raise ContentStatusNotExist()
 
     def allowed_slugs_values(self) -> typing.List[str]:
+        """ Get alls slugs"""
         return [item.slug for item in self._content_status]
 
     def allowed(self) -> typing.List[ContentStatus]:
+        """ Get all status"""
         return [item for item in self._content_status]
 
     def get_default_status(self) -> ContentStatus:
@@ -216,7 +218,11 @@ class ContentTypeList(object):
         self._special_contents_types = [self.Comment]
         self._extra_slugs = [self.Any_SLUG]
 
-    def get_one_by_slug(self, slug: str):
+    def get_one_by_slug(self, slug: str) -> ContentType:
+        """
+        Get ContentType object according to slug
+        match for both slug and slug_alias
+        """
         content_types = self._content_types.copy()
         content_types.extend(self._special_contents_types)
         for item in content_types:
@@ -225,10 +231,21 @@ class ContentTypeList(object):
         raise ContentTypeNotExist()
 
     def endpoint_allowed_types_slug(self) -> typing.List[str]:
+        """
+        Return restricted list of content_type:
+        dont return special content_type like  comment, don't return
+        "any" slug, dont return content type slug alias , don't return event.
+        Useful to restrict slug param in schema.
+        """
         allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
         return allowed_type_slug
 
     def query_allowed_types_slugs(self) -> typing.List[str]:
+        """
+        Return alls allowed types slug : content_type slug + all alias, any
+        and special content_type like comment. Do not return event.
+        Usefull allowed value to perform query to database.
+        """
         allowed_types_slug = []
         for content_type in self._content_types:
             allowed_types_slug.append(content_type.slug)
