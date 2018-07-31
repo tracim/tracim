@@ -38,8 +38,8 @@ export const SelectStatus = props => {
             {s.label}
             <div className='selectStatus__submenu__item__icon'>
               <i
-              className={`fa fa-fw fa-${s.faIcon}`}
-              style={{color: s.hexcolor}}
+                className={`fa fa-fw fa-${s.faIcon}`}
+                style={{color: s.hexcolor}}
               />
             </div>
           </button>
