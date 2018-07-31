@@ -418,20 +418,23 @@ class ContentApi(object):
             workspace = parent.workspace
 
         content_type = CONTENT_TYPES.get_one_by_slug(content_type_slug)
-        if parent:
+        if parent and parent.properties and 'allowed_content' in parent.properties:
             if content_type.slug not in parent.properties['allowed_content'] or not parent.properties['allowed_content'][content_type.slug]:
                 raise UnallowedSubContent(' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(  # nopep8
                     subcontent_type=content_type.slug,
                     content_id=parent.content_id,
                 ))
+        if not workspace and parent:
+            workspace = parent.workspace
 
-        if content_type.slug not in workspace.get_allowed_content_types():
-            raise UnallowedSubContent(
-                ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
-                    subcontent_type=content_type.slug,
-                    content_id=workspace.workspace_id,
+        if workspace:
+            if content_type.slug not in workspace.get_allowed_content_types():
+                raise UnallowedSubContent(
+                    ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
+                        subcontent_type=content_type.slug,
+                        content_id=workspace.workspace_id,
+                    )
                 )
-            )
 
         content = Content()
 
@@ -473,15 +476,16 @@ class ContentApi(object):
         assert parent and parent.type != CONTENT_TYPES.Folder.slug
         if not content:
             raise EmptyCommentContentNotAllowed()
-        item = Content()
-        item.owner = self._user
-        item.parent = parent
-        if not workspace:
-            workspace = item.parent.workspace
-        item.workspace = workspace
-        item.type = CONTENT_TYPES.Comment.slug
+
+        item = self.create(
+            content_type_slug=CONTENT_TYPES.Comment.slug,
+            workspace=workspace,
+            parent=parent,
+            do_notify=False,
+            do_save=False,
+            label='',
+        )
         item.description = content
-        item.label = ''
         item.revision_type = ActionDescription.COMMENT
 
         if do_save:

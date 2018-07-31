@@ -1181,7 +1181,7 @@ class Content(DeclarativeBase):
         else:
             properties = json.loads(self._properties)
         if CONTENT_TYPES.get_one_by_slug(self.type) != CONTENT_TYPES.Event:
-            if not 'allowed_content' in self._properties:
+            if self._properties and not 'allowed_content' in self._properties:
                 properties['allowed_content'] = CONTENT_TYPES.default_allowed_content_properties(self.type)
         return properties
 
