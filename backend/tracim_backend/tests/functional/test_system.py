@@ -123,6 +123,8 @@ class TestContentsTypesEndpoint(FunctionalTest):
         assert content_type['creation_label'] == 'Create a Markdown document'
         assert 'available_statuses' in content_type
         assert len(content_type['available_statuses']) == 4
+
+        content_type = res[4]
         assert content_type['slug'] == 'html-document'
         assert content_type['fa_icon'] == 'file-text-o'
         assert content_type['hexcolor'] == '#3f52e3'
