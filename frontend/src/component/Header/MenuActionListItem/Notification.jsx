@@ -1,4 +1,5 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 // import PropTypes from 'prop-types'
 
 const Notification = props => {
@@ -13,18 +14,18 @@ const Notification = props => {
           aria-haspopup='true'
           aria-expanded='false'
         >
-          Notification
+          {props.t('Notification')}
         </button>
         <div className='timeline__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
           <div className='timeline__subdropdown__text dropdown-item' >
-            Conversation archivé
+            {props.t("Archive Topic")}
           </div>
           <div className='timeline__subdropdown__text dropdown-item' >
-            Fichier supprimé
+            {props.t('Deleted File')}
           </div>
         </div>
       </div>
     </li>
   )
 }
-export default Notification
+export default translate()(Notification)

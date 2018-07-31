@@ -14,5 +14,10 @@
   "Move": "Move",
   "Download": "Download",
   "Archive": "Archive",
-  "Delete": "Delete"
+  "Delete": "Delete",
+  "My Account": "My Account",
+  "Logout": "Logout",
+  "Notification": "Notification",
+  "Archive Topic": "Archive Topic",
+  "Deleted File": "Deleted File"
 }

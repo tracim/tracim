@@ -14,5 +14,10 @@
   "Move": "Déplacer",
   "Download": "Télécharger",
   "Archive": "Archiver",
-  "Delete": "Supprimer"
+  "Delete": "Supprimer",
+  "My Account": "Mon Compte",
+  "Logout": "Se Déconnecter",
+  "Notification": "Notification",
+  "Archive Topic": "Conversation archivée",
+  "Deleted File": "Fichier supprimé"
 }
