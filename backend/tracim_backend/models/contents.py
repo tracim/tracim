@@ -19,9 +19,9 @@ class GlobalStatus(Enum):
     CLOSED = 'closed'
 
 
-class NewContentStatus(object):
+class ContentStatus(object):
     """
-    Future ContentStatus object class
+    ContentStatus object class
     """
     def __init__(
             self,
@@ -38,7 +38,7 @@ class NewContentStatus(object):
         self.hexcolor = hexcolor
 
 
-open_status = NewContentStatus(
+open_status = ContentStatus(
     slug='open',
     global_status=GlobalStatus.OPEN.value,
     label='Open',
@@ -46,7 +46,7 @@ open_status = NewContentStatus(
     hexcolor='#3f52e3',
 )
 
-closed_validated_status = NewContentStatus(
+closed_validated_status = ContentStatus(
     slug='closed-validated',
     global_status=GlobalStatus.CLOSED.value,
     label='Validated',
@@ -54,7 +54,7 @@ closed_validated_status = NewContentStatus(
     hexcolor='#008000',
 )
 
-closed_unvalidated_status = NewContentStatus(
+closed_unvalidated_status = ContentStatus(
     slug='closed-unvalidated',
     global_status=GlobalStatus.CLOSED.value,
     label='Cancelled',
@@ -62,7 +62,7 @@ closed_unvalidated_status = NewContentStatus(
     hexcolor='#f63434',
 )
 
-closed_deprecated_status = NewContentStatus(
+closed_deprecated_status = ContentStatus(
     slug='closed-deprecated',
     global_status=GlobalStatus.CLOSED.value,
     label='Deprecated',
@@ -71,45 +71,37 @@ closed_deprecated_status = NewContentStatus(
 )
 
 
-CONTENT_DEFAULT_STATUS = [
-    open_status,
-    closed_validated_status,
-    closed_unvalidated_status,
-    closed_deprecated_status,
-]
+class ContentStatusList(object):
 
+    OPEN = open_status
 
-class ContentStatusLegacy(NewContentStatus):
-    """
-    Temporary remplacement object for Legacy ContentStatus Object
-    """
-    OPEN = open_status.slug
-    CLOSED_VALIDATED = closed_validated_status.slug
-    CLOSED_UNVALIDATED = closed_unvalidated_status.slug
-    CLOSED_DEPRECATED = closed_deprecated_status.slug
+    def __init__(self, extend_content_status: typing.List[ContentStatus]):
+        self._content_status = [self.OPEN]
+        self._content_status.extend(extend_content_status)
 
-    def __init__(self, slug: str):
-        for status in CONTENT_DEFAULT_STATUS:
-            if slug == status.slug:
-                super(ContentStatusLegacy, self).__init__(
-                    slug=status.slug,
-                    global_status=status.global_status,
-                    label=status.label,
-                    fa_icon=status.fa_icon,
-                    hexcolor=status.hexcolor,
-                )
-                return
+    def get_one_by_slug(self, slug: str) -> ContentStatus:
+        for item in self._content_status:
+            if item.slug == slug:
+                return item
         raise ContentStatusNotExist()
 
-    @classmethod
-    def all(cls, type='') -> ['NewContentStatus']:
-        return CONTENT_DEFAULT_STATUS
+    def allowed_slugs_values(self) -> typing.List[str]:
+        return [item.slug for item in self._content_status]
 
-    @classmethod
-    def allowed_values(cls):
-        return [status.slug for status in CONTENT_DEFAULT_STATUS]
+    def allowed(self) -> typing.List[ContentStatus]:
+        return [item for item in self._content_status]
+
+    def get_default_status(self) -> ContentStatus:
+        return self.OPEN
 
 
+CONTENT_STATUS = ContentStatusList(
+    [
+        closed_validated_status,
+        closed_unvalidated_status,
+        closed_deprecated_status,
+    ]
+)
 ####
 # ContentType
 
@@ -125,7 +117,7 @@ class NewContentType(object):
             hexcolor: str,
             label: str,
             creation_label: str,
-            available_statuses: typing.List[NewContentStatus],
+            available_statuses: typing.List[ContentStatus],
 
     ):
         self.slug = slug
@@ -142,7 +134,7 @@ thread_type = NewContentType(
     hexcolor=thread.hexcolor,
     label='Thread',
     creation_label='Discuss about a topic',
-    available_statuses=CONTENT_DEFAULT_STATUS,
+    available_statuses=CONTENT_STATUS.allowed(),
 )
 
 file_type = NewContentType(
@@ -151,7 +143,7 @@ file_type = NewContentType(
     hexcolor=_file.hexcolor,
     label='File',
     creation_label='Upload a file',
-    available_statuses=CONTENT_DEFAULT_STATUS,
+    available_statuses=CONTENT_STATUS.allowed(),
 )
 
 markdownpluspage_type = NewContentType(
@@ -160,7 +152,7 @@ markdownpluspage_type = NewContentType(
     hexcolor=markdownpluspage.hexcolor,
     label='Rich Markdown File',
     creation_label='Create a Markdown document',
-    available_statuses=CONTENT_DEFAULT_STATUS,
+    available_statuses=CONTENT_STATUS.allowed(),
 )
 
 html_documents_type = NewContentType(
@@ -169,7 +161,7 @@ html_documents_type = NewContentType(
     hexcolor=html_documents.hexcolor,
     label='Text Document',
     creation_label='Write a document',
-    available_statuses=CONTENT_DEFAULT_STATUS,
+    available_statuses=CONTENT_STATUS.allowed(),
 )
 
 # TODO - G.M - 31-05-2018 - Set Better folder params
@@ -179,7 +171,7 @@ folder_type = NewContentType(
     hexcolor=thread.hexcolor,
     label='Folder',
     creation_label='Create collection of any documents',
-    available_statuses=CONTENT_DEFAULT_STATUS,
+    available_statuses=CONTENT_STATUS.allowed(),
 )
 
 CONTENT_DEFAULT_TYPE = [
@@ -197,7 +189,7 @@ event_type = NewContentType(
     hexcolor=thread.hexcolor,
     label='Event',
     creation_label='Event',
-    available_statuses=CONTENT_DEFAULT_STATUS,
+    available_statuses=CONTENT_STATUS.allowed(),
 )
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
@@ -207,7 +199,7 @@ comment_type = NewContentType(
     hexcolor=thread.hexcolor,
     label='Comment',
     creation_label='Comment',
-    available_statuses=CONTENT_DEFAULT_STATUS,
+    available_statuses=CONTENT_STATUS.allowed(),
 )
 
 CONTENT_DEFAULT_TYPE_SPECIAL = [

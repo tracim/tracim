@@ -291,7 +291,8 @@ class ActionDescription(object):
                 ]
 
 
-from tracim_backend.models.contents import ContentStatusLegacy as ContentStatus
+from tracim_backend.models.contents import CONTENT_STATUS
+from tracim_backend.models.contents import ContentStatus
 from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
 # is lost .
@@ -616,7 +617,7 @@ class ContentRevisionRO(DeclarativeBase):
     properties = Column('properties', Text(), unique=False, nullable=False, default='')
 
     type = Column(Unicode(32), unique=False, nullable=False)
-    status = Column(Unicode(32), unique=False, nullable=False, default=ContentStatus.OPEN)
+    status = Column(Unicode(32), unique=False, nullable=False, default=str(CONTENT_STATUS.get_default_status().slug))
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
@@ -754,7 +755,7 @@ class ContentRevisionRO(DeclarativeBase):
         super().__setattr__(key, value)
 
     def get_status(self) -> ContentStatus:
-        return ContentStatus(self.status)
+        return CONTENT_STATUS.get_one_by_slug(self.status)
 
     def get_label(self) -> str:
         return self.label or self.file_name or ''
@@ -1247,10 +1248,8 @@ class Content(DeclarativeBase):
         return self.revision.get_label_as_file()
 
     def get_status(self) -> ContentStatus:
-        return ContentStatus(
+        return CONTENT_STATUS.get_one_by_slug(
             self.status,
-            # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
-            # self.type.__str__()
         )
 
     def get_last_action(self) -> ActionDescription:

@@ -6,10 +6,9 @@ from marshmallow.validate import Range
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.contents import GlobalStatus
+from tracim_backend.models.contents import GlobalStatus, CONTENT_STATUS
 from tracim_backend.models.contents import open_status
 from tracim_backend.models.contents import ContentTypeLegacy as ContentType
-from tracim_backend.models.contents import ContentStatusLegacy as ContentStatus
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
@@ -691,7 +690,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(ContentStatus.allowed_values()),
+        validate=OneOf(CONTENT_STATUS.allowed_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status
     )
@@ -835,7 +834,7 @@ class FileContentModifySchema(TextBasedContentModifySchema):
 class SetContentStatusSchema(marshmallow.Schema):
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(ContentStatus.allowed_values()),
+        validate=OneOf(CONTENT_STATUS.allowed_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status,
         required=True,

@@ -34,10 +34,10 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.utils.utils import current_date_for_filename
+from tracim_backend.models.contents import CONTENT_STATUS
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentStatus
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentType
@@ -1121,7 +1121,7 @@ class ContentApi(object):
         folder.properties = properties
 
     def set_status(self, content: Content, new_status: str):
-        if new_status in ContentStatus.allowed_values():
+        if new_status in CONTENT_STATUS.allowed_slugs_values():
             content.status = new_status
             content.revision_type = ActionDescription.STATUS_UPDATE
         else:
