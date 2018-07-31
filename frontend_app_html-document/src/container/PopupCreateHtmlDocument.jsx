@@ -15,7 +15,7 @@ const debug = { // outdated
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
-    domContainer: 'appContainer',
+    domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:3001',
     apiHeader: {
       'Accept': 'application/json',

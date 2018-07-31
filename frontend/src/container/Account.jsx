@@ -1,9 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Sidebar from './Sidebar.jsx'
-import PageWrapper from '../component/common/layout/PageWrapper.jsx'
-import PageTitle from '../component/common/layout/PageTitle.jsx'
-import PageContent from '../component/common/layout/PageContent.jsx'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -11,7 +8,12 @@ import PersonalData from '../component/Account/PersonalData.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
 import Timezone from '../component/Account/Timezone.jsx'
-import { Delimiter } from 'tracim_frontend_lib'
+import {
+  Delimiter,
+  PageWrapper,
+  PageTitle,
+  PageContent
+} from 'tracim_frontend_lib'
 import { updateUserWorkspaceSubscriptionNotif } from '../action-creator.sync.js'
 import {
   getTimezone,

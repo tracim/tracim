@@ -12,7 +12,7 @@ export const debug = { // copied from html-document => outdated
     faIcon: 'comments-o',
     hexcolor: '#ad4cf9',
     creationLabel: 'Write a thread',
-    domContainer: 'appContainer',
+    domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543/api/v2',
     mockApiUrl: 'http://localhost:3001',
     apiHeader: {

@@ -52,3 +52,21 @@ cp i18next.scanner/en/translation.json ../frontend/dist/app/thread_en_translatio
 log "cp i18next.scanner/fr/translation.json ../frontend/dist/app/thread_fr_translation.json"
 cp i18next.scanner/fr/translation.json ../frontend/dist/app/thread_fr_translation.json
 cd -
+
+# app Admin Workspace User
+
+log "cd frontend_app_admin_workspace_user"
+cd frontend_app_admin_workspace_user
+
+log "npm run build$windoz # for frontend_app_thread"
+npm run build$windoz
+
+log "cp dist/admin_workspace_user.app.js"
+cp dist/admin_workspace_user.app.js ../frontend/dist/app
+
+log "cp i18next.scanner/en/translation.json ../frontend/dist/app/admin_workspace_user_en_translation.json"
+cp i18next.scanner/en/translation.json ../frontend/dist/app/admin_workspace_user_en_translation.json
+
+log "cp i18next.scanner/fr/translation.json ../frontend/dist/app/admin_workspace_user_fr_translation.json"
+cp i18next.scanner/fr/translation.json ../frontend/dist/app/admin_workspace_user_fr_translation.json
+cd -

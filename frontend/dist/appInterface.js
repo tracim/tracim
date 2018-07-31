@@ -9,6 +9,8 @@
         return appThread
       case 'file':
         return appFile
+      case 'admin_workspace_user':
+        return appAdminWorkspaceUser
       default:
         return null
     }
@@ -19,15 +21,30 @@
   // use module.export and require
   // doesn't work, cant resolve a file outside of the build dir
 
-  GLOBAL_renderAppFull = app => {
-    console.log('%cGLOBAL_renderAppFull', 'color: #5cebeb', app)
+  GLOBAL_renderAppFeature = app => {
+    console.log('%cGLOBAL_renderAppFeature', 'color: #5cebeb', app)
 
     const selectedApp = getSelectedApp(app.config.slug)
 
     if (selectedApp.isRendered) {
-      GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app}) // handled by html-documents:src/container/HtmlDocument.jsx
+      GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app}) // handled by html-documents:src/container/AdminWorkspaceUser.jsx
     } else {
-      selectedApp.renderAppFull(app)
+      selectedApp.renderAppFeature(app)
+      selectedApp.isRendered = true
+      prevSelectedApp.isRendered = false
+      prevSelectedApp = selectedApp
+    }
+  }
+
+  GLOBAL_renderAppFullscreen = app => {
+    console.log('%cGLOBAL_renderAppFullscreen', 'color: #5cebeb', app)
+
+    const selectedApp = getSelectedApp(app.config.slug)
+
+    if (selectedApp.isRendered) {
+      GLOBAL_dispatchEvent({type: `${app.config.slug}_showApp`, data: app}) // handled by html-documents:src/container/AdminWorkspaceUser.jsx
+    } else {
+      selectedApp.renderAppFullscreen(app)
       selectedApp.isRendered = true
       prevSelectedApp.isRendered = false
       prevSelectedApp = selectedApp
@@ -64,7 +81,7 @@
         console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
         if (prevSelectedApp.name === '') return
 
-        prevSelectedApp.unmountApp('appContainer')
+        prevSelectedApp.unmountApp('appFeatureContainer')
         prevSelectedApp.unmountApp('popupCreateContentContainer')
         prevSelectedApp.isRendered = false
         break

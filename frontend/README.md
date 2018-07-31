@@ -58,7 +58,7 @@ To test them inside Tracim, you need to build them and copast them to tracim_fro
 You also need to make the mock api able to tell tracim_frontend that it handle you app :
 - add an entry for you App in tracim_frontend/jsonserver/static_db.json in the `app_config` property
 - reload your mock api server
-- add the source of your app in tracim_frontend/dist/index.html and an entry to the switch case of the function `GLOBAL_renderAppFull`. All of this will be handled by backend later on, this is all work in progress stuffs.
+- add the source of your app in tracim_frontend/dist/index.html and an entry to the switch case of the function `GLOBAL_renderAppFeature`. All of this will be handled by backend later on, this is all work in progress stuffs.
 
 
 #### Urls list

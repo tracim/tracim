@@ -15,7 +15,7 @@ const debug = { // outdated
     faIcon: 'file-text-o',
     hexcolor: '#ad4cf9',
     creationLabel: 'Write a thread',
-    domContainer: 'appContainer',
+    domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:3001',
     mockApiUrl: 'http://localhost:8071',
     apiHeader: {
