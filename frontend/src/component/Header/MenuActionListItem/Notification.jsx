@@ -18,7 +18,7 @@ const Notification = props => {
         </button>
         <div className='timeline__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
           <div className='timeline__subdropdown__text dropdown-item' >
-            {props.t("Archive Topic")}
+            {props.t('Archive Topic')}
           </div>
           <div className='timeline__subdropdown__text dropdown-item' >
             {props.t('Deleted File')}
