@@ -1,10 +1,11 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 
 export const Password = props => {
   return (
     <div className='account__userpreference__setting__personaldata'>
       <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
-        Changer de mot de passe
+        {props.t('Change your password')}
       </div>
 
       <div className='personaldata__text ml-2 ml-sm-0'>
@@ -13,12 +14,20 @@ export const Password = props => {
 
       <form className='personaldata__form mr-5'>
         <div className='personaldata__form__title'>
-          Mot de passe :
+          {props.t('Password')}
         </div>
-        <input className='personaldata__form__txtinput form-control' type='password' placeholder='Ancien mot de passe' />
-        <input className='personaldata__form__txtinput form-control mt-4' type='password' placeholder='Nouveau mot de passe' />
+        <input
+          className='personaldata__form__txtinput form-control'
+          type='password'
+          placeholder={props.inputPlaceholderOldPassword}
+        />
+        <input
+          className='personaldata__form__txtinput form-control mt-4'
+          type='password'
+          placeholder={props.inputPlaceholderNewPassword}
+        />
         <button type='submit' className='personaldata__form__button btn btn-outline-primary mt-4'>
-          Envoyer
+          {props.t('Send')}
         </button>
       </form>
 
@@ -26,4 +35,4 @@ export const Password = props => {
   )
 }
 
-export default Password
+export default translate()(Password)

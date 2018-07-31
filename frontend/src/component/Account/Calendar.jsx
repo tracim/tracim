@@ -5,7 +5,7 @@ export const Calendar = props => {
     <div className='account__userpreference__setting__calendar'>
 
       <div className='calendar__title subTitle ml-2 ml-sm-0'>
-        Calendrier
+        {props.t('Calendar')}
       </div>
 
       <div className='calendar__text ml-2 ml-sm-0'>
@@ -13,7 +13,7 @@ export const Calendar = props => {
       </div>
 
       <div className='calendar__title ml-2 ml-sm-0'>
-        Accèder à votre Calendrier personnel
+        {props.t('Access your personal calendar')}
       </div>
       <div className='calendar__link ml-2 ml-sm-0'>
         {props.user.caldavUrl}

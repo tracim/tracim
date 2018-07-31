@@ -19,6 +19,7 @@ import {
   getTimezone,
   getUserRole
 } from '../action-creator.async.js'
+import { translate } from 'react-i18next'
 
 class Account extends React.Component {
   constructor (props) {
@@ -79,7 +80,10 @@ class Account extends React.Component {
     const subComponent = (() => {
       switch (this.state.subComponentMenu.find(({active}) => active).name) {
         case 'personalData':
-          return <PersonalData />
+          return <PersonalData
+            inputPlaceholderNameUser={this.props.t('Change your name')}
+            inputPlaceholderEmailUser={this.props.t('Change your email')}
+          />
 
         // case 'calendar':
         //   return <Calendar user={this.props.user} />
@@ -90,11 +94,14 @@ class Account extends React.Component {
             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
           />
 
+        case 'password':
+          return <Password
+            inputPlaceholderOldPassword={this.props.t('Old Password')}
+            inputPlaceholderNewPassword={this.props.t('New Password')}
+          />
+
         case 'timezone':
           return <Timezone timezone={this.props.timezone} onChangeTimezone={this.handleChangeTimezone} />
-
-        case 'password':
-          return <Password />
       }
     })()
 
@@ -129,4 +136,4 @@ class Account extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, timezone }) => ({ user, workspaceList, timezone })
-export default connect(mapStateToProps)(Account)
+export default translate()(connect(mapStateToProps)(Account))
