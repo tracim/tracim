@@ -5,9 +5,9 @@
   "Error": "Erreur",
   "Email or password invalid": "Email ou mot de passe invalid",
   "Type": "Type",
-  "Document's name": "Nom du document",
   "Status": "Statut",
   "Create in folder...": "Créer dans le dossier ...",
   "Search...": "Rechercher ...",
-  "Create a workspace": "Créer un espace de travail"
+  "Create a workspace": "Créer un espace de travail",
+  "Title": "Titre"
 }
