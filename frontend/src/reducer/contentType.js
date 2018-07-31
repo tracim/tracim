@@ -1,8 +1,8 @@
-import { CONTENT_TYPE_LIST } from '../action-creator.sync.js'
+import { SET, CONTENT_TYPE_LIST } from '../action-creator.sync.js'
 
 export function contentType (state = [], action) {
   switch (action.type) {
-    case `Set/${CONTENT_TYPE_LIST}`:
+    case `${SET}/${CONTENT_TYPE_LIST}`:
       return action.contentTypeList.map(ct => ({
         label: ct.label,
         slug: ct.slug,

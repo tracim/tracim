@@ -1,11 +1,13 @@
 import {
+  SET,
+  UPDATE,
   WORKSPACE,
   FOLDER
 } from '../action-creator.sync.js'
 
 export default function workspace (state = [], action) {
   switch (action.type) {
-    case `Set/${WORKSPACE}/Content`:
+    case `${SET}/${WORKSPACE}/Content`:
       return action.workspaceContent.map(wsc => ({
         id: wsc.content_id,
         label: wsc.label,
@@ -20,10 +22,10 @@ export default function workspace (state = [], action) {
         subContentTypeSlug: wsc.sub_content_type_slug
       }))
 
-    case `Update/${WORKSPACE}/Filter`: // not used anymore ?
+    case `${UPDATE}/${WORKSPACE}/Filter`: // not used anymore ?
       return {...state, filter: action.filterList}
 
-    case `Set/${WORKSPACE}/${FOLDER}/Content`:
+    case `${SET}/${WORKSPACE}/${FOLDER}/Content`:
       const setFolderContent = (contentItem, action) => {
         if (contentItem.id === action.folderId) return {...contentItem, content: action.content}
 

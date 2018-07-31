@@ -1,4 +1,6 @@
 import {
+  SET,
+  UPDATE,
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_DATA,
@@ -25,20 +27,20 @@ const defaultUser = {
 
 export default function user (state = defaultUser, action) {
   switch (action.type) {
-    case `Set/${USER_CONNECTED}`:
+    case `${SET}/${USER_CONNECTED}`:
       return {
         ...state,
         ...action.user,
         avatar_url: 'https://www.algoo.fr/static/images/people_images/PERSO_SEUL.png' // @FIXME use avatar from api when db handles it
       }
 
-    case `Set/${USER_DISCONNECTED}`:
+    case `${SET}/${USER_DISCONNECTED}`:
       return defaultUser
 
-    case `Update/${USER_DATA}`:
+    case `${UPDATE}/${USER_DATA}`:
       return {...state, ...action.data}
 
-    case `Set/${USER_LANG}`:
+    case `${SET}/${USER_LANG}`:
       return {...state, lang: action.lang}
 
     default:
