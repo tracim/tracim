@@ -9,5 +9,10 @@
   "Create in folder...": "Create in folder...",
   "Search...": "Search...",
   "Create a workspace": "Create a workspace",
-  "Title": "Title"
+  "Title": "Title",
+  "Change": "Change",
+  "Move": "Move",
+  "Download": "Download",
+  "Archive": "Archive",
+  "Delete": "Delete"
 }

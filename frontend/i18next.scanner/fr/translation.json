@@ -9,5 +9,10 @@
   "Create in folder...": "Créer dans le dossier ...",
   "Search...": "Rechercher ...",
   "Create a workspace": "Créer un espace de travail",
-  "Title": "Titre"
+  "Title": "Titre",
+  "Change": "Modifier",
+  "Move": "Déplacer",
+  "Download": "Télécharger",
+  "Archive": "Archiver",
+  "Delete": "Supprimer"
 }

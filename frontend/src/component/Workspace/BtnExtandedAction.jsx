@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
 
 const ExtandedAction = props => {
   return (
@@ -22,7 +23,7 @@ const ExtandedAction = props => {
             <i className='fa fa-fw fa-pencil' />
           </div>
           <div className='subdropdown__item__text'>
-            Modifier
+            {props.t('Change')}
           </div>
         </div>
 
@@ -31,7 +32,7 @@ const ExtandedAction = props => {
             <i className='fa fa-fw fa-arrows-alt' />
           </div>
           <div className='subdropdown__item__text'>
-            Déplacer
+            {props.t('Move')}
           </div>
         </div>
 
@@ -40,7 +41,7 @@ const ExtandedAction = props => {
             <i className='fa fa-fw fa-download' />
           </div>
           <div className='subdropdown__item__text'>
-            Télécharger
+            {props.t('Download')}
           </div>
         </div> */ }
 
@@ -49,7 +50,7 @@ const ExtandedAction = props => {
             <i className='fa fa-fw fa-archive' />
           </div>
           <div className='subdropdown__item__text'>
-            Archiver
+            {props.t('Archive')}
           </div>
         </div>
 
@@ -58,7 +59,7 @@ const ExtandedAction = props => {
             <i className='fa fa-fw fa-trash-o' />
           </div>
           <div className='subdropdown__item__text'>
-            Supprimer
+            {props.t('Delete')}
           </div>
         </div>
 
@@ -67,7 +68,7 @@ const ExtandedAction = props => {
   )
 }
 
-export default ExtandedAction
+export default translate()(ExtandedAction)
 
 ExtandedAction.propTypes = {
   onClickExtendedAction: PropTypes.object.isRequired
