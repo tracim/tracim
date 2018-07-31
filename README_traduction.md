@@ -6,7 +6,7 @@ In each frontend repo (frontend, frontend_app_..., frontend_lib), there is a fol
 
 ___
 
-### I have found a translation error, how do I fix it ?
+### I have found a translation error, how do I fix it ?
 
 **If the error is in any language other than english:**
 
@@ -32,7 +32,7 @@ This will add your new key in the translation files and remove the old one.
 
 ___
 
-### I have found an untranslated key in a language, how do I fix it ?
+### I have found an untranslated key in a language, how do I fix it ?
 
 It means you have found an english text even though you have selected another language. 
 
