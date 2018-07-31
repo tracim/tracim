@@ -686,7 +686,7 @@ class ContentDigestSchema(marshmallow.Schema):
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
+            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '

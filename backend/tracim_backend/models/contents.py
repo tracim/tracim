@@ -121,6 +121,7 @@ class ContentType(object):
             creation_label: str,
             available_statuses: typing.List[ContentStatus],
             slug_alias: typing.List[str] = None,
+            allow_sub_content: bool = False,
     ):
         self.slug = slug
         self.fa_icon = fa_icon
@@ -129,6 +130,7 @@ class ContentType(object):
         self.creation_label = creation_label
         self.available_statuses = available_statuses
         self.slug_alias = slug_alias
+        self.allow_sub_content = allow_sub_content
 
 
 thread_type = ContentType(
@@ -176,6 +178,7 @@ folder_type = ContentType(
     label='Folder',
     creation_label='Create collection of any documents',
     available_statuses=CONTENT_STATUS.allowed(),
+    allow_sub_content=True,
 )
 
 
@@ -240,6 +243,12 @@ class ContentTypeList(object):
         allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
         return allowed_type_slug
 
+    def extended_endpoint_allowed_types_slug(self) -> typing.List[str]:
+        allowed_types_slug = self.endpoint_allowed_types_slug().copy()
+        for content_type in self._special_contents_types:
+            allowed_types_slug.append(content_type.slug)
+        return allowed_types_slug
+
     def query_allowed_types_slugs(self) -> typing.List[str]:
         """
         Return alls allowed types slug : content_type slug + all alias, any
@@ -255,6 +264,18 @@ class ContentTypeList(object):
             allowed_types_slug.append(content_type.slug)
         allowed_types_slug.extend(self._extra_slugs)
         return allowed_types_slug
+
+    def default_allowed_content_properties(self, slug) -> dict:
+        content_type = self.get_one_by_slug(slug)
+        if content_type.allow_sub_content:
+            sub_content_allowed = self.extended_endpoint_allowed_types_slug()
+        else:
+            sub_content_allowed = [self.Comment.slug]
+
+        properties_dict = {}
+        for elem in sub_content_allowed:
+            properties_dict[elem] = True
+        return properties_dict
 
 
 CONTENT_TYPES = ContentTypeList(
