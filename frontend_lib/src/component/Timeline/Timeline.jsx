@@ -107,7 +107,7 @@ class Timeline extends React.Component {
                   }}
                   key={'timeline__comment__advancedtext'}
                 >
-                  {props.wysiwyg ? 'Texte Simple' : 'Texte Avancé'}
+                  {props.wysiwyg ? 'Texte Simple' : 'Texte Riche'}
                 </button>
               </div>
 

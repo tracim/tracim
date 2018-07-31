@@ -16,7 +16,7 @@ export const MODE = {
 export const debug = {
   config: {
     label: 'Text Document',
-    slug: 'html-documents',
+    slug: 'html-document',
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
@@ -51,7 +51,19 @@ export const debug = {
       faIcon: 'warning',
       hexcolor: '#ababab',
       globalStatus: 'closed'
-    }]
+    }],
+    translation: {
+      en: {
+        translation: {
+          'Last version': 'Last version debug en'
+        }
+      },
+      fr: {
+        translation: {
+          'Last version': 'Dernière version debug fr'
+        }
+      }
+    }
   },
   loggedUser: { // @FIXME this object is outdated
     user_id: 5,
@@ -59,6 +71,7 @@ export const debug = {
     firstname: 'Côme',
     lastname: 'Stoilenom',
     email: 'osef@algoo.fr',
+    lang: 'en',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
     auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
   },
@@ -69,7 +82,7 @@ export const debug = {
       user_id: 1 // -1 or 1 for debug
     },
     content_id: 22, // 1 or 22 for debug
-    content_type: 'html-documents',
+    content_type: 'html-document',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,
     is_archived: false,
@@ -86,7 +99,7 @@ export const debug = {
     show_in_ui: true,
     slug: 'current-menu',
     status: 'open',
-    sub_content_types: ['thread', 'html-documents', 'file', 'folder'],
+    sub_content_types: ['thread', 'html-document', 'file', 'folder'],
     workspace_id: 1
   },
   timeline: timelineDebugData

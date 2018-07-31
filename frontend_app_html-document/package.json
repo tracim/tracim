@@ -1,5 +1,5 @@
 {
-  "name": "tracim_app_html-documents",
+  "name": "tracim_app_html-document",
   "version": "1.1.2",
   "description": "",
   "main": "index.js",
@@ -7,8 +7,9 @@
     "servdev": "NODE_ENV=development webpack-dev-server --watch --colors --inline --hot --progress",
     "servdevwindoz": "set NODE_ENV=development&& webpack-dev-server --watch --colors --inline --hot --progress",
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9871 -- webpack-dev-server --watch --colors --inline --hot --progress",
-    "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build": "NODE_ENV=production webpack -p",
+    "build-translation": "node i18next.scanner.js",
+    "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -41,6 +42,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "i18next-scanner": "^2.6.1",
     "webpack-dashboard": "^1.1.1",
     "webpack-dev-server": "^2.9.2"
   },

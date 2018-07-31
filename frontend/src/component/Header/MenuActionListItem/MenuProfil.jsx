@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { PAGE } from '../../../helper.js'
+import { translate } from 'react-i18next'
 
 const MenuProfil = props => {
   return props.user.logged
@@ -17,12 +18,12 @@ const MenuProfil = props => {
           <div className='profilgroup__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
             <Link className='setting__link dropdown-item' to={PAGE.ACCOUNT}>
               <i className='fa fa-fw fa-user-o mr-2' />
-              Mon compte
+              {props.t('My Account')}
             </Link>
             {/* <div className='setting__link dropdown-item'>Mot de passe</div> */}
             <div className='setting__link dropdown-item' onClick={props.onClickLogout}>
               <i className='fa fa-fw fa-sign-out mr-2' />
-              Se déconnecter
+              {props.t('Logout')}
             </div>
           </div>
         </div>
@@ -30,7 +31,7 @@ const MenuProfil = props => {
     )
     : ''
 }
-export default MenuProfil
+export default translate()(MenuProfil)
 
 MenuProfil.propTypes = {
   user: PropTypes.object.isRequired,

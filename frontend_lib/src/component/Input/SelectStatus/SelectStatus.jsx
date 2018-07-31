@@ -27,21 +27,20 @@ export const SelectStatus = props => {
       </button>
 
       <div className='selectStatus__submenu dropdown-menu' aria-labelledby='dropdownMenu2'>
-        <h6 className='dropdown-header'>{props.t('Input.SelectStatus.file_status')}</h6>
-
-        <div className='dropdown-divider' />
-
         {props.availableStatus.map(s =>
           <button
             className='selectStatus__submenu__item current dropdown-item'
             type='button'
             onClick={() => props.onChangeStatus(s.slug)}
             key={`status_${s.slug}`}
-            style={{color: s.hexcolor}}
+            // style={{color: s.hexcolor}}
           >
-            {s.label /* props.t('Input.SelectStatus.ongoing') */}
+            {s.label}
             <div className='selectStatus__submenu__item__icon'>
-              <i className={`fa fa-fw fa-${s.faIcon}`} />
+              <i
+                className={`fa fa-fw fa-${s.faIcon}`}
+                style={{color: s.hexcolor}}
+              />
             </div>
           </button>
         )}

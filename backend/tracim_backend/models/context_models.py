@@ -291,7 +291,7 @@ class ContentCreation(object):
     ) -> None:
         self.label = label
         self.content_type = content_type
-        self.parent_id = parent_id
+        self.parent_id = parent_id or None
 
 
 class CommentCreation(object):

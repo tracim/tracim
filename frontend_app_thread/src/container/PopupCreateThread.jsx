@@ -1,13 +1,16 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import {
+  addAllResourceI18n,
   CardPopupCreateContent,
   handleFetchResult
 } from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
+import i18n from '../i18n.js'
 
 const debug = { // outdated
   config: {
-    label: 'Thread',
+    label: 'PopupCreateThread',
     slug: 'thread',
     faIcon: 'file-text-o',
     hexcolor: '#ad4cf9',
@@ -19,6 +22,14 @@ const debug = { // outdated
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    },
+    translation: {
+      en: {
+        translation: {}
+      },
+      fr: {
+        translation: {}
+      }
     }
   },
   loggedUser: {
@@ -33,16 +44,37 @@ const debug = { // outdated
   idFolder: null
 }
 
-class PopupCreateHtmlDocument extends React.Component {
+class PopupCreateThread extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'thread',
+      appName: 'thread', // must remain 'thread' because it is the name of the react built app (which contains Threac and PopupCreateThread)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
       idFolder: props.data ? props.data.idFolder : debug.idFolder,
       newContentName: ''
+    }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, this.state.config.translation)
+    i18n.changeLanguage(this.state.loggedUser.lang)
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    switch (type) {
+      case 'allApp_changeLang':
+        console.log('%c<PopupCreateThread> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        break
     }
   }
 
@@ -89,10 +121,11 @@ class PopupCreateHtmlDocument extends React.Component {
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}
         onChangeContentName={this.handleChangeNewContentName}
-        btnValidateLabel='Valider et créer'
+        btnValidateLabel={this.props.t('Validate and create')}
+        inputPlaceholder={this.props.t("Topic's subject")}
       />
     )
   }
 }
 
-export default PopupCreateHtmlDocument
+export default translate()(PopupCreateThread)

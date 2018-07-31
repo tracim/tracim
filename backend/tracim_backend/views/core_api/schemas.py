@@ -645,17 +645,20 @@ class ContentCreationSchema(marshmallow.Schema):
         description='Title of the content to create'
     )
     content_type = marshmallow.fields.String(
-        example='html-documents',
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),  # nopep8
+        example='html-document',
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
-        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.'
+        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.', # nopep8
+        allow_none=True,
+        default=None,
+        validate=Range(min=1, error="Value must be positive"),
     )
 
 
     @post_load
-    def make_content_filter(self, data):
+    def make_content_creation(self, data):
         return ContentCreation(**data)
 
 
@@ -677,7 +680,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
-        example='html-documents',
+        example='html-document',
         validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
     )
     sub_content_types = marshmallow.fields.List(
@@ -715,6 +718,7 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
+
 
 class ContentSchema(ContentDigestSchema):
     current_revision_id = marshmallow.fields.Int(example=12)

@@ -1,13 +1,17 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import {
-  CardPopupCreateContent, handleFetchResult
+  CardPopupCreateContent,
+  handleFetchResult,
+  addAllResourceI18n
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
+import i18n from '../i18n.js'
 
 const debug = { // outdated
   config: {
     label: 'Text Document',
-    slug: 'html-documents',
+    slug: 'html-document',
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
@@ -35,12 +39,33 @@ class PopupCreateHtmlDocument extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'html-documents',
+      appName: 'html-document', // must remain 'html-document' because it is the name of the react built app (which contains HtmlDocument and PopupCreateHtmlDocument)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
       idFolder: props.data ? props.data.idFolder : debug.idFolder,
       newContentName: ''
+    }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, this.state.config.translation)
+    i18n.changeLanguage(this.state.loggedUser.lang)
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
+    switch (type) {
+      case 'allApp_changeLang':
+        console.log('%c<PopupCreateHtmlDocument> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        break
     }
   }
 
@@ -88,10 +113,11 @@ class PopupCreateHtmlDocument extends React.Component {
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}
         onChangeContentName={this.handleChangeNewContentName}
-        btnValidateLabel='Valider et créer'
+        btnValidateLabel={this.props.t('Validate and create')}
+        inputPlaceholder={this.props.t("Document's title")}
       />
     )
   }
 }
 
-export default PopupCreateHtmlDocument
+export default translate()(PopupCreateHtmlDocument)
