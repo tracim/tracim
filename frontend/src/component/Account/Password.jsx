@@ -19,12 +19,12 @@ export const Password = props => {
         <input
           className='personaldata__form__txtinput form-control'
           type='password'
-          placeholder={props.inputPlaceholderOldPassword}
+          placeholder={props.t('Old password')}
         />
         <input
           className='personaldata__form__txtinput form-control mt-4'
           type='password'
-          placeholder={props.inputPlaceholderNewPassword}
+          placeholder={props.t('New password')}
         />
         <button type='submit' className='personaldata__form__button btn btn-outline-primary mt-4'>
           {props.t('Send')}

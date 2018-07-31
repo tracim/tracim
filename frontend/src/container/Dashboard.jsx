@@ -600,4 +600,4 @@ class Dashboard extends React.Component {
 }
 
 const mapStateToProps = ({ user, app, contentType, workspaceList }) => ({ user, app, contentType, workspaceList })
-export default translate()(connect(mapStateToProps)(Dashboard))
+export default connect(mapStateToProps)(translate()(Dashboard))

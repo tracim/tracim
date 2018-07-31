@@ -15,23 +15,23 @@ export const PersonalData = props => {
 
       <form className='personaldata__form'>
         <div className='personaldata__form__title'>
-          {props.t('Name :')}
+          {props.t('Name:')}
         </div>
         <div className='d-flex align-items-center justify-content-between flex-wrap mb-4'>
           <input
             className='personaldata__form__txtinput form-control mt-3 mt-sm-0'
             type='text'
-            placeholder={props.inputPlaceholderNameUser}
+            placeholder={props.t('Change your name')}
           />
         </div>
         <div className='personaldata__form__title'>
-          {props.t('Email Adress :')}
+          {props.t('Email Adress:')}
         </div>
         <div className='d-flex align-items-center justify-content-between flex-wrap mb-4'>
           <input
             className='personaldata__form__txtinput form-control mt-3 mt-sm-0'
             type='email'
-            placeholder={props.inputPlaceholderEmailUser}
+            placeholder={props.t('Change your email')}
           />
         </div>
         <button type='submit' className='personaldata__form__button btn btn-outline-primary'>

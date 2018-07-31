@@ -20,8 +20,6 @@
   "Notification": "Notification",
   "Archive Topic": "Conversation archivée",
   "Deleted File": "Fichier supprimé",
-  "Name :": "Nom :",
-  "Email Adress :": "Adresse mail :",
   "Send": "Envoyer",
   "Workspace and notifications": "Espace de travail & Notifications",
   "Workspace": "Espace de travail",
@@ -31,8 +29,6 @@
   "Password": "Mot de passe",
   "Change your name": "Modifier votre nom",
   "Change your email": "Modifier votre email",
-  "Old Password": "Ancien mot de passe",
-  "New Password": "Nouveau mot de passe",
   "Change your Timezone": "Modifier votre fuseau horaire",
   "Calendar": "Calendrier",
   "Access your personal calendar": "Accéder à votre calendrier personnel",
@@ -64,5 +60,9 @@
   "Workspace Calendar": "Calendrier de l'espace de travail",
   "Each workspace has its own calendar.": "Chaque espace de travail à son propre calendrier",
   "Choose the role of the member": "Choisissez le rôle du membre",
-  "Email Adress": "Adresse email"
+  "Email Adress": "Adresse email",
+  "Old password": "Ancien mot de passe",
+  "New password": "Nouveau mot de passe",
+  "Name:": "Nom :",
+  "Email Adress:": "Adresse mail :"
 }

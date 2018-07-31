@@ -81,8 +81,6 @@ class Account extends React.Component {
       switch (this.state.subComponentMenu.find(({active}) => active).name) {
         case 'personalData':
           return <PersonalData
-            inputPlaceholderNameUser={this.props.t('Change your name')}
-            inputPlaceholderEmailUser={this.props.t('Change your email')}
           />
 
         // case 'calendar':
@@ -96,8 +94,6 @@ class Account extends React.Component {
 
         case 'password':
           return <Password
-            inputPlaceholderOldPassword={this.props.t('Old Password')}
-            inputPlaceholderNewPassword={this.props.t('New Password')}
           />
 
         case 'timezone':
@@ -136,4 +132,4 @@ class Account extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, timezone }) => ({ user, workspaceList, timezone })
-export default translate()(connect(mapStateToProps)(Account))
+export default connect(mapStateToProps)(translate()(Account))
