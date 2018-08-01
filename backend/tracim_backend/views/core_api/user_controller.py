@@ -11,6 +11,7 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.views.controllers import Controller
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.authorization import require_profile
@@ -265,10 +266,17 @@ class UserController(Controller):
         workspace = None
         if hapic_data.path.workspace_id:
             workspace = wapi.get_one(hapic_data.path.workspace_id)
+        before_content = None
+        if content_filter.before_content_id:
+            before_content = api.get_one(
+                content_id=content_filter.before_content_id,
+                workspace=workspace,
+                content_type=ContentType.Any
+            )
         last_actives = api.get_last_active(
             workspace=workspace,
             limit=content_filter.limit or None,
-            before_datetime=content_filter.before_datetime or None,
+            before_content=before_content,
         )
         return [
             api.get_content_in_context(content)
@@ -302,7 +310,7 @@ class UserController(Controller):
         last_actives = api.get_last_active(
             workspace=workspace,
             limit=None,
-            before_datetime=None,
+            before_content=None,
             content_ids=hapic_data.query.contents_ids or None
         )
         return [
