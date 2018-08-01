@@ -25,7 +25,9 @@ from sqlalchemy.sql.elements import and_
 
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.core.notifications import NotifierFactory
-from tracim_backend.exceptions import SameValueError, UnallowedSubContent
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -1135,9 +1137,9 @@ class ContentApi(object):
     #
     #     return result
 
-    def set_allowed_content(self, folder: Content, allowed_content_dict:dict):
+    def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> None:  # nopep8
         """
-        :param folder: the given folder instance
+        :param content: the given content instance
         :param allowed_content_dict: must be something like this:
             dict(
                 folder = True
@@ -1145,10 +1147,37 @@ class ContentApi(object):
                 file = False,
                 page = True
             )
-        :return:
+        :return: nothing
         """
-        properties = dict(allowed_content = allowed_content_dict)
-        folder.properties = properties
+        properties = content.properties.copy()
+        properties['allowed_content'] = allowed_content_dict
+        content.properties = properties
+
+    def set_allowed_content(self, content: Content, allowed_content_type_slug_list: typing.List[str]) -> None:  # nopep8
+        """
+        :param content: the given content instance
+        :param allowed_content_type_slug_list: list of content_type_slug to
+        accept as subcontent.
+        :return: nothing
+        """
+        allowed_content_dict = {}
+        for allowed_content_type_slug in allowed_content_type_slug_list:
+            if allowed_content_type_slug not in CONTENT_TYPES.extended_endpoint_allowed_types_slug():
+                raise ContentTypeNotExist('Content_type {} does not exist'.format(allowed_content_type_slug))  # nopep8
+            allowed_content_dict[allowed_content_type_slug] = True
+
+        self._set_allowed_content(content, allowed_content_dict)
+
+    def restore_content_default_allowed_content(self, content: Content) -> None:
+        """
+        Return to default allowed_content_types
+        :param content: the given content instance
+        :return: nothing
+        """
+        if content._properties and 'allowed_content' in content._properties:
+            properties = content.properties.copy()
+            del properties['allowed_content']
+            content.properties = properties
 
     def set_status(self, content: Content, new_status: str):
         if new_status in CONTENT_STATUS.allowed_slugs_values():

@@ -209,7 +209,7 @@ class TestContentApi(DefaultTest):
             do_save=False
         )
         allowed_content_dict = {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: False} # nopep8
-        api.set_allowed_content(
+        api._set_allowed_content(
             folder,
             allowed_content_dict=allowed_content_dict
         )
@@ -275,7 +275,136 @@ class TestContentApi(DefaultTest):
                 parent=None,
                 label='lapin',
                 do_save=True
-            )
+           )
+
+    def test_unit__set_allowed_content__ok__private_method(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_dict = {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: False}  # nopep8
+        api._set_allowed_content(
+            folder,
+            allowed_content_dict=allowed_content_dict
+        )
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: False}
+
+    def test_unit__set_allowed_content__ok__nominal_case(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_type_slug_list = [CONTENT_TYPES.Folder.slug, CONTENT_TYPES.File.slug]  # nopep8
+        api.set_allowed_content(
+            folder,
+            allowed_content_type_slug_list=allowed_content_type_slug_list
+        )
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: True}
+
+    def test_unit__restore_content_default_allowed_content__ok__nominal_case(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_type_slug_list = [CONTENT_TYPES.Folder.slug, CONTENT_TYPES.File.slug]  # nopep8
+        api.set_allowed_content(
+            folder,
+            allowed_content_type_slug_list=allowed_content_type_slug_list
+        )
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: True} # nopep8
+        api.restore_content_default_allowed_content(folder)
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == CONTENT_TYPES.default_allowed_content_properties(folder.type)  # nopep8
 
     def test_delete(self):
         uapi = UserApi(

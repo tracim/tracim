@@ -295,14 +295,6 @@ class WorkspaceResource(DAVCollection):
             parent=self.content
         )
 
-        subcontent = dict(
-            folder=True,
-            thread=True,
-            file=True,
-            page=True
-        )
-
-        self.content_api.set_allowed_content(folder, subcontent)
         self.content_api.save(folder)
 
         transaction.commit()
