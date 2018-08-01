@@ -962,7 +962,8 @@ class ContentApi(object):
         (last modification of content itself or one of this comment)
         :param workspace: Workspace to check
         :param limit: maximum number of elements to return
-        :param before_datetime: date from where we check older content.
+        :param before_content: last_active content are only those updated
+         before this content given.
         :param content_ids: restrict selection to some content ids and
         related Comments
         :return: list of content
