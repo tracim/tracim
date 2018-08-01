@@ -26,7 +26,12 @@ export const PAGE = {
     ADMIN: (idws = ':idws') => `/workspaces/${idws}/admin`
   },
   LOGIN: '/login',
-  ACCOUNT: '/account'
+  ACCOUNT: '/account',
+  ADMIN: {
+    ROOT: '/admin',
+    WORKSPACE: '/admin/workspace',
+    USEr: '/admin/user'
+  }
 }
 
 export const ROLE = [{

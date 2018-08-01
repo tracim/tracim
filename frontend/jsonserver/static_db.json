@@ -35,7 +35,7 @@
     "customClass": "wsContentPageHtml",
     "icon": "fa fa-fw fa-file-text-o",
     "color": "#3f52e3",
-    "domContainer": "appContainer"
+    "domContainer": "appFeatureContainer"
   }, {
     "name": "PageMarkdown",
     "label": {
@@ -47,7 +47,7 @@
     "customClass": "wsContentPageMarkdown",
     "icon": "fa fa-fw fa-file-code-o",
     "color": "#e0082b",
-    "domContainer": "appContainer"
+    "domContainer": "appFeatureContainer"
   }, {
     "name": "File",
     "label": {
@@ -59,7 +59,7 @@
     "customClass": "wsContentFile",
     "icon": "fa fa-fw fa-file-image-o",
     "color": "#263462",
-    "domContainer": "appContainer"
+    "domContainer": "appFeatureContainer"
   }, {
     "name": "Thread",
     "label": {
@@ -71,7 +71,7 @@
     "customClass": "wsContentThread",
     "icon": "fa fa-fw fa-comments-o",
     "color": "#2674d3",
-    "domContainer": "appContainer"
+    "domContainer": "appFeatureContainer"
   }, {
     "name": "Task",
     "label": {
@@ -83,7 +83,7 @@
     "customClass": "wsContentTask",
     "icon": "fa fa-fw fa-list-ul",
     "color": "#2d5a88",
-    "domContainer": "appContainer"
+    "domContainer": "appFeatureContainer"
   }, {
     "name": "Issue",
     "label": {
@@ -95,7 +95,7 @@
     "customClass": "wsContentIssue",
     "icon": "fa fa-fw fa-ticket",
     "color": "#a4835e",
-    "domContainer": "appContainer"
+    "domContainer": "appFeatureContainer"
   }],
   "workspace_detail": {
     "id": 1,

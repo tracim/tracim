@@ -20,7 +20,7 @@ export const debug = {
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
     creationLabel: 'Write a document',
-    domContainer: 'appContainer',
+    domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
       'Accept': 'application/json',

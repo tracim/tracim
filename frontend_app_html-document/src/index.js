@@ -12,7 +12,7 @@ require('./css/index.styl')
 const appInterface = {
   name: 'html-document',
   isRendered: false,
-  renderAppFull: data => {
+  renderAppFeature: data => {
     return ReactDOM.render(
       <HtmlDocument data={data} />
       , document.getElementById(data.config.domContainer)

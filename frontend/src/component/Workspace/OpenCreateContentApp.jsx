@@ -5,6 +5,7 @@ import appFactory from '../../appFactory.js'
 
 const qs = require('query-string')
 
+// @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ? (or AppCreateContentManager)
 export class OpenCreateContentApp extends React.Component {
   openCreateContentApp = () => {
     const { idWorkspace, user, contentType, renderAppPopupCreation, match, location } = this.props

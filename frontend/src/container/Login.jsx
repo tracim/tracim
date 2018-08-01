@@ -83,7 +83,7 @@ class Login extends React.Component {
                         customClass='mb-3 mt-4'
                         icon='fa-envelope-open-o'
                         type='email'
-                        placeHolder='Adresse Email'
+                        placeHolder={this.props.t('Email Adress')}
                         invalidMsg='Email invalide.'
                         isInvalid={this.state.inputLogin.isInvalid}
                         value={this.state.inputLogin.value}
@@ -95,7 +95,7 @@ class Login extends React.Component {
                         customClass=''
                         icon='fa-lock'
                         type='password'
-                        placeHolder='Mot de passe'
+                        placeHolder={this.props.t('Password')}
                         invalidMsg='Mot de passe invalide.'
                         isInvalid={this.state.inputPassword.isInvalid}
                         value={this.state.inputPassword.value}

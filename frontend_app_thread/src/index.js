@@ -8,7 +8,7 @@ require('./css/index.styl')
 const appInterface = {
   name: 'thread',
   isRendered: false,
-  renderAppFull: data => {
+  renderAppFeature: data => {
     return ReactDOM.render(
       <Thread data={data} />
       , document.getElementById(data.config.domContainer)

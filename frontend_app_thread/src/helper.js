@@ -12,7 +12,7 @@ export const debug = { // copied from html-document => outdated
     faIcon: 'comments-o',
     hexcolor: '#ad4cf9',
     creationLabel: 'Write a thread',
-    domContainer: 'appContainer',
+    domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543/api/v2',
     mockApiUrl: 'http://localhost:3001',
     apiHeader: {
@@ -44,7 +44,8 @@ export const debug = { // copied from html-document => outdated
       faIcon: 'warning',
       hexcolor: '#ababab',
       globalStatus: 'closed'
-    }]
+    }],
+    translation: {en: {}, fr: {}}
   },
   loggedUser: { // @FIXME this object is outdated
     user_id: 1,
@@ -52,7 +53,8 @@ export const debug = { // copied from html-document => outdated
     firstname: 'Côme',
     lastname: 'Stoilenom',
     email: 'osef@algoo.fr',
-    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+    avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
+    lang: 'en'
   },
   content: {
     author: {

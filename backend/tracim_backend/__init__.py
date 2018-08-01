@@ -104,7 +104,7 @@ def web(global_config, **local_settings):
     context.handle_exception(InsufficientUserProfile, HTTPStatus.FORBIDDEN)
     # Internal server error
     context.handle_exception(OperationalError, HTTPStatus.INTERNAL_SERVER_ERROR)
-    context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)
+    # context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     # Add controllers
     session_controller = SessionController()

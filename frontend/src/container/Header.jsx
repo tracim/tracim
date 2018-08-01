@@ -37,7 +37,7 @@ class Header extends React.Component {
   handleChangeLang = idLang => {
     this.props.dispatch(setUserLang(idLang))
     i18n.changeLanguage(idLang)
-    this.props.emitEventApp('allApp_changeLang', idLang)
+    this.props.dispatchCustomEvent('allApp_changeLang', idLang)
   }
 
   handleClickHelp = () => {}

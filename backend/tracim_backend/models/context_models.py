@@ -226,10 +226,10 @@ class ActiveContentFilter(object):
     def __init__(
             self,
             limit: int = None,
-            before_datetime: datetime = None,
+            before_content_id: datetime = None,
     ):
         self.limit = limit
-        self.before_datetime = before_datetime
+        self.before_content_id = before_content_id
 
 
 class ContentIdsQuery(object):

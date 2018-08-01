@@ -1,9 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Sidebar from './Sidebar.jsx'
-import PageWrapper from '../component/common/layout/PageWrapper.jsx'
-import PageTitle from '../component/common/layout/PageTitle.jsx'
-import PageContent from '../component/common/layout/PageContent.jsx'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -11,12 +8,18 @@ import PersonalData from '../component/Account/PersonalData.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
 import Timezone from '../component/Account/Timezone.jsx'
-import { Delimiter } from 'tracim_frontend_lib'
+import {
+  Delimiter,
+  PageWrapper,
+  PageTitle,
+  PageContent
+} from 'tracim_frontend_lib'
 import { updateUserWorkspaceSubscriptionNotif } from '../action-creator.sync.js'
 import {
   getTimezone,
   getUserRole
 } from '../action-creator.async.js'
+import { translate } from 'react-i18next'
 
 class Account extends React.Component {
   constructor (props) {
@@ -77,7 +80,8 @@ class Account extends React.Component {
     const subComponent = (() => {
       switch (this.state.subComponentMenu.find(({active}) => active).name) {
         case 'personalData':
-          return <PersonalData />
+          return <PersonalData
+          />
 
         // case 'calendar':
         //   return <Calendar user={this.props.user} />
@@ -88,11 +92,12 @@ class Account extends React.Component {
             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
           />
 
+        case 'password':
+          return <Password
+          />
+
         case 'timezone':
           return <Timezone timezone={this.props.timezone} onChangeTimezone={this.handleChangeTimezone} />
-
-        case 'password':
-          return <Password />
       }
     })()
 
@@ -127,4 +132,4 @@ class Account extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, timezone }) => ({ user, workspaceList, timezone })
-export default connect(mapStateToProps)(Account)
+export default connect(mapStateToProps)(translate()(Account))

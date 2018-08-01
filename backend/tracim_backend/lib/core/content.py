@@ -930,41 +930,6 @@ class ContentApi(object):
 
         return resultset.all()
 
-    def get_last_active(self, parent_id: int, content_type: str, workspace: Workspace=None, limit=10) -> typing.List[Content]:
-        assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
-        assert content_type is not None# DYN_REMOVE
-        assert isinstance(content_type, str) # DYN_REMOVE
-
-        resultset = self._base_query(workspace) \
-            .filter(Content.workspace_id == Workspace.workspace_id) \
-            .filter(Workspace.is_deleted.is_(False)) \
-            .order_by(desc(Content.updated))
-
-        if content_type!=CONTENT_TYPES.Any_SLUG:
-            resultset = resultset.filter(Content.type==content_type)
-
-        if parent_id:
-            resultset = resultset.filter(Content.parent_id==parent_id)
-
-        result = []
-        for item in resultset:
-            new_item = None
-            if CONTENT_TYPES.Comment.slug == item.type:
-                new_item = item.parent
-            else:
-                new_item = item
-
-            # INFO - D.A. - 2015-05-20
-            # We do not want to show only one item if the last 10 items are
-            # comments about one thread for example
-            if new_item not in result:
-                result.append(new_item)
-
-            if len(result) >= limit:
-                break
-
-        return result
-
     def get_last_unread(self, parent_id: int, content_type: str,
                         workspace: Workspace=None, limit=10) -> typing.List[Content]:
         assert parent_id is None or isinstance(parent_id, int) # DYN_REMOVE
@@ -995,7 +960,7 @@ class ContentApi(object):
             self,
             workspace: Workspace=None,
             limit: typing.Optional[int]=None,
-            before_datetime: typing.Optional[datetime.datetime]= None,
+            before_content: typing.Optional[Content]= None,
             content_ids: typing.Optional[typing.List[int]] = None,
     ) -> typing.List[Content]:
         """
@@ -1003,7 +968,8 @@ class ContentApi(object):
         (last modification of content itself or one of this comment)
         :param workspace: Workspace to check
         :param limit: maximum number of elements to return
-        :param before_datetime: date from where we check older content.
+        :param before_content: last_active content are only those updated
+         before this content given.
         :param content_ids: restrict selection to some content ids and
         related Comments
         :return: list of content
@@ -1027,6 +993,7 @@ class ContentApi(object):
 
         active_contents = []
         too_recent_content = []
+        before_content_find = False
         for content in resultset:
             related_active_content = None
             if CONTENT_TYPES.Comment.slug == content.type:
@@ -1034,17 +1001,15 @@ class ContentApi(object):
             else:
                 related_active_content = content
 
-            if not before_datetime:
-                before_datetime = datetime.datetime.now()
-            # INFO - D.A. - 2015-05-20
-            # We do not want to show only one item if the last 10 items are
-            # comments about one thread for example
             if related_active_content not in active_contents and related_active_content not in too_recent_content:  # nopep8
-                # we verify that content is old enough
-                if content.updated < before_datetime:
+
+                if not before_content or before_content_find:
                     active_contents.append(related_active_content)
                 else:
                     too_recent_content.append(related_active_content)
+
+                if before_content and related_active_content == before_content:
+                    before_content_find = True
 
             if limit and len(active_contents) >= limit:
                 break
