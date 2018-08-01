@@ -45,6 +45,8 @@ class FolderController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -68,6 +70,8 @@ class FolderController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -110,6 +114,8 @@ class FolderController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -136,6 +142,8 @@ class FolderController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
