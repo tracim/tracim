@@ -10,6 +10,7 @@ import {
   setAppList,
   setContentTypeList, setWorkspaceListIsOpenInSidebar, updateWorkspaceListData
 } from '../action-creator.sync.js'
+import { translate } from 'react-i18next'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -75,12 +76,14 @@ class Dashboard extends React.Component {
             <div className='dashboard__header mb-5'>
               <div className='pageTitleGeneric dashboard__header__title d-flex align-items-center'>
                 <div className='pageTitleGeneric__title dashboard__header__title__text mr-3'>
-                  Dashboard
+                  {this.props.t('Dashboard')}
                 </div>
                 <div className='dashboard__header__acces' />
               </div>
               <div className='dashboard__header__advancedmode mr-3'>
-                <button type='button' className='btn btn-primary'>Activer édition avancé</button>
+                <button type='button' className='btn btn-primary'>
+                  {this.props.t('Active advanced Dashboard')}
+                </button>
               </div>
             </div>
 
@@ -119,7 +122,7 @@ class Dashboard extends React.Component {
                       className='dashboard__userstatut__notification__btn btn btn-outline-primary'
                       onClick={this.handleToggleNotifBtn}
                     >
-                      Changer de statut
+                      {this.props.t('Change your status')}
                     </div>
                   }
 
@@ -129,9 +132,11 @@ class Dashboard extends React.Component {
                         Abonné(e)
                       </button>
                       <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item'>Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item'>
+                          {this.props.t('subscriber')}
                         </div>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item'>Non Abonné(e)
+                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item'>
+                          {this.props.t('unsubscribed')}
                         </div>
                       </div>
                     </div>
@@ -147,7 +152,7 @@ class Dashboard extends React.Component {
                     <i className='fa fa-comments-o' />
                   </div>
                   <div className='dashboard__calltoaction__button__text__title'>
-                    Débuter une nouvelle discussion
+                    {this.props.t('Start a new Thread')}
                   </div>
                 </div>
               </div>
@@ -158,7 +163,7 @@ class Dashboard extends React.Component {
                     <i className='fa fa-file-text-o' />
                   </div>
                   <div className='dashboard__calltoaction__button__text__title'>
-                    Rédiger un document
+                    {this.props.t('Writing a document')}
                   </div>
                 </div>
               </div>
@@ -169,7 +174,7 @@ class Dashboard extends React.Component {
                     <i className='fa fa-paperclip' />
                   </div>
                   <div className='dashboard__calltoaction__button__text__title'>
-                    Importer un fichier
+                    {this.props.t('Upload a file')}
                   </div>
                 </div>
               </div>
@@ -181,7 +186,7 @@ class Dashboard extends React.Component {
                       <i className='fa fa-video-camera' />
                     </div>
                     <div className='dashboard__calltoaction__button__text__title'>
-                      Débuter une visioconférence
+                      {this.props.t('Start a videoconference')}
                     </div>
                   </div>
                 </div>
@@ -192,7 +197,7 @@ class Dashboard extends React.Component {
                       <i className='fa fa-calendar' />
                     </div>
                     <div className='dashboard__calltoaction__button__text__title'>
-                      Voir le Calendrier
+                      {this.props.t('View the Calendar')}
                     </div>
                   </div>
                 </div>
@@ -204,7 +209,7 @@ class Dashboard extends React.Component {
                     <i className='fa fa-folder-open-o' />
                   </div>
                   <div className='dashboard__calltoaction__button__text__title'>
-                    Explorer le Workspace
+                    {this.props.t('Explore the workspace')}
                   </div>
                 </div>
               </div>
@@ -214,11 +219,11 @@ class Dashboard extends React.Component {
               <div className='dashboard__activity'>
                 <div className='dashboard__activity__header'>
                   <div className='dashboard__activity__header__title subTitle'>
-                    Activité récente
+                    {this.props.t('Recent activity')}
                   </div>
 
                   <div className='dashboard__activity__header__allread btn btn-outline-primary'>
-                    Tout marquer comme lu
+                    {this.props.t('Mark everything as read')}
                   </div>
                 </div>
                 <div className='dashboard__activity__wrapper'>
@@ -278,7 +283,7 @@ class Dashboard extends React.Component {
 
                   <div className='dashboard__activity__more d-flex flex-row-reverse'>
                     <div className='dashboard__activity__more__btn btn btn-outline-primary'>
-                      Voir plus
+                      {this.props.t('See more')}
                     </div>
                   </div>
                 </div>
@@ -287,7 +292,7 @@ class Dashboard extends React.Component {
               <div className='dashboard__memberlist'>
 
                 <div className='dashboard__memberlist__title subTitle'>
-                  Liste des membres
+                  {this.props.t('Member List')}
                 </div>
 
                 <div className='dashboard__memberlist__wrapper'>
@@ -426,9 +431,8 @@ class Dashboard extends React.Component {
                           </div>
                           <div
                             className='dashboard__memberlist__btnadd__button__text'
-
                           >
-                             Ajouter un membre
+                            {this.props.t('Add a member')}
                           </div>
                         </div>
                       </div>
@@ -444,7 +448,9 @@ class Dashboard extends React.Component {
                       </div>
                       <div className='dashboard__memberlist__form__member'>
                         <div className='dashboard__memberlist__form__member__name'>
-                          <label className='name__label' htmlFor='addmember'>Indiquer le nom ou l'email du membre</label>
+                          <label className='name__label' htmlFor='addmember'>
+                            {this.props.t('Enter the name or email of the member')}
+                          </label>
                           <input type='text' id='addmember' className='name__input form-control' placeholder='Nom ou Email' />
                         </div>
                         <div className='dashboard__memberlist__form__member__create'>
@@ -452,13 +458,13 @@ class Dashboard extends React.Component {
                             <input type='radio' />
                           </div>
                           <div className='create__text'>
-                            Créer un compte
+                            {this.props.t('Create an account')}
                           </div>
                         </div>
                       </div>
                       <div className='dashboard__memberlist__form__role'>
                         <div className='dashboard__memberlist__form__role__text'>
-                          Choisissez le rôle du membre
+                          {this.props.t('Choose the role of the member')}
                         </div>
                         <ul className='dashboard__memberlist__form__role__list'>
                           <li className='dashboard__memberlist__form__role__list__item'>
@@ -470,7 +476,7 @@ class Dashboard extends React.Component {
                                 <i className='fa fa-gavel' />
                               </div>
                               <div className='item__text__name'>
-                                Responsable
+                                {this.props.t('Supervisor')}
                               </div>
                             </div>
                           </li>
@@ -483,7 +489,7 @@ class Dashboard extends React.Component {
                                 <i className='fa fa-graduation-cap' />
                               </div>
                               <div className='item__text__name'>
-                                Gestionnaire de contenu
+                                {this.props.t('Content Manager')}
                               </div>
                             </div>
                           </li>
@@ -496,7 +502,7 @@ class Dashboard extends React.Component {
                                 <i className='fa fa-pencil' />
                               </div>
                               <div className='item__text__name'>
-                                Contributeur
+                                {this.props.t('Contributor')}
                               </div>
                             </div>
                           </li>
@@ -509,14 +515,16 @@ class Dashboard extends React.Component {
                                 <i className='fa fa-eye' />
                               </div>
                               <div className='item__text__name'>
-                                Lecteur
+                                {this.props.t('Reader')}
                               </div>
                             </div>
                           </li>
                         </ul>
                       </div>
                       <div className='dashboard__memberlist__form__submitbtn'>
-                        <button className='btn btn-outline-primary'>Valider</button>
+                        <button className='btn btn-outline-primary'>
+                          {this.props.t('Validate')}
+                        </button>
                       </div>
                     </form>
                   }
@@ -535,14 +543,14 @@ class Dashboard extends React.Component {
                   </div>
 
                   <div className='dashboard__moreinfo__webdav__btn__text genericBtnInfoDashboard__btn__text'>
-                    Implémenter Tracim dans votre explorateur
+                    {this.props.t('Implement Tracim in your explorer')}
                   </div>
                 </div>
                 {this.state.displayWebdavBtn === true &&
                   <div>
                     <div className='dashboard__moreinfo__webdav__information genericBtnInfoDashboard__info'>
                       <div className='dashboard__moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
-                        Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur via le poste de travail, sans passer par le logiciel.
+                        {this.props.t('Find all your documents deposited online directly on your computer via the workstation, without going through the software.')}'
                       </div>
 
                       <div className='dashboard__moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
@@ -563,7 +571,7 @@ class Dashboard extends React.Component {
                     </div>
 
                     <div className='dashboard__moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text'>
-                      Calendrier de l'espace de travail
+                      {this.props.t('Workspace Calendar')}
                     </div>
                   </div>
                 </div>
@@ -572,7 +580,7 @@ class Dashboard extends React.Component {
                     <div>
                       <div className='dashboard__moreinfo__calendar__information genericBtnInfoDashboard__info'>
                         <div className='dashboard__moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
-                          Chaque espace de travail possède son propre calendrier.
+                          {this.props.t('Each workspace has its own calendar.')}
                         </div>
 
                         <div className='dashboard__moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>
@@ -592,4 +600,4 @@ class Dashboard extends React.Component {
 }
 
 const mapStateToProps = ({ user, app, contentType, workspaceList }) => ({ user, app, contentType, workspaceList })
-export default connect(mapStateToProps)(Dashboard)
+export default connect(mapStateToProps)(translate()(Dashboard))

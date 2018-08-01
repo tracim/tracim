@@ -2552,26 +2552,26 @@ class TestContentApi(DefaultTest):
         secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=datetime.datetime.now())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2)  # nopep8
         assert len(last_actives) == 2
         # comment is newest than page2
         assert last_actives[0] == firstly_created_but_recently_commented
         assert last_actives[1] == secondly_created_but_not_commented
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=last_actives[1].get_simple_last_activity_date())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2, before_content=last_actives[1])  # nopep8
         assert len(last_actives) == 2
         # last updated content is newer than other one despite creation
         # of the other is more recent
         assert last_actives[0] == firstly_created_but_recently_updated
         assert last_actives[1] == secondly_created_but_not_updated
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=last_actives[1].get_simple_last_activity_date())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2, before_content=last_actives[1])  # nopep8
         assert len(last_actives) == 2
         # creation order is inverted here as last created is last active
         assert last_actives[0] == secondly_created
         assert last_actives[1] == firstly_created
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=last_actives[1].get_simple_last_activity_date())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2, before_content=last_actives[1])  # nopep8
         assert len(last_actives) == 1
         # folder subcontent modification does not change folder order
         assert last_actives[0] == main_folder

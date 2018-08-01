@@ -10,12 +10,12 @@ import i18n from '../i18n.js'
 
 const debug = { // outdated
   config: {
-    label: 'PopupCreateThread',
-    slug: 'thread',
+    // label: 'PopupCreateThread',
+    slug: 'New thread',
     faIcon: 'file-text-o',
     hexcolor: '#ad4cf9',
     creationLabel: 'Write a thread',
-    domContainer: 'appContainer',
+    domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:3001',
     mockApiUrl: 'http://localhost:8071',
     apiHeader: {
@@ -116,7 +116,7 @@ class PopupCreateThread extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.state.config.label} // @TODO get the lang of user
+        label={this.props.t('New Thread')} // @TODO get the lang of user
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}

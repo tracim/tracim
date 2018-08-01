@@ -3,9 +3,11 @@ import typing
 
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend import CFG
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.utils.translation import fake_translator as _
 
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -132,10 +134,16 @@ class WorkspaceApi(object):
         return workspace
 
     def get_one(self, id):
-        return self._base_query().filter(Workspace.workspace_id == id).one()
+        try:
+            return self._base_query().filter(Workspace.workspace_id == id).one()
+        except NoResultFound as exc:
+            raise WorkspaceNotFound('workspace {} does not exist or not visible for user'.format(id)) from exc  # nopep8
 
     def get_one_by_label(self, label: str) -> Workspace:
-        return self._base_query().filter(Workspace.label == label).one()
+        try:
+            return self._base_query().filter(Workspace.label == label).one()
+        except NoResultFound as exc:
+            raise WorkspaceNotFound('workspace {} does not exist or not visible for user'.format(id)) from exc  # nopep8
 
     """
     def get_one_for_current_user(self, id):

@@ -6,8 +6,12 @@ import { translate } from 'react-i18next'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar,
-  updateWorkspaceFilter
+  updateWorkspaceFilter,
+  updateWorkspaceListData
 } from '../action-creator.sync.js'
+import {
+  getWorkspaceList
+} from '../action-creator.async.js'
 import { PAGE } from '../helper.js'
 
 const qs = require('query-string')
@@ -18,6 +22,20 @@ class Sidebar extends React.Component {
     this.state = {
       sidebarClose: false,
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
+    }
+  }
+
+  async componentDidMount () {
+    const { workspaceIdInUrl } = this.state
+    const { user, workspaceList, dispatch } = this.props
+
+    if (user.user_id !== -1 && workspaceList.length === 0) {
+      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
+
+      if (fetchGetWorkspaceList.status === 200) {
+        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].workspace_id, true))
+      }
     }
   }
 

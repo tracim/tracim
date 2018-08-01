@@ -361,9 +361,11 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
                     'the first limit elem (according to offset)',
         validate=Range(min=0, error="Value must be positive or 0"),
     )
-    before_datetime = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT,
-        description='return only content lastly updated before this date',
+    before_content_id = marshmallow.fields.Int(
+        example=41,
+        default=None,
+        allow_none=True,
+        description='return only content updated before this content',
     )
     @post_load
     def make_content_filter(self, data):
