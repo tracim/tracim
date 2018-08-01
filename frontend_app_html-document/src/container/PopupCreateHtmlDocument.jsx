@@ -10,7 +10,7 @@ import i18n from '../i18n.js'
 
 const debug = { // outdated
   config: {
-    label: 'Text Document',
+    // label: 'New Document',
     slug: 'html-document',
     faIcon: 'file-text-o',
     hexcolor: '#3f52e3',
@@ -108,7 +108,7 @@ class PopupCreateHtmlDocument extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.state.config.label} // @TODO get the lang of user
+        label={this.props.t('New Document')} // @TODO get the lang of user
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}
