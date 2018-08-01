@@ -10,7 +10,10 @@ const SubDropdownCreateButton = props => {
         <div className='subdropdown__link dropdown-item' onClick={e => props.onClickCreateContent(e, props.idFolder, app.slug)} key={app.slug}>
           <div className={`subdropdown__link__${app.slug} d-flex align-items-center`}>
             <div className={`subdropdown__link__${app.slug}__icon mr-3`}>
-              <i className={`fa fa-fw fa-${app.faIcon}`} />
+              <i
+                className={`fa fa-fw fa-${app.faIcon}`}
+                style={{color: app.hexcolor}}
+              />
             </div>
             <div className='subdropdown__link__folder__text'>
               {app.creationLabel}
