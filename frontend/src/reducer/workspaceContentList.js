@@ -2,13 +2,14 @@ import {
   SET,
   UPDATE,
   WORKSPACE,
+  WORKSPACE_CONTENT,
   FOLDER
 } from '../action-creator.sync.js'
 
-export default function workspace (state = [], action) {
+export default function workspaceContentList (state = [], action) {
   switch (action.type) {
-    case `${SET}/${WORKSPACE}/Content`:
-      return action.workspaceContent.map(wsc => ({
+    case `${SET}/${WORKSPACE_CONTENT}`:
+      return action.workspaceContentList.map(wsc => ({
         id: wsc.content_id,
         label: wsc.label,
         slug: wsc.slug,

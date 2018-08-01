@@ -202,7 +202,7 @@ a
   display flex
   flex-direction column
   justify-content center
-  margin 20px 30px 20px 0
+  margin 0 15px
   border-radius 10px
   padding 15px
   width 230px
@@ -210,6 +210,10 @@ a
   box-shadow shadow-all
   text-align center
   cursor pointer
+  &:nth-child(1)
+    margin-left 0
+  &:nth-last-child
+    margin-right 0
 
 .genericBtnInfoDashboard
   &__btn

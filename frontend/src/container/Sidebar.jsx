@@ -63,7 +63,7 @@ class Sidebar extends React.Component {
 
     history.push(`${PAGE.WORKSPACE.CONTENT_LIST(idWs)}?type=${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
 
-    // obviously, it's ugly to use custom event to tell WorkspaceContent to refresh, but since WorkspaceContent
+    // obviously, it's ugly to use custom event to tell WorkspaceContentList to refresh, but since WorkspaceContentList
     // will end up being an App, it'll have to be that way. So it's fine
     GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
   }
@@ -124,11 +124,10 @@ class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, workspace, workspaceList, app }) => ({
+const mapStateToProps = ({ lang, user, workspace, workspaceList }) => ({
   activeLang: lang.find(l => l.active) || {id: 'en'},
   user,
   workspace,
-  workspaceList,
-  app
+  workspaceList
 })
 export default withRouter(connect(mapStateToProps)(translate()(Sidebar)))

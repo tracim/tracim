@@ -16,12 +16,14 @@ import PrivateRoute from './PrivateRoute.jsx'
 import { COOKIE, PAGE } from '../helper.js'
 import {
   getAppList,
-  getUserIsConnected
+  getUserIsConnected,
+  getContentTypeList
 } from '../action-creator.async.js'
 import {
   removeFlashMessage,
   setAppList,
-  setUserConnected
+  setUserConnected,
+  setContentTypeList
 } from '../action-creator.sync.js'
 import Cookies from 'js-cookie'
 
@@ -47,6 +49,9 @@ class Tracim extends React.Component {
 
         const fetchGetAppList = await dispatch(getAppList(userLogged))
         if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
+
+        const fetchGetContentTypeList = await dispatch(getContentTypeList(userLogged))
+        if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
         break
 
       case 401:

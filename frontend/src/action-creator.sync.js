@@ -15,13 +15,13 @@ export const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg })
 export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, msg })
 
 export const USER = 'User'
-export const USER_LOGIN = 'User/Login'
-export const USER_LOGOUT = 'User/Logout'
-export const USER_DATA = 'User/Data'
-export const USER_ROLE = 'User/Role'
-export const USER_CONNECTED = 'User/Connected'
-export const USER_DISCONNECTED = 'User/Disconnected'
-export const USER_LANG = 'User/Lang'
+export const USER_LOGIN = `${USER}/Login`
+export const USER_LOGOUT = `${USER}/Logout`
+export const USER_DATA = `${USER}/Data`
+export const USER_ROLE = `${USER}/Role`
+export const USER_CONNECTED = `${USER}/Connected`
+export const USER_DISCONNECTED = `${USER}/Disconnected`
+export const USER_LANG = `${USER}/Lang`
 export const setUserConnected = user => ({ type: `${SET}/${USER}/Connected`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER}/Disconnected` })
 export const updateUserData = userData => ({ type: `${UPDATE}/${USER}/Data`, data: userData })
@@ -31,20 +31,30 @@ export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNo
   ({ type: `${UPDATE}/${USER_ROLE}/SubscriptionNotif`, workspaceId, subscriptionNotif })
 
 export const WORKSPACE = 'Workspace'
-export const setWorkspaceContent = (workspaceContent, filterStr = '') => ({ type: `${SET}/${WORKSPACE}/Content`, workspaceContent, filterStr })
+export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
+export const setWorkspaceContentList = (workspaceContentList, filterStr = '') => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, filterStr })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
+
+export const WORKSPACE_LIST = `${WORKSPACE}/List`
+export const updateWorkspaceListData = workspaceList => ({ type: `${UPDATE}/${WORKSPACE_LIST}`, workspaceList })
+export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
+
+export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
+export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPACE_DETAIL}`, workspaceDetail })
+
+export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
+export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
+export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 
 export const FOLDER = 'Folder'
 export const setFolderData = (folderId, content) => ({ type: `${SET}/${WORKSPACE}/${FOLDER}/Content`, folderId, content })
 
-export const WORKSPACE_LIST = 'WorkspaceList'
-export const updateWorkspaceListData = workspaceList => ({ type: `${UPDATE}/${WORKSPACE_LIST}`, workspaceList })
-export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
-
-export const APP_LIST = 'App/List'
+export const APP = 'App'
+export const APP_LIST = `${APP}/List`
 export const setAppList = appList => ({ type: `${SET}/${APP_LIST}`, appList })
 
-export const CONTENT_TYPE_LIST = 'ContentType/List'
+export const CONTENT_TYPE = 'ContentType'
+export const CONTENT_TYPE_LIST = `${CONTENT_TYPE}/List`
 export const setContentTypeList = contentTypeList => ({ type: `${SET}/${CONTENT_TYPE_LIST}`, contentTypeList })
 
 export const LANG = 'Lang'

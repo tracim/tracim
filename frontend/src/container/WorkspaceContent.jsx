@@ -16,14 +16,12 @@ import {
   PageContent
 } from 'tracim_frontend_lib'
 import {
-  getContentTypeList,
   getWorkspaceContentList,
   getFolderContent
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  setContentTypeList,
-  setWorkspaceContent
+  setWorkspaceContentList
 } from '../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -61,14 +59,9 @@ class WorkspaceContent extends React.Component {
   }
 
   async componentDidMount () {
-    const { user, workspaceList, contentType, match, dispatch } = this.props
+    const { workspaceList, match } = this.props
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
-
-    if (contentType.length === 0) {
-      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
-      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
-    }
 
     let wsToLoad = null
 
@@ -109,7 +102,7 @@ class WorkspaceContent extends React.Component {
 
     const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
 
-    if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
+    if (wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json, qs.parse(location.search).type))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
@@ -155,7 +148,7 @@ class WorkspaceContent extends React.Component {
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
   render () {
-    const { workspaceContent, contentType } = this.props
+    const { workspaceContentList, contentType } = this.props
 
     const filterWorkspaceContent = (contentList, filter) => {
       return filter.length === 0
@@ -168,8 +161,8 @@ class WorkspaceContent extends React.Component {
 
     const urlFilter = qs.parse(this.props.location.search).type
 
-    const filteredWorkspaceContent = workspaceContent.length > 0
-      ? filterWorkspaceContent(workspaceContent, urlFilter ? [urlFilter] : [])
+    const filteredWorkspaceContentList = workspaceContentList.length > 0
+      ? filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
     return (
@@ -196,7 +189,7 @@ class WorkspaceContent extends React.Component {
             parentClass='workspace__header'
             customClass='justify-content-between'
             title='Liste des Contenus'
-            subtitle={workspaceContent.label ? workspaceContent.label : ''}
+            subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
             <DropdownCreateButton
               parentClass='workspace__header__btnaddworkspace'
@@ -212,7 +205,7 @@ class WorkspaceContent extends React.Component {
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />
 
-              { filteredWorkspaceContent.map((c, i) => c.type === 'folder'
+              { filteredWorkspaceContentList.map((c, i) => c.type === 'folder'
                 ? (
                   <Folder
                     availableApp={contentType}
@@ -227,7 +220,7 @@ class WorkspaceContent extends React.Component {
                     }}
                     onClickFolder={this.handleClickFolder}
                     onClickCreateContent={this.handleClickCreateContent}
-                    isLast={i === filteredWorkspaceContent.length - 1}
+                    isLast={i === filteredWorkspaceContentList.length - 1}
                     key={c.id}
                   />
                 )
@@ -237,7 +230,7 @@ class WorkspaceContent extends React.Component {
                     type={c.type}
                     faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
                     statusSlug={c.statusSlug}
-                    contentType={contentType.find(ct => ct.slug === c.type)}
+                    contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
                     onClickItem={() => this.handleClickContentItem(c)}
                     onClickExtendedAction={{
                       edit: e => this.handleClickEditContentItem(e, c),
@@ -247,7 +240,7 @@ class WorkspaceContent extends React.Component {
                       delete: e => this.handleClickDeleteContentItem(e, c)
                     }}
                     onClickCreateContent={this.handleClickCreateContent}
-                    isLast={i === filteredWorkspaceContent.length - 1}
+                    isLast={i === filteredWorkspaceContentList.length - 1}
                     key={c.id}
                   />
                 )
@@ -268,5 +261,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceContent, workspaceList, app, contentType }) => ({ user, workspaceContent, workspaceList, app, contentType })
+const mapStateToProps = ({ user, workspaceContentList, workspaceList, contentType }) => ({ user, workspaceContentList, workspaceList, contentType })
 export default withRouter(connect(mapStateToProps)(appFactory(WorkspaceContent)))

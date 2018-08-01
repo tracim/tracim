@@ -6,11 +6,11 @@ import appFactory from '../../appFactory.js'
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
-    const { idWorkspace, appOpenedType, user, workspaceContent, contentType, renderAppFeature, dispatchCustomEvent, match } = this.props
+    const { idWorkspace, appOpenedType, user, workspaceContentList, contentType, renderAppFeature, dispatchCustomEvent, match } = this.props
 
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 
-    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContent.length) {
+    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContentList.length) {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
       const contentToOpen = {
@@ -57,5 +57,5 @@ export class OpenContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceContent, contentType }) => ({ user, workspaceContent, contentType })
+const mapStateToProps = ({ user, workspaceContentList, contentType }) => ({ user, workspaceContentList, contentType })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))
