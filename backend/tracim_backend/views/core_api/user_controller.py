@@ -328,6 +328,8 @@ class UserController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
@@ -345,6 +347,8 @@ class UserController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
@@ -362,6 +366,8 @@ class UserController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
