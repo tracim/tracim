@@ -10,9 +10,11 @@ from tracim_backend import models
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
 from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -25,7 +27,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
     """
     fixtures = [BaseFixture]
 
-    def test_api__get_recently_active_content__ok__200__nominal_case(self):
+    def test_api__get_recently_active_content__ok__200__admin(self):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -54,7 +56,32 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             'test workspace2',
             save_now=True
         )
-
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(
             current_user=admin,
             session=dbsession,
@@ -90,7 +117,10 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/recently_active'.format(workspace.workspace_id), status=200) # nopep8
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active'.format(   # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
         res = res.json_body
         assert len(res) == 7
         for elem in res:
@@ -121,7 +151,316 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[6]['content_id'] == main_folder.content_id
 
-    @pytest.mark.skip('Test should be fixed')
+    def test_api__get_recently_active_content__err__400__no_access_to_workspace(self):
+
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active'.format(   # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=400)
+
+    def test_api__get_recently_active_content__ok__200__user_itself(self):
+
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active'.format(   # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        res = res.json_body
+        assert len(res) == 7
+        for elem in res:
+            assert isinstance(elem['content_id'], int)
+            assert isinstance(elem['content_type'], str)
+            assert elem['content_type'] != 'comments'
+            assert isinstance(elem['is_archived'], bool)
+            assert isinstance(elem['is_deleted'], bool)
+            assert isinstance(elem['label'], str)
+            assert isinstance(elem['parent_id'], int) or elem['parent_id'] is None
+            assert isinstance(elem['show_in_ui'], bool)
+            assert isinstance(elem['slug'], str)
+            assert isinstance(elem['status'], str)
+            assert isinstance(elem['sub_content_types'], list)
+            for sub_content_type in elem['sub_content_types']:
+                assert isinstance(sub_content_type, str)
+            assert isinstance(elem['workspace_id'], int)
+        # comment is newest than page2
+        assert res[0]['content_id'] == firstly_created_but_recently_commented.content_id
+        assert res[1]['content_id'] == secondly_created_but_not_commented.content_id
+        # last updated content is newer than other one despite creation
+        # of the other is more recent
+        assert res[2]['content_id'] == firstly_created_but_recently_updated.content_id
+        assert res[3]['content_id'] == secondly_created_but_not_updated.content_id
+        # creation order is inverted here as last created is last active
+        assert res[4]['content_id'] == secondly_created.content_id
+        assert res[5]['content_id'] == firstly_created.content_id
+        # folder subcontent modification does not change folder order
+        assert res[6]['content_id'] == main_folder.content_id
+
+    def test_api__get_recently_active_content__ok__200__other_user(self):
+
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/recently_active'.format(   # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=403)
+
     def test_api__get_recently_active_content__ok__200__limit_2_multiple(self):
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
         # anymore to fix datetime lack of precision.
@@ -160,17 +499,13 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             config=self.app_config,
         )
         main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
-        sleep(1)
         main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
         firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        sleep(1)
         secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
         firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        sleep(1)
         secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
-        sleep(1)
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -180,11 +515,8 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        sleep(1)
         secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
-        sleep(1)
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
-        sleep(1)
         content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
         dbsession.flush()
         transaction.commit()
@@ -227,7 +559,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
 
         params = {
             'limit': 2,
-            'before_datetime': secondly_created_but_not_commented.get_last_activity_date().strftime('%Y-%m-%dT%H:%M:%SZ'),  # nopep8
+            'before_content_id': secondly_created_but_not_commented.content_id,  # nopep8
         }
         res = self.testapp.get(
             '/api/v2/users/1/workspaces/{}/contents/recently_active'.format(workspace.workspace_id),  # nopep8
@@ -241,12 +573,9 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         assert res[0]['content_id'] == firstly_created_but_recently_updated.content_id
         assert res[1]['content_id'] == secondly_created_but_not_updated.content_id
 
-
-class TestUserReadStatusEndpoint(FunctionalTest):
-    """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status # nopep8
-    """
-    def test_api__get_read_status__ok__200__all(self):
+    def test_api__get_recently_active_content__ok__200__bad_before_content_id_doesnt_exist(self):  # nopep8
+        # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
+        # anymore to fix datetime lack of precision.
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -311,7 +640,114 @@ class TestUserReadStatusEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        params = {
+            'before_content_id': 4000
+        }
+        res = self.testapp.get(
+            '/api/v2/users/1/workspaces/{}/contents/recently_active'.format(workspace.workspace_id),  # nopep8
+            status=400,
+            params=params
+        )
+
+
+class TestUserReadStatusEndpoint(FunctionalTest):
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status # nopep8
+    """
+    def test_api__get_read_status__ok__200__admin(self):
+
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(   # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
         res = res.json_body
         assert len(res) == 7
         for elem in res:
@@ -330,7 +766,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[6]['content_id'] == main_folder.content_id
 
-    def test_api__get_read_status__ok__200__nominal_case(self):
+    def test_api__get_read_status__ok__200__user_itself(self):
 
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -359,7 +795,32 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             'test workspace2',
             save_now=True
         )
-
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(
             current_user=admin,
             session=dbsession,
@@ -391,8 +852,8 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         self.testapp.authorization = (
             'Basic',
             (
-                'admin@admin.admin',
-                'admin@admin.admin'
+                'test@test.test',
+                'pass'
             )
         )
         selected_contents_id = [
@@ -401,12 +862,13 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             firstly_created.content_id,
             main_folder.content_id,
         ]
-        url = '/api/v2/users/1/workspaces/{workspace_id}/contents/read_status?contents_ids={cid1}&contents_ids={cid2}&contents_ids={cid3}&contents_ids={cid4}'.format(  # nopep8
+        url = '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status?contents_ids={cid1}&contents_ids={cid2}&contents_ids={cid3}&contents_ids={cid4}'.format(  # nopep8
               workspace_id=workspace.workspace_id,
               cid1=selected_contents_id[0],
               cid2=selected_contents_id[1],
               cid3=selected_contents_id[2],
               cid4=selected_contents_id[3],
+              user_id=test_user.user_id,
         )
         res = self.testapp.get(
             url=url,
@@ -427,12 +889,8 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         # folder subcontent modification does not change folder order
         assert res[3]['content_id'] == main_folder.content_id
 
+    def test_api__get_read_status__ok__200__other_user(self):
 
-class TestUserSetContentAsRead(FunctionalTest):
-    """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read  # nopep8
-    """
-    def test_api_set_content_as_read__ok__200__nominal_case(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -452,8 +910,152 @@ class TestUserSetContentAsRead(FunctionalTest):
             'test workspace',
             save_now=True
         )
+        workspace2 = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(
             current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        # update order test
+        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
+        ):
+            firstly_created_but_recently_updated.description = 'Just an update'
+        api.save(firstly_created_but_recently_updated)
+        # comment change order
+        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
+        content_workspace_2 = api.create(ContentType.Page, workspace2,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        selected_contents_id = [
+            firstly_created_but_recently_commented.content_id,
+            firstly_created_but_recently_updated.content_id,
+            firstly_created.content_id,
+            main_folder.content_id,
+        ]
+        url = '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status?contents_ids={cid1}&contents_ids={cid2}&contents_ids={cid3}&contents_ids={cid4}'.format(  # nopep8
+              workspace_id=workspace.workspace_id,
+              cid1=selected_contents_id[0],
+              cid2=selected_contents_id[1],
+              cid3=selected_contents_id[2],
+              cid4=selected_contents_id[3],
+              user_id=admin.user_id,
+        )
+        res = self.testapp.get(
+            url=url,
+            status=403,
+        )
+
+
+class TestUserSetContentAsRead(FunctionalTest):
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read  # nopep8
+    """
+    def test_api_set_content_as_read__ok__200__admin(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
             session=dbsession,
             config=self.app_config,
         )
@@ -461,6 +1063,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         # creation order test
         firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(firstly_created)
+        api2.mark_unread(firstly_created)
         dbsession.flush()
         transaction.commit()
 
@@ -471,21 +1074,44 @@ class TestUserSetContentAsRead(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        # before
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is False
+
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+        # read
         self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
-                user_id=admin.user_id,
+                user_id=test_user.user_id,
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200)  # nopep8
+        # after
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is True
 
-    def test_api_set_content_as_read__ok__200__with_comments(self):
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+
+    def test_api_set_content_as_read__ok__200__admin_workspace_do_not_exist(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -505,8 +1131,381 @@ class TestUserSetContentAsRead(FunctionalTest):
             'test workspace',
             save_now=True
         )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(
             current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_unread(firstly_created)
+        api2.mark_unread(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # read
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
+                workspace_id=4000,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
+            ),
+            status=400,
+        )
+
+    def test_api_set_content_as_read__ok__200__admin_content_do_not_exist(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_unread(firstly_created)
+        api2.mark_unread(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # read
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=4000,
+                user_id=test_user.user_id,
+            ),
+            status=400,
+        )
+
+    def test_api_set_content_as_read__ok__200__user_itself(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_unread(firstly_created)
+        api2.mark_unread(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        # before
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+            ),
+            status=200
+        )
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+
+        # read
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
+            )
+        )
+        # after
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+            ),
+            status=200
+        )
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+
+    def test_api_set_content_as_read__ok__403__other_user(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_unread(firstly_created)
+        api2.mark_unread(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        # read
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=admin.user_id,
+            ),
+            status=403,
+        )
+
+    def test_api_set_content_as_read__ok__200__admin_with_comments(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
             session=dbsession,
             config=self.app_config,
         )
@@ -526,29 +1525,52 @@ class TestUserSetContentAsRead(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        # before
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is False
         self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
-                user_id=admin.user_id,
+                user_id=test_user.user_id,
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200)  # nopep8
+        # after
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is True
-
         # comment is also set as read
-        assert comments.has_new_information_for(admin) is False
+        assert comments.has_new_information_for(test_user) is False
+
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200) # nopep8
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+        # comment is also set as read
+        assert comments.has_new_information_for(admin) is True
 
 
 class TestUserSetContentAsUnread(FunctionalTest):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread  # nopep8
     """
-    def test_api_set_content_as_unread__ok__200__nominal_case(self):
+    def test_api_set_content_as_unread__ok__200__admin(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -568,8 +1590,39 @@ class TestUserSetContentAsUnread(FunctionalTest):
             'test workspace',
             save_now=True
         )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(
             current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
             session=dbsession,
             config=self.app_config,
         )
@@ -577,6 +1630,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         # creation order test
         firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_read(firstly_created)
+        api2.mark_read(firstly_created)
         dbsession.flush()
         transaction.commit()
 
@@ -587,19 +1641,383 @@ class TestUserSetContentAsUnread(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        # before
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is True
+
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+
+        # unread
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
+            )
+        )
+        # after
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=admin.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+
+    def test_api_set_content_as_unread__err__400__admin_workspace_do_not_exist(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_read(firstly_created)
+        api2.mark_read(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # unread
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
+                workspace_id=4000,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
+            ),
+            status=400,
+        )
+
+    def test_api_set_content_as_unread__err__400__admin_content_do_not_exist(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_read(firstly_created)
+        api2.mark_read(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+
+        # unread
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=4000,
+                user_id=test_user.user_id,
+            ),
+            status=400,
+        )
+
+    def test_api_set_content_as_unread__ok__200__user_itself(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_read(firstly_created)
+        api2.mark_read(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        # before
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+
+        # unread
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
+            )
+        )
+        # after
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+
+    def test_api_set_content_as_unread__err__403__other_user(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_read(firstly_created)
+        api2.mark_read(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+
+        # unread
         self.testapp.put(
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
                 user_id=admin.user_id,
-            )
+            ),
+            status=403,
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200)  # nopep8
-        assert res.json_body[0]['content_id'] == firstly_created.content_id
-        assert res.json_body[0]['read_by_user'] is False
 
     def test_api_set_content_as_unread__ok__200__with_comments(self):
         # init DB
@@ -663,7 +2081,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
     """
     Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/read
     """
-    def test_api_set_content_as_read__ok__200__nominal_case(self):
+    def test_api_set_content_as_read__ok__200__admin(self):
         # init DB
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -683,8 +2101,39 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             'test workspace',
             save_now=True
         )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = ContentApi(
             current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
             session=dbsession,
             config=self.app_config,
         )
@@ -693,6 +2142,8 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
+        api2.mark_unread(main_folder)
+        api2.mark_unread(firstly_created)
         dbsession.flush()
         transaction.commit()
 
@@ -703,7 +2154,10 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200) # nopep8
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is False
         assert res.json_body[1]['content_id'] == main_folder.content_id
@@ -712,14 +2166,196 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             '/api/v2/users/{user_id}/workspaces/{workspace_id}/read'.format(  # nopep8
                 workspace_id=workspace.workspace_id,
                 content_id=firstly_created.content_id,
-                user_id=admin.user_id,
+                user_id=test_user.user_id,
             )
         )
-        res = self.testapp.get('/api/v2/users/1/workspaces/{}/contents/read_status'.format(workspace.workspace_id), status=200)  # nopep8
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
         assert res.json_body[0]['content_id'] == firstly_created.content_id
         assert res.json_body[0]['read_by_user'] is True
         assert res.json_body[1]['content_id'] == main_folder.content_id
         assert res.json_body[1]['read_by_user'] is True
+
+    def test_api_set_content_as_read__ok__200__user_itself(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_unread(main_folder)
+        api.mark_unread(firstly_created)
+        api2.mark_unread(main_folder)
+        api2.mark_unread(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is False
+        assert res.json_body[1]['content_id'] == main_folder.content_id
+        assert res.json_body[1]['read_by_user'] is False
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/read'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
+            )
+        )
+        res = self.testapp.get('/api/v2/users/{user_id}/workspaces/{workspace_id}/contents/read_status'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=200)
+        assert res.json_body[0]['content_id'] == firstly_created.content_id
+        assert res.json_body[0]['read_by_user'] is True
+        assert res.json_body[1]['content_id'] == main_folder.content_id
+        assert res.json_body[1]['read_by_user'] is True
+
+    def test_api_set_content_as_read__err__403__other_user(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        api2 = ContentApi(
+            current_user=test_user,
+            session=dbsession,
+            config=self.app_config,
+        )
+        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        # creation order test
+        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        api.mark_unread(main_folder)
+        api.mark_unread(firstly_created)
+        api2.mark_unread(main_folder)
+        api2.mark_unread(firstly_created)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/users/{user_id}/workspaces/{workspace_id}/read'.format(  # nopep8
+                workspace_id=workspace.workspace_id,
+                content_id=firstly_created.content_id,
+                user_id=admin.user_id,
+            ),
+            status=403,
+        )
 
 
 class TestUserWorkspaceEndpoint(FunctionalTest):

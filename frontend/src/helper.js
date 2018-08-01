@@ -55,3 +55,5 @@ export const ROLE = [{
   icon: 'fa-gavel',
   translationKey: 'role.manager'
 }]
+
+export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route
