@@ -1,5 +1,6 @@
 # coding=utf-8
 from tracim_backend.tests import FunctionalTest
+from tracim_backend.models.applications import applications
 
 """
 Tests for /api/v2/system subpath endpoints.
@@ -24,41 +25,14 @@ class TestApplicationEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/system/applications', status=200)
         res = res.json_body
-        application = res[0]
-        assert application['label'] == "Text Documents"
-        assert application['slug'] == 'contents/html-document'
-        assert application['fa_icon'] == 'file-text-o'
-        assert application['hexcolor'] == '#3f52e3'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[1]
-        assert application['label'] == "Markdown Plus Documents"
-        assert application['slug'] == 'contents/markdownpluspage'
-        assert application['fa_icon'] == 'file-code-o'
-        assert application['hexcolor'] == '#f12d2d'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[2]
-        assert application['label'] == "Files"
-        assert application['slug'] == 'contents/file'
-        assert application['fa_icon'] == 'paperclip'
-        assert application['hexcolor'] == '#FF9900'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[3]
-        assert application['label'] == "Threads"
-        assert application['slug'] == 'contents/thread'
-        assert application['fa_icon'] == 'comments-o'
-        assert application['hexcolor'] == '#ad4cf9'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[4]
-        assert application['label'] == "Calendar"
-        assert application['slug'] == 'calendar'
-        assert application['fa_icon'] == 'calendar'
-        assert application['hexcolor'] == '#757575'
-        assert application['is_active'] is True
-        assert 'config' in application
+        assert len(res) == len(applications)
+        for counter, application in enumerate(applications):
+            assert res[counter]['label'] == application.label
+            assert res[counter]['slug'] == application.slug
+            assert res[counter]['fa_icon'] == application.fa_icon
+            assert res[counter]['hexcolor'] == application.hexcolor
+            assert res[counter]['is_active'] == application.is_active
+            assert res[counter]['config'] == application.config
 
     def test_api__get_applications__err_401__unregistered_user(self):
         """

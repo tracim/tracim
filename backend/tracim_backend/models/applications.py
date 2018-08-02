@@ -59,6 +59,16 @@ thread = Application(
 
 )
 
+folder = Application(
+    label='Folder',
+    slug='contents/folder',
+    fa_icon='folder-open-o',
+    hexcolor='#252525',
+    is_active=True,
+    config={},
+    main_route='',
+)
+
 _file = Application(
     label='Files',
     slug='contents/file',
@@ -95,5 +105,6 @@ applications = [
     markdownpluspage,
     _file,
     thread,
+    folder,
     calendar,
 ]
