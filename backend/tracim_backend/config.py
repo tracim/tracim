@@ -160,9 +160,11 @@ class CFG(object):
 
         self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
             'email.notification.from.email',
+            'noreply+{user_id}@trac.im'
         )
         self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = settings.get(
-            'email.notification.from.default_label'
+            'email.notification.from.default_label',
+            'Tracim Notifications'
         )
         self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = settings.get(
             'email.notification.reply_to.email',

@@ -214,11 +214,16 @@ class WorkspaceController(Controller):
                 # notification for creation
                 user = uapi.create_user(
                     hapic_data.body.user_email_or_public_name,
-                    do_notify=False
+                    do_notify=True
                 )  # nopep8
                 newly_created = True
+                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                        app_config.EMAIL_PROCESSING_MODE == 'SYNC':
+                    email_sent = True
+
             except EmailValidationFailed:
                 raise UserCreationFailed('no valid mail given')
+
         role = rapi.create_one(
             user=user,
             workspace=request.current_workspace,
