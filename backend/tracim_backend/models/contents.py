@@ -178,6 +178,7 @@ folder_type = ContentType(
     label='Folder',
     creation_label='Create collection of any documents',
     available_statuses=CONTENT_STATUS.get_all(),
+    allow_sub_content=True,
 )
 
 
