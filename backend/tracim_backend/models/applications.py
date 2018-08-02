@@ -102,9 +102,10 @@ html_documents = Application(
 # List of applications
 applications = [
     html_documents,
-    markdownpluspage,
+    # TODO - G.M - 2018-08-02 - Restore markdownpage app
+    # markdownpluspage,
     _file,
     thread,
     folder,
-    calendar,
+    # calendar,
 ]

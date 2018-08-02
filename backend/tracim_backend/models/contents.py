@@ -262,7 +262,8 @@ CONTENT_TYPES = ContentTypeList(
     [
         thread_type,
         file_type,
-        markdownpluspage_type,
+        # TODO - G.M - 2018-08-02 - Restore markdown page content
+        #    markdownpluspage_type,
         html_documents_type,
     ]
 )

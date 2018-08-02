@@ -2382,8 +2382,10 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert workspace['workspace_id'] == 1
         assert workspace['label'] == 'Business'
         assert workspace['slug'] == 'business'
-        assert len(workspace['sidebar_entries']) == 7
+        assert len(workspace['sidebar_entries']) == 5
 
+        # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
+        # not fixed on active application/content-file
         sidebar_entry = workspace['sidebar_entries'][0]
         assert sidebar_entry['slug'] == 'dashboard'
         assert sidebar_entry['label'] == 'Dashboard'
@@ -2406,32 +2408,19 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['fa_icon'] == "file-text-o"
 
         sidebar_entry = workspace['sidebar_entries'][3]
-        assert sidebar_entry['slug'] == 'contents/markdownpluspage'
-        assert sidebar_entry['label'] == 'Markdown Plus Documents'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=markdownpluspage"    # nopep8
-        assert sidebar_entry['hexcolor'] == "#f12d2d"
-        assert sidebar_entry['fa_icon'] == "file-code-o"
-
-        sidebar_entry = workspace['sidebar_entries'][4]
         assert sidebar_entry['slug'] == 'contents/file'
         assert sidebar_entry['label'] == 'Files'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=file"  # nopep8
         assert sidebar_entry['hexcolor'] == "#FF9900"
         assert sidebar_entry['fa_icon'] == "paperclip"
 
-        sidebar_entry = workspace['sidebar_entries'][5]
+        sidebar_entry = workspace['sidebar_entries'][4]
         assert sidebar_entry['slug'] == 'contents/thread'
         assert sidebar_entry['label'] == 'Threads'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
         assert sidebar_entry['hexcolor'] == "#ad4cf9"
         assert sidebar_entry['fa_icon'] == "comments-o"
 
-        sidebar_entry = workspace['sidebar_entries'][6]
-        assert sidebar_entry['slug'] == 'calendar'
-        assert sidebar_entry['label'] == 'Calendar'
-        assert sidebar_entry['route'] == "/#/workspaces/1/calendar"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#757575"
-        assert sidebar_entry['fa_icon'] == "calendar"
 
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
         """
