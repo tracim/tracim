@@ -12,6 +12,15 @@ export const COOKIE = {
   USER_AUTH: 'user_auth'
 }
 
+// Côme - 2018/08/02 - shouldn't this come from api ?
+export const workspaceConfig = {
+  slug: 'workspace',
+  faIcon: 'space-shuttle',
+  hexcolor: '#7d4e24',
+  creationLabel: 'Create a workspace',
+  domContainer: 'appFeatureContainer'
+}
+
 export const PAGE = {
   HOME: '/',
   WORKSPACE: {

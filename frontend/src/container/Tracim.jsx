@@ -28,6 +28,21 @@ import {
 import Cookies from 'js-cookie'
 
 class Tracim extends React.Component {
+  constructor (props) {
+    super(props)
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'redirect':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.history.push(data.url)
+        break
+    }
+  }
+
   async componentDidMount () {
     const { dispatch } = this.props
 

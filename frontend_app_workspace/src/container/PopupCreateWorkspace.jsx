@@ -10,7 +10,6 @@ import i18n from '../i18n.js'
 
 const debug = { // outdated
   config: {
-    // label: 'New Document',
     slug: 'workspace',
     faIcon: 'space-shuttle',
     hexcolor: '#7d4e24',
@@ -83,7 +82,7 @@ class PopupCreateWorkspace extends React.Component {
   handleValidate = async () => {
     const { loggedUser, config, newWorkspaceName } = this.state
 
-    const fetchSaveNewWorkspace = postWorkspace(loggedUser, config.apiUrl, config.slug, newWorkspaceName)
+    const fetchSaveNewWorkspace = postWorkspace(loggedUser, config.apiUrl, newWorkspaceName)
 
     handleFetchResult(await fetchSaveNewWorkspace)
       .then(resSave => {
@@ -95,7 +94,7 @@ class PopupCreateWorkspace extends React.Component {
           GLOBAL_dispatchEvent({
             type: 'redirect',
             data: {
-              url: `/workspaces/${resSave.json.workspace_id}`
+              url: `/workspaces/${resSave.body.workspace_id}/dashboard`
             }
           })
         }

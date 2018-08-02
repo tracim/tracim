@@ -53,6 +53,24 @@ log "cp i18next.scanner/fr/translation.json ../frontend/dist/app/thread_fr_trans
 cp i18next.scanner/fr/translation.json ../frontend/dist/app/thread_fr_translation.json
 cd -
 
+# app Workspace
+
+log "cd frontend_app_workspace"
+cd frontend_app_workspace
+
+log "npm run build$windoz # for frontend_app_workspace"
+npm run build$windoz
+
+log "cp dist/workspace.app.js"
+cp dist/workspace.app.js ../frontend/dist/app
+
+log "cp i18next.scanner/en/translation.json ../frontend/dist/app/workspace_en_translation.json"
+cp i18next.scanner/en/translation.json ../frontend/dist/app/workspace_en_translation.json
+
+log "cp i18next.scanner/fr/translation.json ../frontend/dist/app/workspace_fr_translation.json"
+cp i18next.scanner/fr/translation.json ../frontend/dist/app/workspace_fr_translation.json
+cd -
+
 # app Admin Workspace User
 
 log "cd frontend_app_admin_workspace_user"

@@ -12,7 +12,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'workspace.app.js' : 'workspace.app.dev.js',
     pathinfo: !isProduction,
-    library: isProduction ? 'workspace' : undefined,
+    library: isProduction ? 'appWorkspace' : undefined,
     libraryTarget: isProduction ? 'var' : undefined
   },
   externals: {},
