@@ -10,7 +10,7 @@ from tracim_backend import models
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.models.data import ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -983,9 +983,9 @@ class TestWorkspaceContents(FunctionalTest):
             session=dbsession,
             config=self.app_config
         )
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_thread = content_api.create(
-            content_type=ContentType.Thread,
+            content_type_slug=CONTENT_TYPES.Thread.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test Thread',
@@ -995,7 +995,7 @@ class TestWorkspaceContents(FunctionalTest):
         test_thread.description = 'Thread description'
         dbsession.add(test_thread)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1009,16 +1009,16 @@ class TestWorkspaceContents(FunctionalTest):
             'text/plain',
         )
         test_page_legacy = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
             label='test_page',
             do_save=False,
             do_notify=False,
         )
-        test_page_legacy.type = ContentType.PageLegacy
+        test_page_legacy.type = 'page'
         content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
         test_html_document = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
             label='test_html_page',
             do_save=False,
@@ -1078,9 +1078,9 @@ class TestWorkspaceContents(FunctionalTest):
             session=dbsession,
             config=self.app_config
         )
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_thread = content_api.create(
-            content_type=ContentType.Thread,
+            content_type_slug=CONTENT_TYPES.Thread.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test Thread',
@@ -1090,7 +1090,7 @@ class TestWorkspaceContents(FunctionalTest):
         test_thread.description = 'Thread description'
         dbsession.add(test_thread)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1104,17 +1104,17 @@ class TestWorkspaceContents(FunctionalTest):
             'text/plain',
         )
         test_page_legacy = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='test_page',
             do_save=False,
             do_notify=False,
         )
-        test_page_legacy.type = ContentType.PageLegacy
+        test_page_legacy.type = 'page'
         content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
         test_html_document = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='test_html_page',
@@ -1180,7 +1180,7 @@ class TestWorkspaceContents(FunctionalTest):
             'show_archived': 1,
             'show_deleted': 1,
             'show_active': 1,
-            'content_type': 'any'
+         #   'content_type': 'any'
         }
         self.testapp.authorization = (
             'Basic',

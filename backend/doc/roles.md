@@ -7,6 +7,11 @@ The other is workspace related and is called "workspace role".
 
 ## Global profile
 
+|                               | Normal User | Managers    | Admin          |
+|-------------------------------|-------------|-------------|----------------|
+| slug                            | users       | managers    | administrators |
+|-------------------------------|-------------|-------------|---------|
+
 
 |                               | Normal User | Managers    | Admin   |
 |-------------------------------|-------------|-------------|---------|
@@ -22,8 +27,15 @@ The other is workspace related and is called "workspace role".
 | access to all user data (/users/{user_id} endpoints) |personal-only|personal-only| yes     |
 
 
+
+
 ## Workspace Roles
 
+
+|                              | Reader | Contributor | Content Manager | Workspace Manager |
+|------------------------------|--------|-------------|-----------------|-------------------|
+| slug                         | reader | contributor | content-manager |  workspace-manager|
+|------------------------------|--------|-------------|-----------------|-------------------|
 
 |                              | Reader | Contributor | Content Manager | Workspace Manager |
 |------------------------------|--------|-------------|-----------------|-------------------|

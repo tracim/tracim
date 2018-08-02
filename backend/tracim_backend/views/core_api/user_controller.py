@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -11,7 +12,6 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.views.controllers import Controller
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.authorization import require_profile
@@ -32,6 +32,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.models.contents import CONTENT_TYPES
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 
@@ -271,7 +272,7 @@ class UserController(Controller):
             before_content = api.get_one(
                 content_id=content_filter.before_content_id,
                 workspace=workspace,
-                content_type=ContentType.Any
+                content_type=CONTENT_TYPES.Any_SLUG
             )
         last_actives = api.get_last_active(
             workspace=workspace,
