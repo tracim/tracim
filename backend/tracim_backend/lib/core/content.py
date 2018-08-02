@@ -1092,7 +1092,7 @@ class ContentApi(object):
         folder.properties = properties
 
     def set_status(self, content: Content, new_status: str):
-        if new_status in CONTENT_STATUS.allowed_slugs_values():
+        if new_status in CONTENT_STATUS.get_all_slugs_values():
             content.status = new_status
             content.revision_type = ActionDescription.STATUS_UPDATE
         else:
