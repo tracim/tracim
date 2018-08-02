@@ -4,6 +4,8 @@ import classnames from 'classnames'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 
 const ContentItem = props => {
+  if (props.contentType === null) return null // this means the endpoint system/content_type hasn't responded yet
+
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug)
   return (
     <div className={classnames('content', 'align-items-center', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>

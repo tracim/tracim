@@ -39,5 +39,5 @@ export class OpenCreateContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceContent, contentType }) => ({ user, workspaceContent, contentType })
+const mapStateToProps = ({ user, contentType }) => ({ user, contentType })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenCreateContentApp)))

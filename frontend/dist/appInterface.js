@@ -3,6 +3,8 @@
 
   getSelectedApp = name => {
     switch (name) {
+      case 'workspace':
+        return appWorkspace
       case 'html-document':
         return appHtmlDocument
       case 'thread':

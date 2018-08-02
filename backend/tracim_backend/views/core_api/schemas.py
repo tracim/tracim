@@ -696,7 +696,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(CONTENT_STATUS.allowed_slugs_values()),
+        validate=OneOf(CONTENT_STATUS.get_all_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status
     )
@@ -841,7 +841,7 @@ class FileContentModifySchema(TextBasedContentModifySchema):
 class SetContentStatusSchema(marshmallow.Schema):
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(CONTENT_STATUS.allowed_slugs_values()),
+        validate=OneOf(CONTENT_STATUS.get_all_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status,
         required=True,

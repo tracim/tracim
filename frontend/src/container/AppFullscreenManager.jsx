@@ -17,7 +17,7 @@ class AppFullscreenManager extends React.Component {
   componentDidMount = () => this.setState({AmIMounted: true})
 
   render () {
-    const { user, renderAppFullscreen } = this.props
+    const { props } = this
 
     return (
       <div className='sidebarpagecontainer'>
@@ -28,12 +28,12 @@ class AppFullscreenManager extends React.Component {
         {this.state.AmIMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM
           <div className='emptyDiForRoute'>
             <Route path={PAGE.ADMIN.WORKSPACE} render={() => {
-              renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace'}, user, {})
+              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace'}, props.user, {})
               return null
             }} />
 
             <Route path={PAGE.ADMIN.USER} render={() => {
-              renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user'}, user, {})
+              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user'}, props.user, {})
               return null
             }} />
           </div>

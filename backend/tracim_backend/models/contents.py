@@ -86,11 +86,11 @@ class ContentStatusList(object):
                 return item
         raise ContentStatusNotExist()
 
-    def allowed_slugs_values(self) -> typing.List[str]:
+    def get_all_slugs_values(self) -> typing.List[str]:
         """ Get alls slugs"""
         return [item.slug for item in self._content_status]
 
-    def allowed(self) -> typing.List[ContentStatus]:
+    def get_all(self) -> typing.List[ContentStatus]:
         """ Get all status"""
         return [item for item in self._content_status]
 
@@ -138,7 +138,7 @@ thread_type = ContentType(
     hexcolor=thread.hexcolor,
     label='Thread',
     creation_label='Discuss about a topic',
-    available_statuses=CONTENT_STATUS.allowed(),
+    available_statuses=CONTENT_STATUS.get_all(),
 )
 
 file_type = ContentType(
@@ -147,7 +147,7 @@ file_type = ContentType(
     hexcolor=_file.hexcolor,
     label='File',
     creation_label='Upload a file',
-    available_statuses=CONTENT_STATUS.allowed(),
+    available_statuses=CONTENT_STATUS.get_all(),
 )
 
 markdownpluspage_type = ContentType(
@@ -156,7 +156,7 @@ markdownpluspage_type = ContentType(
     hexcolor=markdownpluspage.hexcolor,
     label='Rich Markdown File',
     creation_label='Create a Markdown document',
-    available_statuses=CONTENT_STATUS.allowed(),
+    available_statuses=CONTENT_STATUS.get_all(),
 )
 
 html_documents_type = ContentType(
@@ -165,7 +165,7 @@ html_documents_type = ContentType(
     hexcolor=html_documents.hexcolor,
     label='Text Document',
     creation_label='Write a document',
-    available_statuses=CONTENT_STATUS.allowed(),
+    available_statuses=CONTENT_STATUS.get_all(),
     slug_alias=['page']
 )
 
@@ -176,7 +176,8 @@ folder_type = ContentType(
     hexcolor=folder.hexcolor,
     label='Folder',
     creation_label='Create a folder',
-    available_statuses=CONTENT_STATUS.allowed(),
+    creation_label='Create collection of any documents',
+    available_statuses=CONTENT_STATUS.get_all(),
 )
 
 
@@ -187,7 +188,7 @@ event_type = ContentType(
     hexcolor=thread.hexcolor,
     label='Event',
     creation_label='Event',
-    available_statuses=CONTENT_STATUS.allowed(),
+    available_statuses=CONTENT_STATUS.get_all(),
 )
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
@@ -197,7 +198,7 @@ comment_type = ContentType(
     hexcolor=thread.hexcolor,
     label='Comment',
     creation_label='Comment',
-    available_statuses=CONTENT_STATUS.allowed(),
+    available_statuses=CONTENT_STATUS.get_all(),
 )
 
 
