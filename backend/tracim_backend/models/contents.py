@@ -176,7 +176,6 @@ folder_type = ContentType(
     hexcolor=folder.hexcolor,
     label='Folder',
     creation_label='Create a folder',
-    creation_label='Create collection of any documents',
     available_statuses=CONTENT_STATUS.get_all(),
 )
 
