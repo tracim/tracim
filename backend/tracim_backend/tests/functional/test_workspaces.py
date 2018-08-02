@@ -2,7 +2,7 @@
 """
 Tests for /api/v2/workspaces subpath endpoints.
 """
-
+import requests
 import transaction
 from depot.io.utils import FileIntent
 
@@ -610,6 +610,89 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['role'] == 'content-manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
+
+
+class TestUserInvitationWithMailActivatedSync(FunctionalTest):
+
+    fixtures = [BaseFixture, ContentFixtures]
+    config_section = 'functional_test_with_mail_test_sync'
+
+    def test_api__create_workspace_member_role__ok_200__new_user(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': 'bob@bob.bob',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['role'] == 'content-manager'
+        assert user_role_found['user_id']
+        user_id = user_role_found['user_id']
+        assert user_role_found['workspace_id'] == 1
+        assert user_role_found['newly_created'] is True
+        assert user_role_found['email_sent'] is True
+
+        # check mail received
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'bob <bob@bob.bob>'
+        assert headers['Subject'][0] == '[TRACIM] Created account'
+
+        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+
+
+class TestUserInvitationWithMailActivatedASync(FunctionalTest):
+
+    fixtures = [BaseFixture, ContentFixtures]
+    config_section = 'functional_test_with_mail_test_async'
+
+    def test_api__create_workspace_member_role__ok_200__new_user(self):  # nopep8
+        """
+        Create workspace member role
+        :return:
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # create workspace role
+        params = {
+            'user_id': None,
+            'user_email_or_public_name': 'bob@bob.bob',
+            'role': 'content-manager',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/members',
+            status=200,
+            params=params,
+        )
+        user_role_found = res.json_body
+        assert user_role_found['newly_created'] is True
+        assert user_role_found['email_sent'] is False
 
 
 class TestWorkspaceContents(FunctionalTest):

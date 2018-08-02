@@ -218,7 +218,7 @@ class WorkspaceController(Controller):
                 )  # nopep8
                 newly_created = True
                 if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                        app_config.EMAIL_PROCESSING_MODE == 'SYNC':
+                        app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
                     email_sent = True
 
             except EmailValidationFailed:
