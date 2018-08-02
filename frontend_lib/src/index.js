@@ -1,4 +1,6 @@
-import { libHandleFetchResult } from './helper.js'
+import { libAddAllResourceI18n, libHandleFetchResult } from './helper.js'
+
+// fr and en are deprecated
 import fr from './translate/fr.js'
 import en from './translate/en.js'
 
@@ -12,6 +14,10 @@ import libTimeline from './component/Timeline/Timeline.jsx'
 import libTextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import libBtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 
+import libPageWrapper from './component/Layout/PageWrapper.jsx'
+import libPageTitle from './component/Layout/PageTitle.jsx'
+import libPageContent from './component/Layout/PageContent.jsx'
+
 import libDelimiter from './component/Delimiter/Delimiter.jsx'
 
 import libCardPopup from './component/CardPopup/CardPopup.jsx'
@@ -24,6 +30,8 @@ import libSelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 export const langFr = fr
 export const langEn = en
 
+export const addAllResourceI18n = libAddAllResourceI18n
+
 export const handleFetchResult = libHandleFetchResult
 
 export const PopinFixed = libPopinFixed
@@ -35,6 +43,10 @@ export const Timeline = libTimeline
 
 export const TextAreaApp = libTextAreaApp
 export const BtnSwitch = libBtnSwitch
+
+export const PageWrapper = libPageWrapper
+export const PageTitle = libPageTitle
+export const PageContent = libPageContent
 
 export const Delimiter = libDelimiter
 

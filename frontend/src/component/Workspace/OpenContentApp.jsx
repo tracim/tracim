@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
 
+// @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
-    const { idWorkspace, appOpenedType, user, workspaceContent, contentType, renderAppFull, match } = this.props
+    const { idWorkspace, appOpenedType, user, workspaceContentList, contentType, renderAppFeature, dispatchCustomEvent, match } = this.props
 
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 
-    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContent.length) {
+    if (['type', 'idcts'].every(p => p in match.params) && match.params.type !== 'contents' && workspaceContentList.length) {
       if (isNaN(match.params.idcts) || !contentType.map(c => c.slug).includes(match.params.type)) return
 
       const contentToOpen = {
@@ -21,15 +22,15 @@ export class OpenContentApp extends React.Component {
       console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
       if (appOpenedType === contentToOpen.type) { // app already open
-        GLOBAL_dispatchEvent({
-          type: `${contentToOpen.type}_reloadContent`, // handled by html-documents:src/container/HtmlDocument.jsx
+        dispatchCustomEvent({
+          type: `${contentToOpen.type}_reloadContent`, // handled by html-document:src/container/AdminWorkspaceUser.jsx
           data: contentToOpen
         })
       } else { // open another app
         // if another app is already visible, hide it
-        if (appOpenedType !== false) GLOBAL_dispatchEvent({type: `${appOpenedType}_hideApp`})
+        if (appOpenedType !== false) dispatchCustomEvent({type: `${appOpenedType}_hideApp`})
         // open app
-        renderAppFull(
+        renderAppFeature(
           contentType.find(ct => ct.slug === contentToOpen.type),
           user,
           contentToOpen
@@ -56,5 +57,5 @@ export class OpenContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceContent, contentType }) => ({ user, workspaceContent, contentType })
+const mapStateToProps = ({ user, workspaceContentList, contentType }) => ({ user, workspaceContentList, contentType })
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))

@@ -20,3 +20,11 @@ export const libHandleFetchResult = async fetchResult => {
       return new Promise((resolve, reject) => reject(fetchResult)) // @TODO : handle errors from api result
   }
 }
+
+export const libAddAllResourceI18n = (i18n, translation) => {
+  Object.keys(translation).forEach(lang =>
+    Object.keys(translation[lang]).forEach(namespace =>
+      i18n.addResources(lang, namespace, translation[lang][namespace])
+    )
+  )
+}

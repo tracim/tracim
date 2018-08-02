@@ -9,7 +9,7 @@ export const Notification = props => {
   return (
     <div className='account__userpreference__setting__notification'>
       <div className='notification__sectiontitle subTitle ml-2 ml-sm-0'>
-        Espace de Travail & Notification
+        {props.t('Workspace and notifications')}
       </div>
 
       <div className='notification__text ml-2 ml-sm-0'>
@@ -20,9 +20,9 @@ export const Notification = props => {
         <table className='table'>
           <thead>
             <tr>
-              <th>Espace de travail</th>
-              <th>Role</th>
-              <th>Notification</th>
+              <th>{props.t('Workspace')}</th>
+              <th>{props.t('Role')}</th>
+              <th>{props.t('Notification')}</th>
             </tr>
           </thead>
           <tbody>

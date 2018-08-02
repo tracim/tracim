@@ -27,7 +27,7 @@ const PopupCreateContent = props => {
           <input
             type='text'
             className='createcontent__form__input'
-            placeHolder='Nommez votre contenu...'
+            placeholder={props.inputPlaceholder}
             value={props.contentName}
             onChange={props.onChangeContentName}
           />
@@ -64,7 +64,8 @@ PopupCreateContent.propTypes = {
   label: PropTypes.string,
   customColor: PropTypes.string,
   faIcon: PropTypes.string,
-  btnValidateLabel: PropTypes.string
+  btnValidateLabel: PropTypes.string,
+  inputPlaceholder: PropTypes.string
 }
 
 PopupCreateContent.defaultProps = {

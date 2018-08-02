@@ -8,9 +8,9 @@ from marshmallow.validate import Range
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.contents import GlobalStatus
+from tracim_backend.models.contents import CONTENT_STATUS
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import open_status
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
-from tracim_backend.models.contents import ContentStatusLegacy as ContentStatus
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import ContentIdsQuery
@@ -355,9 +355,9 @@ class FilterContentQuerySchema(marshmallow.Schema):
         validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
     content_type = marshmallow.fields.String(
-        example=ContentType.Any,
-        default=ContentType.Any,
-        validate=OneOf(ContentType.allowed_type_values())
+        example=CONTENT_TYPES.Any_SLUG,
+        default=CONTENT_TYPES.Any_SLUG,
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
     )
 
     @post_load
@@ -373,9 +373,11 @@ class ActiveContentFilterQuerySchema(marshmallow.Schema):
                     'the first limit elem (according to offset)',
         validate=Range(min=0, error="Value must be positive or 0"),
     )
-    before_datetime = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT,
-        description='return only content lastly updated before this date',
+    before_content_id = marshmallow.fields.Int(
+        example=41,
+        default=None,
+        allow_none=True,
+        description='return only content updated before this content',
     )
     @post_load
     def make_content_filter(self, data):
@@ -605,7 +607,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = marshmallow.fields.String(
         example='pagehtml',
-        validate=OneOf(ContentType.allowed_types()),
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
     )
     fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
@@ -658,17 +660,20 @@ class ContentCreationSchema(marshmallow.Schema):
         description='Title of the content to create'
     )
     content_type = marshmallow.fields.String(
-        example='html-documents',
-        validate=OneOf(ContentType.allowed_types_for_folding()),  # nopep8
+        example='html-document',
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
-        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.'
+        description='content_id of parent content, if content should be placed in a folder, this should be folder content_id.', # nopep8
+        allow_none=True,
+        default=None,
+        validate=Range(min=1, error="Value must be positive"),
     )
 
 
     @post_load
-    def make_content_filter(self, data):
+    def make_content_creation(self, data):
         return ContentCreation(**data)
 
 
@@ -690,13 +695,13 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
-        example='html-documents',
-        validate=OneOf(ContentType.allowed_types()),
+        example='html-document',
+        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
     )
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=OneOf(ContentType.allowed_types())
+            validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
@@ -704,7 +709,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(ContentStatus.allowed_values()),
+        validate=OneOf(CONTENT_STATUS.get_all_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status
     )
@@ -728,6 +733,7 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
+
 
 class ContentSchema(ContentDigestSchema):
     current_revision_id = marshmallow.fields.Int(example=12)
@@ -848,7 +854,7 @@ class FileContentModifySchema(TextBasedContentModifySchema):
 class SetContentStatusSchema(marshmallow.Schema):
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(ContentStatus.allowed_values()),
+        validate=OneOf(CONTENT_STATUS.get_all_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status,
         required=True,

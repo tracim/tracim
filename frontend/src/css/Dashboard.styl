@@ -43,7 +43,7 @@ coloricon()
         margin 0
     &__advancedmode
       cursor pointer
-  &__wkswrapper
+  &__workspace-wrapper
     flexwrap()
   &__workspace
     margin-right 20px
@@ -62,9 +62,9 @@ coloricon()
       flexwrap()
       margin 20px 0
       font-size 18px
-      &__text
+      &__msg
         margin-right 15px
-      &__rank
+      &__definition
         display flex
         &__icon
           margin-right 15px
@@ -88,25 +88,11 @@ coloricon()
       &:active
         box-shadow inset 0px 0px 5px 2px #656565
       &__text
+        color white
         &__icon
           font-size 30px
-          .fa-comments-o, .fa-paperclip, .fa-calendar, .fa-file-text-o, .fa-folder-open-o, .fa-video-camera
-              color white
         &__title
           font-size 18px
-          color white
-    .btnthread
-      background-color threadColor
-    .writefile
-      background-color writefile
-    .importfile
-      background-color importfile
-    .visioconf
-      background-color grey-hover
-    .calendar
-      background-color calendar
-    .explore
-      background-color explore
   &__wksinfo
     flexwrap()
     margin-top 150px
@@ -270,19 +256,19 @@ coloricon()
     justify-content space-between
     flexwrap wrap
     &__webdav
-      margin-bottom 40px
+      margin 0 15px 40px 0
       &__btn
         width 300px
       &__information
-        width 550px
+        width 300px
     &__calendar
       margin-bottom 100px
       &__wrapperBtn
-        margin-right 300px
+        margin-right 290px
       &__btn
         width 300px
       &__information
-        width 550px
+        width 300px
 
 /**** MEDIAQUERIES *****/
 

@@ -7,26 +7,21 @@ import Sidebar from './Sidebar.jsx'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
-import PageWrapper from '../component/common/layout/PageWrapper.jsx'
-import PageTitle from '../component/common/layout/PageTitle.jsx'
-import PageContent from '../component/common/layout/PageContent.jsx'
 import DropdownCreateButton from '../component/common/Input/DropdownCreateButton.jsx'
 import OpenContentApp from '../component/Workspace/OpenContentApp.jsx'
 import OpenCreateContentApp from '../component/Workspace/OpenCreateContentApp.jsx'
 import {
-  getAppList,
-  getContentTypeList,
+  PageWrapper,
+  PageTitle,
+  PageContent
+} from 'tracim_frontend_lib'
+import {
   getWorkspaceContentList,
-  getFolderContent,
-  getWorkspaceList
+  getFolderContent
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  setAppList,
-  setContentTypeList,
-  setWorkspaceContent,
-  setWorkspaceListIsOpenInSidebar,
-  updateWorkspaceListData
+  setWorkspaceContentList
 } from '../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -35,11 +30,6 @@ class WorkspaceContent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      popupCreateContent: {
-        display: false,
-        type: undefined,
-        folder: undefined
-      },
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
       appOpenedType: false
     }
@@ -69,38 +59,16 @@ class WorkspaceContent extends React.Component {
   }
 
   async componentDidMount () {
-    const { workspaceIdInUrl } = this.state
-    const { user, workspaceList, app, contentType, match, dispatch } = this.props
+    const { workspaceList, match } = this.props
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
 
-    if (app.length === 0) { // @fixme shouldn't this be done by <Sidebar> ?
-      const fetchGetAppList = await dispatch(getAppList(user))
-      if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
-    }
-
-    if (contentType.length === 0) {
-      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
-      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
-    }
-
     let wsToLoad = null
-    if (match.params.idws !== undefined) wsToLoad = match.params.idws
 
-    if (user.user_id !== -1 && workspaceList.length === 0) {
-      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
-
-      if (fetchGetWorkspaceList.status === 200) {
-        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
-        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].workspace_id, true))
-
-        if (match.params.idws === undefined && fetchGetWorkspaceList.json.length > 0) {
-          wsToLoad = fetchGetWorkspaceList.json[0].workspace_id // load first ws if none specified
-        }
-      }
-    }
-
-    if (wsToLoad === null) return // ws already loaded
+    if (match.params.idws === undefined) {
+      if (workspaceList.length > 0) wsToLoad = workspaceList[0].id
+      else return
+    } else wsToLoad = match.params.idws
 
     this.loadContentList(wsToLoad)
   }
@@ -111,7 +79,6 @@ class WorkspaceContent extends React.Component {
     if (this.state.workspaceIdInUrl === null) return
 
     const idWorkspace = parseInt(this.props.match.params.idws)
-
     if (isNaN(idWorkspace)) return
 
     const prevFilter = qs.parse(prevProps.location.search).type
@@ -126,7 +93,7 @@ class WorkspaceContent extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.emitEventApp('unmount_app')
+    this.props.dispatchCustomEvent('unmount_app')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -135,7 +102,7 @@ class WorkspaceContent extends React.Component {
 
     const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
 
-    if (wsContent.status === 200) dispatch(setWorkspaceContent(wsContent.json, qs.parse(location.search).type))
+    if (wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json, qs.parse(location.search).type))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
   }
 
@@ -181,7 +148,7 @@ class WorkspaceContent extends React.Component {
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
   render () {
-    const { workspaceContent, contentType } = this.props
+    const { workspaceContentList, contentType } = this.props
 
     const filterWorkspaceContent = (contentList, filter) => {
       return filter.length === 0
@@ -194,8 +161,8 @@ class WorkspaceContent extends React.Component {
 
     const urlFilter = qs.parse(this.props.location.search).type
 
-    const filteredWorkspaceContent = workspaceContent.length > 0
-      ? filterWorkspaceContent(workspaceContent, urlFilter ? [urlFilter] : [])
+    const filteredWorkspaceContentList = workspaceContentList.length > 0
+      ? filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
     return (
@@ -221,7 +188,8 @@ class WorkspaceContent extends React.Component {
           <PageTitle
             parentClass='workspace__header'
             customClass='justify-content-between'
-            title={workspaceContent.label ? workspaceContent.label : ''}
+            title='Liste des Contenus'
+            subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
             <DropdownCreateButton
               parentClass='workspace__header__btnaddworkspace'
@@ -237,7 +205,7 @@ class WorkspaceContent extends React.Component {
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />
 
-              { filteredWorkspaceContent.map((c, i) => c.type === 'folder'
+              { filteredWorkspaceContentList.map((c, i) => c.type === 'folder'
                 ? (
                   <Folder
                     availableApp={contentType}
@@ -252,7 +220,7 @@ class WorkspaceContent extends React.Component {
                     }}
                     onClickFolder={this.handleClickFolder}
                     onClickCreateContent={this.handleClickCreateContent}
-                    isLast={i === filteredWorkspaceContent.length - 1}
+                    isLast={i === filteredWorkspaceContentList.length - 1}
                     key={c.id}
                   />
                 )
@@ -262,7 +230,7 @@ class WorkspaceContent extends React.Component {
                     type={c.type}
                     faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
                     statusSlug={c.statusSlug}
-                    contentType={contentType.find(ct => ct.slug === c.type)}
+                    contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
                     onClickItem={() => this.handleClickContentItem(c)}
                     onClickExtendedAction={{
                       edit: e => this.handleClickEditContentItem(e, c),
@@ -272,7 +240,7 @@ class WorkspaceContent extends React.Component {
                       delete: e => this.handleClickDeleteContentItem(e, c)
                     }}
                     onClickCreateContent={this.handleClickCreateContent}
-                    isLast={i === filteredWorkspaceContent.length - 1}
+                    isLast={i === filteredWorkspaceContentList.length - 1}
                     key={c.id}
                   />
                 )
@@ -285,8 +253,6 @@ class WorkspaceContent extends React.Component {
               onClickCreateContent={this.handleClickCreateContent}
               availableApp={contentType}
             />
-
-            <div id='appContainer' />
           </PageContent>
 
         </PageWrapper>
@@ -295,5 +261,5 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceContent, workspaceList, app, contentType }) => ({ user, workspaceContent, workspaceList, app, contentType })
+const mapStateToProps = ({ user, workspaceContentList, workspaceList, contentType }) => ({ user, workspaceContentList, workspaceList, contentType })
 export default withRouter(connect(mapStateToProps)(appFactory(WorkspaceContent)))

@@ -5,6 +5,7 @@ import Header from './Header.jsx'
 import Login from './Login.jsx'
 import Dashboard from './Dashboard.jsx'
 import Account from './Account.jsx'
+import AppFullscreenManager from './AppFullscreenManager.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
@@ -14,15 +15,34 @@ import {
 import PrivateRoute from './PrivateRoute.jsx'
 import { COOKIE, PAGE } from '../helper.js'
 import {
-  getUserIsConnected
+  getAppList,
+  getUserIsConnected,
+  getContentTypeList
 } from '../action-creator.async.js'
 import {
   removeFlashMessage,
-  setUserConnected
+  setAppList,
+  setUserConnected,
+  setContentTypeList
 } from '../action-creator.sync.js'
 import Cookies from 'js-cookie'
 
 class Tracim extends React.Component {
+  constructor (props) {
+    super(props)
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'redirect':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.history.push(data.url)
+        break
+    }
+  }
+
   async componentDidMount () {
     const { dispatch } = this.props
 
@@ -34,14 +54,24 @@ class Tracim extends React.Component {
     const fetchGetUserIsConnected = await dispatch(getUserIsConnected(userFromCookies))
     switch (fetchGetUserIsConnected.status) {
       case 200:
-        dispatch(setUserConnected({
+        const userLogged = {
           ...fetchGetUserIsConnected.json,
           auth: userFromCookies.auth,
           logged: true
-        }))
+        }
+
+        dispatch(setUserConnected(userLogged))
+
+        const fetchGetAppList = await dispatch(getAppList(userLogged))
+        if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
+
+        const fetchGetContentTypeList = await dispatch(getContentTypeList(userLogged))
+        if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
         break
+
       case 401:
         dispatch(setUserConnected({logged: false})); break
+
       default:
         dispatch(setUserConnected({logged: null})); break
     }
@@ -69,7 +99,10 @@ class Tracim extends React.Component {
           </Switch>
 
           <PrivateRoute path={PAGE.ACCOUNT} component={Account} />
+          <PrivateRoute path={PAGE.ADMIN.ROOT} component={AppFullscreenManager} />
           <PrivateRoute path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
+
+          <div id='appFeatureContainer' />
         </div>
 
       </div>
@@ -77,5 +110,5 @@ class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ flashMessage, user }) => ({ flashMessage, user })
+const mapStateToProps = ({ flashMessage }) => ({ flashMessage })
 export default withRouter(connect(mapStateToProps)(translate()(Tracim)))

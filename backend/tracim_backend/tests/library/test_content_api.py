@@ -14,6 +14,7 @@ from tracim_backend.exceptions import SameValueError
 from tracim_backend.lib.core.workspace import RoleApi
 # TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
@@ -22,7 +23,6 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.tests import DefaultTest
@@ -129,14 +129,14 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         item = api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=workspace,
             parent=None,
             label='not_deleted',
             do_save=True
         )
         item2 = api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=workspace,
             parent=None,
             label='to_delete',
@@ -159,10 +159,10 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(2, len(items))
 
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
                 session=self.session,
                 tm=transaction.manager,
@@ -184,7 +184,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(1, len(items))
         transaction.commit()
 
@@ -202,7 +202,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             show_deleted=True,
         )
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(2, len(items))
 
     def test_archive(self):
@@ -240,14 +240,14 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         item = api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=workspace,
             parent=None,
             label='not_archived',
             do_save=True
         )
         item2 = api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=workspace,
             parent=None,
             label='to_archive',
@@ -269,10 +269,10 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(2, len(items))
 
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
                 session=self.session,
                 tm=transaction.manager,
@@ -295,7 +295,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(1, len(items))
         transaction.commit()
 
@@ -320,7 +320,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             show_archived=True,
         )
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(2, len(items))
 
     def test_get_all_with_filter(self):
@@ -358,14 +358,14 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         item = api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=workspace,
             parent=None,
             label='thefolder',
             do_save=True
         )
         item2 = api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=workspace,
             parent=None,
             label='thefile',
@@ -389,14 +389,14 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(2, len(items))
 
-        items2 = api.get_all(None, ContentType.File, workspace)
+        items2 = api.get_all(None, CONTENT_TYPES.File.slug, workspace)
         eq_(1, len(items2))
         eq_('thefile', items2[0].label)
 
-        items3 = api.get_all(None, ContentType.Folder, workspace)
+        items3 = api.get_all(None, CONTENT_TYPES.Folder.slug, workspace)
         eq_(1, len(items3))
         eq_('thefolder', items3[0].label)
 
@@ -428,21 +428,21 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         item = api.create(
-            ContentType.Folder,
+            CONTENT_TYPES.Folder.slug,
             workspace,
             None,
             'parent',
             do_save=True,
         )
         item2 = api.create(
-            ContentType.File,
+            CONTENT_TYPES.File.slug,
             workspace,
             item,
             'file1',
             do_save=True,
         )
         item3 = api.create(
-            ContentType.File,
+            CONTENT_TYPES.File.slug,
             workspace,
             None,
             'file2',
@@ -468,10 +468,10 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        items = api.get_all(None, ContentType.Any, workspace)
+        items = api.get_all(None, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(3, len(items))
 
-        items2 = api.get_all(parent_id, ContentType.File, workspace)
+        items2 = api.get_all(parent_id, CONTENT_TYPES.File.slug, workspace)
         eq_(1, len(items2))
         eq_(child_id, items2[0].content_id)
 
@@ -506,7 +506,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        c = api.create(ContentType.Folder, workspace, None, 'parent', '', True)
+        c = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'parent', '', True)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -546,7 +546,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        c = api.create(ContentType.Folder, workspace, None, 'parent', '', True)
+        c = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'parent', '', True)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -591,14 +591,14 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        p = api.create(ContentType.Page, workspace, None, 'this_is_a_page')
+        p = api.create(CONTENT_TYPES.Page.slug, workspace, None, 'this_is_a_page')
         c = api.create_comment(workspace, p, 'this is the comment', True)
 
         eq_(Content, c.__class__)
         eq_(p.content_id, c.parent_id)
         eq_(user, c.owner)
         eq_(workspace, c.workspace)
-        eq_(ContentType.Comment, c.type)
+        eq_(CONTENT_TYPES.Comment.slug, c.type)
         eq_('this is the comment', c.description)
         eq_('', c.label)
         eq_(ActionDescription.COMMENT, c.revision_type)
@@ -652,7 +652,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         foldera = api.create(
-            ContentType.Folder,
+            CONTENT_TYPES.Folder.slug,
             workspace,
             None,
             'folder a',
@@ -661,7 +661,7 @@ class TestContentApi(DefaultTest):
         )
         with self.session.no_autoflush:
             text_file = api.create(
-                content_type=ContentType.File,
+                content_type_slug=CONTENT_TYPES.File.slug,
                 workspace=workspace,
                 parent=foldera,
                 label='test_file',
@@ -689,7 +689,7 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
         folderb = api2.create(
-            ContentType.Folder,
+            CONTENT_TYPES.Folder.slug,
             workspace2,
             None,
             'folder b',
@@ -773,7 +773,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         foldera = api.create(
-            ContentType.Folder,
+            CONTENT_TYPES.Folder.slug,
             workspace,
             None,
             'folder a',
@@ -782,7 +782,7 @@ class TestContentApi(DefaultTest):
         )
         with self.session.no_autoflush:
             text_file = api.create(
-                content_type=ContentType.File,
+                content_type_slug=CONTENT_TYPES.File.slug,
                 workspace=workspace,
                 parent=foldera,
                 label='test_file',
@@ -810,7 +810,7 @@ class TestContentApi(DefaultTest):
             save_now=True
         )
         folderb = api2.create(
-            ContentType.Folder,
+            CONTENT_TYPES.Folder.slug,
             workspace2,
             None,
             'folder b',
@@ -891,7 +891,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         foldera = api.create(
-            ContentType.Folder,
+            CONTENT_TYPES.Folder.slug,
             workspace,
             None,
             'folder a',
@@ -900,7 +900,7 @@ class TestContentApi(DefaultTest):
         )
         with self.session.no_autoflush:
             text_file = api.create(
-                content_type=ContentType.File,
+                content_type_slug=CONTENT_TYPES.File.slug,
                 workspace=workspace,
                 parent=foldera,
                 label='test_file',
@@ -1014,13 +1014,13 @@ class TestContentApi(DefaultTest):
 
         # Creates page_1 & page_2 in workspace 1
         #     and page_3 & page_4 in workspace 2
-        page_1 = cont_api_a.create(ContentType.Page, workspace1, None,
+        page_1 = cont_api_a.create(CONTENT_TYPES.Page.slug, workspace1, None,
                                    'this is a page', do_save=True)
-        page_2 = cont_api_a.create(ContentType.Page, workspace1, None,
+        page_2 = cont_api_a.create(CONTENT_TYPES.Page.slug, workspace1, None,
                                    'this is page1', do_save=True)
-        page_3 = cont_api_a.create(ContentType.Thread, workspace2, None,
+        page_3 = cont_api_a.create(CONTENT_TYPES.Thread.slug, workspace2, None,
                                    'this is page2', do_save=True)
-        page_4 = cont_api_a.create(ContentType.File, workspace2, None,
+        page_4 = cont_api_a.create(CONTENT_TYPES.File.slug, workspace2, None,
                                    'this is page3', do_save=True)
 
         for rev in page_1.revisions:
@@ -1118,7 +1118,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        page_1 = cont_api_a.create(ContentType.Page, workspace, None,
+        page_1 = cont_api_a.create(CONTENT_TYPES.Page.slug, workspace, None,
                                    'this is a page', do_save=True)
 
         for rev in page_1.revisions:
@@ -1187,21 +1187,21 @@ class TestContentApi(DefaultTest):
         )
 
         page_2 = cont_api_a.create(
-            ContentType.Page,
+            CONTENT_TYPES.Page.slug,
             workspace,
             None,
             'this is page1',
             do_save=True
         )
         page_3 = cont_api_a.create(
-            ContentType.Thread,
+            CONTENT_TYPES.Thread.slug,
             workspace,
             None,
             'this is page2',
             do_save=True
         )
         page_4 = cont_api_a.create(
-            ContentType.File,
+            CONTENT_TYPES.File.slug,
             workspace,
             None,
             'this is page3',
@@ -1285,7 +1285,7 @@ class TestContentApi(DefaultTest):
         )
 
         p = api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=workspace,
             parent=None,
             label='this_is_a_page',
@@ -1312,7 +1312,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        content = api.get_one(pcid, ContentType.Any, workspace)
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
@@ -1326,7 +1326,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        content2 = api2.get_one(pcid, ContentType.Any, workspace)
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
            session=self.session,
            tm=transaction.manager,
@@ -1353,7 +1353,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        updated = api.get_one(pcid, ContentType.Any, workspace)
+        updated = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u2id, updated.owner_id,
             'the owner id should be {} (found {})'.format(u2id,
                                                           updated.owner_id))
@@ -1412,7 +1412,7 @@ class TestContentApi(DefaultTest):
         )
         with self.session.no_autoflush:
             page = api.create(
-                content_type=ContentType.Page,
+                content_type_slug=CONTENT_TYPES.Page.slug,
                 workspace=workspace,
                 label="same_content",
                 do_save=False
@@ -1426,7 +1426,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        content2 = api2.get_one(page.content_id, ContentType.Any, workspace)
+        content2 = api2.get_one(page.content_id, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
            session=self.session,
            tm=transaction.manager,
@@ -1495,7 +1495,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         p = api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=workspace,
             parent=None,
             label='this_is_a_page',
@@ -1524,7 +1524,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
 
-        content = api.get_one(pcid, ContentType.Any, workspace)
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
@@ -1538,7 +1538,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        content2 = api2.get_one(pcid, ContentType.Any, workspace)
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -1561,7 +1561,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         ).get_one(wid)
 
-        updated = api.get_one(pcid, ContentType.Any, workspace)
+        updated = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u2id, updated.owner_id,
             'the owner id should be {} (found {})'.format(u2id,
                                                           updated.owner_id))
@@ -1622,7 +1622,7 @@ class TestContentApi(DefaultTest):
         )
         with self.session.no_autoflush:
             page = api.create(
-                content_type=ContentType.Page,
+                content_type_slug=CONTENT_TYPES.Page.slug,
                 workspace=workspace,
                 label="same_content",
                 do_save=False
@@ -1641,7 +1641,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        content2 = api2.get_one(page.content_id, ContentType.Any, workspace)
+        content2 = api2.get_one(page.content_id, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -1713,7 +1713,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         p = api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=workspace,
             parent=None,
             label='this_is_a_page',
@@ -1741,7 +1741,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         ).get_one(wid)
 
-        content = api.get_one(pcid, ContentType.Any, workspace)
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
@@ -1757,7 +1757,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             show_archived=True,
         )
-        content2 = api2.get_one(pcid, ContentType.Any, workspace)
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
                 session=self.session,
                 tm=transaction.manager,
@@ -1796,7 +1796,7 @@ class TestContentApi(DefaultTest):
             show_archived=True,
         )
 
-        updated = api2.get_one(pcid, ContentType.Any, workspace)
+        updated = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u2id, updated.owner_id,
             'the owner id should be {} (found {})'.format(u2id,
                                                           updated.owner_id))
@@ -1805,7 +1805,7 @@ class TestContentApi(DefaultTest):
 
         ####
 
-        updated2 = api.get_one(pcid, ContentType.Any, workspace)
+        updated2 = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -1874,7 +1874,7 @@ class TestContentApi(DefaultTest):
             show_deleted=True,
         )
         p = api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=workspace,
             parent=None,
             label='this_is_a_page',
@@ -1900,7 +1900,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         ).get_one(wid)
 
-        content = api.get_one(pcid, ContentType.Any, workspace)
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
@@ -1915,7 +1915,7 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
             show_deleted=True,
         )
-        content2 = api2.get_one(pcid, ContentType.Any, workspace)
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
                 session=self.session,
                 tm=transaction.manager,
@@ -1956,7 +1956,7 @@ class TestContentApi(DefaultTest):
             show_deleted=True
         )
 
-        updated = api2.get_one(pcid, ContentType.Any, workspace)
+        updated = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         eq_(u2id, updated.owner_id,
             'the owner id should be {} (found {})'.format(u2id,
                                                           updated.owner_id))
@@ -1965,7 +1965,7 @@ class TestContentApi(DefaultTest):
 
         ####
 
-        updated2 = api.get_one(pcid, ContentType.Any, workspace)
+        updated2 = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
         with new_revision(
             tm=transaction.manager,
             session=self.session,
@@ -2016,14 +2016,14 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        main_folder_workspace2 = api.create(ContentType.Folder, workspace2, None, 'Hepla', '', True)  # nopep8
-        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder_workspace2 = api.create(CONTENT_TYPES.Folder.slug, workspace2, None, 'Hepla', '', True)  # nopep8
+        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2032,11 +2032,11 @@ class TestContentApi(DefaultTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
 
-        content_workspace_2 = api.create(ContentType.Page, workspace2 ,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
+        content_workspace_2 = api.create(CONTENT_TYPES.Page.slug, workspace2 ,main_folder_workspace2, 'content_workspace_2', '',True)  # nopep8
         last_actives = api.get_last_active()
         assert len(last_actives) == 9
         # workspace_2 content
@@ -2088,13 +2088,13 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2103,8 +2103,8 @@ class TestContentApi(DefaultTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
 
         last_actives = api.get_last_active(workspace=workspace)
@@ -2153,13 +2153,13 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2168,8 +2168,8 @@ class TestContentApi(DefaultTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
 
         selected_contents = [
@@ -2228,13 +2228,13 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2243,30 +2243,30 @@ class TestContentApi(DefaultTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=datetime.datetime.now())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2)  # nopep8
         assert len(last_actives) == 2
         # comment is newest than page2
         assert last_actives[0] == firstly_created_but_recently_commented
         assert last_actives[1] == secondly_created_but_not_commented
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=last_actives[1].get_simple_last_activity_date())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2, before_content=last_actives[1])  # nopep8
         assert len(last_actives) == 2
         # last updated content is newer than other one despite creation
         # of the other is more recent
         assert last_actives[0] == firstly_created_but_recently_updated
         assert last_actives[1] == secondly_created_but_not_updated
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=last_actives[1].get_simple_last_activity_date())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2, before_content=last_actives[1])  # nopep8
         assert len(last_actives) == 2
         # creation order is inverted here as last created is last active
         assert last_actives[0] == secondly_created
         assert last_actives[1] == firstly_created
 
-        last_actives = api.get_last_active(workspace=workspace, limit=2, before_datetime=last_actives[1].get_simple_last_activity_date())  # nopep8
+        last_actives = api.get_last_active(workspace=workspace, limit=2, before_content=last_actives[1])  # nopep8
         assert len(last_actives) == 1
         # folder subcontent modification does not change folder order
         assert last_actives[0] == main_folder
@@ -2309,13 +2309,13 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        main_folder = api.create(ContentType.Folder, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
         # creation order test
-        firstly_created = api.create(ContentType.Page, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
-        secondly_created = api.create(ContentType.Page, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
+        firstly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'creation_order_test', '', True)  # nopep8
+        secondly_created = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another creation_order_test', '', True)  # nopep8
         # update order test
-        firstly_created_but_recently_updated = api.create(ContentType.Page, workspace, main_folder, 'update_order_test', '', True)  # nopep8
-        secondly_created_but_not_updated = api.create(ContentType.Page, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
+        firstly_created_but_recently_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'update_order_test', '', True)  # nopep8
+        secondly_created_but_not_updated = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'another update_order_test', '', True)  # nopep8
         with new_revision(
             session=self.session,
             tm=transaction.manager,
@@ -2324,8 +2324,8 @@ class TestContentApi(DefaultTest):
             firstly_created_but_recently_updated.description = 'Just an update'
         api.save(firstly_created_but_recently_updated)
         # comment change order
-        firstly_created_but_recently_commented = api.create(ContentType.Page, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
-        secondly_created_but_not_commented = api.create(ContentType.Page, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
+        firstly_created_but_recently_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is randomized label content', '', True)  # nopep8
+        secondly_created_but_not_commented = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'this is another randomized label content', '', True)  # nopep8
         comments = api.create_comment(workspace, firstly_created_but_recently_commented, 'juste a super comment', True)  # nopep8
 
         last_actives = api.get_last_active(workspace=workspace2)
@@ -2366,9 +2366,9 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        a = api.create(ContentType.Folder, workspace, None,
+        a = api.create(CONTENT_TYPES.Folder.slug, workspace, None,
                        'this is randomized folder', '', True)
-        p = api.create(ContentType.Page, workspace, a,
+        p = api.create(CONTENT_TYPES.Page.slug, workspace, a,
                        'this is randomized label content', '', True)
 
         with new_revision(
@@ -2422,9 +2422,9 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        a = api.create(ContentType.Folder, workspace, None,
+        a = api.create(CONTENT_TYPES.Folder.slug, workspace, None,
                        'this is randomized folder', '', True)
-        p = api.create(ContentType.Page, workspace, a,
+        p = api.create(CONTENT_TYPES.Page.slug, workspace, a,
                        'this is dummy label content', '', True)
 
         with new_revision(
@@ -2476,21 +2476,21 @@ class TestContentApi(DefaultTest):
             config=self.app_config,
         )
         a = api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=workspace,
             parent=None,
             label='this is randomized folder',
             do_save=True
         )
         p1 = api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=workspace,
             parent=a,
             label='this is dummy label content',
             do_save=True
         )
         p2 = api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=workspace,
             parent=a,
             label='Hey ! Jon !',
@@ -2540,22 +2540,22 @@ class TestContentApi(DefaultTest):
         folder_1 = self._create_content_and_test(
             'folder_1',
             workspace=workspace,
-            type=ContentType.Folder
+            type=CONTENT_TYPES.Folder.slug
         )
         folder_2 = self._create_content_and_test(
             'folder_2',
             workspace=workspace,
-            type=ContentType.Folder
+            type=CONTENT_TYPES.Folder.slug
         )
         page_1 = self._create_content_and_test(
             'foo', workspace=workspace,
-            type=ContentType.Page,
+            type=CONTENT_TYPES.Page.slug,
             parent=folder_1
         )
         page_2 = self._create_content_and_test(
             'bar',
             workspace=workspace,
-            type=ContentType.Page,
+            type=CONTENT_TYPES.Page.slug,
             parent=folder_2
         )
 
@@ -2636,7 +2636,7 @@ class TestContentApiSecurity(DefaultTest):
             session=self.session,
             config=self.app_config,
         ).create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=bob_workspace,
             label='bob_page',
             do_save=True,
@@ -2647,7 +2647,7 @@ class TestContentApiSecurity(DefaultTest):
             session=self.session,
             config=self.app_config,
         ).create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=admin_workspace,
             label='admin_page',
             do_save=True,

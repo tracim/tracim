@@ -25,22 +25,19 @@ const Comment = props => {
           {props.avatar ? <img src={props.avatar} /> : ''}
         </div>
       </div>
-      <div
-        className={classnames(`${props.customClass}__messagelist__item__authorandhour`, 'timeline__body__messagelist__item__authorandhour')}>
-          <div className='mr-5'>
-            {props.createdAt}
-          </div>
+      <div className={classnames(`${props.customClass}__messagelist__item__authorandhour`, 'timeline__body__messagelist__item__authorandhour')}>
+        <div className={classnames(`${props.customClass}__messagelist__item__authorandhour__author`, 'timeline__body__messagelist__item__authorandhour__author')}>
           {props.author}
+        </div>
+        <div className={classnames(`${props.customClass}__messagelist__item__authorandhour__date`, 'timeline__body__messagelist__item__authorandhour__date')}>
+          {props.createdAt}
+        </div>
       </div>
       <div
         className={classnames(`${props.customClass}__messagelist__item__content`, 'timeline__body__messagelist__item__content')}
         style={props.fromMe ? styleSent : styleReceived}
-
-      >
-        <div className='timeline__body__messagelist__item__content__text'>
-          {props.text}
-        </div>
-      </div>
+        dangerouslySetInnerHTML={{__html: props.text}}
+      />
     </li>
   )
 }

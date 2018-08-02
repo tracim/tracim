@@ -16,7 +16,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.workspace_menu_entries import default_workspace_menu_entry
 from tracim_backend.models.workspace_menu_entries import WorkspaceMenuEntry
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 
 
 class PreviewAllowedDim(object):
@@ -234,10 +234,10 @@ class ActiveContentFilter(object):
     def __init__(
             self,
             limit: int = None,
-            before_datetime: datetime = None,
+            before_content_id: datetime = None,
     ):
         self.limit = limit
-        self.before_datetime = before_datetime
+        self.before_content_id = before_content_id
 
 
 class ContentIdsQuery(object):
@@ -299,7 +299,7 @@ class ContentCreation(object):
     ) -> None:
         self.label = label
         self.content_type = content_type
-        self.parent_id = parent_id
+        self.parent_id = parent_id or None
 
 
 class CommentCreation(object):
@@ -586,7 +586,7 @@ class ContentInContext(object):
 
     @property
     def content_type(self) -> str:
-        content_type = ContentType(self.content.type)
+        content_type = CONTENT_TYPES.get_one_by_slug(self.content.type)
         return content_type.slug
 
     @property
@@ -698,11 +698,7 @@ class RevisionInContext(object):
 
     @property
     def content_type(self) -> str:
-        content_type = ContentType(self.revision.type)
-        if content_type:
-            return content_type.slug
-        else:
-            return None
+        return CONTENT_TYPES.get_one_by_slug(self.revision.type).slug
 
     @property
     def sub_content_types(self) -> typing.List[str]:

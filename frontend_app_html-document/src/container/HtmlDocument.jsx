@@ -1,6 +1,9 @@
 import React from 'react'
 import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
+import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
 import {
+  addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
   PopinFixedHeader,
@@ -20,13 +23,12 @@ import {
   putHtmlDocContent,
   putHtmlDocStatus
 } from '../action.async.js'
-import i18n from '../i18n.js'
 
 class HtmlDocument extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      appName: 'html-documents',
+      appName: 'html-document',
       isVisible: true,
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
@@ -38,22 +40,37 @@ class HtmlDocument extends React.Component {
       mode: MODE.VIEW
     }
 
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, this.state.config.translation)
+    i18n.changeLanguage(this.state.loggedUser.lang)
+
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      case 'html-documents_showApp':
+      case 'html-document_showApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: true})
         break
-      case 'html-documents_hideApp':
+      case 'html-document_hideApp':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
         break
-      case 'html-documents_reloadContent':
+      case 'html-document_reloadContent':
         console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
         this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
+        break
+      case 'allApp_changeLang':
+        console.log('%c<HtmlDocument> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        break
     }
   }
 
@@ -284,6 +301,7 @@ class HtmlDocument extends React.Component {
 
   render () {
     const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode } = this.state
+    const { t } = this.props
 
     if (!isVisible) return null
 
@@ -316,12 +334,12 @@ class HtmlDocument extends React.Component {
 
               {mode === MODE.REVISION &&
                 <button
-                  className='wsContentGeneric__option__menu__lastversion html-documents__lastversionbtn btn'
+                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
                 >
                   <i className='fa fa-code-fork' />
-                  Dernière version
+                  {t('Last version')}
                 </button>
               }
             </div>
@@ -358,7 +376,7 @@ class HtmlDocument extends React.Component {
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
             text={content.raw_content}
             onChangeText={this.handleChangeText}
-            key={'html-documents'}
+            key={'html-document'}
           />
 
           <Timeline
@@ -381,4 +399,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default HtmlDocument
+export default translate()(HtmlDocument)

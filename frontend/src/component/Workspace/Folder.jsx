@@ -65,7 +65,7 @@ class Folder extends React.Component {
                 aria-expanded='false'
                 onClick={e => e.stopPropagation()}
               >
-                {t('Folder.create')} ...
+                {t('Create in folder...')}
               </button>
 
               <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>

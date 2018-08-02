@@ -8,6 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend import CFG
 from tracim_backend.lib.webdav.utils import transform_to_bdd, HistoryType, \
     SpecialFolderExtension
+from tracim_backend.models.contents import CONTENT_TYPES
 
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager
@@ -19,7 +20,8 @@ from tracim_backend.lib.core.content import ContentRevisionRO
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.webdav import resources
 from tracim_backend.lib.webdav.utils import normpath
-from tracim_backend.models.data import ContentType, Content, Workspace
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import Workspace
 
 
 class Provider(DAVProvider):
@@ -174,7 +176,7 @@ class Provider(DAVProvider):
             content_revision = content_api.get_one_revision(revision_id)
             content = self.get_content_from_revision(content_revision, content_api)
 
-            if content.type == ContentType.File:
+            if content.type == CONTENT_TYPES.File.slug:
                 return resources.HistoryFileResource(
                     path=path,
                     environ=environ,
@@ -198,7 +200,7 @@ class Provider(DAVProvider):
 
         if content is None:
             return None
-        if content.type == ContentType.Folder:
+        if content.type == CONTENT_TYPES.Folder.slug:
             return resources.FolderResource(
                 path=path,
                 environ=environ,
@@ -207,7 +209,7 @@ class Provider(DAVProvider):
                 session=session,
                 user=user,
             )
-        elif content.type == ContentType.File:
+        elif content.type == CONTENT_TYPES.File.slug:
             return resources.FileResource(
                 path=path,
                 environ=environ,
@@ -356,7 +358,7 @@ class Provider(DAVProvider):
 
     def get_content_from_revision(self, revision: ContentRevisionRO, api: ContentApi) -> Content:
         try:
-            return api.get_one(revision.content_id, ContentType.Any)
+            return api.get_one(revision.content_id, CONTENT_TYPES.Any_SLUG)
         except NoResultFound:
             return None
 

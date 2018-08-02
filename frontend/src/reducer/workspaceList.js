@@ -1,18 +1,19 @@
 import {
+  SET,
+  UPDATE,
   WORKSPACE_LIST,
   USER_ROLE
 } from '../action-creator.sync.js'
-
-const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route
+import { handleRouteFromApi } from '../helper.js'
 
 export function workspaceList (state = [], action) {
   switch (action.type) {
-    case `Update/${WORKSPACE_LIST}`:
+    case `${UPDATE}/${WORKSPACE_LIST}`:
       return action.workspaceList.map(ws => ({
         id: ws.workspace_id,
         label: ws.label,
         slug: ws.slug,
-        description: ws.description,
+        // description: ws.description, // not returned by /api/v2/users/:idUser/workspaces
         sidebarEntry: ws.sidebar_entries.map(sbe => ({
           slug: sbe.slug,
           route: handleRouteFromApi(sbe.route),
@@ -23,13 +24,13 @@ export function workspaceList (state = [], action) {
         isOpenInSidebar: false
       }))
 
-    case `Set/${WORKSPACE_LIST}/isOpenInSidebar`:
+    case `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`:
       return state.map(ws => ws.id === action.workspaceId
         ? {...ws, isOpenInSidebar: action.isOpenInSidebar}
         : ws
       )
 
-    case `Set/${USER_ROLE}`: // not used yet
+    case `${SET}/${USER_ROLE}`: // not used yet
       return state.map(ws => {
         const foundWorkspace = action.userRole.find(r => ws.id === r.workspace.id) || {role: '', subscribed_to_notif: ''}
         return {
@@ -39,7 +40,7 @@ export function workspaceList (state = [], action) {
         }
       })
 
-    case `Update/${USER_ROLE}/SubscriptionNotif`: // not used yet
+    case `${UPDATE}/${USER_ROLE}/SubscriptionNotif`: // not used yet
       return state.map(ws => ws.id === action.workspaceId
         ? {...ws, notif: action.subscriptionNotif}
         : ws

@@ -10,6 +10,7 @@
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -- webpack-dev-server --watch --colors --inline --hot --progress",
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build": "NODE_ENV=production webpack -p",
+    "build-translation": "node i18next.scanner.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -31,6 +32,7 @@
     "js-cookie": "^2.2.0",
     "prop-types": "^15.6.0",
     "query-string": "^6.1.0",
+    "radium": "^0.24.1",
     "react": "^16.0.0",
     "react-animate-height": "^0.10.10",
     "react-dom": "^16.0.0",
@@ -52,6 +54,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "i18next-scanner": "^2.6.1",
     "json-server": "^0.12.0",
     "webpack-dashboard": "^1.0.2",
     "webpack-dev-server": "^2.9.2"
@@ -61,7 +64,8 @@
       "fetch",
       "btoa",
       "history",
-      "GLOBAL_renderAppFull",
+      "GLOBAL_renderAppFeature",
+      "GLOBAL_renderAppFullscreen",
       "GLOBAL_renderAppPopupCreation",
       "GLOBAL_dispatchEvent",
       "GLOBAL_hideApp"

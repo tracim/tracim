@@ -25,7 +25,7 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import thread_type
 from tracim_backend.models.revision_protection import new_revision
 
@@ -51,7 +51,7 @@ class ThreadController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         return api.get_content_in_context(content)
 
@@ -74,7 +74,7 @@ class ThreadController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -112,7 +112,7 @@ class ThreadController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         revisions = content.revisions
         return [
@@ -138,7 +138,7 @@ class ThreadController(Controller):
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,

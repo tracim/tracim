@@ -9,8 +9,9 @@
     "servdev-dashboard": "NODE_ENV=development webpack-dashboard -m -p 9870 -- webpack-dev-server --watch --colors --inline --hot --progress",
     "buildwindoz": "set NODE_ENV=production&& webpack -p",
     "build": "NODE_ENV=production webpack -p",
+    "build-translation": "node i18next.scanner.js",
     "buildtracimlib": "NODE_ENV=production webpack -p && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.js",
-    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack -p && echo '/* eslint-disable */' | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && printf '\n/* eslint-enable */\n' >> dist/tracim_frontend_lib.js",
+    "buildtracimlibwindoz": "set NODE_ENV=production&& webpack -p && echo /* eslint-disable */ | cat - dist/tracim_frontend_lib.js > temp && mv temp dist/tracim_frontend_lib.js && echo /* eslint-enable */>> dist/tracim_frontend_lib.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -44,6 +45,7 @@
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
+    "i18next-scanner": "^2.6.1",
     "webpack-dashboard": "^1.1.1",
     "webpack-dev-server": "^2.9.2"
   },

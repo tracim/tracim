@@ -5,6 +5,7 @@ from tracim_backend.tests import FunctionalTest
 Tests for /api/v2/system subpath endpoints.
 """
 
+
 class TestApplicationEndpoint(FunctionalTest):
     """
     Tests for /api/v2/system/applications
@@ -25,7 +26,7 @@ class TestApplicationEndpoint(FunctionalTest):
         res = res.json_body
         application = res[0]
         assert application['label'] == "Text Documents"
-        assert application['slug'] == 'contents/html-documents'
+        assert application['slug'] == 'contents/html-document'
         assert application['fa_icon'] == 'file-text-o'
         assert application['hexcolor'] == '#3f52e3'
         assert application['is_active'] is True
@@ -39,14 +40,14 @@ class TestApplicationEndpoint(FunctionalTest):
         assert 'config' in application
         application = res[2]
         assert application['label'] == "Files"
-        assert application['slug'] == 'contents/files'
+        assert application['slug'] == 'contents/file'
         assert application['fa_icon'] == 'paperclip'
         assert application['hexcolor'] == '#FF9900'
         assert application['is_active'] is True
         assert 'config' in application
         application = res[3]
         assert application['label'] == "Threads"
-        assert application['slug'] == 'contents/threads'
+        assert application['slug'] == 'contents/thread'
         assert application['fa_icon'] == 'comments-o'
         assert application['hexcolor'] == '#ad4cf9'
         assert application['is_active'] is True
@@ -96,7 +97,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/content_types', status=200)
         res = res.json_body
 
-        content_type = res[0]
+        content_type = res[1]
         assert content_type['slug'] == 'thread'
         assert content_type['fa_icon'] == 'comments-o'
         assert content_type['hexcolor'] == '#ad4cf9'
@@ -105,7 +106,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         assert 'available_statuses' in content_type
         assert len(content_type['available_statuses']) == 4
 
-        content_type = res[1]
+        content_type = res[2]
         assert content_type['slug'] == 'file'
         assert content_type['fa_icon'] == 'paperclip'
         assert content_type['hexcolor'] == '#FF9900'
@@ -114,7 +115,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         assert 'available_statuses' in content_type
         assert len(content_type['available_statuses']) == 4
 
-        content_type = res[2]
+        content_type = res[3]
         assert content_type['slug'] == 'markdownpage'
         assert content_type['fa_icon'] == 'file-code-o'
         assert content_type['hexcolor'] == '#f12d2d'
@@ -123,8 +124,8 @@ class TestContentsTypesEndpoint(FunctionalTest):
         assert 'available_statuses' in content_type
         assert len(content_type['available_statuses']) == 4
 
-        content_type = res[3]
-        assert content_type['slug'] == 'html-documents'
+        content_type = res[4]
+        assert content_type['slug'] == 'html-document'
         assert content_type['fa_icon'] == 'file-text-o'
         assert content_type['hexcolor'] == '#3f52e3'
         assert content_type['label'] == 'Text Document'

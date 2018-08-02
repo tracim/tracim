@@ -1,16 +1,30 @@
 import React from 'react'
 import { FETCH_CONFIG } from './helper.js'
+import i18n from './i18n.js'
 
 export function appFactory (WrappedComponent) {
   return class AppFactory extends React.Component {
-    renderAppFull = (appConfig, user, content) => GLOBAL_renderAppFull({
+    renderAppFeature = (appConfig, user, content) => GLOBAL_renderAppFeature({
       loggedUser: user.logged ? user : {},
       config: {
         ...appConfig,
-        domContainer: 'appContainer',
+        domContainer: 'appFeatureContainer',
         apiUrl: FETCH_CONFIG.apiUrl,
-        mockApiUrl: FETCH_CONFIG.mockApiUrl,
-        apiHeader: FETCH_CONFIG.headers
+        mockApiUrl: FETCH_CONFIG.mockApiUrl, // Côme - 2018/07/31 - this should not be used, I deprecate it
+        apiHeader: FETCH_CONFIG.headers,
+        translation: i18n.store.data
+      },
+      content
+    })
+
+    renderAppFullscreen = (appConfig, user, content) => GLOBAL_renderAppFullscreen({
+      loggedUser: user.logged ? user : {},
+      config: {
+        ...appConfig,
+        domContainer: 'appFullscreenContainer',
+        apiUrl: FETCH_CONFIG.apiUrl,
+        apiHeader: FETCH_CONFIG.headers,
+        translation: i18n.store.data
       },
       content
     })
@@ -22,21 +36,23 @@ export function appFactory (WrappedComponent) {
         domContainer: 'popupCreateContentContainer',
         apiUrl: FETCH_CONFIG.apiUrl,
         mockApiUrl: FETCH_CONFIG.mockApiUrl,
-        apiHeader: FETCH_CONFIG.headers // should this be used by app ? right now, apps have their own headers
+        apiHeader: FETCH_CONFIG.headers, // should this be used by app ? right now, apps have their own headers
+        translation: i18n.store.data
       },
       idWorkspace,
       idFolder: idFolder === 'null' ? null : idFolder
     })
 
-    emitEventApp = (type, data) => GLOBAL_dispatchEvent({ type, data })
+    dispatchCustomEvent = (type, data) => GLOBAL_dispatchEvent({ type, data })
 
     render () {
       return (
         <WrappedComponent
           {...this.props}
-          renderAppFull={this.renderAppFull}
+          renderAppFeature={this.renderAppFeature}
+          renderAppFullscreen={this.renderAppFullscreen}
           renderAppPopupCreation={this.renderAppPopupCreation}
-          emitEventApp={this.emitEventApp}
+          dispatchCustomEvent={this.dispatchCustomEvent}
           // hideApp={this.hideApp}
         />
       )

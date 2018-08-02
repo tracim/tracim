@@ -2,13 +2,22 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Sidebar from './Sidebar.jsx'
 import imgProfil from '../img/imgProfil.png'
+import { translate } from 'react-i18next'
+import Radium from 'radium'
+import color from 'color'
 import {
-  getAppList,
-  getContentTypeList, getWorkspaceList
+  PageWrapper,
+  PageTitle,
+  PageContent
+} from 'tracim_frontend_lib'
+import {
+  getWorkspaceDetail,
+  getWorkspaceMemberList
 } from '../action-creator.async.js'
 import {
-  setAppList,
-  setContentTypeList, setWorkspaceListIsOpenInSidebar, updateWorkspaceListData
+  addFlashMessage,
+  setWorkspaceDetail,
+  setWorkspaceMemberList
 } from '../action-creator.sync.js'
 
 class Dashboard extends React.Component {
@@ -24,28 +33,28 @@ class Dashboard extends React.Component {
   }
 
   async componentDidMount () {
-    const { workspaceIdInUrl } = this.state
-    const { user, workspaceList, app, contentType, dispatch } = this.props
+    const { props, state } = this
 
-    console.log('<Dashboard> componentDidMount')
-
-    if (app.length === 0) {
-      const fetchGetAppList = await dispatch(getAppList(user))
-      if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
+    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
+    switch (fetchWorkspaceDetail.status) {
+      case 200:
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
+        break
+      case 400:
+      case 500:
+        props.dispatch(addFlashMessage(props.t('An error has happened'), 'warning'))
+        break
     }
 
-    if (contentType.length === 0) {
-      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
-      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
-    }
-
-    if (user.user_id !== -1 && workspaceList.length === 0) {
-      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
-
-      if (fetchGetWorkspaceList.status === 200) {
-        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
-        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].workspace_id, true))
-      }
+    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.user, state.workspaceIdInUrl))
+    switch (fetchWorkspaceMemberList.status) {
+      case 200:
+        props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json))
+        break
+      case 400:
+      case 500:
+        props.dispatch(addFlashMessage(props.t('An error has happened'), 'warning'))
+        break
     }
   }
 
@@ -66,162 +75,133 @@ class Dashboard extends React.Component {
   }))
 
   render () {
+    const { props, state } = this
+
     return (
       <div className='sidebarpagecontainer'>
         <Sidebar />
 
-        <div className='dashboard'>
-          <div className='container-fluid nopadding'>
-            <div className='dashboard__header mb-5'>
-              <div className='pageTitleGeneric dashboard__header__title d-flex align-items-center'>
-                <div className='pageTitleGeneric__title dashboard__header__title__text mr-3'>
-                  Dashboard
-                </div>
-                <div className='dashboard__header__acces' />
-              </div>
-              <div className='dashboard__header__advancedmode mr-3'>
-                <button type='button' className='btn btn-primary'>Activer édition avancé</button>
-              </div>
+        <PageWrapper customeClass='dashboard'>
+          <PageTitle
+            parentClass='dashboard__header'
+            title={props.t('Dashboard')}
+            subtitle={''}
+          >
+            <div className='dashboard__header__advancedmode mr-3'>
+              <button type='button' className='btn btn-primary'>
+                {props.t('Active advanced Dashboard')}
+              </button>
             </div>
+          </PageTitle>
 
-            <div className='dashboard__wkswrapper'>
+          <PageContent>
+            <div className='dashboard__workspace-wrapper'>
               <div className='dashboard__workspace'>
                 <div className='dashboard__workspace__title'>
-                  Développement tracim
+                  {props.curWs.label}
                 </div>
 
                 <div className='dashboard__workspace__detail'>
-                  Ligne directive pour le prochain design de Tracim et des futurs fonctionnalités.
+                  {props.curWs.description}
                 </div>
               </div>
-              <div className='dashboard__userstatut'>
 
+              <div className='dashboard__userstatut'>
                 <div className='dashboard__userstatut__role'>
-                  <div className='dashboard__userstatut__role__text'>
-                    Hi ! Alexi, vous êtes actuellement
+                  <div className='dashboard__userstatut__role__msg'>
+                    {props.t(`Hi ! ${props.user.public_name}, vous êtes actuellement`)}
                   </div>
-                  <div className='dashboard__userstatut__role__rank'>
-                    <div className='dashboard__userstatut__role__rank__icon'>
+
+                  <div className='dashboard__userstatut__role__definition'>
+                    <div className='dashboard__userstatut__role__definition__icon'>
                       <i className='fa fa-graduation-cap' />
                     </div>
-                    <div className='dashboard__userstatut__role__rank__rolename'>
-                      Gestionnaire de projet
+
+                    <div className='dashboard__userstatut__role__definition__text'>
+                      {(member => member ? member.role : '')(props.curWs.member.find(m => m.id === props.user.user_id))}
                     </div>
                   </div>
                 </div>
 
                 <div className='dashboard__userstatut__notification'>
                   <div className='dashboard__userstatut__notification__text'>
-                    Vous êtes abonné(e) aux notifications de ce workspace
+                    {props.t("You have subscribed to this workspace's notifications")} (nyi)
                   </div>
-                  {this.state.displayNotifBtn === false &&
-                    <div
-                      className='dashboard__userstatut__notification__btn btn btn-outline-primary'
-                      onClick={this.handleToggleNotifBtn}
-                    >
-                      Changer de statut
-                    </div>
-                  }
 
-                  {this.state.displayNotifBtn === true &&
-                    <div className='dashboard__userstatut__notification__subscribe dropdown'>
-                      <button className='dashboard__userstatut__notification__subscribe__btn btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                        Abonné(e)
-                      </button>
-                      <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item'>Abonné(e)
-                        </div>
-                        <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item'>Non Abonné(e)
+                  {state.displayNotifBtn
+                    ? (
+                      <div className='dashboard__userstatut__notification__subscribe dropdown'>
+                        <button
+                          className='dashboard__userstatut__notification__subscribe__btn btn btn-outline-primary dropdown-toggle'
+                          type='button'
+                          id='dropdownMenuButton'
+                          data-toggle='dropdown'
+                          aria-haspopup='true'
+                          aria-expanded='false'
+                        >
+                          Abonné(e)
+                        </button>
+
+                        <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
+                          <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item'>
+                            {props.t('subscriber')}
+                          </div>
+                          <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item'>
+                            {props.t('unsubscribed')}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )
+                    : (
+                      <div
+                        className='dashboard__userstatut__notification__btn btn btn-outline-primary'
+                        onClick={this.handleToggleNotifBtn}
+                      >
+                        {props.t('Change your status')}
+                      </div>
+                    )
                   }
                 </div>
               </div>
             </div>
 
             <div className='dashboard__calltoaction justify-content-xl-center'>
-              <div className='dashboard__calltoaction__button btnaction btnthread'>
-                <div className='dashboard__calltoaction__button__text'>
-                  <div className='dashboard__calltoaction__button__text__icon'>
-                    <i className='fa fa-comments-o' />
-                  </div>
-                  <div className='dashboard__calltoaction__button__text__title'>
-                    Débuter une nouvelle discussion
-                  </div>
-                </div>
-              </div>
-
-              <div className='dashboard__calltoaction__button btnaction writefile'>
-                <div className='dashboard__calltoaction__button__text'>
-                  <div className='dashboard__calltoaction__button__text__icon'>
-                    <i className='fa fa-file-text-o' />
-                  </div>
-                  <div className='dashboard__calltoaction__button__text__title'>
-                    Rédiger un document
-                  </div>
-                </div>
-              </div>
-
-              <div className='dashboard__calltoaction__button btnaction importfile'>
-                <div className='dashboard__calltoaction__button__text'>
-                  <div className='dashboard__calltoaction__button__text__icon'>
-                    <i className='fa fa-paperclip' />
-                  </div>
-                  <div className='dashboard__calltoaction__button__text__title'>
-                    Importer un fichier
-                  </div>
-                </div>
-              </div>
-
-              {/*
-                <div className='dashboard__calltoaction__button btnaction visioconf'>
+              {props.contentType.map(ct =>
+                <div
+                  className='dashboard__calltoaction__button btnaction'
+                  style={{
+                    backgroundColor: ct.hexcolor,
+                    ':hover': {
+                      backgroundColor: color(ct.hexcolor).darken(0.15).hexString()
+                    }
+                  }}
+                  key={ct.label}
+                >
                   <div className='dashboard__calltoaction__button__text'>
                     <div className='dashboard__calltoaction__button__text__icon'>
-                      <i className='fa fa-video-camera' />
+                      <i className={`fa fa-${ct.faIcon}`} />
                     </div>
                     <div className='dashboard__calltoaction__button__text__title'>
-                      Débuter une visioconférence
+                      {ct.creationLabel}
                     </div>
                   </div>
                 </div>
-
-                <div className='dashboard__calltoaction__button btnaction calendar'>
-                  <div className='dashboard__calltoaction__button__text'>
-                    <div className='dashboard__calltoaction__button__text__icon'>
-                      <i className='fa fa-calendar' />
-                    </div>
-                    <div className='dashboard__calltoaction__button__text__title'>
-                      Voir le Calendrier
-                    </div>
-                  </div>
-                </div>
-              */ }
-
-              <div className='dashboard__calltoaction__button btnaction explore'>
-                <div className='dashboard__calltoaction__button__text'>
-                  <div className='dashboard__calltoaction__button__text__icon'>
-                    <i className='fa fa-folder-open-o' />
-                  </div>
-                  <div className='dashboard__calltoaction__button__text__title'>
-                    Explorer le Workspace
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className='dashboard__wksinfo'>
               <div className='dashboard__activity'>
                 <div className='dashboard__activity__header'>
                   <div className='dashboard__activity__header__title subTitle'>
-                    Activité récente
+                    {this.props.t('Recent activity')}
                   </div>
 
                   <div className='dashboard__activity__header__allread btn btn-outline-primary'>
-                    Tout marquer comme lu
+                    {this.props.t('Mark everything as read')}
                   </div>
                 </div>
                 <div className='dashboard__activity__wrapper'>
+
                   <div className='dashboard__activity__workspace'>
                     <div className='dashboard__activity__workspace__icon'>
                       <i className='fa fa-comments-o' />
@@ -231,54 +211,9 @@ class Dashboard extends React.Component {
                     </div>
                   </div>
 
-                  <div className='dashboard__activity__workspace'>
-                    <div className='dashboard__activity__workspace__icon'>
-                      <i className='fa fa-list-ul' />
-                    </div>
-                    <div className='dashboard__activity__workspace__name'>
-                      Mission externe
-                    </div>
-                  </div>
-
-                  <div className='dashboard__activity__workspace'>
-                    <div className='dashboard__activity__workspace__icon'>
-                      <i className='fa fa-list-ul' />
-                    </div>
-                    <div className='dashboard__activity__workspace__name'>
-                      Recherche et developpement
-                    </div>
-                  </div>
-
-                  <div className='dashboard__activity__workspace'>
-                    <div className='dashboard__activity__workspace__icon'>
-                      <i className='fa fa-file-text-o' />
-                    </div>
-                    <div className='dashboard__activity__workspace__name'>
-                      <span>Marketing</span>
-                    </div>
-                  </div>
-
-                  <div className='dashboard__activity__workspace'>
-                    <div className='dashboard__activity__workspace__icon'>
-                      <i className='fa fa-comments-o' />
-                    </div>
-                    <div className='dashboard__activity__workspace__name'>
-                      <span>Évolution</span>
-                    </div>
-                  </div>
-
-                  <div className='dashboard__activity__workspace'>
-                    <div className='dashboard__activity__workspace__icon'>
-                      <i className='fa fa-file-text-o' />
-                    </div>
-                    <div className='dashboard__activity__workspace__name'>
-                      Commercialisation
-                    </div>
-                  </div>
-
                   <div className='dashboard__activity__more d-flex flex-row-reverse'>
                     <div className='dashboard__activity__more__btn btn btn-outline-primary'>
-                      Voir plus
+                      {this.props.t('See more')}
                     </div>
                   </div>
                 </div>
@@ -287,13 +222,14 @@ class Dashboard extends React.Component {
               <div className='dashboard__memberlist'>
 
                 <div className='dashboard__memberlist__title subTitle'>
-                  Liste des membres
+                  {this.props.t('Member List')}
                 </div>
 
                 <div className='dashboard__memberlist__wrapper'>
                   {this.state.displayNewMemberDashboard === false &&
                     <div>
                       <ul className='dashboard__memberlist__list'>
+
                         <li className='dashboard__memberlist__list__item'>
                           <div className='dashboard__memberlist__list__item__avatar'>
                             <img src={imgProfil} alt='avatar' />
@@ -311,110 +247,12 @@ class Dashboard extends React.Component {
                           </div>
                         </li>
 
-                        <li className='dashboard__memberlist__list__item'>
-                          <div className='dashboard__memberlist__list__item__avatar'>
-                            <img src={imgProfil} alt='avatar' />
-                          </div>
-                          <div className='dashboard__memberlist__list__item__info mr-auto'>
-                            <div className='dashboard__memberlist__list__item__info__name'>
-                              Aldwin Vinel
-                            </div>
-                            <div className='dashboard__memberlist__list__item__info__role'>
-                              Lecteur
-                            </div>
-                          </div>
-                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
-                            <i className='fa fa-trash-o' />
-                          </div>
-                        </li>
-
-                        <li className='dashboard__memberlist__list__item'>
-                          <div className='dashboard__memberlist__list__item__avatar'>
-                            <img src={imgProfil} alt='avatar' />
-                          </div>
-                          <div className='dashboard__memberlist__list__item__info mr-auto'>
-                            <div className='dashboard__memberlist__list__item__info__name'>
-                              William Himme
-                            </div>
-                            <div className='dashboard__memberlist__list__item__info__role'>
-                              Contributeur
-                            </div>
-                          </div>
-                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
-                            <i className='fa fa-trash-o' />
-                          </div>
-                        </li>
-
-                        <li className='dashboard__memberlist__list__item'>
-                          <div className='dashboard__memberlist__list__item__avatar'>
-                            <img src={imgProfil} alt='avatar' />
-                          </div>
-                          <div className='dashboard__memberlist__list__item__info mr-auto'>
-                            <div className='dashboard__memberlist__list__item__info__name'>
-                              Yacine Lite
-                            </div>
-                            <div className='dashboard__memberlist__list__item__info__role'>
-                              Contributeur
-                            </div>
-                          </div>
-                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
-                            <i className='fa fa-trash-o' />
-                          </div>
-                        </li>
-
-                        <li className='dashboard__memberlist__list__item'>
-                          <div className='dashboard__memberlist__list__item__avatar'>
-                            <img src={imgProfil} alt='avatar' />
-                          </div>
-                          <div className='dashboard__memberlist__list__item__info mr-auto'>
-                            <div className='dashboard__memberlist__list__item__info__name'>
-                              Alexi Falcin
-                            </div>
-                            <div className='dashboard__memberlist__list__item__info__role'>
-                              Gestionnaire
-                            </div>
-                          </div>
-                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
-                            <i className='fa fa-trash-o' />
-                          </div>
-                        </li>
-
-                        <li className='dashboard__memberlist__list__item'>
-                          <div className='dashboard__memberlist__list__item__avatar'>
-                            <img src={imgProfil} alt='avatar' />
-                          </div>
-                          <div className='dashboard__memberlist__list__item__info mr-auto'>
-                            <div className='dashboard__memberlist__list__item__info__name'>
-                              Mickaël Fonati
-                            </div>
-                            <div className='dashboard__memberlist__list__item__info__role'>
-                              Gestionnaire
-                            </div>
-                          </div>
-                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
-                            <i className='fa fa-trash-o' />
-                          </div>
-                        </li>
-
-                        <li className='dashboard__memberlist__list__item'>
-                          <div className='dashboard__memberlist__list__item__avatar'>
-                            <img src={imgProfil} alt='avatar' />
-                          </div>
-                          <div className='dashboard__memberlist__list__item__info mr-auto'>
-                            <div className='dashboard__memberlist__list__item__info__name'>
-                              Eva Lonbard
-                            </div>
-                            <div className='dashboard__memberlist__list__item__info__role'>
-                              Gestionnaire
-                            </div>
-                          </div>
-                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
-                            <i className='fa fa-trash-o' />
-                          </div>
-                        </li>
                       </ul>
 
-                      <div className='dashboard__memberlist__btnadd'>
+                      <div
+                        className='dashboard__memberlist__btnadd'
+                        onClick={this.handleToggleNewMemberDashboard}
+                      >
                         <div className='dashboard__memberlist__btnadd__button'>
                           <div className='dashboard__memberlist__btnadd__button__avatar'>
                             <div className='dashboard__memberlist__btnadd__button__avatar__icon'>
@@ -423,9 +261,8 @@ class Dashboard extends React.Component {
                           </div>
                           <div
                             className='dashboard__memberlist__btnadd__button__text'
-                            onClick={this.handleToggleNewMemberDashboard}
                           >
-                             Ajouter un membre
+                            {this.props.t('Add a member')}
                           </div>
                         </div>
                       </div>
@@ -433,89 +270,64 @@ class Dashboard extends React.Component {
                   }
 
                   {this.state.displayNewMemberDashboard === true &&
-                    <form className='dashboard__memberlist__form'>
-                      <div
-                        className='dashboard__memberlist__form__close d-flex justify-content-end'
-                      >
-                        <i className='fa fa-times' onClick={this.handleToggleNewMemberDashboard} />
+                  <form className='dashboard__memberlist__form'>
+                    <div
+                      className='dashboard__memberlist__form__close d-flex justify-content-end'
+                    >
+                      <i className='fa fa-times' onClick={this.handleToggleNewMemberDashboard} />
+                    </div>
+
+                    <div className='dashboard__memberlist__form__member'>
+                      <div className='dashboard__memberlist__form__member__name'>
+                        <label className='name__label' htmlFor='addmember'>
+                          {this.props.t('Enter the name or email of the member')}
+                        </label>
+                        <input type='text' id='addmember' className='name__input form-control' placeholder='Nom ou Email' />
                       </div>
-                      <div className='dashboard__memberlist__form__member'>
-                        <div className='dashboard__memberlist__form__member__name'>
-                          <label className='name__label' htmlFor='addmember'>Indiquer le nom ou l'email du membre</label>
-                          <input type='text' id='addmember' className='name__input form-control' placeholder='Nom ou Email' />
+
+                      <div className='dashboard__memberlist__form__member__create'>
+                        <div className='create__radiobtn mr-3'>
+                          <input type='radio' />
                         </div>
-                        <div className='dashboard__memberlist__form__member__create'>
-                          <div className='create__radiobtn mr-3'>
-                            <input type='radio' />
+
+                        <div className='create__text'>
+                          {this.props.t('Create an account')}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className='dashboard__memberlist__form__role'>
+                      <div className='dashboard__memberlist__form__role__text'>
+                        {this.props.t('Choose the role of the member')}
+                      </div>
+
+                      <ul className='dashboard__memberlist__form__role__list'>
+
+                        <li className='dashboard__memberlist__form__role__list__item'>
+                          <div className='item__radiobtn mr-3'>
+                            <input type='radio' name='role' value='responsable' />
                           </div>
-                          <div className='create__text'>
-                            Créer un compte
+
+                          <div className='item__text'>
+                            <div className='item_text_icon mr-2'>
+                              <i className='fa fa-gavel' />
+                            </div>
+
+                            <div className='item__text__name'>
+                              {this.props.t('Supervisor')}
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className='dashboard__memberlist__form__role'>
-                        <div className='dashboard__memberlist__form__role__text'>
-                          Choisissez le rôle du membre
-                        </div>
-                        <ul className='dashboard__memberlist__form__role__list'>
-                          <li className='dashboard__memberlist__form__role__list__item'>
-                            <div className='item__radiobtn mr-3'>
-                              <input type='radio' name='role' value='responsable' />
-                            </div>
-                            <div className='item__text'>
-                              <div className='item_text_icon mr-2'>
-                                <i className='fa fa-gavel' />
-                              </div>
-                              <div className='item__text__name'>
-                                Responsable
-                              </div>
-                            </div>
-                          </li>
-                          <li className='dashboard__memberlist__form__role__list__item'>
-                            <div className='item__radiobtn mr-3'>
-                              <input type='radio' name='role' value='gestionnaire' />
-                            </div>
-                            <div className='item__text'>
-                              <div className='item_text_icon mr-2'>
-                                <i className='fa fa-graduation-cap' />
-                              </div>
-                              <div className='item__text__name'>
-                                Gestionnaire de contenu
-                              </div>
-                            </div>
-                          </li>
-                          <li className='dashboard__memberlist__form__role__list__item'>
-                            <div className='item__radiobtn mr-3'>
-                              <input type='radio' name='role' value='contributeur' />
-                            </div>
-                            <div className='item__text'>
-                              <div className='item_text_icon mr-2'>
-                                <i className='fa fa-pencil' />
-                              </div>
-                              <div className='item__text__name'>
-                                Contributeur
-                              </div>
-                            </div>
-                          </li>
-                          <li className='dashboard__memberlist__form__role__list__item'>
-                            <div className='item__radiobtn mr-3'>
-                              <input type='radio' name='role' value='lecteur' />
-                            </div>
-                            <div className='item__text'>
-                              <div className='item_text_icon mr-2'>
-                                <i className='fa fa-eye' />
-                              </div>
-                              <div className='item__text__name'>
-                                Lecteur
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                      <div className='dashboard__memberlist__form__submitbtn'>
-                        <button className='btn btn-outline-primary'>Valider</button>
-                      </div>
-                    </form>
+                        </li>
+
+                      </ul>
+                    </div>
+
+                    <div className='dashboard__memberlist__form__submitbtn'>
+                      <button className='btn btn-outline-primary'>
+                        {this.props.t('Validate')}
+                      </button>
+                    </div>
+                  </form>
                   }
                 </div>
               </div>
@@ -532,21 +344,21 @@ class Dashboard extends React.Component {
                   </div>
 
                   <div className='dashboard__moreinfo__webdav__btn__text genericBtnInfoDashboard__btn__text'>
-                    Implémenter Tracim dans votre explorateur
+                    {this.props.t('Implement Tracim in your explorer')}
                   </div>
                 </div>
                 {this.state.displayWebdavBtn === true &&
-                  <div>
-                    <div className='dashboard__moreinfo__webdav__information genericBtnInfoDashboard__info'>
-                      <div className='dashboard__moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
-                        Retrouvez tous vos documents déposés en ligne directement sur votre ordinateur via le poste de travail, sans passer par le logiciel.
-                      </div>
+                <div>
+                  <div className='dashboard__moreinfo__webdav__information genericBtnInfoDashboard__info'>
+                    <div className='dashboard__moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
+                      {this.props.t('Find all your documents deposited online directly on your computer via the workstation, without going through the software.')}'
+                    </div>
 
-                      <div className='dashboard__moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
-                        http://algoo.trac.im/webdav/
-                      </div>
+                    <div className='dashboard__moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
+                      http://algoo.trac.im/webdav/
                     </div>
                   </div>
+                </div>
                 }
               </div>
               <div className='dashboard__moreinfo__calendar genericBtnInfoDashboard'>
@@ -560,33 +372,33 @@ class Dashboard extends React.Component {
                     </div>
 
                     <div className='dashboard__moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text'>
-                      Calendrier de l'espace de travail
+                      {this.props.t('Workspace Calendar')}
                     </div>
                   </div>
                 </div>
                 <div className='dashboard__moreinfo__calendar__wrapperText'>
                   {this.state.displayCalendarBtn === true &&
-                    <div>
-                      <div className='dashboard__moreinfo__calendar__information genericBtnInfoDashboard__info'>
-                        <div className='dashboard__moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
-                          Chaque espace de travail possède son propre calendrier.
-                        </div>
+                  <div>
+                    <div className='dashboard__moreinfo__calendar__information genericBtnInfoDashboard__info'>
+                      <div className='dashboard__moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
+                        {this.props.t('Each workspace has its own calendar.')}
+                      </div>
 
-                        <div className='dashboard__moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>
-                          http://algoo.trac.im/calendar/
-                        </div>
+                      <div className='dashboard__moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>
+                        http://algoo.trac.im/calendar/
                       </div>
                     </div>
+                  </div>
                   }
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </PageContent>
+        </PageWrapper>
       </div>
     )
   }
 }
 
-const mapStateToProps = ({ user, app, contentType, workspaceList }) => ({ user, app, contentType, workspaceList })
-export default connect(mapStateToProps)(Dashboard)
+const mapStateToProps = ({ user, contentType, currentWorkspace }) => ({ user, contentType, curWs: currentWorkspace })
+export default connect(mapStateToProps)(translate()(Radium(Dashboard)))
