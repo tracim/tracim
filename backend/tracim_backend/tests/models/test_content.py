@@ -15,7 +15,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests import StandardTest
 
@@ -95,7 +95,7 @@ class TestContent(StandardTest):
 
         content1_from_api = api.get_one(
             content1.id,
-            ContentType.Page,
+            CONTENT_TYPES.Page.slug,
             workspace1
         )
 
@@ -196,7 +196,7 @@ class TestContent(StandardTest):
         first_content = self._create_content(
             owner=user_admin,
             workspace=workspace,
-            type=ContentType.Page,
+            type=CONTENT_TYPES.Page.slug,
             label='TEST_CONTENT_1',
             description='TEST_CONTENT_DESCRIPTION_1',
             revision_type=ActionDescription.CREATION,
@@ -221,7 +221,7 @@ class TestContent(StandardTest):
         second_content = self._create_content(
             owner=user_admin,
             workspace=workspace,
-            type=ContentType.Page,
+            type=CONTENT_TYPES.Page.slug,
             label='TEST_CONTENT_2',
             description='TEST_CONTENT_DESCRIPTION_2',
             revision_type=ActionDescription.CREATION
@@ -268,7 +268,7 @@ class TestContent(StandardTest):
         created_content = self._create_content(
             owner=user_admin,
             workspace=workspace,
-            type=ContentType.Page,
+            type=CONTENT_TYPES.Page.slug,
             label='TEST_CONTENT_%s' % key,
             description='TEST_CONTENT_DESCRIPTION_%s' % key,
             revision_type=ActionDescription.CREATION
@@ -308,7 +308,7 @@ class TestContent(StandardTest):
         content = self._create_content(
             owner=user_admin,
             workspace=workspace,
-            type=ContentType.File,
+            type=CONTENT_TYPES.File.slug,
             label='TEST_CONTENT_1',
             description='TEST_CONTENT_DESCRIPTION_1',
             revision_type=ActionDescription.CREATION,

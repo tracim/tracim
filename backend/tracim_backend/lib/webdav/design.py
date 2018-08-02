@@ -1,8 +1,8 @@
 #coding: utf8
 from datetime import datetime
 
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.data import VirtualEvent
-from tracim_backend.models.data import ContentType
 from tracim_backend.models import data
 
 # FIXME: fix temporaire ...
@@ -237,6 +237,7 @@ def designPage(content: data.Content, content_revision: data.ContentRevisionRO) 
 
     return page
 
+
 def designThread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
         hist = content.get_history(drop_empty_revision=False)
 
@@ -248,7 +249,7 @@ def designThread(content: data.Content, content_revision: data.ContentRevisionRO
         disc = ''
         participants = {}
         for t in allT:
-            if t.type == ContentType.Comment:
+            if t.type == CONTENT_TYPES.Comment.slug:
                 disc += '''
                     <div class="row comment comment-row">
                         <i class="fa fa-comment-o comment-icon"></i>
