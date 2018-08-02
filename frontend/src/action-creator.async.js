@@ -11,6 +11,8 @@ import {
   setUserRole,
   WORKSPACE,
   WORKSPACE_LIST,
+  WORKSPACE_DETAIL,
+  WORKSPACE_MEMBER_LIST,
   FOLDER,
   setFolderData,
   APP_LIST,
@@ -57,8 +59,20 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
   })()
   if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
 
-  if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
-  else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+  // if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+  // else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+  switch (fetchResult.status) {
+    case 200:
+    case 204:
+    case 304:
+      dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+      break
+    case 400:
+    case 404:
+    case 500:
+      dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+      break
+  }
 
   return fetchResult
 }
@@ -161,6 +175,36 @@ export const getWorkspaceList = user => dispatch => {
   })
 }
 
+export const getWorkspaceDetail = (user, idWorkspace) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_DETAIL,
+    dispatch
+  })
+}
+
+export const getWorkspaceMemberList = (user, idWorkspace) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_MEMBER_LIST,
+    dispatch
+  })
+}
+
 export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idParent}`,
@@ -169,18 +213,6 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
         ...FETCH_CONFIG.headers,
         'Authorization': 'Basic ' + user.auth
       },
-      method: 'GET'
-    },
-    actionName: WORKSPACE,
-    dispatch
-  })
-}
-
-export const getWorkspaceContent = (idWorkspace, idContent) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}`,
-    param: {
-      headers: {...FETCH_CONFIG.headers},
       method: 'GET'
     },
     actionName: WORKSPACE,

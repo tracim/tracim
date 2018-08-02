@@ -27,7 +27,7 @@ const PopupCreateContent = props => {
           <input
             type='text'
             className='createcontent__form__input'
-            placeHolder={props.inputPlaceholder}
+            placeholder={props.inputPlaceholder}
             value={props.contentName}
             onChange={props.onChangeContentName}
           />

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
+import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar,
@@ -12,7 +13,7 @@ import {
 import {
   getWorkspaceList
 } from '../action-creator.async.js'
-import { PAGE } from '../helper.js'
+import { PAGE, workspaceConfig } from '../helper.js'
 
 const qs = require('query-string')
 
@@ -23,20 +24,21 @@ class Sidebar extends React.Component {
       sidebarClose: false,
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
     }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  async componentDidMount () {
-    const { workspaceIdInUrl } = this.state
-    const { user, workspaceList, dispatch } = this.props
-
-    if (user.user_id !== -1 && workspaceList.length === 0) {
-      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
-
-      if (fetchGetWorkspaceList.status === 200) {
-        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
-        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].workspace_id, true))
-      }
+  customEventReducer = async ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'refreshWorkspaceList':
+        console.log('%c<Sidebar> Custom event', 'color: #28a745', type, data)
+        this.loadWorkspaceList()
+        break
     }
+  }
+
+  componentDidMount () {
+    this.loadWorkspaceList()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -45,6 +47,20 @@ class Sidebar extends React.Component {
 
     const newWorkspaceId = parseInt(this.props.match.params.idws)
     if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
+  }
+
+  loadWorkspaceList = async () => {
+    const { workspaceIdInUrl } = this.state
+    const { user, dispatch } = this.props
+
+    if (user.user_id !== -1) {
+      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
+
+      if (fetchGetWorkspaceList.status === 200) {
+        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].workspace_id, true))
+      }
+    }
   }
 
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
@@ -63,12 +79,14 @@ class Sidebar extends React.Component {
 
     history.push(`${PAGE.WORKSPACE.CONTENT_LIST(idWs)}?type=${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
 
-    // obviously, it's ugly to use custom event to tell WorkspaceContent to refresh, but since WorkspaceContent
+    // obviously, it's ugly to use custom event to tell WorkspaceContentList to refresh, but since WorkspaceContentList
     // will end up being an App, it'll have to be that way. So it's fine
     GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
   }
 
   handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
+
+  handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   render () {
     const { sidebarClose, workspaceIdInUrl } = this.state
@@ -103,7 +121,10 @@ class Sidebar extends React.Component {
             </nav>
 
             <div className='sidebar__btnnewworkspace'>
-              <button className='sidebar__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'>
+              <button
+                className='sidebar__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'
+                onClick={this.handleClickNewWorkspace}
+              >
                 {t('Create a workspace')}
               </button>
             </div>
@@ -124,11 +145,10 @@ class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, workspace, workspaceList, app }) => ({
+const mapStateToProps = ({ lang, user, workspace, workspaceList }) => ({
   activeLang: lang.find(l => l.active) || {id: 'en'},
   user,
   workspace,
-  workspaceList,
-  app
+  workspaceList
 })
-export default withRouter(connect(mapStateToProps)(translate()(Sidebar)))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))
