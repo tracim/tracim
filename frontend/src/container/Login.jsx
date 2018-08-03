@@ -55,8 +55,8 @@ class Login extends React.Component {
       Cookies.set(COOKIE.USER_LOGIN, inputLogin.value)
       Cookies.set(COOKIE.USER_AUTH, userAuth)
 
-      history.push(PAGE.HOME)
-    } else if (fetchPostUserLogin.status === 400) {
+      history.push(PAGE.WORKSPACE.ROOT)
+    } else if (fetchPostUserLogin.status === 403) {
       dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
     }
   }

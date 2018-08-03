@@ -4,7 +4,6 @@ import { withRouter } from 'react-router'
 import { Route } from 'react-router-dom'
 import { PAGE } from '../helper.js'
 import appFactory from '../appFactory.js'
-import Sidebar from './Sidebar.jsx'
 
 class AppFullscreenManager extends React.Component {
   constructor (props) {
@@ -20,9 +19,7 @@ class AppFullscreenManager extends React.Component {
     const { props } = this
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-
+      <div className='AppFullScreenManager'>
         <div id='appFullscreenContainer' />
 
         {this.state.AmIMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM

@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Sidebar from './Sidebar.jsx'
 import { translate } from 'react-i18next'
 import {
   PageWrapper,
@@ -93,9 +92,7 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-
+      <div className='Dashboard' style={{width: '100%'}}>
         <PageWrapper customeClass='dashboard'>
           <PageTitle
             parentClass='dashboard__header'
