@@ -202,3 +202,7 @@ For example, with default config:
 In Tracim, only some user can access to some informations, this is also true in
 Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
 what a specific user can do.
+
+# Known issues
+
+see [here](doc/known_issues.md)
