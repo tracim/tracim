@@ -5,6 +5,7 @@ import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import Account from './Account.jsx'
+import AdminWorkspacePage from './AdminWorkspacePage.jsx'
 import AppFullscreenManager from './AppFullscreenManager.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
@@ -96,8 +97,8 @@ class Tracim extends React.Component {
 
                   <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
                     ? null
-                    : <Redirect to={{pathname: `/workspaces/${props.workspaceList[0].id}/contents`, state: {from: props.location}}} />
-                  } />
+
+          <PrivateRoute path='/admin_temp/workspace' component={AdminWorkspacePage} />
 
                   <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
                     <Redirect to={{pathname: `/workspaces/${props2.match.params.idws}/contents`, state: {from: props.location}}} />
