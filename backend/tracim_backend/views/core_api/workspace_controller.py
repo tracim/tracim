@@ -309,7 +309,6 @@ class WorkspaceController(Controller):
         return content
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.READER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)  # nopep8
