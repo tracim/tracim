@@ -18,6 +18,8 @@ from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import UserInfosSchema
@@ -35,6 +37,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
 from tracim_backend.models.contents import CONTENT_TYPES
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
+
 
 
 class UserController(Controller):
@@ -75,6 +78,46 @@ class UserController(Controller):
             config=app_config,
         )
         return uapi.get_user_with_context(request.candidate_user)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_profile(Group.TIM_ADMIN)
+    @hapic.output_body(UserDigestSchema(many=True))
+    def users(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get all users
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        users = uapi.get_all()
+        context_users = [
+            uapi.get_user_with_context(user) for user in users
+        ]
+        return context_users
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_same_user_or_profile(Group.TIM_MANAGER)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(AutocompleteQuerySchema())
+    @hapic.output_body(UserDigestSchema(many=True))
+    def known_members(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get known users list
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        users = uapi.get_known_user(acp=hapic_data.query.acp)
+        context_users = [
+            uapi.get_user_with_context(user) for user in users
+        ]
+        return context_users
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
@@ -383,6 +426,14 @@ class UserController(Controller):
         # user info
         configurator.add_route('user', '/users/{user_id}', request_method='GET')  # nopep8
         configurator.add_view(self.user, route_name='user')
+
+        # users lists
+        configurator.add_route('users', '/users', request_method='GET')  # nopep8
+        configurator.add_view(self.users, route_name='users')
+
+        # known members lists
+        configurator.add_route('known_members', '/users/{user_id}/known_members', request_method='GET')  # nopep8
+        configurator.add_view(self.known_members, route_name='known_members')
 
         # set user email
         configurator.add_route('set_user_email', '/users/{user_id}/email', request_method='PUT')  # nopep8
