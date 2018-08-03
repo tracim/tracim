@@ -109,7 +109,7 @@ class Dashboard extends React.Component {
               <div className='dashboard__userstatut'>
                 <div className='dashboard__userstatut__role'>
                   <div className='dashboard__userstatut__role__msg'>
-                    {props.t(`Hi ! ${props.user.public_name}, vous êtes actuellement`)}
+                    {props.t(`Hi ! ${props.user.public_name} `)}{props.t('currently, you are ')}
                   </div>
 
                   <div className='dashboard__userstatut__role__definition'>
@@ -139,7 +139,7 @@ class Dashboard extends React.Component {
                           aria-haspopup='true'
                           aria-expanded='false'
                         >
-                          Abonné(e)
+                          {props.t('subscriber')}
                         </button>
 
                         <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
