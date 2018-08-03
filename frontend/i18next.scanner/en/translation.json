@@ -64,5 +64,10 @@
   "Old password": "Old password",
   "New password": "New password",
   "Name:": "Name:",
-  "Email Adress:": "Email Adress:"
+  "Email Adress:": "Email Adress:",
+  "An error has happened": "An error has happened",
+  "You have subscribed to this workspace's notifications": "You have subscribed to this workspace's notifications",
+  "Connection": "Connection",
+  "Forgotten password ?": "Forgotten password ?",
+  "currently, you are ": "currently, you are "
 }
