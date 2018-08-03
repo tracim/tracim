@@ -6,11 +6,14 @@ import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
+  setAppList,
+  setContentTypeList,
   setWorkspaceListIsOpenInSidebar,
   updateWorkspaceFilter,
   updateWorkspaceListData
 } from '../action-creator.sync.js'
 import {
+  getAppList, getContentTypeList,
   getWorkspaceList
 } from '../action-creator.async.js'
 import { PAGE, workspaceConfig } from '../helper.js'
@@ -32,13 +35,13 @@ class Sidebar extends React.Component {
     switch (type) {
       case 'refreshWorkspaceList':
         console.log('%c<Sidebar> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceList()
+        this.loadAppConfigAndWorkspaceList()
         break
     }
   }
 
   componentDidMount () {
-    this.loadWorkspaceList()
+    this.loadAppConfigAndWorkspaceList()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -49,11 +52,17 @@ class Sidebar extends React.Component {
     if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
   }
 
-  loadWorkspaceList = async () => {
+  loadAppConfigAndWorkspaceList = async () => {
     const { workspaceIdInUrl } = this.state
     const { user, dispatch } = this.props
 
     if (user.user_id !== -1) {
+      const fetchGetAppList = await dispatch(getAppList(user))
+      if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
+
+      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
+      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
+
       const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
 
       if (fetchGetWorkspaceList.status === 200) {

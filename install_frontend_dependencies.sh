@@ -42,7 +42,6 @@ log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib
 cd -
 
-
 # install app Admin Workspace User
 
 log "cd frontend_app_admin_workspace_user"

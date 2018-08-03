@@ -45,24 +45,28 @@ export const PAGE = {
 
 export const ROLE = [{
   id: 0,
-  name: 'reader',
-  icon: 'fa-eye',
-  translationKey: 'role.reader'
+  slug: 'reader',
+  faIcon: 'eye',
+  hexcolor: '#15D948',
+  label: 'Reader'
 }, {
   id: 1,
-  name: 'contributor',
-  icon: 'fa-pencil',
-  translationKey: 'role.contributor'
+  slug: 'contributor',
+  faIcon: 'pencil',
+  hexcolor: '#3145F7',
+  label: 'Contributor'
 }, {
   id: 2,
-  name: 'content_manager',
-  icon: 'fa-graduation-cap',
-  translationKey: 'role.content_manager'
+  slug: 'content-manager',
+  faIcon: 'graduation-cap',
+  hexcolor: '#f2af2d',
+  label: 'Content manager'
 }, {
   id: 3,
-  name: 'manager',
-  icon: 'fa-gavel',
-  translationKey: 'role.manager'
+  slug: 'workspace-manager',
+  faIcon: 'gavel',
+  hexcolor: '#ed0007',
+  label: 'Workspace manager'
 }]
 
 export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route

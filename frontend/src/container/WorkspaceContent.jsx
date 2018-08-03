@@ -192,7 +192,7 @@ class WorkspaceContent extends React.Component {
             subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
             <DropdownCreateButton
-              parentClass='workspace__header__btnaddworkspace'
+              parentClass='workspace__header__btnaddcontent'
               idFolder={null} // null because it is workspace root content
               onClickCreateContent={this.handleClickCreateContent}
               availableApp={contentType}
