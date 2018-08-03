@@ -31,6 +31,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.views.controllers import Controller
+from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
@@ -213,12 +214,18 @@ class WorkspaceController(Controller):
                 # TODO - G.M - 2018-07-05 - [UserCreation] Reenable email
                 # notification for creation
                 user = uapi.create_user(
-                    hapic_data.body.user_email_or_public_name,
-                    do_notify=False
+                    email=hapic_data.body.user_email_or_public_name,
+                    password= password_generator(),
+                    do_notify=True
                 )  # nopep8
                 newly_created = True
+                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                        app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                    email_sent = True
+
             except EmailValidationFailed:
                 raise UserCreationFailed('no valid mail given')
+
         role = rapi.create_one(
             user=user,
             workspace=request.current_workspace,
