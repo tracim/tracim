@@ -3,8 +3,8 @@ import pytest
 import transaction
 from tracim_backend import models
 
-from tracim_backend.exceptions import AuthenticationFailed, \
-    TooShortAutocompleteString
+from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserNotActive
 from tracim_backend.lib.core.group import GroupApi
