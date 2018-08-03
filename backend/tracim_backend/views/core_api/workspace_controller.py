@@ -327,6 +327,8 @@ class WorkspaceController(Controller):
         move_data = hapic_data.body
 
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -374,6 +376,8 @@ class WorkspaceController(Controller):
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -410,6 +414,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
             show_deleted=True,
+            show_archived=True,
         )
         content = api.get_one(
             path_data.content_id,
@@ -439,6 +444,8 @@ class WorkspaceController(Controller):
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -472,6 +479,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
             show_archived=True,
+            show_deleted=True,
         )
         content = api.get_one(
             path_data.content_id,
