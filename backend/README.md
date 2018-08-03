@@ -137,6 +137,7 @@ and :
     module = wsgi.webdav:application
     home = <PATH>/tracim_v2/backend/env/
     env = TRACIM_CONF_PATH=<PATH>/tracim_v2/backend/development.ini
+    env = TRACIM_WEBDAV_CONF_PATH=<PATH>/tracim_v2/backend/wsgidav.conf
 
 You can then run the process this way :
 
