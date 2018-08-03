@@ -1,4 +1,5 @@
 from sqlalchemy.orm import collections
+from tracim_backend.lib.utils.daemon import FakeDaemon
 
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_rq_queue
@@ -7,14 +8,6 @@ from rq.dummy import do_nothing
 from rq.worker import StopRequested
 from rq import Connection as RQConnection
 from rq import Worker as BaseRQWorker
-
-
-class FakeDaemon(object):
-    """
-    Temporary class for transition between tracim 1 and tracim 2
-    """
-    def __init__(self, config, *args, **kwargs):
-        pass
 
 
 class MailSenderDaemon(FakeDaemon):

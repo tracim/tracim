@@ -41,6 +41,11 @@ requires = [
     'lxml',
     'redis',
     'rq',
+    # mail-fetcher
+    'markdown',
+    'email_reply_parser',
+    'filelock',
+    'imapclient',
 ]
 
 tests_require = [
