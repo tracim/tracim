@@ -65,4 +65,6 @@
   cd frontend
   log "npm i"
   npm i
+  log "npm link tracim_frontend_lib"
+  npm link tracim_frontend_lib
 )
