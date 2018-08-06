@@ -115,9 +115,19 @@ class Tracim extends React.Component {
             </div>
           } />
 
-          <Route path={PAGE.ACCOUNT} component={Account} />
+          <Route path={PAGE.ACCOUNT} render={() =>
+            <div className='sidebarpagecontainer'>
+              <Sidebar />
+              <Account />
+            </div>
+          } />
 
-          <Route path={PAGE.ADMIN.ROOT} component={AppFullscreenManager} />
+          <Route path={PAGE.ADMIN.ROOT} render={() =>
+            <div className='sidebarpagecontainer'>
+              <Sidebar />
+              <AppFullscreenManager />
+            </div>
+          } />
 
           <Route path='/admin_temp/workspace' component={AdminWorkspacePage} />
 
