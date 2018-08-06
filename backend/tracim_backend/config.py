@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from urllib.parse import urlparse
+
+import os
 from paste.deploy.converters import asbool
 from tracim_backend.lib.utils.logger import logger
 from depot.manager import DepotManager
@@ -434,6 +436,29 @@ class CFG(object):
             allowed_dims.append(size)
 
         self.PREVIEW_JPG_ALLOWED_DIMS = allowed_dims
+
+        self.FRONTEND_SERVE = asbool(settings.get(
+            'frontend.serve', False
+        ))
+
+        # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
+        # is probably in frontend subfolder
+        # of tracim_v2 parent of both backend and frontend
+        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
+        tracim_v2_folder = os.path.dirname(backend_folder)
+        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
+
+        self.FRONTEND_DIST_FOLDER_PATH = settings.get(
+            'frontend.dist_folder_path', frontend_dist_folder
+        )
+
+        # INFO - G.M - 2018-08-06 - We check dist folder existence
+        if self.FRONTEND_SERVE and not os.path.isdir(self.FRONTEND_DIST_FOLDER_PATH):  # nopep8
+            raise Exception(
+                'ERROR: {} folder does not exist as folder. '
+                'please set frontend.dist_folder.path'
+                'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
+            )
 
     def configure_filedepot(self):
         depot_storage_name = self.DEPOT_STORAGE_NAME

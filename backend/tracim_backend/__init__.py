@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 
+from tracim_backend.views.frontend import FrontendController
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -106,6 +108,7 @@ def web(global_config, **local_settings):
     context.handle_exception(OperationalError, HTTPStatus.INTERNAL_SERVER_ERROR)
     context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)
 
+
     # Add controllers
     session_controller = SessionController()
     system_controller = SystemController()
@@ -123,6 +126,10 @@ def web(global_config, **local_settings):
     configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)  # nopep8
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
+
+    if app_config.FRONTEND_SERVE:
+        frontend_controller = FrontendController(app_config.FRONTEND_DIST_FOLDER_PATH)  # nopep8
+        configurator.include(frontend_controller.bind)
 
     hapic.add_documentation_view(
         '/api/v2/doc',
