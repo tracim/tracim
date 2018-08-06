@@ -10,7 +10,7 @@ from lxml.html.diff import htmldiff
 from mako.template import Template
 from sqlalchemy.orm import Session
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.lib.core.notifications import INotifier
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration, EST

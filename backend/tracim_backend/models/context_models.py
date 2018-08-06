@@ -5,7 +5,7 @@ from enum import Enum
 
 from slugify import slugify
 from sqlalchemy.orm import Session
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
 from tracim_backend.models import User
 from tracim_backend.models.auth import Profile

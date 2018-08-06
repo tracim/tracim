@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
 from tracim_backend.exceptions import NoUserSetted
