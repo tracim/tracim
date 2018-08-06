@@ -35,7 +35,7 @@ export default function user (state = defaultUser, action) {
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
-      return defaultUser
+      return {...defaultUser, logged: false}
 
     case `${UPDATE}/${USER_DATA}`:
       return {...state, ...action.data}

@@ -107,7 +107,7 @@ class Sidebar extends React.Component {
     return (
       <div className={classnames('sidebar primaryColorBgDarken', {'sidebarclose': sidebarClose})}>
         <div className='sidebarSticky'>
-          <div className='sidebar__expand primaryColorBg whiteColorBorder' onClick={this.handleClickToggleSidebar}>
+          <div className='sidebar__expand primaryColorBg' onClick={this.handleClickToggleSidebar}>
             <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
           </div>
 

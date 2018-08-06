@@ -70,6 +70,12 @@ class Tracim extends React.Component {
   render () {
     const { props } = this
 
+    if (props.user.logged === null) return null // @TODO show loader
+
+    if (props.user.logged === false && props.location.pathname !== '/login') {
+      return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+    }
+
     return (
       <div className='tracim'>
         <Header />
@@ -89,34 +95,29 @@ class Tracim extends React.Component {
             }
           }} />
 
-          { props.user.logged
-            ? (
-              <Route path='/workspaces/:idws?' render={() => // Workspace Router
-                <div className='sidebarpagecontainer'>
-                  <Sidebar />
+          <Route path='/workspaces/:idws?' render={() => // Workspace Router
+            <div className='sidebarpagecontainer'>
+              <Sidebar />
 
-                  <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
-                    ? null
-                    : <Redirect to={{pathname: `/workspaces/${props.workspaceList[0].id}/contents`, state: {from: props.location}}} />
-                  } />
-
-                  <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
-                    <Redirect to={{pathname: `/workspaces/${props2.match.params.idws}/contents`, state: {from: props.location}}} />
-                  } />
-
-                  <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
-                  <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
-                  <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
-                  <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
-
-                  <Route path={PAGE.ACCOUNT} component={Account} />
-                  <Route path={PAGE.ADMIN.ROOT} component={AppFullscreenManager} />
-                </div>
+              <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
+                ? null // @FIXME this needs to be handled in case of new user that has no workspace
+                : <Redirect to={{pathname: `/workspaces/${props.workspaceList[0].id}/contents`, state: {from: props.location}}} />
               } />
-            )
-            : props.user.logged === false && props.location.pathname !== '/login' &&
-              <Redirect to={{pathname: '/login', state: {from: props.location}}} />
-          }
+
+              <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
+                <Redirect to={{pathname: `/workspaces/${props2.match.params.idws}/contents`, state: {from: props.location}}} />
+              } />
+
+              <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
+              <Route path={PAGE.WORKSPACE.CALENDAR(':idws')} component={() => <div><br /><br /><br /><br />NYI</div>} />
+              <Route path={PAGE.WORKSPACE.CONTENT(':idws', ':type', ':idcts')} component={WorkspaceContent} />
+              <Route exact path={PAGE.WORKSPACE.CONTENT_LIST(':idws')} component={WorkspaceContent} />
+            </div>
+          } />
+
+          <Route path={PAGE.ACCOUNT} component={Account} />
+
+          <Route path={PAGE.ADMIN.ROOT} component={AppFullscreenManager} />
 
           <Route path='/admin_temp/workspace' component={AdminWorkspacePage} />
 
