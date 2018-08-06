@@ -8,7 +8,10 @@ if  [[ $1 = "-w" ]]; then
     windoz="windoz"
 fi
 
-echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ ${NC}it also assumes your webpack dev server of frontend is running"
+echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ ${NC}"
+
+# get the new sources
+git pull origin develop
 
 # Tracim Lib
 (
@@ -42,6 +45,12 @@ echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ 
 (
   cd frontend_app_admin_workspace_user || exit
   ./build_admin_workspace_user.sh
+)
+
+# build Tracim
+(
+  cd frontend || exit
+  npm run build
 )
 
 log "-- frontend build successful."
