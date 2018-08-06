@@ -111,7 +111,7 @@ class Sidebar extends React.Component {
             <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
           </div>
 
-          <div className='sidebar__wrapper'>
+          <div className='sidebar__content'>
 
             <nav className='sidebar__navigation'>
               <ul className='sidebar__navigation__workspace'>
