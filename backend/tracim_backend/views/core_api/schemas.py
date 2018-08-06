@@ -2,6 +2,7 @@
 import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import OneOf
+from marshmallow.validate import Length
 from marshmallow.validate import Range
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
@@ -12,6 +13,7 @@ from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import open_status
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import FolderContentUpdate
+from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import ContentIdsQuery
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
 from tracim_backend.models.context_models import ContentCreation
@@ -291,6 +293,17 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     @post_load
     def make_path_object(self, data):
         return CommentPath(**data)
+
+
+class AutocompleteQuerySchema(marshmallow.Schema):
+    acp = marshmallow.fields.Str(
+        example='test',
+        description='search text to query',
+        validate=Length(min=2),
+    )
+    @post_load
+    def make_autocomplete(self, data):
+        return AutocompleteQuery(**data)
 
 
 class PageQuerySchema(marshmallow.Schema):

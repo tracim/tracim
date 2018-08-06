@@ -76,6 +76,7 @@
   GLOBAL_eventReducer = ({detail: {type, data}}) => {
     switch (type) {
       case 'hide_popupCreateContent':
+      case 'hide_popupCreateWorkspace':
         console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
         getSelectedApp(data.name).unmountApp('popupCreateContentContainer')
         break

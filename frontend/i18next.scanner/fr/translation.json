@@ -64,5 +64,10 @@
   "Old password": "Ancien mot de passe",
   "New password": "Nouveau mot de passe",
   "Name:": "Nom :",
-  "Email Adress:": "Adresse mail :"
+  "Email Adress:": "Adresse mail :",
+  "An error has happened": "__NOT_TRANSLATED__",
+  "You have subscribed to this workspace's notifications": "Vous êtes abonné aux notifications de cet espace de travail.",
+  "Connection": "Connexion",
+  "Forgotten password ?": "Mot de passe oublié ?",
+  "currently, you are ": "actuellement, vous êtes "
 }

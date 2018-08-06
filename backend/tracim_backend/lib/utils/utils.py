@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
+import random
+import string
 from redis import Redis
 from rq import Queue
 
@@ -72,3 +74,25 @@ def current_date_for_filename() -> str:
     # webdav utils, it may cause trouble. So, it should be replaced to
     # a character which will not change in bdd.
     return datetime.datetime.now().isoformat().replace(':', '.')
+
+# INFO - G.M - 2018-08-02 - Simple password generator, inspired by
+# https://gist.github.com/23maverick23/4131896
+
+
+ALLOWED_AUTOGEN_PASSWORD_CHAR = string.ascii_letters + \
+                                string.digits + \
+                                string.punctuation
+
+DEFAULT_PASSWORD_GEN_CHAR_LENGTH = 12
+
+
+def password_generator(
+        length: int=DEFAULT_PASSWORD_GEN_CHAR_LENGTH,
+        chars: str=ALLOWED_AUTOGEN_PASSWORD_CHAR
+) -> str:
+    """
+    :param length: length of the new password
+    :param chars: characters allowed
+    :return: password as string
+    """
+    return ''.join(random.choice(chars) for char_number in range(length))

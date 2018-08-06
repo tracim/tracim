@@ -32,7 +32,7 @@ export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNo
 
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
-export const setWorkspaceContentList = (workspaceContentList, filterStr = '') => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList, filterStr })
+export const setWorkspaceContentList = workspaceContentList => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
@@ -45,6 +45,14 @@ export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPAC
 export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
+
+export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
+export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
+export const setWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
+
+export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
+export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
+export const setWorkspaceReadStatusList = workspaceReadStatusList => ({ type: `${SET}/${WORKSPACE_READ_STATUS_LIST}`, workspaceReadStatusList })
 
 export const FOLDER = 'Folder'
 export const setFolderData = (folderId, content) => ({ type: `${SET}/${WORKSPACE}/${FOLDER}/Content`, folderId, content })

@@ -186,6 +186,14 @@ class CommentPath(object):
         self.comment_id = comment_id
 
 
+class AutocompleteQuery(object):
+    """
+    Autocomplete query model
+    """
+    def __init__(self, acp: str):
+        self.acp = acp
+
+
 class PageQuery(object):
     """
     Page query model

@@ -8,6 +8,7 @@ import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
 import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
+import Checkbox from './component/Input/Checkbox.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import TimelineDebugData from './component/Timeline/debugData.js'
@@ -16,6 +17,7 @@ import Delimiter from './component/Delimiter/Delimiter.jsx'
 
 import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
+
 
 import NewVersionButton from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
@@ -78,6 +80,11 @@ ReactDOM.render(
           <span>Here will be the app content. Style is handled by the app (obviously)</span>
           <BtnSwitch />
           {/* <TextAreaApp customClass={'randomClass'} text={'woot'} /> */}
+          <Checkbox
+            name='osef'
+            onClickCheckbox={() => {}}
+            checked
+          />
         </div>
 
         <Timeline

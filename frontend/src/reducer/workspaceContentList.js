@@ -16,7 +16,7 @@ export default function workspaceContentList (state = [], action) {
         type: wsc.content_type,
         idWorkspace: wsc.workspace_id,
         isArchived: wsc.is_archived,
-        parentId: wsc.parent_id,
+        idParent: wsc.parent_id,
         isDeleted: wsc.is_deleted,
         showInUi: wsc.show_in_ui,
         statusSlug: wsc.status,

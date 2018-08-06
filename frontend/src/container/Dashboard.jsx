@@ -1,10 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Sidebar from './Sidebar.jsx'
-import imgProfil from '../img/imgProfil.png'
 import { translate } from 'react-i18next'
-import Radium from 'radium'
-import color from 'color'
 import {
   PageWrapper,
   PageTitle,
@@ -12,13 +8,21 @@ import {
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
-  getWorkspaceMemberList
+  getWorkspaceMemberList,
+  getWorkspaceRecentActivityList,
+  getWorkspaceReadStatusList
 } from '../action-creator.async.js'
 import {
-  addFlashMessage,
+  newFlashMessage,
   setWorkspaceDetail,
-  setWorkspaceMemberList
+  setWorkspaceMemberList,
+  setWorkspaceRecentActivityList,
+  setWorkspaceReadStatusList
 } from '../action-creator.sync.js'
+import { ROLE } from '../helper.js'
+import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
+import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
+import MemberList from '../component/Dashboard/MemberList.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -38,23 +42,33 @@ class Dashboard extends React.Component {
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceDetail.status) {
       case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        break
-      case 400:
-      case 500:
-        props.dispatch(addFlashMessage(props.t('An error has happened'), 'warning'))
-        break
+        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened when fetching workspace detail'), 'warning')); break
     }
 
     const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceMemberList.status) {
       case 200:
-        props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json))
-        break
-      case 400:
-      case 500:
-        props.dispatch(addFlashMessage(props.t('An error has happened'), 'warning'))
-        break
+        props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened while fetching member list'), 'warning')); break
+    }
+
+    const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl))
+    switch (fetchWorkspaceRecentActivityList.status) {
+      case 200:
+        props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened while fetching recent activity list'), 'warning')); break
+    }
+
+    const fetchWorkspaceReadStatusList = await props.dispatch(getWorkspaceReadStatusList(props.user, state.workspaceIdInUrl))
+    switch (fetchWorkspaceReadStatusList.status) {
+      case 200:
+        props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened while fetching read status list'), 'warning')); break
     }
   }
 
@@ -78,9 +92,7 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-
+      <div className='Dashboard' style={{width: '100%'}}>
         <PageWrapper customeClass='dashboard'>
           <PageTitle
             parentClass='dashboard__header'
@@ -109,18 +121,27 @@ class Dashboard extends React.Component {
               <div className='dashboard__userstatut'>
                 <div className='dashboard__userstatut__role'>
                   <div className='dashboard__userstatut__role__msg'>
-                    {props.t(`Hi ! ${props.user.public_name}, vous êtes actuellement`)}
+                    {props.t(`Hi ! ${props.user.public_name} `)}{props.t('currently, you are ')}
                   </div>
 
-                  <div className='dashboard__userstatut__role__definition'>
-                    <div className='dashboard__userstatut__role__definition__icon'>
-                      <i className='fa fa-graduation-cap' />
-                    </div>
+                  {(() => {
+                    const myself = props.curWs.memberList.find(m => m.id === props.user.user_id)
+                    if (myself === undefined) return
 
-                    <div className='dashboard__userstatut__role__definition__text'>
-                      {(member => member ? member.role : '')(props.curWs.member.find(m => m.id === props.user.user_id))}
-                    </div>
-                  </div>
+                    const myRole = ROLE.find(r => r.slug === myself.role)
+
+                    return (
+                      <div className='dashboard__userstatut__role__definition'>
+                        <div className='dashboard__userstatut__role__definition__icon'>
+                          <i className={`fa fa-${myRole.faIcon}`} />
+                        </div>
+
+                        <div className='dashboard__userstatut__role__definition__text'>
+                          {myRole.label}
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 <div className='dashboard__userstatut__notification'>
@@ -139,7 +160,7 @@ class Dashboard extends React.Component {
                           aria-haspopup='true'
                           aria-expanded='false'
                         >
-                          Abonné(e)
+                          {props.t('subscriber')}
                         </button>
 
                         <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
@@ -167,170 +188,32 @@ class Dashboard extends React.Component {
 
             <div className='dashboard__calltoaction justify-content-xl-center'>
               {props.contentType.map(ct =>
-                <div
-                  className='dashboard__calltoaction__button btnaction'
-                  style={{
-                    backgroundColor: ct.hexcolor,
-                    ':hover': {
-                      backgroundColor: color(ct.hexcolor).darken(0.15).hexString()
-                    }
-                  }}
+                <ContentTypeBtn
+                  customClass='dashboard__calltoaction__button'
+                  hexcolor={ct.hexcolor}
+                  label={ct.label}
+                  faIcon={ct.faIcon}
+                  creationLabel={ct.creationLabel}
                   key={ct.label}
-                >
-                  <div className='dashboard__calltoaction__button__text'>
-                    <div className='dashboard__calltoaction__button__text__icon'>
-                      <i className={`fa fa-${ct.faIcon}`} />
-                    </div>
-                    <div className='dashboard__calltoaction__button__text__title'>
-                      {ct.creationLabel}
-                    </div>
-                  </div>
-                </div>
+                />
               )}
             </div>
 
-            <div className='dashboard__wksinfo'>
-              <div className='dashboard__activity'>
-                <div className='dashboard__activity__header'>
-                  <div className='dashboard__activity__header__title subTitle'>
-                    {this.props.t('Recent activity')}
-                  </div>
+            <div className='dashboard__workspaceInfo'>
+              <RecentActivity
+                customClass='dashboard__activity'
+                recentActivityFilteredForUser={props.curWs.recentActivityList.filter(content => !props.curWs.contentReadStatusList.includes(content.id))}
+                contentTypeList={props.contentType}
+                onClickSeeMore={() => {}}
+                t={props.t}
+              />
 
-                  <div className='dashboard__activity__header__allread btn btn-outline-primary'>
-                    {this.props.t('Mark everything as read')}
-                  </div>
-                </div>
-                <div className='dashboard__activity__wrapper'>
-
-                  <div className='dashboard__activity__workspace'>
-                    <div className='dashboard__activity__workspace__icon'>
-                      <i className='fa fa-comments-o' />
-                    </div>
-                    <div className='dashboard__activity__workspace__name'>
-                      <span>Développement Tracim</span>
-                    </div>
-                  </div>
-
-                  <div className='dashboard__activity__more d-flex flex-row-reverse'>
-                    <div className='dashboard__activity__more__btn btn btn-outline-primary'>
-                      {this.props.t('See more')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className='dashboard__memberlist'>
-
-                <div className='dashboard__memberlist__title subTitle'>
-                  {this.props.t('Member List')}
-                </div>
-
-                <div className='dashboard__memberlist__wrapper'>
-                  {this.state.displayNewMemberDashboard === false &&
-                    <div>
-                      <ul className='dashboard__memberlist__list'>
-
-                        <li className='dashboard__memberlist__list__item'>
-                          <div className='dashboard__memberlist__list__item__avatar'>
-                            <img src={imgProfil} alt='avatar' />
-                          </div>
-                          <div className='dashboard__memberlist__list__item__info mr-auto'>
-                            <div className='dashboard__memberlist__list__item__info__name'>
-                              Jean Dupont
-                            </div>
-                            <div className='dashboard__memberlist__list__item__info__role'>
-                              Responsable
-                            </div>
-                          </div>
-                          <div className='dashboard__memberlist__list__item__delete d-flex justify-content-end'>
-                            <i className='fa fa-trash-o' />
-                          </div>
-                        </li>
-
-                      </ul>
-
-                      <div
-                        className='dashboard__memberlist__btnadd'
-                        onClick={this.handleToggleNewMemberDashboard}
-                      >
-                        <div className='dashboard__memberlist__btnadd__button'>
-                          <div className='dashboard__memberlist__btnadd__button__avatar'>
-                            <div className='dashboard__memberlist__btnadd__button__avatar__icon'>
-                              <i className='fa fa-plus' />
-                            </div>
-                          </div>
-                          <div
-                            className='dashboard__memberlist__btnadd__button__text'
-                          >
-                            {this.props.t('Add a member')}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  }
-
-                  {this.state.displayNewMemberDashboard === true &&
-                  <form className='dashboard__memberlist__form'>
-                    <div
-                      className='dashboard__memberlist__form__close d-flex justify-content-end'
-                    >
-                      <i className='fa fa-times' onClick={this.handleToggleNewMemberDashboard} />
-                    </div>
-
-                    <div className='dashboard__memberlist__form__member'>
-                      <div className='dashboard__memberlist__form__member__name'>
-                        <label className='name__label' htmlFor='addmember'>
-                          {this.props.t('Enter the name or email of the member')}
-                        </label>
-                        <input type='text' id='addmember' className='name__input form-control' placeholder='Nom ou Email' />
-                      </div>
-
-                      <div className='dashboard__memberlist__form__member__create'>
-                        <div className='create__radiobtn mr-3'>
-                          <input type='radio' />
-                        </div>
-
-                        <div className='create__text'>
-                          {this.props.t('Create an account')}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className='dashboard__memberlist__form__role'>
-                      <div className='dashboard__memberlist__form__role__text'>
-                        {this.props.t('Choose the role of the member')}
-                      </div>
-
-                      <ul className='dashboard__memberlist__form__role__list'>
-
-                        <li className='dashboard__memberlist__form__role__list__item'>
-                          <div className='item__radiobtn mr-3'>
-                            <input type='radio' name='role' value='responsable' />
-                          </div>
-
-                          <div className='item__text'>
-                            <div className='item_text_icon mr-2'>
-                              <i className='fa fa-gavel' />
-                            </div>
-
-                            <div className='item__text__name'>
-                              {this.props.t('Supervisor')}
-                            </div>
-                          </div>
-                        </li>
-
-                      </ul>
-                    </div>
-
-                    <div className='dashboard__memberlist__form__submitbtn'>
-                      <button className='btn btn-outline-primary'>
-                        {this.props.t('Validate')}
-                      </button>
-                    </div>
-                  </form>
-                  }
-                </div>
-              </div>
+              <MemberList
+                customClass='dashboard__memberlist'
+                memberList={props.curWs.memberList}
+                roleList={ROLE}
+                t={props.t}
+              />
             </div>
 
             <div className='dashboard__moreinfo'>
@@ -401,4 +284,4 @@ class Dashboard extends React.Component {
 }
 
 const mapStateToProps = ({ user, contentType, currentWorkspace }) => ({ user, contentType, curWs: currentWorkspace })
-export default connect(mapStateToProps)(translate()(Radium(Dashboard)))
+export default connect(mapStateToProps)(translate()(Dashboard))

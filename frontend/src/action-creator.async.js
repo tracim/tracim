@@ -2,8 +2,6 @@ import { FETCH_CONFIG } from './helper.js'
 import {
   TIMEZONE,
   setTimezone,
-  LANG,
-  updateLangList,
   USER_LOGIN,
   USER_LOGOUT,
   USER_ROLE,
@@ -16,7 +14,9 @@ import {
   FOLDER,
   setFolderData,
   APP_LIST,
-  CONTENT_TYPE_LIST
+  CONTENT_TYPE_LIST,
+  WORKSPACE_RECENT_ACTIVITY,
+  WORKSPACE_READ_STATUS
 } from './action-creator.sync.js'
 
 /*
@@ -36,6 +36,7 @@ import {
  * This function create a http async request using whatwg-fetch while dispatching a PENDING and a SUCCESS redux action.
  * It also adds, to the Response of the fetch request, the json value so that the redux action have access to the status and the data
  */
+// Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
 const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) => {
   dispatch({type: `${param.method}/${actionName}/PENDING`})
 
@@ -75,19 +76,6 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
   }
 
   return fetchResult
-}
-
-export const getLangList = () => async dispatch => {
-  const fetchGetLangList = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/lang`,
-    param: {
-      headers: {...FETCH_CONFIG.headers},
-      method: 'GET'
-    },
-    actionName: LANG,
-    dispatch
-  })
-  if (fetchGetLangList.status === 200) dispatch(updateLangList(fetchGetLangList.json))
 }
 
 export const getTimezone = () => async dispatch => {
@@ -216,6 +204,36 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
       method: 'GET'
     },
     actionName: WORKSPACE,
+    dispatch
+  })
+}
+
+export const getWorkspaceRecentActivityList = (user, idWorkspace) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_RECENT_ACTIVITY,
+    dispatch
+  })
+}
+
+export const getWorkspaceReadStatusList = (user, idWorkspace) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/read_status`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_READ_STATUS,
     dispatch
   })
 }

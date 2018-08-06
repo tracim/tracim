@@ -1,0 +1,117 @@
+.memberlist
+  margin 0 0 50px 0
+  width 35%
+  &__title
+    margin-bottom 20px
+    padding 6px
+    height 45px
+  &__wrapper
+    position relative
+    border 1px solid grey
+    height 480px
+  &__list
+    margin 0
+    padding 0
+    list-style none
+    height 400px
+    overflow-Y scroll
+    &__item
+      display flex
+      border-bottom 1px solid grey
+      padding 10px 15px
+      &:hover
+        background-color fourthColor
+      &:nth-last-child(1)
+        border-bottom 0
+      &:nth-child(even)
+        background-color grey-hover
+        &:hover
+          background-color fourthColor
+      &__avatar
+        margin-right 20px
+        & > img
+          width 50px
+          height 50px
+      &__info
+        &__name
+          font-size 20px
+        &__role
+          font-size 18px
+      &__delete
+        font-size 20px
+        color darkGrey
+        cursor pointer
+  &__btnadd
+    border-top 1px solid grey
+    padding 15px
+    &__button
+      display flex
+      align-items center
+      &__avatar
+        display flex
+        justify-content center
+        align-items center
+        margin-right 20px
+        border 2px dashed grey
+        border-radius 50%
+        width 50px
+        height 50px
+        cursor pointer
+        &__icon
+          color grey
+          font-size 25px
+      &__text
+        font-size 18px
+        color fontColor
+        cursor pointer
+  &__form
+    padding 15px
+    flex-direction column
+    height 100%
+    width 100%
+    background-color off-white
+    &__close
+      font-size 20px
+      & > i
+        cursor pointer
+    &__member
+      &__name
+        .name__label
+          margin 30px 0 20px 0
+          label()
+      .name__input
+        margin-bottom 20px
+        border 1px solid grey
+        border-radius 10px
+        padding 10px
+        width 300px
+      &__create
+        display flex
+        align-items center
+        margin 15px 0
+        line-height 23px
+        &__checkbox
+          padding-top 6px
+    &__role
+      margin-bottom 15px
+      coloricon()
+      &__text
+        margin 15px 0
+        label()
+      &__list
+        margin 0
+        padding 0
+        list-style none
+        &__item
+          display flex
+          align-items center
+          margin 10px 25px 10px 0
+          .item
+            &__text
+              display flex
+    &__submitbtn
+      display flex
+      justify-content flex-end
+      & > button
+        padding 8px 30px
+        cursor pointer

@@ -55,8 +55,8 @@ class Login extends React.Component {
       Cookies.set(COOKIE.USER_LOGIN, inputLogin.value)
       Cookies.set(COOKIE.USER_AUTH, userAuth)
 
-      history.push(PAGE.HOME)
-    } else if (fetchPostUserLogin.status === 400) {
+      history.push(PAGE.WORKSPACE.ROOT)
+    } else if (fetchPostUserLogin.status === 403) {
       dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
     }
   }
@@ -74,7 +74,7 @@ class Login extends React.Component {
               <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
 
                 <Card customClass='loginpage__connection'>
-                  <CardHeader customClass='connection__header text-center'>{'Connexion'}</CardHeader>
+                  <CardHeader customClass='connection__header text-center'>{this.props.t('Connection')}</CardHeader>
 
                   <CardBody formClass='connection__form'>
                     <div>
@@ -118,7 +118,7 @@ class Login extends React.Component {
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-sm-right'>
                           <LoginBtnForgotPw
                             customClass='connection__form__pwforgot'
-                            label='Mot de passe oublié ?'
+                            label={this.props.t('Forgotten password ?')}
                           />
                         </div>
                       </div>
@@ -127,7 +127,7 @@ class Login extends React.Component {
                         htmlType='button'
                         bootstrapType='primary'
                         customClass='connection__form__btnsubmit ml-auto'
-                        label='Connexion'
+                        label={this.props.t('Connection')}
                         onClick={this.handleClickSubmit}
                       />
                     </div>

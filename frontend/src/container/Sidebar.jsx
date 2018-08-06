@@ -6,11 +6,14 @@ import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
+  setAppList,
+  setContentTypeList,
   setWorkspaceListIsOpenInSidebar,
   updateWorkspaceFilter,
   updateWorkspaceListData
 } from '../action-creator.sync.js'
 import {
+  getAppList, getContentTypeList,
   getWorkspaceList
 } from '../action-creator.async.js'
 import { PAGE, workspaceConfig } from '../helper.js'
@@ -22,7 +25,7 @@ class Sidebar extends React.Component {
     super(props)
     this.state = {
       sidebarClose: false,
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
+      workspaceIdInUrl: props.match && props.match.params.idws ? parseInt(props.match.params.idws) : null
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -32,28 +35,37 @@ class Sidebar extends React.Component {
     switch (type) {
       case 'refreshWorkspaceList':
         console.log('%c<Sidebar> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceList()
+        this.loadAppConfigAndWorkspaceList()
         break
     }
   }
 
   componentDidMount () {
-    this.loadWorkspaceList()
+    // console.log('Sidebar Did Mount', this.props)
+    this.loadAppConfigAndWorkspaceList()
   }
 
   componentDidUpdate (prevProps, prevState) {
-    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
-    if (this.props.match.params.idws === undefined || isNaN(this.props.match.params.idws)) return
+    const { props } = this
 
-    const newWorkspaceId = parseInt(this.props.match.params.idws)
+    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
+    if (!props.match || props.match.params.idws === undefined || isNaN(props.match.params.idws)) return
+
+    const newWorkspaceId = parseInt(props.match.params.idws)
     if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
   }
 
-  loadWorkspaceList = async () => {
+  loadAppConfigAndWorkspaceList = async () => {
     const { workspaceIdInUrl } = this.state
     const { user, dispatch } = this.props
 
     if (user.user_id !== -1) {
+      const fetchGetAppList = await dispatch(getAppList(user))
+      if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
+
+      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
+      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
+
       const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
 
       if (fetchGetWorkspaceList.status === 200) {

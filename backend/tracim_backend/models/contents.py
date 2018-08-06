@@ -6,6 +6,7 @@ from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.models.applications import html_documents
 from tracim_backend.models.applications import _file
+from tracim_backend.models.applications import folder
 from tracim_backend.models.applications import thread
 from tracim_backend.models.applications import markdownpluspage
 
@@ -173,10 +174,10 @@ html_documents_type = ContentType(
 # TODO - G.M - 31-05-2018 - Set Better folder params
 folder_type = ContentType(
     slug='folder',
-    fa_icon=thread.fa_icon,
-    hexcolor=thread.hexcolor,
+    fa_icon=folder.fa_icon,
+    hexcolor=folder.hexcolor,
     label='Folder',
-    creation_label='Create collection of any documents',
+    creation_label='Create a folder',
     available_statuses=CONTENT_STATUS.get_all(),
     allow_sub_content=True,
 )
@@ -283,7 +284,8 @@ CONTENT_TYPES = ContentTypeList(
     [
         thread_type,
         file_type,
-        markdownpluspage_type,
+        # TODO - G.M - 2018-08-02 - Restore markdown page content
+        #    markdownpluspage_type,
         html_documents_type,
     ]
 )
