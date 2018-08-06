@@ -13,6 +13,11 @@ echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ 
 # get the new sources
 git pull origin develop
 
+# create folder frontend/dist/app/ if no exists
+if [ ! -d "frontend/dist/app/" ]; then
+  mkdir frontend/dist/app/
+fi
+
 # Tracim Lib
 (
   log "build frontend_lib"
