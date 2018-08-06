@@ -1,4 +1,4 @@
-sidebar-width = 280px
+sidebar-width = 300px
 sidebar-animate-speed = 0.5s
 
 .sidebarSticky
@@ -17,7 +17,6 @@ leftside()
 .sidebar
   position relative
   transition all sidebar-animate-speed
-  width sidebar-width
   min-height 100%
   background-image url('../img/applat.png')
   background-repeat repeat
@@ -47,6 +46,7 @@ leftside()
       padding 15px 30px
   &__navigation
     padding 0
+    width sidebar-width
     overflow hidden
     &__workspace
       padding-left 0
