@@ -5,19 +5,19 @@
 
 # install Tracim Lib
 
-log "cd frontend_lib"
 (
+  log "cd frontend_lib"
   cd frontend_lib
   log "npm i"
   npm i
   log "sudo npm link"
-  sudo npm link
+  sudo npm link || exit
 )
 
 # install app Html Document
 
-log "cd frontend_app_html-document"
 (
+  log "cd frontend_app_html-document"
   cd frontend_app_html-document
   log "npm i"
   npm i
@@ -27,8 +27,8 @@ log "cd frontend_app_html-document"
 
 # install app Thread
 
-log "cd frontend_app_thread"
 (
+  log "cd frontend_app_thread"
   cd frontend_app_thread
   log "npm i"
   npm i
@@ -38,8 +38,8 @@ log "cd frontend_app_thread"
 
 # install app Workspace
 
-log "cd frontend_app_workspace"
 (
+  log "cd frontend_app_workspace"
   cd frontend_app_workspace
   log "npm i"
   npm i
@@ -49,8 +49,8 @@ log "cd frontend_app_workspace"
 
 # install app Admin Workspace User
 
-log "cd frontend_app_admin_workspace_user"
 (
+  log "cd frontend_app_admin_workspace_user"
   cd frontend_app_admin_workspace_user
   log "npm i"
   npm i
@@ -60,8 +60,8 @@ log "cd frontend_app_admin_workspace_user"
 
 # install Tracim Frontend
 
-log "cd frontend"
 (
+  log "cd frontend"
   cd frontend
   log "npm i"
   npm i
