@@ -28,10 +28,10 @@ module.exports = {
     ]
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist/asset'),
     filename: 'tracim.app.entry.js',
-    pathinfo: !isProduction,
-    publicPath: '/'
+    pathinfo: !isProduction
+    // publicPath: '/'
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
@@ -70,8 +70,10 @@ module.exports = {
       use: ['style-loader', 'css-loader', 'stylus-loader']
     }, {
       test: /\.(jpg|png|svg)$/,
-      loader: 'url-loader',
+      loader: 'file-loader',
       options: {
+        name: '[name].[ext]',
+        outputPath: 'images/', // asset/ is in output.path
         limit: 2000
       }
     }]
