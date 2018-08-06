@@ -97,8 +97,8 @@ class Tracim extends React.Component {
 
                   <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
                     ? null
-
-          <PrivateRoute path='/admin_temp/workspace' component={AdminWorkspacePage} />
+                    : <Redirect to={{pathname: `/workspaces/${props.workspaceList[0].id}/contents`, state: {from: props.location}}} />
+                  } />
 
                   <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
                     <Redirect to={{pathname: `/workspaces/${props2.match.params.idws}/contents`, state: {from: props.location}}} />
@@ -117,6 +117,8 @@ class Tracim extends React.Component {
             : props.user.logged === false && props.location.pathname !== '/login' &&
               <Redirect to={{pathname: '/login', state: {from: props.location}}} />
           }
+
+          <Route path='/admin_temp/workspace' component={AdminWorkspacePage} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
