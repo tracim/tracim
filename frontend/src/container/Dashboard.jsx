@@ -44,7 +44,7 @@ class Dashboard extends React.Component {
       case 200:
         props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
       default:
-        props.dispatch(newFlashMessage(props.t('An error has happened when fetching workspace detail'), 'warning')); break
+        props.dispatch(newFlashMessage(props.t('An error has happened while fetching workspace detail'), 'warning')); break
     }
 
     const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.user, state.workspaceIdInUrl))
@@ -121,7 +121,7 @@ class Dashboard extends React.Component {
               <div className='dashboard__userstatut'>
                 <div className='dashboard__userstatut__role'>
                   <div className='dashboard__userstatut__role__msg'>
-                    {props.t(`Hi ! ${props.user.public_name} `)}{props.t('currently, you are ')}
+                    {props.t('Hi {{name}} ! Currently, you are ', {name: props.user.public_name})}
                   </div>
 
                   {(() => {
