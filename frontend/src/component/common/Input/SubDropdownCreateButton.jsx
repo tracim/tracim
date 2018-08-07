@@ -15,7 +15,7 @@ const SubDropdownCreateButton = props => {
                 style={{color: app.hexcolor}}
               />
             </div>
-            <div className='subdropdown__link__folder__text'>
+            <div className={`subdropdown__link__${app.slug}__text`}>
               {app.creationLabel}
             </div>
           </div>
