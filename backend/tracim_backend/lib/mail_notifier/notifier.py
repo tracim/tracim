@@ -17,9 +17,12 @@ from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration, EST
 from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.models import User
+from tracim_backend.lib.utils.utils import get_login_frontend_url
+from tracim_backend.lib.utils.utils import get_email_logo_frontend_url
 from tracim_backend.models.auth import User
 from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -234,7 +237,13 @@ class EmailManager(object):
             show_archived=True,
             show_deleted=True,
         ).get_one(event_content_id, CONTENT_TYPES.Any_SLUG)
-        main_content = content.parent if content.type == CONTENT_TYPES.Comment.slug else content
+        workspace_api = WorkspaceApi(
+            session=self.session,
+            current_user=user,
+            config=self.config,
+        )
+        workpace_in_context = workspace_api.get_workspace_with_context(workspace_api.get_one(content.workspace_id))  # nopep8
+        main_content = content.parent if content.type == CONTENT_TYPES.Comment.slug else content  # nopep8
         notifiable_roles = WorkspaceApi(
             current_user=user,
             session=self.session,
@@ -265,7 +274,7 @@ class EmailManager(object):
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
             replyto_addr = self.config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL.replace( # nopep8
-                '{content_id}',str(content.content_id)
+                '{content_id}', str(content.content_id)
             )
 
             reference_addr = self.config.EMAIL_NOTIFICATION_REFERENCES_EMAIL.replace( #nopep8
@@ -297,8 +306,21 @@ class EmailManager(object):
             # To link this email to a content we create a virtual parent
             # in reference who contain the content_id.
             message['References'] = formataddr(('',reference_addr))
-            body_text = self._build_email_body_for_content(self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT, role, content, user)
-            body_html = self._build_email_body_for_content(self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML, role, content, user)
+            content_in_context = content_api.get_content_in_context(content)
+            body_text = self._build_email_body_for_content(
+                self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT,
+                role,
+                content_in_context,
+                workpace_in_context,
+                user
+            )
+            body_html = self._build_email_body_for_content(
+                self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
+                role,
+                content_in_context,
+                workpace_in_context,
+                user
+            )
 
             part1 = MIMEText(body_text, 'plain', 'utf-8')
             part2 = MIMEText(body_html, 'html', 'utf-8')
@@ -362,9 +384,9 @@ class EmailManager(object):
             'user': user,
             'password': password,
             # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
-            'logo_url': '',
+            'logo_url': get_email_logo_frontend_url(self.config),
             # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
-            'login_url': self.config.WEBSITE_BASE_URL,
+            'login_url': get_login_frontend_url(self.config),
         }
         body_text = self._render_template(
             mako_template_filepath=text_template_file_path,
@@ -415,8 +437,9 @@ class EmailManager(object):
             self,
             mako_template_filepath: str,
             role: UserRoleInWorkspace,
-            content: Content,
-            actor: User
+            content_in_context: ContentInContext,
+            workspace_in_context: WorkspaceInContext,
+            actor: User,
     ) -> str:
         """
         Build an email body and return it as a string
@@ -424,24 +447,21 @@ class EmailManager(object):
         :param role: the role related to user to whom the email must be sent. The role is required (and not the user only) in order to show in the mail why the user receive the notification
         :param content: the content item related to the notification
         :param actor: the user at the origin of the action / notification (for example the one who wrote a comment
-        :param config: the global configuration
         :return: the built email body as string. In case of multipart email, this method must be called one time for text and one time for html
         """
         logger.debug(self, 'Building email content from MAKO template {}'.format(mako_template_filepath))
-
+        content = content_in_context.content
         main_title = content.label
         content_intro = ''
         content_text = ''
         call_to_action_text = ''
 
-        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for call_to_action_url  # nopep8
-        call_to_action_url =''
+        call_to_action_url = content_in_context.frontend_url
         # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for status_icon_url  # nopep8
         status_icon_url = ''
-        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for workspace_url  # nopep8
-        workspace_url = ''
+        workspace_url = workspace_in_context.frontend_url
         # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
-        logo_url = ''
+        logo_url = get_email_logo_frontend_url(self.config)
 
         action = content.get_last_action().id
         if ActionDescription.COMMENT == action:

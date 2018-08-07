@@ -81,6 +81,12 @@ class CFG(object):
             'website.base_url',
             '',
         )
+        if not self.WEBSITE_BASE_URL:
+            raise Exception(
+                'website.base_url is needed in order to have correct path in'
+                'few place like in email.'
+                'You should set it with frontend root url.'
+            )
 
         # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,  # nopep8
         # Verify this

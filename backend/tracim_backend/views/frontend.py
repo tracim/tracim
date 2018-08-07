@@ -27,7 +27,7 @@ class FrontendController(Controller):
     def not_found_view(self, context, request: TracimRequest):
 
         if request.path.startswith(BASE_API_V2):
-            raise PageNotFound('{} is not a valid path'.format(request.path)) from context # nopep8
+            raise PageNotFound('{} is not a valid path'.format(request.path)) from context  # nopep8
         return self.index(context, request)
 
     def index(self, context, request: TracimRequest):
