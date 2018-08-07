@@ -6,6 +6,7 @@ from tracim_backend.exceptions import PageNotFound
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
+import spectra
 
 INDEX_PAGE_NAME = 'index.mak'
 
@@ -30,7 +31,7 @@ class FrontendController(Controller):
     def index(self, context, request: TracimRequest):
         return render_to_response(
             self._get_index_file_path(),
-            {}
+            {'primary': spectra.html('#7d4e24')}
         )
 
     def bind(self, configurator: Configurator) -> None:
