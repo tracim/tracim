@@ -24,7 +24,7 @@
       ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
-       <% html_class = '.primaryColorFont{state}Hover.hover' %>
+      <% html_class = '.primaryColorFont{state}Hover:hover' %>
       ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
@@ -36,7 +36,7 @@
       ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
-      <% html_class = '.primaryColorBg{state}Hover.hover'%>
+      <% html_class = '.primaryColorBg{state}Hover:hover'%>
       ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
@@ -48,7 +48,7 @@
       ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
-      <% html_class = '.primaryColorBorder{state}Hover.hover' %>
+      <% html_class = '.primaryColorBorder{state}Hover:hover' %>
       ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
