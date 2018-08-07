@@ -3,12 +3,14 @@ import os
 from pyramid.renderers import render_to_response
 from pyramid.config import Configurator
 from tracim_backend.exceptions import PageNotFound
+from tracim_backend.models.applications import applications
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
 import spectra
 
 INDEX_PAGE_NAME = 'index.mak'
+APP_FRONTEND_PATH = 'app/{minislug}.app.js'
 
 
 class FrontendController(Controller):
@@ -29,9 +31,24 @@ class FrontendController(Controller):
         return self.index(context, request)
 
     def index(self, context, request: TracimRequest):
+        app_config = request.registry.settings['CFG']
+        # TODO - G.M - 2018-08-07 - Refactor autogen valid app list for frontend
+        frontend_apps = []
+        for app in applications:
+            app_frontend_path = APP_FRONTEND_PATH.replace('{minislug}',
+                                                          app.minislug)  # nopep8
+            app_path = os.path.join(self.dist_folder_path,
+                                    app_frontend_path)  # nopep8
+            if os.path.exists(app_path):
+                frontend_apps.append(app)
         return render_to_response(
             self._get_index_file_path(),
-            {'primary': spectra.html('#7d4e24')}
+            {
+                'colors': {
+                    'primary': spectra.html('#7d4e24'),
+                },
+                'applications': frontend_apps,
+            }
         )
 
     def bind(self, configurator: Configurator) -> None:

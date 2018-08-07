@@ -16,6 +16,7 @@
 
     <style>
       <%
+        primary = colors['primary']
         html_class = '.primaryColorFont{state}'
         param = 'color'
         color_change_value = 15
@@ -61,9 +62,9 @@
     <script type='text/javascript' src='/asset/tracim.app.entry.js'></script>
 
     <script type='text/javascript' src='/app/workspace.app.js'></script>
-    <script type='text/javascript' src='/app/html-document.app.js'></script>
-    <script type='text/javascript' src='/app/thread.app.js'></script>
-    <!-- <script type='text/javascript' src='/app/file.app.js'></script> -->
+    % for app in applications:
+    <script type='text/javascript' src='/app/${app.minislug}.app.js'></script>
+    %endfor
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
 
     <script type='text/javascript' src='/asset/bootstrap/jquery-3.2.1.js'></script>
