@@ -41,7 +41,7 @@ export const MoreInfo = props =>
             <i className='fa fa-calendar' />
           </div>
 
-          <div className='moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text'>
+          <div className='moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text d-flex align-self-center'>
             {props.t('Workspace Calendar')}
           </div>
         </div>
