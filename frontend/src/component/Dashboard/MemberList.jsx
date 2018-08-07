@@ -1,16 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Checkbox } from 'tracim_frontend_lib'
+// import { Checkbox } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
 
 export class MemberList extends React.Component {
   constructor (props) {
     super(props)
-
     this.state = {
-      displayNewMemberList: true,
-      createAccountCheckbox: false
+      displayNewMemberList: true
     }
   }
 
@@ -21,7 +19,12 @@ export class MemberList extends React.Component {
   handleClickCheckboxCreateAccount = e => {
     e.preventDefault()
     e.stopPropagation()
-    this.setState(prev => ({createAccountCheckbox: !prev.createAccountCheckbox}))
+    this.props.onChangeCreateAccount(!this.props.createAccount)
+  }
+
+  handleClickBtnValidate = () => {
+    this.props.onClickValidateNewMember()
+    this.setState({displayNewMemberList: true})
   }
 
   render () {
@@ -40,7 +43,7 @@ export class MemberList extends React.Component {
               <div>
                 <ul className='memberlist__list'>
                   {props.memberList.map(m =>
-                    <li className='memberlist__list__item primaryColorBgLightenHover' key={m.id}>
+                    <li className='memberlist__list__item' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
                         {m.avatarUrl ? <img src={m.avatarUrl} /> : <img src='NYI' />}
                       </div>
@@ -78,7 +81,7 @@ export class MemberList extends React.Component {
               </div>
             )
             : (
-              <form className='memberlist__form'>
+              <div className='memberlist__form'>
                 <div className='memberlist__form__close d-flex justify-content-end'>
                   <i className='fa fa-times' onClick={this.handleClickCloseAddMemberBtn} />
                 </div>
@@ -94,10 +97,34 @@ export class MemberList extends React.Component {
                       className='name__input form-control'
                       id='addmember'
                       placeholder='Nom ou Email'
-                      onChange={props.onChangeName}
+                      value={props.nameOrEmail}
+                      onChange={e => props.onChangeNameOrEmail(e.target.value)}
+                      autoComplete='off'
                     />
+
+                    {props.searchedKnownMemberList.length > 0 &&
+                      <div className='autocomplete primaryColorBorder'>
+                        {props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
+                          <div
+                            className='autocomplete__item primaryColorBgHover'
+                            onClick={() => props.onClickKnownMember(u)}
+                            key={u.user_id}
+                          >
+                            <div className='autocomplete__item__avatar primaryColorBorder'>
+                              <img src={u.avatar_url} />
+                            </div>
+
+                            <div className='autocomplete__item__name'>
+                              {u.public_name}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    }
                   </div>
 
+                  {/*
+                  // @TODO validate with DA that this checkbox is useless since the backend handle everything
                   <div className='memberlist__form__member__create'>
                     <div className='memberlist__form__member__create__checkbox mr-3'>
                       <Checkbox
@@ -111,6 +138,7 @@ export class MemberList extends React.Component {
                       {props.t('Create an account')}
                     </div>
                   </div>
+                  */}
                 </div>
 
                 <div className='memberlist__form__role'>
@@ -120,20 +148,29 @@ export class MemberList extends React.Component {
 
                   <ul className='memberlist__form__role__list'>
                     {props.roleList.map(r =>
-                      <li className='memberlist__form__role__list__item' key={r.slug}>
-                        <div className='item__radiobtn mr-3'>
-                          <input type='radio' name='role' value={r.slug} />
-                        </div>
-
-                        <div className='item__text'>
-                          <div className='item_text_icon mr-2' style={{color: r.hexcolor}}>
-                            <i className={`fa fa-${r.faIcon}`} />
+                      <li key={r.slug}>
+                        <label className='memberlist__form__role__list__item' htmlFor={r.slug}>
+                          <div className='item__radiobtn mr-3'>
+                            <input
+                              id={r.slug}
+                              type='radio'
+                              name='role'
+                              value={r.slug}
+                              checked={r.slug === props.role}
+                              onChange={() => props.onChangeRole(r.slug)}
+                            />
                           </div>
 
-                          <div className='item__text__name'>
-                            {r.label}
+                          <div className='item__text'>
+                            <div className='item__text__icon mr-2' style={{color: r.hexcolor}}>
+                              <i className={`fa fa-${r.faIcon}`} />
+                            </div>
+
+                            <div className='item__text__name'>
+                              {r.label}
+                            </div>
                           </div>
-                        </div>
+                        </label>
                       </li>
                     )}
 
@@ -141,11 +178,11 @@ export class MemberList extends React.Component {
                 </div>
 
                 <div className='memberlist__form__submitbtn'>
-                  <button className='btn btn-outline-primary'>
+                  <button className='btn btn-outline-primary' onClick={this.handleClickBtnValidate}>
                     {props.t('Validate')}
                   </button>
                 </div>
-              </form>
+              </div>
             )
           }
         </div>

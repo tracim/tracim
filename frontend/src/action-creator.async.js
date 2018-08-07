@@ -6,11 +6,13 @@ import {
   USER_LOGOUT,
   USER_ROLE,
   USER_CONNECTED,
+  USER_KNOWN_MEMBER_LIST,
   setUserRole,
   WORKSPACE,
   WORKSPACE_LIST,
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
+  WORKSPACE_MEMBER_ADD,
   FOLDER,
   setFolderData,
   APP_LIST,
@@ -148,6 +150,36 @@ export const getUserRole = user => async dispatch => {
   if (fetchGetUserRole.status === 200) dispatch(setUserRole(fetchGetUserRole.json))
 }
 
+export const getUserKnownMember = (user, userNameToSearch) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/known_members?acp=${userNameToSearch}`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: USER_KNOWN_MEMBER_LIST,
+    dispatch
+  })
+}
+
+export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/read`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT'
+    },
+    actionName: USER_KNOWN_MEMBER_LIST,
+    dispatch
+  })
+}
+
 export const getWorkspaceList = user => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces`,
@@ -238,6 +270,26 @@ export const getWorkspaceReadStatusList = (user, idWorkspace) => dispatch => {
   })
 }
 
+export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: newMember.id,
+        user_email_or_public_name: newMember.name,
+        role: newMember.role
+      })
+    },
+    actionName: WORKSPACE_MEMBER_ADD,
+    dispatch
+  })
+}
+
 export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
   const fetchGetFolderContent = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/?parent_id=${idFolder}`,
@@ -252,7 +304,6 @@ export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
 }
 
 export const getAppList = user => dispatch => {
-  console.log(user)
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/applications`,
     param: {
@@ -260,8 +311,7 @@ export const getAppList = user => dispatch => {
         ...FETCH_CONFIG.headers,
         'Authorization': 'Basic ' + user.auth
       },
-      method: 'GET',
-      'Authorization': 'Basic ' + user.auth
+      method: 'GET'
     },
     actionName: APP_LIST,
     dispatch
