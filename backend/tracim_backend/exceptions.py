@@ -207,3 +207,7 @@ class PreviewDimNotAllowed(TracimException):
 
 class TooShortAutocompleteString(TracimException):
     pass
+
+
+class PageNotFound(TracimException):
+    pass

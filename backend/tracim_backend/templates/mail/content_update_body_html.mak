@@ -45,7 +45,7 @@
             ${main_title}
             &mdash;&nbsp;<span style="font-weight: bold; color: #999; font-weight: bold;">
               ${status_label|n}
-              <img alt="status_icon" src="${status_icon_url}" style="vertical-align: middle;">
+              <img alt="" src="${status_icon_url}" style="vertical-align: middle;">
             </span>
         </td>
       </tr>
@@ -55,6 +55,8 @@
     <div id="content-body">
         <div>${content_text|n}</div>
         <div href='' id="call-to-action-container">
+            <span style=""> <a href="${call_to_action_url}"
+            id="call-to-action-button">${call_to_action_text}</a> </span> </div>
         </div>
     </div>
     

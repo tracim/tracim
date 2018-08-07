@@ -5,7 +5,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.lib.utils.translation import fake_translator as _

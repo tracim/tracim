@@ -39,7 +39,6 @@ from tracim_backend.models.contents import CONTENT_TYPES
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 
 
-
 class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])

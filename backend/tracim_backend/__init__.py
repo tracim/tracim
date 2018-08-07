@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -9,7 +7,6 @@ except ImportError:
 from pyramid.config import Configurator
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
-from pyramid.exceptions import NotFound
 from sqlalchemy.exc import OperationalError
 
 from tracim_backend.extensions import hapic
@@ -30,8 +27,10 @@ from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
+from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
+from tracim_backend.exceptions import PageNotFound
 from tracim_backend.exceptions import UserNotActive
 from tracim_backend.exceptions import InvalidId
 from tracim_backend.exceptions import InsufficientUserProfile
@@ -86,7 +85,7 @@ def web(global_config, **local_settings):
     hapic.set_context(context)
     # INFO - G.M - 2018-07-04 - global-context exceptions
     # Not found
-    context.handle_exception(NotFound, HTTPStatus.NOT_FOUND)
+    context.handle_exception(PageNotFound, HTTPStatus.NOT_FOUND)
     # Bad request
     context.handle_exception(WorkspaceNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
     context.handle_exception(UserNotFoundInTracimRequest, HTTPStatus.BAD_REQUEST)  # nopep8
@@ -106,6 +105,7 @@ def web(global_config, **local_settings):
     context.handle_exception(OperationalError, HTTPStatus.INTERNAL_SERVER_ERROR)
     context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)
 
+
     # Add controllers
     session_controller = SessionController()
     system_controller = SystemController()
@@ -123,6 +123,11 @@ def web(global_config, **local_settings):
     configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)  # nopep8
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
+
+    if app_config.FRONTEND_SERVE:
+        configurator.include('pyramid_mako')
+        frontend_controller = FrontendController(app_config.FRONTEND_DIST_FOLDER_PATH)  # nopep8
+        configurator.include(frontend_controller.bind)
 
     hapic.add_documentation_view(
         '/api/v2/doc',
