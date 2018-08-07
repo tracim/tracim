@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import typing
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.roles import WorkspaceRoles
 

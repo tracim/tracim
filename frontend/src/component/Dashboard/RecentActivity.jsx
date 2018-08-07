@@ -2,36 +2,45 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
+require('./RecentActivity.styl')
+
 export const RecentActivity = props =>
-  <div className={props.customClass}>
-    <div className={`${props.customClass}__header`}>
-      <div className={classnames(`${props.customClass}__header__title`, 'subTitle')}>
+  <div className='activity'>
+    <div className='activity__header'>
+      <div className={classnames('activity__header__title', 'subTitle')}>
         {props.t('Recent activity')}
       </div>
 
-      <div className={classnames(`${props.customClass}__header__allread`, 'btn btn-outline-primary')}>
+      <div
+        className={classnames('activity__header__allread', 'btn btn-outline-primary')}
+        onClick={props.onClickEverythingAsRead}
+      >
         {props.t('Mark everything as read')}
       </div>
     </div>
 
-    <div className={`${props.customClass}__wrapper`}>
+    <div className='activity__wrapper'>
       {props.recentActivityFilteredForUser.map(content => {
         const contentType = props.contentTypeList.find(ct => ct.slug === content.type)
         return (
-          <div className={`${props.customClass}__workspace`} key={content.id}>
-            <div className={`${props.customClass}__workspace__icon`} style={{color: contentType.hexcolor}}>
+          <div
+            className='activity__workspace'
+            onClick={() => props.onClickRecentContent(content.id, content.type)}
+            key={content.id}
+          >
+            <div className='activity__workspace__icon' style={{color: contentType.hexcolor}}>
               <i className={`fa fa-${contentType.faIcon}`} />
             </div>
-            <div className={`${props.customClass}__workspace__name`}>
+            <div className='activity__workspace__name'>
               {content.label}
             </div>
           </div>
         )
       })}
 
-      <div className={classnames(`${props.customClass}__more`, 'd-flex flex-row-reverse')}>
+      <div className={classnames('activity__more', 'd-flex flex-row-reverse')}>
         <div
-          className={classnames(`${props.customClass}__more__btn`, 'btn btn-outline-primary')}
+          className={classnames('activity__more__btn', 'btn btn-outline-primary')}
           onClick={props.onClickSeeMore}
         >
           {props.t('See more')}

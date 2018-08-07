@@ -1,3 +1,5 @@
+@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
 .memberlist
   margin 0 0 50px 0
   width 35%
@@ -76,11 +78,38 @@
         cursor pointer
     &__member
       &__name
+        position relative
+        margin 0 0 20px 0
         .name__label
           margin 30px 0 20px 0
           label()
+        .autocomplete
+          position absolute
+          min-width 300px
+          background-color off-white
+          border-radius 10px
+          border-width 1px
+          border-style solid
+          &__item
+            display flex
+            align-items center
+            cursor pointer
+            padding 5px 8px
+            &:first-child
+              border-top-left-radius 10px
+              border-top-right-radius 10px
+            &:last-child
+              border-bottom-left-radius 10px
+              border-bottom-right-radius 10px
+            &__avatar
+              width 45px
+              height 45px
+              border-radius 50%
+              border-width 1px
+              border-style solid
+            &__name
+              margin-left 15px
       .name__input
-        margin-bottom 20px
         border 1px solid grey
         border-radius 10px
         padding 10px
@@ -106,6 +135,7 @@
           display flex
           align-items center
           margin 10px 25px 10px 0
+          cursor pointer
           .item
             &__text
               display flex
@@ -115,3 +145,28 @@
       & > button
         padding 8px 30px
         cursor pointer
+
+@media (min-width min-sm) and (max-width: max-lg)
+  .memberlist
+    width 50%
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .memberlist
+    margin 50px 0
+    width 90%
+
+@media (max-width: max-xs)
+  .memberlist
+    margin 50px 0
+    width 100%
+    &__title
+      margin-left 10px
+    &__wrapper
+      height auto
+    &__list
+      height auto
+      overflow-Y visible
+      &__item:nth-last-child(1)
+        border-bottom 1px solid grey
+    &__btnadd
+      border-top 0

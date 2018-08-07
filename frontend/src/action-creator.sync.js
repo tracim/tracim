@@ -17,18 +17,20 @@ export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, 
 export const USER = 'User'
 export const USER_LOGIN = `${USER}/Login`
 export const USER_LOGOUT = `${USER}/Logout`
-export const USER_DATA = `${USER}/Data`
-export const USER_ROLE = `${USER}/Role`
 export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
-export const USER_LANG = `${USER}/Lang`
 export const setUserConnected = user => ({ type: `${SET}/${USER}/Connected`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER}/Disconnected` })
+export const USER_DATA = `${USER}/Data`
 export const updateUserData = userData => ({ type: `${UPDATE}/${USER}/Data`, data: userData })
+export const USER_ROLE = `${USER}/Role`
 export const setUserRole = userRole => ({ type: `${SET}/${USER}/Role`, userRole }) // this actually update workspaceList state
-export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
 export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNotif) =>
   ({ type: `${UPDATE}/${USER_ROLE}/SubscriptionNotif`, workspaceId, subscriptionNotif })
+export const USER_LANG = `${USER}/Lang`
+export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
+export const USER_KNOWN_MEMBER = `${USER}/KnownMember`
+export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
@@ -45,10 +47,13 @@ export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPAC
 export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
+export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 
 export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
 export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
 export const setWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
+export const WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST = `${WORKSPACE_RECENT_ACTIVITY}/ForUser/List`
+export const setWorkspaceRecentActivityForUserList = workspaceRecentActivityForUserList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST}`, workspaceRecentActivityForUserList })
 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`

@@ -29,6 +29,7 @@ class TestWebdavFactory(StandardTest):
         :return:
         """
         tracim_settings = {
+            'website.base_url': 'http://localhost:6543',
             'sqlalchemy.url': 'sqlite:///:memory:',
             'user.auth_token.validity': '604800',
             'depot_storage_dir': '/tmp/test/depot',
