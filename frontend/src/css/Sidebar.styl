@@ -15,8 +15,12 @@ leftside()
   background-color rgba(253, 253, 253, 0.3)
 
 .sidebar
+  display flex
+  flex-direction column
+  justify-content space-between
   position relative
   transition all sidebar-animate-speed
+  width sidebar-width
   min-height 100%
   background-image url('../img/applat.png')
   background-repeat repeat
@@ -25,8 +29,7 @@ leftside()
     width 0
   &__expand
     position absolute
-    top 0
-    right -43px
+    right -42px
     display flex
     justify-content center
     align-items center
@@ -37,74 +40,79 @@ leftside()
     cursor pointer
     color white
     transition all sidebar-animate-speed
-  &__btnnewworkspace
-    margin 50px 0
-    overflow hidden
-    &__btn
-      display block
-      margin 0 auto
-      padding 15px 30px
-  &__navigation
-    padding 0
-    width sidebar-width
-    overflow hidden
-    &__workspace
-      padding-left 0
-      list-style none
-      &__item
-        &__wrapper
-          display flex
-          align-items center
-          border-bottom 1px solid
-          width 100%
-          height 100%
-          cursor pointer
-        &__number
-          display flex
-          leftside()
-          padding 12px
-          width 50px
-          letter-spacing 2px
-        &__name
-          padding 10px
-          font-size 20px
-          color off-white
-          white-space nowrap
-          overflow hidden
-          text-overflow ellipsis
-        &__icon
-          margin 0 10px 0 auto
-          color white
-        &__submenu
-          margin 0
-          padding 0
-          width 100%
-          overflow hidden
-          & > li
-            display block
-          &__dropdown
+  &__content
+    height 100%
+    &__btnnewworkspace
+      margin 50px 0
+      overflow hidden
+      &__btn
+        display block
+        margin 0 auto
+        padding 15px 30px
+    &__navigation
+      padding 0
+      width sidebar-width
+      transition all sidebar-animate-speed
+      overflow hidden
+      &.sidebarclose
+        width 0
+      &__workspace
+        padding-left 0
+        list-style none
+        &__item
+          &__wrapper
             display flex
             align-items center
             border-bottom 1px solid
+            width 100%
+            height 100%
             cursor pointer
-            &__showdropdown
+          &__number
+            display flex
+            leftside()
+            padding 12px
+            width 50px
+            letter-spacing 2px
+          &__name
+            padding 10px
+            font-size 20px
+            color off-white
+            white-space nowrap
+            overflow hidden
+            text-overflow ellipsis
+          &__icon
+            margin 0 10px 0 auto
+            color white
+          &__submenu
+            margin 0
+            padding 0
+            width 100%
+            overflow hidden
+            & > li
+              display block
+            &__dropdown
               display flex
-              justify-content space-between
               align-items center
-              padding 0 10px
-              width 100%
-            .dropdown__icon
-              padding 10px 15px
-              min-width 50px
-              leftside()
-            .dropdown__title
-              white-space nowrap
-              overflow hidden
-              text-overflow ellipsis
-              // color off-white
-            &.activeFilter
+              border-bottom 1px solid
+              cursor pointer
+              &__showdropdown
+                display flex
+                justify-content space-between
+                align-items center
+                padding 0 10px
+                width 100%
               .dropdown__icon
-                background-color rgba(253, 253, 253, 0.8)
+                padding 10px 15px
+                min-width 50px
+                leftside()
+              .dropdown__title
+                white-space nowrap
+                overflow hidden
+                text-overflow ellipsis
+                // color off-white
+              &.activeFilter
+                .dropdown__icon
+                  background-color rgba(253, 253, 253, 0.8)
   &__footer
     &__text
       font-size 14px
@@ -116,22 +124,19 @@ leftside()
             text-decoration underline
             color fourthColor
 
-/***** MEDIA 992px and 1199px ******/
 
-@media (min-width: min-lg) and (max-width: max-lg)
+/***** MEDIA 576px and 1199px ******/
 
-  .sidebar
-    position fixed
+// Regroup the css rules in one mediaqueries
 
-/***** MEDIA 576px and 991px ******/
+@media (min-width: min-sm) and (max-width: max-lg)
 
-@media (min-width: min-sm) and (max-width: max-md)
-
-  .sidebarSticky
-    top 69px
+  .sidebarpagecontainer
+    position relative
 
   .sidebar
-    position fixed
+    position absolute
+
 
 /***** MEDIA 576px and 767px *****/
 
@@ -145,10 +150,8 @@ leftside()
 @media (max-width: 575px)
 
   .sidebarpagecontainer
+    position relative
     padding-top 69px
 
-  .sidebarSticky
-    top 69px
-
   .sidebar
-    position fixed
+    position absolute
