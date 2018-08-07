@@ -25,7 +25,7 @@ class Sidebar extends React.Component {
     super(props)
     this.state = {
       sidebarClose: false,
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null
+      workspaceIdInUrl: props.match && props.match.params.idws ? parseInt(props.match.params.idws) : null
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -41,14 +41,17 @@ class Sidebar extends React.Component {
   }
 
   componentDidMount () {
+    // console.log('Sidebar Did Mount', this.props)
     this.loadAppConfigAndWorkspaceList()
   }
 
   componentDidUpdate (prevProps, prevState) {
-    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
-    if (this.props.match.params.idws === undefined || isNaN(this.props.match.params.idws)) return
+    const { props } = this
 
-    const newWorkspaceId = parseInt(this.props.match.params.idws)
+    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
+    if (!props.match || props.match.params.idws === undefined || isNaN(props.match.params.idws)) return
+
+    const newWorkspaceId = parseInt(props.match.params.idws)
     if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
   }
 
@@ -104,7 +107,7 @@ class Sidebar extends React.Component {
     return (
       <div className={classnames('sidebar primaryColorBgDarken', {'sidebarclose': sidebarClose})}>
         <div className='sidebarSticky'>
-          <div className='sidebar__expand primaryColorBg whiteColorBorder' onClick={this.handleClickToggleSidebar}>
+          <div className='sidebar__expand primaryColorBg' onClick={this.handleClickToggleSidebar}>
             <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
           </div>
 

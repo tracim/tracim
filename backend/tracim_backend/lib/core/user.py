@@ -3,13 +3,17 @@ from smtplib import SMTPException
 
 import transaction
 import typing as typing
+
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend import CFG
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
 from tracim_backend.exceptions import NoUserSetted
+from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import UserDoesNotExist
@@ -20,6 +24,7 @@ from tracim_backend.exceptions import UserNotActive
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
 from tracim_backend.models.context_models import TypeUser
+from tracim_backend.models.data import UserRoleInWorkspace
 
 
 class UserApi(object):
@@ -94,8 +99,41 @@ class UserApi(object):
             raise UserDoesNotExist('There is no current user')
         return self._user
 
+    def _get_all_query(self) -> Query:
+        return self._session.query(User).order_by(User.display_name)
+
     def get_all(self) -> typing.Iterable[User]:
-        return self._session.query(User).order_by(User.display_name).all()
+        return self._get_all_query().all()
+
+    def get_known_user(
+            self,
+            acp: str,
+    ) -> typing.Iterable[User]:
+        """
+        Return list of know user by current UserApi user.
+        :param acp: autocomplete filter by name/email
+        :return: List of found users
+        """
+        if len(acp) < 2:
+            raise TooShortAutocompleteString(
+                '"{acp}" is a too short string, acp string need to have more than one character'.format(acp=acp)  # nopep8
+            )
+        query = self._get_all_query()
+        query = query.filter(or_(User.display_name.ilike('%{}%'.format(acp)), User.email.ilike('%{}%'.format(acp))))  # nopep8
+
+        # INFO - G.M - 2018-07-27 - if user is set and is simple user, we
+        # should show only user in same workspace as user
+        if self._user and self._user.profile.id <= Group.TIM_USER:
+            user_workspaces_id_query = self._session.\
+                query(UserRoleInWorkspace.workspace_id).\
+                distinct(UserRoleInWorkspace.workspace_id).\
+                filter(UserRoleInWorkspace.user_id == self._user.user_id)
+            users_in_workspaces = self._session.\
+                query(UserRoleInWorkspace.user_id).\
+                distinct(UserRoleInWorkspace.user_id).\
+                filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery())).subquery()  # nopep8
+            query = query.filter(User.user_id.in_(users_in_workspaces))
+        return query.all()
 
     def find(
             self,
@@ -196,7 +234,7 @@ class UserApi(object):
         )
         if do_save:
             # TODO - G.M - 2018-07-24 - Check why commit is needed here
-            transaction.commit()
+            self.save(user)
         return user
 
     def set_email(

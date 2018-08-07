@@ -68,20 +68,17 @@ def create_1000px_png_test_image():
 class FunctionalTest(unittest.TestCase):
 
     fixtures = [BaseFixture]
-    sqlalchemy_url = 'sqlite:///tracim_test.sqlite'
+    config_uri = 'tests_configs.ini'
+    config_section = 'functional_test'
 
     def setUp(self):
         logger._logger.setLevel('WARNING')
+
         DepotManager._clear()
-        self.settings = {
-            'sqlalchemy.url': self.sqlalchemy_url,
-            'user.auth_token.validity': '604800',
-            'depot_storage_dir': '/tmp/test/depot',
-            'depot_storage_name': 'test',
-            'preview_cache_dir': '/tmp/test/preview_cache',
-            'preview.jpg.restricted_dims': True,
-            'email.notification.activated': 'false',
-        }
+        self.settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
         hapic.reset_context()
         self.engine = get_engine(self.settings)
         DeclarativeBase.metadata.create_all(self.engine)
@@ -127,7 +124,7 @@ class FunctionalTestEmptyDB(FunctionalTest):
 
 
 class FunctionalTestNoDB(FunctionalTest):
-    sqlalchemy_url = 'sqlite://'
+    config_section = 'functional_test_no_db'
 
     def init_database(self, settings):
         self.engine = get_engine(settings)

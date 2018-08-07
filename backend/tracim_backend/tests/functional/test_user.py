@@ -2382,8 +2382,10 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert workspace['workspace_id'] == 1
         assert workspace['label'] == 'Business'
         assert workspace['slug'] == 'business'
-        assert len(workspace['sidebar_entries']) == 7
+        assert len(workspace['sidebar_entries']) == 5
 
+        # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
+        # not fixed on active application/content-file
         sidebar_entry = workspace['sidebar_entries'][0]
         assert sidebar_entry['slug'] == 'dashboard'
         assert sidebar_entry['label'] == 'Dashboard'
@@ -2406,32 +2408,19 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['fa_icon'] == "file-text-o"
 
         sidebar_entry = workspace['sidebar_entries'][3]
-        assert sidebar_entry['slug'] == 'contents/markdownpluspage'
-        assert sidebar_entry['label'] == 'Markdown Plus Documents'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=markdownpluspage"    # nopep8
-        assert sidebar_entry['hexcolor'] == "#f12d2d"
-        assert sidebar_entry['fa_icon'] == "file-code-o"
-
-        sidebar_entry = workspace['sidebar_entries'][4]
         assert sidebar_entry['slug'] == 'contents/file'
         assert sidebar_entry['label'] == 'Files'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=file"  # nopep8
         assert sidebar_entry['hexcolor'] == "#FF9900"
         assert sidebar_entry['fa_icon'] == "paperclip"
 
-        sidebar_entry = workspace['sidebar_entries'][5]
+        sidebar_entry = workspace['sidebar_entries'][4]
         assert sidebar_entry['slug'] == 'contents/thread'
         assert sidebar_entry['label'] == 'Threads'
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
         assert sidebar_entry['hexcolor'] == "#ad4cf9"
         assert sidebar_entry['fa_icon'] == "comments-o"
 
-        sidebar_entry = workspace['sidebar_entries'][6]
-        assert sidebar_entry['slug'] == 'calendar'
-        assert sidebar_entry['label'] == 'Calendar'
-        assert sidebar_entry['route'] == "/#/workspaces/1/calendar"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#757575"
-        assert sidebar_entry['fa_icon'] == "calendar"
 
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
         """
@@ -2644,6 +2633,390 @@ class TestUserEndpoint(FunctionalTest):
             '/api/v2/users/{}'.format(user_id),
             status=403
         )
+
+
+class TestUsersEndpoint(FunctionalTest):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+    fixtures = [BaseFixture]
+
+    def test_api__get_user__ok_200__admin(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/users',
+            status=200
+        )
+        res = res.json_body
+        assert len(res) == 2
+        assert res[0]['user_id'] == admin.user_id
+        assert res[0]['public_name'] == admin.display_name
+        assert res[0]['avatar_url'] is None
+
+        assert res[1]['user_id'] == test_user.user_id
+        assert res[1]['public_name'] == test_user.display_name
+        assert res[1]['avatar_url'] is None
+
+    def test_api__get_user__err_403__normal_user(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/users',
+            status=403
+        )
+
+
+class TestKnownMembersEndpoint(FunctionalTest):
+    # -*- coding: utf-8 -*-
+    """
+    Tests for GET /api/v2/users/{user_id}
+    """
+    fixtures = [BaseFixture]
+
+    def test_api__get_user__ok_200__admin__by_name(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 'bob',
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 2
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
+
+        assert res[1]['user_id'] == test_user2.user_id
+        assert res[1]['public_name'] == test_user2.display_name
+        assert res[1]['avatar_url'] is None
+
+    def test_api__get_user__ok_200__admin__by_email(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 'test',
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 2
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
+
+        assert res[1]['user_id'] == test_user2.user_id
+        assert res[1]['public_name'] == test_user2.display_name
+        assert res[1]['avatar_url'] is None
+
+    def test_api__get_user__err_403__admin__too_small_acp(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 't',
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=400,
+            params=params
+        )
+
+    def test_api__get_user__ok_200__normal_user_by_email(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email='test3@test3.test3',
+            password='pass',
+            name='bob3',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        uapi.save(test_user3)
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        role_api = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass'
+            )
+        )
+        params = {
+            'acp': 'test',
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params
+        )
+        res = res.json_body
+        assert len(res) == 2
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
+
+        assert res[1]['user_id'] == test_user2.user_id
+        assert res[1]['public_name'] == test_user2.display_name
+        assert res[1]['avatar_url'] is None
 
 
 class TestSetEmailEndpoint(FunctionalTest):
@@ -3025,6 +3398,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             status=204,
         )
         # Check After
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
         user = uapi.get_one(user_id)
         assert not user.validate_password('pass')
         assert user.validate_password('mynewpassword')
@@ -3079,6 +3458,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             '/api/v2/users/{}/password'.format(user_id),
             params=params,
             status=403,
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
         )
         # Check After
         user = uapi.get_one(user_id)
@@ -3138,6 +3523,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             status=400,
         )
         # Check After
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
         user = uapi.get_one(user_id)
         assert user.validate_password('pass')
         assert not user.validate_password('mynewpassword')
@@ -3195,6 +3586,12 @@ class TestSetPasswordEndpoint(FunctionalTest):
             status=204,
         )
         # Check After
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
         user = uapi.get_one(user_id)
         assert not user.validate_password('pass')
         assert user.validate_password('mynewpassword')

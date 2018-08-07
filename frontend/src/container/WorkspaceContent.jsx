@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
 import { PAGE } from '../helper.js'
-import Sidebar from './Sidebar.jsx'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -108,7 +107,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickContentItem = content => {
     console.log('%c<WorkspaceContent> content clicked', 'color: #c17838', content)
-    this.props.history.push(`/workspaces/${content.idWorkspace}/${content.type}/${content.id}`)
+    this.props.history.push(PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id))
   }
 
   handleClickEditContentItem = (e, content) => {
@@ -166,9 +165,7 @@ class WorkspaceContent extends React.Component {
       : []
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-
+      <div className='WorkspaceContent' style={{width: '100%'}}>
         <OpenContentApp
           // automatically open the app for the idContent in url
           idWorkspace={this.state.workspaceIdInUrl}

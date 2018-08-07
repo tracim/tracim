@@ -1,5 +1,7 @@
 # coding=utf-8
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.tests import FunctionalTest
+from tracim_backend.models.applications import applications
 
 """
 Tests for /api/v2/system subpath endpoints.
@@ -24,41 +26,14 @@ class TestApplicationEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/system/applications', status=200)
         res = res.json_body
-        application = res[0]
-        assert application['label'] == "Text Documents"
-        assert application['slug'] == 'contents/html-document'
-        assert application['fa_icon'] == 'file-text-o'
-        assert application['hexcolor'] == '#3f52e3'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[1]
-        assert application['label'] == "Markdown Plus Documents"
-        assert application['slug'] == 'contents/markdownpluspage'
-        assert application['fa_icon'] == 'file-code-o'
-        assert application['hexcolor'] == '#f12d2d'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[2]
-        assert application['label'] == "Files"
-        assert application['slug'] == 'contents/file'
-        assert application['fa_icon'] == 'paperclip'
-        assert application['hexcolor'] == '#FF9900'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[3]
-        assert application['label'] == "Threads"
-        assert application['slug'] == 'contents/thread'
-        assert application['fa_icon'] == 'comments-o'
-        assert application['hexcolor'] == '#ad4cf9'
-        assert application['is_active'] is True
-        assert 'config' in application
-        application = res[4]
-        assert application['label'] == "Calendar"
-        assert application['slug'] == 'calendar'
-        assert application['fa_icon'] == 'calendar'
-        assert application['hexcolor'] == '#757575'
-        assert application['is_active'] is True
-        assert 'config' in application
+        assert len(res) == len(applications)
+        for counter, application in enumerate(applications):
+            assert res[counter]['label'] == application.label
+            assert res[counter]['slug'] == application.slug
+            assert res[counter]['fa_icon'] == application.fa_icon
+            assert res[counter]['hexcolor'] == application.hexcolor
+            assert res[counter]['is_active'] == application.is_active
+            assert res[counter]['config'] == application.config
 
     def test_api__get_applications__err_401__unregistered_user(self):
         """
@@ -96,44 +71,21 @@ class TestContentsTypesEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/system/content_types', status=200)
         res = res.json_body
+        assert len(res) == len(CONTENT_TYPES.endpoint_allowed_types_slug())
+        content_types = CONTENT_TYPES.endpoint_allowed_types_slug()
 
-        content_type = res[1]
-        assert content_type['slug'] == 'thread'
-        assert content_type['fa_icon'] == 'comments-o'
-        assert content_type['hexcolor'] == '#ad4cf9'
-        assert content_type['label'] == 'Thread'
-        assert content_type['creation_label'] == 'Discuss about a topic'
-        assert 'available_statuses' in content_type
-        assert len(content_type['available_statuses']) == 4
-
-        content_type = res[2]
-        assert content_type['slug'] == 'file'
-        assert content_type['fa_icon'] == 'paperclip'
-        assert content_type['hexcolor'] == '#FF9900'
-        assert content_type['label'] == 'File'
-        assert content_type['creation_label'] == 'Upload a file'
-        assert 'available_statuses' in content_type
-        assert len(content_type['available_statuses']) == 4
-
-        content_type = res[3]
-        assert content_type['slug'] == 'markdownpage'
-        assert content_type['fa_icon'] == 'file-code-o'
-        assert content_type['hexcolor'] == '#f12d2d'
-        assert content_type['label'] == 'Rich Markdown File'
-        assert content_type['creation_label'] == 'Create a Markdown document'
-        assert 'available_statuses' in content_type
-        assert len(content_type['available_statuses']) == 4
-
-        content_type = res[4]
-        assert content_type['slug'] == 'html-document'
-        assert content_type['fa_icon'] == 'file-text-o'
-        assert content_type['hexcolor'] == '#3f52e3'
-        assert content_type['label'] == 'Text Document'
-        assert content_type['creation_label'] == 'Write a document'
-        assert 'available_statuses' in content_type
-        assert len(content_type['available_statuses']) == 4
-        # TODO - G.M - 31-05-2018 - Check Folder type
-        # TODO - G.M - 29-05-2018 - Better check for available_statuses
+        for counter, content_type_slug in enumerate(content_types):
+            content_type = CONTENT_TYPES.get_one_by_slug(content_type_slug)
+            assert res[counter]['slug'] == content_type.slug
+            assert res[counter]['fa_icon'] == content_type.fa_icon
+            assert res[counter]['hexcolor'] == content_type.hexcolor
+            assert res[counter]['label'] == content_type.label
+            assert res[counter]['creation_label'] == content_type.creation_label
+            for status_counter, status in enumerate(content_type.available_statuses):
+                assert res[counter]['available_statuses'][status_counter]['fa_icon'] == status.fa_icon  # nopep8
+                assert res[counter]['available_statuses'][status_counter]['global_status'] == status.global_status  # nopep8
+                assert res[counter]['available_statuses'][status_counter]['slug'] == status.slug  # nopep8
+                assert res[counter]['available_statuses'][status_counter]['hexcolor'] == status.hexcolor  # nopep8
 
     def test_api__get_content_types__err_401__unregistered_user(self):
         """

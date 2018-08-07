@@ -55,8 +55,8 @@ class Login extends React.Component {
       Cookies.set(COOKIE.USER_LOGIN, inputLogin.value)
       Cookies.set(COOKIE.USER_AUTH, userAuth)
 
-      history.push(PAGE.HOME)
-    } else if (fetchPostUserLogin.status === 400) {
+      history.push(PAGE.WORKSPACE.ROOT)
+    } else if (fetchPostUserLogin.status === 403) {
       dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
     }
   }
@@ -140,8 +140,8 @@ class Login extends React.Component {
           </div>
 
           <footer className='loginpage__footer'>
-            <div className='loginpage__footer__text whiteFontColor'>
-              copyright © 2013 - 2018 tracim project.
+            <div className='loginpage__footer__text d-flex align-items-center flex wrap'>
+            copyright © 2013 - 2018 <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
             </div>
           </footer>
 

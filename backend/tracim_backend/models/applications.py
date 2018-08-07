@@ -59,6 +59,16 @@ thread = Application(
 
 )
 
+folder = Application(
+    label='Folder',
+    slug='contents/folder',
+    fa_icon='folder-open-o',
+    hexcolor='#252525',
+    is_active=True,
+    config={},
+    main_route='',
+)
+
 _file = Application(
     label='Files',
     slug='contents/file',
@@ -92,8 +102,10 @@ html_documents = Application(
 # List of applications
 applications = [
     html_documents,
-    markdownpluspage,
+    # TODO - G.M - 2018-08-02 - Restore markdownpage app
+    # markdownpluspage,
     _file,
     thread,
-    calendar,
+    folder,
+    # calendar,
 ]

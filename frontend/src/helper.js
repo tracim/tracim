@@ -24,14 +24,12 @@ export const workspaceConfig = {
 export const PAGE = {
   HOME: '/',
   WORKSPACE: {
+    ROOT: '/workspaces',
     DASHBOARD: (idws = ':idws') => `/workspaces/${idws}/dashboard`,
-    NEW: (idws, type) => `/workspaces/${idws}/${type}/new`,
+    NEW: (idws, type) => `/workspaces/${idws}/contents/${type}/new`,
     CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
     CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
-    CONTENT: (idws = ':idws', type = ':type?', idcts = ':idcts?') => `/workspaces/${idws}/${type}/${idcts}`, // @TODO add /contents/ in url and remove <Switch> in <Tracim>
-    // CONTENT_NEW: (idws = ':idws', ctstype = ':ctstype') => `/workspaces/${idws}/contents/${ctstype}/new`,
-    // CONTENT_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/edit`,
-    // CONTENT_TITLE_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/title/edit`,
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/workspaces/${idws}/contents/${type}/${idcts}`,
     ADMIN: (idws = ':idws') => `/workspaces/${idws}/admin`
   },
   LOGIN: '/login',
