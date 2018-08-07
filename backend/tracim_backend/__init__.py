@@ -125,6 +125,7 @@ def web(global_config, **local_settings):
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
 
     if app_config.FRONTEND_SERVE:
+        configurator.include('pyramid_mako')
         frontend_controller = FrontendController(app_config.FRONTEND_DIST_FOLDER_PATH)  # nopep8
         configurator.include(frontend_controller.bind)
 

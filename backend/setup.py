@@ -41,6 +41,8 @@ requires = [
     'lxml',
     'redis',
     'rq',
+    # frontend file serve
+    'pyramid_mako',
 ]
 
 tests_require = [
