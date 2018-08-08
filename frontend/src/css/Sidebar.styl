@@ -129,11 +129,11 @@ leftside()
             color fourthColor
 
 
-/***** MEDIA 576px and 1199px ******/
+/***** MEDIAQUERIES ******/
 
-// Regroup the css rules in one mediaqueries
+/***** MEDIA 992px and 1199px ******/
 
-@media (min-width: min-sm) and (max-width: max-lg)
+@media (min-width: min-lg) and (max-width: max-lg)
 
   .sidebarpagecontainer
     position relative
@@ -141,15 +141,28 @@ leftside()
   .sidebar
     position absolute
 
+/*** MEDIA 768px and 991px ****/
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .sidebarpagecontainer
+    position relative
+
+  .sidebar
+    position absolute
 
 /***** MEDIA 576px and 767px *****/
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
   .sidebarpagecontainer
+    position relative
     padding-top 69px
 
-/***** MEDIA  *****/
+  .sidebar
+    position absolute
+
+/***** MEDIA 575px *****/
 
 @media (max-width: 575px)
 
