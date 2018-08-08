@@ -34,7 +34,7 @@ export default function user (state = defaultUser, action) {
         ...action.user,
         avatar_url: action.user.avatar_url
           ? action.user.avatar_url
-          : generateAvatarFromPublicName(action.user.public_name)
+          : action.user.public_name ? generateAvatarFromPublicName(action.user.public_name) : ''
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
