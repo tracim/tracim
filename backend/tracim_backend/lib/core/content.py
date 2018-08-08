@@ -34,9 +34,9 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.utils.utils import current_date_for_filename
-from tracim_backend.models.contents import CONTENT_STATUS
-from tracim_backend.models.contents import ContentType
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import ContentType
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription

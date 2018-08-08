@@ -5,15 +5,14 @@ import functools
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
-from tracim_backend.models.contents import ContentType
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import ContentType
+from tracim_backend.app_models.contents import CONTENT_TYPES
 
 try:
     from json.decoder import JSONDecodeError
 except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
-from tracim_backend.models.contents import ContentType
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
@@ -133,19 +132,18 @@ def require_candidate_workspace_role(minimal_required_role: int) -> typing.Calla
     return decorator
 
 
-def require_content_types(content_types: typing.List['ContentType']) -> typing.Callable:  # nopep8
+def require_content_types(content_types_slug: typing.List[str]) -> typing.Callable:  # nopep8
     """
     Restricts access to specific file type or raise an exception.
     Check role for candidate_workspace.
-    :param content_types: list of ContentType object
+    :param content_types_slug: list of slug of content_types
     :return: decorator
     """
     def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             content = request.current_content
-            current_content_type_slug = CONTENT_TYPES.get_one_by_slug(content.type).slug
-            content_types_slug = [content_type.slug for content_type in content_types]  # nopep8
+            current_content_type_slug = CONTENT_TYPES.get_one_by_slug(content.type).slug  # nopep8
             if current_content_type_slug in content_types_slug:
                 return func(self, context, request)
             raise ContentTypeNotAllowed()

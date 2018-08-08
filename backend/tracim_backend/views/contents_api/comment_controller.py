@@ -7,7 +7,7 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -20,7 +20,7 @@ from tracim_backend.views.core_api.schemas import SetCommentSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.data import UserRoleInWorkspace
 

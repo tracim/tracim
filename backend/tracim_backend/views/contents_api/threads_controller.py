@@ -10,7 +10,7 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.views.controllers import Controller
@@ -25,8 +25,8 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.contents import CONTENT_TYPES
-from tracim_backend.models.contents import thread_type
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import thread_type
 from tracim_backend.models.revision_protection import new_revision
 
 SWAGGER_TAG__THREAD_ENDPOINTS = 'Threads'

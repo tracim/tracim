@@ -291,9 +291,9 @@ class ActionDescription(object):
                 ]
 
 
-from tracim_backend.models.contents import CONTENT_STATUS
-from tracim_backend.models.contents import ContentStatus
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import CONTENT_TYPES
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
 # is lost .
 

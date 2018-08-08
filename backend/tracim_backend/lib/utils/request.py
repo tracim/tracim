@@ -15,7 +15,7 @@ from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import ImmutableAttribute
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi

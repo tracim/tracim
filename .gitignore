@@ -6,3 +6,4 @@ frontend_app_html-document/dist/html-document.app.js
 frontend_lib/dist/tracim_frontend_lib.js
 npm-debug.log
 package-lock.json
+color.json

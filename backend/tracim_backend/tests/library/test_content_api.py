@@ -14,7 +14,7 @@ from tracim_backend.exceptions import SameValueError
 from tracim_backend.lib.core.workspace import RoleApi
 # TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
