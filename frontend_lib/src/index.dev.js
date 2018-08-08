@@ -18,6 +18,7 @@ import Delimiter from './component/Delimiter/Delimiter.jsx'
 import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
+import { libGenerateAvatarFromPublicName } from './helper.js'
 
 import NewVersionButton from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
@@ -98,7 +99,18 @@ ReactDOM.render(
             email: 'osef@algoo.fr',
             avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
           }}
-          timelineData={TimelineDebugData}
+          timelineData={TimelineDebugData.map(item => item.timelineType === 'comment'
+            ? {
+              ...item,
+              author: {
+                ...item.author,
+                avatar_url: item.author.avatar_url
+                  ? item.author.avatar_url
+                  : libGenerateAvatarFromPublicName(item.author.public_name)
+              }
+            }
+            : item
+          )}
           newComment={''}
           disableComment={false}
           wysiwyg={false}
