@@ -50,7 +50,7 @@
     "webpack-dev-server": "^2.9.2"
   },
   "standard": {
-    "globals": [],
+    "globals": ["G_vmlCanvasManager"],
     "parser": "babel-eslint",
     "ignore": []
   },
