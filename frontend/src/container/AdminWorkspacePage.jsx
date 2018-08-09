@@ -50,6 +50,7 @@ class AdminWorkspacePage extends React.Component {
                     { /*
                       <th scope='col'>Calendar</th>
                     */ }
+                    <th scope='col'>Remove Workspace</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -57,7 +58,6 @@ class AdminWorkspacePage extends React.Component {
                     <th>1</th>
                     <td>Design v_2</td>
                     <td>Workspace about tracim v2 design</td>
-                    <td>8 members</td>
                     { /*
                       <td className='d-flex align-items-center flex-wrap'>
                         <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
@@ -66,12 +66,20 @@ class AdminWorkspacePage extends React.Component {
                         Enable
                       </td>
                     */ }
+                    <td>8 members</td>
+                    <td>
+                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
+                        <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
+                          <i className='fa fa-fw fa-trash-o' />
+                        </div>
+                        Delete
+                      </div>
+                    </td>
                   </tr>
                   <tr>
                     <th>2</th>
                     <td>New features</td>
                     <td>Add a new features : Annotated files</td>
-                    <td>5 members</td>
                     { /*
                       <td className='d-flex align-items-center flex-wrap'>
                         <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
@@ -80,12 +88,20 @@ class AdminWorkspacePage extends React.Component {
                         Disable
                       </td>
                     */ }
+                    <td>5 members</td>
+                    <td>
+                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
+                        <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
+                          <i className='fa fa-fw fa-trash-o' />
+                        </div>
+                        Delete
+                      </div>
+                    </td>
                   </tr>
                   <tr>
                     <th>3</th>
                     <td>Fix Backend</td>
                     <td>workspace referring to multiple issues on the backend </td>
-                    <td>3 members</td>
                     { /*
                       <td className='d-flex align-items-center flex-wrap'>
                         <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
@@ -94,12 +110,20 @@ class AdminWorkspacePage extends React.Component {
                         Enable
                       </td>
                     */ }
+                    <td>3 members</td>
+                    <td>
+                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
+                        <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
+                          <i className='fa fa-fw fa-trash-o' />
+                        </div>
+                        Delete
+                      </div>
+                    </td>
                   </tr>
                   <tr>
                     <th>4</th>
                     <td>Design v_2</td>
                     <td>Workspace about tracim v2 design</td>
-                    <td>8 members</td>
                     { /*
                       <td className='d-flex align-items-center flex-wrap'>
                         <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
@@ -108,12 +132,20 @@ class AdminWorkspacePage extends React.Component {
                         Disable
                       </td>
                     */ }
+                    <td>8 members</td>
+                    <td>
+                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
+                        <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
+                          <i className='fa fa-fw fa-trash-o' />
+                        </div>
+                        Delete
+                      </div>
+                    </td>
                   </tr>
                   <tr>
                     <th>5</th>
                     <td>New features</td>
                     <td>Add a new features : Annotated files</td>
-                    <td>5 members</td>
                     { /*
                       <td className='d-flex align-items-center flex-wrap'>
                         <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
@@ -122,12 +154,20 @@ class AdminWorkspacePage extends React.Component {
                         Disable
                       </td>
                     */ }
+                    <td>5 members</td>
+                    <td>
+                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
+                        <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
+                          <i className='fa fa-fw fa-trash-o' />
+                        </div>
+                        Delete
+                      </div>
+                    </td>
                   </tr>
                   <tr>
                     <th>6</th>
                     <td>Fix Backend</td>
                     <td>workspace referring to multiple issues on the backend </td>
-                    <td>3 members</td>
                     { /*
                       <td className='d-flex align-items-center flex-wrap'>
                         <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
@@ -136,6 +176,15 @@ class AdminWorkspacePage extends React.Component {
                         Enable
                       </td>
                     */ }
+                    <td>3 members</td>
+                    <td>
+                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
+                        <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
+                          <i className='fa fa-fw fa-trash-o' />
+                        </div>
+                        Delete
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
