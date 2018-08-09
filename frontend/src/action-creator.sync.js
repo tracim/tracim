@@ -11,7 +11,7 @@ export const newFlashMessage = (msgText = '', msgType = 'info', msgDelay = 5000)
   msgDelay !== 0 && window.setTimeout(() => dispatch(removeFlashMessage(msgText)), msgDelay)
   return dispatch(addFlashMessage({message: msgText, type: msgType}))
 }
-export const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg })
+const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg }) // only newFlashMsg should be used by component and app so dont export this
 export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, msg })
 
 export const USER = 'User'

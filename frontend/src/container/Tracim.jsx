@@ -18,6 +18,7 @@ import {
   getUserIsConnected
 } from '../action-creator.async.js'
 import {
+  newFlashMessage,
   removeFlashMessage,
   setUserConnected
 } from '../action-creator.sync.js'
@@ -36,6 +37,10 @@ class Tracim extends React.Component {
       case 'redirect':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.history.push(data.url)
+        break
+      case 'addFlashMsg':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
     }
   }

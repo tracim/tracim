@@ -68,3 +68,43 @@ export const putThreadContent = (user, apiUrl, idWorkspace, idContent, label) =>
       raw_content: '' // threads have no content
     })
   })
+
+export const putThreadIsArchived = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putThreadIsDeleted = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putThreadRestoreArchived = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/unarchive`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putThreadRestoreDeleted = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/undelete`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
