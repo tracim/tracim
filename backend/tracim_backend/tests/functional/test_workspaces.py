@@ -41,6 +41,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
@@ -106,6 +107,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # modify workspace
@@ -120,6 +122,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # after
@@ -133,6 +136,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
     def test_api__update_workspace__err_400__empty_label(self) -> None:

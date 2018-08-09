@@ -2382,6 +2382,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert workspace['workspace_id'] == 1
         assert workspace['label'] == 'Business'
         assert workspace['slug'] == 'business'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
@@ -2420,7 +2421,6 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
         assert sidebar_entry['hexcolor'] == "#ad4cf9"
         assert sidebar_entry['fa_icon'] == "comments-o"
-
 
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
         """

@@ -455,6 +455,13 @@ class WorkspaceInContext(object):
         return slugify(self.workspace.label)
 
     @property
+    def is_deleted(self) -> bool:
+        """
+        Is the workspace deleted ?
+        """
+        return self.workspace.is_deleted
+
+    @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:
         """
         get sidebar entries, those depends on activated apps.
