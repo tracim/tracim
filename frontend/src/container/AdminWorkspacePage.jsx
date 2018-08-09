@@ -50,7 +50,7 @@ class AdminWorkspacePage extends React.Component {
                     { /*
                       <th scope='col'>Calendar</th>
                     */ }
-                    <th scope='col'>Remove Workspace</th>
+                    <th scope='col'>Delete workspace</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -66,7 +66,7 @@ class AdminWorkspacePage extends React.Component {
                         Enable
                       </td>
                     */ }
-                    <td>8 members</td>
+                    <td>8</td>
                     <td>
                       <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
                         <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
@@ -88,7 +88,7 @@ class AdminWorkspacePage extends React.Component {
                         Disable
                       </td>
                     */ }
-                    <td>5 members</td>
+                    <td>5</td>
                     <td>
                       <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
                         <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
@@ -110,7 +110,7 @@ class AdminWorkspacePage extends React.Component {
                         Enable
                       </td>
                     */ }
-                    <td>3 members</td>
+                    <td>3</td>
                     <td>
                       <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
                         <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
@@ -132,7 +132,7 @@ class AdminWorkspacePage extends React.Component {
                         Disable
                       </td>
                     */ }
-                    <td>8 members</td>
+                    <td>8</td>
                     <td>
                       <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
                         <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
@@ -154,7 +154,7 @@ class AdminWorkspacePage extends React.Component {
                         Disable
                       </td>
                     */ }
-                    <td>5 members</td>
+                    <td>5</td>
                     <td>
                       <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
                         <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
@@ -176,7 +176,7 @@ class AdminWorkspacePage extends React.Component {
                         Enable
                       </td>
                     */ }
-                    <td>3 members</td>
+                    <td>3</td>
                     <td>
                       <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
                         <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
