@@ -16,6 +16,7 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.lib.utils.authorization import require_profile_or_other_profile_with_workspace_role
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.models import Group
 from tracim_backend.lib.utils.authorization import require_candidate_workspace_role
@@ -116,6 +117,51 @@ class WorkspaceController(Controller):
             save_now=True,
         )
         return wapi.get_workspace_with_context(workspace)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @require_profile_or_other_profile_with_workspace_role(
+        Group.TIM_ADMIN,
+        Group.TIM_MANAGER,
+        UserRoleInWorkspace.WORKSPACE_MANAGER,
+    )
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def delete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        delete workspace
+        """
+        app_config = request.registry.settings['CFG']
+        wapi = WorkspaceApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        wapi.delete(request.current_workspace, flush=True)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @require_profile_or_other_profile_with_workspace_role(
+        Group.TIM_ADMIN,
+        Group.TIM_MANAGER,
+        UserRoleInWorkspace.WORKSPACE_MANAGER,
+    )
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def undelete_workspace(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        restore deleted workspace
+        """
+        app_config = request.registry.settings['CFG']
+        wapi = WorkspaceApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+            show_deleted=True,
+        )
+        wapi.undelete(request.current_workspace, flush=True)
+        return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -512,6 +558,11 @@ class WorkspaceController(Controller):
         # Create workspace
         configurator.add_route('create_workspace', '/workspaces', request_method='POST')  # nopep8
         configurator.add_view(self.create_workspace, route_name='create_workspace')  # nopep8
+        # Delete/Undelete workpace
+        configurator.add_route('delete_workspace', '/workspaces/{workspace_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_view(self.delete_workspace, route_name='delete_workspace')  # nopep8
+        configurator.add_route('undelete_workspace', '/workspaces/{workspace_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_view(self.undelete_workspace, route_name='undelete_workspace')  # nopep8
         # Update Workspace
         configurator.add_route('update_workspace', '/workspaces/{workspace_id}', request_method='PUT')  # nopep8
         configurator.add_view(self.update_workspace, route_name='update_workspace')  # nopep8
