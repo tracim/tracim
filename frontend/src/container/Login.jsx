@@ -102,35 +102,36 @@ class Login extends React.Component {
                         onChange={this.handleChangePassword}
                       />
 
-                      <div className='row mt-4 mb-4'>
-                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
-                          {/*
-                          <InputCheckbox
-                            parentClassName='connection__form__rememberme'
-                            customClass=''
-                            label='Se souvenir de moi'
-                            checked={this.state.inputRememberMe}
-                            onChange={this.handleChangeRememberMe}
-                          />
-                          */}
-                        </div>
+                      <div className='row align-items-center mt-4 mb-4'>
 
-                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-sm-right'>
+                        {/*
+                          <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                            <InputCheckbox
+                              parentClassName='connection__form__rememberme'
+                              customClass=''
+                              label='Se souvenir de moi'
+                              checked={this.state.inputRememberMe}
+                              onChange={this.handleChangeRememberMe}
+                            />
+                          </div>
+                        */}
+
+                        <div className='col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
                           <LoginBtnForgotPw
                             customClass='connection__form__pwforgot'
                             label={this.props.t('Forgotten password ?')}
                           />
                         </div>
+                        <Button
+                          htmlType='button'
+                          bootstrapType='primary'
+                          customClass='connection__form__btnsubmit ml-auto'
+                          label={this.props.t('Connection')}
+                          onClick={this.handleClickSubmit}
+                        />
                       </div>
-
-                      <Button
-                        htmlType='button'
-                        bootstrapType='primary'
-                        customClass='connection__form__btnsubmit ml-auto'
-                        label={this.props.t('Connection')}
-                        onClick={this.handleClickSubmit}
-                      />
                     </div>
+
                   </CardBody>
                 </Card>
 
@@ -140,8 +141,8 @@ class Login extends React.Component {
           </div>
 
           <footer className='loginpage__footer'>
-            <div className='loginpage__footer__text whiteFontColor'>
-              copyright © 2013 - 2018 tracim project.
+            <div className='loginpage__footer__text d-flex align-items-center flex wrap'>
+            copyright © 2013 - 2018 <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
             </div>
           </footer>
 

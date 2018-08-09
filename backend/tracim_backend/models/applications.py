@@ -36,6 +36,12 @@ class Application(object):
         self.config = config
         self.main_route = main_route
 
+    # TODO - G.M - 2018-08-07 - Refactor slug coherence issue like this one.
+    # we probably should not have 2 kind of slug
+    @property
+    def minislug(self):
+        return self.slug.replace('contents/', '')
+
 
 # default apps
 calendar = Application(

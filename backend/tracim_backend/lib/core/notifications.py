@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm import Session
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content

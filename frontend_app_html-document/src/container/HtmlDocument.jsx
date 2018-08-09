@@ -5,6 +5,7 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
+  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -119,7 +120,16 @@ class HtmlDocument extends React.Component {
       handleFetchResult(await fetchResultRevision)
     ])
       .then(([resComment, resRevision]) => {
-        const resCommentWithProperDate = resComment.body.map(c => ({...c, created: (new Date(c.created)).toLocaleString()}))
+        const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
+          ...c,
+          created: (new Date(c.created)).toLocaleString(),
+          author: {
+            ...c.author,
+            avatar_url: c.author.avatar_url
+              ? c.author.avatar_url
+              : generateAvatarFromPublicName(c.author.public_name)
+          }
+        }))
 
         const revisionWithComment = resRevision.body
           .map((r, i) => ({
@@ -128,7 +138,7 @@ class HtmlDocument extends React.Component {
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
               timelineType: 'comment',
-              ...resCommentWithProperDate.find(c => c.content_id === ci)
+              ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
             })),
             number: i + 1
           }))

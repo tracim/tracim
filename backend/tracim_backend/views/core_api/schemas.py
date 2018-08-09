@@ -49,7 +49,7 @@ class UserDigestSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     avatar_url = marshmallow.fields.Url(
         allow_none=True,
-        example="/api/v2/assets/avatars/suri-cate.jpg",
+        example="/api/v2/asset/avatars/suri-cate.jpg",
         description="avatar_url is the url to the image file. "
                     "If no avatar, then set it to null "
                     "(and frontend will interpret this with a default avatar)",

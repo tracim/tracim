@@ -10,25 +10,39 @@ import {
   getWorkspaceDetail,
   getWorkspaceMemberList,
   getWorkspaceRecentActivityList,
-  getWorkspaceReadStatusList
+  getWorkspaceReadStatusList,
+  getUserKnownMember,
+  postWorkspaceMember,
+  putUserWorkspaceRead
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
   setWorkspaceDetail,
   setWorkspaceMemberList,
   setWorkspaceRecentActivityList,
+  setWorkspaceRecentActivityForUserList,
   setWorkspaceReadStatusList
 } from '../action-creator.sync.js'
-import { ROLE } from '../helper.js'
+import { ROLE, PAGE } from '../helper.js'
+import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
+import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt everytime
+      newMember: {
+        id: '',
+        avatarUrl: '',
+        nameOrEmail: '',
+        // createAccount: false, // @TODO ask DA about this checkbox if it is still usefull (since backend handles it all)
+        role: ''
+      },
+      searchedKnownMemberList: [],
       displayNewMemberDashboard: false,
       displayNotifBtn: false,
       displayWebdavBtn: false,
@@ -41,52 +55,126 @@ class Dashboard extends React.Component {
 
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened when fetching workspace detail'), 'warning')); break
+      case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('workspace detail')}`, 'warning')); break
     }
+    this.loadMemberList()
+    this.loadRecentActivity()
+  }
+
+  loadMemberList = async () => {
+    const { props, state } = this
 
     const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceMemberList.status) {
-      case 200:
-        props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened while fetching member list'), 'warning')); break
-    }
-
-    const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl))
-    switch (fetchWorkspaceRecentActivityList.status) {
-      case 200:
-        props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened while fetching recent activity list'), 'warning')); break
-    }
-
-    const fetchWorkspaceReadStatusList = await props.dispatch(getWorkspaceReadStatusList(props.user, state.workspaceIdInUrl))
-    switch (fetchWorkspaceReadStatusList.status) {
-      case 200:
-        props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened while fetching read status list'), 'warning')); break
+      case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('member list')}`, 'warning')); break
     }
   }
 
-  handleToggleNewMemberDashboard = () => this.setState(prevState => ({
-    displayNewMemberDashboard: !prevState.displayNewMemberDashboard
-  }))
+  loadRecentActivity = async () => {
+    const { props, state } = this
 
-  handleToggleNotifBtn = () => this.setState(prevState => ({
-    displayNotifBtn: !prevState.displayNotifBtn
-  }))
+    const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl))
+    const fetchWorkspaceReadStatusList = await props.dispatch(getWorkspaceReadStatusList(props.user, state.workspaceIdInUrl))
 
-  handleToggleWebdavBtn = () => this.setState(prevState => ({
-    displayWebdavBtn: !prevState.displayWebdavBtn
-  }))
+    switch (fetchWorkspaceRecentActivityList.status) {
+      case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('recent activity list')}`, 'warning')); break
+    }
 
-  handleToggleCalendarBtn = () => this.setState(prevState => ({
-    displayCalendarBtn: !prevState.displayCalendarBtn
-  }))
+    switch (fetchWorkspaceReadStatusList.status) {
+      case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('read status list')}`, 'warning')); break
+    }
+
+    const readStatusForUserList = fetchWorkspaceReadStatusList.json.filter(c => c.read_by_user).map(c => c.content_id)
+    const recentActivityForUserList = fetchWorkspaceRecentActivityList.json.filter(content => !readStatusForUserList.includes(content.content_id))
+
+    props.dispatch(setWorkspaceRecentActivityForUserList(recentActivityForUserList))
+  }
+
+  handleToggleNewMemberDashboard = () => this.setState(prevState => ({displayNewMemberDashboard: !prevState.displayNewMemberDashboard}))
+
+  handleToggleNotifBtn = () => this.setState(prevState => ({displayNotifBtn: !prevState.displayNotifBtn}))
+
+  handleToggleWebdavBtn = () => this.setState(prevState => ({displayWebdavBtn: !prevState.displayWebdavBtn}))
+
+  handleToggleCalendarBtn = () => this.setState(prevState => ({displayCalendarBtn: !prevState.displayCalendarBtn}))
+
+  handleClickRecentContent = (idContent, typeContent) => this.props.history.push(PAGE.WORKSPACE.CONTENT(this.props.curWs.id, typeContent, idContent))
+
+  handleClickMarkRecentActivityAsRead = async () => {
+    const { props } = this
+    const fetchUserWorkspaceAllRead = await props.dispatch(putUserWorkspaceRead(props.user, props.curWs.id))
+    switch (fetchUserWorkspaceAllRead.status) {
+      case 204: this.loadRecentActivity(); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching "mark all as read"')}`, 'warning')); break
+    }
+  }
+
+  handleClickSeeMore = async () => {
+    console.log('nyi')
+  }
+
+  handleSearchUser = async userNameToSearch => {
+    const { props } = this
+    const fetchUserKnownMemberList = await props.dispatch(getUserKnownMember(props.user, userNameToSearch))
+    switch (fetchUserKnownMemberList.status) {
+      case 200:
+        this.setState({searchedKnownMemberList: fetchUserKnownMemberList.json}); break
+      default:
+        props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('known members list')}`, 'warning')); break
+    }
+  }
+
+  handleChangeNewMemberNameOrEmail = newNameOrEmail => {
+    if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
+    this.setState(prev => ({newMember: {...prev.newMember, nameOrEmail: newNameOrEmail}}))
+  }
+
+  handleClickKnownMember = knownMember => {
+    this.setState(prev => ({
+      newMember: {
+        ...prev.newMember,
+        id: knownMember.user_id,
+        nameOrEmail: knownMember.public_name,
+        avatarUrl: knownMember.avatar_url
+      },
+      searchedKnownMemberList: []
+    }))
+  }
+
+  // handleChangeNewMemberCreateAccount = newCreateAccount => this.setState(prev => ({newMember: {...prev.newMember, createAccount: newCreateAccount}}))
+
+  handleChangeNewMemberRole = newRole => this.setState(prev => ({newMember: {...prev.newMember, role: newRole}}))
+
+  handleClickValidateNewMember = async () => {
+    const { props, state } = this
+
+    if (state.newMember.nameOrEmail === '') {
+      props.dispatch(newFlashMessage(props.t('Please set a name or email'), 'warning'))
+      return
+    }
+
+    if (state.newMember.role === '') {
+      props.dispatch(newFlashMessage(props.t('Please set a role'), 'warning'))
+      return
+    }
+
+    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
+      id: state.newMember.id,
+      name: state.newMember.nameOrEmail,
+      role: state.newMember.role
+    }))
+
+    switch (fetchWorkspaceNewMember.status) {
+      case 200:
+        this.loadMemberList(); break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened while adding the member'), 'warning')); break
+    }
+  }
 
   render () {
     const { props, state } = this
@@ -118,72 +206,13 @@ class Dashboard extends React.Component {
                 </div>
               </div>
 
-              <div className='dashboard__userstatut'>
-                <div className='dashboard__userstatut__role'>
-                  <div className='dashboard__userstatut__role__msg'>
-                    {props.t(`Hi ! ${props.user.public_name} `)}{props.t('currently, you are ')}
-                  </div>
-
-                  {(() => {
-                    const myself = props.curWs.memberList.find(m => m.id === props.user.user_id)
-                    if (myself === undefined) return
-
-                    const myRole = ROLE.find(r => r.slug === myself.role)
-
-                    return (
-                      <div className='dashboard__userstatut__role__definition'>
-                        <div className='dashboard__userstatut__role__definition__icon'>
-                          <i className={`fa fa-${myRole.faIcon}`} />
-                        </div>
-
-                        <div className='dashboard__userstatut__role__definition__text'>
-                          {myRole.label}
-                        </div>
-                      </div>
-                    )
-                  })()}
-                </div>
-
-                <div className='dashboard__userstatut__notification'>
-                  <div className='dashboard__userstatut__notification__text'>
-                    {props.t("You have subscribed to this workspace's notifications")} (nyi)
-                  </div>
-
-                  {state.displayNotifBtn
-                    ? (
-                      <div className='dashboard__userstatut__notification__subscribe dropdown'>
-                        <button
-                          className='dashboard__userstatut__notification__subscribe__btn btn btn-outline-primary dropdown-toggle'
-                          type='button'
-                          id='dropdownMenuButton'
-                          data-toggle='dropdown'
-                          aria-haspopup='true'
-                          aria-expanded='false'
-                        >
-                          {props.t('subscriber')}
-                        </button>
-
-                        <div className='dashboard__userstatut__notification__subscribe__submenu dropdown-menu'>
-                          <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item'>
-                            {props.t('subscriber')}
-                          </div>
-                          <div className='dashboard__userstatut__notification__subscribe__submenu__item dropdown-item dropdown-item'>
-                            {props.t('unsubscribed')}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                    : (
-                      <div
-                        className='dashboard__userstatut__notification__btn btn btn-outline-primary'
-                        onClick={this.handleToggleNotifBtn}
-                      >
-                        {props.t('Change your status')}
-                      </div>
-                    )
-                  }
-                </div>
-              </div>
+              <UserStatus
+                user={props.user}
+                curWs={props.curWs}
+                displayNotifBtn={state.displayNotifBtn}
+                onClickToggleNotifBtn={this.handleToggleNotifBtn}
+                t={props.t}
+              />
             </div>
 
             <div className='dashboard__calltoaction justify-content-xl-center'>
@@ -202,9 +231,11 @@ class Dashboard extends React.Component {
             <div className='dashboard__workspaceInfo'>
               <RecentActivity
                 customClass='dashboard__activity'
-                recentActivityFilteredForUser={props.curWs.recentActivityList.filter(content => !props.curWs.contentReadStatusList.includes(content.id))}
+                recentActivityFilteredForUser={props.curWs.recentActivityForUserList}
                 contentTypeList={props.contentType}
-                onClickSeeMore={() => {}}
+                onClickRecentContent={this.handleClickRecentContent}
+                onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
+                onClickSeeMore={this.handleClickSeeMore}
                 t={props.t}
               />
 
@@ -212,70 +243,26 @@ class Dashboard extends React.Component {
                 customClass='dashboard__memberlist'
                 memberList={props.curWs.memberList}
                 roleList={ROLE}
+                searchedKnownMemberList={state.searchedKnownMemberList}
+                nameOrEmail={state.newMember.nameOrEmail}
+                onChangeNameOrEmail={this.handleChangeNewMemberNameOrEmail}
+                onClickKnownMember={this.handleClickKnownMember}
+                // createAccount={state.newMember.createAccount}
+                // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
+                role={state.newMember.role}
+                onChangeRole={this.handleChangeNewMemberRole}
+                onClickValidateNewMember={this.handleClickValidateNewMember}
                 t={props.t}
               />
             </div>
 
-            <div className='dashboard__moreinfo'>
-              <div className='dashboard__moreinfo__webdav genericBtnInfoDashboard'>
-                <div
-                  className='dashboard__moreinfo__webdav__btn genericBtnInfoDashboard__btn'
-                  onClick={this.handleToggleWebdavBtn}
-                >
-                  <div className='dashboard__moreinfo__webdav__btn__icon genericBtnInfoDashboard__btn__icon'>
-                    <i className='fa fa-windows' />
-                  </div>
-
-                  <div className='dashboard__moreinfo__webdav__btn__text genericBtnInfoDashboard__btn__text'>
-                    {this.props.t('Implement Tracim in your explorer')}
-                  </div>
-                </div>
-                {this.state.displayWebdavBtn === true &&
-                <div>
-                  <div className='dashboard__moreinfo__webdav__information genericBtnInfoDashboard__info'>
-                    <div className='dashboard__moreinfo__webdav__information__text genericBtnInfoDashboard__info__text'>
-                      {this.props.t('Find all your documents deposited online directly on your computer via the workstation, without going through the software.')}'
-                    </div>
-
-                    <div className='dashboard__moreinfo__webdav__information__link genericBtnInfoDashboard__info__link'>
-                      http://algoo.trac.im/webdav/
-                    </div>
-                  </div>
-                </div>
-                }
-              </div>
-              <div className='dashboard__moreinfo__calendar genericBtnInfoDashboard'>
-                <div className='dashboard__moreinfo__calendar__wrapperBtn'>
-                  <div
-                    className='dashboard__moreinfo__calendar__btn genericBtnInfoDashboard__btn'
-                    onClick={this.handleToggleCalendarBtn}
-                  >
-                    <div className='dashboard__moreinfo__calendar__btn__icon genericBtnInfoDashboard__btn__icon'>
-                      <i className='fa fa-calendar' />
-                    </div>
-
-                    <div className='dashboard__moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text'>
-                      {this.props.t('Workspace Calendar')}
-                    </div>
-                  </div>
-                </div>
-                <div className='dashboard__moreinfo__calendar__wrapperText'>
-                  {this.state.displayCalendarBtn === true &&
-                  <div>
-                    <div className='dashboard__moreinfo__calendar__information genericBtnInfoDashboard__info'>
-                      <div className='dashboard__moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
-                        {this.props.t('Each workspace has its own calendar.')}
-                      </div>
-
-                      <div className='dashboard__moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>
-                        http://algoo.trac.im/calendar/
-                      </div>
-                    </div>
-                  </div>
-                  }
-                </div>
-              </div>
-            </div>
+            <MoreInfo
+              onClickToggleWebdav={this.handleToggleWebdavBtn}
+              displayWebdavBtn={state.displayWebdavBtn}
+              onClickToggleCalendar={this.handleToggleCalendarBtn}
+              displayCalendarBtn={state.displayCalendarBtn}
+              t={props.t}
+            />
           </PageContent>
         </PageWrapper>
       </div>

@@ -209,3 +209,7 @@ class UnallowedSubContent(TracimException):
 
 class TooShortAutocompleteString(TracimException):
     pass
+
+
+class PageNotFound(TracimException):
+    pass

@@ -1,0 +1,30 @@
+.moreinfo
+  display flex
+  justify-content space-between
+  flexwrap wrap
+  &__webdav
+    margin 0 15px 40px 0
+    &__btn
+      width 300px
+    &__information
+      width 300px
+  &__calendar
+    display none
+    margin-bottom 100px
+    &__wrapperBtn
+      margin-right 290px
+    &__btn
+      width 300px
+    &__information
+      width 300px
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .moreinfo__webdav__information
+    width 500px
+
+@media (max-width: max-xs)
+  .moreinfo
+    &__webdav
+      margin-left 10px
+      &__information
+        width 350px

@@ -4,6 +4,7 @@ import { debug } from '../helper.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
+  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -108,7 +109,13 @@ class Thread extends React.Component {
         listMessage: resComment.body.map(c => ({
           ...c,
           timelineType: 'comment',
-          created: (new Date(c.created)).toLocaleString()
+          created: (new Date(c.created)).toLocaleString(),
+          author: {
+            ...c.author,
+            avatar_url: c.author.avatar_url
+              ? c.author.avatar_url
+              : generateAvatarFromPublicName(c.author.public_name)
+          }
         }))
       }))
       .catch(e => console.log('Error loading Thread data.', e))

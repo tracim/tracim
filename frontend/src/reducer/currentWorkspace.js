@@ -2,7 +2,7 @@ import {
   SET,
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
-  WORKSPACE_READ_STATUS_LIST,
+  WORKSPACE_READ_STATUS_LIST, WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST
 } from '../action-creator.sync.js'
 import { handleRouteFromApi } from '../helper.js'
@@ -15,6 +15,7 @@ const defaultWorkspace = {
   sidebarEntryList: [],
   memberList: [],
   recentActivityList: [],
+  recentActivityForUserList: [],
   contentReadStatusList: []
 }
 
@@ -52,6 +53,23 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         recentActivityList: action.workspaceRecentActivityList.map(ra => ({
+          id: ra.content_id,
+          slug: ra.slug,
+          label: ra.label,
+          type: ra.content_type,
+          idParent: ra.parent_id,
+          showInUi: ra.show_in_ui,
+          isArchived: ra.is_archived,
+          isDeleted: ra.is_deleted,
+          statusSlug: ra.status,
+          subContentTypeSlug: ra.sub_content_types
+        }))
+      }
+
+    case `${SET}/${WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST}`:
+      return {
+        ...state,
+        recentActivityForUserList: action.workspaceRecentActivityForUserList.map(ra => ({
           id: ra.content_id,
           slug: ra.slug,
           label: ra.label,
