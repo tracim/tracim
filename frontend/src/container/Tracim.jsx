@@ -106,11 +106,11 @@ class Tracim extends React.Component {
 
               <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
                 ? null // @FIXME this needs to be handled in case of new user that has no workspace
-                : <Redirect to={{pathname: `/workspaces/${props.workspaceList[0].id}/contents`, state: {from: props.location}}} />
+                : <Redirect to={{pathname: PAGE.WORKSPACE.DASHBOARD(props.workspaceList[0].id), state: {from: props.location}}} />
               } />
 
               <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
-                <Redirect to={{pathname: `/workspaces/${props2.match.params.idws}/contents`, state: {from: props.location}}} />
+                <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
               } />
 
               <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />

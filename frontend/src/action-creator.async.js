@@ -240,9 +240,9 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
   })
 }
 
-export const getWorkspaceRecentActivityList = (user, idWorkspace) => dispatch => {
+export const getWorkspaceRecentActivityList = (user, idWorkspace, beforeId = null) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
     param: {
       headers: {
         ...FETCH_CONFIG.headers,

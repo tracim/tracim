@@ -45,7 +45,7 @@ export class MemberList extends React.Component {
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
-                        {m.avatarUrl ? <img src={m.avatarUrl} /> : <img src='NYI' />}
+                        <img src={m.avatarUrl} />
                       </div>
 
                       <div className='memberlist__list__item__info mr-auto'>

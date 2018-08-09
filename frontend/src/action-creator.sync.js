@@ -2,6 +2,7 @@ export const SET = 'Set'
 export const UPDATE = 'Update'
 export const ADD = 'Add'
 export const REMOVE = 'Remove'
+export const APPEND = 'Append'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -52,8 +53,7 @@ export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
 export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
 export const setWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
-export const WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST = `${WORKSPACE_RECENT_ACTIVITY}/ForUser/List`
-export const setWorkspaceRecentActivityForUserList = workspaceRecentActivityForUserList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST}`, workspaceRecentActivityForUserList })
+export const appendWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`

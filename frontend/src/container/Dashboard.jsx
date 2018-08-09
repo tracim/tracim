@@ -20,7 +20,7 @@ import {
   setWorkspaceDetail,
   setWorkspaceMemberList,
   setWorkspaceRecentActivityList,
-  setWorkspaceRecentActivityForUserList,
+  appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList
 } from '../action-creator.sync.js'
 import { ROLE, PAGE } from '../helper.js'
@@ -34,7 +34,7 @@ class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt everytime
+      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
       newMember: {
         id: '',
         avatarUrl: '',
@@ -51,6 +51,26 @@ class Dashboard extends React.Component {
   }
 
   async componentDidMount () {
+    this.loadWorkspaceDetail()
+    this.loadMemberList()
+    this.loadRecentActivity()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { props, state } = this
+
+    if (prevProps.match.params.idws !== props.match.params.idws) {
+      this.setState({workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null})
+    }
+
+    if (prevState.workspaceIdInUrl !== state.workspaceIdInUrl) {
+      this.loadWorkspaceDetail()
+      this.loadMemberList()
+      this.loadRecentActivity()
+    }
+  }
+
+  loadWorkspaceDetail = async () => {
     const { props, state } = this
 
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
@@ -58,8 +78,6 @@ class Dashboard extends React.Component {
       case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('workspace detail')}`, 'warning')); break
     }
-    this.loadMemberList()
-    this.loadRecentActivity()
   }
 
   loadMemberList = async () => {
@@ -87,11 +105,6 @@ class Dashboard extends React.Component {
       case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('read status list')}`, 'warning')); break
     }
-
-    const readStatusForUserList = fetchWorkspaceReadStatusList.json.filter(c => c.read_by_user).map(c => c.content_id)
-    const recentActivityForUserList = fetchWorkspaceRecentActivityList.json.filter(content => !readStatusForUserList.includes(content.content_id))
-
-    props.dispatch(setWorkspaceRecentActivityForUserList(recentActivityForUserList))
   }
 
   handleToggleNewMemberDashboard = () => this.setState(prevState => ({displayNewMemberDashboard: !prevState.displayNewMemberDashboard}))
@@ -114,7 +127,15 @@ class Dashboard extends React.Component {
   }
 
   handleClickSeeMore = async () => {
-    console.log('nyi')
+    const { props, state } = this
+
+    const idLastRecentActivity = props.curWs.recentActivityList[props.curWs.recentActivityList.length - 1].id
+
+    const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl, idLastRecentActivity))
+    switch (fetchWorkspaceRecentActivityList.status) {
+      case 200: props.dispatch(appendWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('recent activity list')}`, 'warning')); break
+    }
   }
 
   handleSearchUser = async userNameToSearch => {
@@ -223,6 +244,7 @@ class Dashboard extends React.Component {
                   label={ct.label}
                   faIcon={ct.faIcon}
                   creationLabel={ct.creationLabel}
+                  onClickBtn={() => props.history.push(PAGE.WORKSPACE.NEW(props.curWs.id, ct.slug))}
                   key={ct.label}
                 />
               )}
@@ -231,7 +253,8 @@ class Dashboard extends React.Component {
             <div className='dashboard__workspaceInfo'>
               <RecentActivity
                 customClass='dashboard__activity'
-                recentActivityFilteredForUser={props.curWs.recentActivityForUserList}
+                recentActivityList={props.curWs.recentActivityList}
+                readByUserList={props.curWs.contentReadStatusList}
                 contentTypeList={props.contentType}
                 onClickRecentContent={this.handleClickRecentContent}
                 onClickEverythingAsRead={this.handleClickMarkRecentActivityAsRead}
