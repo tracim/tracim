@@ -74,21 +74,9 @@ ReactDOM.render(
       />
 
       <PopinFixedContent customClass={`${'randomClass'}__contentpage`}>
-        <div>
-          <NewVersionButton customColor='#3f52e3' />
-          <ArchiveDeleteContent customColor='#3f52e3' />
-          <Delimiter />
-          <span>Here will be the app content. Style is handled by the app (obviously)</span>
-          <BtnSwitch />
-          {/* <TextAreaApp customClass={'randomClass'} text={'woot'} /> */}
-          <Checkbox
-            name='osef'
-            onClickCheckbox={() => {}}
-            checked
-          />
-        </div>
 
         <Timeline
+          showHeader={false}
           customClass={`${'randomClass'}__contentpage`}
           customColor={'#3f52e3'}
           loggedUser={{

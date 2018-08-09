@@ -22,7 +22,11 @@ import {
   getHtmlDocRevision,
   postHtmlDocNewComment,
   putHtmlDocContent,
-  putHtmlDocStatus
+  putHtmlDocStatus,
+  putHtmlDocIsArchived,
+  putHtmlDocIsDeleted,
+  putHtmlDocRestoreArchived,
+  putHtmlDocRestoreDeleted
 } from '../action.async.js'
 
 class HtmlDocument extends React.Component {
@@ -261,22 +265,71 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickArchive = async () => {
-    console.log('archive')
-    // const { config, content } = this.state
-    //
-    // const fetchResultArchive = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/archive`, {
-    //   ...FETCH_CONFIG,
-    //   method: 'PUT'
-    // })
+    const { loggedUser, config, content } = this.state
+
+    const fetchResultArchive = await putHtmlDocIsArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while archiving document'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
   }
 
   handleClickDelete = async () => {
-    console.log('delete')
-    // const { config, content } = this.state
-    // const fetchResultDelete = await fetch(`${config.apiUrl}/workspaces/${content.workspace_id}/contents/${content.content_id}/delete`, {
-    //   ...FETCH_CONFIG,
-    //   method: 'PUT'
-    // })
+    const { loggedUser, config, content } = this.state
+
+    const fetchResultArchive = await putHtmlDocIsDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while deleting document'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
+  handleClickRestoreArchived = async () => {
+    const { loggedUser, config, content } = this.state
+
+    const fetchResultRestore = await putHtmlDocRestoreArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while restoring document'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
+  handleClickRestoreDeleted = async () => {
+    const { loggedUser, config, content } = this.state
+
+    const fetchResultRestore = await putHtmlDocRestoreDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while restoring document'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
   }
 
   handleClickShowRevision = revision => {
@@ -298,7 +351,9 @@ class HtmlDocument extends React.Component {
         label: revision.label,
         raw_content: revision.raw_content,
         number: revision.number,
-        status: revision.status
+        status: revision.status,
+        is_archived: prev.is_archived, // archived and delete should always be taken from last version
+        is_deleted: prev.is_deleted
       },
       mode: MODE.REVISION
     }))
@@ -386,6 +441,10 @@ class HtmlDocument extends React.Component {
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
             text={content.raw_content}
             onChangeText={this.handleChangeText}
+            isArchived={content.is_archived}
+            isDeleted={content.is_deleted}
+            onClickRestoreArchived={this.handleClickRestoreArchived}
+            onClickRestoreDeleted={this.handleClickRestoreDeleted}
             key={'html-document'}
           />
 
