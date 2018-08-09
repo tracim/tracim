@@ -222,6 +222,28 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
+    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @hapic.input_path(WorkspaceAndUserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def delete_workspaces_members_role(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None
+    ) -> None:
+        app_config = request.registry.settings['CFG']
+        rapi = RoleApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        rapi.delete_one(
+            user_id=hapic_data.path.user_id,
+            workspace_id=hapic_data.path.workspace_id,
+        )
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(UserCreationFailed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -575,6 +597,9 @@ class WorkspaceController(Controller):
         # Create Workspace Members roles
         configurator.add_route('create_workspace_member', '/workspaces/{workspace_id}/members', request_method='POST')  # nopep8
         configurator.add_view(self.create_workspaces_members_role, route_name='create_workspace_member')  # nopep8
+        # Delete Workspace Members roles
+        configurator.add_route('delete_workspace_member', '/workspaces/{workspace_id}/members/{user_id}', request_method='DELETE')  # nopep8
+        configurator.add_view(self.delete_workspaces_members_role, route_name='delete_workspace_member')  # nopep8
         # Workspace Content
         configurator.add_route('workspace_content', '/workspaces/{workspace_id}/contents', request_method='GET')  # nopep8
         configurator.add_view(self.workspace_content, route_name='workspace_content')  # nopep8

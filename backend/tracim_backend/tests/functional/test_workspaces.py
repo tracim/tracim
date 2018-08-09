@@ -1211,6 +1211,121 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
 
+    def test_api__delete_workspace_member_role__ok_200__nominal_case(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user.user_id,
+            ),
+            status=204,
+        )
+        # after
+        roles = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        for role in roles:
+            assert role['user_id'] != user.user_id
+
+    def test_api__delete_workspace_member_role__err_400__simple_user(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'test2@test2.test2'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user.user_id,
+            ),
+            status=403,
+        )
+        # after
+        roles = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/members'.format(
+                workspace_id=workspace.workspace_id
+            ),
+            status=200
+        ).json_body
+        assert len([role for role in roles if role['user_id'] == user.user_id]) == 1  # nopep8
+
 
 class TestUserInvitationWithMailActivatedSync(FunctionalTest):
 
