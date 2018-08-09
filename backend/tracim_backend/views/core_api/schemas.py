@@ -7,6 +7,7 @@ from marshmallow.validate import Range
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import Group
 from tracim_backend.models.contents import GlobalStatus
 from tracim_backend.models.contents import CONTENT_STATUS
 from tracim_backend.models.contents import CONTENT_TYPES
@@ -154,12 +155,38 @@ class UserProfileSchema(marshmallow.Schema):
         return UserProfile(**data)
 
 
-class UserCreationSchema(
-    SetEmailSchema,
-    SetPasswordSchema,
-    UserInfosSchema,
-    UserProfileSchema
-):
+class UserCreationSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    password = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=False,
+    )
+    profile = marshmallow.fields.String(
+        attribute='profile',
+        validate=OneOf(Profile._NAME),
+        example='managers',
+        required=False,
+        default=Group.TIM_USER_GROUPNAME
+    )
+    timezone = marshmallow.fields.String(
+        example="Europe/Paris",
+        required=False,
+        default=''
+    )
+    public_name = marshmallow.fields.String(
+        example='Suri Cate',
+        required=False,
+        default=None,
+    )
+    email_notification = marshmallow.fields.Bool(
+        example=True,
+        required=False,
+        default=True,
+    )
+
     @post_load
     def create_user(self, data):
         return UserCreation(**data)

@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+from tracim_backend.lib.utils.utils import password_generator
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -16,6 +17,7 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
@@ -120,6 +122,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -192,8 +195,8 @@ class UserController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
-    @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
     def create_user(self, context, request: TracimRequest, hapic_data=None):

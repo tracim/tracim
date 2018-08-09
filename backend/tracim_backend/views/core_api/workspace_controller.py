@@ -215,7 +215,7 @@ class WorkspaceController(Controller):
                 # notification for creation
                 user = uapi.create_user(
                     email=hapic_data.body.user_email_or_public_name,
-                    password= password_generator(),
+                    password=password_generator(),
                     do_notify=True
                 )  # nopep8
                 newly_created = True

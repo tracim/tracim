@@ -8,10 +8,12 @@ from sqlalchemy.orm import Session
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
 from tracim_backend.lib.utils.utils import get_root_frontend_url
+from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.models import User
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import Group
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
@@ -99,17 +101,17 @@ class UserCreation(object):
     def __init__(
             self,
             email: str,
-            password: str,
-            public_name: str,
-            timezone: str,
-            profile: str,
-            email_notification: str,
+            password: str = None,
+            public_name: str = None,
+            timezone: str = None,
+            profile: str = None,
+            email_notification: bool = True,
     ) -> None:
         self.email = email
-        self.password = password
-        self.public_name = public_name
-        self.timezone = timezone
-        self.profile = profile
+        self.password = password or password_generator()
+        self.public_name = public_name or None
+        self.timezone = timezone or ''
+        self.profile = profile or Group.TIM_USER_GROUPNAME
         self.email_notification = email_notification
 
 

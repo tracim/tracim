@@ -211,3 +211,7 @@ class TooShortAutocompleteString(TracimException):
 
 class PageNotFound(TracimException):
     pass
+
+
+class EmailAlreadyExistInDb(TracimException):
+    pass
