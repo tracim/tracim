@@ -229,6 +229,8 @@ class TracimRequest(Request):
             api = ContentApi(
                 current_user=user,
                 session=request.dbsession,
+                show_deleted=True,
+                show_archived=True,
                 config=request.registry.settings['CFG']
             )
             comment = api.get_one(
@@ -268,6 +270,8 @@ class TracimRequest(Request):
                 raise ContentNotFoundInTracimRequest('No content_id property found in request')  # nopep8
             api = ContentApi(
                 current_user=user,
+                show_deleted=True,
+                show_archived=True,
                 session=request.dbsession,
                 config=request.registry.settings['CFG']
             )

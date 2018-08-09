@@ -116,6 +116,54 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == '<p>To cook a great Tiramisu, you need many ingredients.</p>'  # nopep8
 
+    def test_api__get_html_document__ok_200__archived_content(self) -> None:
+        """
+        Get one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/contents/6/archive',
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/6',
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_archived'] is True
+
+    def test_api__get_html_document__ok_200__deleted_content(self) -> None:
+        """
+        Get one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/contents/6/delete',
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/6',
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_deleted'] is True
+
     def test_api__get_html_document__err_400__wrong_content_type(self) -> None:
         """
         Get one html document of a content content 7 is not html_document
