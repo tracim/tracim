@@ -391,6 +391,10 @@ class UserInContext(object):
     def profile(self) -> Profile:
         return self.user.profile.name
 
+    @property
+    def is_deleted(self) -> bool:
+        return self.user.is_deleted
+
     # Context related
 
     @property

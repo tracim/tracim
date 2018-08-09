@@ -2533,6 +2533,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['is_deleted'] is False
 
     def test_api__get_user__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2582,6 +2583,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['is_deleted'] is False
 
     def test_api__get_user__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
