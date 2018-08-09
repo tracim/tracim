@@ -3,7 +3,9 @@ import {
   UPDATE,
   WORKSPACE,
   WORKSPACE_CONTENT,
-  FOLDER
+  FOLDER,
+  WORKSPACE_CONTENT_ARCHIVED,
+  WORKSPACE_CONTENT_DELETED
 } from '../action-creator.sync.js'
 
 export default function workspaceContentList (state = [], action) {
@@ -39,6 +41,18 @@ export default function workspaceContentList (state = [], action) {
         ...state,
         content: state.content.map(c => setFolderContent(c, action))
       }
+
+    case `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`:
+      return state.map(wsc => wsc.idWorkspace === action.idWorkspace && wsc.id === action.idContent
+        ? {...wsc, isArchived: true}
+        : wsc
+      )
+
+    case `${SET}/${WORKSPACE_CONTENT_DELETED}`:
+      return state.map(wsc => wsc.idWorkspace === action.idWorkspace && wsc.id === action.idContent
+        ? {...wsc, isDeleted: true}
+        : wsc
+      )
 
     default:
       return state
