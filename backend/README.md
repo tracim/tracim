@@ -77,6 +77,10 @@ Initialize the database using [tracimcli](doc/cli.md) tool
 
     tracimcli db init
 
+Stamp current version of database to last (useful for migration):
+
+    alembic -c development.ini stamp head
+
 create wsgidav configuration file for webdav:
 
     cp wsgidav.conf.sample wsgidav.conf

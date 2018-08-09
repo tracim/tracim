@@ -28,6 +28,10 @@ and active the Tracim virtualenv:
 
     alembic -c development.ini current
 
+## Set Alembic stamp to last version (first time use) ##
+
+    alembic -c development.ini stamp head
+
 ### Creating new schema migration ###
 
 This creates a new auto-generated python migration file 
