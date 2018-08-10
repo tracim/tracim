@@ -275,14 +275,14 @@ class UserApi(object):
         if not is_email_correct:
             raise EmailValidationFailed(
                 'Email given form {} is uncorrect'.format(email))  # nopep8
-        email_already_exist_in_db = self._check_email_already_in_db(email)
+        email_already_exist_in_db = self.check_email_already_in_db(email)
         if email_already_exist_in_db:
             raise EmailAlreadyExistInDb(
                 'Email given {} already exist, please choose something else'.format(email)  # nopep8
             )
         return True
 
-    def _check_email_already_in_db(self, email: str) -> bool:
+    def check_email_already_in_db(self, email: str) -> bool:
         """
         Verify if given email does not already exist in db
         """

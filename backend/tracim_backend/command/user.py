@@ -127,7 +127,8 @@ class UserCommand(AppContextCommand):
                     "You must provide -p/--password parameter"
                 )
             password = ''
-
+        if self._user_api.check_email_already_in_db(login):
+            raise UserAlreadyExistError()
         try:
             user = self._user_api.create_user(
                 email=login,
@@ -140,12 +141,12 @@ class UserCommand(AppContextCommand):
             # daemons = DaemonsManager()
             # daemons.run('radicale', RadicaleDaemon)
             self._user_api.execute_created_user_actions(user)
-        except IntegrityError:
+        except IntegrityError as exception:
             self._session.rollback()
-            raise UserAlreadyExistError()
+            raise UserAlreadyExistError() from exception
         except NotificationNotSend as exception:
             self._session.rollback()
-            raise exception
+            raise exception from exception
 
         return user
 
