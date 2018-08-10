@@ -299,6 +299,7 @@ class AutocompleteQuerySchema(marshmallow.Schema):
         example='test',
         description='search text to query',
         validate=Length(min=2),
+        required=True,
     )
     @post_load
     def make_autocomplete(self, data):
