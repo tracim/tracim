@@ -139,6 +139,7 @@ class Tracim extends React.Component {
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
           <div id='appFeatureContainer' />
+          <div id='popupCreateContentContainer' />
         </div>
 
       </div>

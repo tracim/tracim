@@ -221,8 +221,6 @@ class WorkspaceContent extends React.Component {
           </PageTitle>
 
           <PageContent parentClass='workspace__content'>
-            <div id='popupCreateContentContainer' />
-
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />
 
