@@ -1,12 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { PAGE, PROFILE } from '../../../helper.js'
+import { PAGE } from '../../../helper.js'
 import { translate } from 'react-i18next'
 
 const MenuProfil = props => {
-  return props.user.logged
-    ? (
+  if (!props.user.logged) return null
+
+  return (
       <li className='header__menu__rightside__itemprofil'>
         <div className='profilgroup dropdown'>
           <button className='profilgroup__name btn btn-outline-primary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
@@ -18,20 +19,6 @@ const MenuProfil = props => {
           </button>
 
           <div className='profilgroup__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
-            {props.user.profile === PROFILE.ADMINISTRATOR &&
-              <Link className='setting__link dropdown-item' to={PAGE.ADMIN.WORKSPACE}>
-                <i className='fa fa-fw fa-space-shuttle mr-2' />
-                {props.t('Admin workspace')}
-              </Link>
-            }
-
-            {props.user.profile === PROFILE.ADMINISTRATOR &&
-              <Link className='setting__link dropdown-item' to={PAGE.ADMIN.USER}>
-                <i className='fa fa-fw fa-users mr-2' />
-                {props.t('Admin user')}
-              </Link>
-            }
-
             <Link className='setting__link dropdown-item' to={PAGE.ACCOUNT}>
               <i className='fa fa-fw fa-user-o mr-2' />
               {props.t('My Account')}
@@ -46,7 +33,6 @@ const MenuProfil = props => {
         </div>
       </li>
     )
-    : ''
 }
 export default translate()(MenuProfil)
 
