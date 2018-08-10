@@ -32,7 +32,7 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import file_type
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -61,13 +61,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         file = request.POST['files']
         with new_revision(
@@ -95,13 +97,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         file = DepotManager.get().get(content.depot_file)
         response = request.response
@@ -120,13 +124,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         revision = api.get_one_revision(
             revision_id=hapic_data.path.revision_id,
@@ -154,13 +160,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         pdf_preview_path = api.get_pdf_preview_path(
             content.content_id,
@@ -181,13 +189,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
         return FileResponse(pdf_preview_path)
@@ -205,13 +215,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         revision = api.get_one_revision(
             revision_id=hapic_data.path.revision_id,
@@ -238,13 +250,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         allowed_dim = api.get_jpg_preview_allowed_dim()
         jpg_preview_path = api.get_jpg_preview_path(
@@ -270,13 +284,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
@@ -301,13 +317,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         revision = api.get_one_revision(
             revision_id=hapic_data.path.revision_id,
@@ -334,6 +352,8 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -352,13 +372,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         return api.get_content_in_context(content)
 
@@ -375,13 +397,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -413,13 +437,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         revisions = content.revisions
         return [
@@ -440,13 +466,15 @@ class FileController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             hapic_data.path.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,

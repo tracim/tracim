@@ -1,4 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
-.idea/
 .git/
 node_modules/
+dist/asset/tracim.app.entry.js
+dist/asset/tracim.vendor.bundle.js
+dist/asset/images/

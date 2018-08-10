@@ -4,6 +4,7 @@ import { debug } from '../helper.js'
 import {
   addAllResourceI18n,
   handleFetchResult,
+  generateAvatarFromPublicName,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -17,7 +18,12 @@ import {
   getThreadComment,
   postThreadNewComment,
   putThreadStatus,
-  putThreadContent
+  putThreadContent,
+  putThreadIsArchived,
+  putThreadIsDeleted,
+  putThreadRestoreArchived,
+  putThreadRestoreDeleted,
+  putThreadRead
 } from '../action.async.js'
 
 class Thread extends React.Component {
@@ -76,7 +82,7 @@ class Thread extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<Thread> did Update', `color: ${this.state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
@@ -103,14 +109,24 @@ class Thread extends React.Component {
       handleFetchResult(await fetchResultThread),
       handleFetchResult(await fetchResultThreadComment)
     ])
-      .then(([resThread, resComment]) => this.setState({
-        content: resThread.body,
-        listMessage: resComment.body.map(c => ({
-          ...c,
-          timelineType: 'comment',
-          created: (new Date(c.created)).toLocaleString()
-        }))
-      }))
+      .then(([resThread, resComment]) => {
+        this.setState({
+          content: resThread.body,
+          listMessage: resComment.body.map(c => ({
+            ...c,
+            timelineType: 'comment',
+            created: (new Date(c.created)).toLocaleString(),
+            author: {
+              ...c.author,
+              avatar_url: c.author.avatar_url
+                ? c.author.avatar_url
+                : generateAvatarFromPublicName(c.author.public_name)
+            }
+          }))
+        })
+
+        putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+      })
       .catch(e => console.log('Error loading Thread data.', e))
   }
 
@@ -166,17 +182,81 @@ class Thread extends React.Component {
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
-        if (resSave.status !== 204) { // 204 no content so dont take status from resSave.apiResponse.status
-          console.warn('Error saving thread comment. Result:', resSave, 'content:', content, 'config:', config)
-        } else {
+        if (resSave.status === 204) { // 204 no content so dont take status from resSave.apiResponse.status
           this.loadContent()
+        } else {
+          console.warn('Error saving thread comment. Result:', resSave, 'content:', content, 'config:', config)
         }
       })
   }
 
-  handleClickArchive = () => console.log('archive nyi')
+  handleClickArchive = async () => {
+    const { loggedUser, config, content } = this.state
 
-  handleClickDelete = () => console.log('delete nyi')
+    const fetchResultArchive = await putThreadIsArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while archiving thread'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
+  handleClickDelete = async () => {
+    const { loggedUser, config, content } = this.state
+
+    const fetchResultArchive = await putThreadIsDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultArchive.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while deleting thread'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
+  handleClickRestoreArchived = async () => {
+    const { loggedUser, config, content } = this.state
+
+    const fetchResultRestore = await putThreadRestoreArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while restoring thread'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
+  handleClickRestoreDeleted = async () => {
+    const { loggedUser, config, content } = this.state
+
+    const fetchResultRestore = await putThreadRestoreDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    switch (fetchResultRestore.status) {
+      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: this.props.t('Error while restoring thread'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
 
   render () {
     const { config, isVisible, loggedUser, content, listMessage, newComment, timelineWysiwyg } = this.state
@@ -184,10 +264,7 @@ class Thread extends React.Component {
     if (!isVisible) return null
 
     return (
-      <PopinFixed
-        customClass={config.slug}
-        customColor={config.hexcolor}
-      >
+      <PopinFixed customClass={config.slug} customColor={config.hexcolor}>
         <PopinFixedHeader
           customClass={`${config.slug}__contentpage`}
           customColor={config.hexcolor}
@@ -219,9 +296,7 @@ class Thread extends React.Component {
           </div>
         </PopinFixedOption>
 
-        <PopinFixedContent
-          customClass={`${config.slug}__contentpage`}
-        >
+        <PopinFixedContent customClass={`${config.slug}__contentpage`}>
           <Timeline
             customClass={`${config.slug}__contentpage`}
             customColor={config.hexcolor}
@@ -236,6 +311,10 @@ class Thread extends React.Component {
             onClickRevisionBtn={() => {}}
             shouldScrollToBottom
             showHeader={false}
+            isArchived={content.is_archived}
+            onClickRestoreArchived={this.handleClickRestoreArchived}
+            isDeleted={content.is_deleted}
+            onClickRestoreDeleted={this.handleClickRestoreDeleted}
           />
         </PopinFixedContent>
       </PopinFixed>

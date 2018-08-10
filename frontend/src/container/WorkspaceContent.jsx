@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
 import { PAGE } from '../helper.js'
-import Sidebar from './Sidebar.jsx'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -17,11 +16,15 @@ import {
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceContentList,
-  getFolderContent
+  getFolderContent,
+  putWorkspaceContentArchived,
+  putWorkspaceContentDeleted
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  setWorkspaceContentList
+  setWorkspaceContentList,
+  setWorkspaceContentArchived,
+  setWorkspaceContentDeleted
 } from '../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -108,7 +111,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickContentItem = content => {
     console.log('%c<WorkspaceContent> content clicked', 'color: #c17838', content)
-    this.props.history.push(`/workspaces/${content.idWorkspace}/${content.type}/${content.id}`)
+    this.props.history.push(PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id))
   }
 
   handleClickEditContentItem = (e, content) => {
@@ -126,14 +129,34 @@ class WorkspaceContent extends React.Component {
     console.log('%c<WorkspaceContent> download nyi', 'color: #c17838', content)
   }
 
-  handleClickArchiveContentItem = (e, content) => {
+  handleClickArchiveContentItem = async (e, content) => {
+    const { props, state } = this
+
     e.stopPropagation()
-    console.log('%c<WorkspaceContent> archive nyi', 'color: #c17838', content)
+
+    const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(props.user, content.idWorkspace, content.id))
+    switch (fetchPutContentArchived.status) {
+      case 204:
+        props.dispatch(setWorkspaceContentArchived(content.idWorkspace, content.id))
+        this.loadContentList(state.workspaceIdInUrl)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while archiving document')))
+    }
   }
 
-  handleClickDeleteContentItem = (e, content) => {
+  handleClickDeleteContentItem = async (e, content) => {
+    const { props, state } = this
+
     e.stopPropagation()
-    console.log('%c<WorkspaceContent> delete nyi', 'color: #c17838', content)
+
+    const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(props.user, content.idWorkspace, content.id))
+    switch (fetchPutContentDeleted.status) {
+      case 204:
+        props.dispatch(setWorkspaceContentDeleted(content.idWorkspace, content.id))
+        this.loadContentList(state.workspaceIdInUrl)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while deleting document')))
+    }
   }
 
   handleClickFolder = folderId => {
@@ -166,9 +189,7 @@ class WorkspaceContent extends React.Component {
       : []
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-
+      <div className='WorkspaceContent' style={{width: '100%'}}>
         <OpenContentApp
           // automatically open the app for the idContent in url
           idWorkspace={this.state.workspaceIdInUrl}
@@ -192,7 +213,7 @@ class WorkspaceContent extends React.Component {
             subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
             <DropdownCreateButton
-              parentClass='workspace__header__btnaddworkspace'
+              parentClass='workspace__header__btnaddcontent'
               idFolder={null} // null because it is workspace root content
               onClickCreateContent={this.handleClickCreateContent}
               availableApp={contentType}
@@ -200,8 +221,6 @@ class WorkspaceContent extends React.Component {
           </PageTitle>
 
           <PageContent parentClass='workspace__content'>
-            <div id='popupCreateContentContainer' />
-
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />
 

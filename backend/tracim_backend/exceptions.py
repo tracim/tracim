@@ -203,3 +203,11 @@ class PageOfPreviewNotFound(NotFound):
 
 class PreviewDimNotAllowed(TracimException):
     pass
+
+
+class TooShortAutocompleteString(TracimException):
+    pass
+
+
+class PageNotFound(TracimException):
+    pass

@@ -6,6 +6,7 @@ import {
   USER_DATA,
   USER_LANG
 } from '../action-creator.sync.js'
+import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
 const defaultUser = {
   user_id: -1,
@@ -31,11 +32,13 @@ export default function user (state = defaultUser, action) {
       return {
         ...state,
         ...action.user,
-        avatar_url: 'https://www.algoo.fr/static/images/people_images/PERSO_SEUL.png' // @FIXME use avatar from api when db handles it
+        avatar_url: action.user.avatar_url
+          ? action.user.avatar_url
+          : action.user.public_name ? generateAvatarFromPublicName(action.user.public_name) : ''
       }
 
     case `${SET}/${USER_DISCONNECTED}`:
-      return defaultUser
+      return {...defaultUser, logged: false}
 
     case `${UPDATE}/${USER_DATA}`:
       return {...state, ...action.data}

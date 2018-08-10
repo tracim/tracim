@@ -5,6 +5,34 @@ import { MODE } from '../helper.js'
 const HtmlDocument = props => {
   return (
     <div className='wsContentHtmlDocument__contentpage__textnote html-document__contentpage__textnote'>
+      {props.isArchived &&
+        <div className='html-document__contentpage__textnote__state'>
+          <div className='html-document__contentpage__textnote__state__msg'>
+            <i className='fa fa-fw fa-archive' />
+            This content is archived.
+          </div>
+
+          <button className='html-document__contentpage__textnote__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
+            <i className='fa fa-fw fa-archive' />
+            Restore
+          </button>
+        </div>
+      }
+
+      {props.isDeleted &&
+        <div className='html-document__contentpage__textnote__state'>
+          <div className='html-document__contentpage__textnote__state__msg'>
+            <i className='fa fa-fw fa-trash' />
+            Ce contenu est supprimé.
+          </div>
+
+          <button className='html-document__contentpage__textnote__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>
+            <i className='fa fa-fw fa-trash' />
+            Restore
+          </button>
+        </div>
+      }
+
       {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
         <div>
           <div className='html-document__contentpage__textnote__version'>

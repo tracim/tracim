@@ -1,0 +1,67 @@
+@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.userstatus
+  width 35%
+  &__role
+    margin 20px 0
+    font-size 18px
+    &__msg
+      margin-right 15px
+    &__definition
+      display flex
+      &__icon
+        margin-right 15px
+        color gestionnaire
+  &__notification
+    font-size 18px
+    &__btn
+      margin 20px 0
+      border 1px solid thirdColor
+      padding 10px 15px
+      cursor pointer
+    &__subscribe
+      &__btn
+        margin 20px 0
+        border 1px solid thirdColor
+        padding 10px 15px
+      &__submenu
+        padding 0
+        &__item
+          padding 10px
+
+/**** MEDIAQUERIES ****/
+
+/**** MEDIA 992px & 1199px ****/
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .userstatus
+    width 100%
+    &__role
+      display flex
+
+/**** MEDIA 768px & 991px ****/
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .userstatus
+    width 100%
+    &__role
+      display flex
+
+/**** MEDIA 576px & 767px ****/
+
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .userstatus
+    width 100%
+    &__role
+      display flex
+
+/**** MEDIA 575px ****/
+
+@media (max-width: max-xs)
+
+  .userstatus
+    width 100%
+

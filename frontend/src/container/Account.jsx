@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Sidebar from './Sidebar.jsx'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -102,9 +101,7 @@ class Account extends React.Component {
     })()
 
     return (
-      <div className='sidebarpagecontainer'>
-        <Sidebar />
-
+      <div className='Account' style={{width: '100%'}}>
         <PageWrapper customClass='account'>
           <PageTitle
             parentClass={'account'}

@@ -20,6 +20,23 @@
       text-align center
     &__title
       transform rotate(-90deg)
+  &__info
+    position absolute
+    display flex
+    align-items center
+    justify-content space-between
+    margin 10px
+    padding 5px 15px
+    width calc(100% - 20px)
+    background-color #fee498
+    border-radius 10px
+    z-index 1
+    &__msg > i
+      margin-right 8px
+    &__btnrestore
+      cursor pointer
+      & > i
+        margin-right 8px
   &__body
     display flex
     flex-direction column

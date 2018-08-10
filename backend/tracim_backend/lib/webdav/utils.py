@@ -4,12 +4,14 @@ import transaction
 from os.path import normpath as base_normpath
 
 from sqlalchemy.orm import Session
+from tracim_backend.models.contents import CONTENT_TYPES
 from wsgidav import util
 from wsgidav import compat
 
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.models.data import Workspace, Content, ContentType, \
-    ActionDescription
+from tracim_backend.models.data import Workspace
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
 
 
@@ -177,7 +179,7 @@ class FakeFileStream(object):
 
         file = self._api.create(
             filename=self._file_name,
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=self._workspace,
             parent=self._parent,
             is_temporary=is_temporary

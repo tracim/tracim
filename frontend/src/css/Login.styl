@@ -43,6 +43,7 @@
         padding-left 45px
     &__btnsubmit
       display block
+      margin-right 15px
       border none
       width 150px
       background-color green
@@ -52,13 +53,12 @@
       &:focus
         box-shadow shadow-all-side-green
     &__pwforgot
-      margin-top 3px
       cursor pointer
       font-size 13px
       &:hover::after
         position absolute
         top 20px
-        right 15px
+        left 15px
         border-bottom 1px solid darkGrey
         padding-bottom 2px
         content ' '
@@ -70,6 +70,12 @@
     &__text
       width 310px
       font-size 17px
+      color off-white
+      & > a
+        color off-white
+        font-size 19px
+        &:hover
+          text-decoration underline
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .loginpage

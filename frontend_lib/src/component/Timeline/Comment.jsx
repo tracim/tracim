@@ -22,7 +22,7 @@ const Comment = props => {
     )}>
       <div className={classnames(`${props.customClass}__messagelist__item__wrapper`, 'timeline__body__messagelist__item__wrapper')}>
         <div className={classnames(`${props.customClass}__messagelist__item__avatar`, 'timeline__body__messagelist__item__avatar')}>
-          {props.avatar ? <img src={props.avatar} /> : ''}
+          <img src={props.avatar} />
         </div>
       </div>
       <div className={classnames(`${props.customClass}__messagelist__item__authorandhour`, 'timeline__body__messagelist__item__authorandhour')}>

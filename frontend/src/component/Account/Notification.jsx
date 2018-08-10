@@ -4,7 +4,7 @@ import { BtnSwitch } from 'tracim_frontend_lib'
 import { ROLE } from '../../helper.js'
 
 export const Notification = props => {
-  const getRole = role => ROLE.find(r => r.name === role)
+  const getRole = role => ROLE.find(r => r.slug === role)
 
   return (
     <div className='account__userpreference__setting__notification'>

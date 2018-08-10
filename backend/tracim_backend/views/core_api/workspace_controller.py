@@ -31,6 +31,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.views.controllers import Controller
+from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
@@ -46,7 +47,7 @@ from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 
 SWAGGER_TAG_WORKSPACE_ENDPOINTS = 'Workspaces'
@@ -213,12 +214,18 @@ class WorkspaceController(Controller):
                 # TODO - G.M - 2018-07-05 - [UserCreation] Reenable email
                 # notification for creation
                 user = uapi.create_user(
-                    hapic_data.body.user_email_or_public_name,
-                    do_notify=False
+                    email=hapic_data.body.user_email_or_public_name,
+                    password= password_generator(),
+                    do_notify=True
                 )  # nopep8
                 newly_created = True
+                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                        app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                    email_sent = True
+
             except EmailValidationFailed:
                 raise UserCreationFailed('no valid mail given')
+
         role = rapi.create_one(
             user=user,
             workspace=request.current_workspace,
@@ -259,7 +266,7 @@ class WorkspaceController(Controller):
         contents = api.get_all(
             parent_id=content_filter.parent_id,
             workspace=request.current_workspace,
-            content_type=content_filter.content_type or ContentType.Any,
+            content_type=content_filter.content_type or CONTENT_TYPES.Any_SLUG,
         )
         contents = [
             api.get_content_in_context(content) for content in contents
@@ -291,14 +298,14 @@ class WorkspaceController(Controller):
         parent = None
         if creation_data.parent_id:
             try:
-                parent = api.get_one(content_id=creation_data.parent_id, content_type=ContentType.Any)  # nopep8
+                parent = api.get_one(content_id=creation_data.parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     'Parent with content_id {} not found'.format(creation_data.parent_id)
                 ) from exc
         content = api.create(
             label=creation_data.label,
-            content_type=creation_data.content_type,
+            content_type_slug=creation_data.content_type,
             workspace=request.current_workspace,
             parent=parent,
         )
@@ -327,16 +334,18 @@ class WorkspaceController(Controller):
         move_data = hapic_data.body
 
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         new_parent = api.get_one(
-            move_data.new_parent_id, content_type=ContentType.Any
+            move_data.new_parent_id, content_type=CONTENT_TYPES.Any_SLUG
         )
 
         new_workspace = request.candidate_workspace
@@ -354,7 +363,7 @@ class WorkspaceController(Controller):
             )
         updated_content = api.get_one(
             path_data.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         return api.get_content_in_context(updated_content)
 
@@ -374,13 +383,15 @@ class WorkspaceController(Controller):
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -410,10 +421,11 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
             show_deleted=True,
+            show_archived=True,
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -439,11 +451,13 @@ class WorkspaceController(Controller):
         app_config = request.registry.settings['CFG']
         path_data = hapic_data.path
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=ContentType.Any)  # nopep8
+        content = api.get_one(path_data.content_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
@@ -472,10 +486,11 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
             show_archived=True,
+            show_deleted=True,
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=ContentType.Any
+            content_type=CONTENT_TYPES.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,

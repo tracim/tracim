@@ -36,6 +36,12 @@ class Application(object):
         self.config = config
         self.main_route = main_route
 
+    # TODO - G.M - 2018-08-07 - Refactor slug coherence issue like this one.
+    # we probably should not have 2 kind of slug
+    @property
+    def minislug(self):
+        return self.slug.replace('contents/', '')
+
 
 # default apps
 calendar = Application(
@@ -57,6 +63,16 @@ thread = Application(
     config={},
     main_route='/#/workspaces/{workspace_id}/contents?type=thread',
 
+)
+
+folder = Application(
+    label='Folder',
+    slug='contents/folder',
+    fa_icon='folder-open-o',
+    hexcolor='#252525',
+    is_active=True,
+    config={},
+    main_route='',
 )
 
 _file = Application(
@@ -92,8 +108,10 @@ html_documents = Application(
 # List of applications
 applications = [
     html_documents,
-    markdownpluspage,
+    # TODO - G.M - 2018-08-02 - Restore markdownpage app
+    # markdownpluspage,
     _file,
     thread,
-    calendar,
+    folder,
+    # calendar,
 ]
