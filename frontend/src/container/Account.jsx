@@ -101,7 +101,7 @@ class Account extends React.Component {
     })()
 
     return (
-      <div className='Account'>
+      <div className='Account' style={{width: '100%'}}>
         <PageWrapper customClass='account'>
           <PageTitle
             parentClass={'account'}
