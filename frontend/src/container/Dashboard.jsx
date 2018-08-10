@@ -201,7 +201,7 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='Dashboard' style={{width: '100%'}}>
+      <div className='dashboard'>
         <PageWrapper customeClass='dashboard'>
           <PageTitle
             parentClass='dashboard__header'
