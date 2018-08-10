@@ -189,7 +189,7 @@ Timeline.propTypes = {
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
-  onClickRestoreDeleted: PropTypes.func,
+  onClickRestoreDeleted: PropTypes.func
 }
 
 Timeline.defaultProps = {
