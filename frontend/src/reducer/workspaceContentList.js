@@ -11,19 +11,21 @@ import {
 export default function workspaceContentList (state = [], action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_CONTENT}`:
-      return action.workspaceContentList.map(wsc => ({
-        id: wsc.content_id,
-        label: wsc.label,
-        slug: wsc.slug,
-        type: wsc.content_type,
-        idWorkspace: wsc.workspace_id,
-        isArchived: wsc.is_archived,
-        idParent: wsc.parent_id,
-        isDeleted: wsc.is_deleted,
-        showInUi: wsc.show_in_ui,
-        statusSlug: wsc.status,
-        subContentTypeSlug: wsc.sub_content_type_slug
-      }))
+      return action.workspaceContentList
+        .sort((a, b) => a.slug < b.slug ? -1 : 1)
+        .map(wsc => ({
+          id: wsc.content_id,
+          label: wsc.label,
+          slug: wsc.slug,
+          type: wsc.content_type,
+          idWorkspace: wsc.workspace_id,
+          isArchived: wsc.is_archived,
+          idParent: wsc.parent_id,
+          isDeleted: wsc.is_deleted,
+          showInUi: wsc.show_in_ui,
+          statusSlug: wsc.status,
+          subContentTypeSlug: wsc.sub_content_type_slug
+        }))
 
     case `${UPDATE}/${WORKSPACE}/Filter`: // not used anymore ?
       return {...state, filter: action.filterList}
