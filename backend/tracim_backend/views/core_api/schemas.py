@@ -510,6 +510,7 @@ class WorkspaceDigestSchema(marshmallow.Schema):
         WorkspaceMenuEntrySchema,
         many=True,
     )
+    is_deleted = marshmallow.fields.Bool(example=False, default=False)
 
     class Meta:
         description = 'Digest of workspace informations'

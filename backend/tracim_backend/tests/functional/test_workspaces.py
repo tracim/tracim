@@ -8,9 +8,13 @@ from depot.io.utils import FileIntent
 
 from tracim_backend import models
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
 from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -41,6 +45,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
@@ -106,6 +111,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # modify workspace
@@ -120,6 +126,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # after
@@ -133,6 +140,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
     def test_api__update_workspace__err_400__empty_label(self) -> None:
@@ -205,6 +213,610 @@ class TestWorkspaceEndpoint(FunctionalTest):
             '/api/v2/workspaces',
             status=400,
             params=params,
+        )
+
+    def test_api__delete_workspace__ok_200__admin(self) -> None:
+        """
+        Test delete workspace as admin
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('administrators')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=403
+        )
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__delete_workspace__ok_200__manager_workspace_manager(self) -> None:
+        """
+        Test delete workspace as global manager and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__delete_workspace__err_403__user_workspace_manager(self) -> None:
+        """
+        Test delete workspace as simple user and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__delete_workspace__err_403__manager_reader(self) -> None:
+        """
+        Test delete workspace as manager and reader of the workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__delete_workspace__err_400__manager(self) -> None:
+        """
+        Test delete workspace as global manager without having any role in the
+        workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.create_user('test@test.test', password='test@test.test',
+                                do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test',
+                                                   save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=400
+        )
+
+    def test_api__undelete_workspace__ok_200__admin(self) -> None:
+        """
+        Test undelete workspace as admin
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('administrators')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=403
+        )
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__undelete_workspace__ok_200__manager_workspace_manager(self) -> None:
+        """
+        Test undelete workspace as global manager and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__undelete_workspace__err_403__user_workspace_manager(self) -> None:
+        """
+        Test undelete workspace as simple user and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__undelete_workspace__err_403__manager_reader(self) -> None:
+        """
+        Test undelete workspace as manager and reader of the workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__undelete_workspace__err_400__manager(self) -> None:
+        """
+        Test delete workspace as global manager without having any role in the
+        workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.create_user('test@test.test', password='test@test.test',
+                                do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=400
         )
 
     def test_api__get_workspace__err_400__unallowed_user(self) -> None:
@@ -598,6 +1210,121 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['role'] == 'content-manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
+
+    def test_api__delete_workspace_member_role__ok_200__nominal_case(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user.user_id,
+            ),
+            status=204,
+        )
+        # after
+        roles = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        for role in roles:
+            assert role['user_id'] != user.user_id
+
+    def test_api__delete_workspace_member_role__err_400__simple_user(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'test2@test2.test2'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user.user_id,
+            ),
+            status=403,
+        )
+        # after
+        roles = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/members'.format(
+                workspace_id=workspace.workspace_id
+            ),
+            status=200
+        ).json_body
+        assert len([role for role in roles if role['user_id'] == user.user_id]) == 1  # nopep8
 
 
 class TestUserInvitationWithMailActivatedSync(FunctionalTest):

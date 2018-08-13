@@ -9,7 +9,7 @@ The other is workspace related and is called "workspace role".
 
 |                               | Normal User | Managers    | Admin          |
 |-------------------------------|-------------|-------------|----------------|
-| slug                            | users       | managers    | administrators |
+| slug                          | users       | managers    | administrators |
 |-------------------------------|-------------|-------------|---------|
 
 
@@ -20,6 +20,7 @@ The other is workspace related and is called "workspace role".
 |-------------------------------|-------------|-------------|---------|
 | create workspace              |  no         | yes         | yes     |
 | invite user to tracim         |  no         | yes, if manager of a given workspace         | yes     |
+| delete workspace              |  no         | yes, if manager of a given workspace         | yes     |
 |-------------------------------|-------------|-------------|---------|
 | set user global profile rights|  no         | no          | yes     |
 | deactivate user               |  no         | no          | yes     |

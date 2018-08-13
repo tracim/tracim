@@ -27,7 +27,8 @@ class WorkspaceApi(object):
             session: Session,
             current_user: User,
             config: CFG,
-            force_role: bool=False
+            force_role: bool=False,
+            show_deleted: bool=False,
     ):
         """
         :param current_user: Current user of context
@@ -37,18 +38,22 @@ class WorkspaceApi(object):
         self._user = current_user
         self._config = config
         self._force_role = force_role
+        self.show_deleted = show_deleted
 
     def _base_query_without_roles(self):
-        return self._session.query(Workspace).filter(Workspace.is_deleted == False)
+        query = self._session.query(Workspace)
+        if not self.show_deleted:
+            query = query.filter(Workspace.is_deleted == False)
+        return query
 
     def _base_query(self):
         if not self._force_role and self._user.profile.id>=Group.TIM_ADMIN:
             return self._base_query_without_roles()
 
-        return self._session.query(Workspace).\
-            join(Workspace.roles).\
-            filter(UserRoleInWorkspace.user_id == self._user.user_id).\
-            filter(Workspace.is_deleted == False)
+        query = self._base_query_without_roles()
+        query = query.join(Workspace.roles).\
+            filter(UserRoleInWorkspace.user_id == self._user.user_id)
+        return query
 
     def get_workspace_with_context(
             self,
@@ -207,17 +212,13 @@ class WorkspaceApi(object):
     def save(self, workspace: Workspace):
         self._session.flush()
 
-    def delete_one(self, workspace_id, flush=True):
-        workspace = self.get_one(workspace_id)
+    def delete(self, workspace: Workspace, flush=True):
         workspace.is_deleted = True
 
         if flush:
             self._session.flush()
 
-    def restore_one(self, workspace_id, flush=True):
-        workspace = self._session.query(Workspace)\
-            .filter(Workspace.is_deleted==True)\
-            .filter(Workspace.workspace_id==workspace_id).one()
+    def undelete(self, workspace: Workspace, flush=True):
         workspace.is_deleted = False
 
         if flush:

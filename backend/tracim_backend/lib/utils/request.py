@@ -355,7 +355,8 @@ class TracimRequest(Request):
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
-                config=request.registry.settings['CFG']
+                config=request.registry.settings['CFG'],
+                show_deleted=True,
             )
             workspace = wapi.get_one(workspace_id)
         except NoResultFound as exc:
@@ -390,7 +391,8 @@ class TracimRequest(Request):
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
-                config=request.registry.settings['CFG']
+                config=request.registry.settings['CFG'],
+                show_deleted=True,
             )
             workspace = wapi.get_one(workspace_id)
         except JSONDecodeError as exc:
