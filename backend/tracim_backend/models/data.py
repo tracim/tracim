@@ -1327,6 +1327,8 @@ class Content(DeclarativeBase):
                    types.append(
                         CONTENT_TYPES.get_one_by_slug(type_label)
                    )
+        # TODO BS 2018-08-13: This try/except is not correct: except exception
+        # if we know what to except.
         except Exception as e:
             print(e.__str__())
             print('----- /*\ *****')
