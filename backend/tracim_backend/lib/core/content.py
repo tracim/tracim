@@ -1030,6 +1030,13 @@ class ContentApi(object):
             else:
                 related_active_content = content
 
+            # INFO - G.M - 2018-08-10 - re-apply general filters here to avoid
+            # issue with comments
+            if not self._show_deleted and related_active_content.is_deleted:
+                continue
+            if not self._show_archived and related_active_content.is_archived:
+                continue
+
             if related_active_content not in active_contents and related_active_content not in too_recent_content:  # nopep8
 
                 if not before_content or before_content_find:
