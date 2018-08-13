@@ -416,6 +416,9 @@ class ContentApi(object):
         if content_type_slug == CONTENT_TYPES.Folder.slug and not label:
             label = self.generate_folder_label(workspace, parent)
 
+        # TODO BS 2018-08-13: Despite that workspace is required, create_comment
+        # can call here with None. Must update create_comment tu require the
+        # workspace.
         if not workspace:
             workspace = parent.workspace
 
