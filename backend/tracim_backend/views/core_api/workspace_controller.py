@@ -24,6 +24,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import UserCreationFailed
 from tracim_backend.exceptions import UserDoesNotExist
@@ -276,6 +277,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
     @hapic.output_body(ContentDigestSchema())
