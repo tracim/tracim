@@ -23,7 +23,7 @@ The other is workspace related and is called "workspace role".
 |-------------------------------|-------------|-------------|---------|
 | set user global profile rights|  no         | no          | yes     |
 | activate/deactivate user      |  no         | no          | yes     |
-  delete user/ undelete user    |  no         | no          | yes     |
+| delete user/ undelete user    |  no         | no          | yes     |
 |-------------------------------|-------------|-------------|---------|
 | access to all user data (/users/{user_id} endpoints) |personal-only|personal-only| yes     |
 
