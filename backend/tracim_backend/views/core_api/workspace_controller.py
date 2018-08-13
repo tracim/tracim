@@ -23,7 +23,8 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.context_models import ContentInContext
-from tracim_backend.exceptions import EmptyLabelNotAllowed, UnallowedSubContent
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import UserCreationFailed
 from tracim_backend.exceptions import UserDoesNotExist
