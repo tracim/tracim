@@ -9,8 +9,9 @@ from tracim_backend.lib.core.content import ContentApi
 # TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.exceptions import SameValueError, EmptyLabelNotAllowed, \
-    UnallowedSubContent
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import UnallowedSubContent
 # TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
 from tracim_backend.lib.core.workspace import RoleApi
 # TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
