@@ -15,6 +15,7 @@ from datetime import datetime
 from hashlib import sha256
 from typing import TYPE_CHECKING
 
+import sqlalchemy
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
@@ -135,6 +136,7 @@ class User(DeclarativeBase):
     _password = Column('password', Unicode(128))
     created = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)
+    is_deleted = Column(Boolean, default=False, nullable=False, server_default=sqlalchemy.sql.expression.literal(False))
     imported_from = Column(Unicode(32), nullable=True)
     timezone = Column(Unicode(255), nullable=False, server_default='')
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed

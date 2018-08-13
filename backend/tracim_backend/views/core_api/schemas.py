@@ -75,6 +75,10 @@ class UserSchema(UserDigestSchema):
         example=True,
         description='Is user account activated ?'
     )
+    is_deleted = marshmallow.fields.Bool(
+        example=False,
+        description='Is user account deleted ?'
+    )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
         example="Europe/Paris",

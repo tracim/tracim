@@ -293,7 +293,7 @@ class TracimRequest(Request):
         :return: user found from header/body
         """
         app_config = request.registry.settings['CFG']
-        uapi = UserApi(None, session=request.dbsession, config=app_config)
+        uapi = UserApi(None, show_deleted=True, session=request.dbsession, config=app_config)
         login = ''
         try:
             login = None
