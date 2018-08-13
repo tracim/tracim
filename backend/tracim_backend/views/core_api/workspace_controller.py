@@ -1,6 +1,7 @@
 import typing
 import transaction
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPFound
 
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.roles import WorkspaceRoles
@@ -11,6 +12,7 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim_backend import hapic
+from tracim_backend import BASE_API_V2
 from tracim_backend import TracimRequest
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.content import ContentApi
@@ -34,6 +36,7 @@ from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.views.controllers import Controller
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
+from tracim_backend.views.core_api.schemas import ContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
 from tracim_backend.views.core_api.schemas import RoleUpdateSchema
@@ -316,6 +319,65 @@ class WorkspaceController(Controller):
         return content
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)  # nopep8
+    def get_content_from_workspace(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> None:
+        """
+        redirect to correct content file endpoint
+        """
+        app_config = request.registry.settings['CFG']
+        content = request.current_content
+        content_type = CONTENT_TYPES.get_one_by_slug(content.type).slug
+        # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
+        raise HTTPFound(
+            "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
+                base_url=BASE_API_V2,
+                workspace_id=content.workspace_id,
+                content_type=content_type,
+                content_id=content.content_id,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
+    @hapic.input_path(ContentIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)  # nopep8
+    def get_content(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None,
+    ) -> None:
+        """
+        redirect to correct content file endpoint
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            content_id=hapic_data.path['content_id'],
+            content_type=CONTENT_TYPES.Any_SLUG
+        )
+        content_type = CONTENT_TYPES.get_one_by_slug(content.type).slug
+        # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
+        raise HTTPFound(
+            "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
+                base_url=BASE_API_V2,
+                workspace_id=content.workspace_id,
+                content_type=content_type,
+                content_id=content.content_id,
+            )
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
@@ -532,6 +594,12 @@ class WorkspaceController(Controller):
         # Create Generic Content
         configurator.add_route('create_generic_content', '/workspaces/{workspace_id}/contents', request_method='POST')  # nopep8
         configurator.add_view(self.create_generic_empty_content, route_name='create_generic_content')  # nopep8
+        # Get Content
+        configurator.add_route('get_content', '/contents/{content_id}', request_method='GET')  # nopep8
+        configurator.add_view(self.get_content, route_name='get_content')
+        # Get Content From workspace
+        configurator.add_route('get_content_from_workspace', '/workspaces/{workspace_id}/contents/{content_id}', request_method='GET')  # nopep8
+        configurator.add_view(self.get_content_from_workspace, route_name='get_content_from_workspace')  # nopep8
         # Move Content
         configurator.add_route('move_content', '/workspaces/{workspace_id}/contents/{content_id}/move', request_method='PUT')  # nopep8
         configurator.add_view(self.move_content, route_name='move_content')  # nopep8
