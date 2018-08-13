@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -27,6 +28,7 @@ from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.contents_api.file_controller import FileController
+from tracim_backend.views.contents_api.folder_controller import FolderController
 from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
@@ -115,6 +117,7 @@ def web(global_config, **local_settings):
     html_document_controller = HTMLDocumentController()
     thread_controller = ThreadController()
     file_controller = FileController()
+    folder_controller = FolderController()
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
@@ -123,6 +126,7 @@ def web(global_config, **local_settings):
     configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)  # nopep8
     configurator.include(thread_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(file_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(folder_controller.bind, route_prefix=BASE_API_V2)
 
     if app_config.FRONTEND_SERVE:
         configurator.include('pyramid_mako')

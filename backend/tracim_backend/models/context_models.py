@@ -295,10 +295,10 @@ class ContentCreation(object):
     Content creation model
     """
     def __init__(
-            self,
-            label: str,
-            content_type: str,
-            parent_id: typing.Optional[int] = None,
+        self,
+        label: str,
+        content_type: str,
+        parent_id: typing.Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
@@ -310,8 +310,8 @@ class CommentCreation(object):
     Comment creation model
     """
     def __init__(
-            self,
-            raw_content: str,
+        self,
+        raw_content: str,
     ) -> None:
         self.raw_content = raw_content
 
@@ -321,8 +321,8 @@ class SetContentStatus(object):
     Set content status
     """
     def __init__(
-            self,
-            status: str,
+        self,
+        status: str,
     ) -> None:
         self.status = status
 
@@ -332,12 +332,27 @@ class TextBasedContentUpdate(object):
     TextBasedContent update model
     """
     def __init__(
-            self,
-            label: str,
-            raw_content: str,
+        self,
+        label: str,
+        raw_content: str,
     ) -> None:
         self.label = label
         self.raw_content = raw_content
+
+
+class FolderContentUpdate(object):
+    """
+    Folder Content update model
+    """
+    def __init__(
+        self,
+        label: str,
+        raw_content: str,
+        sub_content_types: typing.List[str],
+    ) -> None:
+        self.label = label
+        self.raw_content = raw_content
+        self.sub_content_types = sub_content_types
 
 
 class TypeUser(Enum):

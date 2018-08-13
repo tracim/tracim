@@ -12,6 +12,7 @@ from tracim_backend.models.contents import CONTENT_STATUS
 from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import open_status
 from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import ContentIdsQuery
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
@@ -701,7 +702,7 @@ class ContentDigestSchema(marshmallow.Schema):
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
+            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
@@ -845,6 +846,22 @@ class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbs
     @post_load
     def text_based_content_update(self, data):
         return TextBasedContentUpdate(**data)
+
+
+class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep
+    sub_content_types = marshmallow.fields.List(
+        marshmallow.fields.String(
+            example='html-document',
+            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
+        ),
+        description='list of content types allowed as sub contents. '
+                    'This field is required for folder contents, '
+                    'set it to empty list in other cases'
+    )
+
+    @post_load
+    def folder_content_update(self, data):
+        return FolderContentUpdate(**data)
 
 
 class FileContentModifySchema(TextBasedContentModifySchema):

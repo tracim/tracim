@@ -26,6 +26,8 @@ from sqlalchemy.sql.elements import and_
 from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -408,12 +410,36 @@ class ContentApi(object):
 
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
-        assert content_type_slug in CONTENT_TYPES.query_allowed_types_slugs()
         assert content_type_slug != CONTENT_TYPES.Any_SLUG
         assert not (label and filename)
 
         if content_type_slug == CONTENT_TYPES.Folder.slug and not label:
             label = self.generate_folder_label(workspace, parent)
+
+        # TODO BS 2018-08-13: Despite that workspace is required, create_comment
+        # can call here with None. Must update create_comment tu require the
+        # workspace.
+        if not workspace:
+            workspace = parent.workspace
+
+        content_type = CONTENT_TYPES.get_one_by_slug(content_type_slug)
+        if parent and parent.properties and 'allowed_content' in parent.properties:
+            if content_type.slug not in parent.properties['allowed_content'] or not parent.properties['allowed_content'][content_type.slug]:
+                raise UnallowedSubContent(' SubContent of type {subcontent_type}  not allowed in content {content_id}'.format(  # nopep8
+                    subcontent_type=content_type.slug,
+                    content_id=parent.content_id,
+                ))
+        if not workspace and parent:
+            workspace = parent.workspace
+
+        if workspace:
+            if content_type.slug not in workspace.get_allowed_content_types():
+                raise UnallowedSubContent(
+                    ' SubContent of type {subcontent_type}  not allowed in workspace {content_id}'.format(  # nopep8
+                        subcontent_type=content_type.slug,
+                        content_id=workspace.workspace_id,
+                    )
+                )
 
         content = Content()
 
@@ -433,8 +459,9 @@ class ContentApi(object):
 
         content.owner = self._user
         content.parent = parent
+
         content.workspace = workspace
-        content.type = content_type_slug
+        content.type = content_type.slug
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
 
@@ -450,18 +477,20 @@ class ContentApi(object):
         return content
 
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
+        # TODO: check parent allowed_type and workspace allowed_ type
         assert parent and parent.type != CONTENT_TYPES.Folder.slug
         if not content:
             raise EmptyCommentContentNotAllowed()
-        item = Content()
-        item.owner = self._user
-        item.parent = parent
-        if not workspace:
-            workspace = item.parent.workspace
-        item.workspace = workspace
-        item.type = CONTENT_TYPES.Comment.slug
+
+        item = self.create(
+            content_type_slug=CONTENT_TYPES.Comment.slug,
+            workspace=workspace,
+            parent=parent,
+            do_notify=False,
+            do_save=False,
+            label='',
+        )
         item.description = content
-        item.label = ''
         item.revision_type = ActionDescription.COMMENT
 
         if do_save:
@@ -1076,9 +1105,9 @@ class ContentApi(object):
     #
     #     return result
 
-    def set_allowed_content(self, folder: Content, allowed_content_dict:dict):
+    def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> None:  # nopep8
         """
-        :param folder: the given folder instance
+        :param content: the given content instance
         :param allowed_content_dict: must be something like this:
             dict(
                 folder = True
@@ -1086,10 +1115,37 @@ class ContentApi(object):
                 file = False,
                 page = True
             )
-        :return:
+        :return: nothing
         """
-        properties = dict(allowed_content = allowed_content_dict)
-        folder.properties = properties
+        properties = content.properties.copy()
+        properties['allowed_content'] = allowed_content_dict
+        content.properties = properties
+
+    def set_allowed_content(self, content: Content, allowed_content_type_slug_list: typing.List[str]) -> None:  # nopep8
+        """
+        :param content: the given content instance
+        :param allowed_content_type_slug_list: list of content_type_slug to
+        accept as subcontent.
+        :return: nothing
+        """
+        allowed_content_dict = {}
+        for allowed_content_type_slug in allowed_content_type_slug_list:
+            if allowed_content_type_slug not in CONTENT_TYPES.extended_endpoint_allowed_types_slug():
+                raise ContentTypeNotExist('Content_type {} does not exist'.format(allowed_content_type_slug))  # nopep8
+            allowed_content_dict[allowed_content_type_slug] = True
+
+        self._set_allowed_content(content, allowed_content_dict)
+
+    def restore_content_default_allowed_content(self, content: Content) -> None:
+        """
+        Return to default allowed_content_types
+        :param content: the given content instance
+        :return: nothing
+        """
+        if content._properties and 'allowed_content' in content._properties:
+            properties = content.properties.copy()
+            del properties['allowed_content']
+            content.properties = properties
 
     def set_status(self, content: Content, new_status: str):
         if new_status in CONTENT_STATUS.get_all_slugs_values():
