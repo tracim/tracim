@@ -218,7 +218,7 @@ class Dashboard extends React.Component {
           <PageContent>
             <div className='dashboard__workspace-wrapper'>
               <div className='dashboard__workspace'>
-                <div className='dashboard__workspace__title'>
+                <div className='dashboard__workspace__title primaryColorFont'>
                   {props.curWs.label}
                 </div>
 

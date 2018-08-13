@@ -13,7 +13,7 @@ class ProgressBar extends Component {
               <span className='progress-right'>
                 <span className='progress-bar' />
               </span>
-              <div className='progress-value'>
+              <div className='progress-value primaryColorBg'>
                 90%
               </div>
             </div>

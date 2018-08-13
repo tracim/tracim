@@ -84,7 +84,7 @@ class Login extends React.Component {
               <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
 
                 <Card customClass='loginpage__connection'>
-                  <CardHeader customClass='connection__header text-center'>{this.props.t('Connection')}</CardHeader>
+                  <CardHeader customClass='connection__header primaryColorBgLighten text-center'>{this.props.t('Connection')}</CardHeader>
 
                   <CardBody formClass='connection__form'>
                     <div>
