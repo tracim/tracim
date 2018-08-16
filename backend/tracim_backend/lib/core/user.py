@@ -35,13 +35,18 @@ class UserApi(object):
             current_user: typing.Optional[User],
             session: Session,
             config: CFG,
+            show_deleted: bool = False,
     ) -> None:
         self._session = session
         self._user = current_user
         self._config = config
+        self._show_deleted = show_deleted
 
     def _base_query(self):
-        return self._session.query(User)
+        query = self._session.query(User)
+        if not self._show_deleted:
+            query = query.filter(User.is_deleted == False)
+        return query
 
     def get_user_with_context(self, user: User) -> UserInContext:
         """
@@ -401,6 +406,16 @@ class UserApi(object):
 
     def disable(self, user:User, do_save=False):
         user.is_active = False
+        if do_save:
+            self.save(user)
+
+    def delete(self, user: User, do_save=False):
+        user.is_deleted = True
+        if do_save:
+            self.save(user)
+
+    def undelete(self, user: User, do_save=False):
+        user.is_deleted = False
         if do_save:
             self.save(user)
 

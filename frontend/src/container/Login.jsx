@@ -17,6 +17,7 @@ import {
   setUserConnected
 } from '../action-creator.sync.js'
 import { COOKIE, PAGE } from '../helper.js'
+import { Checkbox } from 'tracim_frontend_lib'
 
 class Login extends React.Component {
   constructor (props) {
@@ -36,7 +37,11 @@ class Login extends React.Component {
 
   handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
   handleChangePassword = e => this.setState({inputPassword: {...this.state.inputPassword, value: e.target.value}})
-  handleChangeRememberMe = () => this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
+  handleChangeRememberMe = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
+  }
 
   handleClickSubmit = async () => {
     const { history, dispatch, t } = this.props
@@ -52,8 +57,13 @@ class Login extends React.Component {
         logged: true
       }))
 
-      Cookies.set(COOKIE.USER_LOGIN, inputLogin.value)
-      Cookies.set(COOKIE.USER_AUTH, userAuth)
+      if (inputRememberMe) {
+        Cookies.set(COOKIE.USER_LOGIN, inputLogin.value, {expires: 365})
+        Cookies.set(COOKIE.USER_AUTH, userAuth, {expires: 365})
+      } else {
+        Cookies.set(COOKIE.USER_LOGIN, inputLogin.value)
+        Cookies.set(COOKIE.USER_AUTH, userAuth)
+      }
 
       history.push(PAGE.WORKSPACE.ROOT)
     } else if (fetchPostUserLogin.status === 403) {
@@ -74,7 +84,7 @@ class Login extends React.Component {
               <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
 
                 <Card customClass='loginpage__connection'>
-                  <CardHeader customClass='connection__header text-center'>{this.props.t('Connection')}</CardHeader>
+                  <CardHeader customClass='connection__header primaryColorBgLighten text-center'>{this.props.t('Connection')}</CardHeader>
 
                   <CardBody formClass='connection__form'>
                     <div>
@@ -103,32 +113,30 @@ class Login extends React.Component {
                       />
 
                       <div className='row align-items-center mt-4 mb-4'>
-
-                        {/*
-                          <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
-                            <InputCheckbox
-                              parentClassName='connection__form__rememberme'
-                              customClass=''
-                              label='Se souvenir de moi'
+                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                          <div className='connection__form__rememberme' onClick={this.handleChangeRememberMe}>
+                            <Checkbox
+                              name='inputRememberMe'
                               checked={this.state.inputRememberMe}
-                              onChange={this.handleChangeRememberMe}
                             />
+                            Se souvenir de moi
                           </div>
-                        */}
 
-                        <div className='col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
                           <LoginBtnForgotPw
                             customClass='connection__form__pwforgot'
                             label={this.props.t('Forgotten password ?')}
                           />
                         </div>
-                        <Button
-                          htmlType='button'
-                          bootstrapType='primary'
-                          customClass='connection__form__btnsubmit ml-auto'
-                          label={this.props.t('Connection')}
-                          onClick={this.handleClickSubmit}
-                        />
+
+                        <div className='col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                          <Button
+                            htmlType='button'
+                            bootstrapType='primary'
+                            customClass='connection__form__btnsubmit ml-auto'
+                            label={this.props.t('Connection')}
+                            onClick={this.handleClickSubmit}
+                          />
+                        </div>
                       </div>
                     </div>
 

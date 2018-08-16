@@ -13,6 +13,7 @@ from tracim_backend.models.contents import CONTENT_STATUS
 from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import open_status
 from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import ContentIdsQuery
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
@@ -74,6 +75,10 @@ class UserSchema(UserDigestSchema):
     is_active = marshmallow.fields.Bool(
         example=True,
         description='Is user account activated ?'
+    )
+    is_deleted = marshmallow.fields.Bool(
+        example=False,
+        description='Is user account deleted ?'
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
@@ -326,6 +331,7 @@ class AutocompleteQuerySchema(marshmallow.Schema):
         example='test',
         description='search text to query',
         validate=Length(min=2),
+        required=True,
     )
     @post_load
     def make_autocomplete(self, data):
@@ -536,6 +542,7 @@ class WorkspaceDigestSchema(marshmallow.Schema):
         WorkspaceMenuEntrySchema,
         many=True,
     )
+    is_deleted = marshmallow.fields.Bool(example=False, default=False)
 
     class Meta:
         description = 'Digest of workspace informations'
@@ -728,7 +735,7 @@ class ContentDigestSchema(marshmallow.Schema):
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
+            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
@@ -872,6 +879,22 @@ class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbs
     @post_load
     def text_based_content_update(self, data):
         return TextBasedContentUpdate(**data)
+
+
+class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep
+    sub_content_types = marshmallow.fields.List(
+        marshmallow.fields.String(
+            example='html-document',
+            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
+        ),
+        description='list of content types allowed as sub contents. '
+                    'This field is required for folder contents, '
+                    'set it to empty list in other cases'
+    )
+
+    @post_load
+    def folder_content_update(self, data):
+        return FolderContentUpdate(**data)
 
 
 class FileContentModifySchema(TextBasedContentModifySchema):

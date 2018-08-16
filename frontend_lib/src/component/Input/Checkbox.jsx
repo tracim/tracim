@@ -59,8 +59,6 @@ Checkbox.propTypes = {
 }
 
 Checkbox.defaultProps = {
-  name: '',
-  onClickCheckbox: () => {},
   checked: false,
   disabled: false
 }

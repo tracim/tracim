@@ -10,6 +10,8 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import UnallowedSubContent
 # TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
 from tracim_backend.lib.core.workspace import RoleApi
 # TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
@@ -100,6 +102,310 @@ class TestContentApi(DefaultTest):
         eq_(sorteds[1], c1,
             'value is {} instead of {}'.format(sorteds[1].content_id,
                                                c1.content_id))
+
+    def test_unit__create_content__OK_nominal_case(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        item = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='not_deleted',
+            do_save=True
+        )
+        assert isinstance(item, Content)
+
+    def test_unit__create_content__err_empty_label(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(EmptyLabelNotAllowed):
+            api.create(
+                content_type_slug=CONTENT_TYPES.Thread.slug,
+                workspace=workspace,
+                parent=None,
+                label='',
+                do_save=True
+            )
+
+    def test_unit__create_content__err_content_type_not_allowed_in_this_folder(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_dict = {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: False} # nopep8
+        api._set_allowed_content(
+            folder,
+            allowed_content_dict=allowed_content_dict
+        )
+        api.save(content=folder)
+        # not in list -> do not allow
+        with pytest.raises(UnallowedSubContent):
+            api.create(
+                content_type_slug=CONTENT_TYPES.Event.slug,
+                workspace=workspace,
+                parent=folder,
+                label='lapin',
+                do_save=True
+            )
+        # in list but false -> do not allow
+        with pytest.raises(UnallowedSubContent):
+            api.create(
+                content_type_slug=CONTENT_TYPES.File.slug,
+                workspace=workspace,
+                parent=folder,
+                label='lapin',
+                do_save=True
+            )
+        # in list and true -> allow
+        api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=folder,
+            label='lapin',
+            do_save=True
+        )
+
+    def test_unit__create_content__err_content_type_not_allowed_in_this_workspace(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(UnallowedSubContent):
+            api.create(
+                content_type_slug=CONTENT_TYPES.Event.slug,
+                workspace=workspace,
+                parent=None,
+                label='lapin',
+                do_save=True
+           )
+
+    def test_unit__set_allowed_content__ok__private_method(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_dict = {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: False}  # nopep8
+        api._set_allowed_content(
+            folder,
+            allowed_content_dict=allowed_content_dict
+        )
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: False}
+
+    def test_unit__set_allowed_content__ok__nominal_case(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_type_slug_list = [CONTENT_TYPES.Folder.slug, CONTENT_TYPES.File.slug]  # nopep8
+        api.set_allowed_content(
+            folder,
+            allowed_content_type_slug_list=allowed_content_type_slug_list
+        )
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: True}
+
+    def test_unit__restore_content_default_allowed_content__ok__nominal_case(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = api.create(
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label='plop',
+            do_save=False
+        )
+        allowed_content_type_slug_list = [CONTENT_TYPES.Folder.slug, CONTENT_TYPES.File.slug]  # nopep8
+        api.set_allowed_content(
+            folder,
+            allowed_content_type_slug_list=allowed_content_type_slug_list
+        )
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == {CONTENT_TYPES.Folder.slug: True, CONTENT_TYPES.File.slug: True} # nopep8
+        api.restore_content_default_allowed_content(folder)
+        assert 'allowed_content' in folder.properties
+        assert folder.properties['allowed_content'] == CONTENT_TYPES.default_allowed_content_properties(folder.type)  # nopep8
 
     def test_delete(self):
         uapi = UserApi(
@@ -2056,6 +2362,101 @@ class TestContentApi(DefaultTest):
         # folder subcontent modification does not change folder order
         # (workspace2)
         assert last_actives[8] == main_folder_workspace2
+
+    def test_unit__get_last_active__ok__do_no_show_deleted_archived(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        workspace2 = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace2',
+            save_now=True
+        )
+
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+            show_deleted=False,
+            show_archived=False,
+        )
+        main_folder = api.create(CONTENT_TYPES.Folder.slug, workspace, None, 'this is randomized folder', '', True)  # nopep8
+        archived = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'archived', '', True)  # nopep8
+        deleted = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'deleted', '', True)  # nopep8
+        comment_archived = api.create_comment(workspace, parent=archived, content='just a comment', do_save=True)  # nopep8
+        comment_deleted = api.create_comment(workspace, parent=deleted, content='just a comment', do_save=True)  # nopep8
+        with new_revision(
+            session=self.session,
+            tm=transaction.manager,
+            content=archived,
+        ):
+            api.archive(archived)
+            api.save(archived)
+
+        with new_revision(
+            session=self.session,
+            tm=transaction.manager,
+            content=deleted,
+        ):
+            api.delete(deleted)
+            api.save(deleted)
+        normal = api.create(CONTENT_TYPES.Page.slug, workspace, main_folder, 'normal', '', True)  # nopep8
+        comment_normal = api.create_comment(workspace, parent=normal, content='just a comment', do_save=True)  # nopep8
+
+        last_actives = api.get_last_active()
+        assert len(last_actives) == 2
+        assert last_actives[0].content_id == normal.content_id
+        assert last_actives[1].content_id == main_folder.content_id
+
+
+        api._show_deleted = True
+        api._show_archived = False
+        last_actives = api.get_last_active()
+        assert len(last_actives) == 3
+        assert last_actives[0] == normal
+        assert last_actives[1] == deleted
+        assert last_actives[2] == main_folder
+
+        api._show_deleted = False
+        api._show_archived = True
+        last_actives = api.get_last_active()
+        assert len(last_actives) == 3
+        assert last_actives[0]== normal
+        assert last_actives[1] == archived
+        assert last_actives[2] == main_folder
+
+        api._show_deleted = True
+        api._show_archived = True
+        last_actives = api.get_last_active()
+        assert len(last_actives) == 4
+        assert last_actives[0] == normal
+        assert last_actives[1] == deleted
+        assert last_actives[2] == archived
+        assert last_actives[3] == main_folder
 
     def test_unit__get_last_active__ok__workspace_filter_workspace_full(self):
         uapi = UserApi(

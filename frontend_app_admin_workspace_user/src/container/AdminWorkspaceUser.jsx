@@ -2,15 +2,15 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  addAllResourceI18n,
-  // handleFetchResult,
-  PageWrapper,
-  PageTitle,
-  PageContent
+  addAllResourceI18n
+  // handleFetchResult
 } from 'tracim_frontend_lib'
 import { debug } from '../helper.js'
 import {
 } from '../action.async.js'
+import AdminWorkspace from '../component/AdminWorkspace.jsx'
+
+require('../css/index.styl')
 
 class AdminWorkspaceUser extends React.Component {
   constructor (props) {
@@ -32,7 +32,10 @@ class AdminWorkspaceUser extends React.Component {
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
-      // console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
+      case 'admin_workspace_user_showApp':
+        console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
+        this.setState({config: data.config})
+        break
       default:
         break
     }
@@ -48,6 +51,7 @@ class AdminWorkspaceUser extends React.Component {
     const { state } = this
 
     console.log('%c<AdminWorkspaceUser> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    if (prevState.config.type !== state.config.type) this.loadContent()
   }
 
   componentWillUnmount () {
@@ -67,17 +71,13 @@ class AdminWorkspaceUser extends React.Component {
 
     return (
       <div>
-        <PageWrapper customeClass='admin'>
-          <PageTitle
-            parentClass='admin__header'
-            customClass='justify-content-between'
-            title={'Admin'}
-          />
+        {this.state.config.type === 'workspace' &&
+          <AdminWorkspace />
+        }
 
-          <PageContent parentClass='workspace__content'>
-            woot { this.state.config.type }
-          </PageContent>
-        </PageWrapper>
+        {this.state.config.type === 'user' &&
+          <div>not yet implemented</div>
+        }
       </div>
     )
   }

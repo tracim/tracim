@@ -2383,6 +2383,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert workspace['workspace_id'] == 1
         assert workspace['label'] == 'Business'
         assert workspace['slug'] == 'business'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
@@ -2480,8 +2481,9 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
 
 
 class TestUserEndpoint(FunctionalTest):
+    # -*- coding: utf-8 -*-
     """
-    Tests for GET/POST /api/v2/users/{user_id}
+    Tests for GET /api/v2/users/{user_id}
     """
     fixtures = [BaseFixture]
 
@@ -2533,6 +2535,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['is_deleted'] is False
 
     def test_api__get_user__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2582,6 +2585,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['is_deleted'] is False
 
     def test_api__get_user__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2931,11 +2935,57 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
         requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
+    def test_api_delete_user__ok_200__admin(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/users/{}/delete'.format(user_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        ).json_body
+        assert res['is_deleted'] is True
+
 
 class TestUsersEndpoint(FunctionalTest):
     # -*- coding: utf-8 -*-
     """
-    Tests for GET /api/v2/users
+    Tests for GET /api/v2/users/{user_id}
     """
     fixtures = [BaseFixture]
 

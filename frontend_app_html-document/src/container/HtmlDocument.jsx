@@ -26,7 +26,8 @@ import {
   putHtmlDocIsArchived,
   putHtmlDocIsDeleted,
   putHtmlDocRestoreArchived,
-  putHtmlDocRestoreDeleted
+  putHtmlDocRestoreDeleted,
+  putHtmlDocRead
 } from '../action.async.js'
 
 class HtmlDocument extends React.Component {
@@ -165,6 +166,9 @@ class HtmlDocument extends React.Component {
         console.log('Error loading Timeline.', e)
         this.setState({timeline: []})
       })
+
+    await Promise.all([fetchResultHtmlDocument, fetchResultComment, fetchResultRevision])
+    putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
   }
 
   handleClickBtnCloseApp = () => {

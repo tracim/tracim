@@ -8,9 +8,13 @@ from depot.io.utils import FileIntent
 
 from tracim_backend import models
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.group import GroupApi
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
 from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
 from tracim_backend.fixtures.content import Content as ContentFixtures
@@ -41,6 +45,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
@@ -106,6 +111,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # modify workspace
@@ -120,6 +126,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
         # after
@@ -133,6 +140,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert workspace['is_deleted'] is False
         assert len(workspace['sidebar_entries']) == 5
 
     def test_api__update_workspace__err_400__empty_label(self) -> None:
@@ -205,6 +213,610 @@ class TestWorkspaceEndpoint(FunctionalTest):
             '/api/v2/workspaces',
             status=400,
             params=params,
+        )
+
+    def test_api__delete_workspace__ok_200__admin(self) -> None:
+        """
+        Test delete workspace as admin
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('administrators')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=403
+        )
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__delete_workspace__ok_200__manager_workspace_manager(self) -> None:
+        """
+        Test delete workspace as global manager and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__delete_workspace__err_403__user_workspace_manager(self) -> None:
+        """
+        Test delete workspace as simple user and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__delete_workspace__err_403__manager_reader(self) -> None:
+        """
+        Test delete workspace as manager and reader of the workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__delete_workspace__err_400__manager(self) -> None:
+        """
+        Test delete workspace as global manager without having any role in the
+        workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.create_user('test@test.test', password='test@test.test',
+                                do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test',
+                                                   save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/delete'.format(workspace_id),
+            status=400
+        )
+
+    def test_api__undelete_workspace__ok_200__admin(self) -> None:
+        """
+        Test undelete workspace as admin
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('administrators')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=403
+        )
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__undelete_workspace__ok_200__manager_workspace_manager(self) -> None:
+        """
+        Test undelete workspace as global manager and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is False
+
+    def test_api__undelete_workspace__err_403__user_workspace_manager(self) -> None:
+        """
+        Test undelete workspace as simple user and workspace manager
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__undelete_workspace__err_403__manager_reader(self) -> None:
+        """
+        Test undelete workspace as manager and reader of the workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=403
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{}'.format(workspace_id),
+            status=200
+        )
+        workspace = res.json_body
+        assert workspace['is_deleted'] is True
+
+    def test_api__undelete_workspace__err_400__manager(self) -> None:
+        """
+        Test delete workspace as global manager without having any role in the
+        workspace
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.create_user('test@test.test', password='test@test.test',
+                                do_save=True, do_notify=False)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.delete(workspace, flush=True)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        transaction.commit()
+        workspace_id = int(workspace.workspace_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        # delete
+        res = self.testapp.put(
+            '/api/v2/workspaces/{}/undelete'.format(workspace_id),
+            status=400
         )
 
     def test_api__get_workspace__err_400__unallowed_user(self) -> None:
@@ -599,6 +1211,121 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
 
+    def test_api__delete_workspace_member_role__ok_200__nominal_case(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user.user_id,
+            ),
+            status=204,
+        )
+        # after
+        roles = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
+        for role in roles:
+            assert role['user_id'] != user.user_id
+
+    def test_api__delete_workspace_member_role__err_400__simple_user(self):
+        """
+        Delete worskpace member role
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        workspace = workspace_api.create_workspace('test', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)  # nopep8
+        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'test2@test2.test2'
+            )
+        )
+        res = self.testapp.delete(
+            '/api/v2/workspaces/{workspace_id}/members/{user_id}'.format(
+                workspace_id=workspace.workspace_id,
+                user_id=user.user_id,
+            ),
+            status=403,
+        )
+        # after
+        roles = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/members'.format(
+                workspace_id=workspace.workspace_id
+            ),
+            status=200
+        ).json_body
+        assert len([role for role in roles if role['user_id'] == user.user_id]) == 1  # nopep8
+
 
 class TestUserInvitationWithMailActivatedSync(FunctionalTest):
 
@@ -714,7 +1441,9 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'tools'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert len(content['sub_content_types']) > 1
+        assert 'comment' in content['sub_content_types']
+        assert 'folder' in content['sub_content_types']
         assert content['workspace_id'] == 1
         content = res[1]
         assert content['content_id'] == 2
@@ -726,7 +1455,9 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'menus'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert len(content['sub_content_types']) > 1
+        assert 'comment' in content['sub_content_types']
+        assert 'folder' in content['sub_content_types']
         assert content['workspace_id'] == 1
         content = res[2]
         assert content['content_id'] == 11
@@ -738,7 +1469,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'current-menu'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 1
 
     def test_api__get_workspace_content__ok_200__get_default_html_documents(self):
@@ -768,7 +1499,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'current-menu'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 1
 
     # Root related
@@ -807,7 +1538,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
         content = res[2]
@@ -820,7 +1551,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
         content = res[3]
@@ -833,7 +1564,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_all_root_content(self):
@@ -870,7 +1601,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
         content = res[2]
@@ -883,7 +1614,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
         content = res[3]
@@ -896,7 +1627,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):  # nopep8
@@ -933,7 +1664,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self):  # nopep8
@@ -969,7 +1700,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self):  # nopep8
@@ -1007,7 +1738,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
     def test_api__get_workspace_content__ok_200__get_nothing_root_content(self):
@@ -1129,7 +1860,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'test-thread'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 1
 
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(self):  # nopep8
@@ -1226,7 +1957,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'test-page'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 1
         content = res[1]
         assert content['content_type'] == 'html-document'
@@ -1238,7 +1969,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'test-html-page'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 1
         assert res[0]['content_id'] != res[1]['content_id']
 
@@ -1276,7 +2007,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
 
         content = res[1]
@@ -1289,7 +2020,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
 
         content = res[2]
@@ -1302,7 +2033,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self):  # nopep8
@@ -1338,7 +2069,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_only_archived_folder_content(self):  # nopep8
@@ -1374,7 +2105,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self):  # nopep8
@@ -1411,7 +2142,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['show_in_ui'] is True
         assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'thread', 'html-document', 'folder', 'file'}  # nopep8
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
 
     def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self):  # nopep8
@@ -1685,6 +2416,69 @@ class TestWorkspaceContents(FunctionalTest):
             '/api/v2/workspaces/1/contents',
             params=params,
             status=400,
+        )
+
+    def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
+        """
+        Create generic content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=False,
+            do_notify=False
+        )
+        content_api.set_allowed_content(folder, [CONTENT_TYPES.Folder.slug])
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # unallowed_content_type
+        params = {
+            'label': 'GenericCreatedContent',
+            'content_type': 'markdownpage',
+            'parent_id': folder.content_id
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
+            params=params,
+            status=400,
+        )
+
+        # allowed_content_type
+        params = {
+            'label': 'GenericCreatedContent',
+            'content_type': 'folder',
+            'parent_id': folder.content_id
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/{workspace_id}/contents'.format(workspace_id=test_workspace.workspace_id),
+            params=params,
+            status=200,
         )
 
     def test_api_put_move_content__ok_200__nominal_case(self):

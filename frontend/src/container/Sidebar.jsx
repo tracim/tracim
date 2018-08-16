@@ -83,6 +83,7 @@ class Sidebar extends React.Component {
     this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
   }
 
+  // @DEPRECATED
   // not used, right now, link on sidebar filters is a <Link>
   handleClickContentFilter = (idWs, filter) => {
     const { workspace, history } = this.props

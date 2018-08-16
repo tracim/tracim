@@ -16,11 +16,15 @@ import {
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceContentList,
-  getFolderContent
+  getFolderContent,
+  putWorkspaceContentArchived,
+  putWorkspaceContentDeleted
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  setWorkspaceContentList
+  setWorkspaceContentList,
+  setWorkspaceContentArchived,
+  setWorkspaceContentDeleted
 } from '../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -125,14 +129,34 @@ class WorkspaceContent extends React.Component {
     console.log('%c<WorkspaceContent> download nyi', 'color: #c17838', content)
   }
 
-  handleClickArchiveContentItem = (e, content) => {
+  handleClickArchiveContentItem = async (e, content) => {
+    const { props, state } = this
+
     e.stopPropagation()
-    console.log('%c<WorkspaceContent> archive nyi', 'color: #c17838', content)
+
+    const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(props.user, content.idWorkspace, content.id))
+    switch (fetchPutContentArchived.status) {
+      case 204:
+        props.dispatch(setWorkspaceContentArchived(content.idWorkspace, content.id))
+        this.loadContentList(state.workspaceIdInUrl)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while archiving document')))
+    }
   }
 
-  handleClickDeleteContentItem = (e, content) => {
+  handleClickDeleteContentItem = async (e, content) => {
+    const { props, state } = this
+
     e.stopPropagation()
-    console.log('%c<WorkspaceContent> delete nyi', 'color: #c17838', content)
+
+    const fetchPutContentDeleted = await props.dispatch(putWorkspaceContentDeleted(props.user, content.idWorkspace, content.id))
+    switch (fetchPutContentDeleted.status) {
+      case 204:
+        props.dispatch(setWorkspaceContentDeleted(content.idWorkspace, content.id))
+        this.loadContentList(state.workspaceIdInUrl)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while deleting document')))
+    }
   }
 
   handleClickFolder = folderId => {
@@ -197,8 +221,6 @@ class WorkspaceContent extends React.Component {
           </PageTitle>
 
           <PageContent parentClass='workspace__content'>
-            <div id='popupCreateContentContainer' />
-
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />
 

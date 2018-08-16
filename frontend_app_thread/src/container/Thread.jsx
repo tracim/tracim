@@ -22,7 +22,8 @@ import {
   putThreadIsArchived,
   putThreadIsDeleted,
   putThreadRestoreArchived,
-  putThreadRestoreDeleted
+  putThreadRestoreDeleted,
+  putThreadRead
 } from '../action.async.js'
 
 class Thread extends React.Component {
@@ -108,20 +109,24 @@ class Thread extends React.Component {
       handleFetchResult(await fetchResultThread),
       handleFetchResult(await fetchResultThreadComment)
     ])
-      .then(([resThread, resComment]) => this.setState({
-        content: resThread.body,
-        listMessage: resComment.body.map(c => ({
-          ...c,
-          timelineType: 'comment',
-          created: (new Date(c.created)).toLocaleString(),
-          author: {
-            ...c.author,
-            avatar_url: c.author.avatar_url
-              ? c.author.avatar_url
-              : generateAvatarFromPublicName(c.author.public_name)
-          }
-        }))
-      }))
+      .then(([resThread, resComment]) => {
+        this.setState({
+          content: resThread.body,
+          listMessage: resComment.body.map(c => ({
+            ...c,
+            timelineType: 'comment',
+            created: (new Date(c.created)).toLocaleString(),
+            author: {
+              ...c.author,
+              avatar_url: c.author.avatar_url
+                ? c.author.avatar_url
+                : generateAvatarFromPublicName(c.author.public_name)
+            }
+          }))
+        })
+
+        putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+      })
       .catch(e => console.log('Error loading Thread data.', e))
   }
 

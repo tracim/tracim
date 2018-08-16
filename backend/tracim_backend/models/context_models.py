@@ -297,10 +297,10 @@ class ContentCreation(object):
     Content creation model
     """
     def __init__(
-            self,
-            label: str,
-            content_type: str,
-            parent_id: typing.Optional[int] = None,
+        self,
+        label: str,
+        content_type: str,
+        parent_id: typing.Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
@@ -312,8 +312,8 @@ class CommentCreation(object):
     Comment creation model
     """
     def __init__(
-            self,
-            raw_content: str,
+        self,
+        raw_content: str,
     ) -> None:
         self.raw_content = raw_content
 
@@ -323,8 +323,8 @@ class SetContentStatus(object):
     Set content status
     """
     def __init__(
-            self,
-            status: str,
+        self,
+        status: str,
     ) -> None:
         self.status = status
 
@@ -334,12 +334,27 @@ class TextBasedContentUpdate(object):
     TextBasedContent update model
     """
     def __init__(
-            self,
-            label: str,
-            raw_content: str,
+        self,
+        label: str,
+        raw_content: str,
     ) -> None:
         self.label = label
         self.raw_content = raw_content
+
+
+class FolderContentUpdate(object):
+    """
+    Folder Content update model
+    """
+    def __init__(
+        self,
+        label: str,
+        raw_content: str,
+        sub_content_types: typing.List[str],
+    ) -> None:
+        self.label = label
+        self.raw_content = raw_content
+        self.sub_content_types = sub_content_types
 
 
 class TypeUser(Enum):
@@ -392,6 +407,10 @@ class UserInContext(object):
     @property
     def profile(self) -> Profile:
         return self.user.profile.name
+
+    @property
+    def is_deleted(self) -> bool:
+        return self.user.is_deleted
 
     # Context related
 
@@ -455,6 +474,13 @@ class WorkspaceInContext(object):
         get workspace slug
         """
         return slugify(self.workspace.label)
+
+    @property
+    def is_deleted(self) -> bool:
+        """
+        Is the workspace deleted ?
+        """
+        return self.workspace.is_deleted
 
     @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:

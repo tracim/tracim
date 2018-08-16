@@ -201,7 +201,7 @@ class Dashboard extends React.Component {
     const { props, state } = this
 
     return (
-      <div className='Dashboard' style={{width: '100%'}}>
+      <div className='dashboard'>
         <PageWrapper customeClass='dashboard'>
           <PageTitle
             parentClass='dashboard__header'
@@ -218,7 +218,7 @@ class Dashboard extends React.Component {
           <PageContent>
             <div className='dashboard__workspace-wrapper'>
               <div className='dashboard__workspace'>
-                <div className='dashboard__workspace__title'>
+                <div className='dashboard__workspace__title primaryColorFont'>
                   {props.curWs.label}
                 </div>
 

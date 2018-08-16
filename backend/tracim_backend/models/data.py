@@ -32,15 +32,6 @@ from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.auth import User
 from tracim_backend.models.roles import WorkspaceRoles
 
-DEFAULT_PROPERTIES = dict(
-    allowed_content=dict(
-        folder=True,
-        file=True,
-        page=True,
-        thread=True,
-    ),
-)
-
 
 class Workspace(DeclarativeBase):
 
@@ -96,7 +87,7 @@ class Workspace(DeclarativeBase):
 
     def get_allowed_content_types(self):
         # @see Content.get_allowed_content_types()
-        return CONTENT_TYPES.endpoint_allowed_types_slug()
+        return CONTENT_TYPES.extended_endpoint_allowed_types_slug()
 
     def get_valid_children(
             self,
@@ -545,22 +536,8 @@ class ContentChecker(object):
 
     @classmethod
     def check_properties(cls, item):
-        if item.type == CONTENT_TYPES.Folder.slug:
-            properties = item.properties
-            if 'allowed_content' not in properties.keys():
-                return False
-            if 'folders' not in properties['allowed_content']:
-                return False
-            if 'files' not in properties['allowed_content']:
-                return False
-            if 'pages' not in properties['allowed_content']:
-                return False
-            if 'threads' not in properties['allowed_content']:
-                return False
-            return True
-
+        properties = item.properties
         if item.type == CONTENT_TYPES.Event.slug:
-            properties = item.properties
             if 'name' not in properties.keys():
                 return False
             if 'raw' not in properties.keys():
@@ -570,22 +547,16 @@ class ContentChecker(object):
             if 'end' not in properties.keys():
                 return False
             return True
-
-        # TODO - G.M - 15-03-2018 - Choose only correct Content-type for origin
-        # Only content who can be copied need this
-        if item.type == CONTENT_TYPES.Any_SLUG:
-            properties = item.properties
+        else:
+            if 'allowed_content' in properties.keys():
+                for content_slug, value in properties['allowed_content'].items():  # nopep8
+                    if not isinstance(value, bool):
+                        return False
+                    if not content_slug in CONTENT_TYPES.extended_endpoint_allowed_types_slug():  # nopep8
+                        return False
             if 'origin' in properties.keys():
-                return True
-        raise NotImplementedError
-
-    @classmethod
-    def reset_properties(cls, item):
-        if item.type == CONTENT_TYPES.Folder.slug:
-            item.properties = DEFAULT_PROPERTIES
-            return
-
-        raise NotImplementedError
+                pass
+            return True
 
 
 class ContentRevisionRO(DeclarativeBase):
@@ -1204,9 +1175,15 @@ class Content(DeclarativeBase):
     @hybrid_property
     def properties(self) -> dict:
         """ return a structure decoded from json content of _properties """
+
         if not self._properties:
-            return DEFAULT_PROPERTIES
-        return json.loads(self._properties)
+            properties = {}
+        else:
+            properties = json.loads(self._properties)
+        if CONTENT_TYPES.get_one_by_slug(self.type) != CONTENT_TYPES.Event:
+            if not 'allowed_content' in properties:
+                properties['allowed_content'] = CONTENT_TYPES.default_allowed_content_properties(self.type)  # nopep8
+        return properties
 
     @properties.setter
     def properties(self, properties_struct: dict) -> None:
@@ -1347,7 +1324,11 @@ class Content(DeclarativeBase):
             allowed_types = self.properties['allowed_content']
             for type_label, is_allowed in allowed_types.items():
                 if is_allowed:
-                    types.append(CONTENT_TYPES.get_one_by_slug(type_label))
+                   types.append(
+                        CONTENT_TYPES.get_one_by_slug(type_label)
+                   )
+        # TODO BS 2018-08-13: This try/except is not correct: except exception
+        # if we know what to except.
         except Exception as e:
             print(e.__str__())
             print('----- /*\ *****')

@@ -38,6 +38,11 @@ export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
 export const setWorkspaceContentList = workspaceContentList => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
+export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
+export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
+export const setWorkspaceContentArchived = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`, idWorkspace, idContent })
+export const setWorkspaceContentDeleted = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, idWorkspace, idContent })
+
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const updateWorkspaceListData = workspaceList => ({ type: `${UPDATE}/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })

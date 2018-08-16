@@ -293,7 +293,7 @@ class TracimRequest(Request):
         :return: user found from header/body
         """
         app_config = request.registry.settings['CFG']
-        uapi = UserApi(None, session=request.dbsession, config=app_config)
+        uapi = UserApi(None, show_deleted=True, session=request.dbsession, config=app_config)
         login = ''
         try:
             login = None
@@ -355,7 +355,8 @@ class TracimRequest(Request):
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
-                config=request.registry.settings['CFG']
+                config=request.registry.settings['CFG'],
+                show_deleted=True,
             )
             workspace = wapi.get_one(workspace_id)
         except NoResultFound as exc:
@@ -390,7 +391,8 @@ class TracimRequest(Request):
             wapi = WorkspaceApi(
                 current_user=user,
                 session=request.dbsession,
-                config=request.registry.settings['CFG']
+                config=request.registry.settings['CFG'],
+                show_deleted=True,
             )
             workspace = wapi.get_one(workspace_id)
         except JSONDecodeError as exc:

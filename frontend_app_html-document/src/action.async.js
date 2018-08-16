@@ -117,3 +117,13 @@ export const putHtmlDocRestoreDeleted = (user, apiUrl, idWorkspace, idContent) =
     method: 'PUT'
   })
 }
+
+export const putHtmlDocRead = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}

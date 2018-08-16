@@ -37,7 +37,7 @@ export const PAGE = {
   ADMIN: {
     ROOT: '/admin',
     WORKSPACE: '/admin/workspace',
-    USEr: '/admin/user'
+    USER: '/admin/user'
   }
 }
 
@@ -66,5 +66,10 @@ export const ROLE = [{
   hexcolor: '#ed0007',
   label: 'Workspace manager'
 }]
+
+export const PROFILE = {
+  ADMINISTRATOR: 'administrators',
+  USER: 'users'
+}
 
 export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route
