@@ -55,7 +55,7 @@ you can add this line to active pyramid debug mode for almost anything:
     ~~~
 
 
-Hapic debug mode : this line is needed for more explicit json error,
+Hapic debug mode: this line is needed for more explicit json error,
 raised error traceback will be send through json. you can uncomment it
 
    ~~~
