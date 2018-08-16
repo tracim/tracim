@@ -22,6 +22,15 @@ Get the sources from GitHub:
 
     ./setup_default_backend.sh
 
+For debugging you can uncomment this 2 lines in '/backend/development.ini'
+    
+    ~~~
+    #pyramid.includes =
+    #    pyramid_debugtoolbar
+    ~~~
+
+If you use debugtoolbar, you can seen one red button on right of the Tracim web interface.
+
 ## Install frontend ##
 
     ./install_frontend_dependencies.sh
