@@ -108,6 +108,8 @@ class UserCreation(object):
             email_notification: bool = True,
     ) -> None:
         self.email = email
+        # INFO - G.M - 2018-08-16 - cleartext password, default value
+        # is auto-generated.
         self.password = password or password_generator()
         self.public_name = public_name or None
         self.timezone = timezone or ''

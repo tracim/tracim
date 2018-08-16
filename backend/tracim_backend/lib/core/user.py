@@ -272,7 +272,7 @@ class UserApi(object):
         )
         return user
 
-    def _check_email(self, email) -> bool:
+    def _check_email(self, email: str) -> bool:
         """
         Check if email is completely ok to be used in user db table
         """
@@ -291,7 +291,7 @@ class UserApi(object):
         """
         Verify if given email does not already exist in db
         """
-        return self._session.query(User.email).filter(User.email==email).all() != []  # nopep8
+        return self._session.query(User.email).filter(User.email==email).count() != 0  # nopep8
 
     def _check_email_correctness(self, email: str) -> bool:
         """
