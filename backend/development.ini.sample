@@ -35,6 +35,8 @@ retry.attempts = 3
 
 ### Global
 
+# Enable debug mode
+# debug = True
 cache_dir = %(here)s/data
 # preview generator cache directory
 preview_cache_dir = /tmp/tracim/preview/
