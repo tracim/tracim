@@ -37,6 +37,11 @@ function setup_config_file {
        log "generate missing wsgidav.conf ..."
        cp wsgidav.conf.sample wsgidav.conf
     fi
+
+    if [ ! -f ../color.json ]; then
+       log "generate missing color.json ..."
+       cp ../color.json.sample ../color.json
+    fi
 }
 
 function setup_db {
