@@ -15,6 +15,7 @@ export const ContentTypeBtn = props =>
         backgroundColor: color(props.hexcolor).darken(0.15).hexString()
       }
     }}
+    onClick={props.onClickBtn}
   >
     <div className={classnames(`${props.customClass}__text`)}>
       <div className={classnames(`${props.customClass}__text__icon`)}>
@@ -33,7 +34,8 @@ ContentTypeBtn.propTypes = {
   label: PropTypes.string.isRequired,
   faIcon: PropTypes.string.isRequired,
   creationLabel: PropTypes.string.isRequired,
-  customClass: PropTypes.string
+  customClass: PropTypes.string,
+  onClickBtn: PropTypes.func
 }
 
 ContentTypeBtn.defaultProps = {

@@ -51,6 +51,7 @@ class Application(object):
             creation_label: str,
             available_statuses: typing.List['ContentStatus'],
             slug_alias: typing.List[str] = None,
+            allow_sub_content: bool = False,
     ):
         content_type = ContentType(
             slug=slug,
@@ -60,6 +61,7 @@ class Application(object):
             creation_label=creation_label,
             available_statuses=available_statuses,
             slug_alias=slug_alias,
+            allow_sub_content=allow_sub_content,
         )
         self.content_types.append(content_type)
 

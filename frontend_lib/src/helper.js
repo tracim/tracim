@@ -1,3 +1,5 @@
+import color from 'color'
+
 export const libHandleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
     case 200:
@@ -27,4 +29,35 @@ export const libAddAllResourceI18n = (i18n, translation) => {
       i18n.addResources(lang, namespace, translation[lang][namespace])
     )
   )
+}
+
+export const libGenerateAvatarFromPublicName = publicName => {
+  // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
+  const stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
+
+  const intToRGB = i => {
+    const c = (i & 0x00FFFFFF).toString(16).toUpperCase()
+    return '00000'.substring(0, 6 - c.length) + c
+  }
+
+  const hexcolor = '#' + intToRGB(stringToHashCode(publicName))
+
+  let canvas = document.createElement('canvas')
+
+  // http://code.google.com/p/explorercanvas/wiki/Instructions#Dynamically_created_elements
+  if (!canvas.getContext) G_vmlCanvasManager.initElement(canvas)
+
+  let ctx = canvas.getContext('2d')
+  canvas.width = 44
+  canvas.height = 44
+
+  const { r, g, b } = color(hexcolor).desaturate(0.75).rgb()
+
+  ctx.beginPath()
+  ctx.arc(22, 22, 20, 0, 2 * Math.PI, false)
+  ctx.fillStyle = 'rgba(' + [r, g, b, 1].join() + ')'
+  ctx.fill()
+  ctx.stroke()
+
+  return canvas.toDataURL('image/png', '')
 }

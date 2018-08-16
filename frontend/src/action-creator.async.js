@@ -17,6 +17,8 @@ import {
   setFolderData,
   APP_LIST,
   CONTENT_TYPE_LIST,
+  WORKSPACE_CONTENT_ARCHIVED,
+  WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS
 } from './action-creator.sync.js'
@@ -240,9 +242,9 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
   })
 }
 
-export const getWorkspaceRecentActivityList = (user, idWorkspace) => dispatch => {
+export const getWorkspaceRecentActivityList = (user, idWorkspace, beforeId = null) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
     param: {
       headers: {
         ...FETCH_CONFIG.headers,
@@ -329,6 +331,36 @@ export const getContentTypeList = user => dispatch => {
       method: 'GET'
     },
     actionName: CONTENT_TYPE_LIST,
+    dispatch
+  })
+}
+
+export const putWorkspaceContentArchived = (user, idWorkspace, idContent) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT'
+    },
+    actionName: WORKSPACE_CONTENT_ARCHIVED,
+    dispatch
+  })
+}
+
+export const putWorkspaceContentDeleted = (user, idWorkspace, idContent) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT'
+    },
+    actionName: WORKSPACE_CONTENT_DELETED,
     dispatch
   })
 }

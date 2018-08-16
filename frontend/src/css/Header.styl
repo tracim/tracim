@@ -24,7 +24,21 @@
       display flex
       margin-top 15px
       list-style none
+      &__adminlink
+        .adminlink
+          &__btn
+            margin-right 15px
+            border 1px solid grey
+            border-radius 5px
+            background-color transparent
+            &::after
+              margin-left 15px
+          &__setting
+            padding 0
+            .setting__link
+              padding 10px
       &__itemsearch
+        display none
         margin-right 8%
         width 55%
         &__search
@@ -32,9 +46,6 @@
           .search__addonsearch
             background-color transparent
             cursor pointer
-            &:hover
-              background-color thirdColor
-              color mainColor
       .btnnavbar
         border 1px solid grey
         background-color transparent
@@ -98,6 +109,7 @@
             padding 0
             left inherit
             right 0
+            width 100%
             cursor pointer
             .setting__link
               padding 10px

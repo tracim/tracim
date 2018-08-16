@@ -89,6 +89,40 @@ def require_profile(group: int) -> typing.Callable:
     return decorator
 
 
+def require_profile_or_other_profile_with_workspace_role(
+        allow_all_group: int,
+        allow_if_role_group: int,
+        minimal_required_role: int,
+) -> typing.Callable:
+    """
+    Allow access for allow_all_group profile
+    or allow access for allow_if_role_group
+    profile if mininal_required_role is correct.
+    :param allow_all_group: value from Group Object
+    like Group.TIM_USER or Group.TIM_MANAGER
+    :param allow_if_role_group: value from Group Object
+    like Group.TIM_USER or Group.TIM_MANAGER
+    :param minimal_required_role: value from UserInWorkspace Object like
+    UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
+    :return: decorator
+    """
+    def decorator(func: typing.Callable) -> typing.Callable:
+        @functools.wraps(func)
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
+            user = request.current_user
+            workspace = request.current_workspace
+            if user.profile.id >= allow_all_group:
+                return func(self, context, request)
+            elif user.profile.id >= allow_if_role_group:
+                if workspace.get_user_role(user) >= minimal_required_role:
+                    return func(self, context, request)
+                raise InsufficientUserRoleInWorkspace()
+            else:
+                raise InsufficientUserProfile()
+        return wrapper
+    return decorator
+
+
 def require_workspace_role(minimal_required_role: int) -> typing.Callable:
     """
     Restricts access to endpoint to minimal role or raise an exception.

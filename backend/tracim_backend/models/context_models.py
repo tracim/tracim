@@ -10,10 +10,12 @@ from tracim_backend.config import PreviewDim
 from tracim_backend.extensions import APP_LIST
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_root_frontend_url
+from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.models import User
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import Group
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
@@ -100,17 +102,19 @@ class UserCreation(object):
     def __init__(
             self,
             email: str,
-            password: str,
-            public_name: str,
-            timezone: str,
-            profile: str,
-            email_notification: str,
+            password: str = None,
+            public_name: str = None,
+            timezone: str = None,
+            profile: str = None,
+            email_notification: bool = True,
     ) -> None:
         self.email = email
-        self.password = password
-        self.public_name = public_name
-        self.timezone = timezone
-        self.profile = profile
+        # INFO - G.M - 2018-08-16 - cleartext password, default value
+        # is auto-generated.
+        self.password = password or password_generator()
+        self.public_name = public_name or None
+        self.timezone = timezone or ''
+        self.profile = profile or Group.TIM_USER_GROUPNAME
         self.email_notification = email_notification
 
 
@@ -296,10 +300,10 @@ class ContentCreation(object):
     Content creation model
     """
     def __init__(
-            self,
-            label: str,
-            content_type: str,
-            parent_id: typing.Optional[int] = None,
+        self,
+        label: str,
+        content_type: str,
+        parent_id: typing.Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
@@ -311,8 +315,8 @@ class CommentCreation(object):
     Comment creation model
     """
     def __init__(
-            self,
-            raw_content: str,
+        self,
+        raw_content: str,
     ) -> None:
         self.raw_content = raw_content
 
@@ -322,8 +326,8 @@ class SetContentStatus(object):
     Set content status
     """
     def __init__(
-            self,
-            status: str,
+        self,
+        status: str,
     ) -> None:
         self.status = status
 
@@ -333,12 +337,27 @@ class TextBasedContentUpdate(object):
     TextBasedContent update model
     """
     def __init__(
-            self,
-            label: str,
-            raw_content: str,
+        self,
+        label: str,
+        raw_content: str,
     ) -> None:
         self.label = label
         self.raw_content = raw_content
+
+
+class FolderContentUpdate(object):
+    """
+    Folder Content update model
+    """
+    def __init__(
+        self,
+        label: str,
+        raw_content: str,
+        sub_content_types: typing.List[str],
+    ) -> None:
+        self.label = label
+        self.raw_content = raw_content
+        self.sub_content_types = sub_content_types
 
 
 class TypeUser(Enum):
@@ -391,6 +410,10 @@ class UserInContext(object):
     @property
     def profile(self) -> Profile:
         return self.user.profile.name
+
+    @property
+    def is_deleted(self) -> bool:
+        return self.user.is_deleted
 
     # Context related
 
@@ -454,6 +477,13 @@ class WorkspaceInContext(object):
         get workspace slug
         """
         return slugify(self.workspace.label)
+
+    @property
+    def is_deleted(self) -> bool:
+        """
+        Is the workspace deleted ?
+        """
+        return self.workspace.is_deleted
 
     @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:

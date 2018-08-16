@@ -5,8 +5,7 @@ import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import Account from './Account.jsx'
-import AdminWorkspacePage from './AdminWorkspacePage.jsx'
-import AppFullscreenManager from './AppFullscreenManager.jsx'
+import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
@@ -18,6 +17,7 @@ import {
   getUserIsConnected
 } from '../action-creator.async.js'
 import {
+  newFlashMessage,
   removeFlashMessage,
   setUserConnected
 } from '../action-creator.sync.js'
@@ -36,6 +36,10 @@ class Tracim extends React.Component {
       case 'redirect':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.history.push(data.url)
+        break
+      case 'addFlashMsg':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
     }
   }
@@ -101,11 +105,11 @@ class Tracim extends React.Component {
 
               <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
                 ? null // @FIXME this needs to be handled in case of new user that has no workspace
-                : <Redirect to={{pathname: `/workspaces/${props.workspaceList[0].id}/contents`, state: {from: props.location}}} />
+                : <Redirect to={{pathname: PAGE.WORKSPACE.DASHBOARD(props.workspaceList[0].id), state: {from: props.location}}} />
               } />
 
               <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
-                <Redirect to={{pathname: `/workspaces/${props2.match.params.idws}/contents`, state: {from: props.location}}} />
+                <Redirect to={{pathname: PAGE.WORKSPACE.CONTENT_LIST(props2.match.params.idws), state: {from: props.location}}} />
               } />
 
               <Route path={PAGE.WORKSPACE.DASHBOARD(':idws')} component={Dashboard} />
@@ -125,15 +129,15 @@ class Tracim extends React.Component {
           <Route path={PAGE.ADMIN.ROOT} render={() =>
             <div className='sidebarpagecontainer'>
               <Sidebar />
-              <AppFullscreenManager />
+
+              <AppFullscreenRouter />
             </div>
           } />
-
-          <Route path='/admin_temp/workspace' component={AdminWorkspacePage} />
 
           <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
           <div id='appFeatureContainer' />
+          <div id='popupCreateContentContainer' />
         </div>
 
       </div>

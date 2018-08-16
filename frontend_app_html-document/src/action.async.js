@@ -77,3 +77,53 @@ export const postHtmlDocContent = (user, apiUrl, idWorkspace, idFolder, contentT
       label: newContentName
     })
   })
+
+export const putHtmlDocIsArchived = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putHtmlDocIsDeleted = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putHtmlDocRestoreArchived = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/unarchive`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putHtmlDocRestoreDeleted = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/undelete`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}
+
+export const putHtmlDocRead = (user, apiUrl, idWorkspace, idContent) => {
+  return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'PUT'
+  })
+}

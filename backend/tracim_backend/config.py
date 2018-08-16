@@ -551,6 +551,7 @@ class CFG(object):
             label='Folder',
             creation_label='Create a folder',
             available_statuses=CONTENT_STATUS.get_all(),
+            allow_sub_content=True,
         )
 
         _file = Application(

@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+from tracim_backend.lib.utils.utils import password_generator
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -16,6 +17,7 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
@@ -120,6 +122,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -192,8 +195,8 @@ class UserController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
-    @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
     def create_user(self, context, request: TracimRequest, hapic_data=None):
@@ -238,6 +241,41 @@ class UserController(Controller):
             config=app_config,
         )
         uapi.enable(user=request.candidate_user, do_save=True)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def delete_user(self, context, request: TracimRequest, hapic_data=None):
+        """
+        delete user
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        uapi.delete(user=request.candidate_user, do_save=True)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def undelete_user(self, context, request: TracimRequest, hapic_data=None):
+        """
+        undelete user
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+            show_deleted=True,
+        )
+        uapi.undelete(user=request.candidate_user, do_save=True)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -463,6 +501,14 @@ class UserController(Controller):
         # disable user
         configurator.add_route('disable_user', '/users/{user_id}/disable', request_method='PUT')  # nopep8
         configurator.add_view(self.disable_user, route_name='disable_user')
+
+        # delete user
+        configurator.add_route('delete_user', '/users/{user_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_view(self.delete_user, route_name='delete_user')
+
+        # undelete user
+        configurator.add_route('undelete_user', '/users/{user_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_view(self.undelete_user, route_name='undelete_user')
 
         # set user profile
         configurator.add_route('set_user_profile', '/users/{user_id}/profile', request_method='PUT')  # nopep8

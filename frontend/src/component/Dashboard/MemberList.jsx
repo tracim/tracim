@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 // import { Checkbox } from 'tracim_frontend_lib'
+import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
 
@@ -45,7 +46,7 @@ export class MemberList extends React.Component {
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
-                        {m.avatarUrl ? <img src={m.avatarUrl} /> : <img src='NYI' />}
+                        <img src={m.avatarUrl} />
                       </div>
 
                       <div className='memberlist__list__item__info mr-auto'>
@@ -110,8 +111,8 @@ export class MemberList extends React.Component {
                             onClick={() => props.onClickKnownMember(u)}
                             key={u.user_id}
                           >
-                            <div className='autocomplete__item__avatar primaryColorBorder'>
-                              <img src={u.avatar_url} />
+                            <div className='autocomplete__item__avatar'>
+                              <img src={u.avatar_url ? u.avatar_url : generateAvatarFromPublicName(u.public_name)} />
                             </div>
 
                             <div className='autocomplete__item__name'>

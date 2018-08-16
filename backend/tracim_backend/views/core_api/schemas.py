@@ -7,11 +7,14 @@ from marshmallow.validate import Range
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
+
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import CONTENT_STATUS
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import open_status
+from tracim_backend.models.auth import Group
 from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import ContentIdsQuery
 from tracim_backend.models.context_models import UserWorkspaceAndContentPath
@@ -74,6 +77,10 @@ class UserSchema(UserDigestSchema):
     is_active = marshmallow.fields.Bool(
         example=True,
         description='Is user account activated ?'
+    )
+    is_deleted = marshmallow.fields.Bool(
+        example=False,
+        description='Is user account deleted ?'
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
@@ -155,12 +162,38 @@ class UserProfileSchema(marshmallow.Schema):
         return UserProfile(**data)
 
 
-class UserCreationSchema(
-    SetEmailSchema,
-    SetPasswordSchema,
-    UserInfosSchema,
-    UserProfileSchema
-):
+class UserCreationSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    password = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=False,
+    )
+    profile = marshmallow.fields.String(
+        attribute='profile',
+        validate=OneOf(Profile._NAME),
+        example='managers',
+        required=False,
+        default=Group.TIM_USER_GROUPNAME
+    )
+    timezone = marshmallow.fields.String(
+        example="Europe/Paris",
+        required=False,
+        default=''
+    )
+    public_name = marshmallow.fields.String(
+        example='Suri Cate',
+        required=False,
+        default=None,
+    )
+    email_notification = marshmallow.fields.Bool(
+        example=True,
+        required=False,
+        default=True,
+    )
+
     @post_load
     def create_user(self, data):
         return UserCreation(**data)
@@ -300,6 +333,7 @@ class AutocompleteQuerySchema(marshmallow.Schema):
         example='test',
         description='search text to query',
         validate=Length(min=2),
+        required=True,
     )
     @post_load
     def make_autocomplete(self, data):
@@ -510,6 +544,7 @@ class WorkspaceDigestSchema(marshmallow.Schema):
         WorkspaceMenuEntrySchema,
         many=True,
     )
+    is_deleted = marshmallow.fields.Bool(example=False, default=False)
 
     class Meta:
         description = 'Digest of workspace informations'
@@ -846,6 +881,22 @@ class TextBasedContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbs
     @post_load
     def text_based_content_update(self, data):
         return TextBasedContentUpdate(**data)
+
+
+class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstractSchema):  # nopep
+    sub_content_types = marshmallow.fields.List(
+        marshmallow.fields.String(
+            example='html-document',
+            validate=ALL_CONTENT_TYPES_VALIDATOR,
+        ),
+        description='list of content types allowed as sub contents. '
+                    'This field is required for folder contents, '
+                    'set it to empty list in other cases'
+    )
+
+    @post_load
+    def folder_content_update(self, data):
+        return FolderContentUpdate(**data)
 
 
 class FileContentModifySchema(TextBasedContentModifySchema):

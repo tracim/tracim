@@ -1,11 +1,13 @@
 import {
   SET,
+  APPEND,
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
-  WORKSPACE_READ_STATUS_LIST, WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST,
+  WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST
 } from '../action-creator.sync.js'
 import { handleRouteFromApi } from '../helper.js'
+import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
   id: 0,
@@ -43,7 +45,9 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         memberList: action.workspaceMemberList.map(m => ({
           id: m.user_id,
           publicName: m.user.public_name,
-          avatarUrl: m.user.avatar_url,
+          avatarUrl: m.user.avatar_url
+            ? m.user.avatar_url
+            : m.user.public_name ? generateAvatarFromPublicName(m.user.public_name) : '',
           role: m.role,
           isActive: m.is_active
         }))
@@ -66,21 +70,24 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         }))
       }
 
-    case `${SET}/${WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST}`:
+    case `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`:
       return {
         ...state,
-        recentActivityForUserList: action.workspaceRecentActivityForUserList.map(ra => ({
-          id: ra.content_id,
-          slug: ra.slug,
-          label: ra.label,
-          type: ra.content_type,
-          idParent: ra.parent_id,
-          showInUi: ra.show_in_ui,
-          isArchived: ra.is_archived,
-          isDeleted: ra.is_deleted,
-          statusSlug: ra.status,
-          subContentTypeSlug: ra.sub_content_types
-        }))
+        recentActivityList: [
+          ...state.recentActivityList,
+          ...action.workspaceRecentActivityList.map(ra => ({
+            id: ra.content_id,
+            slug: ra.slug,
+            label: ra.label,
+            type: ra.content_type,
+            idParent: ra.parent_id,
+            showInUi: ra.show_in_ui,
+            isArchived: ra.is_archived,
+            isDeleted: ra.is_deleted,
+            statusSlug: ra.status,
+            subContentTypeSlug: ra.sub_content_types
+          }))
+        ]
       }
 
     case `${SET}/${WORKSPACE_READ_STATUS_LIST}`:

@@ -118,6 +118,7 @@ class ContentType(object):
             creation_label: str,
             available_statuses: typing.List[ContentStatus],
             slug_alias: typing.List[str] = None,
+            allow_sub_content: bool = False,
     ):
         self.slug = slug
         self.fa_icon = fa_icon
@@ -126,6 +127,7 @@ class ContentType(object):
         self.creation_label = creation_label
         self.available_statuses = available_statuses
         self.slug_alias = slug_alias
+        self.allow_sub_content = allow_sub_content
 
 
 thread_type = 'thread'
@@ -188,7 +190,7 @@ class ContentTypeList(object):
     def _content_types(self):
         app_api = ApplicationApi(self.app_list)
         content_types = app_api.get_content_types()
-        content_types.extend(self._special_contents_types)
+        # content_types.extend(self._special_contents_types)
         return content_types
 
     def get_one_by_slug(self, slug: str) -> ContentType:
@@ -198,19 +200,29 @@ class ContentTypeList(object):
         """
         content_types = self._content_types.copy()
         content_types.extend(self._special_contents_types)
+        content_types.append(self.Event)
         for item in content_types:
             if item.slug == slug or (item.slug_alias and slug in item.slug_alias):  # nopep8
                 return item
         raise ContentTypeNotExist()
 
-    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+    def restricted_allowed_types_slug(self) -> typing.List[str]:
         """
-        Return restricted list of content_type:
-        dont return special content_type like  comment, don't return
+        Return restricted list of content_type: don't return
         "any" slug, dont return content type slug alias , don't return event.
         Useful to restrict slug param in schema.
         """
         allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
+        return allowed_type_slug
+
+    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+        """
+        Same as restricted_allowed_types_slug but with special content_type
+        included like comments.
+        """
+        content_types = self._content_types
+        content_types.extend(self._special_contents_types)
+        allowed_type_slug = [contents_type.slug for contents_type in content_types]  # nopep8
         return allowed_type_slug
 
     def query_allowed_types_slugs(self) -> typing.List[str]:
@@ -220,14 +232,26 @@ class ContentTypeList(object):
         Usefull allowed value to perform query to database.
         """
         allowed_types_slug = []
-        for content_type in self._content_types:
+        content_types = self._content_types
+        content_types.extend(self._special_contents_types)
+        for content_type in content_types:
             allowed_types_slug.append(content_type.slug)
             if content_type.slug_alias:
                 allowed_types_slug.extend(content_type.slug_alias)
-        for content_type in self._special_contents_types:
-            allowed_types_slug.append(content_type.slug)
         allowed_types_slug.extend(self._extra_slugs)
         return allowed_types_slug
+
+    def default_allowed_content_properties(self, slug) -> dict:
+        content_type = self.get_one_by_slug(slug)
+        if content_type.allow_sub_content:
+            sub_content_allowed = self.endpoint_allowed_types_slug()
+        else:
+            sub_content_allowed = [self.Comment.slug]
+
+        properties_dict = {}
+        for elem in sub_content_allowed:
+            properties_dict[elem] = True
+        return properties_dict
 
 
 CONTENT_TYPES = ContentTypeList(APP_LIST)

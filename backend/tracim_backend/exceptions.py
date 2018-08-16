@@ -205,6 +205,10 @@ class PreviewDimNotAllowed(TracimException):
     pass
 
 
+class UnallowedSubContent(TracimException):
+    pass
+
+
 class TooShortAutocompleteString(TracimException):
     pass
 
@@ -214,4 +218,8 @@ class PageNotFound(TracimException):
 
 
 class AppDoesNotExist(TracimException):
+    pass
+
+
+class EmailAlreadyExistInDb(TracimException):
     pass

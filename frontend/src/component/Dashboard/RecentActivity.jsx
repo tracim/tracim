@@ -20,11 +20,11 @@ export const RecentActivity = props =>
     </div>
 
     <div className='activity__wrapper'>
-      {props.recentActivityFilteredForUser.map(content => {
+      {props.recentActivityList.map(content => {
         const contentType = props.contentTypeList.find(ct => ct.slug === content.type)
         return (
           <div
-            className='activity__workspace'
+            className={classnames('activity__workspace', {'read': props.readByUserList.includes(content.id)})}
             onClick={() => props.onClickRecentContent(content.id, content.type)}
             key={content.id}
           >
@@ -53,7 +53,12 @@ export default RecentActivity
 
 RecentActivity.propTypes = {
   t: PropTypes.func.isRequired,
-  recentActivityFilteredForUser: PropTypes.array.isRequired,
+  recentActivityList: PropTypes.array.isRequired,
   contentTypeList: PropTypes.array.isRequired,
-  onClickSeeMore: PropTypes.func.isRequired
+  onClickSeeMore: PropTypes.func.isRequired,
+  readByUserList: PropTypes.array
+}
+
+RecentActivity.defaultProps = {
+  readByUserList: []
 }

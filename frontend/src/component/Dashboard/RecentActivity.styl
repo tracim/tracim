@@ -23,6 +23,9 @@
     border-bottom 1px solid grey
     padding 15px
     cursor pointer
+    font-weight bold
+    &.read
+      font-weight normal
     &:hover
       background-color fourthColor
     &:nth-child(even)
@@ -34,31 +37,44 @@
       font-size 25px
     &__name
       font-size 18px
-      font-weight 500
-      span
-        font-weight 400
   &__more
     &__btn
       margin 15px
       padding 10px 25px
       cursor pointer
 
-@media (min-width min-sm) and (max-width: max-lg)
+
+/**** MEDIAQUERIES ****/
+
+/**** MEDIA 992px and 1199px ****/
+
+@media (min-width min-lg) and (max-width: max-lg)
   .activity
+    margin-right 0
     width 100%
+
+/**** MEDIA 768px and 991px ****/
 
 @media (min-width: min-md) and (max-width: max-md)
   .activity
-    margin 25px 15px 25px 0
+    margin 25px 0 25px 0
+    width 100%
+
+/**** MEDIA 576px and 767px ****/
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .activity
-    margin 25px 15px 25px 0
+    margin 25px 0 25px 0
+    width 100%
+
+/**** MEDIA 575px ****/
 
 @media (max-width: max-xs)
   .activity
     margin 25px 0
     width 100%
+    &__wrapper
+      margin-top 45px
     &__header
       display block
       height auto

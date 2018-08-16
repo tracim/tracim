@@ -2,6 +2,7 @@ export const SET = 'Set'
 export const UPDATE = 'Update'
 export const ADD = 'Add'
 export const REMOVE = 'Remove'
+export const APPEND = 'Append'
 
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
@@ -11,7 +12,7 @@ export const newFlashMessage = (msgText = '', msgType = 'info', msgDelay = 5000)
   msgDelay !== 0 && window.setTimeout(() => dispatch(removeFlashMessage(msgText)), msgDelay)
   return dispatch(addFlashMessage({message: msgText, type: msgType}))
 }
-export const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg })
+const addFlashMessage = msg => ({ type: `${ADD}/${FLASH_MESSAGE}`, msg }) // only newFlashMsg should be used by component and app so dont export this
 export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, msg })
 
 export const USER = 'User'
@@ -37,6 +38,11 @@ export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
 export const setWorkspaceContentList = workspaceContentList => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
+export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
+export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
+export const setWorkspaceContentArchived = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_ARCHIVED}`, idWorkspace, idContent })
+export const setWorkspaceContentDeleted = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, idWorkspace, idContent })
+
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const updateWorkspaceListData = workspaceList => ({ type: `${UPDATE}/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
@@ -52,8 +58,7 @@ export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 export const WORKSPACE_RECENT_ACTIVITY = `${WORKSPACE}/RecentActivity/List`
 export const WORKSPACE_RECENT_ACTIVITY_LIST = `${WORKSPACE_RECENT_ACTIVITY}/List`
 export const setWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
-export const WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST = `${WORKSPACE_RECENT_ACTIVITY}/ForUser/List`
-export const setWorkspaceRecentActivityForUserList = workspaceRecentActivityForUserList => ({ type: `${SET}/${WORKSPACE_RECENT_ACTIVITY_FOR_USER_LIST}`, workspaceRecentActivityForUserList })
+export const appendWorkspaceRecentActivityList = workspaceRecentActivityList => ({ type: `${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, workspaceRecentActivityList })
 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
