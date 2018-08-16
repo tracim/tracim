@@ -68,10 +68,9 @@
         </div>
         <div id="call-to-action-container">
 
-            ${_('To go to {website_title}, please click on following link'.format(
+            ${_('To go to {website_title}, please click on following link :'.format(
                 website_title=config.WEBSITE_TITLE
             ))}
-
             <span style="">
                 <a href="${login_url}" id='call-to-action-button'>${login_url}</a>
             </span>

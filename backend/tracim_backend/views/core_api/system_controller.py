@@ -5,7 +5,7 @@ from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.models import Group
 from tracim_backend.models.applications import applications
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -39,8 +39,8 @@ class SystemController(Controller):
         """
         Get list of alls content types availables in this tracim instance.
         """
-        content_types_slugs = ContentType.allowed_types_for_folding()
-        content_types = [ContentType(slug) for slug in content_types_slugs]
+        content_types_slugs = CONTENT_TYPES.endpoint_allowed_types_slug()
+        content_types = [CONTENT_TYPES.get_one_by_slug(slug) for slug in content_types_slugs]
         return content_types
 
     def bind(self, configurator: Configurator) -> None:

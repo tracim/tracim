@@ -1,4 +1,6 @@
 from pyramid.config import Configurator
+from tracim_backend.lib.utils.utils import password_generator
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -11,13 +13,15 @@ from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
 from tracim_backend.views.controllers import Controller
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.views.core_api.schemas import UserSchema
+from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
+from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import UserInfosSchema
@@ -32,6 +36,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
+from tracim_backend.models.contents import CONTENT_TYPES
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 
@@ -76,7 +81,48 @@ class UserController(Controller):
         return uapi.get_user_with_context(request.candidate_user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_profile(Group.TIM_ADMIN)
+    @hapic.output_body(UserDigestSchema(many=True))
+    def users(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get all users
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        users = uapi.get_all()
+        context_users = [
+            uapi.get_user_with_context(user) for user in users
+        ]
+        return context_users
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_same_user_or_profile(Group.TIM_MANAGER)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(AutocompleteQuerySchema())
+    @hapic.output_body(UserDigestSchema(many=True))
+    def known_members(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get known users list
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        users = uapi.get_known_user(acp=hapic_data.query.acp)
+        context_users = [
+            uapi.get_user_with_context(user) for user in users
+        ]
+        return context_users
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
+    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
     @require_same_user_or_profile(Group.TIM_ADMIN)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -149,8 +195,8 @@ class UserController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(EmailAlreadyExistInDb, HTTPStatus.BAD_REQUEST)
     @require_profile(Group.TIM_ADMIN)
-    @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
     def create_user(self, context, request: TracimRequest, hapic_data=None):
@@ -195,6 +241,41 @@ class UserController(Controller):
             config=app_config,
         )
         uapi.enable(user=request.candidate_user, do_save=True)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def delete_user(self, context, request: TracimRequest, hapic_data=None):
+        """
+        delete user
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        uapi.delete(user=request.candidate_user, do_save=True)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def undelete_user(self, context, request: TracimRequest, hapic_data=None):
+        """
+        undelete user
+        """
+        app_config = request.registry.settings['CFG']
+        uapi = UserApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+            show_deleted=True,
+        )
+        uapi.undelete(user=request.candidate_user, do_save=True)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -271,7 +352,7 @@ class UserController(Controller):
             before_content = api.get_one(
                 content_id=content_filter.before_content_id,
                 workspace=workspace,
-                content_type=ContentType.Any
+                content_type=CONTENT_TYPES.Any_SLUG
             )
         last_actives = api.get_last_active(
             workspace=workspace,
@@ -328,6 +409,8 @@ class UserController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
@@ -345,6 +428,8 @@ class UserController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
@@ -362,6 +447,8 @@ class UserController(Controller):
         """
         app_config = request.registry.settings['CFG']
         api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
@@ -382,6 +469,14 @@ class UserController(Controller):
         # user info
         configurator.add_route('user', '/users/{user_id}', request_method='GET')  # nopep8
         configurator.add_view(self.user, route_name='user')
+
+        # users lists
+        configurator.add_route('users', '/users', request_method='GET')  # nopep8
+        configurator.add_view(self.users, route_name='users')
+
+        # known members lists
+        configurator.add_route('known_members', '/users/{user_id}/known_members', request_method='GET')  # nopep8
+        configurator.add_view(self.known_members, route_name='known_members')
 
         # set user email
         configurator.add_route('set_user_email', '/users/{user_id}/email', request_method='PUT')  # nopep8
@@ -406,6 +501,14 @@ class UserController(Controller):
         # disable user
         configurator.add_route('disable_user', '/users/{user_id}/disable', request_method='PUT')  # nopep8
         configurator.add_view(self.disable_user, route_name='disable_user')
+
+        # delete user
+        configurator.add_route('delete_user', '/users/{user_id}/delete', request_method='PUT')  # nopep8
+        configurator.add_view(self.delete_user, route_name='delete_user')
+
+        # undelete user
+        configurator.add_route('undelete_user', '/users/{user_id}/undelete', request_method='PUT')  # nopep8
+        configurator.add_view(self.undelete_user, route_name='undelete_user')
 
         # set user profile
         configurator.add_route('set_user_profile', '/users/{user_id}/profile', request_method='PUT')  # nopep8

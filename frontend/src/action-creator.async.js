@@ -2,21 +2,25 @@ import { FETCH_CONFIG } from './helper.js'
 import {
   TIMEZONE,
   setTimezone,
-  LANG,
-  updateLangList,
   USER_LOGIN,
   USER_LOGOUT,
   USER_ROLE,
   USER_CONNECTED,
+  USER_KNOWN_MEMBER_LIST,
   setUserRole,
   WORKSPACE,
   WORKSPACE_LIST,
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
+  WORKSPACE_MEMBER_ADD,
   FOLDER,
   setFolderData,
   APP_LIST,
-  CONTENT_TYPE_LIST
+  CONTENT_TYPE_LIST,
+  WORKSPACE_CONTENT_ARCHIVED,
+  WORKSPACE_CONTENT_DELETED,
+  WORKSPACE_RECENT_ACTIVITY,
+  WORKSPACE_READ_STATUS
 } from './action-creator.sync.js'
 
 /*
@@ -36,6 +40,7 @@ import {
  * This function create a http async request using whatwg-fetch while dispatching a PENDING and a SUCCESS redux action.
  * It also adds, to the Response of the fetch request, the json value so that the redux action have access to the status and the data
  */
+// Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
 const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) => {
   dispatch({type: `${param.method}/${actionName}/PENDING`})
 
@@ -75,19 +80,6 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
   }
 
   return fetchResult
-}
-
-export const getLangList = () => async dispatch => {
-  const fetchGetLangList = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/lang`,
-    param: {
-      headers: {...FETCH_CONFIG.headers},
-      method: 'GET'
-    },
-    actionName: LANG,
-    dispatch
-  })
-  if (fetchGetLangList.status === 200) dispatch(updateLangList(fetchGetLangList.json))
 }
 
 export const getTimezone = () => async dispatch => {
@@ -160,6 +152,36 @@ export const getUserRole = user => async dispatch => {
   if (fetchGetUserRole.status === 200) dispatch(setUserRole(fetchGetUserRole.json))
 }
 
+export const getUserKnownMember = (user, userNameToSearch) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/known_members?acp=${userNameToSearch}`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: USER_KNOWN_MEMBER_LIST,
+    dispatch
+  })
+}
+
+export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/read`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT'
+    },
+    actionName: USER_KNOWN_MEMBER_LIST,
+    dispatch
+  })
+}
+
 export const getWorkspaceList = user => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces`,
@@ -220,6 +242,56 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
   })
 }
 
+export const getWorkspaceRecentActivityList = (user, idWorkspace, beforeId = null) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_RECENT_ACTIVITY,
+    dispatch
+  })
+}
+
+export const getWorkspaceReadStatusList = (user, idWorkspace) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/read_status`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_READ_STATUS,
+    dispatch
+  })
+}
+
+export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: newMember.id,
+        user_email_or_public_name: newMember.name,
+        role: newMember.role
+      })
+    },
+    actionName: WORKSPACE_MEMBER_ADD,
+    dispatch
+  })
+}
+
 export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
   const fetchGetFolderContent = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/?parent_id=${idFolder}`,
@@ -234,7 +306,6 @@ export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
 }
 
 export const getAppList = user => dispatch => {
-  console.log(user)
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/applications`,
     param: {
@@ -242,8 +313,7 @@ export const getAppList = user => dispatch => {
         ...FETCH_CONFIG.headers,
         'Authorization': 'Basic ' + user.auth
       },
-      method: 'GET',
-      'Authorization': 'Basic ' + user.auth
+      method: 'GET'
     },
     actionName: APP_LIST,
     dispatch
@@ -261,6 +331,36 @@ export const getContentTypeList = user => dispatch => {
       method: 'GET'
     },
     actionName: CONTENT_TYPE_LIST,
+    dispatch
+  })
+}
+
+export const putWorkspaceContentArchived = (user, idWorkspace, idContent) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT'
+    },
+    actionName: WORKSPACE_CONTENT_ARCHIVED,
+    dispatch
+  })
+}
+
+export const putWorkspaceContentDeleted = (user, idWorkspace, idContent) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT'
+    },
+    actionName: WORKSPACE_CONTENT_DELETED,
     dispatch
   })
 }

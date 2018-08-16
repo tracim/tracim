@@ -46,6 +46,9 @@ requires = [
     'email_reply_parser',
     'filelock',
     'imapclient',
+    # frontend file serve
+    'pyramid_mako',
+    'spectra',
 ]
 
 tests_require = [

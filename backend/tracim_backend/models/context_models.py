@@ -5,18 +5,23 @@ from enum import Enum
 
 from slugify import slugify
 from sqlalchemy.orm import Session
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
+from tracim_backend.lib.utils.utils import get_root_frontend_url
+from tracim_backend.lib.utils.utils import password_generator
+from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.models import User
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.auth import Group
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.models.workspace_menu_entries import default_workspace_menu_entry
+from tracim_backend.models.workspace_menu_entries import default_workspace_menu_entry  # nopep8
 from tracim_backend.models.workspace_menu_entries import WorkspaceMenuEntry
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 
 
 class PreviewAllowedDim(object):
@@ -96,17 +101,19 @@ class UserCreation(object):
     def __init__(
             self,
             email: str,
-            password: str,
-            public_name: str,
-            timezone: str,
-            profile: str,
-            email_notification: str,
+            password: str = None,
+            public_name: str = None,
+            timezone: str = None,
+            profile: str = None,
+            email_notification: bool = True,
     ) -> None:
         self.email = email
-        self.password = password
-        self.public_name = public_name
-        self.timezone = timezone
-        self.profile = profile
+        # INFO - G.M - 2018-08-16 - cleartext password, default value
+        # is auto-generated.
+        self.password = password or password_generator()
+        self.public_name = public_name or None
+        self.timezone = timezone or ''
+        self.profile = profile or Group.TIM_USER_GROUPNAME
         self.email_notification = email_notification
 
 
@@ -184,6 +191,14 @@ class CommentPath(object):
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.comment_id = comment_id
+
+
+class AutocompleteQuery(object):
+    """
+    Autocomplete query model
+    """
+    def __init__(self, acp: str):
+        self.acp = acp
 
 
 class PageQuery(object):
@@ -284,10 +299,10 @@ class ContentCreation(object):
     Content creation model
     """
     def __init__(
-            self,
-            label: str,
-            content_type: str,
-            parent_id: typing.Optional[int] = None,
+        self,
+        label: str,
+        content_type: str,
+        parent_id: typing.Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
@@ -299,8 +314,8 @@ class CommentCreation(object):
     Comment creation model
     """
     def __init__(
-            self,
-            raw_content: str,
+        self,
+        raw_content: str,
     ) -> None:
         self.raw_content = raw_content
 
@@ -310,8 +325,8 @@ class SetContentStatus(object):
     Set content status
     """
     def __init__(
-            self,
-            status: str,
+        self,
+        status: str,
     ) -> None:
         self.status = status
 
@@ -321,12 +336,27 @@ class TextBasedContentUpdate(object):
     TextBasedContent update model
     """
     def __init__(
-            self,
-            label: str,
-            raw_content: str,
+        self,
+        label: str,
+        raw_content: str,
     ) -> None:
         self.label = label
         self.raw_content = raw_content
+
+
+class FolderContentUpdate(object):
+    """
+    Folder Content update model
+    """
+    def __init__(
+        self,
+        label: str,
+        raw_content: str,
+        sub_content_types: typing.List[str],
+    ) -> None:
+        self.label = label
+        self.raw_content = raw_content
+        self.sub_content_types = sub_content_types
 
 
 class TypeUser(Enum):
@@ -379,6 +409,10 @@ class UserInContext(object):
     @property
     def profile(self) -> Profile:
         return self.user.profile.name
+
+    @property
+    def is_deleted(self) -> bool:
+        return self.user.is_deleted
 
     # Context related
 
@@ -444,6 +478,13 @@ class WorkspaceInContext(object):
         return slugify(self.workspace.label)
 
     @property
+    def is_deleted(self) -> bool:
+        """
+        Is the workspace deleted ?
+        """
+        return self.workspace.is_deleted
+
+    @property
     def sidebar_entries(self) -> typing.List[WorkspaceMenuEntry]:
         """
         get sidebar entries, those depends on activated apps.
@@ -453,6 +494,14 @@ class WorkspaceInContext(object):
         # list should be able to change (depending on activated/disabled
         # apps)
         return default_workspace_menu_entry(self.workspace)
+
+    @property
+    def frontend_url(self):
+        root_frontend_url = get_root_frontend_url(self.config)
+        workspace_frontend_url = WORKSPACE_FRONTEND_URL_SCHEMA.format(
+            workspace_id=self.workspace_id,
+        )
+        return root_frontend_url + workspace_frontend_url
 
 
 class UserRoleWorkspaceInContext(object):
@@ -578,7 +627,7 @@ class ContentInContext(object):
 
     @property
     def content_type(self) -> str:
-        content_type = ContentType(self.content.type)
+        content_type = CONTENT_TYPES.get_one_by_slug(self.content.type)
         return content_type.slug
 
     @property
@@ -652,6 +701,16 @@ class ContentInContext(object):
         assert self._user
         return not self.content.has_new_information_for(self._user)
 
+    @property
+    def frontend_url(self):
+        root_frontend_url = get_root_frontend_url(self.config)
+        content_frontend_url = CONTENT_FRONTEND_URL_SCHEMA.format(
+            workspace_id=self.workspace_id,
+            content_type=self.content_type,
+            content_id=self.content_id,
+        )
+        return root_frontend_url + content_frontend_url
+
 
 class RevisionInContext(object):
     """
@@ -690,11 +749,7 @@ class RevisionInContext(object):
 
     @property
     def content_type(self) -> str:
-        content_type = ContentType(self.revision.type)
-        if content_type:
-            return content_type.slug
-        else:
-            return None
+        return CONTENT_TYPES.get_one_by_slug(self.revision.type).slug
 
     @property
     def sub_content_types(self) -> typing.List[str]:

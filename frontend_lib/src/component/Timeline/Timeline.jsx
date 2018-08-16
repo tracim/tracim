@@ -46,6 +46,34 @@ class Timeline extends React.Component {
           </div>
         }
 
+        {props.isArchived &&
+          <div className='timeline__info'>
+            <div className='timeline__info__msg'>
+              <i className='fa fa-fw fa-archive' />
+              This content is archived.
+            </div>
+
+            <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreArchived}>
+              <i className='fa fa-fw fa-archive' />
+              Restore
+            </button>
+          </div>
+        }
+
+        {props.isDeleted &&
+          <div className='timeline__info'>
+            <div className='timeline__info__msg'>
+              <i className='fa fa-fw fa-trash' />
+              This content is deleted.
+            </div>
+
+            <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreDeleted}>
+              <i className='fa fa-fw fa-trash' />
+              Restore
+            </button>
+          </div>
+        }
+
         <div className='timeline__body'>
           <ul className={classnames(`${props.customClass}__messagelist`, 'timeline__body__messagelist')}>
             {props.timelineData.map(content => {
@@ -157,7 +185,11 @@ Timeline.propTypes = {
   onClickRevisionBtn: PropTypes.func,
   shouldScrollToBottom: PropTypes.bool,
   showHeader: PropTypes.bool,
-  rightPartOpen: PropTypes.bool // irrelevent if showHeader in false
+  rightPartOpen: PropTypes.bool, // irrelevant if showHeader is false
+  isArchived: PropTypes.bool,
+  onClickRestoreArchived: PropTypes.func,
+  isDeleted: PropTypes.bool,
+  onClickRestoreDeleted: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -174,5 +206,7 @@ Timeline.defaultProps = {
   onClickWysiwygBtn: () => {},
   shouldScrollToBottom: true,
   showHeader: true,
-  rightPartOpen: false
+  rightPartOpen: false,
+  isArchived: false,
+  isDeleted: false
 }

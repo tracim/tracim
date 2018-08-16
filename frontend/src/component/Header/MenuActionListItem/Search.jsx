@@ -14,7 +14,7 @@ const Search = props => {
           onChange={props.onChangeInput}
         />
         <button
-          className='search__addonsearch input-group-addon'
+          className='search__addonsearch input-group-addon primaryColorBgLightenHover primaryColorFontHover'
           id='headerInputSearch'
           onClick={props.onClickSubmit}
         >

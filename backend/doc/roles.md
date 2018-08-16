@@ -7,6 +7,11 @@ The other is workspace related and is called "workspace role".
 
 ## Global profile
 
+|                               | Normal User | Managers    | Admin          |
+|-------------------------------|-------------|-------------|----------------|
+| slug                          | users       | managers    | administrators |
+|-------------------------------|-------------|-------------|---------|
+
 
 |                               | Normal User | Managers    | Admin   |
 |-------------------------------|-------------|-------------|---------|
@@ -15,15 +20,24 @@ The other is workspace related and is called "workspace role".
 |-------------------------------|-------------|-------------|---------|
 | create workspace              |  no         | yes         | yes     |
 | invite user to tracim         |  no         | yes, if manager of a given workspace         | yes     |
+| delete workspace              |  no         | yes, if manager of a given workspace         | yes     |
 |-------------------------------|-------------|-------------|---------|
 | set user global profile rights|  no         | no          | yes     |
-| deactivate user               |  no         | no          | yes     |
+| activate/deactivate user      |  no         | no          | yes     |
+| delete user/ undelete user    |  no         | no          | yes     |
 |-------------------------------|-------------|-------------|---------|
 | access to all user data (/users/{user_id} endpoints) |personal-only|personal-only| yes     |
 
 
+
+
 ## Workspace Roles
 
+
+|                              | Reader | Contributor | Content Manager | Workspace Manager |
+|------------------------------|--------|-------------|-----------------|-------------------|
+| slug                         | reader | contributor | content-manager |  workspace-manager|
+|------------------------------|--------|-------------|-----------------|-------------------|
 
 |                              | Reader | Contributor | Content Manager | Workspace Manager |
 |------------------------------|--------|-------------|-----------------|-------------------|

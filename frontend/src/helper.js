@@ -12,17 +12,24 @@ export const COOKIE = {
   USER_AUTH: 'user_auth'
 }
 
+// Côme - 2018/08/02 - shouldn't this come from api ?
+export const workspaceConfig = {
+  slug: 'workspace',
+  faIcon: 'space-shuttle',
+  hexcolor: '#7d4e24',
+  creationLabel: 'Create a workspace',
+  domContainer: 'appFeatureContainer'
+}
+
 export const PAGE = {
   HOME: '/',
   WORKSPACE: {
+    ROOT: '/workspaces',
     DASHBOARD: (idws = ':idws') => `/workspaces/${idws}/dashboard`,
-    NEW: (idws, type) => `/workspaces/${idws}/${type}/new`,
+    NEW: (idws, type) => `/workspaces/${idws}/contents/${type}/new`,
     CALENDAR: (idws = ':idws') => `/workspaces/${idws}/calendar`,
     CONTENT_LIST: (idws = ':idws') => `/workspaces/${idws}/contents`,
-    CONTENT: (idws = ':idws', type = ':type?', idcts = ':idcts?') => `/workspaces/${idws}/${type}/${idcts}`, // @TODO add /contents/ in url and remove <Switch> in <Tracim>
-    // CONTENT_NEW: (idws = ':idws', ctstype = ':ctstype') => `/workspaces/${idws}/contents/${ctstype}/new`,
-    // CONTENT_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/edit`,
-    // CONTENT_TITLE_EDIT: (idws = ':idws', idcts = ':idcts') => `/workspaces/${idws}/contents/${idcts}/title/edit`,
+    CONTENT: (idws = ':idws', type = ':type', idcts = ':idcts') => `/workspaces/${idws}/contents/${type}/${idcts}`,
     ADMIN: (idws = ':idws') => `/workspaces/${idws}/admin`
   },
   LOGIN: '/login',
@@ -30,30 +37,39 @@ export const PAGE = {
   ADMIN: {
     ROOT: '/admin',
     WORKSPACE: '/admin/workspace',
-    USEr: '/admin/user'
+    USER: '/admin/user'
   }
 }
 
 export const ROLE = [{
   id: 0,
-  name: 'reader',
-  icon: 'fa-eye',
-  translationKey: 'role.reader'
+  slug: 'reader',
+  faIcon: 'eye',
+  hexcolor: '#15D948',
+  label: 'Reader'
 }, {
   id: 1,
-  name: 'contributor',
-  icon: 'fa-pencil',
-  translationKey: 'role.contributor'
+  slug: 'contributor',
+  faIcon: 'pencil',
+  hexcolor: '#3145F7',
+  label: 'Contributor'
 }, {
   id: 2,
-  name: 'content_manager',
-  icon: 'fa-graduation-cap',
-  translationKey: 'role.content_manager'
+  slug: 'content-manager',
+  faIcon: 'graduation-cap',
+  hexcolor: '#f2af2d',
+  label: 'Content manager'
 }, {
   id: 3,
-  name: 'manager',
-  icon: 'fa-gavel',
-  translationKey: 'role.manager'
+  slug: 'workspace-manager',
+  faIcon: 'gavel',
+  hexcolor: '#ed0007',
+  label: 'Workspace manager'
 }]
+
+export const PROFILE = {
+  ADMINISTRATOR: 'administrators',
+  USER: 'users'
+}
 
 export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route

@@ -14,8 +14,8 @@ from tracim_backend.models import get_engine
 from tracim_backend.models import DeclarativeBase
 from tracim_backend.models import get_session_factory
 from tracim_backend.models import get_tm_session
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.data import ContentType
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
 from tracim_backend.lib.utils.logger import logger
@@ -68,20 +68,17 @@ def create_1000px_png_test_image():
 class FunctionalTest(unittest.TestCase):
 
     fixtures = [BaseFixture]
-    sqlalchemy_url = 'sqlite:///tracim_test.sqlite'
+    config_uri = 'tests_configs.ini'
+    config_section = 'functional_test'
 
     def setUp(self):
         logger._logger.setLevel('WARNING')
+
         DepotManager._clear()
-        self.settings = {
-            'sqlalchemy.url': self.sqlalchemy_url,
-            'user.auth_token.validity': '604800',
-            'depot_storage_dir': '/tmp/test/depot',
-            'depot_storage_name': 'test',
-            'preview_cache_dir': '/tmp/test/preview_cache',
-            'preview.jpg.restricted_dims': True,
-            'email.notification.activated': 'false',
-        }
+        self.settings = plaster.get_settings(
+            self.config_uri,
+            self.config_section
+        )
         hapic.reset_context()
         self.engine = get_engine(self.settings)
         DeclarativeBase.metadata.create_all(self.engine)
@@ -127,7 +124,7 @@ class FunctionalTestEmptyDB(FunctionalTest):
 
 
 class FunctionalTestNoDB(FunctionalTest):
-    sqlalchemy_url = 'sqlite://'
+    config_section = 'functional_test_no_db'
 
     def init_database(self, settings):
         self.engine = get_engine(settings)
@@ -268,13 +265,13 @@ class DefaultTest(StandardTest):
         workspace = self._create_workspace_and_test(workspace_name, user)
         folder = self._create_content_and_test(
             folder_name, workspace,
-            type=ContentType.Folder,
+            type=CONTENT_TYPES.Folder.slug,
             owner=user
         )
         thread = self._create_content_and_test(
             thread_name,
             workspace,
-            type=ContentType.Thread,
+            type=CONTENT_TYPES.Thread.slug,
             parent=folder,
             owner=user
         )

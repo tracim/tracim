@@ -1,0 +1,178 @@
+@import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
+
+.memberlist
+  margin 0 0 50px 0
+  width 35%
+  &__title
+    margin-bottom 20px
+    padding 6px
+    height 45px
+  &__wrapper
+    position relative
+    border 1px solid grey
+    height 480px
+  &__list
+    margin 0
+    padding 0
+    list-style none
+    height 400px
+    overflow-Y scroll
+    &__item
+      display flex
+      border-bottom 1px solid grey
+      padding 10px 15px
+      &__avatar
+        margin-right 20px
+        & > img
+          width 50px
+          height 50px
+      &__info
+        &__name
+          font-size 20px
+        &__role
+          font-size 18px
+      &__delete
+        font-size 20px
+        color darkGrey
+        cursor pointer
+  &__btnadd
+    border-top 1px solid grey
+    padding 15px
+    &__button
+      display flex
+      align-items center
+      &__avatar
+        display flex
+        justify-content center
+        align-items center
+        margin-right 20px
+        border 2px dashed grey
+        border-radius 50%
+        width 50px
+        height 50px
+        cursor pointer
+        &__icon
+          color grey
+          font-size 25px
+      &__text
+        font-size 18px
+        color fontColor
+        cursor pointer
+  &__form
+    padding 15px
+    flex-direction column
+    height 100%
+    width 100%
+    background-color off-white
+    &__close
+      font-size 20px
+      & > i
+        cursor pointer
+    &__member
+      &__name
+        position relative
+        margin 0 0 20px 0
+        .name__label
+          margin 30px 0 20px 0
+          label()
+        .autocomplete
+          position absolute
+          min-width 300px
+          background-color off-white
+          border-radius 10px
+          border-width 1px
+          border-style solid
+          &__item
+            display flex
+            align-items center
+            cursor pointer
+            padding 5px 8px
+            &:first-child
+              border-top-left-radius 10px
+              border-top-right-radius 10px
+            &:last-child
+              border-bottom-left-radius 10px
+              border-bottom-right-radius 10px
+            &__avatar
+              width 45px
+              height 45px
+              border-radius 50%
+            &__name
+              margin-left 15px
+      .name__input
+        border 1px solid grey
+        border-radius 10px
+        padding 10px
+        width 300px
+      &__create
+        display flex
+        align-items center
+        margin 15px 0
+        line-height 23px
+        &__checkbox
+          padding-top 6px
+    &__role
+      margin-bottom 15px
+      coloricon()
+      &__text
+        margin 15px 0
+        label()
+      &__list
+        margin 0
+        padding 0
+        list-style none
+        &__item
+          display flex
+          align-items center
+          margin 10px 25px 10px 0
+          cursor pointer
+          .item
+            &__text
+              display flex
+    &__submitbtn
+      display flex
+      justify-content flex-end
+      & > button
+        padding 8px 30px
+        cursor pointer
+
+/***** MEDIAQUERIES *****/
+
+/*** MEDIA 992px and 1199px ***/
+
+@media (min-width: min-lg) and (max-width: max-lg)
+
+  .memberlist
+    width 50%
+
+/*** MEDIA 768px and 991px ***/
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .memberlist
+    width 50%
+
+/*** MEDIA 576px and 767px ***/
+
+@media (min-width: min-sm) and (max-width: max-sm)
+  .memberlist
+    margin 50px 0
+    width 100%
+
+/*** MEDIA 575px ***/
+
+@media (max-width: max-xs)
+  .memberlist
+    margin 50px 0
+    width 100%
+    &__title
+      margin-left 10px
+    &__wrapper
+      height auto
+    &__list
+      height auto
+      overflow-Y visible
+      &__item:nth-last-child(1)
+        border-bottom 1px solid grey
+    &__btnadd
+      border-top 0

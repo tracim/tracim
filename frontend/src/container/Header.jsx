@@ -13,6 +13,7 @@ import MenuActionListItemDropdownLang from '../component/Header/MenuActionListIt
 import MenuActionListItemHelp from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuActionListItemMenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import MenuActionListItemNotification from '../component/Header/MenuActionListItem/Notification.jsx'
+import MenuActionListAdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import logoHeader from '../img/logo-tracim.png'
 import {
   newFlashMessage,
@@ -22,7 +23,7 @@ import {
 import {
   postUserLogout
 } from '../action-creator.async.js'
-import { COOKIE, PAGE } from '../helper.js'
+import { COOKIE, PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -65,9 +66,11 @@ class Header extends React.Component {
         <nav className='navbar navbar-expand-md navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
-          <div className='header__breadcrumb d-none d-lg-block ml-4'>
-            Dev Tracim - liste des contenus
-          </div>
+          { /*
+            <div className='header__breadcrumb d-none d-lg-block ml-4'>
+              Dev Tracim - liste des contenus
+            </div>
+          */ }
 
           <NavbarToggler />
 
@@ -83,6 +86,10 @@ class Header extends React.Component {
                 onChangeInput={this.handleChangeInput}
                 onClickSubmit={this.handleClickSubmit}
               />
+
+              {user.profile === PROFILE.ADMINISTRATOR &&
+                <MenuActionListAdminLink t={this.props.t} />
+              }
 
               <MenuActionListItemDropdownLang
                 langList={lang}

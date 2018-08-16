@@ -8,7 +8,7 @@ from tracim_backend.fixtures.users_and_groups import Test
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.data import ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 
@@ -91,14 +91,14 @@ class Content(Fixture):
         # Folders
 
         tool_workspace = content_api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=business_workspace,
             label='Tools',
             do_save=True,
             do_notify=False,
         )
         menu_workspace = content_api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=business_workspace,
             label='Menus',
             do_save=True,
@@ -106,21 +106,21 @@ class Content(Fixture):
         )
 
         dessert_folder = content_api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=recipe_workspace,
             label='Desserts',
             do_save=True,
             do_notify=False,
         )
         salads_folder = content_api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=recipe_workspace,
             label='Salads',
             do_save=True,
             do_notify=False,
         )
         other_folder = content_api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=other_workspace,
             label='Infos',
             do_save=True,
@@ -129,7 +129,7 @@ class Content(Fixture):
 
         # Pages, threads, ..
         tiramisu_page = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
             label='Tiramisu Recipes!!!',
@@ -149,7 +149,7 @@ class Content(Fixture):
             content_api.save(tiramisu_page)
 
         best_cake_thread = content_api.create(
-            content_type=ContentType.Thread,
+            content_type_slug=CONTENT_TYPES.Thread.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
             label='Best Cake',
@@ -159,7 +159,7 @@ class Content(Fixture):
         best_cake_thread.description = 'Which is the best cake?'
         self._session.add(best_cake_thread)
         apple_pie_recipe = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
             label='Apple_Pie',
@@ -174,7 +174,7 @@ class Content(Fixture):
         )
         self._session.add(apple_pie_recipe)
         Brownie_recipe = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=recipe_workspace,
             parent=dessert_folder,
             label='Brownie Recipe',
@@ -189,7 +189,7 @@ class Content(Fixture):
         )
         self._session.add(Brownie_recipe)
         fruits_desserts_folder = content_api.create(
-            content_type=ContentType.Folder,
+            content_type_slug=CONTENT_TYPES.Folder.slug,
             workspace=recipe_workspace,
             label='Fruits Desserts',
             parent=dessert_folder,
@@ -197,7 +197,7 @@ class Content(Fixture):
         )
 
         menu_page = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
             parent=menu_workspace,
             label='Current Menu',
@@ -205,14 +205,14 @@ class Content(Fixture):
         )
 
         new_fruit_salad = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=recipe_workspace,
             parent=fruits_desserts_folder,
             label='New Fruit Salad',
             do_save=True,
         )
         old_fruit_salad = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=recipe_workspace,
             parent=fruits_desserts_folder,
             label='Fruit Salad',
@@ -228,7 +228,7 @@ class Content(Fixture):
         content_api.save(old_fruit_salad)
 
         bad_fruit_salad = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=recipe_workspace,
             parent=fruits_desserts_folder,
             label='Bad Fruit Salad',
@@ -245,13 +245,13 @@ class Content(Fixture):
 
         # File at the root for test
         new_fruit_salad = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=other_workspace,
             label='New Fruit Salad',
             do_save=True,
         )
         old_fruit_salad = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=other_workspace,
             label='Fruit Salad',
             do_save=True,
@@ -265,7 +265,7 @@ class Content(Fixture):
         content_api.save(old_fruit_salad)
 
         bad_fruit_salad = content_api.create(
-            content_type=ContentType.Page,
+            content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=other_workspace,
             label='Bad Fruit Salad',
             do_save=True,

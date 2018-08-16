@@ -17,16 +17,16 @@ export const Password = props => {
           {props.t('Password')}
         </div>
         <input
-          className='personaldata__form__txtinput form-control'
+          className='personaldata__form__txtinput primaryColorBorderLighten form-control'
           type='password'
           placeholder={props.t('Old password')}
         />
         <input
-          className='personaldata__form__txtinput form-control mt-4'
+          className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-4'
           type='password'
           placeholder={props.t('New password')}
         />
-        <button type='submit' className='personaldata__form__button btn btn-outline-primary mt-4'>
+        <button type='submit' className='personaldata__form__button primaryColorBorderLighten btn btn-outline-primary mt-4'>
           {props.t('Send')}
         </button>
       </form>

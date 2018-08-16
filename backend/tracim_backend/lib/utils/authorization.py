@@ -5,15 +5,15 @@ import functools
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
-from tracim_backend.models.contents import NewContentType
-from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.contents import ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 
 try:
     from json.decoder import JSONDecodeError
 except ImportError:  # python3.4
     JSONDecodeError = ValueError
 
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import ContentType
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
@@ -90,6 +90,40 @@ def require_profile(group: int) -> typing.Callable:
     return decorator
 
 
+def require_profile_or_other_profile_with_workspace_role(
+        allow_all_group: int,
+        allow_if_role_group: int,
+        minimal_required_role: int,
+) -> typing.Callable:
+    """
+    Allow access for allow_all_group profile
+    or allow access for allow_if_role_group
+    profile if mininal_required_role is correct.
+    :param allow_all_group: value from Group Object
+    like Group.TIM_USER or Group.TIM_MANAGER
+    :param allow_if_role_group: value from Group Object
+    like Group.TIM_USER or Group.TIM_MANAGER
+    :param minimal_required_role: value from UserInWorkspace Object like
+    UserRoleInWorkspace.CONTRIBUTOR or UserRoleInWorkspace.READER
+    :return: decorator
+    """
+    def decorator(func: typing.Callable) -> typing.Callable:
+        @functools.wraps(func)
+        def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
+            user = request.current_user
+            workspace = request.current_workspace
+            if user.profile.id >= allow_all_group:
+                return func(self, context, request)
+            elif user.profile.id >= allow_if_role_group:
+                if workspace.get_user_role(user) >= minimal_required_role:
+                    return func(self, context, request)
+                raise InsufficientUserRoleInWorkspace()
+            else:
+                raise InsufficientUserProfile()
+        return wrapper
+    return decorator
+
+
 def require_workspace_role(minimal_required_role: int) -> typing.Callable:
     """
     Restricts access to endpoint to minimal role or raise an exception.
@@ -133,18 +167,18 @@ def require_candidate_workspace_role(minimal_required_role: int) -> typing.Calla
     return decorator
 
 
-def require_content_types(content_types: typing.List['NewContentType']) -> typing.Callable:  # nopep8
+def require_content_types(content_types: typing.List['ContentType']) -> typing.Callable:  # nopep8
     """
     Restricts access to specific file type or raise an exception.
     Check role for candidate_workspace.
-    :param content_types: list of NewContentType object
+    :param content_types: list of ContentType object
     :return: decorator
     """
     def decorator(func: typing.Callable) -> typing.Callable:
         @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             content = request.current_content
-            current_content_type_slug = ContentType(content.type).slug
+            current_content_type_slug = CONTENT_TYPES.get_one_by_slug(content.type).slug
             content_types_slug = [content_type.slug for content_type in content_types]  # nopep8
             if current_content_type_slug in content_types_slug:
                 return func(self, context, request)

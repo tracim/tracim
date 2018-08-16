@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 import pytest
 import transaction
+from tracim_backend import models
 
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserNotActive
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import User
 from tracim_backend.models.context_models import UserInContext
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
 
@@ -106,6 +111,184 @@ class TestUserApi(DefaultTest):
         users = api.get_all()
         # u1 + Admin user from BaseFixture
         assert 2 == len(users)
+
+    def test_unit__get_known__user__admin__too_short_acp_str(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        with pytest.raises(TooShortAutocompleteString):
+            api.get_known_user('e')
+
+    def test_unit__get_known__user__admin__by_email(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+
+        users = api.get_known_user('email')
+        assert len(users) == 1
+        assert users[0] == u1
+
+    def test_unit__get_known__user__user__no_workspace_empty_known_user(self):
+        admin = self.session.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        api = UserApi(
+            current_user=admin,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        api2 = UserApi(
+            current_user=u1,
+            session=self.session,
+            config=self.config,
+        )
+        users = api2.get_known_user('email')
+        assert len(users) == 0
+
+    def test_unit__get_known__user__same_workspaces_users_by_name(self):
+        admin = self.session.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        u2 = api.create_user(
+            email='email2@email2',
+            name='name2',
+            do_notify=False,
+            do_save=True,
+        )
+        u3 = api.create_user(
+            email='notfound@notfound',
+            name='notfound',
+            do_notify=False,
+            do_save=True,
+        )
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = wapi.create_workspace(
+            'test workspace n°1',
+            save_now=True)
+        role_api = RoleApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        api2 = UserApi(
+            current_user=u1,
+            session=self.session,
+            config=self.config,
+        )
+        users = api2.get_known_user('name')
+        assert len(users) == 2
+        assert users[0] == u1
+        assert users[1] == u2
+
+    def test_unit__get_known__user__same_workspaces_users_by_email(self):
+        admin = self.session.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+        u2 = api.create_user(
+            email='email2@email2',
+            name='name2',
+            do_notify=False,
+            do_save=True,
+        )
+        u3 = api.create_user(
+            email='notfound@notfound',
+            name='notfound',
+            do_notify=False,
+            do_save=True,
+        )
+        wapi = WorkspaceApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = wapi.create_workspace(
+            'test workspace n°1',
+            save_now=True)
+        role_api = RoleApi(
+            current_user=admin,
+            session=self.session,
+            config=self.app_config,
+        )
+        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        api2 = UserApi(
+            current_user=u1,
+            session=self.session,
+            config=self.config,
+        )
+        users = api2.get_known_user('email')
+        assert len(users) == 2
+        assert users[0] == u1
+        assert users[1] == u2
+
+    def test_unit__get_known__user__admin__by_name(self):
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.config,
+        )
+        u1 = api.create_user(
+            email='email@email',
+            name='name',
+            do_notify=False,
+            do_save=True,
+        )
+
+        users = api.get_known_user('nam')
+        assert len(users) == 1
+        assert users[0] == u1
 
     def test_unit__get_one__ok__nominal_case(self):
         api = UserApi(

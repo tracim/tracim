@@ -5,7 +5,7 @@ from tracim_backend import models
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.models.contents import ContentTypeLegacy as ContentType
+from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 import io
 
@@ -16,7 +16,6 @@ from depot.io.utils import FileIntent
 from tracim_backend import models
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.data import ContentType
 from tracim_backend.models import get_tm_session
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -24,6 +23,767 @@ from tracim_backend.tests import create_1000px_png_test_image
 from tracim_backend.tests import set_html_document_slug_to_legacy
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
+
+class TestFolder(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces/{workspace_id}/folders/{content_id}
+    endpoint
+    """
+
+    fixtures = [BaseFixture]
+
+    def test_api__get_folder__ok_200__nominal_case(self) -> None:
+        """
+        Get one folder content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'test-folder'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'test-folder'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id'] == folder.revision_id
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier']['user_id'] == 1
+        assert content['last_modifier']['public_name'] == 'Global manager'
+        assert content['last_modifier']['avatar_url'] is None
+        assert content['raw_content'] == ''
+
+    def test_api__get_folder__err_400__wrong_content_type(self) -> None:
+        """
+        Get one folder of a content content 7 is not folder
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        thread = content_api.create(
+            label='thread',
+            content_type_slug=CONTENT_TYPES.Thread.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.get(
+            '/api/v2/workspaces/2/folders/7',
+            status=400
+        )
+
+    def test_api__get_folder__err_400__content_does_not_exist(self) -> None:  # nopep8
+        """
+        Get one folder content (content 170 does not exist in db)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        transaction.commit()
+        self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/170'.format(workspace_id=test_workspace.workspace_id),  # nopep8
+            status=400
+        )
+
+    def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:  # nopep8
+        """
+        Get one folders of a content (content is in another workspace)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        test_workspace2 = workspace_api.create_workspace(
+            label='test2',
+            save_now=True,
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace2.workspace_id,
+                content_id=folder.content_id,
+            ),
+            status=400
+        )
+
+    def test_api__get_folder__err_400__workspace_does_not_exist(self) -> None:  # nopep8
+        """
+        Get one folder content (Workspace 40 does not exist)
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/workspaces/40/folders/{content_id}'.format(content_id=folder.content_id),  # nopep8
+            status=400
+        )
+
+    def test_api__get_folder__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one folder content, workspace id is not int
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/workspaces/coucou/folders/{content_id}'.format(content_id=folder.content_id),  # nopep8
+            status=400
+        )
+
+    def test_api__get_folder__err_400__content_id_is_not_int(self) -> None:  # nopep8
+        """
+        Get one folder content, content_id is not int
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/coucou'.format(workspace_id=test_workspace.workspace_id),  # nopep8
+            status=400
+        )
+
+    def test_api__update_folder__err_400__empty_label(self) -> None:  # nopep8
+        """
+        Update(put) one folder content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': '',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+        }
+        self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=400
+        )
+
+    def test_api__update_folder__ok_200__nominal_case(self) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
+
+    def test_api__get_folder_revisions__ok_200__nominal_case(
+            self
+    ) -> None:
+        """
+        Get one html document of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test-folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=folder,
+        ):
+            content_api.update_content(
+                folder,
+                new_label='test-folder-updated',
+                new_content='Just a test'
+            )
+        content_api.save(folder)
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=folder,
+        ):
+            content_api.archive(
+                folder,
+            )
+        content_api.save(folder)
+        with new_revision(
+           session=dbsession,
+           tm=transaction.manager,
+           content=folder,
+        ):
+            content_api.unarchive(
+                folder,
+            )
+        content_api.save(folder)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}/revisions'.format(  # nopep8
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            status=200
+        )
+        revisions = res.json_body
+        assert len(revisions) == 4
+        revision = revisions[0]
+        assert revision['content_type'] == 'folder'
+        assert revision['content_id'] == folder.content_id
+        assert revision['is_archived'] is False
+        assert revision['is_deleted'] is False
+        assert revision['label'] == 'test-folder'
+        assert revision['parent_id'] is None
+        assert revision['show_in_ui'] is True
+        assert revision['slug'] == 'test-folder'
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == test_workspace.workspace_id
+        assert revision['revision_id']
+        assert revision['revision_type'] == 'creation'
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comment_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 1
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Global manager'
+
+        revision = revisions[1]
+        assert revision['content_type'] == 'folder'
+        assert revision['content_id'] == folder.content_id
+        assert revision['is_archived'] is False
+        assert revision['is_deleted'] is False
+        assert revision['label'] == 'test-folder-updated'
+        assert revision['parent_id'] is None
+        assert revision['show_in_ui'] is True
+        assert revision['slug'] == 'test-folder-updated'
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == test_workspace.workspace_id
+        assert revision['revision_id']
+        assert revision['revision_type'] == 'edition'
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comment_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 1
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Global manager'
+
+        revision = revisions[2]
+        assert revision['content_type'] == 'folder'
+        assert revision['content_id'] == folder.content_id
+        assert revision['is_archived'] is True
+        assert revision['is_deleted'] is False
+        assert revision['label'] != 'test-folder-updated'
+        assert revision['label'].startswith('test-folder-updated')
+        assert revision['parent_id'] is None
+        assert revision['show_in_ui'] is True
+        assert revision['slug'] != 'test-folder-updated'
+        assert revision['slug'].startswith('test-folder-updated')
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == test_workspace.workspace_id
+        assert revision['revision_id']
+        assert revision['revision_type'] == 'archiving'
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comment_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 1
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Global manager'
+
+        revision = revisions[3]
+        assert revision['content_type'] == 'folder'
+        assert revision['content_id'] == folder.content_id
+        assert revision['is_archived'] is False
+        assert revision['is_deleted'] is False
+        assert revision['label'].startswith('test-folder-updated')
+        assert revision['parent_id'] is None
+        assert revision['show_in_ui'] is True
+        assert revision['slug'].startswith('test-folder-updated')
+        assert revision['status'] == 'open'
+        assert revision['workspace_id'] == test_workspace.workspace_id
+        assert revision['revision_id']
+        assert revision['revision_type'] == 'unarchiving'
+        assert revision['sub_content_types']
+        # TODO - G.M - 2018-06-173 - Test with real comments
+        assert revision['comment_ids'] == []
+        # TODO - G.M - 2018-06-173 - check date format
+        assert revision['created']
+        assert revision['author']
+        assert revision['author']['user_id'] == 1
+        assert revision['author']['avatar_url'] is None
+        assert revision['author']['public_name'] == 'Global manager'
+
+    def test_api__set_folder_status__ok_200__nominal_case(self) -> None:
+        """
+        Get one folder content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'closed-deprecated',
+        }
+
+        # before
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(  # nopep8
+                # nopep8
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['status'] == 'open'
+
+        # set status
+        self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}/status'.format(  # nopep8
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=204
+        )
+
+        # after
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['status'] == 'closed-deprecated'
+
+    def test_api__set_folder_status__err_400__wrong_status(self) -> None:
+        """
+        Get one folder content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'status': 'unexistant-status',
+        }
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}/status'.format(  # nopep8
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=400
+        )
 
 
 class TestHtmlDocuments(FunctionalTest):
@@ -116,6 +876,54 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier']['public_name'] == 'Bob i.'
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == '<p>To cook a great Tiramisu, you need many ingredients.</p>'  # nopep8
+
+    def test_api__get_html_document__ok_200__archived_content(self) -> None:
+        """
+        Get one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/contents/6/archive',
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/6',
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_archived'] is True
+
+    def test_api__get_html_document__ok_200__deleted_content(self) -> None:
+        """
+        Get one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/contents/6/delete',
+            status=204
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/6',
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_deleted'] is True
 
     def test_api__get_html_document__err_400__wrong_content_type(self) -> None:
         """
@@ -480,9 +1288,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -648,9 +1456,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -703,9 +1511,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -809,9 +1617,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -882,9 +1690,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -978,9 +1786,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1031,9 +1839,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1082,9 +1890,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1137,9 +1945,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1196,9 +2004,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1251,9 +2059,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1302,9 +2110,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1375,9 +2183,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1438,9 +2246,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1489,9 +2297,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1554,9 +2362,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1618,9 +2426,9 @@ class TestFiles(FunctionalTest):
             config=self.app_config
         )
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_file = content_api.create(
-            content_type=ContentType.File,
+            content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
@@ -1989,9 +2797,9 @@ class TestThreads(FunctionalTest):
             session=dbsession,
             config=self.app_config
         )
-        tool_folder = content_api.get_one(1, content_type=ContentType.Any)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
         test_thread = content_api.create(
-            content_type=ContentType.Thread,
+            content_type_slug=CONTENT_TYPES.Thread.slug,
             workspace=business_workspace,
             parent=tool_folder,
             label='Test Thread',

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from urllib.parse import urlparse
+
+import os
 from paste.deploy.converters import asbool
 from tracim_backend.lib.utils.logger import logger
 from depot.manager import DepotManager
+from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.models.data import ActionDescription
 
-from tracim_backend.models.data import ActionDescription, ContentType
 
 
 class CFG(object):
@@ -78,6 +81,12 @@ class CFG(object):
             'website.base_url',
             '',
         )
+        if not self.WEBSITE_BASE_URL:
+            raise Exception(
+                'website.base_url is needed in order to have correct path in'
+                'few place like in email.'
+                'You should set it with frontend root url.'
+            )
 
         # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,  # nopep8
         # Verify this
@@ -145,11 +154,11 @@ class CFG(object):
         ]
 
         self.EMAIL_NOTIFICATION_NOTIFIED_CONTENTS = [
-            ContentType.Page,
-            ContentType.Thread,
-            ContentType.File,
-            ContentType.Comment,
-            # ContentType.Folder -- Folder is skipped
+            CONTENT_TYPES.Page.slug,
+            CONTENT_TYPES.Thread.slug,
+            CONTENT_TYPES.File.slug,
+            CONTENT_TYPES.Comment.slug,
+            # CONTENT_TYPES.Folder.slug -- Folder is skipped
         ]
         if settings.get('email.notification.from'):
             raise Exception(
@@ -160,9 +169,11 @@ class CFG(object):
 
         self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
             'email.notification.from.email',
+            'noreply+{user_id}@trac.im'
         )
         self.EMAIL_NOTIFICATION_FROM_DEFAULT_LABEL = settings.get(
-            'email.notification.from.default_label'
+            'email.notification.from.default_label',
+            'Tracim Notifications'
         )
         self.EMAIL_NOTIFICATION_REPLY_TO_EMAIL = settings.get(
             'email.notification.reply_to.email',
@@ -431,6 +442,29 @@ class CFG(object):
             allowed_dims.append(size)
 
         self.PREVIEW_JPG_ALLOWED_DIMS = allowed_dims
+
+        self.FRONTEND_SERVE = asbool(settings.get(
+            'frontend.serve', False
+        ))
+
+        # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
+        # is probably in frontend subfolder
+        # of tracim_v2 parent of both backend and frontend
+        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
+        tracim_v2_folder = os.path.dirname(backend_folder)
+        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
+
+        self.FRONTEND_DIST_FOLDER_PATH = settings.get(
+            'frontend.dist_folder_path', frontend_dist_folder
+        )
+
+        # INFO - G.M - 2018-08-06 - We check dist folder existence
+        if self.FRONTEND_SERVE and not os.path.isdir(self.FRONTEND_DIST_FOLDER_PATH):  # nopep8
+            raise Exception(
+                'ERROR: {} folder does not exist as folder. '
+                'please set frontend.dist_folder.path'
+                'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
+            )
 
     def configure_filedepot(self):
         depot_storage_name = self.DEPOT_STORAGE_NAME
