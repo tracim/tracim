@@ -1,6 +1,5 @@
-from sqlalchemy.orm import collections
+import typing
 from tracim_backend.lib.utils.daemon import FakeDaemon
-
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_rq_queue
 from tracim_backend.lib.utils.utils import get_redis_connection
@@ -13,12 +12,12 @@ from rq import Worker as BaseRQWorker
 class MailSenderDaemon(FakeDaemon):
     # NOTE: use *args and **kwargs because parent __init__ use strange
     # * parameter
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config: 'CFG', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
         self.worker = None  # type: RQWorker
 
-    def append_thread_callback(self, callback: collections.Callable) -> None:
+    def append_thread_callback(self, callback: typing.Callable) -> None:
         logger.warning('MailSenderDaemon not implement append_thread_callback')
         pass
 

@@ -1,4 +1,4 @@
-from sqlalchemy.orm import collections
+import typing
 from tracim_backend.lib.mail_fetcher.email_fetcher import MailFetcher
 from tracim_backend.lib.utils.daemon import FakeDaemon
 from tracim_backend.lib.utils.logger import logger
@@ -9,12 +9,12 @@ class MailFetcherDaemon(FakeDaemon):
     Thread containing a daemon who fetch new mail from a mailbox and
     send http request to a tracim endpoint to handle them.
     """
-    def __init__(self, config, *args, **kwargs):
+    def __init__(self, config: 'CFG', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
         self._fetcher = None  # type: MailFetcher
 
-    def append_thread_callback(self, callback: collections.Callable) -> None:
+    def append_thread_callback(self, callback: typing.Callable) -> None:
         logger.warning('MailFetcherrDaemon not implement append_thread_callback')
         pass
 

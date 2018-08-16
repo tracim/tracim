@@ -103,8 +103,9 @@ or on debian 9 :
 ### All in terminal way ###
 
 
-Run all services with uwsgi
-
+Run all services with uwsgi and python
+    
+    ## UWSGI SERVICES
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
     export TRACIM_WEBDAV_CONF_PATH="$(pwd)/wsgidav.conf"
@@ -112,6 +113,12 @@ Run all services with uwsgi
     uwsgi -d /tmp/tracim_web.log --http-socket :6543 --plugin python3 --wsgi-file wsgi/web.py -H env --pidfile /tmp/tracim_web.pid
     # webdav wsgidav server
     uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --plugin python3 --wsgi-file wsgi/webdav.py -H env --pidfile /tmp/tracim_webdav.pid
+    
+    ## DAEMONS SERVICES
+    # email notifier (if async email notification is enabled)
+    python3 daemons/mail_notifier.py &
+    # email fetcher (if email reply is enabled)
+    python3 daemons/mail_fetcher.py &
 
 to stop them:
 
@@ -119,6 +126,10 @@ to stop them:
     uwsgi --stop /tmp/tracim_web.pid
     # webdav wsgidav server
     uwsgi --stop /tmp/tracim_webdav.pid
+    # email notifier
+    killall python3 daemons/mail_notifier.py
+    # email fetcher
+    killall python3 daemons/mail_fetcher.py
 
 ## With Uwsgi ini script file ##
 
