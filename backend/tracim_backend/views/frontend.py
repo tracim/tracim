@@ -9,7 +9,6 @@ from tracim_backend.lib.utils.utils import Color
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
-import spectra
 
 INDEX_PAGE_NAME = 'index.mak'
 APP_FRONTEND_PATH = 'app/{minislug}.app.js'
