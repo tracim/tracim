@@ -4,6 +4,7 @@ Tests for /api/v2/users subpath endpoints.
 """
 from time import sleep
 import pytest
+import requests
 import transaction
 
 from tracim_backend import models
@@ -2422,6 +2423,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert sidebar_entry['hexcolor'] == "#ad4cf9"
         assert sidebar_entry['fa_icon'] == "comments-o"
 
+
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
         """
         Check obtain all workspaces reachables for one user
@@ -2635,6 +2637,303 @@ class TestUserEndpoint(FunctionalTest):
             '/api/v2/users/{}'.format(user_id),
             status=403
         )
+
+    def test_api__create_user__ok_200__full_admin(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+        assert res['created']
+        assert res['is_active'] is True
+        assert res['profile'] == 'users'
+        assert res['email'] == 'test@test.test'
+        assert res['public_name'] == 'test user'
+        assert res['timezone'] == 'Europe/Paris'
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.get_one(user_id)
+        assert user.email == 'test@test.test'
+        assert user.validate_password('mysuperpassword')
+
+    def test_api__create_user__ok_200__limited_admin(self):
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+        assert res['created']
+        assert res['is_active'] is True
+        assert res['profile'] == 'users'
+        assert res['email'] == 'test@test.test'
+        assert res['public_name'] == 'test'
+        assert res['timezone'] == ''
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.get_one(user_id)
+        assert user.email == 'test@test.test'
+        assert user.password
+
+    def test_api__create_user__err_400__email_already_in_db(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=400,
+            params=params,
+        )
+
+    def test_api__create_user__err_403__other_user(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass',
+            )
+        )
+        params = {
+            'email': 'test2@test2.test2',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'public_name': 'test user',
+            'email_notification': False,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=403,
+            params=params,
+        )
+
+
+class TestUserWithNotificationEndpoint(FunctionalTest):
+    """
+    Tests for POST /api/v2/users/{user_id}
+    """
+    config_section = 'functional_test_with_mail_test_sync'
+
+    def test_api__create_user__ok_200__full_admin_with_notif(self):
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'password': 'mysuperpassword',
+            'profile': 'users',
+            'timezone': 'Europe/Paris',
+            'public_name': 'test user',
+            'email_notification': True,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+        assert res['created']
+        assert res['is_active'] is True
+        assert res['profile'] == 'users'
+        assert res['email'] == 'test@test.test'
+        assert res['public_name'] == 'test user'
+        assert res['timezone'] == 'Europe/Paris'
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.get_one(user_id)
+        assert user.email == 'test@test.test'
+        assert user.validate_password('mysuperpassword')
+
+        # check mail received
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'test user <test@test.test>'
+        assert headers['Subject'][0] == '[TRACIM] Created account'
+
+        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+
+    def test_api__create_user__ok_200__limited_admin_with_notif(self):
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'email': 'test@test.test',
+            'email_notification': True,
+        }
+        res = self.testapp.post_json(
+            '/api/v2/users',
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert res['user_id']
+        user_id = res['user_id']
+        assert res['created']
+        assert res['is_active'] is True
+        assert res['profile'] == 'users'
+        assert res['email'] == 'test@test.test'
+        assert res['public_name'] == 'test'
+        assert res['timezone'] == ''
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        user = uapi.get_one(user_id)
+        assert user.email == 'test@test.test'
+        assert user.password
+
+        # check mail received
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        assert len(response) == 1
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'test <test@test.test>'
+        assert headers['Subject'][0] == '[TRACIM] Created account'
+
+        # TODO - G.M - 2018-08-02 - Place cleanup outside of the test
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
     def test_api_delete_user__ok_200__admin(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3135,6 +3434,68 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         res = res.json_body
         assert res['email'] == 'mysuperemail@email.fr'
+
+    def test_api__set_user_email__err_400__admin_same_email(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        # check before
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['email'] == 'test@test.test'
+
+        # Set password
+        params = {
+            'email': 'admin@admin.admin',
+            'loggedin_user_password': 'admin@admin.admin',
+        }
+        self.testapp.put_json(
+            '/api/v2/users/{}/email'.format(user_id),
+            params=params,
+            status=400,
+        )
+        # Check After
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200
+        )
+        res = res.json_body
+        assert res['email'] == 'test@test.test'
 
     def test_api__set_user_email__err_403__admin_wrong_password(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
