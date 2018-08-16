@@ -1,4 +1,4 @@
-develop branch status :
+develop branch status:
 [![Build Status](https://travis-ci.org/tracim/tracim_v2.svg?branch=develop)](https://travis-ci.org/tracim/tracim_v2)
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim_v2/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim_v2?branch=develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim_v2/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim_v2/?branch=develop)
@@ -42,7 +42,7 @@ for more information about configuration file, see development.ini.sample docume
 and [Backend setting file doc](backend/doc/setting.md).
 
 
-## Install frontend : Automated Script for easy setup ##
+## Install frontend: Automated Script for easy setup ##
 
     ./install_frontend_dependencies.sh
     ./build_full_frontend.sh
@@ -56,7 +56,7 @@ and [Backend setting file doc](backend/doc/setting.md).
 You can now enter the application at
 [http://127.0.0.1:6543](http://127.0.0.1:6543) and login with admin user:
 
- * user : `admin@admin.admin`
- * password : `admin@admin.admin`
+ * user: `admin@admin.admin`
+ * password: `admin@admin.admin`
 
 
