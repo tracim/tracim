@@ -7,7 +7,7 @@
 
 (
   log "verify if nodjs is installed"
-  dpkg -l | grep '^ii' | grep 'noidejs\s'
+  dpkg -l | grep '^ii' | grep 'nodejs\s'
 
   if [ $? -eq 0 ]; then
     log "nodjs is installed"
