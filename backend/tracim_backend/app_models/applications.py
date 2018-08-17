@@ -2,6 +2,9 @@
 import typing
 
 from tracim_backend.app_models.contents import ContentType
+if typing.TYPE_CHECKING:
+    from tracim_backend.config import CFG
+    from tracim_backend.app_models.contents import ContentStatus
 
 
 class Application(object):

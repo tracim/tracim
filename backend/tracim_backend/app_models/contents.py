@@ -9,6 +9,8 @@ from tracim_backend.exceptions import ContentStatusNotExist
 ####
 # Content Status
 from tracim_backend.lib.core.application import ApplicationApi
+if typing.TYPE_CHECKING:
+    from tracim_backend.app_models.applications import Application
 
 
 class GlobalStatus(Enum):
@@ -167,19 +169,19 @@ class ContentTypeList(object):
 
     @property
     def Folder(self):
-        return self.get_one_by_slug('folder')
+        return self.get_one_by_slug(folder_type)
 
     @property
     def File(self):
-        return self.get_one_by_slug('file')
+        return self.get_one_by_slug(file_type)
 
     @property
     def Page(self):
-        return self.get_one_by_slug('html-document')
+        return self.get_one_by_slug(html_documents_type)
 
     @property
     def Thread(self):
-        return self.get_one_by_slug('thread')
+        return self.get_one_by_slug(thread_type)
 
     def __init__(self, app_list: typing.List['Application']):
         self.app_list = app_list
@@ -190,7 +192,6 @@ class ContentTypeList(object):
     def _content_types(self):
         app_api = ApplicationApi(self.app_list)
         content_types = app_api.get_content_types()
-        # content_types.extend(self._special_contents_types)
         return content_types
 
     def get_one_by_slug(self, slug: str) -> ContentType:

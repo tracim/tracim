@@ -7,7 +7,9 @@ import colorsys
 
 from redis import Redis
 from rq import Queue
-
+import typing
+if typing.TYPE_CHECKING:
+    from tracim_backend.config import CFG
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
@@ -137,6 +139,7 @@ def clamp(val: float, minimum: float = 0.0, maximum: float= 255.0) -> int:
 
 COLOR_DARKEN_SCALE_FACTOR = 0.85
 COLOR_LIGHTEN_SCALE_FACTOR = 1.15
+
 
 class Color(object):
     def __init__(self, base_hex_code: str):
