@@ -15,5 +15,5 @@ settings.update(settings.global_conf)
 app_config = CFG(settings)
 app_config.configure_filedepot()
 
-daemon = MailSenderDaemon(app_config)
+daemon = MailSenderDaemon(app_config, burst=False)
 daemon.run()

@@ -12,10 +12,11 @@ from rq import Worker as BaseRQWorker
 class MailSenderDaemon(FakeDaemon):
     # NOTE: use *args and **kwargs because parent __init__ use strange
     # * parameter
-    def __init__(self, config: 'CFG', *args, **kwargs):
+    def __init__(self, config: 'CFG', burst=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
         self.worker = None  # type: RQWorker
+        self.burst = burst
 
     def append_thread_callback(self, callback: typing.Callable) -> None:
         logger.warning('MailSenderDaemon not implement append_thread_callback')
@@ -34,8 +35,7 @@ class MailSenderDaemon(FakeDaemon):
 
         with RQConnection(get_redis_connection(self.config)):
             self.worker = RQWorker(['mail_sender'])
-            self.worker.work()
-
+            self.worker.work(burst=self.burst)
 
 class RQWorker(BaseRQWorker):
     def _install_signal_handlers(self):
