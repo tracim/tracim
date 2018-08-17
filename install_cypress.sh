@@ -8,26 +8,56 @@
   dpkg -l | grep '^ii' | grep 'nodejs\s'
 
   if [ $? -eq 0 ]; then
-    log "nodjs is installed"
+    loggood "nodejs is installed"
   else
     log "install nodejs"
     sudo apt install curl
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     sudo apt install -y nodejs
+    loggood "nodejs is now installed"
   fi
 )
 
 # install Cypress
-
+log "go to functionnal_tests subdir.."
+cd  functionnal_tests || exit 1;
 (
-  log "go to functionnal_tests subdir.."
-  cd  functionnal_tests || exit 1;
+  ACTUALDIR=$(pwd)
+  loggood "Your are now here: \"$ACTUALDIR\""
   log "check if package.json exist"
   if [ ! -f package.json ]; then
-    log "run npm init"
+    log "package.json not exist => run npm init"
     npm init -y
+    loggood "npm init finished => package.json is now created"
+  else
+    loggood "package.json exist"
   fi
   log "install cypress"
   npm install cypress --save-dev
+  loggood "cypress is now installed"
 )
 
+# modify cypress.json
+
+(
+  log "check if cypress.json exist"
+  if [ ! -f cypress.json ]; then
+    log "cypress.json not exist => copy from cypress.json.sample"
+    cp cypress.json.sample cypress.json
+    loggood "cypress.json is now available"
+    log "write path in cypress.json"
+    SUBDIR=$(pwd)
+    sed -i "s|{path_test_file}|$SUBDIR|g" cypress.json
+    loggood "path is now configured"
+  else
+  log "cypress.json exist => check if integrationFolder have path"
+    if grep -q "\"integrationFolder\"\:\s\"{path_test_file}\"" cypress.json ; then
+      log "no path => write path in cypress.json"
+      SUBDIR=$(pwd)
+      sed -i "s|{path_test_file}|$SUBDIR|g" cypress.json
+      loggood "path is now configured"
+    else
+      loggood "path exist. Modify manualy if necessary"
+    fi
+  fi
+)
