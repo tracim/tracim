@@ -13,7 +13,8 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.extensions import hapic, APP_LIST
+from tracim_backend.extensions import hapic
+from tracim_backend.extensions import APP_LIST
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
