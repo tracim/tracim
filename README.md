@@ -76,7 +76,7 @@ This script check if nodejs is installed (npm is necessary to install Cypress), 
     cd functionnal_tests/
     ./node_modules/.bin/cypress run
 
-##Run tests with cypressgui ##
+## Run tests with cypressgui ##
 
 Open Cypress with graphical interface
 
