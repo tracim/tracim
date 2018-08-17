@@ -59,4 +59,28 @@ You can now enter the application at
  * user: `admin@admin.admin`
  * password: `admin@admin.admin`
 
+----
+
+## Running tests with cypress ##
+
+----
+
+## Installation of cypress: Automated script for easy setup ##
+
+This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress.
+
+    ./install_cypress.sh
+
+## Run tests with command line ##
+
+    cd functionnal_tests/
+    ./node_modules/.bin/cypress run
+
+##Run tests with cypressgui ##
+
+Open Cypress with graphical interface
+
+    cd functionnal_tests/
+    ./node_modules/.bin/cypress open
+
 
