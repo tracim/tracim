@@ -7,7 +7,7 @@ import transaction
 from depot.io.utils import FileIntent
 
 from tracim_backend import models
-from tracim_backend.extensions import APP_LIST
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
@@ -46,7 +46,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         workspace = workspace_api.get_one(1)
         app_api = ApplicationApi(
-            APP_LIST
+            app_list
         )
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
 
@@ -89,7 +89,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         workspace = workspace_api.get_one(1)
         app_api = ApplicationApi(
-            APP_LIST
+            app_list
         )
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
 

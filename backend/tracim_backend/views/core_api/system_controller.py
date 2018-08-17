@@ -13,7 +13,7 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.extensions import hapic, APP_LIST
+from tracim_backend.extensions import hapic, app_list
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
@@ -32,7 +32,7 @@ class SystemController(Controller):
         """
         app_config = request.registry.settings['CFG']
         app_api = ApplicationApi(
-            app_list=APP_LIST,
+            app_list=app_list,
         )
         return app_api.get_all()
 

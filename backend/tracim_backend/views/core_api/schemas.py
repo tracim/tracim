@@ -42,7 +42,7 @@ from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.app_models.validator import ALL_CONTENT_TYPES_VALIDATOR
+from tracim_backend.app_models.validator import all_content_types_validator
 
 
 class UserDigestSchema(marshmallow.Schema):
@@ -392,7 +392,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
     content_type = marshmallow.fields.String(
         example=CONTENT_TYPES.Any_SLUG,
         default=CONTENT_TYPES.Any_SLUG,
-        validate=ALL_CONTENT_TYPES_VALIDATOR
+        validate=all_content_types_validator
     )
 
     @post_load
@@ -643,7 +643,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = marshmallow.fields.String(
         example='pagehtml',
-        validate=ALL_CONTENT_TYPES_VALIDATOR,
+        validate=all_content_types_validator,
     )
     fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
@@ -697,7 +697,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type = marshmallow.fields.String(
         example='html-document',
-        validate=ALL_CONTENT_TYPES_VALIDATOR,
+        validate=all_content_types_validator,
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -732,12 +732,12 @@ class ContentDigestSchema(marshmallow.Schema):
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
         example='html-document',
-        validate=ALL_CONTENT_TYPES_VALIDATOR,
+        validate=all_content_types_validator,
     )
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=ALL_CONTENT_TYPES_VALIDATOR
+            validate=all_content_types_validator
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
@@ -887,7 +887,7 @@ class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstra
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-document',
-            validate=ALL_CONTENT_TYPES_VALIDATOR,
+            validate=all_content_types_validator,
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '

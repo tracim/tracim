@@ -2,7 +2,7 @@ import os
 
 from pyramid.renderers import render_to_response
 from pyramid.config import Configurator
-from tracim_backend.extensions import APP_LIST
+from tracim_backend.extensions import app_list
 from tracim_backend.exceptions import PageNotFound
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import Color
@@ -36,7 +36,7 @@ class FrontendController(Controller):
         # TODO - G.M - 2018-08-07 - Refactor autogen valid app list for frontend
         frontend_apps = []
         app_api = ApplicationApi(
-            app_list=APP_LIST,
+            app_list=app_list,
         )
         applications = app_api.get_all()
         for app in applications:

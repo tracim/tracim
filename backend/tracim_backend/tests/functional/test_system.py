@@ -1,6 +1,6 @@
 # coding=utf-8
 import transaction
-from tracim_backend.extensions import APP_LIST
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.models import get_tm_session
 from tracim_backend.app_models.contents import CONTENT_TYPES
@@ -31,7 +31,7 @@ class TestApplicationEndpoint(FunctionalTest):
         res = res.json_body
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         app_api = ApplicationApi(
-            app_list=APP_LIST,
+            app_list=app_list,
         )
         applications = app_api.get_all()
         assert len(res) == len(applications)

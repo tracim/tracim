@@ -7,7 +7,7 @@ from slugify import slugify
 from sqlalchemy.orm import Session
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
-from tracim_backend.extensions import APP_LIST
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_root_frontend_url
 from tracim_backend.lib.utils.utils import password_generator
@@ -495,7 +495,7 @@ class WorkspaceInContext(object):
         # list should be able to change (depending on activated/disabled
         # apps)
         app_api = ApplicationApi(
-            APP_LIST
+            app_list
         )
         return app_api.get_default_workspace_menu_entry(self.workspace)
 

@@ -2,7 +2,7 @@
 import typing
 from enum import Enum
 
-from tracim_backend.extensions import APP_LIST
+from tracim_backend.extensions import app_list
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import ContentStatusNotExist
 
@@ -132,11 +132,11 @@ class ContentType(object):
         self.allow_sub_content = allow_sub_content
 
 
-thread_type = 'thread'
-file_type = 'file'
-markdownpluspage_type = 'markdownpage'
-html_documents_type = 'html-document'
-folder_type = 'folder'
+THREAD_TYPE = 'thread'
+FILE_TYPE = 'file'
+MARKDOWNPLUSPAGE_TYPE = 'markdownpage'
+HTML_DOCUMENTS_TYPE = 'html-document'
+FOLDER_TYPE = 'folder'
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 event_type = ContentType(
@@ -169,19 +169,19 @@ class ContentTypeList(object):
 
     @property
     def Folder(self):
-        return self.get_one_by_slug(folder_type)
+        return self.get_one_by_slug(FOLDER_TYPE)
 
     @property
     def File(self):
-        return self.get_one_by_slug(file_type)
+        return self.get_one_by_slug(FILE_TYPE)
 
     @property
     def Page(self):
-        return self.get_one_by_slug(html_documents_type)
+        return self.get_one_by_slug(HTML_DOCUMENTS_TYPE)
 
     @property
     def Thread(self):
-        return self.get_one_by_slug(thread_type)
+        return self.get_one_by_slug(THREAD_TYPE)
 
     def __init__(self, app_list: typing.List['Application']):
         self.app_list = app_list
@@ -255,4 +255,4 @@ class ContentTypeList(object):
         return properties_dict
 
 
-CONTENT_TYPES = ContentTypeList(APP_LIST)
+CONTENT_TYPES = ContentTypeList(app_list)

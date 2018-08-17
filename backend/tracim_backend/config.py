@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 import os
 from paste.deploy.converters import asbool
 from tracim_backend.app_models.validator import update_validators
-from tracim_backend.extensions import APP_LIST
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from depot.manager import DepotManager
 from tracim_backend.app_models.applications import Application
@@ -606,9 +606,9 @@ class CFG(object):
         )
 
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
-        # of tracim_backend, Be careful APP_LIST is a global_var
-        APP_LIST.clear()
-        APP_LIST.extend([
+        # of tracim_backend, Be careful app_list is a global_var
+        app_list.clear()
+        app_list.extend([
             html_documents,
             markdownpluspage,
             _file,
@@ -617,7 +617,7 @@ class CFG(object):
             calendar,
         ])
         # TODO - G.M - 2018-08-08 - We need to update validators each time
-        # APP_LIST is updated.
+        # app_list is updated.
         update_validators()
 
     class CST(object):
