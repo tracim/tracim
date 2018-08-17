@@ -12,8 +12,8 @@ pyramid.debug_authorization = false
 pyramid.debug_notfound = false
 pyramid.debug_routematch = false
 pyramid.default_locale_name = en
-pyramid.includes =
-    pyramid_debugtoolbar
+#pyramid.includes =
+#    pyramid_debugtoolbar
 
 [pipeline:webdav]
 pipeline = tracim_webdav

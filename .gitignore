@@ -7,3 +7,10 @@ frontend_lib/dist/tracim_frontend_lib.js
 npm-debug.log
 package-lock.json
 color.json
+
+#ignore file or folder about cypress tests
+functionnal_tests/package.json
+functionnal_tests/cypress.json
+functionnal_tests/node_modules/
+functionnal_tests/cypress/
+
