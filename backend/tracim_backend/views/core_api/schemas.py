@@ -13,6 +13,9 @@ from tracim_backend.models.contents import CONTENT_STATUS
 from tracim_backend.models.contents import CONTENT_TYPES
 from tracim_backend.models.contents import open_status
 from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import ResetPasswordRequest
+from tracim_backend.models.context_models import ResetPasswordCheckToken
+from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import ContentIdsQuery
@@ -458,6 +461,55 @@ class WorkspaceMemberInviteSchema(RoleUpdateSchema):
     @post_load
     def make_role(self, data):
         return WorkspaceMemberInvitation(**data)
+
+
+class ResetPasswordRequestSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordRequest(**data)
+
+
+class ResetPasswordCheckTokenSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    reset_password_token = marshmallow.fields.String(
+        description="token to reset password of given user",
+        required=True,
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordCheckToken(**data)
+
+
+class ResetPasswordModifySchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    reset_password_token = marshmallow.fields.String(
+        description="token to reset password of given user",
+        required=True,
+    )
+    new_password = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+    new_password2 = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordModify(**data)
 
 
 class BasicAuthSchema(marshmallow.Schema):

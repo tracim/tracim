@@ -21,14 +21,15 @@ from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
-from tracim_backend.views.contents_api.threads_controller import ThreadController
+from tracim_backend.views.contents_api.threads_controller import ThreadController  # nopep8
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
 from tracim_backend.views.core_api.user_controller import UserController
-from tracim_backend.views.core_api.workspace_controller import WorkspaceController
-from tracim_backend.views.contents_api.comment_controller import CommentController
+from tracim_backend.views.core_api.workspace_controller import WorkspaceController  # nopep8
+from tracim_backend.views.contents_api.comment_controller import CommentController  # nopep8
 from tracim_backend.views.contents_api.file_controller import FileController
-from tracim_backend.views.contents_api.folder_controller import FolderController
+from tracim_backend.views.contents_api.folder_controller import FolderController  # nopep8
+from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController  # nopep8
 from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
@@ -107,11 +108,11 @@ def web(global_config, **local_settings):
     context.handle_exception(OperationalError, HTTPStatus.INTERNAL_SERVER_ERROR)
     context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)
 
-
     # Add controllers
     session_controller = SessionController()
     system_controller = SystemController()
     user_controller = UserController()
+    reset_password_controller = ResetPasswordController()
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
     html_document_controller = HTMLDocumentController()
@@ -121,6 +122,7 @@ def web(global_config, **local_settings):
     configurator.include(session_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(system_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(user_controller.bind, route_prefix=BASE_API_V2)
+    configurator.include(reset_password_controller.bind, route_prefix=BASE_API_V2)  # nopep8
     configurator.include(workspace_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(comment_controller.bind, route_prefix=BASE_API_V2)
     configurator.include(html_document_controller.bind, route_prefix=BASE_API_V2)  # nopep8

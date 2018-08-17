@@ -141,6 +141,7 @@ class User(DeclarativeBase):
     timezone = Column(Unicode(255), nullable=False, server_default='')
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
+    # TODO - G.M - 2018-08-22 - Think about hash instead of direct token
     auth_token = Column(Unicode(255))
     auth_token_created = Column(DateTime)
 
@@ -288,8 +289,7 @@ class User(DeclarativeBase):
         """
 
         if not self.auth_token or not self.auth_token_created:
-            self.auth_token = str(uuid.uuid4())
-            self.auth_token_created = datetime.utcnow()
+            self._generate_auth_token()
             session.flush()
             return
 
@@ -298,9 +298,16 @@ class User(DeclarativeBase):
         difference = now_seconds - auth_token_seconds
 
         if difference > validity_seconds:
-            self.auth_token = str(uuid.uuid4())
-            self.auth_token_created = datetime.utcnow()
+            self._generate_auth_token()
             session.flush()
+
+    def _generate_auth_token(self):
+        self.auth_token = str(uuid.uuid4())
+        self.auth_token_created = datetime.utcnow()
+
+    def reset_tokens(self):
+        self._generate_auth_token()
+        # TODO - G.M - 2018-08-22 - Reset reset_password_token also
 
 
 class Permission(DeclarativeBase):

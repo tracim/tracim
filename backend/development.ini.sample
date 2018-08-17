@@ -92,15 +92,6 @@ user.auth_token.validity = 604800
 
 ### Mail
 
-# Reset password through email related configuration.
-# These emails will be sent through SMTP
-#
-resetpassword.email_sender = email@sender.com
-resetpassword.smtp_host = smtp.sender
-resetpassword.smtp_port = 25
-resetpassword.smtp_login = smtp.login
-resetpassword.smtp_passwd = smtp.password
-
 email.notification.activated = False
 # email.notification.log_file_path = /tmp/mail-notifications.log
 # email notifications can be sent with the user_id added as an identifier
@@ -114,6 +105,8 @@ email.notification.content_update.template.html = %(here)s/tracim_backend/templa
 email.notification.content_update.template.text = %(here)s/tracim_backend/templates/mail/content_update_body_text.mak
 email.notification.created_account.template.html = %(here)s/tracim_backend/templates/mail/created_account_body_html.mak
 email.notification.created_account.template.text = %(here)s/tracim_backend/templates/mail/created_account_body_text.mak
+email.notification.reset_password_request.template.html = %(here)s/tracim_backend/templates/mail/reset_password_body_html.mak
+email.notification.reset_password_request.template.text = %(here)s/tracim_backend/templates/mail/reset_password_body_text.mak
 # Note: items between { and } are variable names. Do not remove / rename them
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Created account

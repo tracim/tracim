@@ -13,6 +13,7 @@ from tracim_backend.config import CFG
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
 from tracim_backend.exceptions import NoUserSetted
+from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import PasswordDoNotMatch
@@ -204,6 +205,14 @@ class UserApi(object):
         except (WrongUserPassword, UserDoesNotExist) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
 
+    def check_reset_password_token(self, user: User, reset_password_token: str):
+        # FIXME - G.M - 2018-08-22 - UNSAFE !
+        # make this work correctly instead of this
+        # uncomplete code.
+        if reset_password_token == 'justatoken':
+            return True
+        raise UnvalidResetPasswordToken('Token is not valid')
+
     # Actions
     def set_password(
             self,
@@ -270,6 +279,32 @@ class UserApi(object):
             email=email,
             do_save=do_save,
         )
+        return user
+
+    def set_password_reset_token(
+            self,
+            user: User,
+            new_password: str,
+            new_password2: str,
+            reset_token: str,
+            do_save: bool,
+    ):
+        if not self.check_reset_password_token(user, reset_token):
+            raise UnvalidResetPasswordToken(
+                'Wrong reset password token for user {}'.format(
+                    self._user.user_id)  # nopep8
+            )
+        if new_password != new_password2:
+            raise PasswordDoNotMatch('Passwords given are different')
+
+        self.update(
+            user=user,
+            password=new_password,
+            do_save=do_save,
+        )
+        user.reset_tokens()
+        if do_save:
+            self.save(user)
         return user
 
     def _check_email(self, email: str) -> bool:
@@ -398,6 +433,21 @@ class UserApi(object):
             self._session.flush()
 
         return user
+
+    def reset_password_notification(self, user: User) -> str:
+        """
+        Reset password notification
+        :param user: User who want is password resetted
+        :return: reset_password_token
+        """
+        # FIXME - G.M - 2018-08-22 - UNSAFE ! Use true generated user token !
+        token = 'justatoken'
+        try:
+            email_manager = get_email_manager(self._config, self._session)
+            email_manager.notify_reset_password(user, token)
+        except SMTPException as e:
+            raise NotificationNotSend()
+        return token
 
     def enable(self, user: User, do_save=False):
         user.is_active = True

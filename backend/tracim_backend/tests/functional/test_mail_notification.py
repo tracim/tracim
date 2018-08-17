@@ -165,6 +165,23 @@ class TestNotificationsSync(MailHogTest):
         assert headers['References'][0] == 'test_user_refs+22@localhost'
         assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'  # nopep8
 
+    def test_func__reset_password__ok__nominal_case(self):
+        uapi = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        current_user = uapi.get_one_by_email('admin@admin.admin')
+        uapi.reset_password_notification(current_user)
+
+        # check mail received
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'Global manager <admin@admin.admin>'
+        assert headers['Subject'][0] == '[TRACIM] Reset Password Request'
+
 
 class TestNotificationsAsync(MailHogTest):
     fixtures = [BaseFixture, ContentFixture]
@@ -265,3 +282,29 @@ class TestNotificationsAsync(MailHogTest):
         assert headers['Subject'][0] == '[TRACIM] [Recipes] file1 (Open)'
         assert headers['References'][0] == 'test_user_refs+22@localhost'
         assert headers['Reply-to'][0] == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'  # nopep8
+
+    def test_func__reset_password__ok__nominal_case(self):
+        uapi = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        current_user = uapi.get_one_by_email('admin@admin.admin')
+        uapi.reset_password_notification(current_user)
+        # Send mail async from redis queue
+        redis = get_redis_connection(
+            self.app_config
+        )
+        queue = get_rq_queue(
+            redis,
+            'mail_sender',
+        )
+        worker = SimpleWorker([queue], connection=queue.connection)
+        worker.work(burst=True)
+        # check mail received
+        response = requests.get('http://127.0.0.1:8025/api/v1/messages')
+        response = response.json()
+        headers = response[0]['Content']['Headers']
+        assert headers['From'][0] == 'Tracim Notifications <test_user_from+0@localhost>'  # nopep8
+        assert headers['To'][0] == 'Global manager <admin@admin.admin>'
+        assert headers['Subject'][0] == '[TRACIM] Reset Password Request'

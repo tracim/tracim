@@ -166,7 +166,6 @@ class CFG(object):
                 'Use instead email.notification.from.email and '
                 'email.notification.from.default_label.'
             )
-
         self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
@@ -181,12 +180,17 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = settings.get(
             'email.notification.references.email'
         )
+        # Content update notification
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
             'email.notification.content_update.template.html',
         )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = settings.get(
             'email.notification.content_update.template.text',
         )
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
+            'email.notification.content_update.subject',
+        )
+        # Created account notification
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
             'email.notification.created_account.template.html',
             './tracim_backend/templates/mail/created_account_body_html.mak',
@@ -195,13 +199,25 @@ class CFG(object):
             'email.notification.created_account.template.text',
             './tracim_backend/templates/mail/created_account_body_text.mak',
         )
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
-            'email.notification.content_update.subject',
-        )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
             'email.notification.created_account.subject',
             '[{website_title}] Created account',
         )
+
+        # Reset password notification
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = settings.get(
+            'email.notification.reset_password_request.template.html',
+            './tracim_backend/templates/mail/reset_password_body_html.mak',
+        )
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_TEXT = settings.get(
+            'email.notification.reset_password_request.template.text',
+            './tracim_backend/templates/mail/reset_password_body_text.mak',
+        )
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = settings.get(
+            'email.notification.reset_password_request.subject',
+            '[{website_title}] Reset Password Request'
+        )
+
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
             'email.notification.processing_mode',
         )
