@@ -226,61 +226,61 @@ class CFG(object):
             None,
         )
 
-        # self.EMAIL_REPLY_ACTIVATED = asbool(settings.get(
-        #     'email.reply.activated',
-        #     False,
-        # ))
-        #
-        # self.EMAIL_REPLY_IMAP_SERVER = settings.get(
-        #     'email.reply.imap.server',
-        # )
-        # self.EMAIL_REPLY_IMAP_PORT = settings.get(
-        #     'email.reply.imap.port',
-        # )
-        # self.EMAIL_REPLY_IMAP_USER = settings.get(
-        #     'email.reply.imap.user',
-        # )
-        # self.EMAIL_REPLY_IMAP_PASSWORD = settings.get(
-        #     'email.reply.imap.password',
-        # )
-        # self.EMAIL_REPLY_IMAP_FOLDER = settings.get(
-        #     'email.reply.imap.folder',
-        # )
-        # self.EMAIL_REPLY_CHECK_HEARTBEAT = int(settings.get(
-        #     'email.reply.check.heartbeat',
-        #     60,
-        # ))
-        # self.EMAIL_REPLY_TOKEN = settings.get(
-        #     'email.reply.token',
-        # )
-        # self.EMAIL_REPLY_IMAP_USE_SSL = asbool(settings.get(
-        #     'email.reply.imap.use_ssl',
-        # ))
-        # self.EMAIL_REPLY_IMAP_USE_IDLE = asbool(settings.get(
-        #     'email.reply.imap.use_idle',
-        #     True,
-        # ))
-        # self.EMAIL_REPLY_CONNECTION_MAX_LIFETIME = int(settings.get(
-        #     'email.reply.connection.max_lifetime',
-        #     600,  # 10 minutes
-        # ))
-        # self.EMAIL_REPLY_USE_HTML_PARSING = asbool(settings.get(
-        #     'email.reply.use_html_parsing',
-        #     True,
-        # ))
-        # self.EMAIL_REPLY_USE_TXT_PARSING = asbool(settings.get(
-        #     'email.reply.use_txt_parsing',
-        #     True,
-        # ))
-        # self.EMAIL_REPLY_LOCKFILE_PATH = settings.get(
-        #     'email.reply.lockfile_path',
-        #     ''
-        # )
-        # if not self.EMAIL_REPLY_LOCKFILE_PATH and self.EMAIL_REPLY_ACTIVATED:
-        #     raise Exception(
-        #         mandatory_msg.format('email.reply.lockfile_path')
-        #     )
-        #
+        self.EMAIL_REPLY_ACTIVATED = asbool(settings.get(
+            'email.reply.activated',
+            False,
+        ))
+
+        self.EMAIL_REPLY_IMAP_SERVER = settings.get(
+            'email.reply.imap.server',
+        )
+        self.EMAIL_REPLY_IMAP_PORT = settings.get(
+            'email.reply.imap.port',
+        )
+        self.EMAIL_REPLY_IMAP_USER = settings.get(
+            'email.reply.imap.user',
+        )
+        self.EMAIL_REPLY_IMAP_PASSWORD = settings.get(
+            'email.reply.imap.password',
+        )
+        self.EMAIL_REPLY_IMAP_FOLDER = settings.get(
+            'email.reply.imap.folder',
+        )
+        self.EMAIL_REPLY_CHECK_HEARTBEAT = int(settings.get(
+            'email.reply.check.heartbeat',
+            60,
+        ))
+        self.EMAIL_REPLY_TOKEN = settings.get(
+            'email.reply.token',
+        )
+        self.EMAIL_REPLY_IMAP_USE_SSL = asbool(settings.get(
+            'email.reply.imap.use_ssl',
+        ))
+        self.EMAIL_REPLY_IMAP_USE_IDLE = asbool(settings.get(
+            'email.reply.imap.use_idle',
+            True,
+        ))
+        self.EMAIL_REPLY_CONNECTION_MAX_LIFETIME = int(settings.get(
+            'email.reply.connection.max_lifetime',
+            600,  # 10 minutes
+        ))
+        self.EMAIL_REPLY_USE_HTML_PARSING = asbool(settings.get(
+            'email.reply.use_html_parsing',
+            True,
+        ))
+        self.EMAIL_REPLY_USE_TXT_PARSING = asbool(settings.get(
+            'email.reply.use_txt_parsing',
+            True,
+        ))
+        self.EMAIL_REPLY_LOCKFILE_PATH = settings.get(
+            'email.reply.lockfile_path',
+            ''
+        )
+        if not self.EMAIL_REPLY_LOCKFILE_PATH and self.EMAIL_REPLY_ACTIVATED:
+            raise Exception(
+                mandatory_msg.format('email.reply.lockfile_path')
+            )
+
         self.EMAIL_PROCESSING_MODE = settings.get(
             'email.processing_mode',
             'sync',

@@ -173,6 +173,7 @@ class MailFetcher(object):
         use_html_parsing: bool,
         use_txt_parsing: bool,
         lockfile_path: str,
+        burst: bool,
     ) -> None:
         """
         Fetch mail from a mailbox folder through IMAP and add their content to
@@ -209,6 +210,7 @@ class MailFetcher(object):
         self.use_txt_parsing = use_txt_parsing
         self.lock = filelock.FileLock(lockfile_path)
         self._is_active = True
+        self.burst = burst
 
     def run(self) -> None:
         logger.info(self, 'Starting MailFetcher')
@@ -261,11 +263,18 @@ class MailFetcher(object):
                             log = 'IDLE mode activated but server do not' \
                                   'support it, use polling instead.'
                             logger.warning(self, log)
+
+                        if self.burst:
+                            self.stop()
+                            break
                         # normal polling mode : sleep a define duration
                         logger.debug(self,
                                      'sleep for {}'.format(self.heartbeat))
                         time.sleep(self.heartbeat)
 
+                    if self.burst:
+                        self.stop()
+                        break
             # Socket
             except (socket.error,
                     socket.gaierror,
@@ -321,6 +330,10 @@ class MailFetcher(object):
                         except Exception as e:
                             log = "Can't logout, connection broken ? {}"
                             logger.error(self, log.format(e.__str__()))
+
+            if self.burst:
+                self.stop()
+                break
 
             if sleep_after_connection:
                 logger.debug(self, 'sleep for {}'.format(self.heartbeat))
