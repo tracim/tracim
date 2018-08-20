@@ -3,6 +3,7 @@ import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import LogoHomepage from '../img/logoHeader.svg'
+import { translate } from 'react-i18next'
 
 class Home extends Component {
   render () {
@@ -14,17 +15,17 @@ class Home extends Component {
             <CardBody customClass='homepagecard'>
               <div>
                 <div className='homepagecard__title text-center my-4'>
-                  Bienvenue sur Tracim
+                  {this.props.t('Welcome on Tracim')}
                 </div>
                 <div className='homepagecard__thanks text-center'>
-                  Merci de nous faire confiance et d'utiliser notre outil collaboratif
+                  {this.props.t('Thank you for trusting us and using our collaborative tool')}
                 </div>
                 <div className='homepagecard__delimiter delimiter' />
                 <div className='homepagecard__text text-center mb-5'>
-                  Vous allez créez votre premier espace de travail
+                  {this.props.t('You will create your first workspace')}
                 </div>
                 <div className='homepagecard__btn btn btn-outline-primary'>
-                  Créer votre espace de travail
+                  {this.props.t('create a workspace')}
                 </div>
                 <div className='homepagecard__logo mt-5 mb-3'>
                   <img src={LogoHomepage} alt='logo homepage' />
@@ -38,4 +39,4 @@ class Home extends Component {
   }
 }
 
-export default Home
+export default translate()(Home)

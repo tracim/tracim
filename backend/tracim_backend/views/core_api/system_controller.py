@@ -2,18 +2,19 @@
 from pyramid.config import Configurator
 from tracim_backend.exceptions import NotAuthenticated
 from tracim_backend.exceptions import InsufficientUserProfile
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.models import Group
-from tracim_backend.models.applications import applications
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.extensions import hapic
+from tracim_backend.extensions import app_list
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
@@ -30,7 +31,11 @@ class SystemController(Controller):
         """
         Get list of alls applications installed in this tracim instance.
         """
-        return applications
+        app_config = request.registry.settings['CFG']
+        app_api = ApplicationApi(
+            app_list=app_list,
+        )
+        return app_api.get_all()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @require_profile(Group.TIM_USER)

@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend import CFG
 from tracim_backend.lib.webdav.utils import transform_to_bdd, HistoryType, \
     SpecialFolderExtension
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.lock_manager import LockManager

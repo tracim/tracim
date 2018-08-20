@@ -1,6 +1,7 @@
 import React from 'react'
 import { TextAreaApp } from 'tracim_frontend_lib'
 import { MODE } from '../helper.js'
+import { translate } from 'react-i18next'
 
 const HtmlDocument = props => {
   return (
@@ -9,12 +10,12 @@ const HtmlDocument = props => {
         <div className='html-document__contentpage__textnote__state'>
           <div className='html-document__contentpage__textnote__state__msg'>
             <i className='fa fa-fw fa-archive' />
-            This content is archived.
+            {props.t('This content is archived.')}
           </div>
 
           <button className='html-document__contentpage__textnote__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
             <i className='fa fa-fw fa-archive' />
-            Restore
+            {props.t('Restore')}
           </button>
         </div>
       }
@@ -23,12 +24,12 @@ const HtmlDocument = props => {
         <div className='html-document__contentpage__textnote__state'>
           <div className='html-document__contentpage__textnote__state__msg'>
             <i className='fa fa-fw fa-trash' />
-            Ce contenu est supprimé.
+            {props.t('This content is deleted.')}
           </div>
 
           <button className='html-document__contentpage__textnote__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>
             <i className='fa fa-fw fa-trash' />
-            Restore
+            {props.t('Restore')}
           </button>
         </div>
       }
@@ -40,7 +41,7 @@ const HtmlDocument = props => {
             <div dangerouslySetInnerHTML={{__html: props.mode === MODE.VIEW ? props.lastVersion : props.version}} />
             {props.mode === MODE.REVISION &&
               <div className='html-document__contentpage__textnote__lastversion'>
-                (dernière version : {props.lastVersion})
+                ({props.t('latest version :')} {props.lastVersion})
               </div>
             }
           </div>
@@ -64,4 +65,4 @@ const HtmlDocument = props => {
   )
 }
 
-export default HtmlDocument
+export default translate()(HtmlDocument)

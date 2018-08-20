@@ -5,6 +5,7 @@ import Radium from 'radium'
 import color from 'color'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
+import { translate } from 'react-i18next'
 
 require('./Timeline.styl')
 
@@ -38,7 +39,7 @@ class Timeline extends React.Component {
               <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
             </div>
             <div className='timeline__header__title'>
-              Timeline
+              {this.props.t('Timeline')}
             </div>
             <div className='timeline__header__icon mb-3 mt-auto'>
               <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
@@ -50,12 +51,12 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-archive' />
-              This content is archived.
+              {this.props.t('This content is archived.')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreArchived}>
               <i className='fa fa-fw fa-archive' />
-              Restore
+              {this.props.t('Restore')}
             </button>
           </div>
         }
@@ -64,12 +65,12 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-trash' />
-              This content is deleted.
+              {this.props.t('This content is deleted.')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreDeleted}>
               <i className='fa fa-fw fa-trash' />
-              Restore
+              {this.props.t('Restore')}
             </button>
           </div>
         }
@@ -135,7 +136,7 @@ class Timeline extends React.Component {
                   }}
                   key={'timeline__comment__advancedtext'}
                 >
-                  {props.wysiwyg ? 'Texte Simple' : 'Texte Riche'}
+                  {props.wysiwyg ? 'Texte simple' : 'Texte riche'}
                 </button>
               </div>
 
@@ -169,7 +170,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default Radium(Timeline)
+export default Radium(translate()(Timeline))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,

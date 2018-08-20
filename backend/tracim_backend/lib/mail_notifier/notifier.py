@@ -20,7 +20,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_login_frontend_url
 from tracim_backend.lib.utils.utils import get_email_logo_frontend_url
 from tracim_backend.models.auth import User
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import ActionDescription
