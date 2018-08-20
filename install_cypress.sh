@@ -1,5 +1,4 @@
 #!/bin/bash
-ash
 . bash_library.sh # source bash_library.sh
 
 # install nodjs if not installed
@@ -12,7 +11,8 @@ ash
     loggood "nodejs is installed."
   else
     log "Install nodejs"
-    sudo apt install curl
+    sudo apt update
+    sudo apt install -y curl
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     sudo apt install -y nodejs
     loggood "nodejs is now installed."
@@ -34,6 +34,8 @@ cd  functionnal_tests || exit 1;
     loggood "package.json exist."
   fi
   log "Install cypress."
+  sudo apt update
+  sudo apt install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 
   npm install cypress --save-dev
   loggood "Cypress is now installed."
 )
