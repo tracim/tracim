@@ -1,5 +1,4 @@
 #!/bin/bash
-ash
 . bash_library.sh # source bash_library.sh
 
 # install nodjs if not installed
