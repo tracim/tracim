@@ -67,18 +67,20 @@ You can now enter the application at
 
 ## Installation of cypress: Automated script for easy setup ##
 
-This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress.
+This script check if nodejs is installed (npm is necessary to install Cypress), if file package.json and cypress.json exist in 'functionnal_tests' folder. if not the script install necessary file and install Cypress and his dependency's.
 
     ./install_cypress.sh
 
 ## Run tests with command line ##
+
+This command run all test present in 'cypress_test' folder.
 
     cd functionnal_tests/
     ./node_modules/.bin/cypress run
 
 ## Run tests with cypressgui ##
 
-Open Cypress with graphical interface
+Open Cypress with graphical interface. You can show test running directly in web interface.
 
     cd functionnal_tests/
     ./node_modules/.bin/cypress open
