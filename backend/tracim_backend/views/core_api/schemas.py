@@ -82,6 +82,7 @@ class UserSchema(UserDigestSchema):
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
+        description="Timezone as tz database format",
         example="Europe/Paris",
     )
     # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
@@ -96,6 +97,14 @@ class UserSchema(UserDigestSchema):
         attribute='profile',
         validate=OneOf(Profile._NAME),
         example='managers',
+    )
+    lang = marshmallow.fields.String(
+        description="User langage in iso639 format",
+        example='en',
+        required=False,
+        validate=Length(min=2, max=3),
+        allow_none=True,
+        default=None,
     )
 
     class Meta:
@@ -136,12 +145,21 @@ class SetPasswordSchema(LoggedInUserPasswordSchema):
 
 class UserInfosSchema(marshmallow.Schema):
     timezone = marshmallow.fields.String(
+        description="Timezone as tz database format",
         example="Europe/Paris",
         required=True,
     )
     public_name = marshmallow.fields.String(
         example='Suri Cate',
         required=True,
+    )
+    lang = marshmallow.fields.String(
+        description="User langage in iso639 format",
+        example='en',
+        required=True,
+        validate=Length(min=2, max=3),
+        allow_none=True,
+        default=None,
     )
 
     @post_load
@@ -177,6 +195,7 @@ class UserCreationSchema(marshmallow.Schema):
         default=Group.TIM_USER_GROUPNAME
     )
     timezone = marshmallow.fields.String(
+        description="Timezone as tz database format",
         example="Europe/Paris",
         required=False,
         default=''
@@ -184,6 +203,14 @@ class UserCreationSchema(marshmallow.Schema):
     public_name = marshmallow.fields.String(
         example='Suri Cate',
         required=False,
+        default=None,
+    )
+    lang = marshmallow.fields.String(
+        description="User langage in iso639 format",
+        example='en',
+        required=False,
+        validate=Length(min=2, max=3),
+        allow_none=True,
         default=None,
     )
     email_notification = marshmallow.fields.Bool(
