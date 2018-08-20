@@ -8,13 +8,15 @@ import requests
 import transaction
 
 from tracim_backend import models
+from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -2370,6 +2372,22 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         """
         Check obtain all workspaces reachables for user with user auth.
         """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        workspace_api = WorkspaceApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config,
+        )
+        workspace = workspace_api.get_one(1)
+        app_api = ApplicationApi(
+            app_list
+        )
+
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
         self.testapp.authorization = (
             'Basic',
             (
@@ -2384,45 +2402,14 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert workspace['label'] == 'Business'
         assert workspace['slug'] == 'business'
         assert workspace['is_deleted'] is False
-        assert len(workspace['sidebar_entries']) == 5
 
-        # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
-        # not fixed on active application/content-file
-        sidebar_entry = workspace['sidebar_entries'][0]
-        assert sidebar_entry['slug'] == 'dashboard'
-        assert sidebar_entry['label'] == 'Dashboard'
-        assert sidebar_entry['route'] == '/#/workspaces/1/dashboard'  # nopep8
-        assert sidebar_entry['hexcolor'] == "#252525"
-        assert sidebar_entry['fa_icon'] == "signal"
-
-        sidebar_entry = workspace['sidebar_entries'][1]
-        assert sidebar_entry['slug'] == 'contents/all'
-        assert sidebar_entry['label'] == 'All Contents'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#fdfdfd"
-        assert sidebar_entry['fa_icon'] == "th"
-
-        sidebar_entry = workspace['sidebar_entries'][2]
-        assert sidebar_entry['slug'] == 'contents/html-document'
-        assert sidebar_entry['label'] == 'Text Documents'
-        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=html-document'  # nopep8
-        assert sidebar_entry['hexcolor'] == "#3f52e3"
-        assert sidebar_entry['fa_icon'] == "file-text-o"
-
-        sidebar_entry = workspace['sidebar_entries'][3]
-        assert sidebar_entry['slug'] == 'contents/file'
-        assert sidebar_entry['label'] == 'Files'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=file"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#FF9900"
-        assert sidebar_entry['fa_icon'] == "paperclip"
-
-        sidebar_entry = workspace['sidebar_entries'][4]
-        assert sidebar_entry['slug'] == 'contents/thread'
-        assert sidebar_entry['label'] == 'Threads'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#ad4cf9"
-        assert sidebar_entry['fa_icon'] == "comments-o"
-
+        assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
+        for counter, sidebar_entry in enumerate(default_sidebar_entry):
+            workspace['sidebar_entries'][counter]['slug'] = sidebar_entry.slug
+            workspace['sidebar_entries'][counter]['label'] = sidebar_entry.label
+            workspace['sidebar_entries'][counter]['route'] = sidebar_entry.route
+            workspace['sidebar_entries'][counter]['hexcolor'] = sidebar_entry.hexcolor  # nopep8
+            workspace['sidebar_entries'][counter]['fa_icon'] = sidebar_entry.fa_icon  # nopep8
 
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
         """

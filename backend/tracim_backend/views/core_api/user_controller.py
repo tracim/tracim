@@ -7,7 +7,7 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim_backend import hapic
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models import Group
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
@@ -36,7 +36,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 

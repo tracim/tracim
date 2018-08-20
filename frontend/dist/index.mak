@@ -21,37 +21,37 @@
         param = 'color'
         color_change_value = 15
       %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
       <% html_class = '.primaryColorFont{state}Hover:hover' %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
 
       <%
         html_class = '.primaryColorBg{state}'
         param = 'background-color'
       %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
       <% html_class = '.primaryColorBg{state}Hover:hover'%>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
 
       <%
         param = 'border-color'
         html_class = '.primaryColorBorder{state}'
       %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
       <% html_class = '.primaryColorBorder{state}Hover:hover' %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.hexcode}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken(color_change_value).hexcode}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.brighten(color_change_value).hexcode}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
     </style>
   </head>
 

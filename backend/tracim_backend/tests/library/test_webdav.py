@@ -22,22 +22,15 @@ from unittest.mock import MagicMock
 
 class TestWebdavFactory(StandardTest):
 
+    config_section = 'webdav_test'
+
     def test_unit__initConfig__ok__nominal_case(self):
         """
         Check if config is correctly modify for wsgidav using mocked
         wsgidav and tracim conf (as dict)
         :return:
         """
-        tracim_settings = {
-            'website.base_url': 'http://localhost:6543',
-            'sqlalchemy.url': 'sqlite:///:memory:',
-            'user.auth_token.validity': '604800',
-            'depot_storage_dir': '/tmp/test/depot',
-            'depot_storage_name': 'test',
-            'preview_cache_dir': '/tmp/test/preview_cache',
-            'wsgidav.config_path': 'development.ini'
-
-        }
+        tracim_settings = self.settings
         wsgidav_setting = DEFAULT_CONFIG.copy()
         wsgidav_setting.update(
             {
