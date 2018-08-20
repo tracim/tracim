@@ -263,8 +263,10 @@ class RoleUpdate(object):
     def __init__(
         self,
         role: str,
+        do_notify: bool,
     ):
         self.role = role
+        self.do_notify = do_notify
 
 
 class WorkspaceMemberInvitation(object):
@@ -276,10 +278,12 @@ class WorkspaceMemberInvitation(object):
         user_id: int,
         user_email_or_public_name: str,
         role: str,
+        do_notify: str,
     ):
         self.role = role
         self.user_email_or_public_name = user_email_or_public_name
         self.user_id = user_id
+        self.do_notify = do_notify
 
 
 class WorkspaceUpdate(object):
@@ -572,6 +576,10 @@ class UserRoleWorkspaceInContext(object):
     @property
     def is_active(self) -> bool:
         return self.user.is_active
+
+    @property
+    def do_notify(self) -> bool:
+        return self.user_role.do_notify
 
     @property
     def user(self) -> UserInContext:

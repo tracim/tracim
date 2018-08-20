@@ -221,7 +221,8 @@ class WorkspaceController(Controller):
         workspace_role = WorkspaceRoles.get_role_from_slug(hapic_data.body.role)
         role = rapi.update_role(
             role,
-            role_level=workspace_role.level
+            role_level=workspace_role.level,
+            with_notif=hapic_data.body.do_notify
         )
         return rapi.get_user_role_workspace_with_context(role)
 
@@ -302,7 +303,7 @@ class WorkspaceController(Controller):
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
-            with_notif=False,
+            with_notif=hapic_data.body.do_notify or False,  # nopep8, default value as false
             flush=True,
         )
         return rapi.get_user_role_workspace_with_context(
