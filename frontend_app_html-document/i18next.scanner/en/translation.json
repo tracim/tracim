@@ -2,5 +2,12 @@
   "Last version": "Last version",
   "Validate and create": "Validate and create",
   "Document's title": "Document's title",
-  "New Document": "New Document"
+  "New Document": "New Document",
+  "Error while archiving document": "Error while archiving document",
+  "Error while deleting document": "Error while deleting document",
+  "Error while restoring document": "Error while restoring document",
+  "This content is archived.": "This content is archived.",
+  "Restore": "Restore",
+  "This content is deleted.": "This content is deleted.",
+  "latest version :": "latest version :"
 }

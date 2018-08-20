@@ -23,7 +23,7 @@ const ExtandedAction = props => {
             <i className='fa fa-fw fa-pencil' />
           </div>
           <div className='subdropdown__item__text'>
-            {props.t('Change')}
+            {props.t('Edit')}
           </div>
         </div>
 
