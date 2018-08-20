@@ -25,8 +25,7 @@ from depot.fields.sqlalchemy import UploadedFileField
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
 
-from tracim_backend.lib.utils.translation import fake_translator as l_
-from tracim_backend.lib.utils.translation import get_locale
+from tracim_backend.lib.utils.translation import get_locale, Translator
 from tracim_backend.exceptions import ContentRevisionUpdateError
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.auth import User
@@ -1432,7 +1431,8 @@ class VirtualEvent(object):
         if content.type == CONTENT_TYPES.Comment.slug:
             # TODO - G.M  - 10-04-2018 - [Cleanup] Remove label param
             # from this object ?
-            label = l_('<strong>{}</strong> wrote:').format(content.owner.get_display_name())
+            # TODO - G.M - 2018-08-20 - [I18n] fix trad of this
+            label = '<strong>{}</strong> wrote:'.format(content.owner.get_display_name())
 
         return VirtualEvent(id=content.content_id,
                             created=content.created,

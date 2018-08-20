@@ -99,6 +99,7 @@ class TestNotificationsSync(MailHogTest):
             password='pass',
             name='bob',
             timezone='+2',
+            lang='fr',
             do_save=True,
             do_notify=True,
         )
