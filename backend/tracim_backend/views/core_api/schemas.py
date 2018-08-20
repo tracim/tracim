@@ -437,6 +437,12 @@ class RoleUpdateSchema(marshmallow.Schema):
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
     )
+    do_notify = marshmallow.fields.Bool(
+        description='has user enabled notification for this workspace',
+        example=True,
+        default=None,
+        allow_none=True,
+    )
 
     @post_load
     def make_role(self, data):
@@ -575,6 +581,10 @@ class WorkspaceMemberSchema(marshmallow.Schema):
         WorkspaceDigestSchema(exclude=('sidebar_entries',))
     )
     is_active = marshmallow.fields.Bool()
+    do_notify = marshmallow.fields.Bool(
+        description='has user enabled notification for this workspace',
+        example=True,
+    )
 
     class Meta:
         description = 'Workspace Member information'
