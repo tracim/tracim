@@ -13,7 +13,7 @@
     log "nodjs is installed"
   else
     log "install nodejs"
-    sudo apt install curl
+    sudo apt install -y curl
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     sudo apt install -y nodejs
   fi
