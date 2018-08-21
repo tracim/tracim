@@ -15,7 +15,7 @@ export const COOKIE = {
 // Côme - 2018/08/02 - shouldn't this come from api ?
 export const workspaceConfig = {
   slug: 'workspace',
-  faIcon: 'space-shuttle',
+  faIcon: 'bank',
   hexcolor: '#7d4e24',
   creationLabel: 'Create a workspace',
   domContainer: 'appFeatureContainer'

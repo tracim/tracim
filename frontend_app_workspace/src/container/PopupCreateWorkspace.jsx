@@ -11,7 +11,7 @@ import i18n from '../i18n.js'
 const debug = { // outdated
   config: {
     slug: 'workspace',
-    faIcon: 'space-shuttle',
+    faIcon: 'bank',
     hexcolor: '#7d4e24',
     creationLabel: 'Create a workspace',
     domContainer: 'appFeatureContainer',
