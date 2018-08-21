@@ -165,7 +165,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickCreateContent = (e, idFolder, contentType) => {
     e.stopPropagation()
-    this.props.history.push(`${PAGE.WORKSPACE.NEW(this.state.workspaceIdInUrl, contentType, idFolder)}?parent_id=${idFolder}`)
+    this.props.history.push(`${PAGE.WORKSPACE.NEW(this.state.workspaceIdInUrl, contentType)}?parent_id=${idFolder}`)
   }
 
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
@@ -216,7 +216,7 @@ class WorkspaceContent extends React.Component {
               parentClass='workspace__header__btnaddcontent'
               idFolder={null} // null because it is workspace root content
               onClickCreateContent={this.handleClickCreateContent}
-              availableApp={contentType}
+              availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
             />
           </PageTitle>
 
@@ -227,7 +227,7 @@ class WorkspaceContent extends React.Component {
               { filteredWorkspaceContentList.map((c, i) => c.type === 'folder'
                 ? (
                   <Folder
-                    availableApp={contentType}
+                    availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
                     folderData={c}
                     onClickItem={this.handleClickContentItem}
                     onClickExtendedAction={{
@@ -270,7 +270,7 @@ class WorkspaceContent extends React.Component {
               customClass='workspace__content__button'
               idFolder={null}
               onClickCreateContent={this.handleClickCreateContent}
-              availableApp={contentType}
+              availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
             />
           </PageContent>
 
