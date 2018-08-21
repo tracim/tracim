@@ -237,15 +237,15 @@ class Dashboard extends React.Component {
             </div>
 
             <div className='dashboard__calltoaction justify-content-xl-center'>
-              {props.contentType.map(ct =>
+              {props.appList.map(app =>
                 <ContentTypeBtn
                   customClass='dashboard__calltoaction__button'
-                  hexcolor={ct.hexcolor}
-                  label={ct.label}
-                  faIcon={ct.faIcon}
-                  creationLabel={ct.creationLabel}
-                  onClickBtn={() => props.history.push(PAGE.WORKSPACE.NEW(props.curWs.id, ct.slug))}
-                  key={ct.label}
+                  hexcolor={app.hexcolor}
+                  label={app.label}
+                  faIcon={app.faIcon}
+                  creationLabel={(props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: ''}).creationLabel}
+                  onClickBtn={() => props.history.push(PAGE.WORKSPACE.NEW(props.curWs.id, app.slug))}
+                  key={app.label}
                 />
               )}
             </div>
@@ -293,5 +293,5 @@ class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, contentType, currentWorkspace }) => ({ user, contentType, curWs: currentWorkspace })
+const mapStateToProps = ({ user, contentType, appList, currentWorkspace }) => ({ user, contentType, appList, curWs: currentWorkspace })
 export default connect(mapStateToProps)(translate()(Dashboard))
