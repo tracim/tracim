@@ -1572,13 +1572,14 @@ class ContentApi(object):
         :param parent: Parent of foture folder (can be None)
         :return: Generated folder name
         """
+        _ = self.translator.get_trad
         query = self._base_query(workspace=workspace)\
             .filter(Content.label.ilike('{0}%'.format(
-                self.translator.get_trad('New folder'),
+                _('New folder'),
             )))
         if parent:
             query = query.filter(Content.parent == parent)
 
-        return self.translator.get_trad('New folder {0}').format(
+        return _('New folder {0}').format(
             query.count() + 1,
         )

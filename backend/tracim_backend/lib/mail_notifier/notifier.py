@@ -269,6 +269,7 @@ class EmailManager(object):
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
             translator = Translator(app_config=self.config, default_lang=role.user.lang)  # nopep8
+            _ = translator.get_trad
             to_addr = formataddr((role.user.display_name, role.user.email))
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
@@ -290,7 +291,7 @@ class EmailManager(object):
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
-            reply_to_label = translator.get_trad('{username} & all members of {workspace}').format(  # nopep8
+            reply_to_label = _('{username} & all members of {workspace}').format(  # nopep8
                 username=user.display_name,
                 workspace=main_content.workspace.label)
 
@@ -455,6 +456,7 @@ class EmailManager(object):
         :param actor: the user at the origin of the action / notification (for example the one who wrote a comment
         :return: the built email body as string. In case of multipart email, this method must be called one time for text and one time for html
         """
+        _ = translator.get_trad
         logger.debug(self, 'Building email content from MAKO template {}'.format(mako_template_filepath))
         content = content_in_context.content
         main_title = content.label
@@ -470,74 +472,74 @@ class EmailManager(object):
         logo_url = get_email_logo_frontend_url(self.config)
         action = content.get_last_action().id
         if ActionDescription.COMMENT == action:
-            content_intro = translator.get_trad('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
+            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
             content_text = content.description
-            call_to_action_text = translator.get_trad('Answer')
+            call_to_action_text = _('Answer')
 
         elif ActionDescription.CREATION == action:
 
             # Default values (if not overriden)
             content_text = content.description
-            call_to_action_text = translator.get_trad('View online')
+            call_to_action_text = _('View online')
 
             if CONTENT_TYPES.Thread.slug == content.type:
-                call_to_action_text = translator.get_trad('Answer')
-                content_intro = translator.get_trad('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
+                call_to_action_text = _('Answer')
+                content_intro = _('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + \
                                content.get_last_comment_from(actor).description
 
             elif CONTENT_TYPES.File.slug == content.type:
-                content_intro = translator.get_trad('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
                 if content.description:
                     content_text = content.description
                 else:
                     content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
             elif CONTENT_TYPES.Page.slug == content.type:
-                content_intro = translator.get_trad('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
                 content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
         elif ActionDescription.REVISION == action:
             content_text = content.description
-            call_to_action_text = translator.get_trad('View online')
+            call_to_action_text = _('View online')
 
             if CONTENT_TYPES.File.slug == content.type:
-                content_intro = translator.get_trad('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
                 content_text = ''
 
             elif CONTENT_TYPES.Page.slug == content.type:
-                content_intro = translator.get_trad('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
                 content_text = str('<p id="content-body-intro">{}</p> {text}</p> {title_diff} {content_diff}').format(
-                    text=translator.get_trad('Here is an overview of the changes:'),
+                    text=_('Here is an overview of the changes:'),
                     title_diff=title_diff,
                     content_diff=htmldiff(previous_revision.description, content.description)
                 )
             elif CONTENT_TYPES.Thread.slug == content.type:
-                content_intro = translator.get_trad('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
                 content_text = str('<p id="content-body-intro">{}</p> {text} {title_diff} {content_diff}').format(
-                    text=translator.get_trad('Here is an overview of the changes:'),
+                    text=_('Here is an overview of the changes:'),
                     title_diff=title_diff,
                     content_diff=htmldiff(previous_revision.description, content.description)
                 )
         elif ActionDescription.EDITION == action:
-            call_to_action_text = translator.get_trad('View online')
+            call_to_action_text = _('View online')
 
             if CONTENT_TYPES.File.slug == content.type:
-                content_intro = translator.get_trad('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
                     content.description
 
         elif ActionDescription.STATUS_UPDATE == action:
-            call_to_action_text = translator.get_trad('View online')
-            intro_user_msg = translator.get_trad(
+            call_to_action_text = _('View online')
+            intro_user_msg = _(
                 '<span id="content-intro-username">{}</span> '
                 'updated the following status:'
             )

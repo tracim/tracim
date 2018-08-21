@@ -7,7 +7,7 @@ import typing
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
-TRANSLATION_FILENAME = 'translation.json'
+TRANSLATION_FILENAME = 'backend.json'
 DEFAULT_FALLBACK_LANG = 'en'
 
 
@@ -42,7 +42,7 @@ class Translator(object):
         try:
             trad_file = self._get_trad_filepath(lang)
             trad = self._get_trad_from_file(trad_file)
-            if message in trad:
+            if message in trad and trad[message]:
                 return trad[message], True
         except Exception:
             pass
