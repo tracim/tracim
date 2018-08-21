@@ -84,4 +84,6 @@
   npm i
   log "npm link tracim_frontend_lib"
   npm link tracim_frontend_lib
+  log "cp config.js.sample config.js"
+  cp configEnv.js.sample configEnv.js
 )
