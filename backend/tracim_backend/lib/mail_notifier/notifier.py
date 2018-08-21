@@ -269,7 +269,7 @@ class EmailManager(object):
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
             translator = Translator(app_config=self.config, default_lang=role.user.lang)  # nopep8
-            _ = translator.get_trad
+            _ = translator.get_translation
             to_addr = formataddr((role.user.display_name, role.user.email))
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
@@ -434,7 +434,7 @@ class EmailManager(object):
 
         template = Template(filename=mako_template_filepath)
         return template.render(
-            _=translator.get_trad,
+            _=translator.get_translation,
             config=self.config,
             **context
         )
@@ -456,7 +456,7 @@ class EmailManager(object):
         :param actor: the user at the origin of the action / notification (for example the one who wrote a comment
         :return: the built email body as string. In case of multipart email, this method must be called one time for text and one time for html
         """
-        _ = translator.get_trad
+        _ = translator.get_translation
         logger.debug(self, 'Building email content from MAKO template {}'.format(mako_template_filepath))
         content = content_in_context.content
         main_title = content.label

@@ -285,7 +285,7 @@ class WorkspaceApi(object):
         """
         :return: Generated workspace label
         """
-        _ = self.translator.get_trad
+        _ = self.translator.get_translation
         query = self._base_query_without_roles() \
             .filter(Workspace.label.ilike('{0}%'.format(
                 _('Workspace'),

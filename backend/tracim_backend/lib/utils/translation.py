@@ -12,6 +12,9 @@ DEFAULT_FALLBACK_LANG = 'en'
 
 
 class Translator(object):
+    """
+    Get translation from json file
+    """
 
     def __init__(self, app_config: 'CFG', default_lang: str = None, fallback_lang: str = None):  # nopep8
         self.config = app_config
@@ -22,7 +25,7 @@ class Translator(object):
             default_lang = fallback_lang
         self.default_lang = default_lang
 
-    def _get_trad_filepath(self, lang: str) -> typing.Optional[str]:
+    def _get_json_translation_lang_filepath(self, lang: str) -> typing.Optional[str]:  # nopep8
         i18n_folder = self.config.BACKEND_I18N_FOLDER
         lang_filepath = os.path.join(i18n_folder, lang, TRANSLATION_FILENAME)
         if not os.path.isdir(self.config.BACKEND_I18N_FOLDER):
@@ -30,7 +33,7 @@ class Translator(object):
         else:
             return lang_filepath
 
-    def _get_trad_from_file(self, filepath: str) -> typing.Optional[typing.Dict[str, str]]:  # nopep8
+    def _get_translation_from_file(self, filepath: str) -> typing.Optional[typing.Dict[str, str]]:  # nopep8
         try:
             with open(filepath) as file:
                 trads = json.load(file)
@@ -38,24 +41,27 @@ class Translator(object):
         except Exception:
             return None
 
-    def _get_trad(self, lang: str, message: str) -> typing.Tuple[str, bool]:
+    def _get_translation(self, lang: str, message: str) -> typing.Tuple[str, bool]:
         try:
-            trad_file = self._get_trad_filepath(lang)
-            trad = self._get_trad_from_file(trad_file)
-            if message in trad and trad[message]:
-                return trad[message], True
+            translation_filepath = self._get_json_translation_lang_filepath(lang)  # nopep8
+            translation = self._get_translation_from_file(translation_filepath)
+            if message in translation and translation[message]:
+                return translation[message], True
         except Exception:
             pass
         return message, False
 
-    def get_trad(self, message: str, lang: str = None) -> str:
+    def get_translation(self, message: str, lang: str = None) -> str:
+        """
+        Return translation according to lang
+        """
         if not lang:
             lang = self.default_lang
         if lang != self.fallback_lang:
-            new_trad, trad_found = self._get_trad(lang, message)
+            new_trad, trad_found = self._get_translation(lang, message)
             if trad_found:
                 return new_trad
-        new_trad, trad_found = self._get_trad(self.fallback_lang, message)
+        new_trad, trad_found = self._get_translation(self.fallback_lang, message)
         if trad_found:
             return new_trad
         return message
