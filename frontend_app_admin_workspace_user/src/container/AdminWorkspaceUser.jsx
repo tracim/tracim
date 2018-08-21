@@ -9,6 +9,7 @@ import { debug } from '../helper.js'
 import {
 } from '../action.async.js'
 import AdminWorkspace from '../component/AdminWorkspace.jsx'
+import AdminUser from '../component/AdminUser.jsx'
 
 require('../css/index.styl')
 
@@ -76,7 +77,7 @@ class AdminWorkspaceUser extends React.Component {
         }
 
         {this.state.config.type === 'user' &&
-          <div>not yet implemented</div>
+          <AdminUser />
         }
       </div>
     )

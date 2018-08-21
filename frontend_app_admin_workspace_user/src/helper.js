@@ -11,7 +11,7 @@ export const debug = {
     slug: 'admin_workspace_user',
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
-    type: 'workspace',
+    type: 'user',
     translation: {en: {}, fr: {}}
   },
   loggedUser: { // @FIXME this object is outdated

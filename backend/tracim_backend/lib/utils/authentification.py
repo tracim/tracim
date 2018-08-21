@@ -3,7 +3,7 @@ import typing
 from pyramid.request import Request
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models import User

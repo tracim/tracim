@@ -1,9 +1,11 @@
+import { apiUrl as configApiUrl } from '../configEnv.js'
+
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
-  apiUrl: 'http://localhost:6543/api/v2',
+  apiUrl: configApiUrl,
   mockApiUrl: 'http://localhost:3001' // @todo: better to use one url only and use proxy on mock api to point to real api (if implemented)
 }
 
@@ -15,7 +17,7 @@ export const COOKIE = {
 // Côme - 2018/08/02 - shouldn't this come from api ?
 export const workspaceConfig = {
   slug: 'workspace',
-  faIcon: 'space-shuttle',
+  faIcon: 'bank',
   hexcolor: '#7d4e24',
   creationLabel: 'Create a workspace',
   domContainer: 'appFeatureContainer'

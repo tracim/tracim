@@ -12,8 +12,8 @@ except ImportError:
     from http import client as HTTPStatus
 
 from tracim_backend import hapic
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend import BASE_API_V2
-from tracim_backend import TracimRequest
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
@@ -52,7 +52,7 @@ from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 
 SWAGGER_TAG_WORKSPACE_ENDPOINTS = 'Workspaces'
@@ -221,7 +221,8 @@ class WorkspaceController(Controller):
         workspace_role = WorkspaceRoles.get_role_from_slug(hapic_data.body.role)
         role = rapi.update_role(
             role,
-            role_level=workspace_role.level
+            role_level=workspace_role.level,
+            with_notif=hapic_data.body.do_notify
         )
         return rapi.get_user_role_workspace_with_context(role)
 
@@ -302,7 +303,7 @@ class WorkspaceController(Controller):
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,  # nopep8
-            with_notif=False,
+            with_notif=hapic_data.body.do_notify or False,  # nopep8, default value as false
             flush=True,
         )
         return rapi.get_user_role_workspace_with_context(

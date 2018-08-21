@@ -19,7 +19,7 @@ from tracim_backend.lib.webdav.utils import transform_to_display, HistoryType, \
     FakeFileStream
 from tracim_backend.lib.webdav.utils import transform_to_bdd
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import User, ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import Content

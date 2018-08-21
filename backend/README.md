@@ -85,8 +85,11 @@ create wsgidav configuration file for webdav:
 
     cp wsgidav.conf.sample wsgidav.conf
 
-## Run Tracim_backend With Uwsgi : great for production ##
+if not did before, you need to create a color.json file at root of tracim_v2 :
+   
+    cp ../color.json.sample ../color.json
 
+## Run Tracim_backend With Uwsgi : great for production ##
 
 #### Install Uwsgi
 

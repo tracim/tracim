@@ -5,7 +5,7 @@ from tracim_backend import models
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.revision_protection import new_revision
 import io
 

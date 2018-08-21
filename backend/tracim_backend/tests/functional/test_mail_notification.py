@@ -11,7 +11,7 @@ from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.lib.utils.utils import get_redis_connection
 from tracim_backend.lib.utils.utils import get_rq_queue
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi

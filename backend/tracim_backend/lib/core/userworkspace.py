@@ -115,7 +115,7 @@ class RoleApi(object):
         """
         role.role = role_level
         if with_notif is not None:
-            role.do_notify == with_notif
+            role.do_notify = with_notif
         if save_now:
             self.save(role)
 

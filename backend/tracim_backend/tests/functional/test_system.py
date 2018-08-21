@@ -1,7 +1,10 @@
 # coding=utf-8
-from tracim_backend.models.contents import CONTENT_TYPES
+import transaction
+from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.models import get_tm_session
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.tests import FunctionalTest
-from tracim_backend.models.applications import applications
 
 """
 Tests for /api/v2/system subpath endpoints.
@@ -26,6 +29,11 @@ class TestApplicationEndpoint(FunctionalTest):
         )
         res = self.testapp.get('/api/v2/system/applications', status=200)
         res = res.json_body
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        app_api = ApplicationApi(
+            app_list=app_list,
+        )
+        applications = app_api.get_all()
         assert len(res) == len(applications)
         for counter, application in enumerate(applications):
             assert res[counter]['label'] == application.label

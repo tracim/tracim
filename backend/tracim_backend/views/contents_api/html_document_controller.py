@@ -11,7 +11,7 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.views.controllers import Controller
@@ -26,8 +26,8 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.contents import CONTENT_TYPES
-from tracim_backend.models.contents import html_documents_type
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.models.revision_protection import new_revision
 
 SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS = 'HTML documents'
@@ -37,7 +37,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([html_documents_type])
+    @require_content_types([HTML_DOCUMENTS_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedContentSchema())
     def get_html_document(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
@@ -61,7 +61,7 @@ class HTMLDocumentController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([html_documents_type])
+    @require_content_types([HTML_DOCUMENTS_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(TextBasedContentModifySchema())
     @hapic.output_body(TextBasedContentSchema())
@@ -97,7 +97,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([html_documents_type])
+    @require_content_types([HTML_DOCUMENTS_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedRevisionSchema(many=True))
     def get_html_document_revisions(
@@ -129,7 +129,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__HTML_DOCUMENT_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([html_documents_type])
+    @require_content_types([HTML_DOCUMENTS_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

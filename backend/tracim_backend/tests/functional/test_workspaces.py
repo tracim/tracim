@@ -7,13 +7,15 @@ import transaction
 from depot.io.utils import FileIntent
 
 from tracim_backend import models
+from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
@@ -32,6 +34,22 @@ class TestWorkspaceEndpoint(FunctionalTest):
         """
         Check obtain workspace reachable for user.
         """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        workspace_api = WorkspaceApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config,
+        )
+        workspace = workspace_api.get_one(1)
+        app_api = ApplicationApi(
+            app_list
+        )
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
+
         self.testapp.authorization = (
             'Basic',
             (
@@ -46,49 +64,35 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
         assert workspace['is_deleted'] is False
-        assert len(workspace['sidebar_entries']) == 5
 
-        # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
-        # not fixed on active application/content-file
-        sidebar_entry = workspace['sidebar_entries'][0]
-        assert sidebar_entry['slug'] == 'dashboard'
-        assert sidebar_entry['label'] == 'Dashboard'
-        assert sidebar_entry['route'] == '/#/workspaces/1/dashboard'  # nopep8
-        assert sidebar_entry['hexcolor'] == "#252525"
-        assert sidebar_entry['fa_icon'] == "signal"
-
-        sidebar_entry = workspace['sidebar_entries'][1]
-        assert sidebar_entry['slug'] == 'contents/all'
-        assert sidebar_entry['label'] == 'All Contents'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#fdfdfd"
-        assert sidebar_entry['fa_icon'] == "th"
-
-        sidebar_entry = workspace['sidebar_entries'][2]
-        assert sidebar_entry['slug'] == 'contents/html-document'
-        assert sidebar_entry['label'] == 'Text Documents'
-        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=html-document'  # nopep8
-        assert sidebar_entry['hexcolor'] == "#3f52e3"
-        assert sidebar_entry['fa_icon'] == "file-text-o"
-
-        sidebar_entry = workspace['sidebar_entries'][3]
-        assert sidebar_entry['slug'] == 'contents/file'
-        assert sidebar_entry['label'] == 'Files'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=file"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#FF9900"
-        assert sidebar_entry['fa_icon'] == "paperclip"
-
-        sidebar_entry = workspace['sidebar_entries'][4]
-        assert sidebar_entry['slug'] == 'contents/thread'
-        assert sidebar_entry['label'] == 'Threads'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#ad4cf9"
-        assert sidebar_entry['fa_icon'] == "comments-o"
+        assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
+        for counter, sidebar_entry in enumerate(default_sidebar_entry):
+            workspace['sidebar_entries'][counter]['slug'] = sidebar_entry.slug
+            workspace['sidebar_entries'][counter]['label'] = sidebar_entry.label
+            workspace['sidebar_entries'][counter]['route'] = sidebar_entry.route
+            workspace['sidebar_entries'][counter]['hexcolor'] = sidebar_entry.hexcolor  # nopep8
+            workspace['sidebar_entries'][counter]['fa_icon'] = sidebar_entry.fa_icon  # nopep8
 
     def test_api__update_workspace__ok_200__nominal_case(self) -> None:
         """
         Test update workspace
         """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        workspace_api = WorkspaceApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config,
+        )
+        workspace = workspace_api.get_one(1)
+        app_api = ApplicationApi(
+            app_list
+        )
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
+
         self.testapp.authorization = (
             'Basic',
             (
@@ -111,8 +115,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'business'
         assert workspace['label'] == 'Business'
         assert workspace['description'] == 'All importants documents'
+        assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
-        assert len(workspace['sidebar_entries']) == 5
 
         # modify workspace
         res = self.testapp.put_json(
@@ -126,8 +130,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
-        assert len(workspace['sidebar_entries']) == 5
 
         # after
         res = self.testapp.get(
@@ -140,8 +144,8 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert workspace['slug'] == 'superworkspace'
         assert workspace['label'] == 'superworkspace'
         assert workspace['description'] == 'mysuperdescription'
+        assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
         assert workspace['is_deleted'] is False
-        assert len(workspace['sidebar_entries']) == 5
 
     def test_api__update_workspace__err_400__empty_label(self) -> None:
         """
@@ -901,6 +905,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['user']['public_name'] == 'Global manager'
         assert user_role['user']['user_id'] == 1
         assert user_role['is_active'] is True
+        assert user_role['do_notify'] is True
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
         assert user_role['user']['avatar_url'] is None
@@ -975,6 +980,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': 2,
             'user_email_or_public_name': None,
             'role': 'content-manager',
+            'do_notify': False,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -987,6 +993,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is False
         assert user_role_found['email_sent'] is False
+        assert user_role_found['do_notify'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -1016,6 +1023,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
             'role': 'content-manager',
+            'do_notify': 'True',
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1028,6 +1036,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is False
         assert user_role_found['email_sent'] is False
+        assert user_role_found['do_notify'] is True
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -1057,6 +1066,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'Lawrence L.',
             'role': 'content-manager',
+            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1069,6 +1079,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is False
         assert user_role_found['email_sent'] is False
+        assert user_role_found['do_notify'] is True
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -1098,6 +1109,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': None,
             'role': 'content-manager',
+            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1122,6 +1134,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': 47,
             'user_email_or_public_name': None,
             'role': 'content-manager',
+            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1146,6 +1159,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'nothing@nothing.nothing',
             'role': 'content-manager',
+            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1159,6 +1173,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is False
+        assert user_role_found['do_notify'] is True
 
         res = self.testapp.get('/api/v2/workspaces/1/members',
                                status=200).json_body  # nopep8
@@ -1193,6 +1208,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         # update workspace role
         params = {
             'role': 'content-manager',
+            'do_notify': False,
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/1/members/1',
@@ -1208,6 +1224,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert len(res) == 1
         user_role = res[0]
         assert user_role['role'] == 'content-manager'
+        assert user_role['do_notify'] is False
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
 
@@ -1350,6 +1367,7 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'bob@bob.bob',
             'role': 'content-manager',
+            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1363,6 +1381,7 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is True
+        assert user_role_found['do_notify'] is True
 
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
@@ -1399,6 +1418,7 @@ class TestUserInvitationWithMailActivatedASync(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'bob@bob.bob',
             'role': 'content-manager',
+            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
