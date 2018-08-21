@@ -44,6 +44,8 @@ requires = [
     # frontend file serve
     'pyramid_mako',
     'spectra',
+    # i18n
+    'Babel',
 ]
 
 tests_require = [
@@ -116,4 +118,9 @@ setup(
             'webdav start = tracim_backend.command.webdav:WebdavRunnerCommand',
         ]
     },
+    message_extractors={'tracim_backend': [
+        ('**.py', 'python', None),
+        ('templates/**.mak', 'mako', None),
+        ]
+    }
 )

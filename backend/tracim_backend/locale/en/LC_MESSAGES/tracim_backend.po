@@ -1,0 +1,102 @@
+# English translations for tracim_backend.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the tracim_backend
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tracim_backend 1.9.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-08-21 15:03+0200\n"
+"PO-Revision-Date: 2018-08-21 15:04+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:66
+msgid ""
+"{user_display_name}, you receive this email because you are registered on"
+" <i>{website_title}</i> and you are <i>{user_role_label}</i> in the "
+"workspace <a href=\"{workspace_url}\">{workspace_label}</a>."
+msgstr ""
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:70
+msgid ""
+"This email was automatically sent by <i>Tracim</i>, a collaborative "
+"software developped by Algoo."
+msgstr ""
+
+#: tracim_backend/templates/mail/content_update_body_text.mak:3
+msgid "Dear {user}"
+msgstr ""
+
+#: tracim_backend/templates/mail/content_update_body_text.mak:5
+msgid ""
+"This email is intended to be read as HTML content.Please configure your "
+"email client to get the best of Tracim notifications."
+msgstr ""
+
+#: tracim_backend/templates/mail/content_update_body_text.mak:6
+msgid ""
+"We understand that Email was originally intended to carry raw text only.\n"
+"And you probably understand on your own that we are a decades after email"
+" \n"
+" was created ;)"
+msgstr ""
+
+#: tracim_backend/templates/mail/content_update_body_text.mak:8
+msgid "Hope you'll switch your mail client configuration and enjoy Tracim :)"
+msgstr ""
+
+#: tracim_backend/templates/mail/content_update_body_text.mak:13
+msgid ""
+"You receive this email because you are registered on {website_title} \n"
+" and you are {role} in the workspace {workspace_label}."
+msgstr ""
+
+#: tracim_backend/templates/mail/content_update_body_text.mak:20
+#: tracim_backend/templates/mail/created_account_body_text.mak:18
+msgid ""
+"This email was sent by *Tracim*,\n"
+"a collaborative software developped by Algoo."
+msgstr ""
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:46
+msgid "Created account"
+msgstr ""
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:55
+#: tracim_backend/templates/mail/created_account_body_text.mak:3
+msgid "An administrator just create account for you on {website_title}"
+msgstr ""
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:61
+#: tracim_backend/templates/mail/created_account_body_text.mak:7
+msgid "Login"
+msgstr ""
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:64
+#: tracim_backend/templates/mail/created_account_body_text.mak:8
+msgid "Password"
+msgstr ""
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:71
+msgid "To go to {website_title}, please click on following link :"
+msgstr ""
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:82
+msgid ""
+"This email was sent by <i>Tracim</i>, a collaborative software developped"
+" by Algoo."
+msgstr ""
+
+#: tracim_backend/templates/mail/created_account_body_text.mak:10
+msgid "To go to {website_title}, please click on following link"
+msgstr ""
+

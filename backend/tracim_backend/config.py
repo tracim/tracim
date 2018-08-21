@@ -452,10 +452,10 @@ class CFG(object):
         # of tracim_v2 parent of both backend and frontend
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
         tracim_v2_folder = os.path.dirname(backend_folder)
+        backend_i18n_folder = os.path.join(backend_folder,'tracim_backend', 'locale')  # nopep8
 
-        frontend_i18n_folder = os.path.join(tracim_v2_folder, 'frontend', 'i18next.scanner')  # nopep8
         self.BACKEND_I18N_FOLDER = settings.get(
-            'backend.18n_folder_path', frontend_i18n_folder
+            'backend.18n_folder_path', backend_i18n_folder
         )
         if not os.path.isdir(self.BACKEND_I18N_FOLDER):
             raise Exception(
