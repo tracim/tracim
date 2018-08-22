@@ -59,7 +59,8 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        reset_password_token = uapi.reset_password_notification(admin)
+        reset_password_token = uapi.reset_password_notification(admin, do_save=True) # nopep8
+        transaction.commit()
         params = {
             'email': 'admin@admin.admin',
             'reset_password_token': reset_password_token
@@ -81,6 +82,7 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
             config=self.app_config,
         )
         reset_password_token = 'wrong_token'
+        transaction.commit()
         params = {
             'email': 'admin@admin.admin',
             'reset_password_token': reset_password_token
@@ -104,7 +106,8 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        reset_password_token = uapi.reset_password_notification(admin)
+        reset_password_token = uapi.reset_password_notification(admin, do_save=True)  # nopep8
+        transaction.commit()
         params = {
             'email': 'admin@admin.admin',
             'reset_password_token': reset_password_token,
@@ -150,7 +153,8 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        reset_password_token = uapi.reset_password_notification(admin)
+        reset_password_token = uapi.reset_password_notification(admin, do_save=True)  # nopep8
+        transaction.commit()
         params = {
             'email': 'admin@admin.admin',
             'reset_password_token': reset_password_token,

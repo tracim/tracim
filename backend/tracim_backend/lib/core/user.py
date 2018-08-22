@@ -205,14 +205,6 @@ class UserApi(object):
         except (WrongUserPassword, UserDoesNotExist) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(email)) from exc  # nopep8
 
-    def check_reset_password_token(self, user: User, reset_password_token: str):
-        # FIXME - G.M - 2018-08-22 - UNSAFE !
-        # make this work correctly instead of this
-        # uncomplete code.
-        if reset_password_token == 'justatoken':
-            return True
-        raise UnvalidResetPasswordToken('Token is not valid')
-
     # Actions
     def set_password(
             self,
@@ -287,13 +279,9 @@ class UserApi(object):
             new_password: str,
             new_password2: str,
             reset_token: str,
-            do_save: bool,
+            do_save: bool = False,
     ):
-        if not self.check_reset_password_token(user, reset_token):
-            raise UnvalidResetPasswordToken(
-                'Wrong reset password token for user {}'.format(
-                    self._user.user_id)  # nopep8
-            )
+        self.validate_reset_password_token(user, reset_token)
         if new_password != new_password2:
             raise PasswordDoNotMatch('Passwords given are different')
 
@@ -434,27 +422,35 @@ class UserApi(object):
 
         return user
 
-    def reset_password_notification(self, user: User) -> str:
+    def reset_password_notification(self, user: User, do_save: bool=False) -> str:  # nopep8
         """
         Reset password notification
         :param user: User who want is password resetted
+        :param do_save: save update ?
         :return: reset_password_token
         """
-        # FIXME - G.M - 2018-08-22 - UNSAFE ! Use true generated user token !
-        token = 'justatoken'
+        token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)
             email_manager.notify_reset_password(user, token)
         except SMTPException as e:
             raise NotificationNotSend()
+        if do_save:
+            self.save(user)
         return token
+
+    def validate_reset_password_token(self, user: User, token: str) -> bool:
+        return user.validate_reset_password_token(
+            token=token,
+            validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_VALIDITY,
+        )
 
     def enable(self, user: User, do_save=False):
         user.is_active = True
         if do_save:
             self.save(user)
 
-    def disable(self, user:User, do_save=False):
+    def disable(self, user: User, do_save=False):
         user.is_active = False
         if do_save:
             self.save(user)

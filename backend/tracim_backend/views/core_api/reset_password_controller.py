@@ -15,6 +15,7 @@ from tracim_backend.views.core_api.schemas import ResetPasswordRequestSchema
 from tracim_backend.views.core_api.schemas import ResetPasswordCheckTokenSchema
 from tracim_backend.views.core_api.schemas import ResetPasswordModifySchema
 from tracim_backend.exceptions import UnvalidResetPasswordToken
+from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import PasswordDoNotMatch
 
 SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS = 'Reset Password'
@@ -36,10 +37,11 @@ class ResetPasswordController(Controller):
             config=app_config,
         )
         user = uapi.get_one_by_email(hapic_data.body.email)
-        uapi.reset_password_notification(user)
+        uapi.reset_password_notification(user, do_save=True)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS])
+    @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
     @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
     @hapic.input_body(ResetPasswordCheckTokenSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -54,10 +56,11 @@ class ResetPasswordController(Controller):
             config=app_config,
         )
         user = uapi.get_one_by_email(hapic_data.body.email)
-        uapi.check_reset_password_token(user, hapic_data.body.reset_password_token)  # nopep8
+        uapi.validate_reset_password_token(user, hapic_data.body.reset_password_token)  # nopep8
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS])
+    @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
     @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
     @hapic.handle_exception(PasswordDoNotMatch, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_body(ResetPasswordModifySchema())

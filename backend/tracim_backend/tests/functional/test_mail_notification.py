@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import requests
+import transaction
 from rq import SimpleWorker
 
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
@@ -172,8 +173,8 @@ class TestNotificationsSync(MailHogTest):
             config=self.app_config,
         )
         current_user = uapi.get_one_by_email('admin@admin.admin')
-        uapi.reset_password_notification(current_user)
-
+        uapi.reset_password_notification(current_user, do_save=True)
+        transaction.commit()
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
         response = response.json()
@@ -290,7 +291,8 @@ class TestNotificationsAsync(MailHogTest):
             config=self.app_config,
         )
         current_user = uapi.get_one_by_email('admin@admin.admin')
-        uapi.reset_password_notification(current_user)
+        uapi.reset_password_notification(current_user, do_save=True)
+        transaction.commit()
         # Send mail async from redis queue
         redis = get_redis_connection(
             self.app_config

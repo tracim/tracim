@@ -171,6 +171,10 @@ class CFG(object):
             'user.auth_token.validity',
             '604800',
         ))
+        self.USER_RESET_PASSWORD_TOKEN_VALIDITY = int(settings.get(
+            'user.reset_password.validity',
+            '600'
+        ))
 
         self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
