@@ -280,7 +280,7 @@ class User(DeclarativeBase):
 
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
-    def ensure_auth_token(self, validity_seconds, session) -> None:
+    def ensure_auth_token(self, validity_seconds) -> None:
         """
         Create auth_token if None, regenerate auth_token if too much old.
 
@@ -290,7 +290,6 @@ class User(DeclarativeBase):
 
         if not self.auth_token or not self.auth_token_created:
             self._generate_auth_token()
-            session.flush()
             return
 
         now_seconds = time.mktime(datetime.utcnow().timetuple())
@@ -299,7 +298,6 @@ class User(DeclarativeBase):
 
         if difference > validity_seconds:
             self._generate_auth_token()
-            session.flush()
 
     def _generate_auth_token(self):
         self.auth_token = str(uuid.uuid4())
