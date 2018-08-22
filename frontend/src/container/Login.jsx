@@ -52,6 +52,8 @@ class Login extends React.Component {
     this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
   }
 
+  handleInputKeyPress = e => e.key === 'Enter' && this.handleClickSubmit()
+
   handleClickSubmit = async () => {
     const { history, dispatch, t } = this.props
     const { inputLogin, inputPassword, inputRememberMe } = this.state
@@ -142,6 +144,7 @@ class Login extends React.Component {
                         isInvalid={this.state.inputLogin.isInvalid}
                         value={this.state.inputLogin.value}
                         onChange={this.handleChangeLogin}
+                        onKeyPress={this.handleInputKeyPress}
                       />
 
                       <InputGroupText
@@ -154,6 +157,7 @@ class Login extends React.Component {
                         isInvalid={this.state.inputPassword.isInvalid}
                         value={this.state.inputPassword.value}
                         onChange={this.handleChangePassword}
+                        onKeyPress={this.handleInputKeyPress}
                       />
 
                       <div className='row align-items-center mt-4 mb-4'>
