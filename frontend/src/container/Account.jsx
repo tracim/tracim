@@ -29,18 +29,15 @@ class Account extends React.Component {
         name: 'personalData',
         menuLabel: 'Mon profil',
         active: true
-      },
-      {
+      }, {
         name: 'notification',
         menuLabel: 'Espace de travail & Notifications',
         active: false
-      },
-      {
+      }, {
         name: 'password',
         menuLabel: 'Mot de passe',
         active: false
-      },
-      {
+      }, {
         name: 'timezone',
         menuLabel: 'Fuseau Horaire',
         active: false
@@ -79,8 +76,7 @@ class Account extends React.Component {
     const subComponent = (() => {
       switch (this.state.subComponentMenu.find(({active}) => active).name) {
         case 'personalData':
-          return <PersonalData
-          />
+          return <PersonalData />
 
         // case 'calendar':
         //   return <Calendar user={this.props.user} />
@@ -92,8 +88,7 @@ class Account extends React.Component {
           />
 
         case 'password':
-          return <Password
-          />
+          return <Password />
 
         case 'timezone':
           return <Timezone timezone={this.props.timezone} onChangeTimezone={this.handleChangeTimezone} />

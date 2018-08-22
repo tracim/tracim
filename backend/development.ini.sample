@@ -35,6 +35,8 @@ retry.attempts = 3
 
 ### Global
 
+# Enable debug mode
+# debug = True
 cache_dir = %(here)s/data
 # preview generator cache directory
 preview_cache_dir = /tmp/tracim/preview/
@@ -185,6 +187,13 @@ frontend.serve = True
 # will try to get it automatically according to tracim_v2 repository
 # organisation.
 # frontend.dist_folder_path = /home/user/tracim_v2/frontend/dist
+
+### Color
+# check for color.json file in tracim_v2, check by default in tracim_v2 parent
+# dir of backend.
+# you can set a specific file path here
+# color.config_file_path = /home/user/tracim_v2/color.json
+
 
 ###
 # wsgi server configuration

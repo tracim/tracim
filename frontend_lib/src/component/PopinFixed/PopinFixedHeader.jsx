@@ -27,7 +27,7 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, customColor, faIcon, title, onClickCloseBtn } = this.props
+    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn } = this.props
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{backgroundColor: customColor}}>
@@ -42,12 +42,14 @@ class PopinFixedHeader extends React.Component {
           }
         </div>
 
-        <div
-          className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle`)}
-          onClick={this.handleClickChangeTitleBtn}
-        >
-          {this.state.editTitle ? <i className='fa fa-check' title='Valider le Titre' /> : <i className='fa fa-pencil' title='Modifier le Titre' />}
-        </div>
+        {idRoleUserWorkspace >= 2 &&
+          <div
+            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle`)}
+            onClick={this.handleClickChangeTitleBtn}
+          >
+            {this.state.editTitle ? <i className='fa fa-check' title='Valider le Titre' /> : <i className='fa fa-pencil' title='Modifier le Titre' />}
+          </div>
+        }
 
         <div
           className={classnames('wsContentGeneric__header__close', `${customClass}__header__close`)}
@@ -68,6 +70,7 @@ PopinFixedHeader.propTypes = {
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   title: PropTypes.string,
+  idRoleUserWorkspace: PropTypes.number,
   onValidateChangeTitle: PropTypes.func
 }
 
@@ -75,5 +78,6 @@ PopinFixedHeader.defaultProps = {
   customClass: '',
   customColor: '',
   title: '',
+  idRoleUserWorkspace: 1,
   onChangeTitle: () => {}
 }

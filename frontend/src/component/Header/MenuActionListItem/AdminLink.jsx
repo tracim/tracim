@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { PAGE } from '../../../helper.js'
+import { PAGE, workspaceConfig } from '../../../helper.js'
 
 const AdminLink = props => {
   return (
@@ -12,7 +12,7 @@ const AdminLink = props => {
 
         <div className='adminlink__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
           <Link className='setting__link dropdown-item' to={PAGE.ADMIN.WORKSPACE}>
-            <i className='fa fa-fw fa-space-shuttle mr-2' />
+            <i className={`fa fa-fw fa-${workspaceConfig.faIcon} mr-2`} />
             {props.t('Admin workspace')}
           </Link>
 

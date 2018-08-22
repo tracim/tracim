@@ -13,13 +13,13 @@ class AdminWorkspacePage extends React.Component {
       <PageWrapper customClass='adminWorkspacePage'>
         <PageTitle
           parentClass={'adminWorkspacePage'}
-          title={'Workspace management'}
+          title={this.props.t('Workspace management')}
         />
 
         <PageContent parentClass='adminWorkspacePage'>
 
           <div className='adminWorkspacePage__description'>
-            This page informs all workspaces of the instances
+            {this.props.t('This page list all workspaces')}
           </div>
 
           { /*
@@ -39,14 +39,26 @@ class AdminWorkspacePage extends React.Component {
             <table className='table'>
               <thead>
                 <tr>
-                  <th scope='col'>ID</th>
-                  <th scope='col'>Workspace</th>
-                  <th scope='col'>Description</th>
-                  <th scope='col'>Member's number</th>
+                  <th scope='col'>
+                    {this.props.t('ID')}
+                  </th>
+                  <th scope='col'>
+                    {this.props.t('Workspace')}
+                  </th>
+                  <th scope='col'>
+                    {this.props.t('Description')}
+                  </th>
+                  <th scope='col'>
+                    {this.props.t("Member's number")}
+                  </th>
                   { /*
-                    <th scope='col'>Calendar</th>
+                    <th scope='col'>
+                      {this.props.t('Calendar')}
+                    </th>
                   */ }
-                  <th scope='col'>Delete workspace</th>
+                  <th scope='col'>
+                    {this.props.t('Delete workspace')}
+                  </th>
                 </tr>
               </thead>
               <tbody>

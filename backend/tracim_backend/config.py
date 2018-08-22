@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
+import json
 from urllib.parse import urlparse
 
 import os
 from paste.deploy.converters import asbool
+from tracim_backend.app_models.validator import update_validators
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.utils.logger import logger
 from depot.manager import DepotManager
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.applications import Application
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_STATUS
 from tracim_backend.models.data import ActionDescription
-
 
 
 class CFG(object):
@@ -41,7 +45,36 @@ class CFG(object):
         ###
         # General
         ###
+        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
+        tracim_v2_folder = os.path.dirname(backend_folder)
+        default_color_config_file_path = os.path.join(tracim_v2_folder, 'color.json')  # nopep8
+        self.COLOR_CONFIG_FILE_PATH = settings.get(
+            'color.config_file_path', default_color_config_file_path
+        )
+        if not os.path.exists(self.COLOR_CONFIG_FILE_PATH):
+            raise Exception(
+                'ERROR: {} file does not exist. '
+                'please create it or set color.config_file_path'
+                'with a correct value'.format(self.COLOR_CONFIG_FILE_PATH)
+            )
 
+        try:
+            with open(self.COLOR_CONFIG_FILE_PATH) as json_file:
+                self.APPS_COLORS = json.load(json_file)
+        except Exception as e:
+            raise Exception(
+                'Error: {} file could not be load as json'.format(self.COLOR_CONFIG_FILE_PATH) # nopep8
+            ) from e
+
+        try:
+            self.APPS_COLORS['primary']
+        except KeyError as e:
+            raise Exception(
+                'Error: primary color is required in {} file'.format(
+                    self.COLOR_CONFIG_FILE_PATH)  # nopep8
+            ) from e
+
+        self._set_default_app()
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
         self.DEPOT_STORAGE_DIR = settings.get(
@@ -466,8 +499,6 @@ class CFG(object):
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
         # of tracim_v2 parent of both backend and frontend
-        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
-        tracim_v2_folder = os.path.dirname(backend_folder)
         frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
 
         self.FRONTEND_DIST_FOLDER_PATH = settings.get(
@@ -483,6 +514,10 @@ class CFG(object):
             )
 
     def configure_filedepot(self):
+
+        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
+        # of tracim_backend, Be careful DepotManager is a Singleton !
+
         depot_storage_name = self.DEPOT_STORAGE_NAME
         depot_storage_path = self.DEPOT_STORAGE_DIR
         depot_storage_settings = {'depot.storage_path': depot_storage_path}
@@ -490,6 +525,116 @@ class CFG(object):
             depot_storage_name,
             depot_storage_settings,
         )
+
+    def _set_default_app(self):
+        calendar = Application(
+            label='Calendar',
+            slug='calendar',
+            fa_icon='calendar',
+            is_active=False,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/calendar',
+            app_config=self
+        )
+
+        thread = Application(
+            label='Threads',
+            slug='contents/thread',
+            fa_icon='comments-o',
+            is_active=True,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=thread',
+            app_config=self
+        )
+        thread.add_content_type(
+            slug='thread',
+            label='Thread',
+            creation_label='Discuss about a topic',
+            available_statuses=CONTENT_STATUS.get_all(),
+        )
+
+        folder = Application(
+            label='Folder',
+            slug='contents/folder',
+            fa_icon='folder-open-o',
+            is_active=True,
+            config={},
+            main_route='',
+            app_config=self
+        )
+        folder.add_content_type(
+            slug='folder',
+            label='Folder',
+            creation_label='Create a folder',
+            available_statuses=CONTENT_STATUS.get_all(),
+            allow_sub_content=True,
+        )
+
+        _file = Application(
+            label='Files',
+            slug='contents/file',
+            fa_icon='paperclip',
+            is_active=True,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=file',
+            app_config=self,
+        )
+        _file.add_content_type(
+            slug='file',
+            label='File',
+            creation_label='Upload a file',
+            available_statuses=CONTENT_STATUS.get_all(),
+        )
+
+        markdownpluspage = Application(
+            label='Markdown Plus Documents',
+            # TODO - G.M - 24-05-2018 - Check label
+            slug='content/markdownpluspage',
+            fa_icon='file-code-o',
+            is_active=False,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
+            # nopep8
+            app_config=self,
+        )
+        markdownpluspage.add_content_type(
+            slug='markdownpage',
+            label='Rich Markdown File',
+            creation_label='Create a Markdown document',
+            available_statuses=CONTENT_STATUS.get_all(),
+        )
+
+        html_documents = Application(
+            label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
+            slug='contents/html-document',
+            fa_icon='file-text-o',
+            is_active=True,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
+            app_config=self
+        )
+        html_documents.add_content_type(
+            slug='html-document',
+            label='Text Document',
+            creation_label='Write a document',
+            available_statuses=CONTENT_STATUS.get_all(),
+            slug_alias=['page']
+        )
+
+        # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
+        # of tracim_backend, Be careful app_list is a global_var
+        app_list.clear()
+        app_list.extend([
+            html_documents,
+            markdownpluspage,
+            _file,
+            thread,
+            folder,
+            calendar,
+        ])
+        # TODO - G.M - 2018-08-08 - We need to update validators each time
+        # app_list is updated.
+        update_validators()
 
     class CST(object):
         ASYNC = 'ASYNC'

@@ -46,6 +46,7 @@ const PopupCreateContent = props => {
                   color: '#fdfdfd'
                 }
               }}
+              disabled={!props.contentName || props.contentName.length === 0}
             >
               {props.btnValidateLabel}
             </button>

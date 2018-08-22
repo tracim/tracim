@@ -7,6 +7,8 @@ from slugify import slugify
 from sqlalchemy.orm import Session
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
+from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_root_frontend_url
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
@@ -19,9 +21,8 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.models.workspace_menu_entries import default_workspace_menu_entry  # nopep8
-from tracim_backend.models.workspace_menu_entries import WorkspaceMenuEntry
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
+from tracim_backend.app_models.contents import CONTENT_TYPES
 
 
 class PreviewAllowedDim(object):
@@ -301,8 +302,10 @@ class RoleUpdate(object):
     def __init__(
         self,
         role: str,
+        do_notify: bool,
     ):
         self.role = role
+        self.do_notify = do_notify
 
 
 class WorkspaceMemberInvitation(object):
@@ -314,10 +317,12 @@ class WorkspaceMemberInvitation(object):
         user_id: int,
         user_email_or_public_name: str,
         role: str,
+        do_notify: str,
     ):
         self.role = role
         self.user_email_or_public_name = user_email_or_public_name
         self.user_id = user_id
+        self.do_notify = do_notify
 
 
 class WorkspaceUpdate(object):
@@ -532,7 +537,10 @@ class WorkspaceInContext(object):
         # order to not use hardcoded list
         # list should be able to change (depending on activated/disabled
         # apps)
-        return default_workspace_menu_entry(self.workspace)
+        app_api = ApplicationApi(
+            app_list
+        )
+        return app_api.get_default_workspace_menu_entry(self.workspace)
 
     @property
     def frontend_url(self):
@@ -607,6 +615,10 @@ class UserRoleWorkspaceInContext(object):
     @property
     def is_active(self) -> bool:
         return self.user.is_active
+
+    @property
+    def do_notify(self) -> bool:
+        return self.user_role.do_notify
 
     @property
     def user(self) -> UserInContext:

@@ -1,7 +1,7 @@
 #coding: utf8
 from datetime import datetime
 
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import VirtualEvent
 from tracim_backend.models import data
 

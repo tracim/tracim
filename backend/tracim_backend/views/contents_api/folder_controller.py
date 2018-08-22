@@ -25,8 +25,8 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.contents import CONTENT_TYPES
-from tracim_backend.models.contents import folder_type
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.models.revision_protection import new_revision
 
 SWAGGER_TAG__Folders_ENDPOINTS = 'Folders'
@@ -36,7 +36,7 @@ class FolderController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__Folders_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([folder_type])
+    @require_content_types([FOLDER_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedContentSchema())
     def get_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:  # nopep8
@@ -60,7 +60,7 @@ class FolderController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__Folders_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([folder_type])
+    @require_content_types([FOLDER_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(FolderContentModifySchema())
     @hapic.output_body(TextBasedContentSchema())
@@ -100,7 +100,7 @@ class FolderController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__Folders_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
-    @require_content_types([folder_type])
+    @require_content_types([FOLDER_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(TextBasedRevisionSchema(many=True))
     def get_folder_revisions(
@@ -132,7 +132,7 @@ class FolderController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__Folders_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
-    @require_content_types([folder_type])
+    @require_content_types([FOLDER_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

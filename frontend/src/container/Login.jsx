@@ -1,11 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router'
+import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
 import Cookies from 'js-cookie'
 import LoginLogo from '../component/Login/LoginLogo.jsx'
 import LoginLogoImg from '../img/logoTracimWhite.svg'
-import { postUserLogin } from '../action-creator.async.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -14,8 +13,18 @@ import Button from '../component/common/Input/Button.jsx'
 import LoginBtnForgotPw from '../component/Login/LoginBtnForgotPw.jsx'
 import {
   newFlashMessage,
-  setUserConnected
+  setUserConnected,
+  updateWorkspaceListData,
+  setWorkspaceListIsOpenInSidebar,
+  setContentTypeList,
+  setAppList
 } from '../action-creator.sync.js'
+import {
+  getAppList,
+  getContentTypeList,
+  getWorkspaceList,
+  postUserLogin
+} from '../action-creator.async.js'
 import { COOKIE, PAGE } from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
 
@@ -43,6 +52,8 @@ class Login extends React.Component {
     this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
   }
 
+  handleInputKeyPress = e => e.key === 'Enter' && this.handleClickSubmit()
+
   handleClickSubmit = async () => {
     const { history, dispatch, t } = this.props
     const { inputLogin, inputPassword, inputRememberMe } = this.state
@@ -51,11 +62,16 @@ class Login extends React.Component {
     const userAuth = btoa(`${inputLogin.value}:${inputPassword.value}`)
 
     if (fetchPostUserLogin.status === 200) {
-      dispatch(setUserConnected({
+      const loggedUser = {
         ...fetchPostUserLogin.json,
         auth: userAuth,
         logged: true
-      }))
+      }
+
+      dispatch(setUserConnected(loggedUser))
+
+      this.loadAppConfig(loggedUser)
+      this.loadWorkspaceList(loggedUser)
 
       if (inputRememberMe) {
         Cookies.set(COOKIE.USER_LOGIN, inputLogin.value, {expires: 365})
@@ -68,6 +84,36 @@ class Login extends React.Component {
       history.push(PAGE.WORKSPACE.ROOT)
     } else if (fetchPostUserLogin.status === 403) {
       dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
+    }
+  }
+
+  // @FIXME Côme - 2018/08/22 - this function is duplicated from Tracim.jsx
+  loadAppConfig = async user => {
+    const { props } = this
+
+    const fetchGetAppList = await props.dispatch(getAppList(user))
+    if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
+
+    const fetchGetContentTypeList = await props.dispatch(getContentTypeList(user))
+    if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
+  }
+
+  // @FIXME Côme - 2018/08/22 - this function is duplicated from Tracim.jsx
+  loadWorkspaceList = async user => {
+    const { props } = this
+
+    const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(user))
+
+    if (fetchGetWorkspaceList.status === 200) {
+      props.dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+
+      const idWorkspaceToOpen = (() =>
+        props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
+          ? parseInt(props.match.params.idws)
+          : fetchGetWorkspaceList.json[0].workspace_id
+      )()
+
+      props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
     }
   }
 
@@ -98,6 +144,7 @@ class Login extends React.Component {
                         isInvalid={this.state.inputLogin.isInvalid}
                         value={this.state.inputLogin.value}
                         onChange={this.handleChangeLogin}
+                        onKeyPress={this.handleInputKeyPress}
                       />
 
                       <InputGroupText
@@ -110,6 +157,7 @@ class Login extends React.Component {
                         isInvalid={this.state.inputPassword.isInvalid}
                         value={this.state.inputPassword.value}
                         onChange={this.handleChangePassword}
+                        onKeyPress={this.handleInputKeyPress}
                       />
 
                       <div className='row align-items-center mt-4 mb-4'>
@@ -118,6 +166,7 @@ class Login extends React.Component {
                             <Checkbox
                               name='inputRememberMe'
                               checked={this.state.inputRememberMe}
+                              onClickCheckbox={() => {}}
                             />
                             Se souvenir de moi
                           </div>
@@ -161,4 +210,4 @@ class Login extends React.Component {
 }
 
 const mapStateToProps = ({ user }) => ({ user })
-export default connect(mapStateToProps)(translate()(Login))
+export default withRouter(connect(mapStateToProps)(translate()(Login)))

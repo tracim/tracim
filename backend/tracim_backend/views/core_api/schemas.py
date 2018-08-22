@@ -7,11 +7,12 @@ from marshmallow.validate import Range
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
+
+from tracim_backend.app_models.contents import GlobalStatus
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import open_status
 from tracim_backend.models.auth import Group
-from tracim_backend.models.contents import GlobalStatus
-from tracim_backend.models.contents import CONTENT_STATUS
-from tracim_backend.models.contents import CONTENT_TYPES
-from tracim_backend.models.contents import open_status
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import ResetPasswordRequest
 from tracim_backend.models.context_models import ResetPasswordCheckToken
@@ -44,6 +45,7 @@ from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.app_models.validator import all_content_types_validator
 
 
 class UserDigestSchema(marshmallow.Schema):
@@ -393,7 +395,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
     content_type = marshmallow.fields.String(
         example=CONTENT_TYPES.Any_SLUG,
         default=CONTENT_TYPES.Any_SLUG,
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
+        validate=all_content_types_validator
     )
 
     @post_load
@@ -439,6 +441,12 @@ class RoleUpdateSchema(marshmallow.Schema):
     role = marshmallow.fields.String(
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+    )
+    do_notify = marshmallow.fields.Bool(
+        description='has user enabled notification for this workspace',
+        example=True,
+        default=None,
+        allow_none=True,
     )
 
     @post_load
@@ -627,6 +635,10 @@ class WorkspaceMemberSchema(marshmallow.Schema):
         WorkspaceDigestSchema(exclude=('sidebar_entries',))
     )
     is_active = marshmallow.fields.Bool()
+    do_notify = marshmallow.fields.Bool(
+        description='has user enabled notification for this workspace',
+        example=True,
+    )
 
     class Meta:
         description = 'Workspace Member information'
@@ -693,7 +705,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = marshmallow.fields.String(
         example='pagehtml',
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
+        validate=all_content_types_validator,
     )
     fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
@@ -747,7 +759,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type = marshmallow.fields.String(
         example='html-document',
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
+        validate=all_content_types_validator,
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -782,12 +794,12 @@ class ContentDigestSchema(marshmallow.Schema):
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
         example='html-document',
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
+        validate=all_content_types_validator,
     )
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
+            validate=all_content_types_validator
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
@@ -937,7 +949,7 @@ class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstra
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-document',
-            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
+            validate=all_content_types_validator,
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '

@@ -2,17 +2,15 @@
 import typing
 from enum import Enum
 
+from tracim_backend.extensions import app_list
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import ContentStatusNotExist
-from tracim_backend.models.applications import html_documents
-from tracim_backend.models.applications import _file
-from tracim_backend.models.applications import folder
-from tracim_backend.models.applications import thread
-from tracim_backend.models.applications import markdownpluspage
-
 
 ####
 # Content Status
+from tracim_backend.lib.core.application import ApplicationApi
+if typing.TYPE_CHECKING:
+    from tracim_backend.app_models.applications import Application
 
 
 class GlobalStatus(Enum):
@@ -134,60 +132,17 @@ class ContentType(object):
         self.allow_sub_content = allow_sub_content
 
 
-thread_type = ContentType(
-    slug='thread',
-    fa_icon=thread.fa_icon,
-    hexcolor=thread.hexcolor,
-    label='Thread',
-    creation_label='Discuss about a topic',
-    available_statuses=CONTENT_STATUS.get_all(),
-)
-
-file_type = ContentType(
-    slug='file',
-    fa_icon=_file.fa_icon,
-    hexcolor=_file.hexcolor,
-    label='File',
-    creation_label='Upload a file',
-    available_statuses=CONTENT_STATUS.get_all(),
-)
-
-markdownpluspage_type = ContentType(
-    slug='markdownpage',
-    fa_icon=markdownpluspage.fa_icon,
-    hexcolor=markdownpluspage.hexcolor,
-    label='Rich Markdown File',
-    creation_label='Create a Markdown document',
-    available_statuses=CONTENT_STATUS.get_all(),
-)
-
-html_documents_type = ContentType(
-    slug='html-document',
-    fa_icon=html_documents.fa_icon,
-    hexcolor=html_documents.hexcolor,
-    label='Text Document',
-    creation_label='Write a document',
-    available_statuses=CONTENT_STATUS.get_all(),
-    slug_alias=['page']
-)
-
-# TODO - G.M - 31-05-2018 - Set Better folder params
-folder_type = ContentType(
-    slug='folder',
-    fa_icon=folder.fa_icon,
-    hexcolor=folder.hexcolor,
-    label='Folder',
-    creation_label='Create a folder',
-    available_statuses=CONTENT_STATUS.get_all(),
-    allow_sub_content=True,
-)
-
+THREAD_TYPE = 'thread'
+FILE_TYPE = 'file'
+MARKDOWNPLUSPAGE_TYPE = 'markdownpage'
+HTML_DOCUMENTS_TYPE = 'html-document'
+FOLDER_TYPE = 'folder'
 
 # TODO - G.M - 31-05-2018 - Set Better Event params
 event_type = ContentType(
     slug='event',
-    fa_icon=thread.fa_icon,
-    hexcolor=thread.hexcolor,
+    fa_icon='',
+    hexcolor='',
     label='Event',
     creation_label='Event',
     available_statuses=CONTENT_STATUS.get_all(),
@@ -196,8 +151,8 @@ event_type = ContentType(
 # TODO - G.M - 31-05-2018 - Set Better Event params
 comment_type = ContentType(
     slug='comment',
-    fa_icon=thread.fa_icon,
-    hexcolor=thread.hexcolor,
+    fa_icon='',
+    hexcolor='',
     label='Comment',
     creation_label='Comment',
     available_statuses=CONTENT_STATUS.get_all(),
@@ -209,18 +164,35 @@ class ContentTypeList(object):
     ContentType List
     """
     Any_SLUG = 'any'
-    Folder = folder_type
     Comment = comment_type
     Event = event_type
-    File = file_type
-    Page = html_documents_type
-    Thread = thread_type
 
-    def __init__(self, extend_content_status: typing.List[ContentType]):
-        self._content_types = [self.Folder]
-        self._content_types.extend(extend_content_status)
+    @property
+    def Folder(self):
+        return self.get_one_by_slug(FOLDER_TYPE)
+
+    @property
+    def File(self):
+        return self.get_one_by_slug(FILE_TYPE)
+
+    @property
+    def Page(self):
+        return self.get_one_by_slug(HTML_DOCUMENTS_TYPE)
+
+    @property
+    def Thread(self):
+        return self.get_one_by_slug(THREAD_TYPE)
+
+    def __init__(self, app_list: typing.List['Application']):
+        self.app_list = app_list
         self._special_contents_types = [self.Comment]
         self._extra_slugs = [self.Any_SLUG]
+
+    @property
+    def _content_types(self):
+        app_api = ApplicationApi(self.app_list)
+        content_types = app_api.get_content_types()
+        return content_types
 
     def get_one_by_slug(self, slug: str) -> ContentType:
         """
@@ -235,21 +207,24 @@ class ContentTypeList(object):
                 return item
         raise ContentTypeNotExist()
 
-    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+    def restricted_allowed_types_slug(self) -> typing.List[str]:
         """
-        Return restricted list of content_type:
-        dont return special content_type like  comment, don't return
+        Return restricted list of content_type: don't return
         "any" slug, dont return content type slug alias , don't return event.
         Useful to restrict slug param in schema.
         """
         allowed_type_slug = [contents_type.slug for contents_type in self._content_types]  # nopep8
         return allowed_type_slug
 
-    def extended_endpoint_allowed_types_slug(self) -> typing.List[str]:
-        allowed_types_slug = self.endpoint_allowed_types_slug().copy()
-        for content_type in self._special_contents_types:
-            allowed_types_slug.append(content_type.slug)
-        return allowed_types_slug
+    def endpoint_allowed_types_slug(self) -> typing.List[str]:
+        """
+        Same as restricted_allowed_types_slug but with special content_type
+        included like comments.
+        """
+        content_types = self._content_types
+        content_types.extend(self._special_contents_types)
+        allowed_type_slug = [contents_type.slug for contents_type in content_types]  # nopep8
+        return allowed_type_slug
 
     def query_allowed_types_slugs(self) -> typing.List[str]:
         """
@@ -258,19 +233,19 @@ class ContentTypeList(object):
         Usefull allowed value to perform query to database.
         """
         allowed_types_slug = []
-        for content_type in self._content_types:
+        content_types = self._content_types
+        content_types.extend(self._special_contents_types)
+        for content_type in content_types:
             allowed_types_slug.append(content_type.slug)
             if content_type.slug_alias:
                 allowed_types_slug.extend(content_type.slug_alias)
-        for content_type in self._special_contents_types:
-            allowed_types_slug.append(content_type.slug)
         allowed_types_slug.extend(self._extra_slugs)
         return allowed_types_slug
 
     def default_allowed_content_properties(self, slug) -> dict:
         content_type = self.get_one_by_slug(slug)
         if content_type.allow_sub_content:
-            sub_content_allowed = self.extended_endpoint_allowed_types_slug()
+            sub_content_allowed = self.endpoint_allowed_types_slug()
         else:
             sub_content_allowed = [self.Comment.slug]
 
@@ -280,12 +255,4 @@ class ContentTypeList(object):
         return properties_dict
 
 
-CONTENT_TYPES = ContentTypeList(
-    [
-        thread_type,
-        file_type,
-        # TODO - G.M - 2018-08-02 - Restore markdown page content
-        #    markdownpluspage_type,
-        html_documents_type,
-    ]
-)
+CONTENT_TYPES = ContentTypeList(app_list)

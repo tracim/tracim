@@ -5,7 +5,7 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import TracimRequest
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.views.controllers import Controller

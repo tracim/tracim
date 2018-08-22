@@ -33,8 +33,8 @@ describe('operation :: workspace > create_new > html-document', function () {
     it ('all content > header button ', function () {
         var titre2='all content button'
         cy.url().should('include', '/workspaces/1/contents')
-        cy.get('.workspace__header__btnaddcontent').should('be.visible')
-        cy.get('.workspace__header__btnaddcontent').click()
+        cy.get('.workspace__header__btnaddcontent__label').should('be.visible')
+        cy.get('.workspace__header__btnaddcontent__label').click()
         cy.get('.workspace__header__btnaddcontent__setting div:nth-child(4).subdropdown__link').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
