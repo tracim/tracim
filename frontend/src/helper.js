@@ -44,33 +44,71 @@ export const PAGE = {
 }
 
 export const ROLE = [{
-  id: 0,
+  id: 1,
   slug: 'reader',
   faIcon: 'eye',
-  hexcolor: '#15D948',
+  hexcolor: '#15d948',
   label: 'Reader'
 }, {
-  id: 1,
+  id: 2,
   slug: 'contributor',
   faIcon: 'pencil',
-  hexcolor: '#3145F7',
+  hexcolor: '#3145f7',
   label: 'Contributor'
 }, {
-  id: 2,
+  id: 4,
   slug: 'content-manager',
   faIcon: 'graduation-cap',
   hexcolor: '#f2af2d',
   label: 'Content manager'
 }, {
-  id: 3,
+  id: 8,
   slug: 'workspace-manager',
   faIcon: 'gavel',
   hexcolor: '#ed0007',
   label: 'Workspace manager'
 }]
 
+export const findIdRoleUserWorkspace = (idUser, memberList, roleList) => {
+  const myself = memberList.find(u => u.id === idUser) || {role: 'reader'}
+  return (roleList.find(r => myself.role === r.slug) || {id: 1}).id
+}
+
+// Côme - 2018/08/21 - useful ?
+export const ROLE2 = {
+  reader: {
+    id: 1,
+    sluf: 'reader',
+    faIcon: 'eye',
+    hexcolor: '#15D948',
+    label: 'Reader'
+  },
+  contributor: {
+    id: 2,
+    slug: 'contributor',
+    faIcon: 'pencil',
+    hexcolor: '#3145f7',
+    label: 'Contributor'
+  },
+  contentManager: {
+    id: 4,
+    slug: 'content-manager',
+    faIcon: 'graduation-cap',
+    hexcolor: '#f2af2d',
+    label: 'Content manager'
+  },
+  workspaceManager: {
+    id: 8,
+    slug: 'workspace-manager',
+    faIcon: 'gavel',
+    hexcolor: '#ed0007',
+    label: 'Workspace manager'
+  }
+}
+
 export const PROFILE = {
   ADMINISTRATOR: 'administrators',
+  MANAGER: 'managers',
   USER: 'users'
 }
 

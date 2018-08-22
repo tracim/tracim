@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
-import { PAGE } from '../helper.js'
+import { PAGE, ROLE, findIdRoleUserWorkspace } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -16,6 +16,7 @@ import {
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceContentList,
+  getWorkspaceMemberList,
   getFolderContent,
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted
@@ -24,7 +25,8 @@ import {
   newFlashMessage,
   setWorkspaceContentList,
   setWorkspaceContentArchived,
-  setWorkspaceContentDeleted
+  setWorkspaceContentDeleted,
+  setWorkspaceMemberList
 } from '../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -101,12 +103,16 @@ class WorkspaceContent extends React.Component {
   }
 
   loadContentList = async idWorkspace => {
-    const { user, location, dispatch } = this.props
+    const { user, dispatch } = this.props
 
     const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
+    const wsMember = await dispatch(getWorkspaceMemberList(user, idWorkspace))
 
-    if (wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json, qs.parse(location.search).type))
+    if (await wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
+
+    if (await wsMember.status === 200) dispatch(setWorkspaceMemberList(wsMember.json))
+    else dispatch(newFlashMessage('Error while loading members list', 'warning'))
   }
 
   handleClickContentItem = content => {
@@ -171,7 +177,7 @@ class WorkspaceContent extends React.Component {
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
   render () {
-    const { workspaceContentList, contentType } = this.props
+    const { user, currentWorkspace, workspaceContentList, contentType } = this.props
 
     const filterWorkspaceContent = (contentList, filter) => {
       return filter.length === 0
@@ -187,6 +193,8 @@ class WorkspaceContent extends React.Component {
     const filteredWorkspaceContentList = workspaceContentList.length > 0
       ? filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
+
+    const idRoleUserWorkspace = findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE)
 
     return (
       <div className='WorkspaceContent' style={{width: '100%'}}>
@@ -212,12 +220,14 @@ class WorkspaceContent extends React.Component {
             title='Liste des Contenus'
             subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
-            <DropdownCreateButton
-              parentClass='workspace__header__btnaddcontent'
-              idFolder={null} // null because it is workspace root content
-              onClickCreateContent={this.handleClickCreateContent}
-              availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
-            />
+            {idRoleUserWorkspace >= 2 &&
+              <DropdownCreateButton
+                parentClass='workspace__header__btnaddcontent'
+                idFolder={null} // null because it is workspace root content
+                onClickCreateContent={this.handleClickCreateContent}
+                availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+              />
+            }
           </PageTitle>
 
           <PageContent parentClass='workspace__content'>
@@ -230,6 +240,7 @@ class WorkspaceContent extends React.Component {
                     availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
                     folderData={c}
                     onClickItem={this.handleClickContentItem}
+                    idRoleUserWorkspace={idRoleUserWorkspace}
                     onClickExtendedAction={{
                       edit: this.handleClickEditContentItem,
                       move: this.handleClickMoveContentItem,
@@ -251,6 +262,7 @@ class WorkspaceContent extends React.Component {
                     statusSlug={c.statusSlug}
                     contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
                     onClickItem={() => this.handleClickContentItem(c)}
+                    idRoleUserWorkspace={idRoleUserWorkspace}
                     onClickExtendedAction={{
                       edit: e => this.handleClickEditContentItem(e, c),
                       move: e => this.handleClickMoveContentItem(e, c),
@@ -266,12 +278,14 @@ class WorkspaceContent extends React.Component {
               )}
             </div>
 
-            <DropdownCreateButton
-              customClass='workspace__content__button'
-              idFolder={null}
-              onClickCreateContent={this.handleClickCreateContent}
-              availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
-            />
+            {idRoleUserWorkspace >= 2 &&
+              <DropdownCreateButton
+                customClass='workspace__content__button'
+                idFolder={null}
+                onClickCreateContent={this.handleClickCreateContent}
+                availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+              />
+            }
           </PageContent>
 
         </PageWrapper>
@@ -280,5 +294,7 @@ class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceContentList, workspaceList, contentType }) => ({ user, workspaceContentList, workspaceList, contentType })
+const mapStateToProps = ({ user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
+  user, currentWorkspace, workspaceContentList, workspaceList, contentType
+})
 export default withRouter(connect(mapStateToProps)(appFactory(WorkspaceContent)))

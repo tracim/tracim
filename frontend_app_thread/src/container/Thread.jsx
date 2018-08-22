@@ -270,6 +270,7 @@ class Thread extends React.Component {
           customColor={config.hexcolor}
           faIcon={config.faIcon}
           title={content.label}
+          idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
         />
@@ -280,19 +281,23 @@ class Thread extends React.Component {
           i18n={i18n}
         >
           <div className='justify-content-end'>
-            <SelectStatus
-              selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-              availableStatus={config.availableStatuses}
-              onChangeStatus={this.handleChangeStatus}
-              disabled={false}
-            />
+            {loggedUser.idRoleUserWorkspace >= 2 &&
+              <SelectStatus
+                selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
+                availableStatus={config.availableStatuses}
+                onChangeStatus={this.handleChangeStatus}
+                disabled={false}
+              />
+            }
 
-            <ArchiveDeleteContent
-              customColor={config.hexcolor}
-              onClickArchiveBtn={this.handleClickArchive}
-              onClickDeleteBtn={this.handleClickDelete}
-              disabled={false}
-            />
+            {loggedUser.idRoleUserWorkspace >= 4 &&
+              <ArchiveDeleteContent
+                customColor={config.hexcolor}
+                onClickArchiveBtn={this.handleClickArchive}
+                onClickDeleteBtn={this.handleClickDelete}
+                disabled={false}
+              />
+            }
           </div>
         </PopinFixedOption>
 

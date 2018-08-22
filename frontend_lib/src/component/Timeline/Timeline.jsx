@@ -105,65 +105,67 @@ class Timeline extends React.Component {
             <li style={{visibility: 'hidden'}} ref={el => { this.timelineBottom = el }} />
           </ul>
 
-          <form className={classnames(`${props.customClass}__texteditor`, 'timeline__body__texteditor')}>
-            <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
-              <textarea
-                id='wysiwygTimelineComment'
-                placeholder='Votre message ...'
-                value={props.newComment}
-                onChange={props.onChangeNewComment}
-                disabled={props.disableComment}
-              />
-            </div>
-
-            <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__body__texteditor__wrapper')}>
-              <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__body__texteditor__advancedtext')}>
-                <button
-                  type='button'
-                  className={classnames(
-                    `${props.customClass}__texteditor__advancedtext__btn timeline__body__texteditor__advancedtext__btn btn`
-                  )}
-                  onClick={props.onClickWysiwygBtn}
+          {props.loggedUser.idRoleUserWorkspace >= 2 &&
+            <form className={classnames(`${props.customClass}__texteditor`, 'timeline__body__texteditor')}>
+              <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
+                <textarea
+                  id='wysiwygTimelineComment'
+                  placeholder='Votre message ...'
+                  value={props.newComment}
+                  onChange={props.onChangeNewComment}
                   disabled={props.disableComment}
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: '#333',
-                    borderColor: props.customColor,
-                    ':hover': {
+                />
+              </div>
+
+              <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__body__texteditor__wrapper')}>
+                <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__body__texteditor__advancedtext')}>
+                  <button
+                    type='button'
+                    className={classnames(
+                      `${props.customClass}__texteditor__advancedtext__btn timeline__body__texteditor__advancedtext__btn btn`
+                    )}
+                    onClick={props.onClickWysiwygBtn}
+                    disabled={props.disableComment}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: '#333',
+                      borderColor: props.customColor,
+                      ':hover': {
+                        backgroundColor: props.customColor,
+                        color: '#fdfdfd'
+                      }
+                    }}
+                    key={'timeline__comment__advancedtext'}
+                  >
+                    {props.wysiwyg ? 'Texte simple' : 'Texte riche'}
+                  </button>
+                </div>
+
+                <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__body__texteditor__submit')}>
+                  <button
+                    type='button'
+                    className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__body__texteditor__submit__btn btn')}
+                    onClick={props.onClickValidateNewCommentBtn}
+                    disabled={props.disableComment}
+                    style={{
                       backgroundColor: props.customColor,
-                      color: '#fdfdfd'
-                    }
-                  }}
-                  key={'timeline__comment__advancedtext'}
-                >
-                  {props.wysiwyg ? 'Texte simple' : 'Texte riche'}
-                </button>
+                      color: '#fdfdfd',
+                      ':hover': {
+                        backgroundColor: color(props.customColor).darken(0.15).hexString()
+                      }
+                    }}
+                    key={'timeline__comment__send'}
+                  >
+                    Envoyer
+                    <div
+                      className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__body__texteditor__submit__btn__icon')}>
+                      <i className='fa fa-paper-plane-o' />
+                    </div>
+                  </button>
+                </div>
               </div>
-
-              <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__body__texteditor__submit')}>
-                <button
-                  type='button'
-                  className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__body__texteditor__submit__btn btn')}
-                  onClick={props.onClickValidateNewCommentBtn}
-                  disabled={props.disableComment}
-                  style={{
-                    backgroundColor: props.customColor,
-                    color: '#fdfdfd',
-                    ':hover': {
-                      backgroundColor: color(props.customColor).darken(0.15).hexString()
-                    }
-                  }}
-                  key={'timeline__comment__send'}
-                >
-                  Envoyer
-                  <div
-                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__body__texteditor__submit__btn__icon')}>
-                    <i className='fa fa-paper-plane-o' />
-                  </div>
-                </button>
-              </div>
-            </div>
-          </form>
+            </form>
+          }
         </div>
       </div>
     )
@@ -200,7 +202,8 @@ Timeline.defaultProps = {
   loggedUser: {
     id: '',
     name: '',
-    avatar: ''
+    avatar: '',
+    idRoleUserWorkspace: 1
   },
   timelineData: [],
   wysiwyg: false,
