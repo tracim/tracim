@@ -44,7 +44,7 @@ export class MemberList extends React.Component {
               <div>
                 <ul className='memberlist__list'>
                   {props.memberList.map(m =>
-                    <li className='memberlist__list__item' key={m.id}>
+                    <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
                         <img src={m.avatarUrl} />
                       </div>
@@ -59,7 +59,7 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      <div className='memberlist__list__item__delete'>
+                      <div className='memberlist__list__item__delete primaryColorFontHover'>
                         <i className='fa fa-trash-o' />
                       </div>
                     </li>
@@ -74,7 +74,7 @@ export class MemberList extends React.Component {
                       </div>
                     </div>
 
-                    <div className='memberlist__btnadd__button__text'>
+                    <div className='memberlist__btnadd__button__text primaryColorFontHover'>
                       {props.t('Add a member')}
                     </div>
                   </div>
@@ -179,7 +179,10 @@ export class MemberList extends React.Component {
                 </div>
 
                 <div className='memberlist__form__submitbtn'>
-                  <button className='btn btn-outline-primary' onClick={this.handleClickBtnValidate}>
+                  <button
+                    className='btn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                    onClick={this.handleClickBtnValidate}
+                  >
                     {props.t('Validate')}
                   </button>
                 </div>

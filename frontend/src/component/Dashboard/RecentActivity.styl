@@ -15,7 +15,10 @@
     &__allread
       padding 10px 25px
       font-size 18px
+      background-color transparent
       cursor pointer
+      &:hover
+        color off-white
   &__workspace
     display flex
     align-items center
@@ -26,11 +29,11 @@
     &.read
       font-weight normal
     &:hover
-      background-color fourthColor
-    &:nth-child(even)
-      background-color grey-hover
-      &:hover
-        background-color fourthColor
+      color off-white
+    &:nth-child(even):not(:hover)
+      background-color lightGrey
+      // &:hover
+      //   background-color fourthColor
     &__icon
       margin 0 25px
       font-size 25px
@@ -40,7 +43,10 @@
     &__btn
       margin 15px
       padding 10px 25px
+      background-color transparent
       cursor pointer
+      &:hover
+        color off-white
 
 
 /**** MEDIAQUERIES ****/

@@ -6,7 +6,7 @@ export const MoreInfo = props =>
   <div className='moreinfo'>
     <div className='moreinfo__webdav genericBtnInfoDashboard'>
       <div
-        className='moreinfo__webdav__btn genericBtnInfoDashboard__btn primaryColorBorderLighten primaryColorFontLighten'
+        className='moreinfo__webdav__btn genericBtnInfoDashboard__btn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
         onClick={props.onClickToggleWebdav}
       >
         <div className='moreinfo__webdav__btn__icon genericBtnInfoDashboard__btn__icon'>

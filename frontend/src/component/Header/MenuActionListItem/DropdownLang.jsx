@@ -9,7 +9,7 @@ const DropdownLang = props => {
       <div className='header__menu__rightside__itemlanguage__languagedropdown dropdown'>
         <button
           type='button'
-          className='languagedropdown__btnlanguage btnnavbar btn btn-outline-primary dropdown-toggle'
+          className='languagedropdown__btnlanguage btnnavbar btn primaryColorBorder dropdown-toggle'
           id='headerDropdownMenuButton'
           data-toggle='dropdown'
           aria-haspopup='true'
@@ -19,7 +19,7 @@ const DropdownLang = props => {
         </button>
         <div className='languagedropdown__subdropdown dropdown-menu' aria-labelledby='headerDropdownMenuButton'>
           { props.langList.filter(l => l.id !== props.idLangActive).map(l =>
-            <div className='subdropdown__link dropdown-item' onClick={() => props.onChangeLang(l.id)} key={l.id}>
+            <div className='subdropdown__link primaryColorBgLightenHover dropdown-item' onClick={() => props.onChangeLang(l.id)} key={l.id}>
               <img className='subdropdown__flag' src={l.icon} />
               { l.label }
             </div>

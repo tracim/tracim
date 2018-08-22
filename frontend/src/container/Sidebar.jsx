@@ -134,7 +134,7 @@ class Sidebar extends React.Component {
 
           <div className='sidebar__content__btnnewworkspace'>
             <button
-              className='sidebar__content__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'
+              className='sidebar__content__btnnewworkspace__btn btn primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'
               onClick={this.handleClickNewWorkspace}
             >
               {t('Create a workspace')}

@@ -20,6 +20,10 @@
       display flex
       border-bottom 1px solid grey
       padding 10px 15px
+      &:hover > .memberlist__list__item__info
+        color off-white
+      &:hover > .memberlist__list__item__delete
+        color off-white
       &__avatar
         margin-right 20px
         & > img
@@ -133,7 +137,10 @@
       justify-content flex-end
       & > button
         padding 8px 30px
+        background-color transparent
         cursor pointer
+        &:hover
+          color off-white
 
 /***** MEDIAQUERIES *****/
 

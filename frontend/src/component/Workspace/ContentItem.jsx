@@ -8,7 +8,7 @@ const ContentItem = props => {
 
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug)
   return (
-    <div className={classnames('content', 'align-items-center', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
+    <div className={classnames('content', 'align-items-center', 'primaryColorBgLightenHover', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
@@ -23,9 +23,11 @@ const ContentItem = props => {
         <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
       </div>
 
-      <div className={classnames('content__status')} style={{color: status.hexcolor}}>
-        <div className='content__status__text d-none d-xl-flex align-items-center justify-content-between'>
+      <div className={classnames('content__status d-none d-xl-flex align-items-center justify-content-between')} style={{color: status.hexcolor}}>
+        <div className='content__status__text'>
           {status.label}
+        </div>
+        <div className='content__status__icon'>
           <i className={`fa fa-fw fa-${status.faIcon}`} />
         </div>
       </div>

@@ -9,54 +9,54 @@ a
   &__content
     height 100%
 
-.btn-primary
-  background-color thirdColor
-  border-color secondColor
-  cursor pointer
-  &:hover, &:focus, &:active, &:visited, &:focus-within
-    background-color hover-button
-    border-color hover-button
-    box-shadow none
-    outline none
+// .btn-primary
+//   background-color thirdColor
+//   border-color secondColor
+//   cursor pointer
+//   &:hover, &:focus, &:active, &:visited, &:focus-within
+//     background-color hover-button
+//     border-color hover-button
+//     box-shadow none
+//     outline none
 
-.btn-outline-primary
-  color fontColor
-  border-color secondColor
-  cursor pointer
-  &:hover, &:focus, &:active, &:visited, &:focus-within
-    background-color hover-button
-    border-color hover-button
-    box-shadow none
-    outline none
+// .btn-outline-primary
+//   color fontColor
+//   border-color secondColor
+//   cursor pointer
+//   &:hover, &:focus, &:active, &:visited, &:focus-within
+//     background-color hover-button
+//     border-color hover-button
+//     box-shadow none
+//     outline none
 
-.btn-primary.active, .btn-primary:active, .show>.btn-primary.dropdown-toggle
-  background-color hover-button
-  border-color hover-button
-  box-shadow none
+// .btn-primary.active, .btn-primary:active, .show>.btn-primary.dropdown-toggle
+//   background-color hover-button
+//   border-color hover-button
+//   box-shadow none
 
-.btn-outline-primary.active, .btn-outline-primary:active, .show>.btn-outline-primary.dropdown-toggle
-  background-color hover-button
-  border-color hover-button
-  box-shadow none
-  outline none
+// .btn-outline-primary.active, .btn-outline-primary:active, .show>.btn-outline-primary.dropdown-toggle
+//   background-color hover-button
+//   border-color hover-button
+//   box-shadow none
+//   outline none
 
-.dropdown-item
-  &:hover, &:focus
-    background-color thirdColor
-    color off-white
-    box-shadow none
-    outline none
+// .dropdown-item
+//   &:hover, &:focus
+//     background-color thirdColor
+//     color off-white
+//     box-shadow none
+//     outline none
 
-.btn-primary.disabled, .btn-primary:disabled
-  background-color thirdColor
-  border-color transparent
-  color off-white
+// .btn-primary.disabled, .btn-primary:disabled
+//   background-color thirdColor
+//   border-color transparent
+//   color off-white
 
-.btn-outline-primary.disabled, .btn-outline-primary:disabled
-  color fontColor
+// .btn-outline-primary.disabled, .btn-outline-primary:disabled
+//   color fontColor
 
-.btn.disabled, .btn:disabled
-  cursor not-allowed
+// .btn.disabled, .btn:disabled
+//   cursor not-allowed
 
 .sidebarpagecontainer
   display flex
@@ -119,8 +119,9 @@ a
   margin-left 10px
   &__label
     padding 10px 65px
-    background-color thirdColor
     cursor pointer
+    &:focus
+      box-shadow none
     &__text
       display inline-block
       color white
@@ -196,7 +197,6 @@ a
 .subTitle
   font-size 20px
   font-weight 500
-  color thirdColor
 
 .genericBtnInfoDashboard
   &__btn
@@ -208,7 +208,6 @@ a
     padding 15px 25px
     cursor pointer
     &:hover, &:focus
-      background-color thirdColor
       color white
     &__icon
       margin-right 20px
