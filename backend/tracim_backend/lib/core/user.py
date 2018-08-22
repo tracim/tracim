@@ -486,7 +486,6 @@ class UserApi(object):
         # Check if this is already needed with
         # new auth system
         created_user.ensure_auth_token(
-            session=self._session,
             validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY
         )
 
