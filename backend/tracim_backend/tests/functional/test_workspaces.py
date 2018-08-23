@@ -980,7 +980,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': 2,
             'user_email_or_public_name': None,
             'role': 'content-manager',
-            'do_notify': False,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1023,7 +1022,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
             'role': 'content-manager',
-            'do_notify': 'True',
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1036,7 +1034,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is False
         assert user_role_found['email_sent'] is False
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -1066,7 +1064,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'Lawrence L.',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1079,7 +1076,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is False
         assert user_role_found['email_sent'] is False
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -1109,7 +1106,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': None,
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1134,7 +1130,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': 47,
             'user_email_or_public_name': None,
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1159,7 +1154,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'nothing@nothing.nothing',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1173,7 +1167,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is False
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members',
                                status=200).json_body  # nopep8
@@ -1205,10 +1199,10 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['role'] == 'workspace-manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
+        assert user_role['do_notify'] is True
         # update workspace role
         params = {
             'role': 'content-manager',
-            'do_notify': False,
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/1/members/1',
@@ -1224,7 +1218,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert len(res) == 1
         user_role = res[0]
         assert user_role['role'] == 'content-manager'
-        assert user_role['do_notify'] is False
+        assert user_role['do_notify'] is True
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
 
@@ -1367,7 +1361,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'bob@bob.bob',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1381,7 +1374,7 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is True
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
@@ -1418,7 +1411,6 @@ class TestUserInvitationWithMailActivatedASync(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'bob@bob.bob',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
