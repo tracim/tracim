@@ -433,7 +433,7 @@ class EmailManager(object):
         logger.info(self, 'Sending asynchronous email to 1 user ({0})'.format(
             user.email,
         ))
-
+        translator = Translator(self.config, default_lang=user.lang)
         async_email_sender = EmailSender(
             self.config,
             self._smtp_config,
@@ -460,12 +460,14 @@ class EmailManager(object):
         }
         body_text = self._render_template(
             mako_template_filepath=text_template_file_path,
-            context=context
+            context=context,
+            translator=translator,
         )
 
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path,
             context=context,
+            translator=translator,
         )
 
         part1 = MIMEText(body_text, 'plain', 'utf-8')
