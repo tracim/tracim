@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.utils import password_generator
 
 try:  # Python 3.5+
@@ -458,6 +459,60 @@ class UserController(Controller):
         api.mark_read__workspace(request.current_workspace)
         return
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserWorkspaceIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def enable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        enable workspace notification
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        wapi = WorkspaceApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        workspace = wapi.get_one(hapic_data.path.workspace_id)
+        wapi.enable_notifications(request.candidate_user, workspace)
+        rapi = RoleApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        role = rapi.get_one(request.candidate_user.user_id, workspace.workspace_id)
+        wapi.save(workspace)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @require_same_user_or_profile(Group.TIM_ADMIN)
+    @hapic.input_path(UserWorkspaceIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
+    def disable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        disable workspace notification
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        wapi = WorkspaceApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        workspace = wapi.get_one(hapic_data.path.workspace_id)
+        wapi.disable_notifications(request.candidate_user, workspace)
+        wapi.save(workspace)
+        return
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -532,3 +587,11 @@ class UserController(Controller):
         # set workspace as read
         configurator.add_route('read_workspace', '/users/{user_id}/workspaces/{workspace_id}/read', request_method='PUT')  # nopep8
         configurator.add_view(self.set_workspace_as_read, route_name='read_workspace')  # nopep8
+
+        # enable workspace notification
+        configurator.add_route('enable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/notify', request_method='PUT')  # nopep8
+        configurator.add_view(self.enable_workspace_notification, route_name='enable_workspace_notification')  # nopep8
+
+        # enable workspace notification
+        configurator.add_route('disable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/unnotify', request_method='PUT')  # nopep8
+        configurator.add_view(self.disable_workspace_notification, route_name='disable_workspace_notification')  # nopep8
