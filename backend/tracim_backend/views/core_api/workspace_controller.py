@@ -18,6 +18,7 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.lib.utils.authorization import require_same_user_or_profile
 from tracim_backend.lib.utils.authorization import require_profile_or_other_profile_with_workspace_role
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.models import Group
@@ -75,6 +76,26 @@ class WorkspaceController(Controller):
             config=app_config,
         )
         return wapi.get_workspace_with_context(request.current_workspace)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
+    @require_profile(Group.TIM_ADMIN)
+    @hapic.output_body(WorkspaceSchema(many=True), )
+    def workspaces(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get list of all workspaces
+        """
+        app_config = request.registry.settings['CFG']
+        wapi = WorkspaceApi(
+            current_user=request.current_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+
+        workspaces = wapi.get_all()
+        return [
+            wapi.get_workspace_with_context(workspace)
+            for workspace in workspaces
+        ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -664,6 +685,9 @@ class WorkspaceController(Controller):
         pyramid configurator for this controller
         """
 
+        # Workspaces
+        configurator.add_route('workspaces', '/workspaces', request_method='GET')  # nopep8
+        configurator.add_view(self.workspaces, route_name='workspaces')
         # Workspace
         configurator.add_route('workspace', '/workspaces/{workspace_id}', request_method='GET')  # nopep8
         configurator.add_view(self.workspace, route_name='workspace')

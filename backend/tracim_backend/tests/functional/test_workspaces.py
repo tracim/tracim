@@ -875,6 +875,106 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
 
+class TestWorkspacesEndpoints(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces
+    """
+    fixtures = [BaseFixture]
+
+    def test_api__get_workspaces__ok_200__nominal_case(self):
+        """
+        Check obtain all workspaces reachables for user with user auth.
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        workspace_api = WorkspaceApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config,
+        )
+        workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.create_workspace('test2', save_now=True)  # nopep8
+        workspace_api.create_workspace('test3', save_now=True)  # nopep8
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces', status=200)
+        res = res.json_body
+        assert len(res) == 3
+        workspace = res[0]
+        assert workspace['label'] == 'test'
+        assert workspace['slug'] == 'test'
+        workspace = res[1]
+        assert workspace['label'] == 'test2'
+        assert workspace['slug'] == 'test2'
+        workspace = res[2]
+        assert workspace['label'] == 'test3'
+        assert workspace['slug'] == 'test3'
+
+    def test_api__get_workspaces__err_403__unallowed_user(self):
+        """
+        Check obtain all workspaces reachables for one user
+        with another non-admin user auth.
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test',
+                                do_save=True, do_notify=False,
+                                groups=groups)  # nopep8
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces', status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api__get_workspaces__err_401__unregistered_user(self):
+        """
+        Check obtain all workspaces reachables for one user
+        without correct user auth (user unregistered).
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+
 class TestWorkspaceMembersEndpoint(FunctionalTest):
     """
     Tests for /api/v2/workspaces/{workspace_id}/members endpoint
