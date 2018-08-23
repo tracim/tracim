@@ -194,6 +194,32 @@ class WorkspaceController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @hapic.input_path(WorkspaceAndUserIdPathSchema())
+    @hapic.output_body(WorkspaceMemberSchema())
+    def workspaces_member_role(
+            self,
+            context,
+            request: TracimRequest,
+            hapic_data=None
+    ) -> UserRoleWorkspaceInContext:
+        """
+        Get role of user in workspace
+        """
+        app_config = request.registry.settings['CFG']
+        rapi = RoleApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+
+        role = rapi.get_one(
+            user_id=hapic_data.path.user_id,
+            workspace_id=hapic_data.path.workspace_id,
+        )
+        return rapi.get_user_role_workspace_with_context(role)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
@@ -655,6 +681,9 @@ class WorkspaceController(Controller):
         # Workspace Members (Roles)
         configurator.add_route('workspace_members', '/workspaces/{workspace_id}/members', request_method='GET')  # nopep8
         configurator.add_view(self.workspaces_members, route_name='workspace_members')  # nopep8
+        # Workspace Members (Role) Individual
+        configurator.add_route('workspace_member_role', '/workspaces/{workspace_id}/members/{user_id}', request_method='GET')  # nopep8
+        configurator.add_view(self.workspaces_member_role, route_name='workspace_member_role')  # nopep8
         # Update Workspace Members roles
         configurator.add_route('update_workspace_member', '/workspaces/{workspace_id}/members/{user_id}', request_method='PUT')  # nopep8
         configurator.add_view(self.update_workspaces_members_role, route_name='update_workspace_member')  # nopep8
