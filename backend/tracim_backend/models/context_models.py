@@ -82,9 +82,10 @@ class UserInfos(object):
     """
     Just some user infos
     """
-    def __init__(self, timezone: str, public_name: str) -> None:
+    def __init__(self, timezone: str, public_name: str, lang: str) -> None:
         self.timezone = timezone
         self.public_name = public_name
+        self.lang = lang
 
 
 class UserProfile(object):
@@ -106,6 +107,7 @@ class UserCreation(object):
             public_name: str = None,
             timezone: str = None,
             profile: str = None,
+            lang: str = None,
             email_notification: bool = True,
     ) -> None:
         self.email = email
@@ -114,6 +116,7 @@ class UserCreation(object):
         self.password = password or password_generator()
         self.public_name = public_name or None
         self.timezone = timezone or ''
+        self.lang = lang or None
         self.profile = profile or Group.TIM_USER_GROUPNAME
         self.email_notification = email_notification
 
@@ -410,6 +413,10 @@ class UserInContext(object):
     @property
     def timezone(self) -> str:
         return self.user.timezone
+
+    @property
+    def lang(self) -> str:
+        return self.user.lang
 
     @property
     def profile(self) -> Profile:
