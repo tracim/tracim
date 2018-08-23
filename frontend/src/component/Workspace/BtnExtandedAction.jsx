@@ -18,23 +18,29 @@ const ExtandedAction = props => {
       </button>
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-        <div className='subdropdown__item dropdown-item primaryColorBgLightenHover d-flex align-items-center' onClick={props.onClickExtendedAction.edit}>
-          <div className='subdropdown__item__icon mr-3'>
-            <i className='fa fa-fw fa-pencil' />
-          </div>
-          <div className='subdropdown__item__text'>
-            {props.t('Edit')}
-          </div>
-        </div>
+        {props.idRoleUserWorkspace >= 2 &&
+          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.edit}>
+            <div className='subdropdown__item__icon mr-3'>
+              <i className='fa fa-fw fa-pencil' />
+            </div>
 
-        <div className='subdropdown__item dropdown-item primaryColorBgLightenHover d-flex align-items-center' onClick={props.onClickExtendedAction.move}>
-          <div className='subdropdown__item__icon mr-3'>
-            <i className='fa fa-fw fa-arrows-alt' />
+            <div className='subdropdown__item__text'>
+              {props.t('Edit')}
+            </div>
           </div>
-          <div className='subdropdown__item__text'>
-            {props.t('Move')}
+        }
+
+        {props.idRoleUserWorkspace >= 4 &&
+          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.move}>
+            <div className='subdropdown__item__icon mr-3'>
+              <i className='fa fa-fw fa-arrows-alt' />
+            </div>
+
+            <div className='subdropdown__item__text'>
+              {props.t('Move')}
+            </div>
           </div>
-        </div>
+        }
 
         {/* <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.download}>
           <div className='subdropdown__item__icon mr-3'>
@@ -45,23 +51,29 @@ const ExtandedAction = props => {
           </div>
         </div> */ }
 
-        <div className='subdropdown__item dropdown-item primaryColorBgLightenHover d-flex align-items-center' onClick={props.onClickExtendedAction.archive}>
-          <div className='subdropdown__item__icon mr-3'>
-            <i className='fa fa-fw fa-archive' />
-          </div>
-          <div className='subdropdown__item__text'>
-            {props.t('Archive')}
-          </div>
-        </div>
+        {props.idRoleUserWorkspace >= 4 &&
+          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.archive}>
+            <div className='subdropdown__item__icon mr-3'>
+              <i className='fa fa-fw fa-archive' />
+            </div>
 
-        <div className='subdropdown__item dropdown-item primaryColorBgLightenHover d-flex align-items-center' onClick={props.onClickExtendedAction.delete}>
-          <div className='subdropdown__item__icon mr-3'>
-            <i className='fa fa-fw fa-trash-o' />
+            <div className='subdropdown__item__text'>
+              {props.t('Archive')}
+            </div>
           </div>
-          <div className='subdropdown__item__text'>
-            {props.t('Delete')}
+        }
+
+        {props.idRoleUserWorkspace >= 4 &&
+          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.delete}>
+            <div className='subdropdown__item__icon mr-3'>
+              <i className='fa fa-fw fa-trash-o' />
+            </div>
+
+            <div className='subdropdown__item__text'>
+              {props.t('Delete')}
+            </div>
           </div>
-        </div>
+        }
 
       </div>
     </div>

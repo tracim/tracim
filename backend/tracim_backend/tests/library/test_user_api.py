@@ -55,6 +55,7 @@ class TestUserApi(DefaultTest):
             password='pass',
             name='bob',
             timezone='+2',
+            lang='en',
             do_save=True,
             do_notify=False,
         )
@@ -63,6 +64,7 @@ class TestUserApi(DefaultTest):
         assert u.validate_password('pass')
         assert u.display_name == 'bob'
         assert u.timezone == '+2'
+        assert u.lang == 'en'
 
     def test_unit__user_with_email_exists__ok__nominal_case(self):
         api = UserApi(

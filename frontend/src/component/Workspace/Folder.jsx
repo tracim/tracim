@@ -30,6 +30,7 @@ class Folder extends React.Component {
       availableApp,
       folderData,
       // onClickItem,
+      idRoleUserWorkspace,
       onClickExtendedAction,
       onClickCreateContent,
       // onClickFolder,
@@ -54,39 +55,42 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__button'>
-
-            <div className='folder__header__button__addbtn'>
-              <button
+            {idRoleUserWorkspace >= 2 &&
+              <div className='folder__header__button__addbtn'>
+                <button
                 className='folder__header__button__addbtn__text btn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
-                type='button'
-                id='dropdownMenuButton'
-                data-toggle='dropdown'
-                aria-haspopup='true'
-                aria-expanded='false'
-                onClick={e => e.stopPropagation()}
-              >
-                {t('Create in folder...')}
-              </button>
+                  type='button'
+                  id='dropdownMenuButton'
+                  data-toggle='dropdown'
+                  aria-haspopup='true'
+                  aria-expanded='false'
+                  onClick={e => e.stopPropagation()}
+                >
+                  {t('Create in folder...')}
+                </button>
 
-              <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                <SubDropdownCreateButton
-                  idFolder={null}
-                  availableApp={availableApp}
-                  onClickCreateContent={onClickCreateContent}
-                />
+                <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                  <SubDropdownCreateButton
+                    idFolder={null}
+                    availableApp={availableApp}
+                    onClickCreateContent={onClickCreateContent}
+                  />
+                </div>
+
+                <div className='d-none d-md-flex'>
+                  <BtnExtandedAction
+                    idRoleUserWorkspace={idRoleUserWorkspace}
+                    onClickExtendedAction={{
+                      edit: e => onClickExtendedAction.edit(e, folderData),
+                      move: e => onClickExtendedAction.move(e, folderData),
+                      download: e => onClickExtendedAction.download(e, folderData),
+                      archive: e => onClickExtendedAction.archive(e, folderData),
+                      delete: e => onClickExtendedAction.delete(e, folderData)
+                    }}
+                  />
+                </div>
               </div>
-
-              <div className='d-none d-md-flex'>
-                <BtnExtandedAction onClickExtendedAction={{
-                  edit: e => onClickExtendedAction.edit(e, folderData),
-                  move: e => onClickExtendedAction.move(e, folderData),
-                  download: e => onClickExtendedAction.download(e, folderData),
-                  archive: e => onClickExtendedAction.archive(e, folderData),
-                  delete: e => onClickExtendedAction.delete(e, folderData)
-                }} />
-              </div>
-
-            </div>
+            }
           </div>
 
           <div className='folder__header__status' />

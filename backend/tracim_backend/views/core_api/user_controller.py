@@ -190,6 +190,7 @@ class UserController(Controller):
             request.candidate_user,
             name=hapic_data.body.public_name,
             timezone=hapic_data.body.timezone,
+            lang=hapic_data.body.lang,
             do_save=True
         )
         return uapi.get_user_with_context(user)
@@ -219,6 +220,7 @@ class UserController(Controller):
             email=hapic_data.body.email,
             password=hapic_data.body.password,
             timezone=hapic_data.body.timezone,
+            lang=hapic_data.body.lang,
             name=hapic_data.body.public_name,
             do_notify=hapic_data.body.email_notification,
             groups=groups,

@@ -6,16 +6,8 @@ import { translate } from 'react-i18next'
 import appFactory from '../appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
-  setAppList,
-  setContentTypeList,
-  setWorkspaceListIsOpenInSidebar,
-  updateWorkspaceFilter,
-  updateWorkspaceListData
+  setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
-import {
-  getAppList, getContentTypeList,
-  getWorkspaceList
-} from '../action-creator.async.js'
 import { PAGE, workspaceConfig } from '../helper.js'
 
 const qs = require('query-string')
@@ -25,6 +17,7 @@ class Sidebar extends React.Component {
     super(props)
     this.state = {
       sidebarClose: false,
+      workspaceListLoaded: false,
       workspaceIdInUrl: props.match && props.match.params.idws ? parseInt(props.match.params.idws) : null
     }
 
@@ -40,62 +33,26 @@ class Sidebar extends React.Component {
     }
   }
 
-  componentDidMount () {
-    // console.log('Sidebar Did Mount', this.props)
-    this.loadAppConfigAndWorkspaceList()
-  }
-
   componentDidUpdate (prevProps, prevState) {
     const { props } = this
 
-    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
-    if (!props.match || props.match.params.idws === undefined || isNaN(props.match.params.idws)) return
+    if (!this.shouldDisplaySidebar()) return
 
-    const newWorkspaceId = parseInt(props.match.params.idws)
-    if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
+    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
+    if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) {
+      const newWorkspaceId = parseInt(props.match.params.idws)
+      if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
+    }
   }
 
-  loadAppConfigAndWorkspaceList = async () => {
-    const { workspaceIdInUrl } = this.state
-    const { user, dispatch } = this.props
-
-    if (user.user_id !== -1) {
-      const fetchGetAppList = await dispatch(getAppList(user))
-      if (fetchGetAppList.status === 200) dispatch(setAppList(fetchGetAppList.json))
-
-      const fetchGetContentTypeList = await dispatch(getContentTypeList(user))
-      if (fetchGetContentTypeList.status === 200) dispatch(setContentTypeList(fetchGetContentTypeList.json))
-
-      const fetchGetWorkspaceList = await dispatch(getWorkspaceList(user))
-
-      if (fetchGetWorkspaceList.status === 200) {
-        dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
-        dispatch(setWorkspaceListIsOpenInSidebar(workspaceIdInUrl || fetchGetWorkspaceList.json[0].workspace_id, true))
-      }
-    }
+  shouldDisplaySidebar = () => {
+    const pageWithoutSidebar = [PAGE.LOGIN]
+    return !pageWithoutSidebar.includes(this.props.location.pathname)
   }
 
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))
 
-  handleClickAllContent = idWs => {
-    this.props.dispatch(updateWorkspaceFilter([]))
-
-    this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
-  }
-
-  // @DEPRECATED
-  // not used, right now, link on sidebar filters is a <Link>
-  handleClickContentFilter = (idWs, filter) => {
-    const { workspace, history } = this.props
-
-    const newFilter = workspace.filter.includes(filter) ? [] : [filter] // use an array to allow multiple filters (NYI)
-
-    history.push(`${PAGE.WORKSPACE.CONTENT_LIST(idWs)}?type=${newFilter.join(';')}`) // workspace.filter gets updated on react redraw from match.params
-
-    // obviously, it's ugly to use custom event to tell WorkspaceContentList to refresh, but since WorkspaceContentList
-    // will end up being an App, it'll have to be that way. So it's fine
-    GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
-  }
+  handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
 
   handleClickToggleSidebar = () => this.setState(prev => ({sidebarClose: !prev.sidebarClose}))
 
@@ -104,6 +61,8 @@ class Sidebar extends React.Component {
   render () {
     const { sidebarClose, workspaceIdInUrl } = this.state
     const { activeLang, workspaceList, t } = this.props
+
+    if (!this.shouldDisplaySidebar()) return null
 
     return (
       <div className={classnames('sidebar primaryColorBgDarken', {'sidebarclose': sidebarClose})}>
@@ -125,7 +84,6 @@ class Sidebar extends React.Component {
                   isOpenInSidebar={ws.isOpenInSidebar}
                   onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
                   onClickAllContent={this.handleClickAllContent}
-                  // onClickContentFilter={this.handleClickContentFilter}
                   key={ws.id}
                 />
               )}
@@ -156,10 +114,9 @@ class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, workspace, workspaceList }) => ({
+const mapStateToProps = ({ lang, user, workspaceList }) => ({
   activeLang: lang.find(l => l.active) || {id: 'en'},
   user,
-  workspace,
   workspaceList
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))

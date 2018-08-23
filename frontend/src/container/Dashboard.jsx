@@ -237,17 +237,20 @@ class Dashboard extends React.Component {
             </div>
 
             <div className='dashboard__calltoaction justify-content-xl-center'>
-              {props.appList.map(app =>
-                <ContentTypeBtn
-                  customClass='dashboard__calltoaction__button'
-                  hexcolor={app.hexcolor}
-                  label={app.label}
-                  faIcon={app.faIcon}
-                  creationLabel={(props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: ''}).creationLabel}
-                  onClickBtn={() => props.history.push(PAGE.WORKSPACE.NEW(props.curWs.id, app.slug))}
-                  key={app.label}
-                />
-              )}
+              {props.appList.map(app => {
+                const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+                return (
+                  <ContentTypeBtn
+                    customClass='dashboard__calltoaction__button'
+                    hexcolor={app.hexcolor}
+                    label={app.label}
+                    faIcon={app.faIcon}
+                    creationLabel={contentType.creationLabel}
+                    onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
+                    key={app.label}
+                  />
+                )
+              })}
             </div>
 
             <div className='dashboard__workspaceInfo'>

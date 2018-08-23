@@ -4,8 +4,10 @@ import i18n from './i18n.js'
 
 export function appFactory (WrappedComponent) {
   return class AppFactory extends React.Component {
-    renderAppFeature = (appConfig, user, content) => GLOBAL_renderAppFeature({
-      loggedUser: user.logged ? user : {},
+    renderAppFeature = (appConfig, user, idRoleUserWorkspace, content) => GLOBAL_renderAppFeature({
+      loggedUser: user.logged
+        ? {...user, idRoleUserWorkspace}
+        : {},
       config: {
         ...appConfig,
         domContainer: 'appFeatureContainer',

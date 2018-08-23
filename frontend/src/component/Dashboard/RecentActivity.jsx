@@ -21,7 +21,7 @@ export const RecentActivity = props =>
 
     <div className='activity__wrapper'>
       {props.recentActivityList.map(content => {
-        const contentType = props.contentTypeList.find(ct => ct.slug === content.type)
+        const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || {hexcolor: '', faIcon: ''}
         return (
           <div
             className={classnames('activity__workspace primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}

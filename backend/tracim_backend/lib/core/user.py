@@ -314,6 +314,7 @@ class UserApi(object):
             email: str=None,
             password: str=None,
             timezone: str=None,
+            lang: str=None,
             groups: typing.Optional[typing.List[Group]]=None,
             do_save=True,
     ) -> User:
@@ -329,6 +330,9 @@ class UserApi(object):
 
         if timezone is not None:
             user.timezone = timezone
+
+        if lang is not None:
+            user.lang = lang
 
         if groups is not None:
             # INFO - G.M - 2018-07-18 - Delete old groups
@@ -351,6 +355,7 @@ class UserApi(object):
         password: str = None,
         name: str = None,
         timezone: str = '',
+        lang: str= None,
         groups=[],
         do_save: bool=True,
         do_notify: bool=True,
@@ -362,6 +367,7 @@ class UserApi(object):
             email=email,
             password=password,
             timezone=timezone,
+            lang=lang,
             do_save=False,
         )
         if do_notify:
