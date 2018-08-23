@@ -12,7 +12,7 @@ export const RecentActivity = props =>
       </div>
 
       <button
-        className={classnames('activity__header__allread', 'btn', 'primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover')}
+        className={classnames('activity__header__allread', 'btn', 'actionBtn', 'primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover')}
         onClick={props.onClickEverythingAsRead}
       >
         {props.t('Mark everything as read')}
@@ -40,7 +40,7 @@ export const RecentActivity = props =>
 
       <div className={classnames('activity__more', 'd-flex flex-row-reverse')}>
         <button
-          className={classnames('activity__more__btn', 'btn', 'primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover')}
+          className={classnames('activity__more__btn', 'btn', 'actionBtn', 'primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover')}
           onClick={props.onClickSeeMore}
         >
           {props.t('See more')}

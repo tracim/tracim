@@ -40,7 +40,7 @@ export const UserStatus = props =>
         ? (
           <div className='userstatus__notification__subscribe dropdown'>
             <button
-              className='userstatus__notification__subscribe__btn btn dropdown-toggle primaryColorBorder primaryColorBgHover primaryColorBorderDarken'
+              className='userstatus__notification__subscribe__btn btn actionBtn dropdown-toggle primaryColorBorder primaryColorBgHover primaryColorBorderDarken'
               type='button'
               id='dropdownMenuButton'
               data-toggle='dropdown'
@@ -62,7 +62,7 @@ export const UserStatus = props =>
         )
         : (
           <div
-            className='userstatus__notification__btn btn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+            className='userstatus__notification__btn btn actionBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={props.onClickToggleNotifBtn}
           >
             {props.t('Change your status')}

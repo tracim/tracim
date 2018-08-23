@@ -58,7 +58,7 @@ class Folder extends React.Component {
             {idRoleUserWorkspace >= 2 &&
               <div className='folder__header__button__addbtn'>
                 <button
-                className='folder__header__button__addbtn__text btn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
+                  className='folder__header__button__addbtn__text btn actionBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
                   type='button'
                   id='dropdownMenuButton'
                   data-toggle='dropdown'
