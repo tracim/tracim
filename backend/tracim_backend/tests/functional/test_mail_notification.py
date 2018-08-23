@@ -100,6 +100,7 @@ class TestNotificationsSync(MailHogTest):
             password='pass',
             name='bob',
             timezone='+2',
+            lang='fr',
             do_save=True,
             do_notify=True,
         )
@@ -124,6 +125,8 @@ class TestNotificationsSync(MailHogTest):
             config=self.app_config,
         )
         current_user = uapi.get_one_by_email('admin@admin.admin')
+        # set admin as french, useful to verify if i18n work properly
+        current_user.lang = 'fr'
         # Create new user with notification enabled on w1 workspace
         wapi = WorkspaceApi(
             current_user=current_user,

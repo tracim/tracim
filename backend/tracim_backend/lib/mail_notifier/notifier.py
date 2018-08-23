@@ -27,8 +27,7 @@ from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.lib.utils.translation import fake_translator as l_, \
-    fake_translator as _
+from tracim_backend.lib.utils.translation import Translator
 
 
 class EmailNotifier(INotifier):
@@ -233,7 +232,7 @@ class EmailManager(object):
             )
         content = ContentApi(
             session=self.session,
-            current_user=user, # TODO - use a system user instead of the user that has triggered the event
+            current_user=user,  # nopep8 TODO - use a system user instead of the user that has triggered the event
             config=self.config,
             show_archived=True,
             show_deleted=True,
@@ -270,8 +269,9 @@ class EmailManager(object):
         )
         for role in notifiable_roles:
             logger.info(self, 'Sending email to {}'.format(role.user.email))
+            translator = Translator(app_config=self.config, default_lang=role.user.lang)  # nopep8
+            _ = translator.get_translation
             to_addr = formataddr((role.user.display_name, role.user.email))
-            #
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
             replyto_addr = self.config.EMAIL_NOTIFICATION_REPLY_TO_EMAIL.replace( # nopep8
@@ -292,7 +292,7 @@ class EmailManager(object):
             subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, main_content.get_status().label.__str__())
-            reply_to_label = l_('{username} & all members of {workspace}').format(
+            reply_to_label = _('{username} & all members of {workspace}').format(  # nopep8
                 username=user.display_name,
                 workspace=main_content.workspace.label)
 
@@ -306,21 +306,23 @@ class EmailManager(object):
             # contains only message_id from parents post in thread.
             # To link this email to a content we create a virtual parent
             # in reference who contain the content_id.
-            message['References'] = formataddr(('',reference_addr))
+            message['References'] = formataddr(('', reference_addr))
             content_in_context = content_api.get_content_in_context(content)
             body_text = self._build_email_body_for_content(
                 self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT,
                 role,
                 content_in_context,
                 workpace_in_context,
-                user
+                user,
+                translator
             )
             body_html = self._build_email_body_for_content(
                 self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
                 role,
                 content_in_context,
                 workpace_in_context,
-                user
+                user,
+                translator
             )
 
             part1 = MIMEText(body_text, 'plain', 'utf-8')
@@ -389,14 +391,17 @@ class EmailManager(object):
             # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
             'login_url': get_login_frontend_url(self.config),
         }
+        translator = Translator(self.config, default_lang=user.lang)
         body_text = self._render_template(
             mako_template_filepath=text_template_file_path,
-            context=context
+            context=context,
+            translator=translator
         )
 
         body_html = self._render_template(
             mako_template_filepath=html_template_file_path,
             context=context,
+            translator=translator
         )
 
         part1 = MIMEText(body_text, 'plain', 'utf-8')
@@ -481,7 +486,8 @@ class EmailManager(object):
     def _render_template(
             self,
             mako_template_filepath: str,
-            context: dict
+            context: dict,
+            translator: Translator
     ) -> str:
         """
         Render mako template with all needed current variables.
@@ -493,7 +499,7 @@ class EmailManager(object):
 
         template = Template(filename=mako_template_filepath)
         return template.render(
-            _=_,
+            _=translator.get_translation,
             config=self.config,
             **context
         )
@@ -505,6 +511,7 @@ class EmailManager(object):
             content_in_context: ContentInContext,
             workspace_in_context: WorkspaceInContext,
             actor: User,
+            translator: Translator
     ) -> str:
         """
         Build an email body and return it as a string
@@ -514,6 +521,7 @@ class EmailManager(object):
         :param actor: the user at the origin of the action / notification (for example the one who wrote a comment
         :return: the built email body as string. In case of multipart email, this method must be called one time for text and one time for html
         """
+        _ = translator.get_translation
         logger.debug(self, 'Building email content from MAKO template {}'.format(mako_template_filepath))
         content = content_in_context.content
         main_title = content.label
@@ -527,75 +535,76 @@ class EmailManager(object):
         workspace_url = workspace_in_context.frontend_url
         # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
         logo_url = get_email_logo_frontend_url(self.config)
-
         action = content.get_last_action().id
         if ActionDescription.COMMENT == action:
-            content_intro = l_('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
+            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
             content_text = content.description
-            call_to_action_text = l_('Answer')
+            call_to_action_text = _('Answer')
 
         elif ActionDescription.CREATION == action:
 
             # Default values (if not overriden)
             content_text = content.description
-            call_to_action_text = l_('View online')
+            call_to_action_text = _('View online')
 
             if CONTENT_TYPES.Thread.slug == content.type:
-                call_to_action_text = l_('Answer')
-                content_intro = l_('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
+                call_to_action_text = _('Answer')
+                content_intro = _('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + \
                                content.get_last_comment_from(actor).description
 
             elif CONTENT_TYPES.File.slug == content.type:
-                content_intro = l_('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)
                 if content.description:
                     content_text = content.description
                 else:
                     content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
             elif CONTENT_TYPES.Page.slug == content.type:
-                content_intro = l_('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> added a page entitled:').format(actor.display_name)
                 content_text = '<span id="content-body-only-title">{}</span>'.format(content.label)
 
         elif ActionDescription.REVISION == action:
             content_text = content.description
-            call_to_action_text = l_('View online')
+            call_to_action_text = _('View online')
 
             if CONTENT_TYPES.File.slug == content.type:
-                content_intro = l_('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
                 content_text = ''
 
             elif CONTENT_TYPES.Page.slug == content.type:
-                content_intro = l_('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = str(l_('<p id="content-body-intro">Here is an overview of the changes:</p>'))+ \
-                    title_diff + \
-                    htmldiff(previous_revision.description, content.description)
-
+                content_text = str('<p id="content-body-intro">{}</p> {text}</p> {title_diff} {content_diff}').format(
+                    text=_('Here is an overview of the changes:'),
+                    title_diff=title_diff,
+                    content_diff=htmldiff(previous_revision.description, content.description)
+                )
             elif CONTENT_TYPES.Thread.slug == content.type:
-                content_intro = l_('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
                 title_diff = ''
                 if previous_revision.label != content.label:
                     title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = str(l_('<p id="content-body-intro">Here is an overview of the changes:</p>'))+ \
-                    title_diff + \
-                    htmldiff(previous_revision.description, content.description)
-
+                content_text = str('<p id="content-body-intro">{}</p> {text} {title_diff} {content_diff}').format(
+                    text=_('Here is an overview of the changes:'),
+                    title_diff=title_diff,
+                    content_diff=htmldiff(previous_revision.description, content.description)
+                )
         elif ActionDescription.EDITION == action:
-            call_to_action_text = l_('View online')
+            call_to_action_text = _('View online')
 
             if CONTENT_TYPES.File.slug == content.type:
-                content_intro = l_('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
+                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
                 content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
                     content.description
 
         elif ActionDescription.STATUS_UPDATE == action:
-            call_to_action_text = l_('View online')
-            intro_user_msg = l_(
+            call_to_action_text = _('View online')
+            intro_user_msg = _(
                 '<span id="content-intro-username">{}</span> '
                 'updated the following status:'
             )
@@ -636,6 +645,7 @@ class EmailManager(object):
         body_content = self._render_template(
             mako_template_filepath=mako_template_filepath,
             context=context,
+            translator=translator,
         )
         return body_content
 

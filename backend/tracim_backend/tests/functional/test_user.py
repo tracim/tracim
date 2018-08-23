@@ -76,6 +76,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -200,6 +201,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -291,6 +293,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -416,6 +419,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -704,6 +708,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -816,6 +821,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -939,6 +945,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1152,6 +1159,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1233,6 +1241,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1314,6 +1323,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1413,6 +1423,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1494,6 +1505,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1611,6 +1623,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1720,6 +1733,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1801,6 +1815,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1883,6 +1898,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1978,6 +1994,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2122,6 +2139,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2219,6 +2237,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2316,6 +2335,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2496,6 +2516,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2523,6 +2544,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
         assert res['is_deleted'] is False
+        assert res['lang'] == 'fr'
 
     def test_api__get_user__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2546,6 +2568,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2605,6 +2628,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2638,6 +2662,7 @@ class TestUserEndpoint(FunctionalTest):
             'password': 'mysuperpassword',
             'profile': 'users',
             'timezone': 'Europe/Paris',
+            'lang': 'fr',
             'public_name': 'test user',
             'email_notification': False,
         }
@@ -2655,7 +2680,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test user'
         assert res['timezone'] == 'Europe/Paris'
-
+        assert res['lang'] == 'fr'
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -2695,6 +2720,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test'
         assert res['timezone'] == ''
+        assert res['lang'] is None
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -2731,6 +2757,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2748,6 +2775,7 @@ class TestUserEndpoint(FunctionalTest):
             'password': 'mysuperpassword',
             'profile': 'users',
             'timezone': 'Europe/Paris',
+            'lang': 'fr',
             'public_name': 'test user',
             'email_notification': False,
         }
@@ -2779,6 +2807,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2797,6 +2826,7 @@ class TestUserEndpoint(FunctionalTest):
             'profile': 'users',
             'timezone': 'Europe/Paris',
             'public_name': 'test user',
+            'lang': 'fr',
             'email_notification': False,
         }
         res = self.testapp.post_json(
@@ -2827,6 +2857,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
             'profile': 'users',
             'timezone': 'Europe/Paris',
             'public_name': 'test user',
+            'lang': 'fr',
             'email_notification': True,
         }
         res = self.testapp.post_json(
@@ -2843,6 +2874,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test user'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['lang'] == 'fr'
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -2896,6 +2928,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test'
         assert res['timezone'] == ''
+        assert res['lang'] == None
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -2944,6 +2977,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2998,6 +3032,7 @@ class TestUsersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3048,6 +3083,7 @@ class TestUsersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3097,6 +3133,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3106,6 +3143,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3161,6 +3199,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3170,6 +3209,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3225,6 +3265,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3234,6 +3275,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3279,6 +3321,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3288,6 +3331,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3297,6 +3341,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob3',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3382,6 +3427,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3444,6 +3490,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3506,6 +3553,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3568,6 +3616,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3630,6 +3679,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3699,6 +3749,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3708,6 +3759,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3764,6 +3816,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3826,6 +3879,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3888,6 +3942,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3952,6 +4007,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4013,6 +4069,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             password='pass',
             name='bob',
             groups=groups,
+            lang='fr',
             timezone='Europe/Paris',
             do_save=True,
             do_notify=False,
@@ -4023,6 +4080,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4079,6 +4137,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4102,10 +4161,12 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['lang'] == 'fr'
         # Set params
         params = {
             'public_name': 'updated',
             'timezone': 'Europe/London',
+            'lang': 'en',
         }
         self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
@@ -4121,6 +4182,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'updated'
         assert res['timezone'] == 'Europe/London'
+        assert res['lang'] == 'en'
 
     def test_api__set_user_info__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -4144,6 +4206,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4167,10 +4230,12 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['lang'] == 'fr'
         # Set params
         params = {
             'public_name': 'updated',
             'timezone': 'Europe/London',
+            'lang' : 'en',
         }
         self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
@@ -4186,6 +4251,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'updated'
         assert res['timezone'] == 'Europe/London'
+        assert res['lang'] == 'en'
 
     def test_api__set_user_email__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -4209,6 +4275,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4218,6 +4285,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='test',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4237,6 +4305,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         params = {
             'public_name': 'updated',
             'timezone': 'Europe/London',
+            'lang': 'en'
         }
         self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
@@ -4274,6 +4343,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4336,6 +4406,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4398,6 +4469,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4407,6 +4479,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='test',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4463,6 +4536,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4521,6 +4595,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4579,6 +4654,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4588,6 +4664,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='test2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4631,6 +4708,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4640,6 +4718,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='test2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4683,6 +4762,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
