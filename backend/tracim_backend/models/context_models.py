@@ -169,7 +169,7 @@ class WorkspaceAndUserPath(object):
     """
     def __init__(self, workspace_id: int, user_id: int):
         self.workspace_id = workspace_id
-        self.user_id = workspace_id
+        self.user_id = user_id
 
 
 class UserWorkspaceAndContentPath(object):
