@@ -63,7 +63,7 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     const { workspaceList, match } = this.props
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')

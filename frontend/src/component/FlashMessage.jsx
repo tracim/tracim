@@ -22,7 +22,13 @@ const FlashMessage = props => {
 
               <div className='flashmessage__container__content__text'>
                 <div className='flashmessage__container__content__text__title'>
-                  {props.t('Error')}
+                  {(() => {
+                    switch (props.flashMessage[0].type) {
+                      case 'info': return props.t('Information')
+                      case 'warning': return props.t('Warning')
+                      case 'danger': return props.t('Error')
+                    }
+                  })()}
                 </div>
                 <div className='flashmessage__container__content__text__paragraph'>
                   {props.flashMessage[0].message}
