@@ -212,3 +212,78 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
+
+
+class TestWhoamiEndpointWithApiKey(FunctionalTest):
+
+    def test_api__try_whoami_enpoint_with_api_key__ok_200__nominal_case(self):
+        headers_auth = {
+                'Tracim-Api-Key': 'mysuperapikey',
+                'Tracim-Api-Login': 'admin@admin.admin',
+        }
+        res = self.testapp.get(
+            '/api/v2/sessions/whoami',
+            status=200,
+            headers=headers_auth
+        )
+        assert res.json_body['public_name'] == 'Global manager'
+        assert res.json_body['email'] == 'admin@admin.admin'
+        assert res.json_body['created']
+        assert res.json_body['is_active']
+        assert res.json_body['profile']
+        assert res.json_body['profile'] == 'administrators'
+        assert res.json_body['caldav_url'] is None
+        assert res.json_body['avatar_url'] is None
+
+    def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.disable(test_user)
+        transaction.commit()
+        headers_auth = {
+                'Tracim-Api-Key': 'mysuperapikey',
+                'Tracim-Api-Login': 'test@test.test',
+        }
+        res = self.testapp.get(
+            '/api/v2/sessions/whoami',
+            status=401,
+            headers=headers_auth
+        )
+
+    def test_api__try_whoami_enpoint__err_401__unauthenticated(self):
+        headers_auth = {
+                'Tracim-Api-Key': 'mysuperapikey',
+                'Tracim-Api-Login': 'john@doe.doe',
+        }
+        res = self.testapp.get(
+            '/api/v2/sessions/whoami',
+            status=401,
+            headers=headers_auth
+        )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()

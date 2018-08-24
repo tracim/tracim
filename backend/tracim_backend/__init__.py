@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pyramid_multiauth import MultiAuthenticationPolicy
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -14,6 +15,9 @@ from tracim_backend.extensions import hapic
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.authentification import basic_auth_check_credentials
+from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
@@ -57,16 +61,24 @@ def web(global_config, **local_settings):
     app_config.configure_filedepot()
     settings['CFG'] = app_config
     configurator = Configurator(settings=settings, autocommit=True)
-    # Add BasicAuthPolicy
-    authn_policy = BasicAuthAuthenticationPolicy(
-        basic_auth_check_credentials,
-        realm=BASIC_AUTH_WEBUI_REALM,
-    )
+    # Add AuthPolicy
+    configurator.include("pyramid_multiauth")
+    policies = [
+        ApiTokenAuthentificationPolicy(
+            api_key_header=TRACIM_API_KEY_HEADER,
+            api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
+        ),
+        BasicAuthAuthenticationPolicy(
+            basic_auth_check_credentials,
+            realm=BASIC_AUTH_WEBUI_REALM
+        ),
+    ]
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
     # Default authorization : Accept anything.
     configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
+    authn_policy = MultiAuthenticationPolicy(policies)
     configurator.set_authentication_policy(authn_policy)
     # INFO - GM - 11-04-2018 - set default perm
     # setting default perm is needed to force authentification
