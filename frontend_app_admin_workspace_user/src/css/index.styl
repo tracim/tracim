@@ -15,9 +15,9 @@
     font-size 20px
   &__delimiter
     margin 65px auto
-  &__workspaceTable
+  &__table
     margin 25px 15px
-    &__deleteworkspace
+    &__delete
       display flex
       align-items center
       flex-wrap wrap
@@ -41,14 +41,31 @@
         &__input
           margin 15px 0 20px 0
           width 40%
-      &__userrole
-        .userrole
-        &__text
-          margin 20px 0
-          font-weight bold
-        &__role
-          margin 25px 0
+      &__profile
+        .profile
+          &__text
+            margin 20px 0
+            font-weight bold
+          &__list
+            margin 25px 0
+            &__item
+              display flex
+              align-items center
+              margin-top 10px
+              cursor pointer
   &__delimiter
     margin 50px auto
   &__table
     margin-bottom 100px
+
+.adminworkspaceuser__popup
+  top 0
+  .cardPopup__container
+    width 400px
+  &__body
+    width 100%
+    &__btn
+      display flex
+      justify-content flex-end
+      .btn:first-child
+        margin-right 15px

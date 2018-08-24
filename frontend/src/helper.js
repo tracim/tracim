@@ -123,9 +123,27 @@ export const ROLE2 = {
 }
 
 export const PROFILE = {
-  ADMINISTRATOR: 'administrators',
-  MANAGER: 'managers',
-  USER: 'users'
+  ADMINISTRATOR: {
+    id: 1,
+    slug: 'administrators',
+    faIcon: 'rocket',
+    hexcolor: '#123456',
+    label: i18n.t('Administrator')
+  },
+  MANAGER: {
+    id: 2,
+    slug: 'managers',
+    faIcon: 'car',
+    hexcolor: '#654321',
+    label: i18n.t('Manager')
+  },
+  USER: {
+    id: 4,
+    slug: 'users',
+    faIcon: 'bicycle',
+    hexcolor: '#123123',
+    label: i18n.t('User')
+  }
 }
 
 export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route

@@ -98,7 +98,7 @@ class Account extends React.Component {
       switch (fetchPutUserName.status) {
         case 200:
           props.dispatch(updateUserName(newName))
-          if (newEmail === '' )props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
+          if (newEmail === '') props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
           // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
           break
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break

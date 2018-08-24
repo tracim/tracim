@@ -1,74 +1,108 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 
-export const AddMemberForm = props =>
-  <form className='adminUserPage__adduser__form'>
-    <div className='adminUserPage__adduser__form__username'>
-      <label className='username__text' htmlFor='adduser'>
-        Ajouter un membre
-      </label>
+export class AddMemberForm extends React.Component {
+  constructor (props) {
+    super(props)
 
-      <input
-        type='text'
-        className='username__input form-control'
-        id='adduser'
-        placeholder='Nom ou Email'
-      />
+    this.state = {
+      newUserEmail: '',
+      newUserProfile: ''
+    }
+  }
 
-      <div className='username__createaccount'>
-        <input type='radio' id='createuseraccount' />
-        <label className='ml-2' htmlFor='createuseraccount'>Create an account for this member</label>
-      </div>
-    </div>
+  handleChangeNewUserEmail = e => this.setState({newUserEmail: e.target.value})
 
-    <div className='adminUserPage__adduser__form__userrole'>
-      <div className='userrole__text'>
-        Choose the role of the member
-      </div>
+  handleChangeNewUserProfile = e => this.setState({newUserProfile: e.currentTarget.value})
 
-      <div className='userrole__role'>
-        <div className='userrole__role__workspacemanager mt-3 d-flex align-items-center'>
-          <input type='radio' name='adminuser' />
-          <div className='d-flex align-items-center'>
-            <div className='userrole__role__icon mx-2'>
-              <i className='fa fa-fw fa-gavel' />
-            </div>
-            Workspace manager
+  handleClickAddUser = () => {
+    const { props, state } = this
+
+    if (state.newUserEmail === '' || state.newUserProfile === '') {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('Please type a name and select a profile'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
+
+    props.onClickAddUser(state.newUserEmail, state.newUserProfile)
+  }
+
+  render () {
+    const { props, state } = this
+
+    return (
+      <form className='adminUserPage__adduser__form'>
+        <div className='adminUserPage__adduser__form__username'>
+          <label className='username__text' htmlFor='adduser'>
+            {props.t('Add a user')}
+          </label>
+
+          <input
+            type='text'
+            className='username__input form-control'
+            id='adduser'
+            placeholder={props.t('Email')}
+            value={state.newUserEmail}
+            onChange={this.handleChangeNewUserEmail}
+          />
+
+          {/*
+          <div className='username__createaccount'>
+            <input type='radio' id='createuseraccount' />
+            <label className='ml-2' htmlFor='createuseraccount'>Create an account for this member</label>
+          </div>
+          */}
+        </div>
+
+        <div className='adminUserPage__adduser__form__profile'>
+          <div className='profile__text'>
+            {props.t('Choose the profile of the user')}
+          </div>
+
+          <div className='profile__list'>
+            {Object.keys(props.profile).map(p => props.profile[p]).map(p =>
+              <label
+                className='profile__list__item'
+                htmlFor={p.slug}
+                key={p.id}
+              >
+                <input
+                  type='radio'
+                  name='newUserProfile'
+                  id={p.slug}
+                  value={p.slug}
+                  checked={state.newUserProfile === p.slug}
+                  onChange={this.handleChangeNewUserProfile}
+                />
+
+                <div className='d-flex align-items-center'>
+                  <div className='userrole__role__icon mx-2' style={{color: p.hexcolor}}>
+                    <i className={`fa fa-fw fa-${p.faIcon}`} />
+                  </div>
+                  {p.label}
+                </div>
+              </label>
+            )}
           </div>
         </div>
-        <div className='userrole__role__contentmanager mt-3 d-flex align-items-center'>
-          <input type='radio' name='adminuser' />
-          <div className='d-flex align-items-center'>
-            <div className='userrole__role__icon mx-2'>
-              <i className='fa fa-fw fa-graduation-cap' />
-            </div>
-            Content manager
-          </div>
+        <div className='adminUserPage__adduser__form__submit'>
+          <button
+            type='button'
+            className='btn'
+            onClick={this.handleClickAddUser}
+          >
+            {props.t('Add the user')}
+          </button>
         </div>
-        <div className='userrole__role__contributor mt-3 d-flex align-items-center'>
-          <input type='radio' name='adminuser' />
-          <div className='d-flex align-items-center'>
-            <div className='userrole__role__icon mx-2'>
-              <i className='fa fa-fw fa-pencil' />
-            </div>
-            Contributor
-          </div>
-        </div>
-        <div className='userrole__role__reader mt-3 d-flex align-items-center'>
-          <input type='radio' name='adminuser' />
-          <div className='d-flex align-items-center'>
-            <div className='userrole__role__icon mx-2'>
-              <i className='fa fa-fw fa-eye' />
-            </div>
-            Reader
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className='adminUserPage__adduser__form__submit'>
-      <button className='btn'>
-        Add the member
-      </button>
-    </div>
-  </form>
+      </form>
+    )
+  }
+}
 
-export default AddMemberForm
+export default translate()(AddMemberForm)

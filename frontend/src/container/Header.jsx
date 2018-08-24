@@ -87,7 +87,7 @@ class Header extends React.Component {
                 onClickSubmit={this.handleClickSubmit}
               />
 
-              {user.profile === PROFILE.ADMINISTRATOR &&
+              {user.profile === PROFILE.ADMINISTRATOR.slug &&
                 <MenuActionListAdminLink t={this.props.t} />
               }
 

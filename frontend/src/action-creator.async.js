@@ -73,6 +73,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
       break
     case 400:
+    case 401:
     case 404:
     case 500:
       dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})

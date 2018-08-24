@@ -25,16 +25,27 @@ class AppFullscreenRouter extends React.Component {
         {this.state.isMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM
           <div className='emptyDivForRoute'>
             <Route path={PAGE.ADMIN.WORKSPACE} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR) return <Redirect to={{pathname: '/'}} />
+              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/'}} />
 
-              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace'}, props.user, {})
+              const content = {
+                workspaceList: [],
+                userList: []
+              }
+
+              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'workspace'}, props.user, content)
               return null
             }} />
 
             <Route path={PAGE.ADMIN.USER} render={() => {
-              if (props.user.profile !== PROFILE.ADMINISTRATOR) return <Redirect to={{pathname: '/'}} />
+              if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/'}} />
 
-              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user'}, props.user, {})
+              const content = {
+                profile: PROFILE,
+                workspaceList: [],
+                userList: []
+              }
+
+              props.renderAppFullscreen({slug: 'admin_workspace_user', hexcolor: '#7d4e24', type: 'user'}, props.user, content)
               return null
             }} />
           </div>
