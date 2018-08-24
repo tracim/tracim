@@ -105,6 +105,11 @@ class CFG(object):
             0,
         ))
 
+        self.API_KEY = settings.get(
+            'api.key',
+            ''
+        )
+
         self.WEBSITE_TITLE = settings.get(
             'website.title',
             'TRACIM',
@@ -135,7 +140,6 @@ class CFG(object):
         #     '/assets/img/bg.jpg',
         # )
         #
-
         self.WEBSITE_SERVER_NAME = settings.get(
             'website.server_name',
             None,
