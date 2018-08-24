@@ -50,7 +50,7 @@ class Dashboard extends React.Component {
     }
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     this.loadWorkspaceDetail()
     this.loadMemberList()
     this.loadRecentActivity()
