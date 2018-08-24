@@ -37,6 +37,7 @@ class MailSenderDaemon(FakeDaemon):
             self.worker = RQWorker(['mail_sender'])
             self.worker.work(burst=self.burst)
 
+
 class RQWorker(BaseRQWorker):
     def _install_signal_handlers(self):
         # RQ Worker is designed to work in main thread

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import time
 import json
-import typing
 import socket
 import ssl
-
+import time
+import typing
 from email import message_from_bytes
 from email.header import decode_header
 from email.header import make_header
@@ -13,14 +12,20 @@ from email.message import Message
 from email.utils import parseaddr
 
 import filelock
+import imapclient
 import markdown
 import requests
-import imapclient
 from email_reply_parser import EmailReplyParser
 
+from tracim_backend.exceptions import BadStatusCode
+from tracim_backend.exceptions import EmptyEmailBody
+from tracim_backend.exceptions import NoSpecialKeyFound
+from tracim_backend.exceptions import UnsupportedRequestMethod
+from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail  # nopep8
+from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer  # nopep8
+from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER  # nopep8
 from tracim_backend.lib.utils.logger import logger
-from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
-from tracim_backend.lib.mail_fetcher.email_processing.sanitizer import HtmlSanitizer
 
 TRACIM_SPECIAL_KEY_HEADER = 'X-Tracim-Key'
 CONTENT_TYPE_TEXT_PLAIN = 'text/plain'
@@ -92,7 +97,8 @@ class DecodedMail(object):
                 if use_html_parsing:
                     html_body = str(ParsedHTMLMail(html_body))
                 body = HtmlSanitizer.sanitize(html_body)
-
+            if not body:
+                raise EmptyEmailBody()
         return body
 
     def _get_mime_body_message(self) -> typing.Optional[Message]:
@@ -132,7 +138,7 @@ class DecodedMail(object):
         if first_ref:
             return DecodedMail.find_key_from_mail_address(first_ref)
 
-        return None
+        raise NoSpecialKeyFound()
 
     @classmethod
     def find_key_from_mail_address(
@@ -168,8 +174,8 @@ class MailFetcher(object):
         use_idle: bool,
         connection_max_lifetime: int,
         heartbeat: int,
-        endpoint: str,
-        token: str,
+        api_base_url: str,
+        api_key: str,
         use_html_parsing: bool,
         use_txt_parsing: bool,
         lockfile_path: str,
@@ -190,8 +196,8 @@ class MailFetcher(object):
         :param connection_max_lifetime: maximum duration allowed for a
              connection . connection are automatically renew when their
              lifetime excess this duration.
-        :param endpoint: tracim http endpoint where decoded mail are send.
-        :param token: token to authenticate http connexion
+        :param api_base_url: url to get access to tracim api
+        :param api_key: tracim api key
         :param use_html_parsing: parse html mail
         :param use_txt_parsing: parse txt mail
         """
@@ -204,8 +210,8 @@ class MailFetcher(object):
         self.heartbeat = heartbeat
         self.use_idle = use_idle
         self.connection_max_lifetime = connection_max_lifetime
-        self.endpoint = endpoint
-        self.token = token
+        self.api_base_url = api_base_url
+        self.api_key = api_key
         self.use_html_parsing = use_html_parsing
         self.use_txt_parsing = use_txt_parsing
         self.lock = filelock.FileLock(lockfile_path)
@@ -414,52 +420,110 @@ class MailFetcher(object):
         #  if no from address for example) and catch it here
         while mails:
             mail = mails.pop()
-            body = mail.get_body(
-                use_html_parsing=self.use_html_parsing,
-                use_txt_parsing=self.use_txt_parsing,
-            )
-            from_address = mail.get_from_address()
-
-            # don't create element for 'empty' mail
-            if not body:
-                logger.warning(
-                    self,
-                    'Mail from {} has not valable content'.format(
-                        from_address
-                    ),
-                )
+            try:
+                method, endpoint, json_body_dict = self._create_comment_request(mail)  # nopep8
+            except NoSpecialKeyFound as exc:
+                log = 'Failed to create comment request due to missing specialkey in mail {}'  # nopep8
+                logger.error(self, log.format(exc.__str__()))
+                continue
+            except EmptyEmailBody as exc:
+                log = 'Empty body, skip mail'
+                logger.error(self, log)
+                continue
+            except Exception as exc:
+                log = 'Failed to create comment request in mail fetcher error {}'  # nopep8
+                logger.error(self, log.format(exc.__str__()))
                 continue
 
-            msg = {'token': self.token,
-                   'user_mail': from_address,
-                   'content_id': mail.get_key(),
-                   'payload': {
-                       'content': body,
-                   }}
             try:
-                logger.debug(
-                    self,
-                    'Contact API on {} with body {}'.format(
-                        self.endpoint,
-                        json.dumps(msg),
-                    ),
+                self._send_request(
+                    mail=mail,
+                    imapc=imapc,
+                    method=method,
+                    endpoint=endpoint,
+                    json_body_dict=json_body_dict,
                 )
-                r = requests.post(self.endpoint, json=msg)
-                if r.status_code not in [200, 204]:
-                    details = r.json().get('msg')
-                    log = 'bad status code {} response when sending mail to tracim: {}'  # nopep8
-                    logger.error(self, log.format(
-                        str(r.status_code),
-                        details,
-                    ))
-                # Flag all correctly checked mail
-                if r.status_code in [200, 204, 400]:
-                    imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
-                    imapc.add_flags((mail.uid,), IMAP_SEEN_FLAG)
-            # TODO - G.M - Verify exception correctly works
             except requests.exceptions.Timeout as e:
                 log = 'Timeout error to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
             except requests.exceptions.RequestException as e:
                 log = 'Fail to transmit fetched mail to tracim : {}'
                 logger.error(self, log.format(str(e)))
+
+    def _get_auth_headers(self, user_email) -> dict:
+        return {
+            TRACIM_API_KEY_HEADER: self.api_key,
+            TRACIM_API_USER_EMAIL_LOGIN_HEADER: user_email
+        }
+
+    def _get_content_info(self, content_id, user_email):
+        endpoint = '{api_base_url}contents/{content_id}'.format(
+            api_base_url=self.api_base_url,
+            content_id=content_id,
+        )
+        result = requests.get(
+            endpoint,
+            headers=self._get_auth_headers(user_email)
+        )
+        if result.status_code != 200:
+            raise BadStatusCode('status code should be 200 is {}'.format(
+                result.status_code)
+            )
+        return result.json()
+
+    def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:  # nopep8
+        content_id = mail.get_key()
+        content_info = self._get_content_info(content_id, mail.get_from_address())  # nopep8
+        mail_body = mail.get_body(
+            use_html_parsing=self.use_html_parsing,
+            use_txt_parsing=self.use_txt_parsing,
+        )
+        endpoint = '{api_base_url}workspaces/{workspace_id}/contents/{content_id}/comments'.format(  # nopep8
+            api_base_url=self.api_base_url,
+            content_id=content_id,
+            workspace_id=content_info['workspace_id']
+        )
+        method = 'POST'
+        body = {
+            'raw_content': mail_body
+        }
+        return method, endpoint, body
+
+    def _send_request(
+            self,
+            mail: DecodedMail,
+            imapc: imapclient.IMAPClient,
+            method: str,
+            endpoint: str,
+            json_body_dict: dict
+    ):
+        logger.debug(
+            self,
+            'Contact API on {endpoint} with method {method} with body {body}'.format(   # nopep8
+                endpoint=endpoint,
+                method=method,
+                body=str(json_body_dict),
+            ),
+        )
+        if method == 'POST':
+            request_method = requests.post
+        else:
+            # TODO - G.M - 2018-08-24 - Better handling exception
+            raise UnsupportedRequestMethod('Request method not supported')
+
+        r = request_method(
+            url=endpoint,
+            json=json_body_dict,
+            headers=self._get_auth_headers(mail.get_from_address()),
+        )
+        if r.status_code not in [200, 204]:
+            details = r.json().get('msg')
+            log = 'bad status code {} response when sending mail to tracim: {}'  # nopep8
+            logger.error(self, log.format(
+                str(r.status_code),
+                details,
+            ))
+        # Flag all correctly checked mail
+        if r.status_code in [200, 204]:
+            imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
+            imapc.add_flags((mail.uid,), IMAP_SEEN_FLAG)

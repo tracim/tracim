@@ -5,6 +5,7 @@ import typing
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
+from smtplib import SMTPRecipientsRefused
 
 from lxml.html.diff import htmldiff
 from mako.template import Template
@@ -126,7 +127,8 @@ class EmailNotifier(INotifier):
                     self.config,
                     self.session,
                 ).notify_content_update(self._user.user_id, content.content_id)
-        except TypeError as e:
+        except Exception as e:
+            # TODO - G.M - 2018-08-27 - Do Better catching for exception here
             logger.error(self, 'Exception catched during email notification: {}'.format(e.__str__()))
 
 
@@ -470,16 +472,18 @@ class EmailManager(object):
             call_to_action_text = l_('Answer')
 
         elif ActionDescription.CREATION == action:
-
             # Default values (if not overriden)
             content_text = content.description
             call_to_action_text = l_('View online')
 
             if CONTENT_TYPES.Thread.slug == content.type:
+                if content.get_last_comment_from(actor):
+                    content_text = content.get_last_comment_from(actor).description  # nopep8
+
                 call_to_action_text = l_('Answer')
                 content_intro = l_('<span id="content-intro-username">{}</span> started a thread entitled:').format(actor.display_name)
-                content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + \
-                               content.get_last_comment_from(actor).description
+                content_text = '<p id="content-body-intro">{}</p>'.format(content.label) + content_text  # nopep8
+
 
             elif CONTENT_TYPES.File.slug == content.type:
                 content_intro = l_('<span id="content-intro-username">{}</span> added a file entitled:').format(actor.display_name)

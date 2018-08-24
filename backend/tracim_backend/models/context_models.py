@@ -276,9 +276,9 @@ class WorkspaceMemberInvitation(object):
     """
     def __init__(
         self,
-        user_id: int,
-        user_email_or_public_name: str,
-        role: str,
+        user_id: int = None,
+        user_email_or_public_name: str = None,
+        role: str = None,
     ):
         self.role = role
         self.user_email_or_public_name = user_email_or_public_name
