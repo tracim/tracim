@@ -138,7 +138,10 @@ class User(DeclarativeBase):
     is_active = Column(Boolean, default=True, nullable=False)
     is_deleted = Column(Boolean, default=False, nullable=False, server_default=sqlalchemy.sql.expression.literal(False))
     imported_from = Column(Unicode(32), nullable=True)
+    # timezone as tz database format
     timezone = Column(Unicode(255), nullable=False, server_default='')
+    # lang in iso639 format
+    lang = Column(Unicode(3), nullable=True, default=None)
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
     auth_token = Column(Unicode(255))

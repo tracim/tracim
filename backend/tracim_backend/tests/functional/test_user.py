@@ -8,13 +8,15 @@ import requests
 import transaction
 
 from tracim_backend import models
+from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
@@ -74,6 +76,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -198,6 +201,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -289,6 +293,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -414,6 +419,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -702,6 +708,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -814,6 +821,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -937,6 +945,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1150,6 +1159,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1231,6 +1241,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1312,6 +1323,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1411,6 +1423,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1492,6 +1505,7 @@ class TestUserSetContentAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1609,6 +1623,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1718,6 +1733,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1799,6 +1815,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1881,6 +1898,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -1976,6 +1994,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2120,6 +2139,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2217,6 +2237,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2314,6 +2335,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2360,6 +2382,444 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         )
 
 
+class TestUserEnableWorkspaceNotification(FunctionalTest):
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notify
+    """
+    def test_api_enable_user_workspace_notification__ok__200__admin(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+
+    def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+
+    def test_api_enable_user_workspace_notification__err__403__other_user(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='boby',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=403)
+
+
+class TestUserDisableWorkspaceNotification(FunctionalTest):
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify
+    """
+    def test_api_disable_user_workspace_notification__ok__200__admin(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=True,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+
+    def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+
+    def test_api_disable_user_workspace_notification__err__403__other_user(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='boby',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)  # nopep8
+        rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=403)
+
+
 class TestUserWorkspaceEndpoint(FunctionalTest):
     """
     Tests for /api/v2/users/{user_id}/workspaces
@@ -2370,6 +2830,22 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         """
         Check obtain all workspaces reachables for user with user auth.
         """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        workspace_api = WorkspaceApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config,
+        )
+        workspace = workspace_api.get_one(1)
+        app_api = ApplicationApi(
+            app_list
+        )
+
+        default_sidebar_entry = app_api.get_default_workspace_menu_entry(workspace=workspace)  # nope8
         self.testapp.authorization = (
             'Basic',
             (
@@ -2384,45 +2860,14 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         assert workspace['label'] == 'Business'
         assert workspace['slug'] == 'business'
         assert workspace['is_deleted'] is False
-        assert len(workspace['sidebar_entries']) == 5
 
-        # TODO - G.M - 2018-08-02 - Better test for sidebar entry, make it
-        # not fixed on active application/content-file
-        sidebar_entry = workspace['sidebar_entries'][0]
-        assert sidebar_entry['slug'] == 'dashboard'
-        assert sidebar_entry['label'] == 'Dashboard'
-        assert sidebar_entry['route'] == '/#/workspaces/1/dashboard'  # nopep8
-        assert sidebar_entry['hexcolor'] == "#252525"
-        assert sidebar_entry['fa_icon'] == "signal"
-
-        sidebar_entry = workspace['sidebar_entries'][1]
-        assert sidebar_entry['slug'] == 'contents/all'
-        assert sidebar_entry['label'] == 'All Contents'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#fdfdfd"
-        assert sidebar_entry['fa_icon'] == "th"
-
-        sidebar_entry = workspace['sidebar_entries'][2]
-        assert sidebar_entry['slug'] == 'contents/html-document'
-        assert sidebar_entry['label'] == 'Text Documents'
-        assert sidebar_entry['route'] == '/#/workspaces/1/contents?type=html-document'  # nopep8
-        assert sidebar_entry['hexcolor'] == "#3f52e3"
-        assert sidebar_entry['fa_icon'] == "file-text-o"
-
-        sidebar_entry = workspace['sidebar_entries'][3]
-        assert sidebar_entry['slug'] == 'contents/file'
-        assert sidebar_entry['label'] == 'Files'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=file"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#FF9900"
-        assert sidebar_entry['fa_icon'] == "paperclip"
-
-        sidebar_entry = workspace['sidebar_entries'][4]
-        assert sidebar_entry['slug'] == 'contents/thread'
-        assert sidebar_entry['label'] == 'Threads'
-        assert sidebar_entry['route'] == "/#/workspaces/1/contents?type=thread"  # nopep8
-        assert sidebar_entry['hexcolor'] == "#ad4cf9"
-        assert sidebar_entry['fa_icon'] == "comments-o"
-
+        assert len(workspace['sidebar_entries']) == len(default_sidebar_entry)
+        for counter, sidebar_entry in enumerate(default_sidebar_entry):
+            workspace['sidebar_entries'][counter]['slug'] = sidebar_entry.slug
+            workspace['sidebar_entries'][counter]['label'] = sidebar_entry.label
+            workspace['sidebar_entries'][counter]['route'] = sidebar_entry.route
+            workspace['sidebar_entries'][counter]['hexcolor'] = sidebar_entry.hexcolor  # nopep8
+            workspace['sidebar_entries'][counter]['fa_icon'] = sidebar_entry.fa_icon  # nopep8
 
     def test_api__get_user_workspaces__err_403__unallowed_user(self):
         """
@@ -2509,6 +2954,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2536,6 +2982,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
         assert res['is_deleted'] is False
+        assert res['lang'] == 'fr'
 
     def test_api__get_user__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2559,6 +3006,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2618,6 +3066,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2651,6 +3100,7 @@ class TestUserEndpoint(FunctionalTest):
             'password': 'mysuperpassword',
             'profile': 'users',
             'timezone': 'Europe/Paris',
+            'lang': 'fr',
             'public_name': 'test user',
             'email_notification': False,
         }
@@ -2668,7 +3118,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test user'
         assert res['timezone'] == 'Europe/Paris'
-
+        assert res['lang'] == 'fr'
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
             .filter(models.User.email == 'admin@admin.admin') \
@@ -2708,6 +3158,7 @@ class TestUserEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test'
         assert res['timezone'] == ''
+        assert res['lang'] is None
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -2744,6 +3195,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2761,6 +3213,7 @@ class TestUserEndpoint(FunctionalTest):
             'password': 'mysuperpassword',
             'profile': 'users',
             'timezone': 'Europe/Paris',
+            'lang': 'fr',
             'public_name': 'test user',
             'email_notification': False,
         }
@@ -2792,6 +3245,7 @@ class TestUserEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -2810,6 +3264,7 @@ class TestUserEndpoint(FunctionalTest):
             'profile': 'users',
             'timezone': 'Europe/Paris',
             'public_name': 'test user',
+            'lang': 'fr',
             'email_notification': False,
         }
         res = self.testapp.post_json(
@@ -2840,6 +3295,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
             'profile': 'users',
             'timezone': 'Europe/Paris',
             'public_name': 'test user',
+            'lang': 'fr',
             'email_notification': True,
         }
         res = self.testapp.post_json(
@@ -2856,6 +3312,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test user'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['lang'] == 'fr'
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -2909,6 +3366,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
         assert res['email'] == 'test@test.test'
         assert res['public_name'] == 'test'
         assert res['timezone'] == ''
+        assert res['lang'] == None
 
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -2957,6 +3415,7 @@ class TestUserWithNotificationEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3011,6 +3470,7 @@ class TestUsersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3061,6 +3521,7 @@ class TestUsersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3110,6 +3571,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3119,6 +3581,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3174,6 +3637,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3183,6 +3647,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3238,6 +3703,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3247,6 +3713,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3292,6 +3759,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3301,6 +3769,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3310,6 +3779,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
             name='bob3',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3395,6 +3865,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3457,6 +3928,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3519,6 +3991,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3581,6 +4054,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3643,6 +4117,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3712,6 +4187,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3721,6 +4197,7 @@ class TestSetEmailEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3777,6 +4254,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3839,6 +4317,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3901,6 +4380,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -3965,6 +4445,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4026,6 +4507,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             password='pass',
             name='bob',
             groups=groups,
+            lang='fr',
             timezone='Europe/Paris',
             do_save=True,
             do_notify=False,
@@ -4036,6 +4518,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
             name='bob2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4092,6 +4575,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4115,10 +4599,12 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['lang'] == 'fr'
         # Set params
         params = {
             'public_name': 'updated',
             'timezone': 'Europe/London',
+            'lang': 'en',
         }
         self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
@@ -4134,6 +4620,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'updated'
         assert res['timezone'] == 'Europe/London'
+        assert res['lang'] == 'en'
 
     def test_api__set_user_info__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -4157,6 +4644,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4180,10 +4668,12 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'bob'
         assert res['timezone'] == 'Europe/Paris'
+        assert res['lang'] == 'fr'
         # Set params
         params = {
             'public_name': 'updated',
             'timezone': 'Europe/London',
+            'lang': 'en',
         }
         self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
@@ -4199,6 +4689,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         assert res['user_id'] == user_id
         assert res['public_name'] == 'updated'
         assert res['timezone'] == 'Europe/London'
+        assert res['lang'] == 'en'
 
     def test_api__set_user_email__err_403__other_normal_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -4222,6 +4713,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4231,6 +4723,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             name='test',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4250,6 +4743,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         params = {
             'public_name': 'updated',
             'timezone': 'Europe/London',
+            'lang': 'en'
         }
         self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
@@ -4287,6 +4781,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4349,6 +4844,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4411,6 +4907,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4420,6 +4917,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
             name='test',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4476,6 +4974,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4534,6 +5033,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4592,6 +5092,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4601,6 +5102,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='test2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4644,6 +5146,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4653,6 +5156,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='test2',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )
@@ -4696,6 +5200,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='fr',
             do_save=True,
             do_notify=False,
         )

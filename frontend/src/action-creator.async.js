@@ -1,13 +1,12 @@
 import { FETCH_CONFIG } from './helper.js'
 import {
-  TIMEZONE,
-  setTimezone,
   USER_LOGIN,
   USER_LOGOUT,
-  USER_ROLE,
   USER_CONNECTED,
   USER_KNOWN_MEMBER_LIST,
-  setUserRole,
+  USER_NAME,
+  USER_EMAIL,
+  USER_PASSWORD,
   WORKSPACE,
   WORKSPACE_LIST,
   WORKSPACE_DETAIL,
@@ -20,7 +19,8 @@ import {
   WORKSPACE_CONTENT_ARCHIVED,
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
-  WORKSPACE_READ_STATUS
+  WORKSPACE_READ_STATUS,
+  USER_WORKSPACE_DO_NOTIFY
 } from './action-creator.sync.js'
 
 /*
@@ -82,19 +82,6 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
   return fetchResult
 }
 
-export const getTimezone = () => async dispatch => {
-  const fetchGetTimezone = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/timezone`,
-    param: {
-      headers: {...FETCH_CONFIG.headers},
-      method: 'GET'
-    },
-    actionName: TIMEZONE,
-    dispatch
-  })
-  if (fetchGetTimezone.status === 200) dispatch(setTimezone(fetchGetTimezone.json))
-}
-
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/sessions/login`, // FETCH_CONFIG.apiUrl
@@ -139,19 +126,6 @@ export const getUserIsConnected = user => async dispatch => {
   })
 }
 
-export const getUserRole = user => async dispatch => {
-  const fetchGetUserRole = await fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/roles`,
-    param: {
-      headers: {...FETCH_CONFIG.headers},
-      method: 'GET'
-    },
-    actionName: USER_ROLE,
-    dispatch
-  })
-  if (fetchGetUserRole.status === 200) dispatch(setUserRole(fetchGetUserRole.json))
-}
-
 export const getUserKnownMember = (user, userNameToSearch) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/known_members?acp=${userNameToSearch}`,
@@ -167,6 +141,64 @@ export const getUserKnownMember = (user, userNameToSearch) => dispatch => {
   })
 }
 
+export const putUserName = (user, newName) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        public_name: newName,
+        timezone: user.timezone
+      })
+    },
+    actionName: USER_NAME,
+    dispatch
+  })
+}
+
+export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/email`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        email: newEmail,
+        loggedin_user_password: checkPassword
+      })
+    },
+    actionName: USER_EMAIL,
+    dispatch
+  })
+}
+
+export const putUserPassword = (user, oldPassword, newPassword, newPassword2) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/password`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        loggedin_user_password: oldPassword,
+        new_password: newPassword,
+        new_password2: newPassword2
+      })
+    },
+    actionName: USER_PASSWORD,
+    dispatch
+  })
+}
+
 export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/read`,
@@ -178,6 +210,26 @@ export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
       method: 'PUT'
     },
     actionName: USER_KNOWN_MEMBER_LIST,
+    dispatch
+  })
+}
+
+export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatch => {
+  return fetchWrapper({
+    // @TODO Côme - 2018/08/23 - this is the wrong endpoint, but backend hasn't implemented it yet
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members/${user.user_id}`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        do_notify: doNotify
+      })
+
+    },
+    actionName: USER_WORKSPACE_DO_NOTIFY,
     dispatch
   })
 }

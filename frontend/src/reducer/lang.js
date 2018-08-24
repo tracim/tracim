@@ -4,9 +4,11 @@ import flagFr from '../img/flag_fr.png'
 
 const defaultLang = [{
   id: 'en',
+  label: 'English',
   icon: flagEn
 }, {
   id: 'fr',
+  label: 'Français',
   icon: flagFr
 }]
 

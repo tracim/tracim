@@ -50,7 +50,6 @@ requires = [
     'pyramid_multiauth',
     # frontend file serve
     'pyramid_mako',
-    'spectra',
 ]
 
 tests_require = [

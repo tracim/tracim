@@ -7,6 +7,8 @@ from slugify import slugify
 from sqlalchemy.orm import Session
 from tracim_backend.config import CFG
 from tracim_backend.config import PreviewDim
+from tracim_backend.extensions import app_list
+from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_root_frontend_url
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
@@ -19,9 +21,8 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.roles import WorkspaceRoles
-from tracim_backend.models.workspace_menu_entries import default_workspace_menu_entry  # nopep8
-from tracim_backend.models.workspace_menu_entries import WorkspaceMenuEntry
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
+from tracim_backend.app_models.contents import CONTENT_TYPES
 
 
 class PreviewAllowedDim(object):
@@ -81,9 +82,10 @@ class UserInfos(object):
     """
     Just some user infos
     """
-    def __init__(self, timezone: str, public_name: str) -> None:
+    def __init__(self, timezone: str, public_name: str, lang: str) -> None:
         self.timezone = timezone
         self.public_name = public_name
+        self.lang = lang
 
 
 class UserProfile(object):
@@ -105,6 +107,7 @@ class UserCreation(object):
             public_name: str = None,
             timezone: str = None,
             profile: str = None,
+            lang: str = None,
             email_notification: bool = True,
     ) -> None:
         self.email = email
@@ -113,6 +116,7 @@ class UserCreation(object):
         self.password = password or password_generator()
         self.public_name = public_name or None
         self.timezone = timezone or ''
+        self.lang = lang or None
         self.profile = profile or Group.TIM_USER_GROUPNAME
         self.email_notification = email_notification
 
@@ -165,7 +169,7 @@ class WorkspaceAndUserPath(object):
     """
     def __init__(self, workspace_id: int, user_id: int):
         self.workspace_id = workspace_id
-        self.user_id = workspace_id
+        self.user_id = user_id
 
 
 class UserWorkspaceAndContentPath(object):
@@ -407,6 +411,10 @@ class UserInContext(object):
         return self.user.timezone
 
     @property
+    def lang(self) -> str:
+        return self.user.lang
+
+    @property
     def profile(self) -> Profile:
         return self.user.profile.name
 
@@ -493,7 +501,10 @@ class WorkspaceInContext(object):
         # order to not use hardcoded list
         # list should be able to change (depending on activated/disabled
         # apps)
-        return default_workspace_menu_entry(self.workspace)
+        app_api = ApplicationApi(
+            app_list
+        )
+        return app_api.get_default_workspace_menu_entry(self.workspace)
 
     @property
     def frontend_url(self):
@@ -568,6 +579,10 @@ class UserRoleWorkspaceInContext(object):
     @property
     def is_active(self) -> bool:
         return self.user.is_active
+
+    @property
+    def do_notify(self) -> bool:
+        return self.user_role.do_notify
 
     @property
     def user(self) -> UserInContext:

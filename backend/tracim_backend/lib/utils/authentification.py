@@ -3,14 +3,12 @@ import typing
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
-from sqlalchemy.orm.exc import NoResultFound
+from zope.interface import implementer
 
-from tracim_backend import TracimRequest
-from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models import User
-from zope.interface import implementer
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"

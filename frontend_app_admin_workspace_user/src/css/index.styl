@@ -1,7 +1,10 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-.table th
-  vertical-align middle
+.table
+  th
+    vertical-align middle
+  td a:hover
+    text-decoration underline
 
 .adminWorkspacePage
   &__createworkspace
@@ -19,3 +22,33 @@
       align-items center
       flex-wrap wrap
       cursor pointer
+
+.adminUserPage
+  &__description
+    margin-bottom 40px
+  &__adduser
+    margin 25px 0
+    &__button
+      margin-bottom 20px
+    &__form
+      border 1px solid grey
+      border-radius 5px
+      padding 20px
+      &__username
+        .username
+        &__text
+          font-weight bold
+        &__input
+          margin 15px 0 20px 0
+          width 40%
+      &__userrole
+        .userrole
+        &__text
+          margin 20px 0
+          font-weight bold
+        &__role
+          margin 25px 0
+  &__delimiter
+    margin 50px auto
+  &__table
+    margin-bottom 100px

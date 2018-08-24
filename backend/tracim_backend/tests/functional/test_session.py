@@ -160,6 +160,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert res.json_body['profile'] == 'administrators'
         assert res.json_body['caldav_url'] is None
         assert res.json_body['avatar_url'] is None
+        assert res.json_body['lang'] is None
 
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -183,6 +184,7 @@ class TestWhoamiEndpoint(FunctionalTest):
             name='bob',
             groups=groups,
             timezone='Europe/Paris',
+            lang='en',
             do_save=True,
             do_notify=False,
         )

@@ -4,7 +4,7 @@ import transaction
 from os.path import normpath as base_normpath
 
 from sqlalchemy.orm import Session
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from wsgidav import util
 from wsgidav import compat
 

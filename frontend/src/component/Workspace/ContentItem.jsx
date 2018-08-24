@@ -19,12 +19,17 @@ const ContentItem = props => {
         </div>
       </div>
 
-      <div className='d-none d-md-flex'>
-        <BtnExtandedAction onClickExtendedAction={props.onClickExtendedAction} />
-      </div>
+      {props.idRoleUserWorkspace >= 2 &&
+        <div className='d-none d-md-flex'>
+          <BtnExtandedAction
+            idRoleUserWorkspace={props.idRoleUserWorkspace}
+            onClickExtendedAction={props.onClickExtendedAction}
+          />
+        </div>
+      }
 
       <div className={classnames('content__status')} style={{color: status.hexcolor}}>
-        <div className='content__status__text d-none d-xl-block'>
+        <div className='content__status__text d-none d-xl-flex align-items-center justify-content-between'>
           {status.label}
           <i className={`fa fa-fw fa-${status.faIcon}`} />
         </div>

@@ -15,7 +15,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests import StandardTest
 

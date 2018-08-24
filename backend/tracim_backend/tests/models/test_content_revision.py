@@ -5,7 +5,7 @@ from sqlalchemy import inspect
 
 from tracim_backend.models import ContentRevisionRO
 from tracim_backend.models import User
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
 

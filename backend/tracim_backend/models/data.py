@@ -87,7 +87,7 @@ class Workspace(DeclarativeBase):
 
     def get_allowed_content_types(self):
         # @see Content.get_allowed_content_types()
-        return CONTENT_TYPES.extended_endpoint_allowed_types_slug()
+        return CONTENT_TYPES.endpoint_allowed_types_slug()
 
     def get_valid_children(
             self,
@@ -282,9 +282,9 @@ class ActionDescription(object):
                 ]
 
 
-from tracim_backend.models.contents import CONTENT_STATUS
-from tracim_backend.models.contents import ContentStatus
-from tracim_backend.models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import CONTENT_TYPES
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
 # is lost .
 
@@ -552,7 +552,7 @@ class ContentChecker(object):
                 for content_slug, value in properties['allowed_content'].items():  # nopep8
                     if not isinstance(value, bool):
                         return False
-                    if not content_slug in CONTENT_TYPES.extended_endpoint_allowed_types_slug():  # nopep8
+                    if not content_slug in CONTENT_TYPES.endpoint_allowed_types_slug():  # nopep8
                         return False
             if 'origin' in properties.keys():
                 pass

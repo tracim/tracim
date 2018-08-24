@@ -2,11 +2,22 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import appFactory from '../../appFactory.js'
+import { ROLE, findIdRoleUserWorkspace } from '../../helper.js'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
   openContentApp = () => {
-    const { idWorkspace, appOpenedType, user, workspaceContentList, contentType, renderAppFeature, dispatchCustomEvent, match } = this.props
+    const {
+      idWorkspace,
+      appOpenedType,
+      user,
+      currentWorkspace,
+      workspaceContentList,
+      contentType,
+      renderAppFeature,
+      dispatchCustomEvent,
+      match
+    } = this.props
 
     if (isNaN(idWorkspace) || idWorkspace === -1) return
 
@@ -30,6 +41,7 @@ export class OpenContentApp extends React.Component {
         renderAppFeature(
           contentType.find(ct => ct.slug === contentToOpen.type),
           user,
+          findIdRoleUserWorkspace(user.user_id, currentWorkspace.memberList, ROLE),
           contentToOpen
         )
         this.props.updateAppOpenedType(contentToOpen.type)
@@ -54,5 +66,7 @@ export class OpenContentApp extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceContentList, contentType }) => ({ user, workspaceContentList, contentType })
+const mapStateToProps = ({ user, currentWorkspace, workspaceContentList, contentType }) => ({
+  user, currentWorkspace, workspaceContentList, contentType
+})
 export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))

@@ -7,11 +7,12 @@ from marshmallow.validate import Range
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
+
+from tracim_backend.app_models.contents import GlobalStatus
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import open_status
 from tracim_backend.models.auth import Group
-from tracim_backend.models.contents import GlobalStatus
-from tracim_backend.models.contents import CONTENT_STATUS
-from tracim_backend.models.contents import CONTENT_TYPES
-from tracim_backend.models.contents import open_status
 from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
@@ -41,6 +42,7 @@ from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.app_models.validator import all_content_types_validator
 
 
 class UserDigestSchema(marshmallow.Schema):
@@ -82,6 +84,7 @@ class UserSchema(UserDigestSchema):
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
+        description="Timezone as tz database format",
         example="Europe/Paris",
     )
     # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
@@ -96,6 +99,14 @@ class UserSchema(UserDigestSchema):
         attribute='profile',
         validate=OneOf(Profile._NAME),
         example='managers',
+    )
+    lang = marshmallow.fields.String(
+        description="User langage in iso639 format",
+        example='en',
+        required=False,
+        validate=Length(min=2, max=3),
+        allow_none=True,
+        default=None,
     )
 
     class Meta:
@@ -136,12 +147,21 @@ class SetPasswordSchema(LoggedInUserPasswordSchema):
 
 class UserInfosSchema(marshmallow.Schema):
     timezone = marshmallow.fields.String(
+        description="Timezone as tz database format",
         example="Europe/Paris",
         required=True,
     )
     public_name = marshmallow.fields.String(
         example='Suri Cate',
         required=True,
+    )
+    lang = marshmallow.fields.String(
+        description="User langage in iso639 format",
+        example='en',
+        required=True,
+        validate=Length(min=2, max=3),
+        allow_none=True,
+        default=None,
     )
 
     @post_load
@@ -177,6 +197,7 @@ class UserCreationSchema(marshmallow.Schema):
         default=Group.TIM_USER_GROUPNAME
     )
     timezone = marshmallow.fields.String(
+        description="Timezone as tz database format",
         example="Europe/Paris",
         required=False,
         default=''
@@ -184,6 +205,14 @@ class UserCreationSchema(marshmallow.Schema):
     public_name = marshmallow.fields.String(
         example='Suri Cate',
         required=False,
+        default=None,
+    )
+    lang = marshmallow.fields.String(
+        description="User langage in iso639 format",
+        example='en',
+        required=False,
+        validate=Length(min=2, max=3),
+        allow_none=True,
         default=None,
     )
     email_notification = marshmallow.fields.Bool(
@@ -390,7 +419,7 @@ class FilterContentQuerySchema(marshmallow.Schema):
     content_type = marshmallow.fields.String(
         example=CONTENT_TYPES.Any_SLUG,
         default=CONTENT_TYPES.Any_SLUG,
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug())
+        validate=all_content_types_validator
     )
 
     @post_load
@@ -575,6 +604,10 @@ class WorkspaceMemberSchema(marshmallow.Schema):
         WorkspaceDigestSchema(exclude=('sidebar_entries',))
     )
     is_active = marshmallow.fields.Bool()
+    do_notify = marshmallow.fields.Bool(
+        description='has user enabled notification for this workspace',
+        example=True,
+    )
 
     class Meta:
         description = 'Workspace Member information'
@@ -641,7 +674,7 @@ class StatusSchema(marshmallow.Schema):
 class ContentTypeSchema(marshmallow.Schema):
     slug = marshmallow.fields.String(
         example='pagehtml',
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
+        validate=all_content_types_validator,
     )
     fa_icon = marshmallow.fields.String(
         example='fa-file-text-o',
@@ -695,7 +728,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
     content_type = marshmallow.fields.String(
         example='html-document',
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
+        validate=all_content_types_validator,
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -730,12 +763,12 @@ class ContentDigestSchema(marshmallow.Schema):
     label = marshmallow.fields.Str(example='Intervention Report 12')
     content_type = marshmallow.fields.Str(
         example='html-document',
-        validate=OneOf(CONTENT_TYPES.endpoint_allowed_types_slug()),
+        validate=all_content_types_validator,
     )
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-content',
-            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
+            validate=all_content_types_validator
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
@@ -885,7 +918,7 @@ class FolderContentModifySchema(ContentModifyAbstractSchema, TextBasedDataAbstra
     sub_content_types = marshmallow.fields.List(
         marshmallow.fields.String(
             example='html-document',
-            validate=OneOf(CONTENT_TYPES.extended_endpoint_allowed_types_slug())
+            validate=all_content_types_validator,
         ),
         description='list of content types allowed as sub contents. '
                     'This field is required for folder contents, '
