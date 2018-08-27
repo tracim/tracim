@@ -169,7 +169,7 @@ class WorkspaceAndUserPath(object):
     """
     def __init__(self, workspace_id: int, user_id: int):
         self.workspace_id = workspace_id
-        self.user_id = workspace_id
+        self.user_id = user_id
 
 
 class UserWorkspaceAndContentPath(object):
@@ -266,10 +266,8 @@ class RoleUpdate(object):
     def __init__(
         self,
         role: str,
-        do_notify: bool,
     ):
         self.role = role
-        self.do_notify = do_notify
 
 
 class WorkspaceMemberInvitation(object):
@@ -281,12 +279,10 @@ class WorkspaceMemberInvitation(object):
         user_id: int,
         user_email_or_public_name: str,
         role: str,
-        do_notify: str,
     ):
         self.role = role
         self.user_email_or_public_name = user_email_or_public_name
         self.user_id = user_id
-        self.do_notify = do_notify
 
 
 class WorkspaceUpdate(object):

@@ -384,6 +384,7 @@ class HtmlDocument extends React.Component {
           customColor={config.hexcolor}
           faIcon={config.faIcon}
           title={content.label}
+          idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
         />
@@ -395,11 +396,13 @@ class HtmlDocument extends React.Component {
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              <NewVersionBtn
-                customColor={config.hexcolor}
-                onClickNewVersionBtn={this.handleClickNewVersion}
-                disabled={mode !== MODE.VIEW}
-              />
+              {loggedUser.idRoleUserWorkspace >= 2 &&
+                <NewVersionBtn
+                  customColor={config.hexcolor}
+                  onClickNewVersionBtn={this.handleClickNewVersion}
+                  disabled={mode !== MODE.VIEW}
+                />
+              }
 
               {mode === MODE.REVISION &&
                 <button
@@ -414,19 +417,23 @@ class HtmlDocument extends React.Component {
             </div>
 
             <div className='d-flex'>
-              <SelectStatus
-                selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-                availableStatus={config.availableStatuses}
-                onChangeStatus={this.handleChangeStatus}
-                disabled={mode === MODE.REVISION}
-              />
+              {loggedUser.idRoleUserWorkspace >= 2 &&
+                <SelectStatus
+                  selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
+                  availableStatus={config.availableStatuses}
+                  onChangeStatus={this.handleChangeStatus}
+                  disabled={mode === MODE.REVISION}
+                />
+              }
 
-              <ArchiveDeleteContent
-                customColor={config.hexcolor}
-                onClickArchiveBtn={this.handleClickArchive}
-                onClickDeleteBtn={this.handleClickDelete}
-                disabled={mode === MODE.REVISION}
-              />
+              {loggedUser.idRoleUserWorkspace >= 4 &&
+                <ArchiveDeleteContent
+                  customColor={config.hexcolor}
+                  onClickArchiveBtn={this.handleClickArchive}
+                  onClickDeleteBtn={this.handleClickDelete}
+                  disabled={mode === MODE.REVISION}
+                />
+              }
             </div>
           </div>
         </PopinFixedOption>

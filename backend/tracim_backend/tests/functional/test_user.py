@@ -2382,6 +2382,444 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         )
 
 
+class TestUserEnableWorkspaceNotification(FunctionalTest):
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notify
+    """
+    def test_api_enable_user_workspace_notification__ok__200__admin(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+
+    def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+
+    def test_api_enable_user_workspace_notification__err__403__other_user(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='boby',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=403)
+
+
+class TestUserDisableWorkspaceNotification(FunctionalTest):
+    """
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify
+    """
+    def test_api_disable_user_workspace_notification__ok__200__admin(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=True,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+
+    def test_api_enable_user_workspace_notification__ok__200__user_itself(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=204)
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is False
+
+    def test_api_disable_user_workspace_notification__err__403__other_user(self):
+        # init DB
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+
+        )
+        workspace = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='boby',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)  # nopep8
+        rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)  # nopep8
+        transaction.commit()
+        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.do_notify is True
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test2@test2.test2',
+                'pass',
+            )
+        )
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+            user_id=test_user.user_id,
+            workspace_id=workspace.workspace_id
+        ), status=403)
+
+
 class TestUserWorkspaceEndpoint(FunctionalTest):
     """
     Tests for /api/v2/users/{user_id}/workspaces
@@ -4235,7 +4673,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         params = {
             'public_name': 'updated',
             'timezone': 'Europe/London',
-            'lang' : 'en',
+            'lang': 'en',
         }
         self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),

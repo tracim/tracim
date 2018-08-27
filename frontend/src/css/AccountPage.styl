@@ -119,27 +119,6 @@ settingText()
       width 80%
       min-height 600px
       background-color off-white
-      .personaldata
-        &__text
-          settingText()
-        &__form
-          margin 25px 0
-          &__title
-            margin-bottom 15px
-            font-size 18px
-          &__txtinput
-            display block
-            width auto
-            border-width 1px
-            border-style solid
-            border-radius 5px
-          &__button
-            vertical-align top
-            border-width 1px
-            border-style solid
-            border-radius 5px
-            padding 8px 25px
-            cursor pointer
       .calendar
         &__text
           settingText()
@@ -171,8 +150,7 @@ settingText()
 
 /**** MEDIA 576px & 1199px ****/
 
-// Regroup the common rules
-
+// @TODO Côme - 2018/08/22 - dont bypass breakpoints (from sm to md)
 @media (min-width: min-sm) and (max-width: max-md)
 
   .account
