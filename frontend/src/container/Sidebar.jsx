@@ -25,10 +25,10 @@ class Sidebar extends React.Component {
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      default:
-        return
-    }
+    // switch (type) {
+    //   default:
+    //     return
+    // }
   }
 
   componentDidUpdate (prevProps, prevState) {
