@@ -59,7 +59,9 @@ tests_require = [
     'pep8',
     'mypy',
     'requests',
-    'Pillow'
+    'responses',
+    'mock'
+    'Pillow',
 ]
 
 mysql_require = [

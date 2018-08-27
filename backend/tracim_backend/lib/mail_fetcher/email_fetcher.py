@@ -465,10 +465,11 @@ class MailFetcher(object):
             endpoint,
             headers=self._get_auth_headers(user_email)
         )
-        if result.status_code != 200:
-            raise BadStatusCode('status code should be 200 is {}'.format(
-                result.status_code)
-            )
+        if result.status_code not in [200, 204]:
+            details = result.json().get('message')
+            msg = 'bad status code {}(200 is valid) response when trying to get info about a content: {}'  # nopep8
+            msg = msg.format(str(result.status_code), details)
+            raise BadStatusCode(msg)
         return result.json()
 
     def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:  # nopep8
@@ -517,12 +518,10 @@ class MailFetcher(object):
             headers=self._get_auth_headers(mail.get_from_address()),
         )
         if r.status_code not in [200, 204]:
-            details = r.json().get('msg')
-            log = 'bad status code {} response when sending mail to tracim: {}'  # nopep8
-            logger.error(self, log.format(
-                str(r.status_code),
-                details,
-            ))
+            details = r.json().get('message')
+            msg = 'bad status code {} (200 and 204 are valid) response when sending mail to tracim: {}'  # nopep8
+            msg = msg.format(str(r.status_code), details)
+            raise BadStatusCode(msg)
         # Flag all correctly checked mail
         if r.status_code in [200, 204]:
             imapc.add_flags((mail.uid,), IMAP_CHECKED_FLAG)
