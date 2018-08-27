@@ -32,7 +32,6 @@
     });
 
     tinymce.init({
-      forced_root_block : "",
       selector: selector,
       menubar: false,
       resize: false,

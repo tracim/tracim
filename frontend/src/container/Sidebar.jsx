@@ -25,12 +25,10 @@ class Sidebar extends React.Component {
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case 'refreshWorkspaceList':
-        console.log('%c<Sidebar> Custom event', 'color: #28a745', type, data)
-        this.loadAppConfigAndWorkspaceList()
-        break
-    }
+    // switch (type) {
+    //   default:
+    //     return
+    // }
   }
 
   componentDidUpdate (prevProps, prevState) {
