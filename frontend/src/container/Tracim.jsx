@@ -47,6 +47,10 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
+      case 'refreshWorkspaceList':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.loadWorkspaceList()
+        break
     }
   }
 

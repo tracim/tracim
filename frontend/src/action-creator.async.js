@@ -7,6 +7,7 @@ import {
   USER_NAME,
   USER_EMAIL,
   USER_PASSWORD,
+  USER_LANG,
   WORKSPACE,
   WORKSPACE_LIST,
   WORKSPACE_DETAIL,
@@ -73,6 +74,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
       break
     case 400:
+    case 401:
     case 404:
     case 500:
       dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
@@ -152,7 +154,8 @@ export const putUserName = (user, newName) => dispatch => {
       method: 'PUT',
       body: JSON.stringify({
         public_name: newName,
-        timezone: user.timezone
+        timezone: user.timezone,
+        lang: user.lang
       })
     },
     actionName: USER_NAME,
@@ -195,6 +198,26 @@ export const putUserPassword = (user, oldPassword, newPassword, newPassword2) =>
       })
     },
     actionName: USER_PASSWORD,
+    dispatch
+  })
+}
+
+export const putUserLang = (user, newLang) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
+    param: {
+      headers: {
+        ...FETCH_CONFIG.headers,
+        'Authorization': 'Basic ' + user.auth
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        public_name: user.public_name,
+        timezone: user.timezone,
+        lang: newLang
+      })
+    },
+    actionName: USER_LANG,
     dispatch
   })
 }

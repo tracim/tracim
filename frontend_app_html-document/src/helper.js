@@ -22,11 +22,6 @@ export const debug = {
     creationLabel: 'Write a document',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543/api/v2',
-    apiHeader: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-      // 'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
-    },
     availableStatuses: [{
       label: 'Open',
       slug: 'open',
