@@ -1,0 +1,6 @@
+[report]
+omit =
+frontend/*
+backend/tracim_backend/tests/*
+*/python?.?/*
+*/site-packages/nose/*
