@@ -60,7 +60,7 @@ tests_require = [
     'mypy',
     'requests',
     'responses',
-    'mock'
+    'mock',
     'Pillow',
 ]
 
