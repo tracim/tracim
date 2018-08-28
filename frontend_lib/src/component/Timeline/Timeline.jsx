@@ -122,14 +122,13 @@ class Timeline extends React.Component {
                   <button
                     type='button'
                     className={classnames(
-                      `${props.customClass}__texteditor__advancedtext__btn timeline__body__texteditor__advancedtext__btn btn`
+                      `${props.customClass}__texteditor__advancedtext__btn timeline__body__texteditor__advancedtext__btn btn outlineTextBtn`
                     )}
                     onClick={props.onClickWysiwygBtn}
                     disabled={props.disableComment}
                     style={{
-                      backgroundColor: 'transparent',
-                      color: '#333',
                       borderColor: props.customColor,
+                      color: '#252525',
                       ':hover': {
                         backgroundColor: props.customColor,
                         color: '#fdfdfd'
@@ -144,7 +143,7 @@ class Timeline extends React.Component {
                 <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__body__texteditor__submit')}>
                   <button
                     type='button'
-                    className={classnames(`${props.customClass}__texteditor__submit__btn`, 'timeline__body__texteditor__submit__btn btn')}
+                    className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__body__texteditor__submit__btn btn highlightBtn')}
                     onClick={props.onClickValidateNewCommentBtn}
                     disabled={props.disableComment}
                     style={{

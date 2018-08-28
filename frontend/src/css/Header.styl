@@ -28,15 +28,14 @@
         .adminlink
           &__btn
             margin-right 15px
-            border 1px solid grey
-            border-radius 5px
-            background-color transparent
             &::after
               margin-left 15px
           &__setting
             padding 0
             .setting__link
               padding 10px
+              &:hover
+                color off-white
       &__itemsearch
         display none
         margin-right 8%
@@ -46,10 +45,6 @@
           .search__addonsearch
             background-color transparent
             cursor pointer
-      .btnnavbar
-        border 1px solid grey
-        background-color transparent
-        cursor pointer
       &__itemquestion
         display none
         &__btnquestion
@@ -62,8 +57,6 @@
           &__name
             border 0
             padding 0 5px
-            background-color transparent
-            cursor pointer
             &::after //bootstrap overrides
               vertical-align middle
               color darkGrey
@@ -76,7 +69,6 @@
               display inline-block
               vertical-align middle
               margin-right 10px
-              color darkGrey
           &__sub
             color darkGrey
             cursor pointer
@@ -91,6 +83,8 @@
             .setting__link
               padding 10px
               // color fontColor
+              &:hover
+                color off-white
       &__itemnotification
         display none
         &__timeline

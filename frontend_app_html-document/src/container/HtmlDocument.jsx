@@ -29,6 +29,7 @@ import {
   putHtmlDocRestoreDeleted,
   putHtmlDocRead
 } from '../action.async.js'
+import Radium from 'radium'
 
 class HtmlDocument extends React.Component {
   constructor (props) {
@@ -406,7 +407,7 @@ class HtmlDocument extends React.Component {
 
               {mode === MODE.REVISION &&
                 <button
-                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
+                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
                 >
@@ -479,4 +480,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(HtmlDocument)
+export default Radium(translate()(HtmlDocument))

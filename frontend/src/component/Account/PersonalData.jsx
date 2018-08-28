@@ -79,7 +79,7 @@ export class PersonalData extends React.Component {
 
           <button
             type='button'
-            className='personaldata__form__button primaryColorBorderLighten btn'
+            className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickSubmit}
           >
             {props.t('Send')}

@@ -81,7 +81,7 @@ export class AdminUser extends React.Component {
           </div>
 
           <div className='adminUserPage__adduser'>
-            <button className='adminUserPage__adduser__button btn' onClick={this.handleToggleAddMember}>
+            <button className='adminUserPage__adduser__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover' onClick={this.handleToggleAddMember}>
               {props.t('Add a member')}
             </button>
 

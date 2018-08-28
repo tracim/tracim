@@ -7,16 +7,16 @@ require('./RecentActivity.styl')
 export const RecentActivity = props =>
   <div className='activity'>
     <div className='activity__header'>
-      <div className={classnames('activity__header__title', 'subTitle')}>
+      <div className='activity__header__title subTitle'>
         {props.t('Recent activity')}
       </div>
 
-      <div
-        className={classnames('activity__header__allread', 'btn btn-outline-primary')}
+      <button
+        className='activity__header__allread btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
         onClick={props.onClickEverythingAsRead}
       >
         {props.t('Mark everything as read')}
-      </div>
+      </button>
     </div>
 
     <div className='activity__wrapper'>
@@ -24,7 +24,7 @@ export const RecentActivity = props =>
         const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || {hexcolor: '', faIcon: ''}
         return (
           <div
-            className={classnames('activity__workspace', {'read': props.readByUserList.includes(content.id)})}
+            className={classnames('activity__workspace primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
             onClick={() => props.onClickRecentContent(content.id, content.type)}
             key={content.id}
           >
@@ -39,12 +39,12 @@ export const RecentActivity = props =>
       })}
 
       <div className={classnames('activity__more', 'd-flex flex-row-reverse')}>
-        <div
-          className={classnames('activity__more__btn', 'btn btn-outline-primary')}
+        <button
+          className='activity__more__btn btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
           onClick={props.onClickSeeMore}
         >
           {props.t('See more')}
-        </div>
+        </button>
       </div>
     </div>
   </div>

@@ -48,7 +48,6 @@ class Header extends React.Component {
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
     }
-
   }
 
   handleClickHelp = () => {}
