@@ -12,6 +12,7 @@ import {
 } from '../action.async.js'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
+import FileDropzone from '../component/FileDropzone.jsx'
 
 class PopupCreateFile extends React.Component {
   constructor (props) {
@@ -120,33 +121,11 @@ class PopupCreateFile extends React.Component {
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
       >
-        <Dropzone
+        <FileDropzone
           onDrop={this.handleChangeFile}
           onClick={this.handleChangeFile}
-          disablePreview
-          multiple={false}
-          style={{}}
-        >
-          <div className='filecontent__form mb-4' drop='true'>
-            <div
-              className='filecontent__form__icon d-flex justify-content-center'
-              style={{color: state.config.hexcolor}}
-            >
-              <i className='fa fa-download' />
-            </div>
-
-            <div
-              className='filecontent__form__instruction text-center'
-              style={{color: state.config.hexcolor}}
-            >
-              {props.t('Drag and drop your file here')}
-            </div>
-
-            <div className='filecontent__form__text text-center'>
-              {props.t('You can also import your file by clicking here')}
-            </div>
-          </div>
-        </Dropzone>
+          hexcolor={state.config.hexcolor}
+        />
       </CardPopupCreateContent>
     )
   }

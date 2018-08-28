@@ -1,21 +1,5 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-.filecontent
-  &__form
-    width 100%
-    border 1px dashed grey
-    padding 10px 15px
-    cursor pointer
-    &__icon
-      margin-top 15px
-      font-size 30px
-      & > label
-        cursor pointer
-    &__instruction
-      font-size 20px
-    &__text
-      margin-bottom 20px
-
 .file
   width 1200px
   height calc(100% - 85px)
@@ -101,10 +85,12 @@
                 margin 20px 0
                 textarea
                   width 100%
-                  height 250px
-                &__validate
-                  margin 30px auto
-                  width 150px
+                  height 200px
+                &__btn
+                  display flex
+                  justify-content flex-end
+                  &__cancel
+                    margin 0 15px 0 0
             &__btndesc
               display block
               margin 15px 0

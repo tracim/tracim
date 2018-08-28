@@ -28,7 +28,7 @@ import {
   putFileIsDeleted,
   putFileRestoreArchived,
   putFileRestoreDeleted,
-  putFileRead
+  putFileRead, putFileContentRaw
 } from '../action.async.js'
 
 class File extends React.Component {
@@ -40,9 +40,9 @@ class File extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
-      rawContentBeforeEdit: '',
       timeline: props.data ? [] : [], // debug.timeline,
       newComment: '',
+      newFile: '',
       timelineWysiwyg: false,
       mode: MODE.VIEW,
       displayProperty: false
@@ -202,21 +202,7 @@ class File extends React.Component {
       })
   }
 
-  handleClickNewVersion = () => this.setState(prev => ({
-    rawContentBeforeEdit: prev.content.raw_content,
-    mode: MODE.EDIT
-  }))
-
-  handleCloseNewVersion = () => {
-    tinymce.remove('#wysiwygNewVersion')
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        raw_content: prev.rawContentBeforeEdit
-      },
-      mode: MODE.VIEW
-    }))
-  }
+  handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
 
   handleSaveFile = async () => {
     const { loggedUser, content, config } = this.state
@@ -380,6 +366,43 @@ class File extends React.Component {
 
   handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
 
+  handleClickDownloadRaw = async () => {
+    // const { props, state } = this
+    //
+    // const fetchFileRaw = getFileContentRaw(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    // const rezFileRaw = await fetchFileRaw
+    // console.log(fetchFileRaw)
+    // console.log(rezFileRaw.body)
+  }
+
+  handleClickDownloadPdfPage = async () => {}
+
+  handleClickDownloadPdfFull = async () => {}
+
+  handleChangeFile = newFile => this.setState({newFile: newFile[0]})
+
+  handleClickDropzoneCancel = () => this.setState({mode: MODE.VIEW})
+
+  handleClickDropzoneValidate = async () => {
+    const { props, state } = this
+
+    const formData = new FormData()
+    formData.append('files', state.newFile)
+
+    const fetchPutRaw = await handleFetchResult(putFileContentRaw(state.loggedUser, state.config.apiUrl, state.idWorkspace, state.content.content_id, formData))
+    switch (fetchPutRaw.status) {
+      case 204: this.loadContent(); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('Error while creating file'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
   render () {
     const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, displayProperty } = this.state
     const { t } = this.props
@@ -455,7 +478,7 @@ class File extends React.Component {
           showRightPartOnLoad={mode === MODE.VIEW}
         >
           <FileComponent
-            // mode={mode}
+            mode={mode}
             customColor={config.hexcolor}
             // wysiwygNewVersion={'wysiwygNewVersion'}
             // onClickCloseEditMode={this.handleCloseNewVersion}
@@ -471,6 +494,12 @@ class File extends React.Component {
             isDeleted={content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
+            onClickDownloadRaw={this.handleClickDownloadRaw}
+            onClickDownloadPdfPage={this.handleClickDownloadPdfPage}
+            onClickDownloadPdfFull={this.handleClickDownloadPdfFull}
+            onChangeFile={this.handleChangeFile}
+            onClickDropzoneCancel={this.handleClickDropzoneCancel}
+            onClickDropzoneValidate={this.handleClickDropzoneValidate}
             key={'file'}
           />
 
