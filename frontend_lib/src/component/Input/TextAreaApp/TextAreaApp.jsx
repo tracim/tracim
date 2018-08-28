@@ -16,7 +16,7 @@ export const TextAreaApp = props =>
     <div className={`${props.customClass}__button editionmode__button`}>
       <button
         type='button'
-        className={`${props.customClass}__cancel editionmode__button__cancel btn mr-3`}
+        className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
         onClick={props.onClickCancelBtn}
         style={{
           backgroundColor: '#fdfdfd',
@@ -34,7 +34,7 @@ export const TextAreaApp = props =>
 
       <button
         type='button'
-        className={`${props.customClass}__submit editionmode__button__submit btn`}
+        className={`${props.customClass}__submit editionmode__button__submit btn outlineTextBtn`}
         onClick={props.onClickValidateBtn}
         style={{
           backgroundColor: '#fdfdfd',

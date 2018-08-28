@@ -1,6 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
+
 require('./MenuSubComponent.styl')
 
 export const MenuSubComponent = props => {
@@ -24,7 +25,7 @@ export const MenuSubComponent = props => {
         <li className='menusubcomponent__list__disabled'>Menu</li>
         { props.subMenuList.map(sm =>
           <li
-            className={classnames('menusubcomponent__list__item nav-item', {'active': sm.active})}
+            className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': sm.active})}
             onClick={() => props.onClickMenuItem(sm.name)}
             key={sm.name}
           >

@@ -6,7 +6,7 @@ const ExtandedAction = props => {
   return (
     <div className='extandedaction dropdown'>
       <button
-        className='extandedaction__button btn actionBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
+        className='extandedaction__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
         type='button'
         id='dropdownMenuButton'
         data-toggle='dropdown'

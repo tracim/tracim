@@ -8,7 +8,7 @@ const DropdownCreateButton = props => {
   return (
     <div className={classnames(props.parentClass, props.customClass, 'dropdownCreateBtn')}>
       <button
-        className={classnames(`${props.parentClass}__label`, 'dropdownCreateBtn__label btn createBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover dropdown-toggle')}
+        className={classnames(`${props.parentClass}__label`, 'dropdownCreateBtn__label btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover dropdown-toggle')}
         type='button'
         id='dropdownCreateBtn'
         data-toggle='dropdown'

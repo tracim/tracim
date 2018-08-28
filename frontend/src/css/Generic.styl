@@ -10,82 +10,20 @@ a
     height 100%
     width 100%
 
-.actionBtn
+.outlineTextBtn
   padding 10px 15px
   background-color transparent
   cursor pointer
   &:hover
     color off-white
-  &:focus
-    box-shadow none
+  &.nohover
+    &:hover
+      color inherit
 
-.headerBtn
-  padding 10px 15px
-  background-color transparent
-  cursor pointer
-  &:focus
-    box-shadow none
-
-.moreinfoBtn
-  padding 15px 25px
-  cursor pointer
-  &:hover, &:focus
-    color white
-
-.createBtn
+.highlightBtn
   padding 10px 25px
+  color off-white
   cursor pointer
-  &:focus
-    box-shadow none
-
-// .btn-primary
-//   background-color thirdColor
-//   border-color secondColor
-//   cursor pointer
-//   &:hover, &:focus, &:active, &:visited, &:focus-within
-//     background-color hover-button
-//     border-color hover-button
-//     box-shadow none
-//     outline none
-
-// .btn-outline-primary
-//   color fontColor
-//   border-color secondColor
-//   cursor pointer
-//   &:hover, &:focus, &:active, &:visited, &:focus-within
-//     background-color hover-button
-//     border-color hover-button
-//     box-shadow none
-//     outline none
-
-// .btn-primary.active, .btn-primary:active, .show>.btn-primary.dropdown-toggle
-//   background-color hover-button
-//   border-color hover-button
-//   box-shadow none
-
-// .btn-outline-primary.active, .btn-outline-primary:active, .show>.btn-outline-primary.dropdown-toggle
-//   background-color hover-button
-//   border-color hover-button
-//   box-shadow none
-//   outline none
-
-// .dropdown-item
-//   &:hover, &:focus
-//     background-color thirdColor
-//     color off-white
-//     box-shadow none
-//     outline none
-
-// .btn-primary.disabled, .btn-primary:disabled
-//   background-color thirdColor
-//   border-color transparent
-//   color off-white
-
-// .btn-outline-primary.disabled, .btn-outline-primary:disabled
-//   color fontColor
-
-// .btn.disabled, .btn:disabled
-//   cursor not-allowed
 
 .sidebarpagecontainer
   display flex
@@ -179,22 +117,6 @@ a
 .issueColor
   color issueColor
 
-// .fa-comments-o
-//   color threadColor
-
-// .fa-list-ul
-//   color taskColor
-
-// .fa-file-code-o
-//   color markdownColor
-
-// .fa-file-text-o
-//   color htmlColor
-
-// .fa-ticket
-//   color issueColor
-
-
 .gestionnaire
   color gestionnaire
 
@@ -207,18 +129,6 @@ a
 .lecteur
   color lecteur
 
-// .fa-graduation-cap
-//   color gestionnaire
-
-// .fa-pencil
-//   color contributeur
-
-// .fa-gavel
-//   color responsable
-
-// .fa-eye
-//   color lecteur
-
 .subTitle
   font-size 20px
   font-weight 500
@@ -230,6 +140,10 @@ a
     border-width 1px
     border-style solid
     border-radius 10px
+    padding 10px 25px
+    cursor pointer
+    &:hover
+      color off-white
     &__icon
       margin-right 20px
       font-size 30px

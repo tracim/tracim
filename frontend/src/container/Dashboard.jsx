@@ -209,7 +209,7 @@ class Dashboard extends React.Component {
             subtitle={''}
           >
             <div className='dashboard__header__advancedmode mr-3'>
-              <button type='button' className='dashboard__header__advancedmode__button btn actionBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'>
+              <button type='button' className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'>
                 {props.t('Active advanced Dashboard')}
               </button>
             </div>

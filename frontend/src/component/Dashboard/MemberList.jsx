@@ -180,7 +180,7 @@ export class MemberList extends React.Component {
 
                 <div className='memberlist__form__submitbtn'>
                   <button
-                    className='btn actionBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                    className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
                     onClick={this.handleClickBtnValidate}
                   >
                     {props.t('Validate')}

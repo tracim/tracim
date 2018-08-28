@@ -3,6 +3,6 @@ import classnames from 'classnames'
 
 require('./Delimiter.styl')
 
-export const Delimiter = props => <div className={classnames(props.customClass, 'delimiter')} />
+export const Delimiter = props => <div className={classnames(props.customClass, 'delimiter primaryColorBg')} />
 
 export default Delimiter

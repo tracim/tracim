@@ -6,7 +6,7 @@ const AdminLink = props => {
   return (
     <li className='header__menu__rightside__adminlink'>
       <div className='adminlink dropdown'>
-        <button className='adminlink__btn btn headerBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle' type='button' data-toggle='dropdown'>
+        <button className='adminlink__btn btn outlineTextBtn nohover primaryColorBorder dropdown-toggle' type='button' data-toggle='dropdown'>
           Administration
         </button>
 

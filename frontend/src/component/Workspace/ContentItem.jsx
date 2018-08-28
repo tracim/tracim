@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Radium from 'radium'
 import classnames from 'classnames'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 
@@ -8,7 +9,10 @@ const ContentItem = props => {
 
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug)
   return (
-    <div className={classnames('content', 'align-items-center', 'primaryColorBgLightenHover', {'item-last': props.isLast}, props.customClass)} onClick={props.onClickItem}>
+    <div
+      className={classnames('content', 'align-items-center', 'primaryColorBgLightenHover', {'item-last': props.isLast}, props.customClass)}
+      onClick={props.onClickItem}
+    >
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
         <i className={`fa fa-fw fa-${props.faIcon}`} />
       </div>
@@ -28,7 +32,15 @@ const ContentItem = props => {
         </div>
       }
 
-      <div className={classnames('content__status d-none d-xl-flex align-items-center justify-content-between')} style={{color: status.hexcolor}}>
+      <div
+        className='content__status d-none d-xl-flex align-items-center justify-content-between'
+        style={{
+          color: status.hexcolor,
+          ':hover': {
+            color: '#fdfdfd'
+          }
+        }}
+      >
         <div className='content__status__text'>
           {status.label}
         </div>
@@ -40,9 +52,10 @@ const ContentItem = props => {
   )
 }
 
-export default ContentItem
+export default Radium(ContentItem)
 
 ContentItem.propTypes = {
+  hexcolor: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   statusSlug: PropTypes.string.isRequired,
   customClass: PropTypes.string,

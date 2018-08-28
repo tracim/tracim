@@ -1,23 +1,33 @@
 import React from 'react'
 import classnames from 'classnames'
 import Radium from 'radium'
-import color from 'color'
 
 const Revision = props => (
-  <li className={classnames(`${props.customClass}__messagelist__version`, 'timeline__body__messagelist__version')} >
+  <li
+    className={classnames(`${props.customClass}__messagelist__version`, 'timeline__body__messagelist__version')}
+    key={props.key}
+  >
     <button
       type='button'
-      className={classnames(`${props.customClass}__messagelist__version__btn`, 'timeline__body__messagelist__version__btn btn')}
+      className={classnames(`${props.customClass}__messagelist__version__btn`, 'timeline__body__messagelist__version__btn btn outlineTextBtn')}
       onClick={props.onClickRevision}
       style={{
-        backgroundColor: props.customColor,
-        color: '#fdfdfd',
+        borderColor: props.customColor,
+        color: '#252525',
         ':hover': {
-          backgroundColor: color(props.customColor).darken(0.15).hexString()
+          backgroundColor: props.customColor,
+          color: '#fdfdfd'
         }
       }}
+      key={`${props.key}_button`}
     >
-      <i className='fa fa-code-fork' />
+      <i
+        className='fa fa-code-fork'
+        style={{
+          color: '#252525'
+        }}
+        key={`${props.key}_button_icon`}
+      />
       version {props.number}
     </button>
 

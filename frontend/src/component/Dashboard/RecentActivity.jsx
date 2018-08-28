@@ -7,12 +7,12 @@ require('./RecentActivity.styl')
 export const RecentActivity = props =>
   <div className='activity'>
     <div className='activity__header'>
-      <div className={classnames('activity__header__title', 'subTitle')}>
+      <div className='activity__header__title subTitle'>
         {props.t('Recent activity')}
       </div>
 
       <button
-        className={classnames('activity__header__allread', 'btn', 'actionBtn', 'primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover')}
+        className='activity__header__allread btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
         onClick={props.onClickEverythingAsRead}
       >
         {props.t('Mark everything as read')}
@@ -40,7 +40,7 @@ export const RecentActivity = props =>
 
       <div className={classnames('activity__more', 'd-flex flex-row-reverse')}>
         <button
-          className={classnames('activity__more__btn', 'btn', 'actionBtn', 'primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover')}
+          className='activity__more__btn btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
           onClick={props.onClickSeeMore}
         >
           {props.t('See more')}
