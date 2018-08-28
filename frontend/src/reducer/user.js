@@ -3,8 +3,9 @@ import {
   UPDATE,
   USER_CONNECTED,
   USER_DISCONNECTED,
-  USER_DATA,
-  USER_LANG
+  USER_LANG,
+  USER_NAME,
+  USER_AUTH
 } from '../action-creator.sync.js'
 import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
 
@@ -23,7 +24,7 @@ const defaultUser = {
   avatar_url: null,
   created: '',
   public_name: '',
-  lang: 'en' // @FIXME Côme - 2018/07/30 - remove this line when api returns the lang (https://github.com/tracim/tracim/issues/734)
+  lang: ''
 }
 
 export default function user (state = defaultUser, action) {
@@ -32,6 +33,7 @@ export default function user (state = defaultUser, action) {
       return {
         ...state,
         ...action.user,
+        lang: action.user.lang ? action.user.lang : 'en',
         avatar_url: action.user.avatar_url
           ? action.user.avatar_url
           : action.user.public_name ? generateAvatarFromPublicName(action.user.public_name) : ''
@@ -40,11 +42,14 @@ export default function user (state = defaultUser, action) {
     case `${SET}/${USER_DISCONNECTED}`:
       return {...defaultUser, logged: false}
 
-    case `${UPDATE}/${USER_DATA}`:
-      return {...state, ...action.data}
-
     case `${SET}/${USER_LANG}`:
       return {...state, lang: action.lang}
+
+    case `${UPDATE}/${USER_NAME}`:
+      return {...state, public_name: action.newName}
+
+    case `${UPDATE}/${USER_AUTH}`:
+      return {...state, auth: action.auth}
 
     default:
       return state

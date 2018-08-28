@@ -1,4 +1,5 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import {
   Delimiter,
   PageWrapper,
@@ -6,189 +7,66 @@ import {
   PageContent
 } from 'tracim_frontend_lib'
 
-export class AdminWorkspace extends React.Component {
-  render () {
-    return (
-      <PageWrapper customClass='adminWorkspacePage'>
-        <PageTitle
-          parentClass={'adminWorkspacePage'}
-          title={'Workspace management'}
-        />
+const AdminWorkspace = props =>
+  <PageWrapper customClass='adminWorkspacePage'>
+    <PageTitle
+      parentClass={'adminWorkspacePage'}
+      title={'Workspace management'}
+    />
 
-        <PageContent parentClass='adminWorkspacePage'>
+    <PageContent parentClass='adminWorkspacePage'>
+      <div className='adminWorkspacePage__description'>
+        {props.t('List of every workspaces')}
+      </div>
 
-          <div className='adminWorkspacePage__description'>
-            List of every workspaces
-          </div>
+      <Delimiter customClass={'adminWorkspacePage__delimiter'} />
 
-          { /*
-            Alexi Cauvin 08/08/2018 => desactivate create workspace button due to redundancy
+      <div className='adminWorkspacePage__workspaceTable'>
 
-            <div className='adminWorkspacePage__createworkspace'>
-              <button className='adminWorkspacePage__createworkspace__btncreate btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover'>
-                {this.props.t('Create a workspace')}
-              </button>
-            </div>
-          */ }
+        <table className='table'>
+          <thead>
+            <tr>
+              <th scope='col'>Id</th>
+              <th scope='col'>{props.t('Workspace')}</th>
+              <th scope='col'>{props.t('Description')}</th>
+              <th scope='col'>{props.t('Member count')}</th>
+              {/* <th scope='col'>Calendar</th> */}
+              <th scope='col'>{props.t('Delete workspace')}</th>
+            </tr>
+          </thead>
 
-          <Delimiter customClass={'adminWorkspacePage__delimiter'} />
-
-          <div className='adminWorkspacePage__workspaceTable'>
-
-            <table className='table'>
-              <thead>
-                <tr>
-                  <th scope='col'>ID</th>
-                  <th scope='col'>Workspace</th>
-                  <th scope='col'>Description</th>
-                  <th scope='col'>Member count</th>
-                  { /*
-                      <th scope='col'>Calendar</th>
-                    */ }
-                  <th scope='col'>Delete workspace</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>1</th>
-                  <td>Design v_2</td>
-                  <td>Workspace about tracim v2 design</td>
-                  { /*
-                      <td className='d-flex align-items-center flex-wrap'>
-                        <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
-                          <i className='fa fa-fw fa-check-square-o' />
-                        </div>
-                        Enable
-                      </td>
-                    */ }
-                  <td>8</td>
-                  <td>
-                    <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
-                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
-                        <i className='fa fa-fw fa-trash-o' />
-                      </div>
-                      Delete
+          <tbody>
+            {props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws =>
+              <tr key={ws.slug}>
+                <th>{ws.workspace_id}</th>
+                <td>{ws.label}</td>
+                <td>"(nyi) blocked by backend"</td>
+                {/*
+                  <td className='d-flex align-items-center flex-wrap'>
+                    <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
+                      <i className='fa fa-fw fa-check-square-o' />
                     </div>
+                    Enable
                   </td>
-                </tr>
-                <tr>
-                  <th>2</th>
-                  <td>New features</td>
-                  <td>Add a new features : Annotated files</td>
-                  { /*
-                      <td className='d-flex align-items-center flex-wrap'>
-                        <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
-                          <i className='fa fa-fw fa-square-o' />
-                        </div>
-                        Disable
-                      </td>
-                    */ }
-                  <td>5</td>
-                  <td>
-                    <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
-                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
-                        <i className='fa fa-fw fa-trash-o' />
-                      </div>
-                      Delete
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th>3</th>
-                  <td>Fix Backend</td>
-                  <td>workspace referring to multiple issues on the backend </td>
-                  { /*
-                      <td className='d-flex align-items-center flex-wrap'>
-                        <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
-                          <i className='fa fa-fw fa-check-square-o' />
-                        </div>
-                        Enable
-                      </td>
-                    */ }
-                  <td>3</td>
-                  <td>
-                    <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
-                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
-                        <i className='fa fa-fw fa-trash-o' />
-                      </div>
-                      Delete
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th>4</th>
-                  <td>Design v_2</td>
-                  <td>Workspace about tracim v2 design</td>
-                  { /*
-                      <td className='d-flex align-items-center flex-wrap'>
-                        <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
-                          <i className='fa fa-fw fa-square-o' />
-                        </div>
-                        Disable
-                      </td>
-                    */ }
-                  <td>8</td>
-                  <td>
-                    <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
-                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
-                        <i className='fa fa-fw fa-trash-o' />
-                      </div>
-                      Delete
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th>5</th>
-                  <td>New features</td>
-                  <td>Add a new features : Annotated files</td>
-                  { /*
-                      <td className='d-flex align-items-center flex-wrap'>
-                        <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
-                          <i className='fa fa-fw fa-square-o' />
-                        </div>
-                        Disable
-                      </td>
-                    */ }
-                  <td>5</td>
-                  <td>
-                    <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
-                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
-                        <i className='fa fa-fw fa-trash-o' />
-                      </div>
-                      Delete
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <th>6</th>
-                  <td>Fix Backend</td>
-                  <td>workspace referring to multiple issues on the backend </td>
-                  { /*
-                      <td className='d-flex align-items-center flex-wrap'>
-                        <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
-                          <i className='fa fa-fw fa-check-square-o' />
-                        </div>
-                        Enable
-                      </td>
-                    */ }
-                  <td>3</td>
-                  <td>
-                    <div className='adminWorkspacePage__workspaceTable__deleteworkspace primaryColorFont primaryColorFontDarkenHover'>
-                      <div className='adminWorkspacePage__workspaceTable__deleteworkspace__removalicon mr-3'>
-                        <i className='fa fa-fw fa-trash-o' />
-                      </div>
-                      Delete
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                */}
+                <td>{ws.memberList.length}</td>
+                <td>
+                  <div className='adminWorkspacePage__table__delete primaryColorFont primaryColorFontDarkenHover'>
+                    <button
+                      type='button'
+                      className='adminWorkspacePage__table__delete__icon btn mr-3'
+                      onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
+                    >
+                      <i className='fa fa-fw fa-trash-o' />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </PageContent>
+  </PageWrapper>
 
-        </PageContent>
-      </PageWrapper>
-    )
-  }
-}
-
-export default AdminWorkspace
+export default translate()(AdminWorkspace)

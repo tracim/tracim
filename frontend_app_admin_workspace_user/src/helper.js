@@ -1,3 +1,5 @@
+import i18n from '../../frontend/src/i18n.js'
+
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
@@ -11,44 +13,48 @@ export const debug = {
     slug: 'admin_workspace_user',
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
-    type: 'user',
-    translation: {en: {}, fr: {}}
+    type: 'user', // 'user' or 'workspace'
+    translation: {en: {}, fr: {}},
+    apiUrl: 'http://localhost:6543/api/v2',
+    apiHeader: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+      // 'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    }
   },
-  loggedUser: { // @FIXME this object is outdated
-    user_id: 5,
-    username: 'Smoi',
-    firstname: 'Côme',
-    lastname: 'Stoilenom',
+  loggedUser: {
+    user_id: 1,
+    public_name: 'Global Manager',
     email: 'osef@algoo.fr',
     lang: 'en',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
     auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
   },
   content: {
-    author: {
-      avatar_url: null,
-      public_name: 'Global manager',
-      user_id: 1 // -1 or 1 for debug
+    profile: {
+      ADMINISTRATOR: {
+        id: 1,
+        slug: 'administrators',
+        faIcon: 'rocket',
+        hexcolor: '#123456',
+        label: i18n.t('Administrator')
+      },
+      MANAGER: {
+        id: 2,
+        slug: 'managers',
+        faIcon: 'car',
+        hexcolor: '#654321',
+        label: i18n.t('Manager')
+      },
+      USER: {
+        id: 4,
+        slug: 'users',
+        faIcon: 'bicycle',
+        hexcolor: '#123123',
+        label: i18n.t('User')
+      }
     },
-    content_id: 22, // 1 or 22 for debug
-    content_type: 'html-document',
-    created: '2018-06-18T14:59:26Z',
-    current_revision_id: 11,
-    is_archived: false,
-    is_deleted: false,
-    label: 'Current Menu',
-    last_modifier: {
-      avatar_url: null,
-      public_name: 'Global manager',
-      user_id: 1
-    },
-    modified: '2018-06-18T14:59:26Z',
-    parent_id: 2,
-    raw_content: '<div>bonjour, je suis un lapin.</div>',
-    show_in_ui: true,
-    slug: 'current-menu',
-    status: 'open',
-    sub_content_types: ['thread', 'html-document', 'file', 'folder'],
-    workspace_id: 1
+    workspaceList: [],
+    userList: []
   }
 }

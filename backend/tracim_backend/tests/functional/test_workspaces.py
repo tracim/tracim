@@ -875,6 +875,106 @@ class TestWorkspaceEndpoint(FunctionalTest):
         assert 'details' in res.json.keys()
 
 
+class TestWorkspacesEndpoints(FunctionalTest):
+    """
+    Tests for /api/v2/workspaces
+    """
+    fixtures = [BaseFixture]
+
+    def test_api__get_workspaces__ok_200__nominal_case(self):
+        """
+        Check obtain all workspaces reachables for user with user auth.
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+
+        workspace_api = WorkspaceApi(
+            session=dbsession,
+            current_user=admin,
+            config=self.app_config,
+        )
+        workspace_api.create_workspace('test', save_now=True)  # nopep8
+        workspace_api.create_workspace('test2', save_now=True)  # nopep8
+        workspace_api.create_workspace('test3', save_now=True)  # nopep8
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces', status=200)
+        res = res.json_body
+        assert len(res) == 3
+        workspace = res[0]
+        assert workspace['label'] == 'test'
+        assert workspace['slug'] == 'test'
+        workspace = res[1]
+        assert workspace['label'] == 'test2'
+        assert workspace['slug'] == 'test2'
+        workspace = res[2]
+        assert workspace['label'] == 'test3'
+        assert workspace['slug'] == 'test3'
+
+    def test_api__get_workspaces__err_403__unallowed_user(self):
+        """
+        Check obtain all workspaces reachables for one user
+        with another non-admin user auth.
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        user = uapi.create_user('test@test.test', password='test@test.test',
+                                do_save=True, do_notify=False,
+                                groups=groups)  # nopep8
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces', status=403)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api__get_workspaces__err_401__unregistered_user(self):
+        """
+        Check obtain all workspaces reachables for one user
+        without correct user auth (user unregistered).
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+
 class TestWorkspaceMembersEndpoint(FunctionalTest):
     """
     Tests for /api/v2/workspaces/{workspace_id}/members endpoint
@@ -945,6 +1045,143 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
+    def test_api__get_workspace_member__ok_200__self(self):
+        """
+        Check obtain workspace members list with a reachable workspace for user
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/1/members/1', status=200).json_body   # nopep8
+        user_role = res
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == 1
+        assert user_role['workspace_id'] == 1
+        assert user_role['workspace']['workspace_id'] == 1
+        assert user_role['workspace']['label'] == 'Business'
+        assert user_role['workspace']['slug'] == 'business'
+        assert user_role['user']['public_name'] == 'Global manager'
+        assert user_role['user']['user_id'] == 1
+        assert user_role['is_active'] is True
+        assert user_role['do_notify'] is True
+        # TODO - G.M - 24-05-2018 - [Avatar] Replace
+        # by correct value when avatar feature will be enabled
+        assert user_role['user']['avatar_url'] is None
+
+    def test_api__get_workspace_member__ok_200__other_user(self):
+        """
+        Check obtain workspace members list with a reachable workspace for user
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        transaction.commit()
+        user_id = user.user_id
+        workspace_id = workspace.workspace_id
+        admin_id = admin.user_id
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        print(str(user_id) + '##' + str(workspace_id))
+        res = self.testapp.get('/api/v2/workspaces/{}/members/{}'.format(
+            workspace_id,
+            user_id
+        ), status=200).json_body
+        user_role = res
+        assert user_role['role'] == 'reader'
+        assert user_role['user_id'] == user_id
+        assert user_role['workspace_id'] == workspace_id
+        assert user_role['is_active'] is True
+        assert user_role['do_notify'] is False
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'test@test.test',
+                'test@test.test'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/{}/members/{}'.format(
+            workspace_id,
+            admin_id
+        ), status=200).json_body
+        user_role = res
+        assert user_role['role'] == 'workspace-manager'
+        assert user_role['user_id'] == admin_id
+        assert user_role['workspace_id'] == workspace_id
+        assert user_role['is_active'] is True
+        assert user_role['do_notify'] is True
+
+
+    def test_api__get_workspace_member__err_400__unallowed_user(self):
+        """
+        Check obtain workspace members info with an unreachable workspace for
+        user
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'lawrence-not-real-email@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/3/members/1', status=400)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+    def test_api__get_workspace_member__err_401__unregistered_user(self):
+        """
+        Check obtain workspace member info with an unregistered user
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/1/members/1', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+
     def test_api__get_workspace_members__err_400__workspace_does_not_exist(self):  # nopep8
         """
         Check obtain workspace members list with an existing user but
@@ -980,7 +1217,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': 2,
             'user_email_or_public_name': None,
             'role': 'content-manager',
-            'do_notify': False,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1023,7 +1259,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'lawrence-not-real-email@fsf.local',
             'role': 'content-manager',
-            'do_notify': 'True',
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1036,7 +1271,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is False
         assert user_role_found['email_sent'] is False
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -1066,7 +1301,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'Lawrence L.',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1079,7 +1313,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is False
         assert user_role_found['email_sent'] is False
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members', status=200).json_body   # nopep8
         assert len(res) == 2
@@ -1109,7 +1343,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': None,
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1134,7 +1367,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': 47,
             'user_email_or_public_name': None,
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1159,7 +1391,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'nothing@nothing.nothing',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1173,7 +1404,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is False
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         res = self.testapp.get('/api/v2/workspaces/1/members',
                                status=200).json_body  # nopep8
@@ -1205,10 +1436,10 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['role'] == 'workspace-manager'
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
+        assert user_role['do_notify'] is True
         # update workspace role
         params = {
             'role': 'content-manager',
-            'do_notify': False,
         }
         res = self.testapp.put_json(
             '/api/v2/workspaces/1/members/1',
@@ -1224,7 +1455,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert len(res) == 1
         user_role = res[0]
         assert user_role['role'] == 'content-manager'
-        assert user_role['do_notify'] is False
+        assert user_role['do_notify'] is True
         assert user_role['user_id'] == 1
         assert user_role['workspace_id'] == 1
 
@@ -1367,7 +1598,6 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'bob@bob.bob',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
@@ -1381,7 +1611,7 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert user_role_found['workspace_id'] == 1
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is True
-        assert user_role_found['do_notify'] is True
+        assert user_role_found['do_notify'] is False
 
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
@@ -1418,7 +1648,6 @@ class TestUserInvitationWithMailActivatedASync(FunctionalTest):
             'user_id': None,
             'user_email_or_public_name': 'bob@bob.bob',
             'role': 'content-manager',
-            'do_notify': True,
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',

@@ -8,7 +8,7 @@ const CardPopup = props => {
   return (
     <div className={classnames(props.customClass, 'cardPopup')}>
       <div className='cardPopup__container'>
-        <div className='cardPopup__header' style={{backgroundColor: props.customColor}} />
+        <div className={classnames(props.customHeaderClass, 'cardPopup__header')} style={{backgroundColor: props.customColor}} />
 
         <div className='cardPopup__close' onClick={props.onClose}>
           <i className='fa fa-times' />
@@ -26,12 +26,14 @@ export default CardPopup
 
 CardPopup.propTypes = {
   customClass: PropTypes.string,
+  customHeaderClass: PropTypes.string,
   customColor: PropTypes.string,
   onClose: PropTypes.func
 }
 
 CardPopup.defaultProps = {
   customClass: 'defaultCustomClass',
+  customHeaderClass: '',
   customColor: '',
   onClose: () => {}
 }

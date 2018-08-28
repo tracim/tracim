@@ -29,7 +29,7 @@ const ContentItem = props => {
       }
 
       <div className={classnames('content__status')} style={{color: status.hexcolor}}>
-        <div className='content__status__text d-none d-xl-flex align-items-center justify-content-between'>
+        <div className='content__status__text d-none d-xl-flex align-items-center justify-content-center'>
           {status.label}
           <i className={`fa fa-fw fa-${status.faIcon}`} />
         </div>

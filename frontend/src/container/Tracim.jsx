@@ -23,7 +23,9 @@ import {
   removeFlashMessage,
   setAppList,
   setContentTypeList,
-  setUserConnected, setWorkspaceListIsOpenInSidebar, updateWorkspaceListData
+  setUserConnected,
+  setWorkspaceListIsOpenInSidebar,
+  setWorkspaceList
 } from '../action-creator.sync.js'
 import Cookies from 'js-cookie'
 import Dashboard from './Dashboard.jsx'
@@ -44,6 +46,10 @@ class Tracim extends React.Component {
       case 'addFlashMsg':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
+        break
+      case 'refreshWorkspaceList':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.loadWorkspaceList()
         break
     }
   }
@@ -69,6 +75,8 @@ class Tracim extends React.Component {
         this.loadWorkspaceList()
         break
       case 401:
+        Cookies.remove(COOKIE.USER_LOGIN)
+        Cookies.remove(COOKIE.USER_AUTH)
         dispatch(setUserConnected({logged: false})); break
       default:
         dispatch(setUserConnected({logged: null})); break
@@ -93,7 +101,7 @@ class Tracim extends React.Component {
     if (fetchGetWorkspaceList.status === 200) {
       this.setState({workspaceListLoaded: true})
 
-      props.dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
       const idWorkspaceToOpen = (() =>
         props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
@@ -115,6 +123,12 @@ class Tracim extends React.Component {
     if (props.user.logged === false && props.location.pathname !== '/login') {
       return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
     }
+
+    if (props.location.pathname !== '/login' && (
+      !props.system.workspaceListLoaded ||
+      !props.system.appListLoaded ||
+      !props.system.contentTypeListLoaded
+    )) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
       <div className='tracim'>
@@ -175,5 +189,5 @@ class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, appList, contentType, workspaceList, flashMessage }) => ({ user, appList, contentType, workspaceList, flashMessage })
+const mapStateToProps = ({ user, appList, contentType, workspaceList, flashMessage, system }) => ({ user, appList, contentType, workspaceList, flashMessage, system })
 export default withRouter(connect(mapStateToProps)(translate()(Tracim)))
