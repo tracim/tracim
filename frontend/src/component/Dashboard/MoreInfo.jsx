@@ -6,7 +6,7 @@ export const MoreInfo = props =>
   <div className='moreinfo'>
     <div className='moreinfo__webdav genericBtnInfoDashboard'>
       <div
-        className='moreinfo__webdav__btn genericBtnInfoDashboard__btn primaryColorBorderLighten primaryColorFontLighten'
+        className='moreinfo__webdav__btn genericBtnInfoDashboard__btn primaryColorBgHover primaryColorBorderDarkenHover'
         onClick={props.onClickToggleWebdav}
       >
         <div className='moreinfo__webdav__btn__icon genericBtnInfoDashboard__btn__icon'>
@@ -34,7 +34,7 @@ export const MoreInfo = props =>
     <div className='moreinfo__calendar genericBtnInfoDashboard'>
       <div className='moreinfo__calendar__wrapperBtn'>
         <div
-          className='moreinfo__calendar__btn genericBtnInfoDashboard__btn'
+          className='moreinfo__calendar__btn genericBtnInfoDashboard__btn genericBtnInfoDashboard__btn primaryColorBgHover primaryColorBorderDarkenHover'
           onClick={props.onClickToggleCalendar}
         >
           <div className='moreinfo__calendar__btn__icon genericBtnInfoDashboard__btn__icon'>

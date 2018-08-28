@@ -40,7 +40,7 @@ class Folder extends React.Component {
 
     return (
       <div className={classnames('folder', {'active': this.state.open && folderData.content.length > 0, 'item-last': isLast})}>
-        <div className='folder__header align-items-center' onClick={this.handleClickToggleFolder}>
+        <div className='folder__header align-items-center primaryColorBgLightenHover' onClick={this.handleClickToggleFolder}>
 
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle' />
@@ -58,7 +58,7 @@ class Folder extends React.Component {
             {idRoleUserWorkspace >= 2 &&
               <div className='folder__header__button__addbtn'>
                 <button
-                  className='addbtn__text btn btn-outline-primary dropdown-toggle'
+                  className='folder__header__button__addbtn__text btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
                   type='button'
                   id='dropdownMenuButton'
                   data-toggle='dropdown'
@@ -94,6 +94,7 @@ class Folder extends React.Component {
           </div>
 
           <div className='folder__header__status' />
+
         </div>
 
         <div className='folder__content'>
