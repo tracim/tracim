@@ -92,6 +92,13 @@ auth_type = internal
 # User auth token validity in seconds (used to interfaces like web calendars)
 user.auth_token.validity = 604800
 
+# cookie auth token config
+auth.token.secret = toto
+auth.token.timeout = 1200
+auth.token.max_age = 1500
+auth.token.reissue_time = 120
+auth.token.hash_alg = sha512
+
 ### Mail
 
 # Reset password through email related configuration.
