@@ -6,8 +6,9 @@ from tracim_backend.lib.utils.request import TracimRequest
 
 
 def add_auth_cookie_in_all_response(config):
+    pass
     # INFO - G.M - 17-05-2018 Cookie Headers for all responses
-    config.add_subscriber(add_auth_cookie_to_response, NewResponse)
+    # config.add_subscriber(add_auth_cookie_to_response, NewResponse)
 
 
 def add_auth_cookie_to_response(event):

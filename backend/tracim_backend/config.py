@@ -109,36 +109,10 @@ class CFG(object):
             'api.key',
             ''
         )
-
-        self.AUTH_TOKEN_SECRET = settings.get(
-            'auth.token.secret',
-            ''
-        )
-        if not self.AUTH_TOKEN_SECRET:
-            raise Exception(
-                'Error: auth.token.secret is not set '
-                '! Set it before continuing'
-            )
-        self.AUTH_TOKEN_TIMEOUT = int(settings.get(
-            'auth.token.timeout',
-            '1200'
+        self.SESSION_REISSUE_TIME = int(settings.get(
+            'session.reissue_time',
+            120
         ))
-        self.AUTH_TOKEN_MAX_AGE = int(settings.get(
-            'auth.token.max_age',
-            '1500'
-        ))
-        self.AUTH_TOKEN_REISSUE_TIME = int(settings.get(
-            'auth.token.reissue_time',
-            '120'
-        ))
-        self.AUTH_TOKEN_REISSUE_TIME = int(settings.get(
-            'auth.token.reissue_time',
-            '120'
-        ))
-        self.AUTH_TOKEN_HASH_ALG = settings.get(
-            'auth.token.hash_alg',
-            'sha512'
-        )
 
         self.WEBSITE_TITLE = settings.get(
             'website.title',

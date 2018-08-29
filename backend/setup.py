@@ -43,6 +43,8 @@ requires = [
     'rq',
     # auth
     'pyramid_multiauth',
+    'beaker',
+    'pyramid_beaker',
     # frontend file serve
     'pyramid_mako',
 ]
@@ -54,7 +56,8 @@ tests_require = [
     'pep8',
     'mypy',
     'requests',
-    'Pillow'
+    'Pillow',
+    'freezegun'
 ]
 
 mysql_require = [

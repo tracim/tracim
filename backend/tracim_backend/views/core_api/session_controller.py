@@ -42,8 +42,7 @@ class SessionController(Controller):
             config=app_config,
         )
         user = uapi.authenticate_user(login.email, login.password)
-        request.current_user = user
-        request.add_cookie = True
+        remember(request, user.email)
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])
@@ -52,7 +51,7 @@ class SessionController(Controller):
         """
         Logs out current logged in user session
         """
-        request.remove_cookie = True
+        request.session.delete()
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])

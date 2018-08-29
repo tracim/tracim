@@ -7,7 +7,8 @@ except ImportError:
     from http import client as HTTPStatus
 
 from pyramid.config import Configurator
-from pyramid.authentication import BasicAuthAuthenticationPolicy
+from pyramid.authentication import BasicAuthAuthenticationPolicy, \
+    SessionAuthenticationPolicy
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
 from sqlalchemy.exc import OperationalError
@@ -15,7 +16,8 @@ from sqlalchemy.exc import OperationalError
 from tracim_backend.extensions import hapic
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.authentification import basic_auth_check_credentials
+from tracim_backend.lib.utils.authentification import \
+    basic_auth_check_credentials, CookieSessionAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -53,6 +55,10 @@ from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import ContentTypeNotAllowed
 
 
+def test(*args, **kwargs):
+    return []
+
+
 def web(global_config, **local_settings):
     """ This function returns a Pyramid WSGI application.
     """
@@ -64,15 +70,17 @@ def web(global_config, **local_settings):
     settings['CFG'] = app_config
     configurator = Configurator(settings=settings, autocommit=True)
     # Add AuthPolicy
+    configurator.include("pyramid_beaker")
     configurator.include("pyramid_multiauth")
     policies = [
-        AuthTktAuthenticationPolicy(
-            secret='test',
-            timeout=1200,
-            max_age=1500,
-            reissue_time=120,
-            hashalg='sha512'
-        ),
+        CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
+        # AuthTktAuthenticationPolicy(
+        #     secret='test',
+        #     timeout=app_config.AUTH_TOKEN_TIMEOUT,
+        #     max_age=app_config.AUTH_TOKEN_MAX_AGE,
+        #     reissue_time=app_config.AUTH_TOKEN_REISSUE_TIME,
+        #     hashalg=app_config.AUTH_TOKEN_HASH_ALG
+        # ),
         ApiTokenAuthentificationPolicy(
             api_key_header=TRACIM_API_KEY_HEADER,
             api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER

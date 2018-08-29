@@ -3,7 +3,7 @@ import datetime
 import pytest
 import transaction
 from sqlalchemy.exc import OperationalError
-
+from freezegun import freeze_time
 from tracim_backend import models
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
@@ -289,3 +289,156 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
+
+
+class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
+    config_section = 'functional_test_with_cookie_auth'
+
+    def test_api__test_cookie_auth_token__ok__nominal(self):
+        with freeze_time("1999-12-31 23:59:59"):
+            params = {
+                'email': 'admin@admin.admin',
+                'password': 'admin@admin.admin',
+            }
+            res = self.testapp.post_json(
+                '/api/v2/sessions/login',
+                params=params,
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_1 = self.testapp.cookies['session_key']
+
+        # session_id should not be return before x time
+        with freeze_time("2000-01-01 00:00:00"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' not in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_2 = self.testapp.cookies['session_key']
+            assert user_session_key_1 == user_session_key_2
+
+        # after x time session_id should be renew
+        with freeze_time("2000-01-01 00:02:01"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_3 = self.testapp.cookies['session_key']
+            assert user_session_key_3 != user_session_key_2
+
+        # after too much time, session_id should be revoked
+        with freeze_time("2000-01-01 00:12:01"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                params=params,
+                status=401,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert not self.testapp.cookies
+
+    def test_api__test_cookie_auth_token__ok__revocation_case(self):
+        with freeze_time("1999-12-31 23:59:59"):
+            params = {
+                'email': 'admin@admin.admin',
+                'password': 'admin@admin.admin',
+            }
+            res = self.testapp.post_json(
+                '/api/v2/sessions/login',
+                params=params,
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_1 = self.testapp.cookies['session_key']
+
+        with freeze_time("2000-01-01 00:00:00"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' not in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_2 = self.testapp.cookies['session_key']
+            assert user_session_key_1 == user_session_key_2
+
+            res = self.testapp.post_json(
+                '/api/v2/sessions/logout',
+                status=204,
+            )
+            assert 'Set-Cookie' in res.headers
+
+        with freeze_time("2000-01-01 00:00:02"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=401,
+            )
+            assert 'Set-Cookie' in res.headers
+
+        # test replay old token
+        with freeze_time("2000-01-01 00:00:04"):
+            self.testapp.reset()
+            self.testapp.set_cookie('session_key', user_session_key_1)
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=401,
+            )
+
+    def test_api__test_cookie_auth_token__ok__reissue_revocation_case(self):
+        with freeze_time("1999-12-31 23:59:59"):
+            params = {
+                'email': 'admin@admin.admin',
+                'password': 'admin@admin.admin',
+            }
+            res = self.testapp.post_json(
+                '/api/v2/sessions/login',
+                params=params,
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_1 = self.testapp.cookies['session_key']
+
+        # session_id should not be return before x time
+        with freeze_time("2000-01-01 00:00:00"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' not in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_2 = self.testapp.cookies['session_key']
+            assert user_session_key_1 == user_session_key_2
+
+        # after x time session_id should be renew
+        with freeze_time("2000-01-01 00:02:01"):
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+            assert 'Set-Cookie' in res.headers
+            assert 'session_key' in self.testapp.cookies
+            user_session_key_3 = self.testapp.cookies['session_key']
+            assert user_session_key_3 != user_session_key_2
+
+        # test replay old token
+        with freeze_time("2000-01-01 00:02:03"):
+            self.testapp.reset()
+            self.testapp.set_cookie('session_key', user_session_key_1)
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=200,
+            )
+
+        # test replay old token after timeout
+        with freeze_time("2000-01-01 00:12:04"):
+            self.testapp.reset()
+            self.testapp.set_cookie('session_key', user_session_key_1)
+            res = self.testapp.get(
+                '/api/v2/sessions/whoami',
+                status=401,
+            )

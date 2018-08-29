@@ -64,12 +64,6 @@ class TracimRequest(Request):
         # user
         self._candidate_user = None  # type: User
 
-        # if set to true, all cookie should be removed in response,
-        # see cookie_response.py
-        self.remove_cookie = False  # type: bool
-        # if set to true, new cookie according to current_user will be created
-        # see cookie_response.py
-        self.add_cookie = False  # type: bool
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
 
