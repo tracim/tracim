@@ -15,6 +15,11 @@ export class PreviewComponent extends React.Component {
 
   handleChangeDescription = e => this.setState({newDescription: e.target.value})
 
+  handleClickValidateNewDescription = () => {
+    this.props.onClickValidateNewDescription(this.state.newDescription)
+    this.setState({displayFormNewDescription: false})
+  }
+
   render () {
     const { props, state } = this
 
@@ -47,17 +52,25 @@ export class PreviewComponent extends React.Component {
         </div>
 
         <div className='file__contentpage__preview__slider'>
-          <div className='file__contentpage__preview__slider__icon'>
+          <button
+            type='button'
+            className='file__contentpage__preview__slider__icon'
+            onClick={props.onClickPreviousPage}
+          >
             <i className='fa fa-chevron-left' />
-          </div>
+          </button>
 
           <div className='file__contentpage__preview__slider__fileimg'>
             <img src={props.previewFile} className='img-thumbnail mx-auto' />
           </div>
 
-          <div className='file__contentpage__preview__slider__icon'>
+          <button
+            type='button'
+            className='file__contentpage__preview__slider__icon'
+            onClick={props.onClickNextPage}
+          >
             <i className='fa fa-chevron-right' />
-          </div>
+          </button>
         </div>
 
         <div className='file__contentpage__preview__sidebar'>
@@ -98,6 +111,7 @@ export class PreviewComponent extends React.Component {
                         <button
                           type='button'
                           className='file__contentpage__preview__sidebar__property__detail__description__editiondesc__validate btn'
+                          onClick={this.handleClickValidateNewDescription}
                         >
                           {props.t('Validate')}
                         </button>

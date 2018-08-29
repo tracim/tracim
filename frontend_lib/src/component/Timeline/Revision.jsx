@@ -3,10 +3,7 @@ import classnames from 'classnames'
 import Radium from 'radium'
 
 const Revision = props => (
-  <li
-    className={classnames(`${props.customClass}__messagelist__version`, 'timeline__body__messagelist__version')}
-    key={props.key}
-  >
+  <li className={classnames(`${props.customClass}__messagelist__version`, 'timeline__body__messagelist__version')}>
     <button
       type='button'
       className={classnames(`${props.customClass}__messagelist__version__btn`, 'timeline__body__messagelist__version__btn btn outlineTextBtn')}
@@ -19,15 +16,8 @@ const Revision = props => (
           color: '#fdfdfd'
         }
       }}
-      key={`${props.key}_button`}
     >
-      <i
-        className='fa fa-code-fork'
-        style={{
-          color: '#252525'
-        }}
-        key={`${props.key}_button_icon`}
-      />
+      <i className='fa fa-code-fork' style={{color: '#252525'}} />
       version {props.number}
     </button>
 

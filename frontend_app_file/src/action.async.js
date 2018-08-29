@@ -9,8 +9,17 @@ export const getFileContent = (user, apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
-export const getFileContentPreview = (user, apiUrl, idWorkspace, idContent, pageNum = 0) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/preview/jpg?page=${pageNum}`, {
+export const getFileContentPreview = (user, apiUrl, idWorkspace, idContent, pageNum) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/preview/jpg/500x500?page=${pageNum}`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
+export const getFileContentPreviewRevision = (user, apiUrl, idWorkspace, idContent, pageNum, idRevision) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions/${idRevision}/preview/jpg/500x500`, {
     headers: {
       'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers

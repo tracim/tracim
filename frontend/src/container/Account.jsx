@@ -87,7 +87,7 @@ class Account extends React.Component {
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
-    subComponentMenu: prev.subComponentMenu.map(m => ({...m, active: m.name === subMenuItemName }))
+    subComponentMenu: prev.subComponentMenu.map(m => ({...m, active: m.name === subMenuItemName}))
   }))
 
   handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {

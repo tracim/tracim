@@ -35,7 +35,7 @@ export const FileComponent = props =>
       </div>
     }
 
-    {props.mode === MODE.VIEW &&
+    {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
       <PreviewComponent
         onClickDownloadRaw={props.onClickDownloadRaw}
         onClickDownloadPdfPage={props.onClickDownloadPdfPage}
@@ -44,6 +44,9 @@ export const FileComponent = props =>
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}
+        onClickPreviousPage={props.onClickPreviousPage}
+        onClickNextPage={props.onClickNextPage}
+        onClickValidateNewDescription={props.onClickValidateNewDescription}
       />
     }
 
@@ -58,7 +61,7 @@ export const FileComponent = props =>
         <div className='file__contentpage__dropzone__btn'>
           <button
             type='button'
-            className='file__contentpage__dropzone__btn__cancel'
+            className='file__contentpage__dropzone__btn__cancel btn'
             onClick={props.onClickDropzoneCancel}
           >
             {props.t('Cancel')}
@@ -66,8 +69,9 @@ export const FileComponent = props =>
 
           <button
             type='button'
-            className='file__contentpage__dropzone__btn__validate'
+            className='file__contentpage__dropzone__btn__validate btn'
             onClick={props.onClickDropzoneValidate}
+            disabled={props.newFile === ''}
           >
             {props.t('Validate')}
           </button>

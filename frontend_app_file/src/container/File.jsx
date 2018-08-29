@@ -28,7 +28,9 @@ import {
   putFileIsDeleted,
   putFileRestoreArchived,
   putFileRestoreDeleted,
-  putFileRead, putFileContentRaw
+  putFileRead,
+  putFileContentRaw,
+  getFileContentPreviewRevision
 } from '../action.async.js'
 
 class File extends React.Component {
@@ -43,6 +45,7 @@ class File extends React.Component {
       timeline: props.data ? [] : [], // debug.timeline,
       newComment: '',
       newFile: '',
+      fileCurrentPage: 0,
       timelineWysiwyg: false,
       mode: MODE.VIEW,
       displayProperty: false
@@ -163,7 +166,7 @@ class File extends React.Component {
             ...rev.commentList.map(comment => ({
               ...comment,
               customClass: '',
-              loggedUser: this.state.config.loggedUser
+              loggedUser: config.loggedUser
             }))
           ], [])
 
@@ -204,25 +207,23 @@ class File extends React.Component {
 
   handleClickNewVersion = () => this.setState({mode: MODE.EDIT})
 
-  handleSaveFile = async () => {
-    const { loggedUser, content, config } = this.state
+  handleClickValidateNewDescription = async newDescription => {
+    const { props, state } = this
 
-    const fetchResultSaveFile = putFileContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
-
-    handleFetchResult(await fetchResultSaveFile)
-      .then(resSave => {
-        if (resSave.apiResponse.status === 200) {
-          this.handleCloseNewVersion()
-          this.loadContent()
-        } else {
-          console.warn('Error saving file. Result:', resSave, 'content:', content, 'config:', config)
+    const fetchResultSaveFile = await handleFetchResult(
+      await putFileContent(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
+    )
+    switch (fetchResultSaveFile.apiResponse.status) {
+      case 200: this.setState(prev => ({content: {...prev.content, raw_content: newDescription}})); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('Error while saving new description'),
+          type: 'warning',
+          delay: undefined
         }
       })
-  }
-
-  handleChangeDescription = e => {
-    const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
-    this.setState(prev => ({content: {...prev.content, raw_content: newText}}))
+    }
   }
 
   handleChangeNewComment = e => {
@@ -332,31 +333,46 @@ class File extends React.Component {
     }
   }
 
-  handleClickShowRevision = revision => {
-    const { mode, timeline } = this.state
+  handleClickShowRevision = async revision => {
+    const { props, state } = this
 
-    const revisionArray = timeline.filter(t => t.timelineType === 'revision')
+    const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
 
-    if (mode === MODE.REVISION && isLastRevision) {
+    if (state.mode === MODE.REVISION && isLastRevision) {
       this.handleClickLastVersion()
       return
     }
 
-    if (mode === MODE.VIEW && isLastRevision) return
+    if (state.mode === MODE.VIEW && isLastRevision) return
 
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        label: revision.label,
-        raw_content: revision.raw_content,
-        number: revision.number,
-        status: revision.status,
-        is_archived: prev.is_archived, // archived and delete should always be taken from last version
-        is_deleted: prev.is_deleted
-      },
-      mode: MODE.REVISION
-    }))
+    const fetchResultFilePreview = await getFileContentPreviewRevision(state.loggedUser, state.config.apiUrl, revision.workspace_id, revision.content_id, 0, revision.revision_id)
+    switch (fetchResultFilePreview.status) {
+      case 200:
+        const filePreviousVersion = URL.createObjectURL(await fetchResultFilePreview.blob())
+        this.setState(prev => ({
+          content: {
+            ...prev.content,
+            label: revision.label,
+            raw_content: revision.raw_content,
+            number: revision.number,
+            status: revision.status,
+            is_archived: prev.is_archived, // archived and delete should always be taken from last version
+            is_deleted: prev.is_deleted,
+            previewFile: filePreviousVersion
+          },
+          mode: MODE.REVISION
+        }))
+        break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('Error while loading previous version'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
   }
 
   handleClickLastVersion = () => {
@@ -389,7 +405,7 @@ class File extends React.Component {
     const formData = new FormData()
     formData.append('files', state.newFile)
 
-    const fetchPutRaw = await handleFetchResult(putFileContentRaw(state.loggedUser, state.config.apiUrl, state.idWorkspace, state.content.content_id, formData))
+    const fetchPutRaw = await handleFetchResult(await putFileContentRaw(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, formData))
     switch (fetchPutRaw.status) {
       case 204: this.loadContent(); break
       default: GLOBAL_dispatchEvent({
@@ -403,8 +419,38 @@ class File extends React.Component {
     }
   }
 
+  handleClickPreviousNextPage = async previousNext => {
+    const { props, state } = this
+
+    console.log('tg', previousNext)
+
+    if (!['previous', 'next'].includes(previousNext)) return
+    if (previousNext === 'previous' && state.fileCurrentPage === 0) return
+    // if (previousNext === 'next' && state.fileCurrentPage > 999) return // @TODO set proper max page (from api => api doesn't return that info yet)
+
+    const endPoint = state.mode === MODE.REVISION ? getFileContentPreviewRevision : getFileContentPreview
+    const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
+
+    const fetchNewPage = await endPoint(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, nextPageNumber)
+
+    switch (fetchNewPage.status) {
+      case 200: this.setState({
+        previewFile: URL.createObjectURL(await fetchNewPage.blob()),
+        fileCurrentPage: nextPageNumber
+      }); break
+      default: GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('Error while loading new page'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+    }
+  }
+
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, displayProperty } = this.state
+    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, displayProperty, newFile } = this.state
     const { t } = this.props
 
     if (!isVisible) return null
@@ -480,16 +526,13 @@ class File extends React.Component {
           <FileComponent
             mode={mode}
             customColor={config.hexcolor}
-            // wysiwygNewVersion={'wysiwygNewVersion'}
-            // onClickCloseEditMode={this.handleCloseNewVersion}
-            // onClickValidateBtn={this.handleSaveFile}
             previewFile={content.previewFile ? content.previewFile : ''}
             displayProperty={displayProperty}
             onClickProperty={this.handleClickProperty}
             version={content.number}
             lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
             description={content.raw_content}
-            onChangeDescription={this.handleChangeDescription}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
             isArchived={content.is_archived}
             isDeleted={content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
@@ -500,7 +543,9 @@ class File extends React.Component {
             onChangeFile={this.handleChangeFile}
             onClickDropzoneCancel={this.handleClickDropzoneCancel}
             onClickDropzoneValidate={this.handleClickDropzoneValidate}
-            key={'file'}
+            onClickPreviousPage={() => this.handleClickPreviousNextPage('previous')}
+            onClickNextPage={() => this.handleClickPreviousNextPage('next')}
+            newFile={newFile}
           />
 
           <Timeline
