@@ -8,6 +8,7 @@ except ImportError:
 
 from pyramid.config import Configurator
 from pyramid.authentication import BasicAuthAuthenticationPolicy
+from pyramid.authentication import AuthTktAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
 from sqlalchemy.exc import OperationalError
 
@@ -22,6 +23,7 @@ from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.utils.cookie_response import add_auth_cookie_in_all_response  # nopep8
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
@@ -64,6 +66,13 @@ def web(global_config, **local_settings):
     # Add AuthPolicy
     configurator.include("pyramid_multiauth")
     policies = [
+        AuthTktAuthenticationPolicy(
+            secret='test',
+            timeout=1200,
+            max_age=1500,
+            reissue_time=120,
+            hashalg='sha512'
+        ),
         ApiTokenAuthentificationPolicy(
             api_key_header=TRACIM_API_KEY_HEADER,
             api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -74,6 +83,7 @@ def web(global_config, **local_settings):
         ),
     ]
     configurator.include(add_cors_support)
+    configurator.include(add_auth_cookie_in_all_response)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
     # Default authorization : Accept anything.
