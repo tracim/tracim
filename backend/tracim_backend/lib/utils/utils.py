@@ -4,7 +4,7 @@ import random
 import string
 from enum import Enum
 import colorsys
-
+import pytz
 from redis import Redis
 from rq import Queue
 import typing
@@ -104,6 +104,18 @@ def current_date_for_filename() -> str:
     # webdav utils, it may cause trouble. So, it should be replaced to
     # a character which will not change in bdd.
     return datetime.datetime.now().isoformat().replace(':', '.')
+
+
+class Timezone(object):
+    def __init__(self, name):
+        self.name = name
+
+
+def get_timezones_list() -> typing.List[Timezone]:
+    tz_list = []
+    for tz_name in pytz.common_timezones:
+        tz_list.append(Timezone(tz_name))
+    return tz_list
 
 # INFO - G.M - 2018-08-02 - Simple password generator, inspired by
 # https://gist.github.com/23maverick23/4131896
