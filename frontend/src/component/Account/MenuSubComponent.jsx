@@ -1,7 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
 
-
 require('./MenuSubComponent.styl')
 
 export const MenuSubComponent = props => {
