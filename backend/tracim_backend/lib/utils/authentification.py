@@ -1,15 +1,16 @@
 import datetime
 import typing
 
-from pyramid.authentication import CallbackAuthenticationPolicy, \
-    SessionAuthenticationPolicy
+from pyramid.authentication import CallbackAuthenticationPolicy
+from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
-from tracim_backend.lib.utils.request import TracimRequest
+from zope.interface import implementer
+
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models import User
-from zope.interface import implementer
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"

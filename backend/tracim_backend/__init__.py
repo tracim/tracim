@@ -16,8 +16,8 @@ from sqlalchemy.exc import OperationalError
 from tracim_backend.extensions import hapic
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.authentification import \
-    basic_auth_check_credentials, CookieSessionAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import basic_auth_check_credentials
+from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -25,7 +25,6 @@ from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.cors import add_cors_support
-from tracim_backend.lib.utils.cookie_response import add_auth_cookie_in_all_response  # nopep8
 from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.views.contents_api.html_document_controller import HTMLDocumentController  # nopep8
@@ -74,13 +73,6 @@ def web(global_config, **local_settings):
     configurator.include("pyramid_multiauth")
     policies = [
         CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
-        # AuthTktAuthenticationPolicy(
-        #     secret='test',
-        #     timeout=app_config.AUTH_TOKEN_TIMEOUT,
-        #     max_age=app_config.AUTH_TOKEN_MAX_AGE,
-        #     reissue_time=app_config.AUTH_TOKEN_REISSUE_TIME,
-        #     hashalg=app_config.AUTH_TOKEN_HASH_ALG
-        # ),
         ApiTokenAuthentificationPolicy(
             api_key_header=TRACIM_API_KEY_HEADER,
             api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -91,7 +83,6 @@ def web(global_config, **local_settings):
         ),
     ]
     configurator.include(add_cors_support)
-    configurator.include(add_auth_cookie_in_all_response)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
     # Default authorization : Accept anything.
