@@ -6,12 +6,12 @@ import {
   addAllResourceI18n
 } from 'tracim_frontend_lib'
 import {
-  postFileContent,
-  putFileContentRaw
+  postFileContent
 } from '../action.async.js'
 import i18n from '../i18n.js'
 import { debug } from '../helper.js'
 import FileDropzone from '../component/FileDropzone.jsx'
+import PopupProgressUpload from '../component/PopupProgressUpload.jsx'
 
 class PopupCreateFile extends React.Component {
   constructor (props) {
@@ -22,7 +22,11 @@ class PopupCreateFile extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       idWorkspace: props.data ? props.data.idWorkspace : debug.idWorkspace,
       idFolder: props.data ? props.data.idFolder : debug.idFolder,
-      uploadFile: ''
+      uploadFile: '',
+      progressUpload: {
+        display: false,
+        percent: 0
+      }
     }
 
     // i18n has been init, add resources from frontend
@@ -75,32 +79,45 @@ class PopupCreateFile extends React.Component {
       }
     })
 
-    const fetchPostContent = await handleFetchResult(postFileContent(state.loggedUser, state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
+    const fetchPostContent = await handleFetchResult(await postFileContent(state.loggedUser, state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
     switch (fetchPostContent.apiResponse.status) {
       case 200:
-        const newIdContent = fetchPostContent.body.content_id
-
         const formData = new FormData()
         formData.append('files', state.uploadFile)
 
-        const fetchPutRaw = await handleFetchResult(putFileContentRaw(state.loggedUser, state.config.apiUrl, state.idWorkspace, newIdContent, formData))
-        switch (fetchPutRaw.status) {
-          case 204:
-            this.handleClose()
+        // fetch still doesn't handle event progress. So we need to use old school xhr object
+        const xhr = new XMLHttpRequest()
+        xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+        const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
+        xhr.upload.addEventListener('progress', uploadInProgress, false)
+        xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
-            GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+        xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.idWorkspace}/files/${fetchPostContent.body.content_id}/raw`, true)
+        xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
+        xhr.setRequestHeader('Accept', 'application/json')
 
-            GLOBAL_dispatchEvent({
-              type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
-              data: {
-                idWorkspace: fetchPostContent.body.workspace_id,
-                contentType: state.appName,
-                idContent: fetchPostContent.body.content_id
-              }
-            })
-            break
-          default: displayFlashMsgError()
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4) {
+            switch (xhr.status) {
+              case 204:
+                this.handleClose()
+
+                GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
+
+                GLOBAL_dispatchEvent({
+                  type: 'openContentUrl', // handled by tracim_front:src/container/WorkspaceContent.jsx
+                  data: {
+                    idWorkspace: fetchPostContent.body.workspace_id,
+                    contentType: state.appName,
+                    idContent: fetchPostContent.body.content_id
+                  }
+                }); break
+              default: displayFlashMsgError()
+            }
+          }
         }
+
+        xhr.send(formData)
         break
       default: displayFlashMsgError()
     }
@@ -120,11 +137,20 @@ class PopupCreateFile extends React.Component {
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
       >
-        <FileDropzone
-          onDrop={this.handleChangeFile}
-          onClick={this.handleChangeFile}
-          hexcolor={state.config.hexcolor}
-        />
+        <div>
+          {state.progressUpload.display &&
+            <PopupProgressUpload
+              color={state.config.hexcolor}
+              percent={state.progressUpload.percent}
+              filename={state.uploadFile ? state.uploadFile.name : ''}
+            />
+          }
+          <FileDropzone
+            onDrop={this.handleChangeFile}
+            onClick={this.handleChangeFile}
+            hexcolor={state.config.hexcolor}
+          />
+        </div>
       </CardPopupCreateContent>
     )
   }

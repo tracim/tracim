@@ -76,12 +76,13 @@ module.exports = {
       ? [ // production specific plugins
         new webpack.DefinePlugin({
           'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-          compress: { warnings: false }
         })
+        // new webpack.optimize.UglifyJsPlugin({
+        //   compress: { warnings: false }
+        // })
       ]
-      : [] // development specific plugins
+      : [ // development specific plugins
+      ]
     )
   ]
 }

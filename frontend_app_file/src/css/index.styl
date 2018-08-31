@@ -26,13 +26,13 @@
       height calc(100% - 130px)
     &__statewrapper
       height 100%
+      padding 10px 10px 0px 10px
+      overflow-y auto
       &.displayState ^[1]__preview // render .file__contentpage__statewrapper.displayState .file__contentpage__preview
         height calc(100% - 68px) // 100% - file__contentpage__preview__state height
     &__preview
       position relative
-      margin 10px
       border-radius 10px
-      // height calc(100% - 150px) // margin + height of header and option
       height 100%
       background-color off-white
       &__state
@@ -49,11 +49,13 @@
           cursor pointer
           & > i
             margin-right 8px
-      &__sidebar
+      &__property
         display flex
+        justify-content flex-end
         position absolute
         top 0
         right 0
+        width 100%
         height 100%
         &__button
           display flex
@@ -71,7 +73,7 @@
             margin-top 45px
             color white
             transform rotate(-90deg)
-        &__property
+        &__content
           width 0
           overflow-X hidden
           background-color off-white
@@ -107,8 +109,8 @@
       &__slider
         display flex
         align-items center
-        width calc(100% - 50px) // 50px => width of sidebar
-        height calc(100% - 40px) // 40px => height of dloption
+        width calc(100% - 50px) // 50px => width of property
+        height calc(100% - 53px) // 53px => height of dloption
         &__fileimg
           display flex
           flex-direction column
@@ -138,12 +140,12 @@
         &__cancel
           margin-right 15px
 
-.activesidebar
+.openproperty
   .file__contentpage__preview
-    &__sidebar
+    &__property
       width 100%
       border-radius 0 10px 10px 0
-      &__property
+      &__content
         width 100%
         overflow-Y auto
 
@@ -155,7 +157,7 @@
       display none
 
 .activeEditionDesc
-  .file__contentpage__preview__sidebar__property__detail
+  .file__contentpage__preview__property__content__detail
     &__description
       &__editiondesc
         display block
@@ -204,10 +206,10 @@
     overflow-Y scroll
 
 @media (max-width: max-xs)
-  .activesidebar
+  .openproperty
     .file__contentpage__preview
-      &__sidebar
-        &__property
+      &__property
+        &__content
           width 300px
 
   .file

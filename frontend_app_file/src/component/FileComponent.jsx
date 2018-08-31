@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
 import FileDropzone from './FileDropzone.jsx'
+import PopupProgressUpload from './PopupProgressUpload.jsx'
 
 export const FileComponent = props =>
   <div className={classnames('file__contentpage__statewrapper', {'displayState': props.isArchived || props.isDeleted})}>
@@ -37,6 +38,7 @@ export const FileComponent = props =>
 
     {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
       <PreviewComponent
+        color={props.customColor}
         onClickDownloadRaw={props.onClickDownloadRaw}
         onClickDownloadPdfPage={props.onClickDownloadPdfPage}
         onClickDownloadPdfFull={props.onClickDownloadPdfFull}
@@ -52,10 +54,19 @@ export const FileComponent = props =>
 
     {props.mode === MODE.EDIT &&
       <div className='file__contentpage__dropzone'>
+        {props.progressUpload.display &&
+          <PopupProgressUpload
+            color={props.customColor}
+            percent={props.progressUpload.percent}
+            filename={props.newFile ? props.newFile.name : ''}
+          />
+        }
+
         <FileDropzone
           onDrop={props.onChangeFile}
           onClick={props.onChangeFile}
           hexcolor={props.customColor}
+          preview={props.newFilePreview}
         />
 
         <div className='file__contentpage__dropzone__btn'>

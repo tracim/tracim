@@ -79,17 +79,6 @@ export const putFileContent = (user, apiUrl, idWorkspace, idContent, label, newC
     })
   })
 
-export const putFileContentRaw = (user, apiUrl, idWorkspace, idContent, fileData) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/raw`, {
-    headers: {
-      'Authorization': 'Basic ' + user.auth,
-      'Accept': 'application/json'
-      // dont set content type when sending multipart/form-data. fetch will ad it properly
-    },
-    method: 'PUT',
-    body: fileData
-  })
-
 export const putFileStatus = (user, apiUrl, idWorkspace, idContent, newStatus) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/status`, {
     headers: {
@@ -110,7 +99,7 @@ export const postFileContent = (user, apiUrl, idWorkspace, idFolder, contentType
     },
     method: 'POST',
     body: JSON.stringify({
-      parent_id: idFolder,
+      // parent_id: idFolder,
       content_type: contentType,
       label: uploadFileName
     })

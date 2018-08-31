@@ -29,7 +29,6 @@ import {
   putFileRestoreArchived,
   putFileRestoreDeleted,
   putFileRead,
-  putFileContentRaw,
   getFileContentPreviewRevision
 } from '../action.async.js'
 
@@ -45,10 +44,15 @@ class File extends React.Component {
       timeline: props.data ? [] : [], // debug.timeline,
       newComment: '',
       newFile: '',
+      newFilePreview: null,
       fileCurrentPage: 0,
       timelineWysiwyg: false,
       mode: MODE.VIEW,
-      displayProperty: false
+      displayProperty: false,
+      progressUpload: {
+        display: false,
+        percent: 0
+      }
     }
 
     // i18n has been init, add resources from frontend
@@ -395,9 +399,18 @@ class File extends React.Component {
 
   handleClickDownloadPdfFull = async () => {}
 
-  handleChangeFile = newFile => this.setState({newFile: newFile[0]})
+  handleChangeFile = newFile => {
+    if (!newFile || !newFile[0]) return
 
-  handleClickDropzoneCancel = () => this.setState({mode: MODE.VIEW})
+    const fileToSave = newFile[0]
+    this.setState({newFile: fileToSave})
+
+    var reader = new FileReader()
+    reader.onload = e => this.setState({newFilePreview: e.target.result})
+    reader.readAsDataURL(fileToSave)
+  }
+
+  handleClickDropzoneCancel = () => this.setState({mode: MODE.VIEW, newFile: '', newFilePreview: null})
 
   handleClickDropzoneValidate = async () => {
     const { props, state } = this
@@ -405,24 +418,44 @@ class File extends React.Component {
     const formData = new FormData()
     formData.append('files', state.newFile)
 
-    const fetchPutRaw = await handleFetchResult(await putFileContentRaw(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, formData))
-    switch (fetchPutRaw.status) {
-      case 204: this.loadContent(); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while creating file'),
-          type: 'warning',
-          delay: undefined
+    // fetch still doesn't handle event progress. So we need to use old school xhr object
+    const xhr = new XMLHttpRequest()
+    xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+    const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
+    xhr.upload.addEventListener('progress', uploadInProgress, false)
+    xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
+
+    xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw`, true)
+    xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
+    xhr.setRequestHeader('Accept', 'application/json')
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        switch (xhr.status) {
+          case 204:
+            this.loadContent()
+            this.setState({
+              newFile: '',
+              newFilePreview: null
+            })
+            break
+          default: GLOBAL_dispatchEvent({
+            type: 'addFlashMsg',
+            data: {
+              msg: props.t('Error while uploading file'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
         }
-      })
+      }
     }
+
+    xhr.send(formData)
   }
 
   handleClickPreviousNextPage = async previousNext => {
     const { props, state } = this
-
-    console.log('tg', previousNext)
 
     if (!['previous', 'next'].includes(previousNext)) return
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
@@ -450,69 +483,68 @@ class File extends React.Component {
   }
 
   render () {
-    const { isVisible, loggedUser, content, timeline, newComment, timelineWysiwyg, config, mode, displayProperty, newFile } = this.state
-    const { t } = this.props
+    const { props, state } = this
 
-    if (!isVisible) return null
+    if (!state.isVisible) return null
 
     return (
       <PopinFixed
-        customClass={`${config.slug}`}
-        customColor={config.hexcolor}
+        customClass={`${state.config.slug}`}
+        customColor={state.config.hexcolor}
       >
         <PopinFixedHeader
-          customClass={`${config.slug}`}
-          customColor={config.hexcolor}
-          faIcon={config.faIcon}
-          title={content.label}
-          idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
+          customClass={`${state.config.slug}`}
+          customColor={state.config.hexcolor}
+          faIcon={state.config.faIcon}
+          title={state.content.label}
+          idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
         />
 
         <PopinFixedOption
-          customColor={config.hexcolor}
-          customClass={`${config.slug}`}
+          customColor={state.config.hexcolor}
+          customClass={`${state.config.slug}`}
           i18n={i18n}
         >
           <div /* this div in display flex, justify-content space-between */>
             <div className='d-flex'>
-              {loggedUser.idRoleUserWorkspace >= 2 &&
+              {state.loggedUser.idRoleUserWorkspace >= 2 &&
                 <NewVersionBtn
-                  customColor={config.hexcolor}
+                  customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={mode !== MODE.VIEW}
+                  disabled={state.mode !== MODE.VIEW}
                 />
               }
 
-              {mode === MODE.REVISION &&
+              {state.mode === MODE.REVISION &&
                 <button
                   className='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
                   onClick={this.handleClickLastVersion}
-                  style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
+                  style={{backgroundColor: state.config.hexcolor, color: '#fdfdfd'}}
                 >
                   <i className='fa fa-code-fork' />
-                  {t('Last version')}
+                  {props.t('Last version')}
                 </button>
               }
             </div>
 
             <div className='d-flex'>
-              {loggedUser.idRoleUserWorkspace >= 2 &&
+              {state.loggedUser.idRoleUserWorkspace >= 2 &&
                 <SelectStatus
-                  selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
-                  availableStatus={config.availableStatuses}
+                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                  availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION}
                 />
               }
 
-              {loggedUser.idRoleUserWorkspace >= 4 &&
+              {state.loggedUser.idRoleUserWorkspace >= 4 &&
                 <ArchiveDeleteContent
-                  customColor={config.hexcolor}
+                  customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION}
                 />
               }
             </div>
@@ -520,21 +552,21 @@ class File extends React.Component {
         </PopinFixedOption>
 
         <PopinFixedContent
-          customClass={`${config.slug}__contentpage`}
-          showRightPartOnLoad={mode === MODE.VIEW}
+          customClass={`${state.config.slug}__contentpage`}
+          showRightPartOnLoad={state.mode === MODE.VIEW}
         >
           <FileComponent
-            mode={mode}
-            customColor={config.hexcolor}
-            previewFile={content.previewFile ? content.previewFile : ''}
-            displayProperty={displayProperty}
+            mode={state.mode}
+            customColor={state.config.hexcolor}
+            previewFile={state.content.previewFile ? state.content.previewFile : ''}
+            displayProperty={state.displayProperty}
             onClickProperty={this.handleClickProperty}
-            version={content.number}
-            lastVersion={timeline.filter(t => t.timelineType === 'revision').length}
-            description={content.raw_content}
+            version={state.content.number}
+            lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+            description={state.content.raw_content}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
-            isArchived={content.is_archived}
-            isDeleted={content.is_deleted}
+            isArchived={state.content.is_archived}
+            isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             onClickDownloadRaw={this.handleClickDownloadRaw}
@@ -545,22 +577,24 @@ class File extends React.Component {
             onClickDropzoneValidate={this.handleClickDropzoneValidate}
             onClickPreviousPage={() => this.handleClickPreviousNextPage('previous')}
             onClickNextPage={() => this.handleClickPreviousNextPage('next')}
-            newFile={newFile}
+            newFile={state.newFile}
+            newFilePreview={state.newFilePreview}
+            progressUpload={state.progressUpload}
           />
 
           <Timeline
-            customClass={`${config.slug}__contentpage`}
-            customColor={config.hexcolor}
-            loggedUser={loggedUser}
-            timelineData={timeline}
-            newComment={newComment}
-            disableComment={mode === MODE.REVISION}
-            wysiwyg={timelineWysiwyg}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            loggedUser={state.loggedUser}
+            timelineData={state.timeline}
+            newComment={state.newComment}
+            disableComment={state.mode === MODE.REVISION}
+            wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={mode !== MODE.REVISION}
+            shouldScrollToBottom={state.mode !== MODE.REVISION}
           />
         </PopinFixedContent>
       </PopinFixed>
