@@ -7,8 +7,8 @@ except ImportError:
     from http import client as HTTPStatus
 
 from pyramid.config import Configurator
-from pyramid.authentication import BasicAuthAuthenticationPolicy, \
-    SessionAuthenticationPolicy
+from pyramid.authentication import BasicAuthAuthenticationPolicy
+from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
 from sqlalchemy.exc import OperationalError
