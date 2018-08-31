@@ -143,9 +143,9 @@ def password_generator(
 def clamp(val: float, minimum: float = 0.0, maximum: float= 255.0) -> int:
     """ Fix value between min an max"""
     if val < minimum:
-        return minimum
+        return int(minimum)
     if val > maximum:
-        return maximum
+        return int(maximum)
     return int(val)
 
 
@@ -160,6 +160,7 @@ class Color(object):
         """
 
         assert len(base_hex_code) == 7
+        assert base_hex_code[0] == '#'
         self._base_hex_code = base_hex_code
 
     # INFO - G.M - 2018-08-10 - get_hexcolor, inspired by
@@ -175,7 +176,7 @@ class Color(object):
         """
 
         hex_color = self._base_hex_code.strip('#')
-        assert scalefactor > 0
+        assert scalefactor >= 0
 
         r = int(hex_color[:2], 16)
         g = int(hex_color[2:4], 16)
