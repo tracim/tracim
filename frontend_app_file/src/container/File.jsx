@@ -29,7 +29,9 @@ import {
   putFileRestoreArchived,
   putFileRestoreDeleted,
   putFileRead,
-  getFileContentPreviewRevision
+  getFileContentPreviewRevision,
+  getFileContentRaw,
+  getFileContentRawRevision
 } from '../action.async.js'
 
 class File extends React.Component {
@@ -117,6 +119,15 @@ class File extends React.Component {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: 'addFlashMsg',
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
 
   loadContent = async () => {
     const { loggedUser, content, config } = this.state
@@ -219,14 +230,7 @@ class File extends React.Component {
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: this.setState(prev => ({content: {...prev.content, raw_content: newDescription}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while saving new description'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
     }
   }
 
@@ -361,6 +365,8 @@ class File extends React.Component {
             raw_content: revision.raw_content,
             number: revision.number,
             status: revision.status,
+            current_revision_id: revision.revision_id,
+            contentFull: null,
             is_archived: prev.is_archived, // archived and delete should always be taken from last version
             is_deleted: prev.is_deleted,
             previewFile: filePreviousVersion
@@ -368,14 +374,7 @@ class File extends React.Component {
           mode: MODE.REVISION
         }))
         break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading previous version'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(props.t('Error while loading previous version'))
     }
   }
 
@@ -439,14 +438,7 @@ class File extends React.Component {
               newFilePreview: null
             })
             break
-          default: GLOBAL_dispatchEvent({
-            type: 'addFlashMsg',
-            data: {
-              msg: props.t('Error while uploading file'),
-              type: 'warning',
-              delay: undefined
-            }
-          })
+          default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
         }
       }
     }
@@ -464,21 +456,28 @@ class File extends React.Component {
     const endPoint = state.mode === MODE.REVISION ? getFileContentPreviewRevision : getFileContentPreview
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
-    const fetchNewPage = await endPoint(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, nextPageNumber)
+    const fetchNewPage = await endPoint(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, nextPageNumber, state.content.current_revision_id)
 
     switch (fetchNewPage.status) {
       case 200: this.setState({
         previewFile: URL.createObjectURL(await fetchNewPage.blob()),
         fileCurrentPage: nextPageNumber
       }); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading new page'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(props.t('Error while loading new page'))
+    }
+  }
+
+  handleClickDisplayContentFull = async () => {
+    const { props, state } = this
+
+    const endPoint = state.mode === MODE.REVISION ? getFileContentRawRevision : getFileContentRaw
+    // last param bellow is only useful for getFileContentRawRevision(). It is just ignored for getFileContentRaw
+    const fetchContentFull = await endPoint(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.current_revision_id)
+    switch (fetchContentFull.status) {
+      case 200:
+        const contentFull = URL.createObjectURL(await fetchContentFull.blob())
+        this.setState(prev => ({content: {...prev.content, contentFull: contentFull}})); break
+      default: this.sendGlobalFlashMessage(props.t('Error while loading file'))
     }
   }
 
@@ -570,6 +569,8 @@ class File extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
             onClickDownloadRaw={this.handleClickDownloadRaw}
+            onClickDisplayFull={this.handleClickDisplayContentFull}
+            contentFull={state.content.contentFull}
             onClickDownloadPdfPage={this.handleClickDownloadPdfPage}
             onClickDownloadPdfFull={this.handleClickDownloadPdfFull}
             onChangeFile={this.handleChangeFile}

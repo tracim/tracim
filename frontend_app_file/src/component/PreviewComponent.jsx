@@ -2,13 +2,18 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
+import Lightbox from 'react-image-lightbox'
+import 'react-image-lightbox/style.css'
+
+require('./Previewcomponent.styl')
 
 export class PreviewComponent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       displayFormNewDescription: false,
-      newDescription: ''
+      newDescription: '',
+      displayLightbox: false
     }
   }
 
@@ -21,17 +26,20 @@ export class PreviewComponent extends React.Component {
     this.setState({displayFormNewDescription: false})
   }
 
+  handleClickShowImageRaw = async () => {
+    this.setState({displayLightbox: true})
+    this.props.onClickDisplayFull()
+  }
+
   render () {
     const { props, state } = this
 
-    console.log('color', props.color)
-
     return (
-      <div className={classnames('file__contentpage__preview', {'openproperty': props.displayProperty})}>
-        <div className='file__contentpage__preview__dloption'>
+      <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
+        <div className='previewcomponent__dloption'>
           <button
             type='button'
-            className='file__contentpage__preview__dloption__icon btn iconBtn'
+            className='previewcomponent__dloption__icon btn iconBtn'
             onClick={props.onClickDownloadRaw}
             style={{':hover': {color: props.color}}}
             key={'file_btn_dl_raw'}
@@ -41,7 +49,7 @@ export class PreviewComponent extends React.Component {
 
           <button
             type='button'
-            className='file__contentpage__preview__dloption__icon btn iconBtn'
+            className='previewcomponent__dloption__icon btn iconBtn'
             onClick={props.onClickDownloadPdfPage}
             style={{':hover': {color: props.color}}}
             key={'file_btn_dl_pdfpage'}
@@ -51,7 +59,7 @@ export class PreviewComponent extends React.Component {
 
           <button
             type='button'
-            className='file__contentpage__preview__dloption__icon btn iconBtn'
+            className='previewcomponent__dloption__icon btn iconBtn'
             onClick={props.onClickDownloadPdfFull}
             style={{':hover': {color: props.color}}}
             key={'file_btn_dl_pdfall'}
@@ -60,10 +68,10 @@ export class PreviewComponent extends React.Component {
           </button>
         </div>
 
-        <div className='file__contentpage__preview__slider'>
+        <div className='previewcomponent__slider'>
           <button
             type='button'
-            className='file__contentpage__preview__slider__icon btn iconBtn'
+            className='previewcomponent__slider__icon btn iconBtn'
             onClick={props.onClickPreviousPage}
             style={{':hover': {color: props.color}}}
             key={'file_btn_previouspage'}
@@ -71,13 +79,23 @@ export class PreviewComponent extends React.Component {
             <i className='fa fa-chevron-left' />
           </button>
 
-          <div className='file__contentpage__preview__slider__fileimg'>
+          <div
+            className='previewcomponent__slider__fileimg'
+            onClick={this.handleClickShowImageRaw}
+          >
             <img src={props.previewFile} className='img-thumbnail mx-auto' />
+
+            {state.displayLightbox && props.contentFull !== null && props.contentFull !== undefined &&
+              <Lightbox
+                mainSrc={props.contentFull}
+                onCloseRequest={() => this.setState({displayLightbox: false})}
+              />
+            }
           </div>
 
           <button
             type='button'
-            className='file__contentpage__preview__slider__icon btn iconBtn'
+            className='previewcomponent__slider__icon btn iconBtn'
             onClick={props.onClickNextPage}
             style={{':hover': {color: props.color}}}
             key={'file_btn_nextpage'}
@@ -86,36 +104,36 @@ export class PreviewComponent extends React.Component {
           </button>
         </div>
 
-        <div className='file__contentpage__preview__property'>
-          <div className='file__contentpage__preview__property__button' onClick={props.onClickProperty}>
-            <div className='file__contentpage__preview__property__button__icon'>
+        <div className='previewcomponent__property'>
+          <div className='previewcomponent__property__button' onClick={props.onClickProperty}>
+            <div className='previewcomponent__property__button__icon'>
               <i className='fa fa-gear' />
             </div>
 
-            <div className='file__contentpage__preview__property__button__title'>
+            <div className='previewcomponent__property__button__title'>
               {props.t('Properties')}
             </div>
           </div>
 
-          <div className='file__contentpage__preview__property__content'>
-            <div className='file__contentpage__preview__property__content__detail'>
-              <div className='file__contentpage__preview__property__content__detail__size'>
+          <div className='previewcomponent__property__content'>
+            <div className='previewcomponent__property__content__detail'>
+              <div className='previewcomponent__property__content__detail__size'>
                 {props.t('Size')}: nyi
               </div>
 
-              <div className='file__contentpage__preview__property__content__detail__description'>
+              <div className='previewcomponent__property__content__detail__description'>
                 {state.displayFormNewDescription
                   ? (
-                    <form className='file__contentpage__preview__property__content__detail__description__editiondesc'>
+                    <form className='previewcomponent__property__content__detail__description__editiondesc'>
                       <textarea
                         value={state.newDescription}
                         onChange={this.handleChangeDescription}
                       />
 
-                      <div className='file__contentpage__preview__property__content__detail__description__editiondesc__btn'>
+                      <div className='previewcomponent__property__content__detail__description__editiondesc__btn'>
                         <button
                           type='button'
-                          className='file__contentpage__preview__property__content__detail__description__editiondesc__btn__cancel btn'
+                          className='previewcomponent__property__content__detail__description__editiondesc__btn__cancel btn'
                           onClick={this.handleToggleFormNewDescription}
                         >
                           {props.t('Cancel')}
@@ -123,7 +141,7 @@ export class PreviewComponent extends React.Component {
 
                         <button
                           type='button'
-                          className='file__contentpage__preview__property__content__detail__description__editiondesc__validate btn'
+                          className='previewcomponent__property__content__detail__description__editiondesc__validate btn'
                           onClick={this.handleClickValidateNewDescription}
                         >
                           {props.t('Validate')}
@@ -142,7 +160,7 @@ export class PreviewComponent extends React.Component {
               {!state.displayFormNewDescription &&
               <button
                 type='button'
-                className='file__contentpage__preview__property__content__detail__btndesc btn outlineTextBtn'
+                className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
                 onClick={this.handleToggleFormNewDescription}
               >
                 {props.t('Change description')}

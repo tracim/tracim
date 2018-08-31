@@ -36,6 +36,15 @@ export const getFileContentRaw = (user, apiUrl, idWorkspace, idContent) =>
     method: 'GET'
   })
 
+export const getFileContentRawRevision = (user, apiUrl, idWorkspace, idContent, idRevision) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions/${idRevision}/raw`, {
+    headers: {
+      'Authorization': 'Basic ' + user.auth,
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
 export const getFileComment = (user, apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
     headers: {

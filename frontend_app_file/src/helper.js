@@ -95,7 +95,8 @@ export const debug = {
     slug: 'current-menu',
     status: 'open',
     sub_content_types: ['thread', 'html-document', 'file', 'folder'],
-    workspace_id: 1
+    workspace_id: 1,
+    contentFull: null
   },
   timeline: timelineDebugData,
   idWorkspace: 1
