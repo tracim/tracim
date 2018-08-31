@@ -105,6 +105,15 @@ class CFG(object):
             0,
         ))
 
+        self.API_KEY = settings.get(
+            'api.key',
+            ''
+        )
+        self.SESSION_REISSUE_TIME = int(settings.get(
+            'session.reissue_time',
+            120
+        ))
+
         self.WEBSITE_TITLE = settings.get(
             'website.title',
             'TRACIM',
@@ -135,7 +144,6 @@ class CFG(object):
         #     '/assets/img/bg.jpg',
         # )
         #
-
         self.WEBSITE_SERVER_NAME = settings.get(
             'website.server_name',
             None,
