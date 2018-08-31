@@ -332,14 +332,13 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             assert user_session_key_3 != user_session_key_2
 
         # after too much time, session_id should be revoked
-        with freeze_time("2000-01-01 00:12:01"):
+        with freeze_time("2000-01-01 00:12:02"):
             res = self.testapp.get(
                 '/api/v2/sessions/whoami',
                 params=params,
                 status=401,
             )
             assert 'Set-Cookie' in res.headers
-            assert not self.testapp.cookies
 
     def test_api__test_cookie_auth_token__ok__revocation_case(self):
         with freeze_time("1999-12-31 23:59:59"):
