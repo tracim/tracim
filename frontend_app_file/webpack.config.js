@@ -1,42 +1,32 @@
 const webpack = require('webpack')
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
-const dashboardPlugin = require('webpack-dashboard/plugin')
+
+console.log('isProduction : ', isProduction)
 
 module.exports = {
-  entry: {
-    app: ['babel-polyfill', 'whatwg-fetch', './src/index.js'],
-    vendor: [
-      'babel-plugin-transform-class-properties',
-      'babel-plugin-transform-object-assign',
-      'babel-plugin-transform-object-rest-spread',
-      'babel-polyfill',
-      // 'lodash.pull',
-      // 'lodash.reject',
-      // 'lodash.uniqby',
-      'react',
-      'react-dom',
-      'react-redux',
-      'react-router-dom',
-      // 'react-select',
-      'redux',
-      'redux-logger',
-      // 'redux-saga',
-      'redux-thunk',
-      'whatwg-fetch',
-      'classnames'
-    ]
-  },
+  entry: isProduction
+    ? './src/index.js' // only one instance of babel-polyfill is allowed
+    : ['babel-polyfill', './src/index.dev.js'],
   output: {
-    path: path.resolve(__dirname, 'dist/asset'),
-    filename: 'tracim.app.entry.js',
+    path: path.resolve(__dirname, 'dist'),
+    filename: isProduction ? 'file.app.js' : 'file.app.dev.js',
     pathinfo: !isProduction,
-    publicPath: '/asset/'
+    library: isProduction ? 'appFile' : undefined,
+    libraryTarget: isProduction ? 'var' : undefined
   },
+  externals: {},
+  // isProduction ? { // Côme - since plugins are imported through <script>, cannot externalize libraries
+  //   react: {commonjs: 'react', commonjs2: 'react', amd: 'react', root: '_'},
+  //   'react-dom': {commonjs: 'react-dom', commonjs2: 'react-dom', amd: 'react-dom', root: '_'},
+  //   classnames: {commonjs: 'classnames', commonjs2: 'classnames', amd: 'classnames', root: '_'},
+  //   'prop-types': {commonjs: 'prop-types', commonjs2: 'prop-types', amd: 'prop-types', root: '_'},
+  //   tracim_lib: {commonjs: 'tracim_lib', commonjs2: 'tracim_lib', amd: 'tracim_lib', root: '_'}
+  // }
+  // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
-    host: '0.0.0.0',
-    port: 8090,
+    port: 8075,
     hot: true,
     noInfo: true,
     overlay: {
@@ -71,35 +61,28 @@ module.exports = {
       use: ['style-loader', 'css-loader', 'stylus-loader']
     }, {
       test: /\.(jpg|png|svg)$/,
-      loader: 'file-loader',
+      loader: 'url-loader',
       options: {
-        name: '[name].[ext]',
-        outputPath: 'images/', // asset/ is in output.path
-        limit: 2000
+        limit: 25000
       }
     }]
   },
   resolve: {
     extensions: ['.js', '.jsx']
   },
-  plugins:[
-    ...[ // generic plugins always present
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        filename: 'tracim.vendor.bundle.js'
-      })
-      // new dashboardPlugin()
-    ],
+  plugins: [
+    ...[], // generic plugins always present
     ...(isProduction
       ? [ // production specific plugins
         new webpack.DefinePlugin({
           'process.env': { 'NODE_ENV': JSON.stringify('production') }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-          compress: { warnings: false }
         })
+        // new webpack.optimize.UglifyJsPlugin({
+        //   compress: { warnings: false }
+        // })
       ]
-      : [] // development specific plugins
+      : [ // development specific plugins
+      ]
     )
   ]
 }
