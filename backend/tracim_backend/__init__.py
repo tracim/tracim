@@ -54,10 +54,6 @@ from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import ContentTypeNotAllowed
 
 
-def test(*args, **kwargs):
-    return []
-
-
 def web(global_config, **local_settings):
     """ This function returns a Pyramid WSGI application.
     """
