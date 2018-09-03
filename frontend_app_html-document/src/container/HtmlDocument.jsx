@@ -13,7 +13,8 @@ import {
   Timeline,
   NewVersionBtn,
   ArchiveDeleteContent,
-  SelectStatus
+  SelectStatus,
+  displayDate
 } from 'tracim_frontend_lib'
 import { MODE, debug } from '../helper.js'
 import {
@@ -77,6 +78,7 @@ class HtmlDocument extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.loadContent()
         break
     }
   }
@@ -140,7 +142,8 @@ class HtmlDocument extends React.Component {
         const revisionWithComment = resRevision.body
           .map((r, i) => ({
             ...r,
-            created: (new Date(r.created)).toLocaleString(),
+            // created: (new Date(r.created)).toLocaleString(),
+            created: displayDate(r.created),
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
               timelineType: 'comment',
