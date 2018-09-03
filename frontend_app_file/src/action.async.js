@@ -1,72 +1,64 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const getFileContent = (user, apiUrl, idWorkspace, idContent) =>
+export const getFileContent = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
-export const getFileContentPreview = (user, apiUrl, idWorkspace, idContent, pageNum) =>
+export const getFileContentPreview = (apiUrl, idWorkspace, idContent, pageNum) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/preview/jpg/500x500?page=${pageNum}`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
-export const getFileContentPreviewRevision = (user, apiUrl, idWorkspace, idContent, pageNum, idRevision) =>
+export const getFileContentPreviewRevision = (apiUrl, idWorkspace, idContent, pageNum, idRevision) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions/${idRevision}/preview/jpg/500x500`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
-export const getFileContentRaw = (user, apiUrl, idWorkspace, idContent) =>
+export const getFileContentRaw = (apiUrl, idWorkspace, idContent) => // caper à 1900x1080
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/raw`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
-export const getFileContentRawRevision = (user, apiUrl, idWorkspace, idContent, idRevision) =>
+export const getFileContentRawRevision = (apiUrl, idWorkspace, idContent, idRevision) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions/${idRevision}/raw`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
-export const getFileComment = (user, apiUrl, idWorkspace, idContent) =>
+export const getFileComment = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
-export const getFileRevision = (user, apiUrl, idWorkspace, idContent) =>
+export const getFileRevision = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
-export const postFileNewComment = (user, apiUrl, idWorkspace, idContent, newComment) =>
+export const postFileNewComment = (apiUrl, idWorkspace, idContent, newComment) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'POST',
@@ -75,10 +67,9 @@ export const postFileNewComment = (user, apiUrl, idWorkspace, idContent, newComm
     })
   })
 
-export const putFileContent = (user, apiUrl, idWorkspace, idContent, label, newContent) =>
+export const putFileContent = (apiUrl, idWorkspace, idContent, label, newContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT',
@@ -88,10 +79,9 @@ export const putFileContent = (user, apiUrl, idWorkspace, idContent, label, newC
     })
   })
 
-export const putFileStatus = (user, apiUrl, idWorkspace, idContent, newStatus) =>
+export const putFileStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/status`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT',
@@ -100,10 +90,9 @@ export const putFileStatus = (user, apiUrl, idWorkspace, idContent, newStatus) =
     })
   })
 
-export const postFileContent = (user, apiUrl, idWorkspace, idFolder, contentType, uploadFileName) =>
+export const postFileContent = (apiUrl, idWorkspace, idFolder, contentType, uploadFileName) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'POST',
@@ -114,40 +103,36 @@ export const postFileContent = (user, apiUrl, idWorkspace, idFolder, contentType
     })
   })
 
-export const putFileIsArchived = (user, apiUrl, idWorkspace, idContent) => {
+export const putFileIsArchived = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
   })
 }
 
-export const putFileIsDeleted = (user, apiUrl, idWorkspace, idContent) => {
+export const putFileIsDeleted = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
   })
 }
 
-export const putFileRestoreArchived = (user, apiUrl, idWorkspace, idContent) => {
+export const putFileRestoreArchived = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/unarchive`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
   })
 }
 
-export const putFileRestoreDeleted = (user, apiUrl, idWorkspace, idContent) => {
+export const putFileRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/undelete`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
@@ -157,7 +142,6 @@ export const putFileRestoreDeleted = (user, apiUrl, idWorkspace, idContent) => {
 export const putFileRead = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'

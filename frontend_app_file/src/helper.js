@@ -20,7 +20,7 @@ export const debug = {
     hexcolor: '#ff9900',
     creationLabel: 'Upload a file',
     domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:6543/api/v2',
+    apiUrl: 'http://192.168.1.153:6543/api/v2',
     availableStatuses: [{
       label: 'Open',
       slug: 'open',
@@ -100,4 +100,20 @@ export const debug = {
   },
   timeline: timelineDebugData,
   idWorkspace: 1
+}
+
+export const fakeLogin = async () => {
+  const fetchFakeLogin = await fetch(`${debug.config.apiUrl}/sessions/login`, {
+    headers: {...FETCH_CONFIG.headers},
+    method: 'POST',
+    body: JSON.stringify({
+      email: 'admin@admin.admin',
+      password: 'admin@admin.admin'
+    })
+  })
+  console.log('fetchFakeLogin', fetchFakeLogin)
+  switch (fetchFakeLogin.status) {
+    case 200: return true
+    default: return false
+  }
 }

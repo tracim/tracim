@@ -26,6 +26,7 @@ module.exports = {
   // : {},
   devServer: {
     contentBase: path.join(__dirname, 'dist/'),
+    host: '192.168.1.153',
     port: 8075,
     hot: true,
     noInfo: true,

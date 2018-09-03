@@ -118,8 +118,7 @@ export const getUserIsConnected = user => async dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -133,8 +132,7 @@ export const getUserKnownMember = (user, userNameToSearch) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/known_members?acp=${userNameToSearch}`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -148,8 +146,7 @@ export const putUserName = (user, newName) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -168,8 +165,7 @@ export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/email`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -187,8 +183,7 @@ export const putUserPassword = (user, oldPassword, newPassword, newPassword2) =>
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/password`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -207,8 +202,7 @@ export const putUserLang = (user, newLang) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -227,8 +221,7 @@ export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/read`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT'
     },
@@ -243,8 +236,7 @@ export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatc
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members/${user.user_id}`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -262,8 +254,7 @@ export const getWorkspaceList = user => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -277,8 +268,7 @@ export const getWorkspaceDetail = (user, idWorkspace) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -292,8 +282,7 @@ export const getWorkspaceMemberList = (user, idWorkspace) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -307,8 +296,7 @@ export const getWorkspaceContentList = (user, idWorkspace, idParent) => dispatch
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents?parent_id=${idParent}`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -322,8 +310,7 @@ export const getWorkspaceRecentActivityList = (user, idWorkspace, beforeId = nul
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -337,8 +324,7 @@ export const getWorkspaceReadStatusList = (user, idWorkspace) => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/read_status`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -352,8 +338,7 @@ export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch =>
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'POST',
       body: JSON.stringify({
@@ -385,8 +370,7 @@ export const getAppList = user => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/system/applications`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -400,8 +384,7 @@ export const getContentTypeList = user => dispatch => {
     url: `${FETCH_CONFIG.apiUrl}/system/content_types`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'GET'
     },
@@ -415,8 +398,7 @@ export const putWorkspaceContentArchived = (user, idWorkspace, idContent) => dis
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT'
     },
@@ -430,8 +412,7 @@ export const putWorkspaceContentDeleted = (user, idWorkspace, idContent) => disp
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`,
     param: {
       headers: {
-        ...FETCH_CONFIG.headers,
-        'Authorization': 'Basic ' + user.auth
+        ...FETCH_CONFIG.headers
       },
       method: 'PUT'
     },

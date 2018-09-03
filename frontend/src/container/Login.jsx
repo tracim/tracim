@@ -60,14 +60,8 @@ class Login extends React.Component {
     const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
 
     if (fetchPostUserLogin.status === 200) {
-      let userAuth = ''
-
-      if (inputRememberMe) userAuth = setCookie(inputLogin.value, inputPassword.value, 365)
-      else userAuth = setCookie(inputLogin.value, inputPassword.value)
-
       const loggedUser = {
         ...fetchPostUserLogin.json,
-        auth: userAuth,
         logged: true
       }
 

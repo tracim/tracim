@@ -132,19 +132,15 @@ class File extends React.Component {
   loadContent = async () => {
     const { loggedUser, content, config } = this.state
 
-    const fetchResultFile = getFileContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultFilePreview = getFileContentPreview(loggedUser, config.apiUrl, content.workspace_id, content.content_id, 0)
-    const fetchResultComment = getFileComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getFileRevision(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultFile = getFileContent(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultComment = getFileComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getFileRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    Promise.all([
-      handleFetchResult(await fetchResultFile),
-      await fetchResultFilePreview
-    ])
-      .then(async ([resFile, resFilePreview]) => this.setState({
+    handleFetchResult(await fetchResultFile)
+      .then(async resFile => this.setState({
         content: {
           ...resFile.body,
-          previewFile: URL.createObjectURL(await resFilePreview.blob())
+          previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/preview/jpg/500x500?page=${0}`
         }
       }))
 
@@ -205,9 +201,9 @@ class File extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveFile = putFileContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveFile = putFileContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
 
     handleFetchResult(await fetchResultSaveFile)
       .then(resSave => {
@@ -240,9 +236,9 @@ class File extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { loggedUser, config, content, newComment } = this.state
+    const { config, content, newComment } = this.state
 
-    const fetchResultSaveNewComment = await postFileNewComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newComment)
+    const fetchResultSaveNewComment = await postFileNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
 
     handleFetchResult(await fetchResultSaveNewComment)
       .then(resSave => {
@@ -259,9 +255,9 @@ class File extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveEditStatus = putFileStatus(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    const fetchResultSaveEditStatus = putFileStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
@@ -274,70 +270,42 @@ class File extends React.Component {
   }
 
   handleClickArchive = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putFileIsArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while archiving document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
     }
   }
 
   handleClickDelete = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putFileIsDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while deleting document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
     }
   }
 
   handleClickRestoreArchived = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putFileRestoreArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
 
   handleClickRestoreDeleted = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putFileRestoreDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
 
@@ -369,7 +337,7 @@ class File extends React.Component {
             contentFull: null,
             is_archived: prev.is_archived, // archived and delete should always be taken from last version
             is_deleted: prev.is_deleted,
-            previewFile: filePreviousVersion
+            previewUrl: filePreviousVersion
           },
           mode: MODE.REVISION
         }))
@@ -460,7 +428,7 @@ class File extends React.Component {
 
     switch (fetchNewPage.status) {
       case 200: this.setState({
-        previewFile: URL.createObjectURL(await fetchNewPage.blob()),
+        previewUrl: URL.createObjectURL(await fetchNewPage.blob()),
         fileCurrentPage: nextPageNumber
       }); break
       default: this.sendGlobalFlashMessage(props.t('Error while loading new page'))
@@ -557,7 +525,7 @@ class File extends React.Component {
           <FileComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
-            previewFile={state.content.previewFile ? state.content.previewFile : ''}
+            previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
             displayProperty={state.displayProperty}
             onClickProperty={this.handleClickProperty}
             version={state.content.number}
