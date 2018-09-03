@@ -69,10 +69,10 @@ def add_cors_to_response(event):
     request = event.request
     response = event.response
     app_config = request.registry.settings['CFG']
-    if 'Origin' in request.headers:
+    if 'Origin' in request.headers and request.headers['Origin'] in app_config.CORS_ALLOWED_ORIGIN:  # nopep8
         response.headers['Access-Control-Expose-Headers'] = (
             'Content-Type,Date,Content-Length,Authorization,X-Request-ID'
         )
-        # TODO - G.M - 17-05-2018 - Allow to configure this header in config
-        response.headers['Access-Control-Allow-Origin'] = ', '.join(app_config.CORS_ALLOWED_ORIGIN)  # nopep8
+        response.headers['Access-Control-Allow-Origin'] = request.headers['Origin']  # nopep8
         response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Vary'] = 'Origin'
