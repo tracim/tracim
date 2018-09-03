@@ -119,6 +119,7 @@ class CFG(object):
             'TRACIM',
         )
 
+        # base url of the frontend
         self.WEBSITE_BASE_URL = settings.get(
             'website.base_url',
             '',
@@ -129,6 +130,23 @@ class CFG(object):
                 'few place like in email.'
                 'You should set it with frontend root url.'
             )
+
+        self.API_BASE_URL = settings.get(
+            'api.base_url',
+            self.WEBSITE_BASE_URL,
+        )
+        allowed_origin = []
+        allowed_origin_string = settings.get(
+            'cors.access-control-allowed-origin',
+            ''
+        )
+        if allowed_origin_string:
+            allowed_origin.extend(allowed_origin_string.split(','))  # nopep8
+        if not allowed_origin:
+            allowed_origin.append(self.WEBSITE_BASE_URL)
+            if self.API_BASE_URL != self.WEBSITE_BASE_URL:
+                allowed_origin.append(self.API_BASE_URL)
+        self.CORS_ALLOWED_ORIGIN = allowed_origin
 
         # TODO - G.M - 26-03-2018 - [Cleanup] These params seems deprecated for tracimv2,  # nopep8
         # Verify this
@@ -487,7 +505,6 @@ class CFG(object):
         self.FRONTEND_SERVE = asbool(settings.get(
             'frontend.serve', False
         ))
-
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
         # of tracim_v2 parent of both backend and frontend
