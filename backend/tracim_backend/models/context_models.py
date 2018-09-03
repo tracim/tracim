@@ -726,17 +726,49 @@ class ContentInContext(object):
         )
         return root_frontend_url + content_frontend_url
 
+    # file specific
+    @property
+    def nb_pages(self):
+        if self.content.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.get_preview_nb_pages(self.content.revision_id)
+        else:
+            return None
+
+    @property
+    def mimetype(self):
+        return self.content.file_mimetype
+
+    @property
+    def size(self):
+        if self.content.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.get_file_size(self.content.revision_id)
+        else:
+            return None
+
 
 class RevisionInContext(object):
     """
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content_revision: ContentRevisionRO, dbsession: Session, config: CFG):
+    def __init__(self, content_revision: ContentRevisionRO, dbsession: Session, config: CFG,  user: User=None):  # nopep8
         assert content_revision is not None
         self.revision = content_revision
         self.dbsession = dbsession
         self.config = config
+        self._user = user
 
     # Default
     @property
@@ -878,3 +910,34 @@ class RevisionInContext(object):
     @property
     def slug(self) -> str:
         return slugify(self.revision.label)
+
+    # file specific
+    @property
+    def nb_pages(self):
+        if self.revision.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.get_preview_nb_pages(self.revision.revision_id)
+        else:
+            return None
+
+    @property
+    def mimetype(self):
+        return self.revision.file_mimetype
+
+    @property
+    def size(self):
+        if self.revision.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.get_file_size(self.revision.revision_id)
+        else:
+            return None

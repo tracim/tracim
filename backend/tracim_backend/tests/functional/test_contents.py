@@ -24,6 +24,7 @@ from tracim_backend.tests import set_html_document_slug_to_legacy
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
+
 class TestFolder(FunctionalTest):
     """
     Tests for /api/v2/workspaces/{workspace_id}/folders/{content_id}
@@ -1297,12 +1298,13 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        test_file.file_extension = '.txt'
-        test_file.depot_file = FileIntent(
-            b'Test file',
+        content_api.update_file_data(
+            test_file,
             'Test_file.txt',
-            'text/plain',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
         )
+        test_file.file_mimetype = test_file.depot_file.content_type
         content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
@@ -1340,6 +1342,9 @@ class TestFiles(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p>description</p>'  # nopep8
+        assert content['mimetype'] == 'plain/text'
+        assert content['size'] == len(b'Test file')
+        assert content['nb_pages'] == 1
 
     def test_api__get_files__err_400__wrong_content_type(self) -> None:
         """
@@ -1465,11 +1470,11 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        test_file.file_extension = '.txt'
-        test_file.depot_file = FileIntent(
-            b'Test file',
+        content_api.update_file_data(
+            test_file,
             'Test_file.txt',
-            'text/plain',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
         )
         content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
@@ -1520,11 +1525,11 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        test_file.file_extension = '.txt'
-        test_file.depot_file = FileIntent(
-            b'Test file',
+        content_api.update_file_data(
+            test_file,
             'Test_file.txt',
-            'text/plain',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
         )
         content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
@@ -1568,6 +1573,9 @@ class TestFiles(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['mimetype'] == 'plain/text'
+        assert content['size'] == len(b'Test file')
+        assert content['nb_pages'] == 1
 
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
@@ -1595,6 +1603,9 @@ class TestFiles(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['mimetype'] == 'plain/text'
+        assert content['size'] == len(b'Test file')
+        assert content['nb_pages'] == 1
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
@@ -1626,11 +1637,11 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        test_file.file_extension = '.txt'
-        test_file.depot_file = FileIntent(
-            b'Test file',
+        content_api.update_file_data(
+            test_file,
             'Test_file.txt',
-            'text/plain',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
         )
         content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
@@ -1670,6 +1681,9 @@ class TestFiles(FunctionalTest):
         assert revision['author']['user_id'] == 1
         assert revision['author']['avatar_url'] is None
         assert revision['author']['public_name'] == 'Global manager'
+        assert revision['mimetype'] == 'plain/text'
+        assert revision['size'] == len(b'Test file')
+        assert revision['nb_pages'] == 1
 
     def test_api__set_file_status__ok_200__nominal_case(self) -> None:
         """
@@ -2544,6 +2558,7 @@ class TestThreads(FunctionalTest):
         assert content['last_modifier']['public_name'] == 'Bob i.'
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == 'What is the best cake?'  # nopep8
+
 
     def test_api__get_thread__err_400__content_does_not_exist(self) -> None:
         """

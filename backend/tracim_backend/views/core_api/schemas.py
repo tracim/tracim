@@ -830,6 +830,19 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
         description='raw text or html description of the file'
     )
+    nb_pages = marshmallow.fields.Int(
+        description='number of pages',
+        example=1,
+    )
+    mimetype = marshmallow.fields.String(
+        description='file content mimetype',
+        example='image/jpeg',
+        required=True,
+    )
+    size = marshmallow.fields.Int(
+        description='file size in byte',
+        example=1024
+    )
 
 
 class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
