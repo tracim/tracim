@@ -44,7 +44,7 @@ class PopinFixedHeader extends React.Component {
 
         {idRoleUserWorkspace >= 2 &&
           <div
-            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle`)}
+            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
           >
             {this.state.editTitle ? <i className='fa fa-check' title='Valider le Titre' /> : <i className='fa fa-pencil' title='Modifier le Titre' />}
@@ -52,7 +52,7 @@ class PopinFixedHeader extends React.Component {
         }
 
         <div
-          className={classnames('wsContentGeneric__header__close', `${customClass}__header__close`)}
+          className={classnames('wsContentGeneric__header__close', `${customClass}__header__close iconBtn`)}
           onClick={onClickCloseBtn}
         >
           <i className='fa fa-times' />
