@@ -10,7 +10,7 @@
   dpkg -l | grep '^ii' | grep 'nodejs\s'
 
   if [ $? -eq 0 ]; then
-    log "nodjs is installed"
+    loggood "nodjs is installed"
   else
     log "install nodejs"
     sudo apt install -y curl
@@ -84,6 +84,6 @@
   npm i
   log "npm link tracim_frontend_lib"
   npm link tracim_frontend_lib
-  log "cp config.js.sample config.js"
-  cp configEnv.js.sample configEnv.js
+  log "cp configEnv.json.sample configEnv.js"
+  cp configEnv.json.sample configEnv.js
 )
