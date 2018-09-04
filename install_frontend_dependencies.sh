@@ -85,6 +85,19 @@
   npm run build-translation && loggood "success" || logerror "some error"
 )
 
+# install app file
+
+(
+  log "cd frontend_app_file"
+  cd frontend_app_file
+  log "npm i"
+  npm i && loggood "success" || logerror "some error"
+  log "npm link tracim_frontend_lib"
+  npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+  log "build-translation"
+  npm run build-translation && loggood "success" || logerror "some error"
+)
+
 # install Tracim Frontend
 
 (

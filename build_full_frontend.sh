@@ -55,6 +55,13 @@ fi
   ./build_admin_workspace_user.sh
 )
 
+# app File
+(
+  log "cd frontend_app_file"
+  cd frontend_app_file || exit
+  ./build_file.sh
+)
+
 # build Tracim
 (
   log "cd frontend"
