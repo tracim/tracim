@@ -1303,8 +1303,13 @@ class TestFiles(FunctionalTest):
             'Test_file.txt',
             'text/plain',
         )
-        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
-        dbsession.flush()
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            dbsession.flush()
         transaction.commit()
 
         self.testapp.authorization = (
@@ -1471,8 +1476,13 @@ class TestFiles(FunctionalTest):
             'Test_file.txt',
             'text/plain',
         )
-        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
-        dbsession.flush()
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            dbsession.flush()
         transaction.commit()
 
         self.testapp.authorization = (
@@ -1526,7 +1536,12 @@ class TestFiles(FunctionalTest):
             'Test_file.txt',
             'text/plain',
         )
-        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -1632,8 +1647,13 @@ class TestFiles(FunctionalTest):
             'Test_file.txt',
             'text/plain',
         )
-        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
-        dbsession.flush()
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            dbsession.flush()
         transaction.commit()
 
         self.testapp.authorization = (
@@ -1705,7 +1725,12 @@ class TestFiles(FunctionalTest):
             'Test_file.txt',
             'text/plain',
         )
-        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
 
@@ -1801,8 +1826,13 @@ class TestFiles(FunctionalTest):
             'Test_file.txt',
             'text/plain',
         )
-        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
-        dbsession.flush()
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
         self.testapp.authorization = (

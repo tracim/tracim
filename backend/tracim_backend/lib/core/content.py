@@ -1,58 +1,57 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
-import os
 import datetime
+import os
 import re
 import typing
-from operator import itemgetter
+from contextlib import contextmanager
 
-import transaction
-from preview_generator.manager import PreviewManager
-from sqlalchemy import func
-from sqlalchemy.orm import Query
-from depot.manager import DepotManager
-from depot.io.utils import FileIntent
 import sqlalchemy
+import transaction
+from depot.io.utils import FileIntent
+from depot.manager import DepotManager
+from preview_generator.manager import PreviewManager
+from sqlalchemy import desc
+from sqlalchemy import func
+from sqlalchemy import or_
+from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
-from sqlalchemy import desc
-from sqlalchemy import distinct
-from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
 
-from tracim_backend.lib.utils.utils import cmp_to_key
-from tracim_backend.lib.core.notifications import NotifierFactory
-from tracim_backend.exceptions import SameValueError
-from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import ContentType
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
+from tracim_backend.exceptions import EmptyCommentContentNotAllowed
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import InconsistentDatabase
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
-from tracim_backend.exceptions import EmptyCommentContentNotAllowed
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.utils.translation import fake_translator as _
+from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
-from tracim_backend.app_models.contents import CONTENT_STATUS
-from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import PreviewAllowedDim
+from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
-
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.lib.utils.translation import fake_translator as _
-from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.context_models import PreviewAllowedDim
-from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.revision_protection import new_revision
 
 __author__ = 'damien'
 
@@ -408,6 +407,88 @@ class ContentApi(object):
     # 
     #     return result
 
+    def _is_content_label_is_free(
+            self,
+            label: str,
+            workspace: Workspace,
+            parent: Content = None,
+            exclude_content_id: int = None,
+    ) -> bool:
+        """
+        Check if content label is free
+        :param label: content label
+        :param workspace: workspace of the content
+        :param parent: parent of the content
+        :param exclude_content_id: exclude a specific content_id (useful
+        to verify  other content for content update)
+        :return: True if content label is available
+        """
+        # INFO - G.M - 2018-09-04 - Method should not be used by special content
+        # with empty label like comment.
+        assert label
+        assert workspace
+        query = self.get_base_query(workspace)
+
+        if parent:
+            query = query.filter(Content.parent_id == parent.content_id)
+        else:
+            query = query.filter(Content.parent_id == None)
+
+        if exclude_content_id:
+            query = query.filter(Content.content_id != exclude_content_id)
+        query = query.filter(Content.workspace_id == workspace.workspace_id)
+
+        nb_content_with_the_label = query.filter(Content.label == label).count()
+        if nb_content_with_the_label == 0:
+            return True
+        elif nb_content_with_the_label == 1:
+            return False
+        else:
+            text = 'Something is wrong in the database ! ' \
+                    'Content label should be unique'\
+                    'in a same folder in database' \
+                    'but you have {nb} content with label {label}' \
+                    'in workspace {workspace_id}'.format(
+                        nb=nb_content_with_the_label,
+                        label=label,
+                        workspace_id=workspace.workspace_id,
+                    )
+            if parent:
+                text = '{text} and parent as content {parent_id}'.format(
+                    text=text,
+                    parent_id=parent.parent_id
+                )
+            raise InconsistentDatabase(text)
+
+    def _verify_content_label_is_free(
+        self,
+        label: str,
+        workspace: Workspace,
+        parent: Content = None,
+        exclude_content_id: int = None,
+    ) -> None:
+        """
+        Same as _is_content_label_is_free but raise exception instead of
+        returning boolean if content label is already used
+        """
+        if not self._is_content_label_is_free(
+            label,
+            workspace,
+            parent,
+            exclude_content_id
+        ):
+            text = 'A Content already exist with the same label {label} ' \
+                   ' in workspace {workspace_id}'.format(
+                      label=label,
+                      workspace_id=workspace.workspace_id,
+                   )
+            if parent:
+                text = '{text} and parent as content {parent_id}'.format(
+                    text=text,
+                    parent_id=parent.parent_id
+                )
+            raise ContentLabelAlreadyUsedHere(text)
+
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
         assert content_type_slug != CONTENT_TYPES.Any_SLUG
@@ -440,9 +521,16 @@ class ContentApi(object):
                         content_id=workspace.workspace_id,
                     )
                 )
+        if filename:
+            label = os.path.splitext(filename)[0]
+        if label:
+            self._verify_content_label_is_free(
+                label,
+                workspace,
+                parent,
+            )
 
         content = Content()
-
         if filename:
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
@@ -1189,6 +1277,12 @@ class ContentApi(object):
             if new_parent:
                 item.workspace = new_parent.workspace
 
+        self._verify_content_label_is_free(
+            item.label,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
         item.revision_type = ActionDescription.MOVE
 
     def copy(
@@ -1219,6 +1313,7 @@ class ContentApi(object):
             parent = item.parent
         label = new_label or item.label
 
+        self._verify_content_label_is_free(label, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1258,12 +1353,20 @@ class ContentApi(object):
         return
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
-        if item.label==new_label and item.description==new_content:
+        if item.label == new_label and item.description == new_content:
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
             # Internatization disabled in libcontent for now.
             raise SameValueError('The content did not changed')
         if not new_label:
             raise EmptyLabelNotAllowed()
+
+        self._verify_content_label_is_free(
+            new_label,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
+
         item.owner = self._user
         item.label = new_label
         item.description = new_content if new_content else item.description # TODO: convert urls into links

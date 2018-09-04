@@ -9,7 +9,8 @@ from tracim_backend.lib.core.content import ContentApi
 # TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import SameValueError, \
+    ContentLabelAlreadyUsedHere, InconsistentDatabase
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UnallowedSubContent
 # TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
@@ -277,6 +278,223 @@ class TestContentApi(DefaultTest):
                 label='lapin',
                 do_save=True
            )
+
+    def test_unit__create_content__err_same_label_as_another_content(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        api.create(
+            content_type_slug=CONTENT_TYPES.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label='file',
+            do_save=True
+        )
+        with pytest.raises(ContentLabelAlreadyUsedHere):
+            api.create(
+                content_type_slug=CONTENT_TYPES.Page.slug,
+                workspace=workspace,
+                parent=None,
+                label='file',
+                do_save=True
+            )
+
+    def test_unit__is_content_label_is_free__ok__nominal_case(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        content = Content()
+        content.label = 'test'
+        content.owner = user
+        content.parent = None
+        content.workspace = workspace
+        content.type = CONTENT_TYPES.Page.slug
+        content.revision_type = ActionDescription.CREATION
+        self.session.add(content)
+        api.save(content, ActionDescription.CREATION, do_notify=False)
+        assert api._is_content_label_is_free('test', workspace, parent=None) == False  # nopep8
+        content = Content()
+        content.label = 'test'
+        content.owner = user
+        content.parent = None
+        content.workspace = workspace
+        content.type = CONTENT_TYPES.Page.slug
+        content.revision_type = ActionDescription.CREATION
+        self.session.add(content)
+        api.save(content, ActionDescription.CREATION, do_notify=False)
+        with pytest.raises(InconsistentDatabase):
+            assert api._is_content_label_is_free('test', workspace, parent=None) == False  # nopep8
+
+    def test_unit__is_content_label_is_free__ok__different_workspace(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        workspace2 = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace2', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        content = Content()
+        content.label = 'test'
+        content.owner = user
+        content.parent = None
+        content.workspace = workspace2
+        content.type = CONTENT_TYPES.Page.slug
+        content.revision_type = ActionDescription.CREATION
+        self.session.add(content)
+        api.save(content, ActionDescription.CREATION, do_notify=False)
+        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+
+    def test_unit__is_content_label_is_free__ok__different_parent(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(email='this.is@user',
+                                        groups=groups, save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace', save_now=True)
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace('test workspace2', save_now=True)
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        folder = Content()
+        folder.label = 'folder'
+        folder.owner = user
+        folder.parent = None
+        folder.workspace = workspace
+        folder.type = CONTENT_TYPES.Folder.slug
+        folder.revision_type = ActionDescription.CREATION
+        self.session.add(folder)
+        folder2 = Content()
+        folder2.label = 'folder2'
+        folder2.owner = user
+        folder2.parent = None
+        folder2.workspace = workspace
+        folder2.type = CONTENT_TYPES.Folder.slug
+        folder2.revision_type = ActionDescription.CREATION
+        self.session.add(folder)
+        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        content = Content()
+        content.label = 'test'
+        content.owner = user
+        content.parent = folder
+        content.workspace = workspace
+        content.type = CONTENT_TYPES.Page.slug
+        content.revision_type = ActionDescription.CREATION
+        self.session.add(content)
+        api.save(content, ActionDescription.CREATION, do_notify=False)
+        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        content = Content()
+        content.label = 'test'
+        content.owner = user
+        content.parent = folder2
+        content.workspace = workspace
+        content.type = CONTENT_TYPES.Page.slug
+        content.revision_type = ActionDescription.CREATION
+        self.session.add(content)
+        api.save(content, ActionDescription.CREATION, do_notify=False)
+        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        content = Content()
+        content.label = 'test'
+        content.owner = user
+        content.parent = None
+        content.workspace = workspace
+        content.type = CONTENT_TYPES.Page.slug
+        content.revision_type = ActionDescription.CREATION
+        self.session.add(content)
+        api.save(content, ActionDescription.CREATION, do_notify=False)
+        assert api._is_content_label_is_free('test', workspace, parent=None) == False  # nopep8
 
     def test_unit__set_allowed_content__ok__private_method(self):
         uapi = UserApi(
@@ -1255,6 +1473,108 @@ class TestContentApi(DefaultTest):
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
 
+    def test_unit_copy_file_different_label_same_parent__err__label_already_used(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user = uapi.create_minimal_user(
+            email='user1@user',
+            groups=groups,
+            save_now=True,
+        )
+        user2 = uapi.create_minimal_user(
+            email='user2@user',
+            groups=groups,
+            save_now=True
+        )
+        workspace = WorkspaceApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        RoleApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
+            user2, workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            with_notif=False
+        )
+        api = ContentApi(
+            current_user=user,
+            session=self.session,
+            config=self.app_config,
+        )
+        foldera = api.create(
+            CONTENT_TYPES.Folder.slug,
+            workspace,
+            None,
+            'folder a',
+            '',
+            True
+        )
+        already_exist = api.create(
+            CONTENT_TYPES.Folder.slug,
+            workspace,
+            foldera,
+            'already_exist',
+            '',
+            True
+        )
+        with self.session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=CONTENT_TYPES.File.slug,
+                workspace=workspace,
+                parent=foldera,
+                label='test_file',
+                do_save=False,
+            )
+            api.update_file_data(
+                text_file,
+                'test_file',
+                'text/plain',
+                b'test_content'
+            )
+
+        api.save(
+            text_file,
+            ActionDescription.CREATION
+        )
+        api2 = ContentApi(
+            current_user=user2,
+            session=self.session,
+            config=self.app_config,
+        )
+        with pytest.raises(ContentLabelAlreadyUsedHere):
+            api2.copy(
+                item=text_file,
+                new_label='already_exist'
+            )
+
+        transaction.commit()
+        new_already_exist = api2.get_one_by_label_and_parent(
+            'already_exist',
+            foldera,
+        )
+
+        # file has no changed
+        assert new_already_exist.content_id == already_exist.content_id
+
     def test_mark_read__workspace(self):
         uapi = UserApi(
             session=self.session,
@@ -1534,7 +1854,7 @@ class TestContentApi(DefaultTest):
         for rev in page_4.revisions:
             eq_(user_b in rev.read_by.keys(), True)
 
-    def test_update(self):
+    def test_unit__update__ok__nominal_case(self):
         uapi = UserApi(
             session=self.session,
             config=self.app_config,
@@ -1667,6 +1987,245 @@ class TestContentApi(DefaultTest):
         eq_('new content', updated.description)
         eq_(ActionDescription.EDITION, updated.revision_type)
 
+    def test_unit__update__err__label_already_used(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user1 = uapi.create_minimal_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True
+        )
+
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = workspace_api.create_workspace(
+            'test workspace',
+            save_now=True
+        )
+
+        wid = workspace.workspace_id
+
+        user2 = uapi.create_minimal_user('this.is@another.user')
+        uapi.save(user2)
+
+        RoleApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+            flush=True
+        )
+
+        # Test starts here
+
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+
+        p = api.create(
+            content_type_slug=CONTENT_TYPES.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=True
+        )
+        p2 = api.create(
+            content_type_slug=CONTENT_TYPES.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page2',
+            do_save=True
+        )
+        u1id = user1.user_id
+        u2id = user2.user_id
+        pcid = p.content_id
+        poid = p.owner_id
+
+        transaction.commit()
+
+        # Refresh instances after commit
+        user1 = uapi.get_one(u1id)
+        workspace = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        ).get_one(wid)
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        eq_(u1id, content.owner_id)
+        eq_(poid, content.owner_id)
+
+        u2 = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        ).get_one(u2id)
+        api2 = ContentApi(
+            current_user=u2,
+            session=self.session,
+            config=self.app_config,
+        )
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        with pytest.raises(ContentLabelAlreadyUsedHere):
+            with new_revision(
+                    session=self.session,
+                    tm=transaction.manager,
+                    content=content2,
+            ):
+                api2.update_content(
+                    content2,
+                    'this_is_a_page2',
+                    'new content'
+                )
+            api2.save(content2)
+            content3 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+            assert content3.label == 'this_is_a_page'
+
+    def test_unit__update__err__label_dont_change(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user1 = uapi.create_minimal_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True
+        )
+
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = workspace_api.create_workspace(
+            'test workspace',
+            save_now=True
+        )
+
+        wid = workspace.workspace_id
+
+        user2 = uapi.create_minimal_user('this.is@another.user')
+        uapi.save(user2)
+
+        RoleApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+            flush=True
+        )
+
+        # Test starts here
+
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+
+        p = api.create(
+            content_type_slug=CONTENT_TYPES.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=True
+        )
+        p2 = api.create(
+            content_type_slug=CONTENT_TYPES.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page2',
+            do_save=True
+        )
+        u1id = user1.user_id
+        u2id = user2.user_id
+        pcid = p.content_id
+        poid = p.owner_id
+
+        transaction.commit()
+
+        # Refresh instances after commit
+        user1 = uapi.get_one(u1id)
+        workspace = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        ).get_one(wid)
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        eq_(u1id, content.owner_id)
+        eq_(poid, content.owner_id)
+
+        u2 = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        ).get_one(u2id)
+        api2 = ContentApi(
+            current_user=u2,
+            session=self.session,
+            config=self.app_config,
+        )
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=content2,
+        ):
+            api2.update_content(
+                content2,
+                'this_is_a_page',
+                'new content'
+            )
+        api2.save(content2)
+        content3 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        assert content3.label == 'this_is_a_page'
+
     def test_update_no_change(self):
         uapi = UserApi(
             session=self.session,
@@ -1746,6 +2305,8 @@ class TestContentApi(DefaultTest):
                 )
         api2.save(content2)
         transaction.commit()
+        content3 = api2.get_one(page.content_id, CONTENT_TYPES.Any_SLUG, workspace)
+        assert content3.label == 'same_content'
 
     def test_update_file_data(self):
         uapi = UserApi(

@@ -7,7 +7,10 @@ import transaction
 from depot.io.utils import FileIntent
 
 from tracim_backend import models
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.extensions import app_list
+from tracim_backend.fixtures.content import Content as ContentFixtures
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
@@ -15,12 +18,10 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
 
 class TestWorkspaceEndpoint(FunctionalTest):
@@ -2067,7 +2068,12 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_page_legacy.type = 'page'
-        content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_page_legacy,
+        ):
+            content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
         test_html_document = content_api.create(
             content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
@@ -2075,7 +2081,12 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_content(test_html_document, 'test_page', '<p>HTML_DOCUMENT</p>')  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_html_document,
+        ):
+            content_api.update_content(test_html_document, 'test_page', '<p>HTML_DOCUMENT</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
         # test-itself
@@ -2163,7 +2174,12 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_page_legacy.type = 'page'
-        content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_page_legacy,
+        ):
+            content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
         test_html_document = content_api.create(
             content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
@@ -2172,8 +2188,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_content(test_html_document, 'test_html_page', '<p>HTML_DOCUMENT</p>')  # nopep8
-        dbsession.flush()
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_html_document,
+        ):
+            content_api.update_content(test_html_document, 'test_html_page', '<p>HTML_DOCUMENT</p>')  # nopep8
+            dbsession.flush()
         transaction.commit()
         # test-itself
         params = {
