@@ -3,31 +3,34 @@ import typing
 
 import transaction
 from pyramid.config import Configurator
+
+from tracim_backend import TracimRequest
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.utils.authorization import require_content_types
+from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import FolderContentModifySchema
+from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import TextBasedContentSchema
+from tracim_backend.views.core_api.schemas import TextBasedRevisionSchema
+from tracim_backend.views.core_api.schemas import \
+    WorkspaceAndContentIdPathSchema  # nopep8
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import TracimRequest
-from tracim_backend.extensions import hapic
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import TextBasedContentSchema
-from tracim_backend.views.core_api.schemas import FolderContentModifySchema
-from tracim_backend.views.core_api.schemas import TextBasedRevisionSchema
-from tracim_backend.views.core_api.schemas import SetContentStatusSchema
-from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema  # nopep8
-from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.lib.utils.authorization import require_content_types
-from tracim_backend.lib.utils.authorization import require_workspace_role
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.models.context_models import ContentInContext
-from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.models.revision_protection import new_revision
 
 SWAGGER_TAG__Folders_ENDPOINTS = 'Folders'
 
@@ -59,6 +62,7 @@ class FolderController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__Folders_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FOLDER_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

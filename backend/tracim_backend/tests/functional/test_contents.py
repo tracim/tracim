@@ -487,6 +487,63 @@ class TestFolder(FunctionalTest):
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
         assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
 
+    def test_api__update_folder__err_400__label_already_used(self) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        content_api.create(
+            label='already_used',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'already_used',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=400
+        )
     def test_api__get_folder_revisions__ok_200__nominal_case(
             self
     ) -> None:
@@ -1610,6 +1667,74 @@ class TestFiles(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+    def test_api__update_file_info__err_400__label_already_used(self) -> None:
+        """
+        Update(put) one file, failed because label already used
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='already_used',
+            do_save=True,
+            do_notify=False,
+        )
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'already_used',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
