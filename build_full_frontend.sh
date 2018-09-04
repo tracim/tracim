@@ -12,14 +12,14 @@ echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ 
 
 # create folder frontend/dist/app/ if no exists
 if [ ! -d "frontend/dist/app/" ]; then
-  mkdir frontend/dist/app/
+  mkdir frontend/dist/app/ && loggood "success" || logerror "some error"
 fi
 
 # Tracim Lib
 (
   log "build frontend_lib"
   cd frontend_lib || exit
-  npm run buildtracimlib$windoz
+  npm run buildtracimlib$windoz && loggood "success" || logerror "some error"
 )
 
 
@@ -52,7 +52,7 @@ fi
 # build Tracim
 (
   cd frontend || exit
-  npm run build
+  npm run build && loggood "success" || logerror "some error"
 )
 
-log "-- frontend build successful."
+loggood "-- frontend build successful."
