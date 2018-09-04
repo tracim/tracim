@@ -13,7 +13,7 @@
     loggood "nodjs is installed"
   else
     log "install nodejs"
-    sudo apt install -y curl
+    sudo apt install -y curl && loggood "success" || logerror "some error"
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     sudo apt install -y nodejs && loggood "success" || logerror "some error"
   fi
@@ -28,9 +28,9 @@
   log "npm i"
   npm i && loggood "success" || logerror "some error"
   log "sudo npm link"
-  sudo npm link && loggood "success" || exit
+  sudo npm link && loggood "success" || logerror "some error"
   log "build-translation"
-  npm run build-translation &> /dev/null && loggood "success" || logerror "some error"
+  npm run build-translation && loggood "success" || logerror "some error"
 )
 
 # install app Html Document
@@ -43,7 +43,7 @@
   log "npm link tracim_frontend_lib"
   npm link tracim_frontend_lib && loggood "success" || logerror "some error"
   log "build-translation"
-  npm run build-translation &> /dev/null && loggood "success" || logerror "some error"
+  npm run build-translation && loggood "success" || logerror "some error"
 )
 
 # install app Thread
@@ -56,7 +56,7 @@
   log "npm link tracim_frontend_lib"
   npm link tracim_frontend_lib && loggood "success" || logerror "some error"
   log "build-translation"
-  npm run build-translation &> /dev/null && loggood "success" || logerror "some error"
+  npm run build-translation && loggood "success" || logerror "some error"
 )
 
 # install app Workspace
@@ -69,7 +69,7 @@
   log "npm link tracim_frontend_lib"
   npm link tracim_frontend_lib && loggood "success" || logerror "some error"
   log "build-translation"
-  npm run build-translation &> /dev/null && loggood "success" || logerror "some error"
+  npm run build-translation && loggood "success" || logerror "some error"
 )
 
 # install app Admin Workspace User
@@ -82,7 +82,7 @@
   log "npm link tracim_frontend_lib"
   npm link tracim_frontend_lib && loggood "success" || logerror "some error"
   log "build-translation"
-  npm run build-translation &> /dev/null && loggood "success" || logerror "some error"
+  npm run build-translation && loggood "success" || logerror "some error"
 )
 
 # install Tracim Frontend
@@ -94,8 +94,8 @@
   npm i && loggood "success" || logerror "some error"
   log "npm link tracim_frontend_lib"
   npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-  log "cp configEnv.json.sample configEnv.js"
-  cp configEnv.json.sample configEnv.js && loggood "success" || logerror "some error"
+  log "cp configEnv.json.sample configEnv.json"
+  cp configEnv.json.sample configEnv.json && loggood "success" || logerror "some error"
   log "build-translation"
-  npm run build-translation &> /dev/null && loggood "success" || logerror "some error"
+  npm run build-translation && loggood "success" || logerror "some error"
 )
