@@ -162,6 +162,14 @@ export class PreviewComponent extends React.Component {
                 type='button'
                 className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
                 onClick={this.handleToggleFormNewDescription}
+                style={{
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: props.color,
+                  ':hover': {
+                    backgroundColor: props.color,
+                  }
+                }}
               >
                 {props.t('Change description')}
               </button>
