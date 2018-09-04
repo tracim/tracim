@@ -587,6 +587,7 @@ class ContentApi(object):
         depot_file_path = depot_stored_file._file_path  # type: str
         return depot_file_path
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent(
             self,
             content_label: str,
@@ -606,6 +607,8 @@ class ContentApi(object):
 
         file_name, file_extension = os.path.splitext(content_label)
 
+        # TODO - G.M - 2018-09-04 - If this method is needed, it should be
+        # rewritten in order to avoid content_type hardcoded code there
         return query.filter(
             or_(
                 and_(
@@ -628,6 +631,7 @@ class ContentApi(object):
             )
         ).one()
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent_labels(
             self,
             content_label: str,
@@ -725,6 +729,7 @@ class ContentApi(object):
 
         return folder
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def filter_query_for_content_label_as_path(
             self,
             query: Query,
@@ -753,6 +758,8 @@ class ContentApi(object):
             file_extension_filter = func.lower(Content.file_extension) == \
                                     func.lower(file_extension)
 
+        # TODO - G.M - 2018-09-04 - If this method is needed, it should be
+        # rewritten in order to avoid content_type hardcoded code there
         return query.filter(or_(
             and_(
                 Content.type == CONTENT_TYPES.File.slug,
@@ -774,7 +781,6 @@ class ContentApi(object):
                 label_filter,
             ),
         ))
-
 
     def get_pdf_preview_path(
             self,
