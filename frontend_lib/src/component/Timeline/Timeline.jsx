@@ -6,10 +6,25 @@ import color from 'color'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
+import i18n from '../../i18n.js'
 
 require('./Timeline.styl')
 
 class Timeline extends React.Component {
+  constructor (props) {
+    super(props)
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'allApp_changeLang':
+        console.log('%c<FrontendLib:Timeline> Custom event', 'color: #28a745', type, data)
+        i18n.changeLanguage(data)
+        break
+    }
+  }
+
   componentDidMount () {
     this.scrollToBottom()
   }
