@@ -2,22 +2,7 @@ import { FETCH_CONFIG } from './helper.js'
 
 export const getFileContent = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
-export const getFileContentPreview = (apiUrl, idWorkspace, idContent, pageNum) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/preview/jpg/500x500?page=${pageNum}`, {
-    headers: {
-      ...FETCH_CONFIG.headers
-    },
-    method: 'GET'
-  })
-
-export const getFileContentPreviewRevision = (apiUrl, idWorkspace, idContent, pageNum, idRevision) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions/${idRevision}/preview/jpg/500x500`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -26,6 +11,7 @@ export const getFileContentPreviewRevision = (apiUrl, idWorkspace, idContent, pa
 
 export const getFileContentRaw = (apiUrl, idWorkspace, idContent) => // caper à 1900x1080
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/raw`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -34,6 +20,7 @@ export const getFileContentRaw = (apiUrl, idWorkspace, idContent) => // caper à
 
 export const getFileContentRawRevision = (apiUrl, idWorkspace, idContent, idRevision) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions/${idRevision}/raw`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -42,6 +29,7 @@ export const getFileContentRawRevision = (apiUrl, idWorkspace, idContent, idRevi
 
 export const getFileComment = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -50,6 +38,7 @@ export const getFileComment = (apiUrl, idWorkspace, idContent) =>
 
 export const getFileRevision = (apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/revisions`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -58,6 +47,7 @@ export const getFileRevision = (apiUrl, idWorkspace, idContent) =>
 
 export const postFileNewComment = (apiUrl, idWorkspace, idContent, newComment) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -68,7 +58,8 @@ export const postFileNewComment = (apiUrl, idWorkspace, idContent, newComment) =
   })
 
 export const putFileContent = (apiUrl, idWorkspace, idContent, label, newContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/raw`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -81,6 +72,7 @@ export const putFileContent = (apiUrl, idWorkspace, idContent, label, newContent
 
 export const putFileStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/status`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -92,6 +84,7 @@ export const putFileStatus = (apiUrl, idWorkspace, idContent, newStatus) =>
 
 export const postFileContent = (apiUrl, idWorkspace, idFolder, contentType, uploadFileName) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -105,6 +98,7 @@ export const postFileContent = (apiUrl, idWorkspace, idFolder, contentType, uplo
 
 export const putFileIsArchived = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -114,6 +108,7 @@ export const putFileIsArchived = (apiUrl, idWorkspace, idContent) => {
 
 export const putFileIsDeleted = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -123,6 +118,7 @@ export const putFileIsDeleted = (apiUrl, idWorkspace, idContent) => {
 
 export const putFileRestoreArchived = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/unarchive`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -132,6 +128,7 @@ export const putFileRestoreArchived = (apiUrl, idWorkspace, idContent) => {
 
 export const putFileRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/undelete`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },
@@ -141,6 +138,7 @@ export const putFileRestoreDeleted = (apiUrl, idWorkspace, idContent) => {
 
 export const putFileRead = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
+    credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
     },

@@ -20,7 +20,7 @@ export const debug = {
     hexcolor: '#ff9900',
     creationLabel: 'Upload a file',
     domContainer: 'appFeatureContainer',
-    apiUrl: 'http://192.168.1.153:6543/api/v2',
+    apiUrl: 'http://localhost:6543/api/v2',
     availableStatuses: [{
       label: 'Open',
       slug: 'open',

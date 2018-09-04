@@ -18,7 +18,6 @@ import {
 import { MODE, debug } from '../helper.js'
 import {
   getFileContent,
-  getFileContentPreview,
   getFileComment,
   getFileRevision,
   postFileNewComment,
@@ -28,10 +27,7 @@ import {
   putFileIsDeleted,
   putFileRestoreArchived,
   putFileRestoreDeleted,
-  putFileRead,
-  getFileContentPreviewRevision,
-  getFileContentRaw,
-  getFileContentRawRevision
+  putFileRead
 } from '../action.async.js'
 
 class File extends React.Component {
@@ -95,6 +91,7 @@ class File extends React.Component {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
+    this.loadTimeline()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -133,16 +130,24 @@ class File extends React.Component {
     const { loggedUser, content, config } = this.state
 
     const fetchResultFile = getFileContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getFileComment(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getFileRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    handleFetchResult(await fetchResultFile)
+    await handleFetchResult(await fetchResultFile)
       .then(async resFile => this.setState({
         content: {
           ...resFile.body,
-          previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/preview/jpg/500x500?page=${0}`
+          previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/500x500?page=${0}`,
+          contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/1920x1080?page=${0}`
         }
       }))
+
+    putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+  }
+
+  loadTimeline = async () => {
+    const { content, config } = this.state
+
+    const fetchResultComment = getFileComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getFileRevision(config.apiUrl, content.workspace_id, content.content_id)
 
     Promise.all([
       handleFetchResult(await fetchResultComment),
@@ -190,9 +195,6 @@ class File extends React.Component {
         console.log('Error loading Timeline.', e)
         this.setState({timeline: []})
       })
-
-    await Promise.all([fetchResultFile, fetchResultComment, fetchResultRevision])
-    putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
   }
 
   handleClickBtnCloseApp = () => {
@@ -310,7 +312,7 @@ class File extends React.Component {
   }
 
   handleClickShowRevision = async revision => {
-    const { props, state } = this
+    const { state } = this
 
     const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
@@ -322,28 +324,22 @@ class File extends React.Component {
 
     if (state.mode === MODE.VIEW && isLastRevision) return
 
-    const fetchResultFilePreview = await getFileContentPreviewRevision(state.loggedUser, state.config.apiUrl, revision.workspace_id, revision.content_id, 0, revision.revision_id)
-    switch (fetchResultFilePreview.status) {
-      case 200:
-        const filePreviousVersion = URL.createObjectURL(await fetchResultFilePreview.blob())
-        this.setState(prev => ({
-          content: {
-            ...prev.content,
-            label: revision.label,
-            raw_content: revision.raw_content,
-            number: revision.number,
-            status: revision.status,
-            current_revision_id: revision.revision_id,
-            contentFull: null,
-            is_archived: prev.is_archived, // archived and delete should always be taken from last version
-            is_deleted: prev.is_deleted,
-            previewUrl: filePreviousVersion
-          },
-          mode: MODE.REVISION
-        }))
-        break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading previous version'))
-    }
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        label: revision.label,
+        raw_content: revision.raw_content,
+        number: revision.number,
+        status: revision.status,
+        current_revision_id: revision.revision_id,
+        contentFull: null,
+        is_archived: prev.is_archived, // archived and delete should always be taken from last version
+        is_deleted: prev.is_deleted,
+        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500?page=${0}`,
+        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080?page=${0}`
+      },
+      mode: MODE.REVISION
+    }))
   }
 
   handleClickLastVersion = () => {
@@ -352,19 +348,6 @@ class File extends React.Component {
   }
 
   handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
-
-  handleClickDownloadRaw = async () => {
-    // const { props, state } = this
-    //
-    // const fetchFileRaw = getFileContentRaw(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    // const rezFileRaw = await fetchFileRaw
-    // console.log(fetchFileRaw)
-    // console.log(rezFileRaw.body)
-  }
-
-  handleClickDownloadPdfPage = async () => {}
-
-  handleClickDownloadPdfFull = async () => {}
 
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
@@ -393,18 +376,20 @@ class File extends React.Component {
     xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw`, true)
-    xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
+    // xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
     xhr.setRequestHeader('Accept', 'application/json')
+    xhr.withCredentials = true
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
           case 204:
-            this.loadContent()
             this.setState({
               newFile: '',
               newFilePreview: null
             })
+            this.loadContent()
+            this.loadTimeline()
             break
           default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
         }
@@ -415,38 +400,19 @@ class File extends React.Component {
   }
 
   handleClickPreviousNextPage = async previousNext => {
-    const { props, state } = this
+    const { state } = this
 
     if (!['previous', 'next'].includes(previousNext)) return
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
     // if (previousNext === 'next' && state.fileCurrentPage > 999) return // @TODO set proper max page (from api => api doesn't return that info yet)
 
-    const endPoint = state.mode === MODE.REVISION ? getFileContentPreviewRevision : getFileContentPreview
+    const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}` : ''
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
-    const fetchNewPage = await endPoint(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, nextPageNumber, state.content.current_revision_id)
-
-    switch (fetchNewPage.status) {
-      case 200: this.setState({
-        previewUrl: URL.createObjectURL(await fetchNewPage.blob()),
-        fileCurrentPage: nextPageNumber
-      }); break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading new page'))
-    }
-  }
-
-  handleClickDisplayContentFull = async () => {
-    const { props, state } = this
-
-    const endPoint = state.mode === MODE.REVISION ? getFileContentRawRevision : getFileContentRaw
-    // last param bellow is only useful for getFileContentRawRevision(). It is just ignored for getFileContentRaw
-    const fetchContentFull = await endPoint(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.current_revision_id)
-    switch (fetchContentFull.status) {
-      case 200:
-        const contentFull = URL.createObjectURL(await fetchContentFull.blob())
-        this.setState(prev => ({content: {...prev.content, contentFull: contentFull}})); break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading file'))
-    }
+    this.setState({
+      previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500?page=${nextPageNumber}`,
+      contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/1920x1080?page=${nextPageNumber}`
+    })
   }
 
   render () {
@@ -536,11 +502,16 @@ class File extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            onClickDownloadRaw={this.handleClickDownloadRaw}
-            onClickDisplayFull={this.handleClickDisplayContentFull}
-            contentFull={state.content.contentFull}
-            onClickDownloadPdfPage={this.handleClickDownloadPdfPage}
-            onClickDownloadPdfFull={this.handleClickDownloadPdfFull}
+            downloadRawUrl={(({config, content, mode}) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw`
+            )(state)}
+            downloadPdfPageUrl={(({config, content, mode}) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${0}`
+            )(state)}
+            downloadPdfFullUrl={(({config, content, mode}) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full`
+            )(state)}
+            contentFullScreenUrl={state.content.contentFullScreenUrl}
             onChangeFile={this.handleChangeFile}
             onClickDropzoneCancel={this.handleClickDropzoneCancel}
             onClickDropzoneValidate={this.handleClickDropzoneValidate}

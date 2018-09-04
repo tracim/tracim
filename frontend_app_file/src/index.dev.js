@@ -19,9 +19,5 @@ require('./css/index.styl')
     //   <PopupCreateFile />
     //   , document.getElementById('content')
     // )
-  }
-  else console.log('failed to login. rez: ', rez)
+  } else console.log('failed to login. rez: ', rez)
 })()
-
-
-
