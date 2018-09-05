@@ -2,27 +2,27 @@ import { FETCH_CONFIG } from './helper.js'
 
 export const getThreadContent = (user, apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}`, {
+    credentials: 'include',
     headers: {
-      ...FETCH_CONFIG.headers,
-      'Authorization': 'Basic ' + user.auth
+      ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
 export const getThreadComment = (user, apiUrl, idWorkspace, idContent) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+    credentials: 'include',
     headers: {
-      ...FETCH_CONFIG.headers,
-      'Authorization': 'Basic ' + user.auth
+      ...FETCH_CONFIG.headers
     },
     method: 'GET'
   })
 
 export const postThreadNewComment = (user, apiUrl, idWorkspace, idContent, newComment) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/comments`, {
+    credentials: 'include',
     headers: {
-      ...FETCH_CONFIG.headers,
-      'Authorization': 'Basic ' + user.auth
+      ...FETCH_CONFIG.headers
     },
     method: 'POST',
     body: JSON.stringify({
@@ -32,9 +32,9 @@ export const postThreadNewComment = (user, apiUrl, idWorkspace, idContent, newCo
 
 export const putThreadStatus = (user, apiUrl, idWorkspace, idContent, newStatus) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}/status`, {
+    credentials: 'include',
     headers: {
-      ...FETCH_CONFIG.headers,
-      'Authorization': 'Basic ' + user.auth
+      ...FETCH_CONFIG.headers
     },
     method: 'PUT',
     body: JSON.stringify({
@@ -44,9 +44,9 @@ export const putThreadStatus = (user, apiUrl, idWorkspace, idContent, newStatus)
 
 export const postThreadContent = (user, apiUrl, idWorkspace, idFolder, contentType, newContentName) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/contents`, {
+    credentials: 'include',
     headers: {
-      ...FETCH_CONFIG.headers,
-      'Authorization': 'Basic ' + user.auth
+      ...FETCH_CONFIG.headers
     },
     method: 'POST',
     body: JSON.stringify({
@@ -58,9 +58,9 @@ export const postThreadContent = (user, apiUrl, idWorkspace, idFolder, contentTy
 
 export const putThreadContent = (user, apiUrl, idWorkspace, idContent, label) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/threads/${idContent}`, {
+    credentials: 'include',
     headers: {
-      ...FETCH_CONFIG.headers,
-      'Authorization': 'Basic ' + user.auth
+      ...FETCH_CONFIG.headers
     },
     method: 'PUT',
     body: JSON.stringify({
@@ -71,8 +71,8 @@ export const putThreadContent = (user, apiUrl, idWorkspace, idContent, label) =>
 
 export const putThreadIsArchived = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/archive`, {
+    credentials: 'include',
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
@@ -81,8 +81,8 @@ export const putThreadIsArchived = (user, apiUrl, idWorkspace, idContent) => {
 
 export const putThreadIsDeleted = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/delete`, {
+    credentials: 'include',
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
@@ -91,8 +91,8 @@ export const putThreadIsDeleted = (user, apiUrl, idWorkspace, idContent) => {
 
 export const putThreadRestoreArchived = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/unarchive`, {
+    credentials: 'include',
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
@@ -101,8 +101,8 @@ export const putThreadRestoreArchived = (user, apiUrl, idWorkspace, idContent) =
 
 export const putThreadRestoreDeleted = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/workspaces/${idWorkspace}/contents/${idContent}/undelete`, {
+    credentials: 'include',
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
@@ -111,8 +111,8 @@ export const putThreadRestoreDeleted = (user, apiUrl, idWorkspace, idContent) =>
 
 export const putThreadRead = (user, apiUrl, idWorkspace, idContent) => {
   return fetch(`${apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/contents/${idContent}/read`, {
+    credentials: 'include',
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'PUT'
