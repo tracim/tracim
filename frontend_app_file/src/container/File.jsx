@@ -18,7 +18,6 @@ import {
 import { MODE, debug } from '../helper.js'
 import {
   getFileContent,
-  getFileContentPreview,
   getFileComment,
   getFileRevision,
   postFileNewComment,
@@ -28,8 +27,7 @@ import {
   putFileIsDeleted,
   putFileRestoreArchived,
   putFileRestoreDeleted,
-  putFileRead,
-  getFileContentPreviewRevision
+  putFileRead
 } from '../action.async.js'
 
 class File extends React.Component {
@@ -93,6 +91,7 @@ class File extends React.Component {
     console.log('%c<File> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
+    this.loadTimeline()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -118,24 +117,37 @@ class File extends React.Component {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: 'addFlashMsg',
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
+
   loadContent = async () => {
     const { loggedUser, content, config } = this.state
 
-    const fetchResultFile = getFileContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultFilePreview = getFileContentPreview(loggedUser, config.apiUrl, content.workspace_id, content.content_id, 0)
-    const fetchResultComment = getFileComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getFileRevision(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultFile = getFileContent(config.apiUrl, content.workspace_id, content.content_id)
 
-    Promise.all([
-      handleFetchResult(await fetchResultFile),
-      await fetchResultFilePreview
-    ])
-      .then(async ([resFile, resFilePreview]) => this.setState({
+    await handleFetchResult(await fetchResultFile)
+      .then(async resFile => this.setState({
         content: {
           ...resFile.body,
-          previewFile: URL.createObjectURL(await resFilePreview.blob())
+          previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/500x500?page=${0}`,
+          contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/1920x1080?page=${0}`
         }
       }))
+
+    putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+  }
+
+  loadTimeline = async () => {
+    const { content, config } = this.state
+
+    const fetchResultComment = getFileComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getFileRevision(config.apiUrl, content.workspace_id, content.content_id)
 
     Promise.all([
       handleFetchResult(await fetchResultComment),
@@ -183,9 +195,6 @@ class File extends React.Component {
         console.log('Error loading Timeline.', e)
         this.setState({timeline: []})
       })
-
-    await Promise.all([fetchResultFile, fetchResultComment, fetchResultRevision])
-    putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
   }
 
   handleClickBtnCloseApp = () => {
@@ -194,14 +203,15 @@ class File extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveFile = putFileContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveFile = putFileContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
 
     handleFetchResult(await fetchResultSaveFile)
       .then(resSave => {
         if (resSave.apiResponse.status === 200) {
           this.loadContent()
+          this.loadTimeline()
           GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
         } else {
           console.warn('Error saving file. Result:', resSave, 'content:', content, 'config:', config)
@@ -219,14 +229,7 @@ class File extends React.Component {
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: this.setState(prev => ({content: {...prev.content, raw_content: newDescription}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while saving new description'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
     }
   }
 
@@ -236,9 +239,9 @@ class File extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { loggedUser, config, content, newComment } = this.state
+    const { config, content, newComment } = this.state
 
-    const fetchResultSaveNewComment = await postFileNewComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newComment)
+    const fetchResultSaveNewComment = await postFileNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
 
     handleFetchResult(await fetchResultSaveNewComment)
       .then(resSave => {
@@ -246,6 +249,7 @@ class File extends React.Component {
           this.setState({newComment: ''})
           if (this.state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
           this.loadContent()
+          this.loadTimeline()
         } else {
           console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
         }
@@ -255,9 +259,9 @@ class File extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveEditStatus = putFileStatus(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    const fetchResultSaveEditStatus = putFileStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
@@ -265,80 +269,53 @@ class File extends React.Component {
           console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
         } else {
           this.loadContent()
+          this.loadTimeline()
         }
       })
   }
 
   handleClickArchive = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putFileIsArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while archiving document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
     }
   }
 
   handleClickDelete = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putFileIsDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while deleting document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
     }
   }
 
   handleClickRestoreArchived = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putFileRestoreArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
 
   handleClickRestoreDeleted = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putFileRestoreDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: this.props.t('Error while restoring document'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
 
   handleClickShowRevision = async revision => {
-    const { props, state } = this
+    const { state } = this
 
     const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
@@ -350,33 +327,22 @@ class File extends React.Component {
 
     if (state.mode === MODE.VIEW && isLastRevision) return
 
-    const fetchResultFilePreview = await getFileContentPreviewRevision(state.loggedUser, state.config.apiUrl, revision.workspace_id, revision.content_id, 0, revision.revision_id)
-    switch (fetchResultFilePreview.status) {
-      case 200:
-        const filePreviousVersion = URL.createObjectURL(await fetchResultFilePreview.blob())
-        this.setState(prev => ({
-          content: {
-            ...prev.content,
-            label: revision.label,
-            raw_content: revision.raw_content,
-            number: revision.number,
-            status: revision.status,
-            is_archived: prev.is_archived, // archived and delete should always be taken from last version
-            is_deleted: prev.is_deleted,
-            previewFile: filePreviousVersion
-          },
-          mode: MODE.REVISION
-        }))
-        break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading previous version'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        label: revision.label,
+        raw_content: revision.raw_content,
+        number: revision.number,
+        status: revision.status,
+        current_revision_id: revision.revision_id,
+        contentFull: null,
+        is_archived: prev.is_archived, // archived and delete should always be taken from last version
+        is_deleted: prev.is_deleted,
+        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500?page=${0}`,
+        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080?page=${0}`
+      },
+      mode: MODE.REVISION
+    }))
   }
 
   handleClickLastVersion = () => {
@@ -385,19 +351,6 @@ class File extends React.Component {
   }
 
   handleClickProperty = () => this.setState(prev => ({displayProperty: !prev.displayProperty}))
-
-  handleClickDownloadRaw = async () => {
-    // const { props, state } = this
-    //
-    // const fetchFileRaw = getFileContentRaw(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    // const rezFileRaw = await fetchFileRaw
-    // console.log(fetchFileRaw)
-    // console.log(rezFileRaw.body)
-  }
-
-  handleClickDownloadPdfPage = async () => {}
-
-  handleClickDownloadPdfFull = async () => {}
 
   handleChangeFile = newFile => {
     if (!newFile || !newFile[0]) return
@@ -426,27 +379,22 @@ class File extends React.Component {
     xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
     xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw`, true)
-    xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
+    // xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
     xhr.setRequestHeader('Accept', 'application/json')
+    xhr.withCredentials = true
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {
         switch (xhr.status) {
           case 204:
-            this.loadContent()
             this.setState({
               newFile: '',
               newFilePreview: null
             })
+            this.loadContent()
+            this.loadTimeline()
             break
-          default: GLOBAL_dispatchEvent({
-            type: 'addFlashMsg',
-            data: {
-              msg: props.t('Error while uploading file'),
-              type: 'warning',
-              delay: undefined
-            }
-          })
+          default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
         }
       }
     }
@@ -455,31 +403,19 @@ class File extends React.Component {
   }
 
   handleClickPreviousNextPage = async previousNext => {
-    const { props, state } = this
+    const { state } = this
 
     if (!['previous', 'next'].includes(previousNext)) return
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
     // if (previousNext === 'next' && state.fileCurrentPage > 999) return // @TODO set proper max page (from api => api doesn't return that info yet)
 
-    const endPoint = state.mode === MODE.REVISION ? getFileContentPreviewRevision : getFileContentPreview
+    const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}` : ''
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
-    const fetchNewPage = await endPoint(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, nextPageNumber)
-
-    switch (fetchNewPage.status) {
-      case 200: this.setState({
-        previewFile: URL.createObjectURL(await fetchNewPage.blob()),
-        fileCurrentPage: nextPageNumber
-      }); break
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading new page'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
-    }
+    this.setState({
+      previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500?page=${nextPageNumber}`,
+      contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/1920x1080?page=${nextPageNumber}`
+    })
   }
 
   render () {
@@ -558,7 +494,7 @@ class File extends React.Component {
           <FileComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
-            previewFile={state.content.previewFile ? state.content.previewFile : ''}
+            previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
             displayProperty={state.displayProperty}
             onClickProperty={this.handleClickProperty}
             version={state.content.number}
@@ -569,9 +505,16 @@ class File extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            onClickDownloadRaw={this.handleClickDownloadRaw}
-            onClickDownloadPdfPage={this.handleClickDownloadPdfPage}
-            onClickDownloadPdfFull={this.handleClickDownloadPdfFull}
+            downloadRawUrl={(({config, content, mode}) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw`
+            )(state)}
+            downloadPdfPageUrl={(({config, content, mode}) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${0}`
+            )(state)}
+            downloadPdfFullUrl={(({config, content, mode}) =>
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full`
+            )(state)}
+            contentFullScreenUrl={state.content.contentFullScreenUrl}
             onChangeFile={this.handleChangeFile}
             onClickDropzoneCancel={this.handleClickDropzoneCancel}
             onClickDropzoneValidate={this.handleClickDropzoneValidate}

@@ -30,6 +30,7 @@
     "css-loader": "^0.28.7",
     "file-loader": "^1.1.5",
     "i18next": "^10.5.0",
+    "moment": "^2.22.2",
     "prop-types": "^15.6.0",
     "radium": "^0.24.1",
     "react": "^16.0.0",

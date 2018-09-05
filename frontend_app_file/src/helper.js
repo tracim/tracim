@@ -95,8 +95,25 @@ export const debug = {
     slug: 'current-menu',
     status: 'open',
     sub_content_types: ['thread', 'html-document', 'file', 'folder'],
-    workspace_id: 1
+    workspace_id: 1,
+    contentFull: null
   },
   timeline: timelineDebugData,
   idWorkspace: 1
+}
+
+export const fakeLogin = async () => {
+  const fetchFakeLogin = await fetch(`${debug.config.apiUrl}/sessions/login`, {
+    headers: {...FETCH_CONFIG.headers},
+    method: 'POST',
+    body: JSON.stringify({
+      email: 'admin@admin.admin',
+      password: 'admin@admin.admin'
+    })
+  })
+  console.log('fetchFakeLogin', fetchFakeLogin)
+  switch (fetchFakeLogin.status) {
+    case 200: return true
+    default: return false
+  }
 }

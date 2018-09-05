@@ -1,7 +1,8 @@
 import {
   libAddAllResourceI18n,
   libHandleFetchResult,
-  libGenerateAvatarFromPublicName
+  libGenerateAvatarFromPublicName,
+  libDisplayDate
 } from './helper.js'
 
 import libPopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -31,6 +32,7 @@ import libSelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 export const addAllResourceI18n = libAddAllResourceI18n
 export const handleFetchResult = libHandleFetchResult
 export const generateAvatarFromPublicName = libGenerateAvatarFromPublicName
+export const displayDate = libDisplayDate
 
 export const PopinFixed = libPopinFixed
 export const PopinFixedHeader = libPopinFixedHeader

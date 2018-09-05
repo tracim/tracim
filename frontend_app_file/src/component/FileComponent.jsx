@@ -39,10 +39,11 @@ export const FileComponent = props =>
     {(props.mode === MODE.VIEW || props.mode === MODE.REVISION) &&
       <PreviewComponent
         color={props.customColor}
-        onClickDownloadRaw={props.onClickDownloadRaw}
-        onClickDownloadPdfPage={props.onClickDownloadPdfPage}
-        onClickDownloadPdfFull={props.onClickDownloadPdfFull}
-        previewFile={props.previewFile}
+        downloadRawUrl={props.downloadRawUrl}
+        downloadPdfPageUrl={props.downloadPdfPageUrl}
+        downloadPdfFullUrl={props.downloadPdfFullUrl}
+        previewUrl={props.previewUrl}
+        contentFullScreenUrl={props.contentFullScreenUrl}
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}

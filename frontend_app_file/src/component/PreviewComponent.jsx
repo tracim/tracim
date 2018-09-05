@@ -2,13 +2,18 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
+import Lightbox from 'react-image-lightbox'
+import 'react-image-lightbox/style.css'
+
+require('./Previewcomponent.styl')
 
 export class PreviewComponent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       displayFormNewDescription: false,
-      newDescription: ''
+      newDescription: '',
+      displayLightbox: false
     }
   }
 
@@ -21,101 +26,121 @@ export class PreviewComponent extends React.Component {
     this.setState({displayFormNewDescription: false})
   }
 
+  handleClickShowImageRaw = async () => {
+    this.setState({displayLightbox: true})
+  }
+
   render () {
     const { props, state } = this
 
-    console.log('color', props.color)
-
     return (
-      <div className={classnames('file__contentpage__preview', {'openproperty': props.displayProperty})}>
-        <div className='file__contentpage__preview__dloption'>
-          <button
-            type='button'
-            className='file__contentpage__preview__dloption__icon btn iconBtn'
-            onClick={props.onClickDownloadRaw}
+      <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
+        <div className='previewcomponent__dloption'>
+          <a
+            className='previewcomponent__dloption__icon btn iconBtn'
+            href={props.downloadRawUrl}
+            target='_blank'
+            download
             style={{':hover': {color: props.color}}}
+            title={props.t('Download file')}
             key={'file_btn_dl_raw'}
           >
             <i className='fa fa-download' />
-          </button>
+          </a>
 
-          <button
-            type='button'
-            className='file__contentpage__preview__dloption__icon btn iconBtn'
-            onClick={props.onClickDownloadPdfPage}
+          <a
+            className='previewcomponent__dloption__icon btn iconBtn'
+            href={props.downloadPdfPageUrl}
+            target='_blank'
+            download
             style={{':hover': {color: props.color}}}
+            title={props.t('Download current page as PDF')}
             key={'file_btn_dl_pdfpage'}
           >
             <i className='fa fa-file-pdf-o' />
-          </button>
+          </a>
 
-          <button
-            type='button'
-            className='file__contentpage__preview__dloption__icon btn iconBtn'
-            onClick={props.onClickDownloadPdfFull}
+          <a
+            className='previewcomponent__dloption__icon btn iconBtn'
+            href={props.downloadPdfFullUrl}
+            target='_blank'
+            download
             style={{':hover': {color: props.color}}}
+            title={props.t('Download as PDF')}
             key={'file_btn_dl_pdfall'}
           >
             <i className='fa fa-files-o' />
-          </button>
+          </a>
         </div>
 
-        <div className='file__contentpage__preview__slider'>
+        <div className='previewcomponent__slider'>
           <button
             type='button'
-            className='file__contentpage__preview__slider__icon btn iconBtn'
+            className='previewcomponent__slider__icon btn iconBtn'
             onClick={props.onClickPreviousPage}
             style={{':hover': {color: props.color}}}
+            title={'Previous page'}
             key={'file_btn_previouspage'}
           >
             <i className='fa fa-chevron-left' />
           </button>
 
-          <div className='file__contentpage__preview__slider__fileimg'>
-            <img src={props.previewFile} className='img-thumbnail mx-auto' />
+          <div
+            className='previewcomponent__slider__fileimg'
+            onClick={this.handleClickShowImageRaw}
+          >
+            <img src={props.previewUrl} className='img-thumbnail mx-auto' />
+
+            {state.displayLightbox && props.contentFullScreenUrl !== null && props.contentFullScreenUrl !== undefined &&
+              <Lightbox
+                mainSrc={props.contentFullScreenUrl}
+                onCloseRequest={() => this.setState({displayLightbox: false})}
+              />
+            }
           </div>
 
           <button
             type='button'
-            className='file__contentpage__preview__slider__icon btn iconBtn'
+            className='previewcomponent__slider__icon btn iconBtn'
             onClick={props.onClickNextPage}
             style={{':hover': {color: props.color}}}
+            title={'Next page'}
             key={'file_btn_nextpage'}
           >
             <i className='fa fa-chevron-right' />
           </button>
         </div>
 
-        <div className='file__contentpage__preview__property'>
-          <div className='file__contentpage__preview__property__button' onClick={props.onClickProperty}>
-            <div className='file__contentpage__preview__property__button__icon'>
+        <div className='previewcomponent__property'>
+          <div className='previewcomponent__property__button' onClick={props.onClickProperty}>
+            <div className='previewcomponent__property__button__icon'>
               <i className='fa fa-gear' />
             </div>
 
-            <div className='file__contentpage__preview__property__button__title'>
+            <div className='previewcomponent__property__button__title'>
               {props.t('Properties')}
             </div>
           </div>
 
-          <div className='file__contentpage__preview__property__content'>
-            <div className='file__contentpage__preview__property__content__detail'>
-              <div className='file__contentpage__preview__property__content__detail__size'>
+          <div className='previewcomponent__property__content'>
+            <div className='previewcomponent__property__content__detail'>
+              <div className='previewcomponent__property__content__detail__size'>
                 {props.t('Size')}: nyi
               </div>
 
-              <div className='file__contentpage__preview__property__content__detail__description'>
+              <div className='previewcomponent__property__content__detail__description'>
                 {state.displayFormNewDescription
                   ? (
-                    <form className='file__contentpage__preview__property__content__detail__description__editiondesc'>
+                    <form className='previewcomponent__property__content__detail__description__editiondesc'>
                       <textarea
                         value={state.newDescription}
                         onChange={this.handleChangeDescription}
                       />
 
-                      <div className='file__contentpage__preview__property__content__detail__description__editiondesc__btn'>
+                      <div className='previewcomponent__property__content__detail__description__editiondesc__btn'>
                         <button
                           type='button'
-                          className='file__contentpage__preview__property__content__detail__description__editiondesc__btn__cancel btn'
+                          className='previewcomponent__property__content__detail__description__editiondesc__btn__cancel btn'
                           onClick={this.handleToggleFormNewDescription}
                         >
                           {props.t('Cancel')}
@@ -123,7 +148,7 @@ export class PreviewComponent extends React.Component {
 
                         <button
                           type='button'
-                          className='file__contentpage__preview__property__content__detail__description__editiondesc__validate btn'
+                          className='previewcomponent__property__content__detail__description__editiondesc__validate btn'
                           onClick={this.handleClickValidateNewDescription}
                         >
                           {props.t('Validate')}
@@ -142,8 +167,16 @@ export class PreviewComponent extends React.Component {
               {!state.displayFormNewDescription &&
               <button
                 type='button'
-                className='file__contentpage__preview__property__content__detail__btndesc btn outlineTextBtn'
+                className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
                 onClick={this.handleToggleFormNewDescription}
+                style={{
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: props.color,
+                  ':hover': {
+                    backgroundColor: props.color,
+                  }
+                }}
               >
                 {props.t('Change description')}
               </button>

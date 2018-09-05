@@ -22,7 +22,7 @@ const Revision = props => (
     </button>
 
     <div className={classnames(`${props.customClass}__messagelist__version__date`, 'timeline__body__messagelist__version__date')}>
-      Créé le {props.createdAt}
+      {props.createdAt}
     </div>
   </li>
 )
