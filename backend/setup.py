@@ -41,6 +41,10 @@ requires = [
     'lxml',
     'redis',
     'rq',
+    # auth
+    'pyramid_multiauth',
+    'beaker',
+    'pyramid_beaker',
     # frontend file serve
     'pyramid_mako',
     # i18n

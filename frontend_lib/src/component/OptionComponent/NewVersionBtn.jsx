@@ -4,7 +4,7 @@ import Radium from 'radium'
 const NewVersionBtn = props => {
   return (
     <button
-      className='wsContentGeneric__option__menu__addversion newversionbtn btn'
+      className='wsContentGeneric__option__menu__addversion newversionbtn btn outlineTextBtn'
       onClick={props.onClickNewVersionBtn}
       disabled={props.disabled}
       style={{

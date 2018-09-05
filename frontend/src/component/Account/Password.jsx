@@ -68,7 +68,7 @@ export class Password extends React.Component {
 
           <button
             type='button'
-            className='personaldata__form__button primaryColorBorderLighten btn btn-outline-primary mt-4'
+            className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover mt-4'
             onClick={this.handleClickSubmit}
           >
             {props.t('Send')}

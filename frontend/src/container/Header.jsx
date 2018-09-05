@@ -4,7 +4,6 @@ import { withRouter } from 'react-router'
 import i18n from '../i18n.js'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
-import Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import MenuLinkList from '../component/Header/MenuLinkList.jsx'
@@ -24,7 +23,7 @@ import {
   postUserLogout,
   putUserLang
 } from '../action-creator.async.js'
-import { COOKIE, PAGE, PROFILE } from '../helper.js'
+import { PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -48,7 +47,6 @@ class Header extends React.Component {
         break
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
     }
-
   }
 
   handleClickHelp = () => {}
@@ -58,9 +56,6 @@ class Header extends React.Component {
 
     const fetchPostUserLogout = await dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      Cookies.remove(COOKIE.USER_LOGIN)
-      Cookies.remove(COOKIE.USER_AUTH)
-
       dispatch(setUserDisconnected())
       history.push(PAGE.LOGIN)
     } else {

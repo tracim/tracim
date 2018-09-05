@@ -20,8 +20,12 @@
       display flex
       border-bottom 1px solid grey
       padding 10px 15px
-      // &:nth-last-child(1)
+      // &:nth-last-child()
       //   border-bottom 0
+      &:hover > .memberlist__list__item__info
+        color offWhite
+      &:hover > .memberlist__list__item__delete
+        color offWhite
       &__avatar
         margin-right 20px
         & > img
@@ -64,7 +68,7 @@
     flex-direction column
     height 100%
     width 100%
-    background-color off-white
+    background-color offWhite
     &__close
       font-size 20px
       & > i
@@ -79,7 +83,7 @@
         .autocomplete
           position absolute
           min-width 300px
-          background-color off-white
+          background-color offWhite
           border-radius 10px
           border-width 1px
           border-style solid
@@ -133,9 +137,6 @@
     &__submitbtn
       display flex
       justify-content flex-end
-      & > button
-        padding 8px 30px
-        cursor pointer
 
 /***** MEDIAQUERIES *****/
 

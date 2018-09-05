@@ -6,7 +6,7 @@ const ExtandedAction = props => {
   return (
     <div className='extandedaction dropdown'>
       <button
-        className='extandedaction__button btn btn-outline-primary dropdown-toggle'
+        className='extandedaction__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover dropdown-toggle'
         type='button'
         id='dropdownMenuButton'
         data-toggle='dropdown'
@@ -19,7 +19,7 @@ const ExtandedAction = props => {
 
       <div className='extandedaction__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
         {props.idRoleUserWorkspace >= 2 &&
-          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.edit}>
+          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.edit}>
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-pencil' />
             </div>
@@ -31,7 +31,7 @@ const ExtandedAction = props => {
         }
 
         {props.idRoleUserWorkspace >= 4 &&
-          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.move}>
+          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.move}>
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-arrows-alt' />
             </div>
@@ -52,7 +52,7 @@ const ExtandedAction = props => {
         </div> */ }
 
         {props.idRoleUserWorkspace >= 4 &&
-          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.archive}>
+          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.archive}>
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-archive' />
             </div>
@@ -64,7 +64,7 @@ const ExtandedAction = props => {
         }
 
         {props.idRoleUserWorkspace >= 4 &&
-          <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.delete}>
+          <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.delete}>
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-trash-o' />
             </div>

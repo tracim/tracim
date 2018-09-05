@@ -44,6 +44,10 @@ preview_cache_dir = /tmp/tracim/preview/
 depot_storage_name = tracim
 depot_storage_dir = %(here)s/depot/
 
+# Backend API config
+api.key = changethisnow!
+# base url of the backend API, default to same as website.base_url
+# api.base_url = http://127.0.0.1:6543
 # The following parameters allow to personalize the home page
 # They are html ready (you can put html tags they will be interpreted)
 website.title = TRACIM
@@ -58,6 +62,12 @@ website.treeview.content = all
 website.base_url = http://127.0.0.1:8080
 # If config not provided, it will be extracted from website.base_url
 website.server_name = 127.0.0.1
+
+# CORS Special config
+# you can override access control allowed origin here with list of comma separated
+# base_url, by default only website.base_url and api.base_url are allowed
+# cors.access-control-allowed-origin = http://127.0.0.1:6543,http://127.0.0.1:8090
+
 
 # Specifies if the update of comments and attached files is allowed (by the owner only).
 # Examples:
@@ -93,6 +103,18 @@ auth_type = internal
 user.auth_token.validity = 604800
 # user reset_password token validity (default to 600 -> 5 minutes)
 user.reset_password.validity = 600
+
+
+session.type = file
+session.data_dir = %(here)s/sessions_data
+session.lock_dir = %(here)s/ssessions_lock
+session.key = session_key
+session.secret = change_this_value_please!
+session.save_accessed_time = True
+session.cookie_expires = 600
+session.timeout = 600
+session.cookie_on_exception = true
+
 ### Mail
 
 email.notification.activated = False

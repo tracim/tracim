@@ -2,5 +2,9 @@
   "Timeline": "Historique",
   "This content is archived.": "Ce contenu est archivé.",
   "Restore": "Restaurer",
-  "This content is deleted.": "Ce contenu est supprimé."
+  "This content is deleted.": "Ce contenu est supprimé.",
+  "{{nb}} days ago": "Il y a {{nb}} jours",
+  "{{nb}} hours ago": "Il y a {{nb}} heures",
+  "{{nb}} minutes ago": "Il y a {{nb}} minutes",
+  "{{nb}} seconds ago": "Il y a {{nb}} secondes"
 }

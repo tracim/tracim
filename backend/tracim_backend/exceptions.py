@@ -29,6 +29,18 @@ class UserAlreadyExistError(TracimError):
     pass
 
 
+class ForceArgumentNeeded(TracimException):
+    pass
+
+
+class InvalidSettingFile(TracimException):
+    pass
+
+
+class DatabaseInitializationFailed(TracimException):
+    pass
+
+
 class BadCommandError(TracimError):
     pass
 

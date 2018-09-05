@@ -40,7 +40,7 @@ const HtmlDocument = props => {
             version n°
             <div dangerouslySetInnerHTML={{__html: props.mode === MODE.VIEW ? props.lastVersion : props.version}} />
             {props.mode === MODE.REVISION &&
-              <div className='html-document__contentpage__textnote__lastversion'>
+              <div className='html-document__contentpage__textnote__lastversion outlineTextBtn'>
                 ({props.t('latest version :')} {props.lastVersion})
               </div>
             }

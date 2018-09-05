@@ -6,7 +6,7 @@
   margin 10px 10px 10px 5px
   border-radius 10px
   width 100%
-  height 100%
+  height calc(100% - 10px)
   & > p
     margin 0
     padding 0
@@ -49,7 +49,7 @@
       margin-bottom 0
       padding-left 0
       border-bottom 1px solid grey
-      background-color off-white
+      background-color offWhite
       overflow-y auto
       list-style none
       &__item
@@ -74,27 +74,24 @@
           border 1px solid grey
           border-radius 5px
           padding 15px
-          background-color off-white
+          background-color offWhite
           font-size 15px
       &__version
         display flex
         justify-content space-between
-        margin 20px 0 20px 0
+        margin-top 20px
         padding 10px 15px
         width 100%
         background-color lightGrey
         &__btn
           display flex
           justify-content center
-          padding 5px 20px
-          border-radius 5px
+          border-width 1px
+          border-style solid
           width 145px
-          color white
           font-size 17px
-          cursor pointer
           & > i
             margin-right 10px
-            color off-white
             font-size 22px
         &__date
           color fontColor
@@ -118,7 +115,6 @@
         margin-top 10px
       &__advancedtext
         margin-right 15px
-        cursor pointer
       &__submit
         &__btn
           display inline-block

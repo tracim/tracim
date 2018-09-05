@@ -24,7 +24,7 @@ import {
   getWorkspaceList,
   postUserLogin
 } from '../action-creator.async.js'
-import { setCookie, PAGE } from '../helper.js'
+import { PAGE } from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
 
 class Login extends React.Component {
@@ -60,14 +60,8 @@ class Login extends React.Component {
     const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
 
     if (fetchPostUserLogin.status === 200) {
-      let userAuth = ''
-
-      if (inputRememberMe) userAuth = setCookie(inputLogin.value, inputPassword.value, 365)
-      else userAuth = setCookie(inputLogin.value, inputPassword.value)
-
       const loggedUser = {
         ...fetchPostUserLogin.json,
-        auth: userAuth,
         logged: true
       }
 
@@ -155,7 +149,7 @@ class Login extends React.Component {
                         onKeyPress={this.handleInputKeyPress}
                       />
 
-                      <div className='row align-items-center mt-4 mb-4'>
+                      <div className='row mt-4 mb-4'>
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
                           <div className='connection__form__rememberme' onClick={this.handleChangeRememberMe}>
                             <Checkbox
@@ -172,7 +166,7 @@ class Login extends React.Component {
                           />
                         </div>
 
-                        <div className='col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-end'>
                           <Button
                             htmlType='button'
                             bootstrapType='primary'

@@ -31,30 +31,26 @@
       & > input
         padding-left 5px
     &__edittitle
-      margin 0 15px
       border 1px solid transparent
       border-radius 5px
       padding 2px 8px
       color white
       font-size 17px
-      cursor pointer
       &:hover
         border-color white
       .fa-pencil
-        color off-white
+        color offWhite
     &__close
       border 1px solid white
       border-radius 5px
-      padding 2px 5px
-      cursor pointer
       & > i
         color white
         font-size 20px
   &__option
     border-bottom 1px solid grey
-    padding 10px
+    padding 6px 10px
     height 58px
-    background-color off-white
+    background-color offWhite
     &__menu
       & > div
         display flex
@@ -68,8 +64,9 @@
       &__lastversion
         display flex
         align-items center
-        cursor pointer
         margin-left 15px
+        border-width 1px
+        border-style solid
         & > i
           margin-right 10px
           color darkGrey
@@ -95,11 +92,11 @@
     &__left
       transition width 0.4s ease
       width 25%
-      height calc(100% - 10px) // 10px => margin of timeline
+      height 100%
     &__right
       transition width 0.4s ease
       width calc(25% - 10px)
-      height calc(100% - 10px) // 10px => margin of timeline
+      height 100%
 
 .rightPartClose
   .wsContentGeneric__content__left
@@ -129,7 +126,7 @@
 @media (max-width: max-xs)
 
   .wsContentGeneric
-    top 68  px
+    top 68px
     &__content
       overflow-Y auto
       &__left

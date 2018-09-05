@@ -33,8 +33,6 @@ export const updateUserName = newName => ({ type: `${UPDATE}/${USER_NAME}`, newN
 export const USER_EMAIL = `${USER}/Email`
 export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
-export const USER_AUTH = `${USER}/Auth`
-export const updateUserAuth = newAuth => ({ type: `${UPDATE}/${USER_AUTH}`, newAuth })
 
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`

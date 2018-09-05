@@ -25,7 +25,10 @@ matrix:
         - pip install --upgrade pip setuptools
         - pip install -e .
         - pip install -e ".[testing]"
-        - pip install pytest-cov
+        # using old version of pytest-cov to avoid
+        # version conflict with python-coveralls
+        # see https://github.com/z4r/python-coveralls/issues/66
+        - pip install 'pytest-cov<2.6'
         - pip install python-coveralls
 
       script:

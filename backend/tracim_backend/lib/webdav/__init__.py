@@ -1,27 +1,26 @@
 import json
-import sys
 import os
+import sys
+import traceback
+from inspect import isfunction
+
 from pyramid.paster import get_appsettings
 from waitress import serve
+from wsgidav.dir_browser import WsgiDavDirBrowser
+from wsgidav.error_printer import ErrorPrinter
+from wsgidav.http_authenticator import HTTPAuthenticator
 from wsgidav.wsgidav_app import DEFAULT_CONFIG
-from wsgidav.xml_tools import useLxml
 from wsgidav.wsgidav_app import WsgiDAVApp
+from wsgidav.xml_tools import useLxml
 
 from tracim_backend import CFG
-from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE, \
-    DEFAULT_WEBDAV_CONFIG_FILE
-from tracim_backend.lib.webdav.dav_provider import Provider
+from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 from tracim_backend.lib.webdav.authentification import TracimDomainController
-from wsgidav.dir_browser import WsgiDavDirBrowser
-from wsgidav.http_authenticator import HTTPAuthenticator
-from wsgidav.error_printer import ErrorPrinter
-from tracim_backend.lib.webdav.middlewares import TracimWsgiDavDebugFilter, \
-    TracimEnforceHTTPS, TracimEnv, TracimUserSession
-
-from inspect import isfunction
-import traceback
-
-from tracim_backend.models import get_engine, get_session_factory
+from tracim_backend.lib.webdav.dav_provider import Provider
+from tracim_backend.lib.webdav.middlewares import TracimEnforceHTTPS
+from tracim_backend.lib.webdav.middlewares import TracimEnv
+from tracim_backend.lib.webdav.middlewares import TracimUserSession
+from tracim_backend.lib.webdav.middlewares import TracimWsgiDavDebugFilter
 
 
 class WebdavAppFactory(object):

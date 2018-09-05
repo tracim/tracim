@@ -18,7 +18,6 @@ import {
   setWorkspaceListMemberList,
   updateUserName,
   updateUserEmail,
-  updateUserAuth,
   updateUserWorkspaceSubscriptionNotif
 } from '../action-creator.sync.js'
 import {
@@ -29,7 +28,6 @@ import {
   putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
 import { translate } from 'react-i18next'
-import { setCookie } from '../helper.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -110,8 +108,6 @@ class Account extends React.Component {
       switch (fetchPutUserEmail.status) {
         case 200:
           props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
-          const newAuth = setCookie(fetchPutUserEmail.json.email, checkPassword)
-          props.dispatch(updateUserAuth(newAuth))
           if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           break
@@ -141,8 +137,6 @@ class Account extends React.Component {
     const fetchPutUserPassword = await props.dispatch(putUserPassword(props.user, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
       case 204:
-        const newAuth = setCookie(props.user.email, newPassword)
-        props.dispatch(updateUserAuth(newAuth))
         props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info'))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning')); break

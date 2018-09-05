@@ -9,11 +9,11 @@ export const UserInfo = props =>
     </div>
 
     <div className='userinfo__wrapper'>
-      <div className='userinfo__name mb-3'>
+      <div className='userinfo__name primaryColorFont mb-3'>
         {`${props.user.public_name}`}
       </div>
 
-      <a href={`mailto:${props.user.email}`} className='userinfo__email d-block primaryColorFontLighten mb-3'>
+      <a href={`mailto:${props.user.email}`} className='userinfo__email d-block mb-3'>
         {props.user.email}
       </a>
 
