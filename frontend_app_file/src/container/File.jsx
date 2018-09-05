@@ -211,6 +211,7 @@ class File extends React.Component {
       .then(resSave => {
         if (resSave.apiResponse.status === 200) {
           this.loadContent()
+          this.loadTimeline()
           GLOBAL_dispatchEvent({ type: 'refreshContentList', data: {} })
         } else {
           console.warn('Error saving file. Result:', resSave, 'content:', content, 'config:', config)
@@ -248,6 +249,7 @@ class File extends React.Component {
           this.setState({newComment: ''})
           if (this.state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
           this.loadContent()
+          this.loadTimeline()
         } else {
           console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
         }
@@ -267,6 +269,7 @@ class File extends React.Component {
           console.warn('Error saving file comment. Result:', resSave, 'content:', content, 'config:', config)
         } else {
           this.loadContent()
+          this.loadTimeline()
         }
       })
   }
