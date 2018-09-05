@@ -115,9 +115,9 @@ class HtmlDocument extends React.Component {
   loadContent = async () => {
     const { loggedUser, content, config } = this.state
 
-    const fetchResultHtmlDocument = getHtmlDocContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getHtmlDocComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getHtmlDocRevision(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultHtmlDocument = getHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultComment = getHtmlDocComment(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRevision = getHtmlDocRevision(config.apiUrl, content.workspace_id, content.content_id)
 
     handleFetchResult(await fetchResultHtmlDocument)
       .then(resHtmlDocument => this.setState({content: resHtmlDocument.body}))
@@ -181,9 +181,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
+    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, newTitle, content.raw_content)
 
     handleFetchResult(await fetchResultSaveHtmlDoc)
       .then(resSave => {
@@ -213,9 +213,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleSaveHtmlDocument = async () => {
-    const { loggedUser, content, config } = this.state
+    const { content, config } = this.state
 
-    const fetchResultSaveHtmlDoc = putHtmlDocContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
+    const fetchResultSaveHtmlDoc = putHtmlDocContent(config.apiUrl, content.workspace_id, content.content_id, content.label, content.raw_content)
 
     handleFetchResult(await fetchResultSaveHtmlDoc)
       .then(resSave => {
@@ -239,9 +239,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { loggedUser, config, content, newComment } = this.state
+    const { config, content, newComment } = this.state
 
-    const fetchResultSaveNewComment = await postHtmlDocNewComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newComment)
+    const fetchResultSaveNewComment = await postHtmlDocNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
 
     handleFetchResult(await fetchResultSaveNewComment)
       .then(resSave => {
@@ -258,9 +258,9 @@ class HtmlDocument extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveEditStatus = putHtmlDocStatus(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    const fetchResultSaveEditStatus = putHtmlDocStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
@@ -273,9 +273,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickArchive = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putHtmlDocIsArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
       default: GLOBAL_dispatchEvent({
@@ -290,9 +290,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickDelete = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putHtmlDocIsDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
       default: GLOBAL_dispatchEvent({
@@ -307,9 +307,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickRestoreArchived = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putHtmlDocRestoreArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
       default: GLOBAL_dispatchEvent({
@@ -324,9 +324,9 @@ class HtmlDocument extends React.Component {
   }
 
   handleClickRestoreDeleted = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putHtmlDocRestoreDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
       default: GLOBAL_dispatchEvent({
