@@ -2,17 +2,17 @@
 <html>
   <head>
     <meta charset='utf-8' />
-    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta name='viewport' content='width=device-width, user-scalable=no'>
     <title>Tracim</title>
     <link rel='shortcut icon' type='image/x-icon' href='/asset/favicon.ico' >
 
-    <link rel="stylesheet" type="text/css" href="/asset/font/font-awesome-4.7.0/css/font-awesome.css">
-    <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
+    <link rel='stylesheet' type='text/css' href='/asset/font/font-awesome-4.7.0/css/font-awesome.css'>
     <!--
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700' rel='stylesheet'>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css' integrity='sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M' crossorigin='anonymous'>
     -->
-    <link rel="stylesheet" type="text/css" href="/asset/hamburger/hamburgers.min.css">
-    <link rel="stylesheet" type="text/css" href="/asset/bootstrap/bootstrap-4.0.0-beta.css">
+    <link rel='stylesheet' type='text/css' href='/asset/hamburger/hamburgers.min.css'>
+    <link rel='stylesheet' type='text/css' href='/asset/bootstrap/bootstrap-4.0.0-beta.css'>
 
     <style>
       <%
@@ -52,6 +52,17 @@
       ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
       ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
       ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
+    </style>
+
+    <style>
+      @font-face {
+        font-family: 'Quicksand';
+        src: url('/asset/font/Quicksand/Quicksand-Regular.ttf');
+      }
+
+      body {
+        font-family: 'Quicksand';
+      }
     </style>
   </head>
 

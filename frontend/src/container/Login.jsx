@@ -24,7 +24,7 @@ import {
   getWorkspaceList,
   postUserLogin
 } from '../action-creator.async.js'
-import { setCookie, PAGE } from '../helper.js'
+import { PAGE } from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
 
 class Login extends React.Component {
@@ -60,14 +60,8 @@ class Login extends React.Component {
     const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
 
     if (fetchPostUserLogin.status === 200) {
-      let userAuth = ''
-
-      if (inputRememberMe) userAuth = setCookie(inputLogin.value, inputPassword.value, 365)
-      else userAuth = setCookie(inputLogin.value, inputPassword.value)
-
       const loggedUser = {
         ...fetchPostUserLogin.json,
-        auth: userAuth,
         logged: true
       }
 
