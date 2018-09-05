@@ -79,7 +79,7 @@ class PopupCreateFile extends React.Component {
       }
     })
 
-    const fetchPostContent = await handleFetchResult(await postFileContent(state.loggedUser, state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
+    const fetchPostContent = await handleFetchResult(await postFileContent(state.config.apiUrl, state.idWorkspace, state.idFolder, 'file', state.uploadFile.name))
     switch (fetchPostContent.apiResponse.status) {
       case 200:
         const formData = new FormData()
@@ -92,9 +92,10 @@ class PopupCreateFile extends React.Component {
         xhr.upload.addEventListener('progress', uploadInProgress, false)
         xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
-        xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.idWorkspace}/files/${fetchPostContent.body.content_id}/raw`, true)
-        xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
+        xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw`, true)
+        // xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
         xhr.setRequestHeader('Accept', 'application/json')
+        xhr.withCredentials = true
 
         xhr.onreadystatechange = () => {
           if (xhr.readyState === 4) {

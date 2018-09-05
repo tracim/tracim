@@ -28,7 +28,6 @@ export class PreviewComponent extends React.Component {
 
   handleClickShowImageRaw = async () => {
     this.setState({displayLightbox: true})
-    this.props.onClickDisplayFull()
   }
 
   render () {
@@ -37,35 +36,41 @@ export class PreviewComponent extends React.Component {
     return (
       <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
         <div className='previewcomponent__dloption'>
-          <button
-            type='button'
+          <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            onClick={props.onClickDownloadRaw}
+            href={props.downloadRawUrl}
+            target='_blank'
+            download
             style={{':hover': {color: props.color}}}
+            title={props.t('Download file')}
             key={'file_btn_dl_raw'}
           >
             <i className='fa fa-download' />
-          </button>
+          </a>
 
-          <button
-            type='button'
+          <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            onClick={props.onClickDownloadPdfPage}
+            href={props.downloadPdfPageUrl}
+            target='_blank'
+            download
             style={{':hover': {color: props.color}}}
+            title={props.t('Download current page as PDF')}
             key={'file_btn_dl_pdfpage'}
           >
             <i className='fa fa-file-pdf-o' />
-          </button>
+          </a>
 
-          <button
-            type='button'
+          <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            onClick={props.onClickDownloadPdfFull}
+            href={props.downloadPdfFullUrl}
+            target='_blank'
+            download
             style={{':hover': {color: props.color}}}
+            title={props.t('Download as PDF')}
             key={'file_btn_dl_pdfall'}
           >
             <i className='fa fa-files-o' />
-          </button>
+          </a>
         </div>
 
         <div className='previewcomponent__slider'>
@@ -74,6 +79,7 @@ export class PreviewComponent extends React.Component {
             className='previewcomponent__slider__icon btn iconBtn'
             onClick={props.onClickPreviousPage}
             style={{':hover': {color: props.color}}}
+            title={'Previous page'}
             key={'file_btn_previouspage'}
           >
             <i className='fa fa-chevron-left' />
@@ -83,11 +89,11 @@ export class PreviewComponent extends React.Component {
             className='previewcomponent__slider__fileimg'
             onClick={this.handleClickShowImageRaw}
           >
-            <img src={props.previewFile} className='img-thumbnail mx-auto' />
+            <img src={props.previewUrl} className='img-thumbnail mx-auto' />
 
-            {state.displayLightbox && props.contentFull !== null && props.contentFull !== undefined &&
+            {state.displayLightbox && props.contentFullScreenUrl !== null && props.contentFullScreenUrl !== undefined &&
               <Lightbox
-                mainSrc={props.contentFull}
+                mainSrc={props.contentFullScreenUrl}
                 onCloseRequest={() => this.setState({displayLightbox: false})}
               />
             }
@@ -98,6 +104,7 @@ export class PreviewComponent extends React.Component {
             className='previewcomponent__slider__icon btn iconBtn'
             onClick={props.onClickNextPage}
             style={{':hover': {color: props.color}}}
+            title={'Next page'}
             key={'file_btn_nextpage'}
           >
             <i className='fa fa-chevron-right' />
@@ -162,6 +169,14 @@ export class PreviewComponent extends React.Component {
                 type='button'
                 className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
                 onClick={this.handleToggleFormNewDescription}
+                style={{
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: props.color,
+                  ':hover': {
+                    backgroundColor: props.color
+                  }
+                }}
               >
                 {props.t('Change description')}
               </button>

@@ -1,5 +1,4 @@
 import i18n from './i18n.js'
-import Cookies from 'js-cookie'
 
 const configEnv = require('../configEnv.json')
 
@@ -8,26 +7,7 @@ export const FETCH_CONFIG = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
-  apiUrl: configEnv.apiUrl,
-  mockApiUrl: 'http://localhost:3001' // @todo: better to use one url only and use proxy on mock api to point to real api (if implemented)
-}
-
-export const COOKIE = {
-  USER_LOGIN: 'user_login',
-  USER_AUTH: 'user_auth'
-}
-
-export const setCookie = (login, password, expires = undefined) => {
-  const auth = btoa(`${login}:${password}`)
-  if (expires) {
-    Cookies.set(COOKIE.USER_LOGIN, login, {expires})
-    Cookies.set(COOKIE.USER_AUTH, auth, {expires})
-  } else {
-    Cookies.set(COOKIE.USER_LOGIN, login)
-    Cookies.set(COOKIE.USER_AUTH, auth)
-  }
-
-  return auth
+  apiUrl: configEnv.apiUrl
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?
