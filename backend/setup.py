@@ -41,7 +41,6 @@ requires = [
     'lxml',
     'redis',
     'rq',
-<<<<<<< HEAD
     # mail-fetcher
     'markdown',
     'email_reply_parser',
@@ -49,12 +48,9 @@ requires = [
     'imapclient',
     # auth
     'pyramid_multiauth',
-=======
-    # auth
     'pyramid_multiauth',
     'beaker',
     'pyramid_beaker',
->>>>>>> 126b90eddb51320d2ffbdf562a052200869f001f
     # frontend file serve
     'pyramid_mako',
 ]
@@ -66,14 +62,10 @@ tests_require = [
     'pep8',
     'mypy',
     'requests',
-<<<<<<< HEAD
     'responses',
     'mock',
     'Pillow',
-=======
-    'Pillow',
     'freezegun'
->>>>>>> 126b90eddb51320d2ffbdf562a052200869f001f
 ]
 
 mysql_require = [
