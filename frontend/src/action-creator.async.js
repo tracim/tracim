@@ -115,7 +115,7 @@ export const postUserLogout = () => async dispatch => {
   })
 }
 
-export const getUserIsConnected = user => async dispatch => {
+export const getUserIsConnected = () => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
     param: {
