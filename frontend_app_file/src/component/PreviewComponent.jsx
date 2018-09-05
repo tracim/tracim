@@ -174,7 +174,7 @@ export class PreviewComponent extends React.Component {
                   borderStyle: 'solid',
                   borderColor: props.color,
                   ':hover': {
-                    backgroundColor: props.color,
+                    backgroundColor: props.color
                   }
                 }}
               >

@@ -1,5 +1,4 @@
 import i18n from './i18n.js'
-import Cookies from 'js-cookie'
 
 const configEnv = require('../configEnv.json')
 
@@ -15,19 +14,6 @@ export const FETCH_CONFIG = {
 export const COOKIE = {
   USER_LOGIN: 'user_login',
   USER_AUTH: 'user_auth'
-}
-
-export const setCookie = (login, password, expires = undefined) => {
-  const auth = btoa(`${login}:${password}`)
-  if (expires) {
-    Cookies.set(COOKIE.USER_LOGIN, login, {expires})
-    Cookies.set(COOKIE.USER_AUTH, auth, {expires})
-  } else {
-    Cookies.set(COOKIE.USER_LOGIN, login)
-    Cookies.set(COOKIE.USER_AUTH, auth)
-  }
-
-  return auth
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?

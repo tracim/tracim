@@ -24,7 +24,7 @@ import {
   getWorkspaceList,
   postUserLogin
 } from '../action-creator.async.js'
-import { setCookie, PAGE } from '../helper.js'
+import { PAGE } from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
 
 class Login extends React.Component {
