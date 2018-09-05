@@ -54,7 +54,7 @@ const AdminWorkspace = props =>
                   <div className='adminWorkspacePage__table__delete primaryColorFont primaryColorFontDarkenHover'>
                     <button
                       type='button'
-                      className='adminWorkspacePage__table__delete__icon btn mr-3'
+                      className='adminWorkspacePage__table__delete__icon btn iconBtn mr-3'
                       onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
                     >
                       <i className='fa fa-fw fa-trash-o' />
