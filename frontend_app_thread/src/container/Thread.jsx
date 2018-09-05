@@ -102,8 +102,8 @@ class Thread extends React.Component {
 
     if (content.content_id === '-1') return // debug case
 
-    const fetchResultThread = getThreadContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultThreadComment = getThreadComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultThread = getThreadContent(config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultThreadComment = getThreadComment(config.apiUrl, content.workspace_id, content.content_id)
 
     Promise.all([
       handleFetchResult(await fetchResultThread),
@@ -136,9 +136,9 @@ class Thread extends React.Component {
   }
 
   handleSaveEditTitle = async newTitle => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveThread = putThreadContent(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newTitle)
+    const fetchResultSaveThread = putThreadContent(config.apiUrl, content.workspace_id, content.content_id, newTitle)
 
     handleFetchResult(await fetchResultSaveThread)
       .then(resSave => {
@@ -157,9 +157,9 @@ class Thread extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = async () => {
-    const { loggedUser, config, content, newComment } = this.state
+    const { config, content, newComment } = this.state
 
-    const fetchResultSaveNewComment = await postThreadNewComment(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newComment)
+    const fetchResultSaveNewComment = await postThreadNewComment(config.apiUrl, content.workspace_id, content.content_id, newComment)
 
     handleFetchResult(await fetchResultSaveNewComment)
       .then(resSave => {
@@ -176,9 +176,9 @@ class Thread extends React.Component {
   handleToggleWysiwyg = () => this.setState(prev => ({timelineWysiwyg: !prev.timelineWysiwyg}))
 
   handleChangeStatus = async newStatus => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultSaveEditStatus = putThreadStatus(loggedUser, config.apiUrl, content.workspace_id, content.content_id, newStatus)
+    const fetchResultSaveEditStatus = putThreadStatus(config.apiUrl, content.workspace_id, content.content_id, newStatus)
 
     handleFetchResult(await fetchResultSaveEditStatus)
       .then(resSave => {
@@ -191,9 +191,9 @@ class Thread extends React.Component {
   }
 
   handleClickArchive = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putThreadIsArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putThreadIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
       default: GLOBAL_dispatchEvent({
@@ -208,9 +208,9 @@ class Thread extends React.Component {
   }
 
   handleClickDelete = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultArchive = await putThreadIsDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultArchive = await putThreadIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
       default: GLOBAL_dispatchEvent({
@@ -225,9 +225,9 @@ class Thread extends React.Component {
   }
 
   handleClickRestoreArchived = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putThreadRestoreArchived(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putThreadRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
       default: GLOBAL_dispatchEvent({
@@ -242,9 +242,9 @@ class Thread extends React.Component {
   }
 
   handleClickRestoreDeleted = async () => {
-    const { loggedUser, config, content } = this.state
+    const { config, content } = this.state
 
-    const fetchResultRestore = await putThreadRestoreDeleted(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    const fetchResultRestore = await putThreadRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
       case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
       default: GLOBAL_dispatchEvent({
