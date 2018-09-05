@@ -54,10 +54,12 @@ def add_cors_preflight_handler(config):
 
 def cors_options_view(context, request):
     response = request.response
-    if 'Access-Control-Request-Headers' in request.headers:
-        response.headers['Access-Control-Allow-Methods'] = (
-            'OPTIONS,HEAD,GET,POST,PUT,DELETE'
-        )
+    # @TODO Côme - 2018/09/04 - I commented the test bellow because I can't work with for editing a file in app file.
+    # I checked with GM and this test might require some fixes
+    # if 'Access-Control-Request-Headers' in request.headers:
+    response.headers['Access-Control-Allow-Methods'] = (
+        'OPTIONS,HEAD,GET,POST,PUT,DELETE'
+    )
     response.headers['Access-Control-Allow-Headers'] = (
         'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID'
     )
