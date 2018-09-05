@@ -1320,11 +1320,6 @@ class ContentApi(object):
         nb_pages = self.preview_manager.get_page_nb(file_path)
         return nb_pages
 
-    def get_file_size(self, revision_id: int) -> int:
-        file_path = self.get_one_revision_filepath(revision_id)
-        size = os.path.getsize(file_path)
-        return size
-
     def mark_read__all(
             self,
             read_datetime: datetime=None,

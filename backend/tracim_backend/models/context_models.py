@@ -756,13 +756,7 @@ class ContentInContext(object):
         :return: size of content if available
         """
         if self.content.depot_file:
-            from tracim_backend.lib.core.content import ContentApi
-            content_api = ContentApi(
-                current_user=self._user,
-                session=self.dbsession,
-                config=self.config
-            )
-            return content_api.get_file_size(self.content.revision_id)
+            return self.content.depot_file.file.content_length
         else:
             return None
 
@@ -951,13 +945,6 @@ class RevisionInContext(object):
         :return: size of content if available, -1 if no valid size
         """
         if self.revision.depot_file:
-            # TODO - G.M - 2018-09-05 - Fix circular import better
-            from tracim_backend.lib.core.content import ContentApi
-            content_api = ContentApi(
-                current_user=self._user,
-                session=self.dbsession,
-                config=self.config
-            )
-            return content_api.get_file_size(self.revision.revision_id)
+            return self.revision.depot_file.file.content_length
         else:
             return None
