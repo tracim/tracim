@@ -155,7 +155,7 @@ class Login extends React.Component {
                         onKeyPress={this.handleInputKeyPress}
                       />
 
-                      <div className='row align-items-center mt-4 mb-4'>
+                      <div className='row mt-4 mb-4'>
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
                           <div className='connection__form__rememberme' onClick={this.handleChangeRememberMe}>
                             <Checkbox
@@ -172,7 +172,7 @@ class Login extends React.Component {
                           />
                         </div>
 
-                        <div className='col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-end'>
                           <Button
                             htmlType='button'
                             bootstrapType='primary'

@@ -2,6 +2,7 @@
 import transaction
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.models import get_tm_session
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.tests import FunctionalTest
@@ -107,6 +108,48 @@ class TestContentsTypesEndpoint(FunctionalTest):
             )
         )
         res = self.testapp.get('/api/v2/system/content_types', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+
+class TestTimezonesEndpoint(FunctionalTest):
+    """
+    Tests for /api/v2/system/timezones
+    """
+
+    def test_api__get_timezones__ok_200__nominal_case(self):
+        """
+        Get alls timezones list with a registered user.
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/system/timezones', status=200)
+        timezones = res.json_body
+        timezones_list = get_timezones_list()
+        assert len(timezones) == len(timezones_list)
+
+        for counter, timezone in enumerate(timezones_list):
+            assert timezones[counter]['name'] == timezone.name
+
+    def test_api__get_content_types__err_401__unregistered_user(self):
+        """
+        Get availables timezones list with an unregistered user (bad auth)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/system/timezones', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()

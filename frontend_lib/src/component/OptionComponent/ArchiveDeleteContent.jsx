@@ -14,7 +14,7 @@ const ArchiveDeleteContent = props => {
     <div className='d-flex align-items-center'>
       <button
         type='button'
-        className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block'
+        className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block btn iconBtn'
         onClick={props.onClickArchiveBtn}
         disabled={props.disabled}
         title='Archiver'
@@ -25,7 +25,7 @@ const ArchiveDeleteContent = props => {
       </button>
       <button
         type='button'
-        className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block'
+        className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block btn iconBtn'
         onClick={props.onClickDeleteBtn}
         disabled={props.disabled}
         title='Supprimer'

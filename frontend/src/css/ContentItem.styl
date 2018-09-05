@@ -17,8 +17,10 @@
   border-bottom 0
   width 100%
   cursor pointer
-  &:hover
-    background-color hover-theme
+  &:hover > .content__name
+    color off-white
+  &:hover > .content__status
+    color off-white
   &__type
     flex-grow 0
     padding 0 25px
@@ -44,7 +46,7 @@
       margin-left 15px
       font-size 20px
     &__icon
-      font-size 30px
+      font-size 20px
 
 
 @media (min-width: max-xs) and (max-width: max-lg)

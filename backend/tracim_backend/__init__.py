@@ -8,6 +8,8 @@ except ImportError:
 
 from pyramid.config import Configurator
 from pyramid.authentication import BasicAuthAuthenticationPolicy
+from pyramid.authentication import SessionAuthenticationPolicy
+from pyramid.authentication import AuthTktAuthenticationPolicy
 from hapic.ext.pyramid import PyramidContext
 from sqlalchemy.exc import OperationalError
 
@@ -15,6 +17,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.authentification import basic_auth_check_credentials
+from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
@@ -62,8 +65,10 @@ def web(global_config, **local_settings):
     settings['CFG'] = app_config
     configurator = Configurator(settings=settings, autocommit=True)
     # Add AuthPolicy
+    configurator.include("pyramid_beaker")
     configurator.include("pyramid_multiauth")
     policies = [
+        CookieSessionAuthentificationPolicy(reissue_time=app_config.SESSION_REISSUE_TIME),  # nopep8
         ApiTokenAuthentificationPolicy(
             api_key_header=TRACIM_API_KEY_HEADER,
             api_user_email_login_header=TRACIM_API_USER_EMAIL_LOGIN_HEADER

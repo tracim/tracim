@@ -20,8 +20,12 @@
       display flex
       border-bottom 1px solid grey
       padding 10px 15px
-      // &:nth-last-child(1)
+      // &:nth-last-child()
       //   border-bottom 0
+      &:hover > .memberlist__list__item__info
+        color off-white
+      &:hover > .memberlist__list__item__delete
+        color off-white
       &__avatar
         margin-right 20px
         & > img
@@ -133,9 +137,6 @@
     &__submitbtn
       display flex
       justify-content flex-end
-      & > button
-        padding 8px 30px
-        cursor pointer
 
 /***** MEDIAQUERIES *****/
 

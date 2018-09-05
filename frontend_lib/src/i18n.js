@@ -1,12 +1,12 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import fr from './translate/fr.js'
-import en from './translate/en.js'
+import en from '../i18next.scanner/en/translation.json'
+import fr from '../i18next.scanner/fr/translation.json'
 
 i18n
   .use(reactI18nextModule)
   .init({
-    fallbackLng: 'fr',
+    fallbackLng: 'en',
     // have a common namespace used around the full app
     ns: ['translation'], // namespace
     defaultNS: 'translation',

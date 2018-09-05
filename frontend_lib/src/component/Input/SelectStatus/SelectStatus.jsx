@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../../../i18n.js'
+import Radium from 'radium'
 
 require('./SelectStatus.styl')
 
@@ -10,7 +11,7 @@ export const SelectStatus = props => {
   return (
     <div className='selectStatus dropdown'>
       <button
-        className='selectStatus__dropdownbtn check btn dropdown-toggle'
+        className='selectStatus__dropdownbtn check btn outlineTextBtn nohover dropdown-toggle'
         type='button'
         id='dropdownMenu2'
         data-toggle='dropdown'
@@ -33,7 +34,11 @@ export const SelectStatus = props => {
             type='button'
             onClick={() => props.onChangeStatus(s.slug)}
             key={`status_${s.slug}`}
-            // style={{color: s.hexcolor}}
+            style={{
+              ':hover': {
+                backgroundColor: s.customColor
+              }
+            }}
           >
             {s.label}
             <div className='selectStatus__submenu__item__icon'>
@@ -49,4 +54,4 @@ export const SelectStatus = props => {
   )
 }
 
-export default translate()(SelectStatus)
+export default Radium(translate()(SelectStatus))

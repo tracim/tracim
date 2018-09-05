@@ -94,7 +94,7 @@ export class AddMemberForm extends React.Component {
         <div className='adminUserPage__adduser__form__submit'>
           <button
             type='button'
-            className='btn'
+            className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickAddUser}
           >
             {props.t('Add the user')}

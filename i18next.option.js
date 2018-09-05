@@ -2,7 +2,7 @@ module.exports = {
   debug: true,
   removeUnusedKeys: true,
   func: {
-    list: ['t', 'props.t', 'this.props.t'],
+    list: ['t', 'props.t', 'this.props.t', 'i18n.t'],
     extensions: ['.js', '.jsx']
   },
   lngs: ['en', 'fr'],

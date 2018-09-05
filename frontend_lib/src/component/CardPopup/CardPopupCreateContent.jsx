@@ -24,14 +24,18 @@ const PopupCreateContent = props => {
         </div>
 
         <form className='createcontent__form'>
-          <input
-            type='text'
-            className='createcontent__form__input'
-            placeholder={props.inputPlaceholder}
-            value={props.contentName}
-            onChange={props.onChangeContentName}
-          />
-
+          {props.children
+            ? props.children
+            : (
+              <input
+                type='text'
+                className='createcontent__form__input'
+                placeholder={props.inputPlaceholder}
+                value={props.contentName}
+                onChange={props.onChangeContentName}
+              />
+            )
+          }
           <div className='createcontent__form__button'>
             <button
               type='button' // do neither remove this nor set it to 'submit' otherwise clicking the btn will submit the form and reload the page

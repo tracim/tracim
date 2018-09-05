@@ -4,7 +4,7 @@ import random
 import string
 from enum import Enum
 import colorsys
-
+import pytz
 from redis import Redis
 from rq import Queue
 import typing
@@ -105,6 +105,18 @@ def current_date_for_filename() -> str:
     # a character which will not change in bdd.
     return datetime.datetime.now().isoformat().replace(':', '.')
 
+
+class Timezone(object):
+    def __init__(self, name):
+        self.name = name
+
+
+def get_timezones_list() -> typing.List[Timezone]:
+    tz_list = []
+    for tz_name in pytz.common_timezones:
+        tz_list.append(Timezone(tz_name))
+    return tz_list
+
 # INFO - G.M - 2018-08-02 - Simple password generator, inspired by
 # https://gist.github.com/23maverick23/4131896
 
@@ -131,9 +143,9 @@ def password_generator(
 def clamp(val: float, minimum: float = 0.0, maximum: float= 255.0) -> int:
     """ Fix value between min an max"""
     if val < minimum:
-        return minimum
+        return int(minimum)
     if val > maximum:
-        return maximum
+        return int(maximum)
     return int(val)
 
 
@@ -148,6 +160,7 @@ class Color(object):
         """
 
         assert len(base_hex_code) == 7
+        assert base_hex_code[0] == '#'
         self._base_hex_code = base_hex_code
 
     # INFO - G.M - 2018-08-10 - get_hexcolor, inspired by
@@ -163,7 +176,7 @@ class Color(object):
         """
 
         hex_color = self._base_hex_code.strip('#')
-        assert scalefactor > 0
+        assert scalefactor >= 0
 
         r = int(hex_color[:2], 16)
         g = int(hex_color[2:4], 16)

@@ -639,6 +639,10 @@ class ApplicationConfigSchema(marshmallow.Schema):
     #  TODO - G.M - 24-05-2018 - Set this
 
 
+class TimezoneSchema(marshmallow.Schema):
+    name = marshmallow.fields.String(example='Europe/London')
+
+
 class ApplicationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(example='Calendar')
     slug = marshmallow.fields.String(example='calendar')

@@ -13,7 +13,8 @@ import {
   Timeline,
   NewVersionBtn,
   ArchiveDeleteContent,
-  SelectStatus
+  SelectStatus,
+  displayDate
 } from 'tracim_frontend_lib'
 import { MODE, debug } from '../helper.js'
 import {
@@ -29,6 +30,7 @@ import {
   putHtmlDocRestoreDeleted,
   putHtmlDocRead
 } from '../action.async.js'
+import Radium from 'radium'
 
 class HtmlDocument extends React.Component {
   constructor (props) {
@@ -76,6 +78,7 @@ class HtmlDocument extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.loadContent()
         break
     }
   }
@@ -139,7 +142,8 @@ class HtmlDocument extends React.Component {
         const revisionWithComment = resRevision.body
           .map((r, i) => ({
             ...r,
-            created: (new Date(r.created)).toLocaleString(),
+            // created: (new Date(r.created)).toLocaleString(),
+            created: displayDate(r.created),
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
               timelineType: 'comment',
@@ -406,7 +410,7 @@ class HtmlDocument extends React.Component {
 
               {mode === MODE.REVISION &&
                 <button
-                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
+                  className='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn highlightBtn'
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
                 >
@@ -479,4 +483,4 @@ class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(HtmlDocument)
+export default Radium(translate()(HtmlDocument))

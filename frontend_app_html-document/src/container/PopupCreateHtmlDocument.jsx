@@ -21,6 +21,10 @@ const debug = { // outdated
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    },
+    translation: {
+      en: {translation: {}},
+      fr: {translation: {}}
     }
   },
   loggedUser: {
