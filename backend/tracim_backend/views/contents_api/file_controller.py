@@ -199,7 +199,7 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
-    @hapic.input_query(PageQuerySchema())
+    @hapic.input_query(FileQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):  # nopep8
