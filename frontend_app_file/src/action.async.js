@@ -58,7 +58,7 @@ export const postFileNewComment = (apiUrl, idWorkspace, idContent, newComment) =
   })
 
 export const putFileContent = (apiUrl, idWorkspace, idContent, label, newContent) =>
-  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}/raw`, {
+  fetch(`${apiUrl}/workspaces/${idWorkspace}/files/${idContent}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
