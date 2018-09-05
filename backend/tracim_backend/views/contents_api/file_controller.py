@@ -5,39 +5,45 @@ import transaction
 from depot.manager import DepotManager
 from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
-from pyramid.response import FileResponse, FileIter
+from pyramid.response import FileIter
+from pyramid.response import FileResponse
+
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import PageOfPreviewNotFound
+from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.utils.authorization import require_content_types
+from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import RevisionInContext
+from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
+from tracim_backend.views.core_api.schemas import ContentPreviewSizedPathSchema
+from tracim_backend.views.core_api.schemas import FileContentModifySchema
+from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import FileQuerySchema
+from tracim_backend.views.core_api.schemas import FileRevisionSchema
+from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import PageQuerySchema
+from tracim_backend.views.core_api.schemas import \
+    RevisionPreviewSizedPathSchema
+from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import \
+    WorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import \
+    WorkspaceAndContentRevisionIdPathSchema  # nopep8
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.extensions import hapic
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import FileContentSchema
-from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
-from tracim_backend.views.core_api.schemas import ContentPreviewSizedPathSchema
-from tracim_backend.views.core_api.schemas import RevisionPreviewSizedPathSchema
-from tracim_backend.views.core_api.schemas import PageQuerySchema
-from tracim_backend.views.core_api.schemas import WorkspaceAndContentRevisionIdPathSchema  # nopep8
-from tracim_backend.views.core_api.schemas import FileRevisionSchema
-from tracim_backend.views.core_api.schemas import SetContentStatusSchema
-from tracim_backend.views.core_api.schemas import FileContentModifySchema
-from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
-from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.lib.utils.authorization import require_content_types
-from tracim_backend.lib.utils.authorization import require_workspace_role
-from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.models.context_models import ContentInContext
-from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import PageOfPreviewNotFound
-from tracim_backend.exceptions import PreviewDimNotAllowed
 
 SWAGGER_TAG__FILE_ENDPOINTS = 'Files'
 
@@ -89,6 +95,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.input_query(FileQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def download_file(self, context, request: TracimRequest, hapic_data=None):
@@ -111,11 +118,15 @@ class FileController(Controller):
         response = request.response
         response.content_type = file.content_type
         response.app_iter = FileIter(file)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.input_query(FileQuerySchema())
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.output_file([])
     def download_revisions_file(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -142,6 +153,9 @@ class FileController(Controller):
         response = request.response
         response.content_type = file.content_type
         response.app_iter = FileIter(file)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
         return response
 
     # preview
@@ -175,12 +189,17 @@ class FileController(Controller):
             content.revision_id,
             page=hapic_data.query.page
         )
-        return FileResponse(pdf_preview_path)
+        response = FileResponse(pdf_preview_path)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
+        return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.input_query(PageQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
     def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -200,7 +219,11 @@ class FileController(Controller):
             content_type=CONTENT_TYPES.Any_SLUG
         )
         pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
-        return FileResponse(pdf_preview_path)
+        response = FileResponse(pdf_preview_path)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
+        return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -234,7 +257,11 @@ class FileController(Controller):
             revision.revision_id,
             page=hapic_data.query.page
         )
-        return FileResponse(pdf_preview_path)
+        response = FileResponse(pdf_preview_path)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
+        return response
 
     # jpg
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
@@ -268,7 +295,11 @@ class FileController(Controller):
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
         )
-        return FileResponse(jpg_preview_path)
+        response = FileResponse(jpg_preview_path)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
+        return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -301,7 +332,11 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
-        return FileResponse(jpg_preview_path)
+        response = FileResponse(jpg_preview_path)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
+        return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -338,7 +373,11 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
-        return FileResponse(jpg_preview_path)
+        response = FileResponse(jpg_preview_path)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
+        return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)

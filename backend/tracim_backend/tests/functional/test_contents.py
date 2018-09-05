@@ -24,6 +24,7 @@ from tracim_backend.tests import set_html_document_slug_to_legacy
 from tracim_backend.fixtures.content import Content as ContentFixtures
 from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
+
 class TestFolder(FunctionalTest):
     """
     Tests for /api/v2/workspaces/{workspace_id}/folders/{content_id}
@@ -1820,6 +1821,64 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'text/plain'
         assert res.content_length == len(b'Test file')
 
+    def test_api__get_file_raw__ok_200__force_download_case(self) -> None:
+        """
+        Get one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'force_download': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            status=200,
+            params=params
+        )
+        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.body == b'Test file'
+        assert res.content_type == 'text/plain'
+        assert res.content_length == len(b'Test file')
+
     def test_api__set_file_raw__ok_200__nominal_case(self) -> None:
         """
         Set one file of a content
@@ -1985,6 +2044,70 @@ class TestFiles(FunctionalTest):
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
 
+    def test_api__get_jpeg_preview__ok__200__force_download_case(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        params = {
+            'force_download': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg'.format(content_id),
+            status=200,
+            params=params
+        )
+        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.body != image.getvalue()
+        assert res.content_type == 'image/jpeg'
+
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(self) -> None:
         """
         get 256x256 preview of a txt file
@@ -2036,6 +2159,66 @@ class TestFiles(FunctionalTest):
             status=200
         )
         assert res.body != image.getvalue()
+        assert res.content_type == 'image/jpeg'
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 256, 256 == new_image.size
+
+    def test_api__get_sized_jpeg_preview__ok__200__force_download_case(self) -> None:
+        """
+        get 256x256 preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        params = {
+            'force_download': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id),  # nopep8
+            status=200,
+            params=params,
+        )
+        assert res.body != image.getvalue()
+        assert res.headers['Content-Disposition'] == 'attachment'
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -2164,6 +2347,84 @@ class TestFiles(FunctionalTest):
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
+    def test_api__get_sized_jpeg_revision_preview__ok__200__force_download_case(self) -> None:  # nopep8
+        """
+        get 256x256 revision preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        revision_id = int(test_file.revision_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+                content_id=content_id,
+                revision_id=revision_id,
+            ),
+            status=200
+        )
+        assert res.content_type == 'text/plain'
+        params = {
+            'force_download': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/jpg/256x256'.format(  # nopep8
+                content_id=content_id,
+                revision_id=revision_id,
+            ),
+            status=200,
+            params=params,
+        )
+        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.body != image.getvalue()
+        assert res.content_type == 'image/jpeg'
+        new_image = Image.open(io.BytesIO(res.body))
+        assert 256, 256 == new_image.size
+
     def test_api__get_full_pdf_preview__ok__200__nominal_case(self) -> None:
         """
         get full pdf preview of a txt file
@@ -2225,6 +2486,74 @@ class TestFiles(FunctionalTest):
             '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
             status=200
         )
+        assert res.content_type == 'application/pdf'
+
+    def test_api__get_full_pdf_preview__ok__200__force_download_case(self) -> None:
+        """
+        get full pdf preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(
+                session=dbsession,
+                tm=transaction.manager,
+                content=test_file,
+        ):
+            test_file.file_extension = '.txt'
+            test_file.depot_file = FileIntent(
+                b'Test file',
+                'Test_file.txt',
+                'text/plain',
+            )
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', test_file.file_name, test_file.depot_file.file.read())
+            ],
+            status=204,
+        )
+        params = {
+            'force_download': 1,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
+            status=200,
+            params=params
+        )
+        assert res.headers['Content-Disposition'] == 'attachment'
         assert res.content_type == 'application/pdf'
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:  # nopep8
@@ -2342,6 +2671,72 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.content_type == 'application/pdf'
+
+    def test_api__get_pdf_preview__ok__200__force_download_case(self) -> None:
+        """
+        get full pdf preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        with new_revision(
+                session=dbsession,
+                tm=transaction.manager,
+                content=test_file,
+        ):
+            test_file.file_extension = '.txt'
+            test_file.depot_file = FileIntent(
+                b'Test file',
+                'Test_file.txt',
+                'text/plain',
+            )
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', test_file.file_name, test_file.depot_file.file.read())
+            ],
+            status=204,
+        )
+        params = {'page': 0, 'force_download': 1}
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
+            status=200,
+            params=params,
+        )
+        assert res.content_type == 'application/pdf'
+        assert res.headers['Content-Disposition'] == 'attachment'
 
     def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:  # nopep8
         """
@@ -2477,6 +2872,79 @@ class TestFiles(FunctionalTest):
             ),
             status=200
         )
+        assert res.content_type == 'application/pdf'
+
+    def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
+        """
+        get pdf revision preview of content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        revision_id = int(test_file.revision_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/raw'.format(  # nopep8
+                content_id=content_id,
+                revision_id=revision_id,
+            ),
+            status=200
+        )
+        assert res.content_type == 'text/plain'
+        params = {'page': 0, 'force_download': 1}
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf'.format(  # nopep8
+                content_id=content_id,
+                revision_id=revision_id,
+            ),
+            status=200,
+            params=params,
+        )
+        assert res.headers['Content-Disposition'] == 'attachment'
         assert res.content_type == 'application/pdf'
 
 

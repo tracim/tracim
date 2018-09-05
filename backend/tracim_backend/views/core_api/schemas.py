@@ -1,48 +1,49 @@
 # coding=utf-8
 import marshmallow
 from marshmallow import post_load
-from marshmallow.validate import OneOf
 from marshmallow.validate import Length
+from marshmallow.validate import OneOf
 from marshmallow.validate import Range
 
-from tracim_backend.lib.utils.utils import DATETIME_FORMAT
-from tracim_backend.models.auth import Profile
-
-from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import CONTENT_STATUS
 from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import open_status
+from tracim_backend.app_models.validator import all_content_types_validator
+from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import ActiveContentFilter
-from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
-from tracim_backend.models.context_models import ContentIdsQuery
-from tracim_backend.models.context_models import UserWorkspaceAndContentPath
+from tracim_backend.models.context_models import CommentCreation
+from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
-from tracim_backend.models.context_models import UserCreation
+from tracim_backend.models.context_models import ContentFilter
+from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentPreviewSizedPath
+from tracim_backend.models.context_models import FileQuery
+from tracim_backend.models.context_models import FolderContentUpdate
+from tracim_backend.models.context_models import LoginCredentials
+from tracim_backend.models.context_models import MoveParams
+from tracim_backend.models.context_models import PageQuery
+from tracim_backend.models.context_models import RevisionPreviewSizedPath
+from tracim_backend.models.context_models import RoleUpdate
+from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
+from tracim_backend.models.context_models import TextBasedContentUpdate
+from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserProfile
-from tracim_backend.models.context_models import ContentPreviewSizedPath
-from tracim_backend.models.context_models import RevisionPreviewSizedPath
-from tracim_backend.models.context_models import PageQuery
-from tracim_backend.models.context_models import WorkspaceAndContentRevisionPath
+from tracim_backend.models.context_models import UserWorkspaceAndContentPath
+from tracim_backend.models.context_models import WorkspaceAndContentPath
+from tracim_backend.models.context_models import \
+    WorkspaceAndContentRevisionPath
+from tracim_backend.models.context_models import WorkspaceAndUserPath
 from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspaceUpdate
-from tracim_backend.models.context_models import RoleUpdate
-from tracim_backend.models.context_models import CommentCreation
-from tracim_backend.models.context_models import TextBasedContentUpdate
-from tracim_backend.models.context_models import SetContentStatus
-from tracim_backend.models.context_models import CommentPath
-from tracim_backend.models.context_models import MoveParams
-from tracim_backend.models.context_models import WorkspaceAndContentPath
-from tracim_backend.models.context_models import WorkspaceAndUserPath
-from tracim_backend.models.context_models import ContentFilter
-from tracim_backend.models.context_models import LoginCredentials
-from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.app_models.validator import all_content_types_validator
+from tracim_backend.models.data import UserRoleInWorkspace
 
 
 class UserDigestSchema(marshmallow.Schema):
@@ -367,7 +368,21 @@ class AutocompleteQuerySchema(marshmallow.Schema):
         return AutocompleteQuery(**data)
 
 
-class PageQuerySchema(marshmallow.Schema):
+class FileQuerySchema(marshmallow.Schema):
+    force_download = marshmallow.fields.Int(
+        example=1,
+        default=0,
+        description='force download of file or let browser decide if'
+                    'file can be read directly from browser',
+        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
+    )
+
+    @post_load
+    def make_query(self, data):
+        return FileQuery(**data)
+
+
+class PageQuerySchema(FileQuerySchema):
     page = marshmallow.fields.Int(
         example=2,
         default=0,
@@ -376,7 +391,7 @@ class PageQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_page_query(self, data):
+    def make_query(self, data):
         return PageQuery(**data)
 
 
