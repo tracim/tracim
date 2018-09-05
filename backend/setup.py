@@ -48,7 +48,6 @@ requires = [
     'imapclient',
     # auth
     'pyramid_multiauth',
-    'pyramid_multiauth',
     'beaker',
     'pyramid_beaker',
     # frontend file serve
