@@ -918,7 +918,7 @@ class RevisionInContext(object):
     @property
     def page_nb(self) -> typing.Optional[int]:
         """
-        :return: page_nb of content if available, -1 if no valid page number
+        :return: page_nb of content if available
         """
         if self.revision.depot_file:
             # TODO - G.M - 2018-09-05 - Fix circular import better
@@ -942,7 +942,7 @@ class RevisionInContext(object):
     @property
     def size(self) -> typing.Optional[int]:
         """
-        :return: size of content if available, -1 if no valid size
+        :return: size of content if available
         """
         if self.revision.depot_file:
             return self.revision.depot_file.file.content_length
