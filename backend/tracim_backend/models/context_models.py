@@ -730,7 +730,7 @@ class ContentInContext(object):
     @property
     def page_nb(self) -> typing.Optional[int]:
         """
-        :return: page_nb of content if available
+        :return: page_nb of content if available, None if unavailable
         """
         if self.content.depot_file:
             from tracim_backend.lib.core.content import ContentApi
@@ -746,14 +746,14 @@ class ContentInContext(object):
     @property
     def mimetype(self) -> str:
         """
-        :return: mimetype of content if available
+        :return: mimetype of content if available, None if unavailable
         """
         return self.content.file_mimetype
 
     @property
     def size(self) -> typing.Optional[int]:
         """
-        :return: size of content if available
+        :return: size of content if available, None if unavailable
         """
         if self.content.depot_file:
             return self.content.depot_file.file.content_length
@@ -918,7 +918,7 @@ class RevisionInContext(object):
     @property
     def page_nb(self) -> typing.Optional[int]:
         """
-        :return: page_nb of content if available
+        :return: page_nb of content if available, None if unavailable
         """
         if self.revision.depot_file:
             # TODO - G.M - 2018-09-05 - Fix circular import better
@@ -935,14 +935,14 @@ class RevisionInContext(object):
     @property
     def mimetype(self) -> str:
         """
-        :return: mimetype of content if available
+        :return: mimetype of content if available, None if unavailable
         """
         return self.revision.file_mimetype
 
     @property
     def size(self) -> typing.Optional[int]:
         """
-        :return: size of content if available
+        :return: size of content if available, None if unavailable
         """
         if self.revision.depot_file:
             return self.revision.depot_file.file.content_length
