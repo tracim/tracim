@@ -178,7 +178,7 @@ class ContentApi(object):
 
     def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:  # nopep8
         # TODO - G.M - 2018-06-173 - create revision in context object
-        return RevisionInContext(revision, self._session, self._config)
+        return RevisionInContext(revision, self._session, self._config, self._user) # nopep8
     
     def _get_revision_join(self) -> sqlalchemy.sql.elements.BooleanClauseList:
         """
@@ -1315,11 +1315,24 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def mark_read__all(self,
-                       read_datetime: datetime=None,
-                       do_flush: bool=True,
-                       recursive: bool=True
-                       ):
+    def get_preview_page_nb(self, revision_id: int) -> int:
+        file_path = self.get_one_revision_filepath(revision_id)
+        nb_pages = self.preview_manager.get_page_nb(file_path)
+        return nb_pages
+
+    def mark_read__all(
+            self,
+            read_datetime: datetime=None,
+            do_flush: bool=True,
+            recursive: bool=True
+    ) -> None:
+        """
+        Read content of all workspace visible for the user.
+        :param read_datetime: date of readigin
+        :param do_flush: flush database
+        :param recursive: mark read subcontent too
+        :return: nothing
+        """
         return self.mark_read__workspace(None, read_datetime, do_flush, recursive) # nopep8
 
     def mark_read__workspace(self,
@@ -1327,16 +1340,33 @@ class ContentApi(object):
                        read_datetime: datetime=None,
                        do_flush: bool=True,
                        recursive: bool=True
-                       ):
+    ) -> None:
+        """
+        Read content of a workspace visible for the user.
+        :param read_datetime: date of readigin
+        :param do_flush: flush database
+        :param recursive: mark read subcontent too
+        :return: nothing
+        """
         itemset = self.get_last_active(workspace)
         for item in itemset:
             if item.has_new_information_for(self._user):
                 self.mark_read(item, read_datetime, do_flush, recursive)
 
-    def mark_read(self, content: Content,
-                  read_datetime: datetime=None,
-                  do_flush: bool=True, recursive: bool=True) -> Content:
-
+    def mark_read(
+            self,
+            content: Content,
+            read_datetime: datetime=None,
+            do_flush: bool=True,
+            recursive: bool=True
+    ) -> Content:
+        """
+        Read content for the user.
+        :param read_datetime: date of readigin
+        :param do_flush: flush database
+        :param recursive: mark read subcontent too
+        :return: nothing
+        """
         assert self._user
         assert content
 
