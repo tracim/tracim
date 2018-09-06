@@ -114,6 +114,10 @@ session.save_accessed_time = True
 session.cookie_expires = 600
 session.timeout = 600
 session.cookie_on_exception = true
+<<<<<<< HEAD
+=======
+
+>>>>>>> 26177e0345c00663e327edf5c410ab683e4013e3
 ### Mail
 
 email.notification.activated = False
