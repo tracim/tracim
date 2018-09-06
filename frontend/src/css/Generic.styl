@@ -7,57 +7,30 @@ a
 .tracim
   height 100%
   &__content
-    height 100%
+    min-height 100%
     width 100%
 
-.btn-primary
-  background-color thirdColor
-  border-color secondColor
+.outlineTextBtn
+  padding 10px 15px
+  background-color transparent
   cursor pointer
-  &:hover, &:focus, &:active, &:visited, &:focus-within
-    background-color hover-button
-    border-color hover-button
-    box-shadow none
-    outline none
+  &:hover
+    color offWhite
+  &.nohover
+    &:hover
+      color inherit
 
-.btn-outline-primary
-  color fontColor
-  border-color secondColor
+.highlightBtn
+  padding 10px 25px
+  color offWhite
   cursor pointer
-  &:hover, &:focus, &:active, &:visited, &:focus-within
-    background-color hover-button
-    border-color hover-button
-    box-shadow none
-    outline none
 
-.btn-primary.active, .btn-primary:active, .show>.btn-primary.dropdown-toggle
-  background-color hover-button
-  border-color hover-button
-  box-shadow none
-
-.btn-outline-primary.active, .btn-outline-primary:active, .show>.btn-outline-primary.dropdown-toggle
-  background-color hover-button
-  border-color hover-button
-  box-shadow none
-  outline none
-
-.dropdown-item
-  &:hover, &:focus
-    background-color thirdColor
-    color off-white
-    box-shadow none
-    outline none
-
-.btn-primary.disabled, .btn-primary:disabled
-  background-color thirdColor
+.iconBtn
   border-color transparent
-  color off-white
-
-.btn-outline-primary.disabled, .btn-outline-primary:disabled
-  color fontColor
-
-.btn.disabled, .btn:disabled
-  cursor not-allowed
+  background-color transparent
+  margin 2px
+  padding 5px
+  cursor pointer
 
 .sidebarpagecontainer
   display flex
@@ -119,9 +92,6 @@ a
 .dropdownCreateBtn
   margin-left 10px
   &__label
-    padding 10px 65px
-    background-color thirdColor
-    cursor pointer
     &__text
       display inline-block
       color white
@@ -154,22 +124,6 @@ a
 .issueColor
   color issueColor
 
-// .fa-comments-o
-//   color threadColor
-
-// .fa-list-ul
-//   color taskColor
-
-// .fa-file-code-o
-//   color markdownColor
-
-// .fa-file-text-o
-//   color htmlColor
-
-// .fa-ticket
-//   color issueColor
-
-
 .gestionnaire
   color gestionnaire
 
@@ -182,22 +136,9 @@ a
 .lecteur
   color lecteur
 
-// .fa-graduation-cap
-//   color gestionnaire
-
-// .fa-pencil
-//   color contributeur
-
-// .fa-gavel
-//   color responsable
-
-// .fa-eye
-//   color lecteur
-
 .subTitle
   font-size 20px
   font-weight 500
-  color thirdColor
 
 .genericBtnInfoDashboard
   &__btn
@@ -206,11 +147,10 @@ a
     border-width 1px
     border-style solid
     border-radius 10px
-    padding 15px 25px
+    padding 10px 25px
     cursor pointer
-    &:hover, &:focus
-      background-color thirdColor
-      color white
+    &:hover
+      color offWhite
     &__icon
       margin-right 20px
       font-size 30px

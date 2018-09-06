@@ -1,4 +1,6 @@
+import i18n from './i18n.js'
 import color from 'color'
+import moment from 'moment'
 
 export const libHandleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
@@ -60,4 +62,21 @@ export const libGenerateAvatarFromPublicName = publicName => {
   ctx.stroke()
 
   return canvas.toDataURL('image/png', '')
+}
+
+export const libDisplayDate = dateToDisplay => {
+  const todayMoment = moment(new Date())
+  const dateToDisplayMoment = moment(new Date(dateToDisplay))
+
+  const diffDay = todayMoment.diff(dateToDisplayMoment, 'days')
+  if (diffDay > 0) return i18n.t('{{nb}} days ago', {nb: diffDay})
+
+  const diffHour = todayMoment.diff(dateToDisplayMoment, 'hours')
+  if (diffHour > 0) return i18n.t('{{nb}} hours ago', {nb: diffHour})
+
+  const diffMinute = todayMoment.diff(dateToDisplayMoment, 'minutes')
+  if (diffMinute > 0) return i18n.t('{{nb}} minutes ago', {nb: diffMinute})
+
+  const diffSeconde = todayMoment.diff(dateToDisplayMoment, 'seconds')
+  return i18n.t('{{nb}} seconds ago', {nb: diffSeconde})
 }

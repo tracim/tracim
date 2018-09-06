@@ -36,7 +36,8 @@ class WorkspaceContent extends React.Component {
     super(props)
     this.state = {
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
-      appOpenedType: false
+      appOpenedType: false,
+      contentLoaded: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -63,7 +64,7 @@ class WorkspaceContent extends React.Component {
     }
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     const { workspaceList, match } = this.props
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
@@ -108,11 +109,13 @@ class WorkspaceContent extends React.Component {
     const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
     const wsMember = await dispatch(getWorkspaceMemberList(user, idWorkspace))
 
-    if (await wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json))
+    if (wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
 
-    if (await wsMember.status === 200) dispatch(setWorkspaceMemberList(wsMember.json))
+    if (wsMember.status === 200) dispatch(setWorkspaceMemberList(wsMember.json))
     else dispatch(newFlashMessage('Error while loading members list', 'warning'))
+
+    this.setState({contentLoaded: true})
   }
 
   handleClickContentItem = content => {
@@ -178,6 +181,7 @@ class WorkspaceContent extends React.Component {
 
   render () {
     const { user, currentWorkspace, workspaceContentList, contentType } = this.props
+    const { state } = this
 
     const filterWorkspaceContent = (contentList, filter) => {
       return filter.length === 0
@@ -198,20 +202,24 @@ class WorkspaceContent extends React.Component {
 
     return (
       <div className='WorkspaceContent' style={{width: '100%'}}>
-        <OpenContentApp
-          // automatically open the app for the idContent in url
-          idWorkspace={this.state.workspaceIdInUrl}
-          appOpenedType={this.state.appOpenedType}
-          updateAppOpenedType={this.handleUpdateAppOpenedType}
-        />
-
-        <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
-          <OpenCreateContentApp
-            // automatically open the popup create content of the app in url
+        {state.contentLoaded &&
+          <OpenContentApp
+            // automatically open the app for the idContent in url
             idWorkspace={this.state.workspaceIdInUrl}
             appOpenedType={this.state.appOpenedType}
+            updateAppOpenedType={this.handleUpdateAppOpenedType}
           />
-        } />
+        }
+
+        {state.contentLoaded &&
+          <Route path={PAGE.WORKSPACE.NEW(':idws', ':type')} component={() =>
+            <OpenCreateContentApp
+              // automatically open the popup create content of the app in url
+              idWorkspace={this.state.workspaceIdInUrl}
+              appOpenedType={this.state.appOpenedType}
+            />
+          } />
+        }
 
         <PageWrapper customeClass='workspace'>
           <PageTitle

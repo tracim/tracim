@@ -44,15 +44,6 @@ settingText()
 .account
   margin 45px 0 0 0
   width 100%
-  .btn-outline-primary
-    color thirdColor
-    border-color thirdColor
-    &:hover, &:focus, &:active
-      color off-white
-      border-color thirdColor
-      background-color thirdColor
-      box-shadow 0 0 1px 2px fifthColor
-      outline fifthColor
   &__userinformation
     display flex
     justify-content center
@@ -87,7 +78,7 @@ settingText()
       padding 0
       width 20%
       min-height 600px
-      background-color off-white
+      background-color offWhite
       &__responsive
         font-size 20px
       &__list
@@ -118,28 +109,7 @@ settingText()
       padding 20px
       width 80%
       min-height 600px
-      background-color off-white
-      .personaldata
-        &__text
-          settingText()
-        &__form
-          margin 25px 0
-          &__title
-            margin-bottom 15px
-            font-size 18px
-          &__txtinput
-            display block
-            width auto
-            border-width 1px
-            border-style solid
-            border-radius 5px
-          &__button
-            vertical-align top
-            border-width 1px
-            border-style solid
-            border-radius 5px
-            padding 8px 25px
-            cursor pointer
+      background-color offWhite
       .calendar
         &__text
           settingText()
@@ -171,8 +141,7 @@ settingText()
 
 /**** MEDIA 576px & 1199px ****/
 
-// Regroup the common rules
-
+// @TODO Côme - 2018/08/22 - dont bypass breakpoints (from sm to md)
 @media (min-width: min-sm) and (max-width: max-md)
 
   .account
@@ -219,7 +188,7 @@ settingText()
             display block
             border-radius 10px
             height 100%
-            background-color off-white
+            background-color offWhite
             width 300px
             &__close
               display flex
@@ -322,7 +291,7 @@ settingText()
             display block
             border-radius 10px
             height 100%
-            background-color off-white
+            background-color offWhite
             width 300px
             &__close
               display flex

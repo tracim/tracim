@@ -1,3 +1,5 @@
+import i18n from './i18n.js'
+
 const configEnv = require('../configEnv.json')
 
 export const FETCH_CONFIG = {
@@ -5,13 +7,7 @@ export const FETCH_CONFIG = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
-  apiUrl: configEnv.apiUrl,
-  mockApiUrl: 'http://localhost:3001' // @todo: better to use one url only and use proxy on mock api to point to real api (if implemented)
-}
-
-export const COOKIE = {
-  USER_LOGIN: 'user_login',
-  USER_AUTH: 'user_auth'
+  apiUrl: configEnv.apiUrl
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?
@@ -19,7 +15,7 @@ export const workspaceConfig = {
   slug: 'workspace',
   faIcon: 'bank',
   hexcolor: '#7d4e24',
-  creationLabel: 'Create a workspace',
+  creationLabel: i18n.t('Create a workspace'),
   domContainer: 'appFeatureContainer'
 }
 
@@ -48,25 +44,25 @@ export const ROLE = [{
   slug: 'reader',
   faIcon: 'eye',
   hexcolor: '#15d948',
-  label: 'Reader'
+  label: i18n.t('Reader')
 }, {
   id: 2,
   slug: 'contributor',
   faIcon: 'pencil',
   hexcolor: '#3145f7',
-  label: 'Contributor'
+  label: i18n.t('Contributor')
 }, {
   id: 4,
   slug: 'content-manager',
   faIcon: 'graduation-cap',
   hexcolor: '#f2af2d',
-  label: 'Content manager'
+  label: i18n.t('Content manager')
 }, {
   id: 8,
   slug: 'workspace-manager',
   faIcon: 'gavel',
   hexcolor: '#ed0007',
-  label: 'Workspace manager'
+  label: i18n.t('Workspace manager')
 }]
 
 export const findIdRoleUserWorkspace = (idUser, memberList, roleList) => {
@@ -81,35 +77,53 @@ export const ROLE2 = {
     sluf: 'reader',
     faIcon: 'eye',
     hexcolor: '#15D948',
-    label: 'Reader'
+    label: i18n.t('Reader')
   },
   contributor: {
     id: 2,
     slug: 'contributor',
     faIcon: 'pencil',
     hexcolor: '#3145f7',
-    label: 'Contributor'
+    label: i18n.t('Contributor')
   },
   contentManager: {
     id: 4,
     slug: 'content-manager',
     faIcon: 'graduation-cap',
     hexcolor: '#f2af2d',
-    label: 'Content manager'
+    label: i18n.t('Content manager')
   },
   workspaceManager: {
     id: 8,
     slug: 'workspace-manager',
     faIcon: 'gavel',
     hexcolor: '#ed0007',
-    label: 'Workspace manager'
+    label: i18n.t('Workspace manager')
   }
 }
 
 export const PROFILE = {
-  ADMINISTRATOR: 'administrators',
-  MANAGER: 'managers',
-  USER: 'users'
+  ADMINISTRATOR: {
+    id: 1,
+    slug: 'administrators',
+    faIcon: 'rocket',
+    hexcolor: '#123456',
+    label: i18n.t('Administrator')
+  },
+  MANAGER: {
+    id: 2,
+    slug: 'managers',
+    faIcon: 'car',
+    hexcolor: '#654321',
+    label: i18n.t('Manager')
+  },
+  USER: {
+    id: 4,
+    slug: 'users',
+    faIcon: 'bicycle',
+    hexcolor: '#123123',
+    label: i18n.t('User')
+  }
 }
 
 export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route

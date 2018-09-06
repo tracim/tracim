@@ -1,12 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import ProgressBar from './ProgressBar.jsx'
 import Home from './Home.jsx'
 
 export class WIPcomponent extends React.Component {
   render () {
     const MyComponent = {
-      ProgressBar,
       Home
     }
 

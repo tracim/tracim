@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
-import Cookies from 'js-cookie'
 import LoginLogo from '../component/Login/LoginLogo.jsx'
 import LoginLogoImg from '../img/logoTracimWhite.svg'
 import Card from '../component/common/Card/Card.jsx'
@@ -14,7 +13,7 @@ import LoginBtnForgotPw from '../component/Login/LoginBtnForgotPw.jsx'
 import {
   newFlashMessage,
   setUserConnected,
-  updateWorkspaceListData,
+  setWorkspaceList,
   setWorkspaceListIsOpenInSidebar,
   setContentTypeList,
   setAppList
@@ -25,7 +24,7 @@ import {
   getWorkspaceList,
   postUserLogin
 } from '../action-creator.async.js'
-import { COOKIE, PAGE } from '../helper.js'
+import { PAGE } from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
 
 class Login extends React.Component {
@@ -59,12 +58,10 @@ class Login extends React.Component {
     const { inputLogin, inputPassword, inputRememberMe } = this.state
 
     const fetchPostUserLogin = await dispatch(postUserLogin(inputLogin.value, inputPassword.value, inputRememberMe))
-    const userAuth = btoa(`${inputLogin.value}:${inputPassword.value}`)
 
     if (fetchPostUserLogin.status === 200) {
       const loggedUser = {
         ...fetchPostUserLogin.json,
-        auth: userAuth,
         logged: true
       }
 
@@ -72,14 +69,6 @@ class Login extends React.Component {
 
       this.loadAppConfig(loggedUser)
       this.loadWorkspaceList(loggedUser)
-
-      if (inputRememberMe) {
-        Cookies.set(COOKIE.USER_LOGIN, inputLogin.value, {expires: 365})
-        Cookies.set(COOKIE.USER_AUTH, userAuth, {expires: 365})
-      } else {
-        Cookies.set(COOKIE.USER_LOGIN, inputLogin.value)
-        Cookies.set(COOKIE.USER_AUTH, userAuth)
-      }
 
       history.push(PAGE.WORKSPACE.ROOT)
     } else if (fetchPostUserLogin.status === 403) {
@@ -105,7 +94,7 @@ class Login extends React.Component {
     const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(user))
 
     if (fetchGetWorkspaceList.status === 200) {
-      props.dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
       const idWorkspaceToOpen = (() =>
         props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
@@ -160,7 +149,7 @@ class Login extends React.Component {
                         onKeyPress={this.handleInputKeyPress}
                       />
 
-                      <div className='row align-items-center mt-4 mb-4'>
+                      <div className='row mt-4 mb-4'>
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
                           <div className='connection__form__rememberme' onClick={this.handleChangeRememberMe}>
                             <Checkbox
@@ -177,7 +166,7 @@ class Login extends React.Component {
                           />
                         </div>
 
-                        <div className='col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
+                        <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 d-flex align-items-end'>
                           <Button
                             htmlType='button'
                             bootstrapType='primary'

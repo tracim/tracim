@@ -25,12 +25,10 @@ class Sidebar extends React.Component {
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
-    switch (type) {
-      case 'refreshWorkspaceList':
-        console.log('%c<Sidebar> Custom event', 'color: #28a745', type, data)
-        this.loadAppConfigAndWorkspaceList()
-        break
-    }
+    // switch (type) {
+    //   default:
+    //     return
+    // }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -92,7 +90,7 @@ class Sidebar extends React.Component {
 
           <div className='sidebar__content__btnnewworkspace'>
             <button
-              className='sidebar__content__btnnewworkspace__btn btn btn-primary primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'
+              className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'
               onClick={this.handleClickNewWorkspace}
             >
               {t('Create a workspace')}

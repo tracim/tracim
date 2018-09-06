@@ -1,5 +1,5 @@
-export const SET = 'Set'
-export const UPDATE = 'Update'
+export const SET = 'Set' // save data from api
+export const UPDATE = 'Update' // edit data from api
 export const ADD = 'Add'
 export const REMOVE = 'Remove'
 export const APPEND = 'Append'
@@ -22,21 +22,26 @@ export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
 export const setUserConnected = user => ({ type: `${SET}/${USER}/Connected`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER}/Disconnected` })
-export const USER_DATA = `${USER}/Data`
-export const updateUserData = userData => ({ type: `${UPDATE}/${USER}/Data`, data: userData })
-export const USER_ROLE = `${USER}/Role`
-export const setUserRole = userRole => ({ type: `${SET}/${USER}/Role`, userRole }) // this actually update workspaceList state
-export const updateUserWorkspaceSubscriptionNotif = (workspaceId, subscriptionNotif) =>
-  ({ type: `${UPDATE}/${USER_ROLE}/SubscriptionNotif`, workspaceId, subscriptionNotif })
+
 export const USER_LANG = `${USER}/Lang`
 export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
 export const USER_KNOWN_MEMBER = `${USER}/KnownMember`
 export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
+export const USER_NAME = `${USER}/PublicName`
+export const updateUserName = newName => ({ type: `${UPDATE}/${USER_NAME}`, newName })
+export const USER_EMAIL = `${USER}/Email`
+export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
+export const USER_PASSWORD = `${USER}/Password`
+
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
 export const setWorkspaceContentList = workspaceContentList => ({ type: `${SET}/${WORKSPACE_CONTENT}`, workspaceContentList })
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
+
+export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
+export const updateUserWorkspaceSubscriptionNotif = (idUser, idWorkspace, doNotify) =>
+  ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, idUser, idWorkspace, doNotify })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
@@ -44,9 +49,13 @@ export const setWorkspaceContentArchived = (idWorkspace, idContent) => ({ type: 
 export const setWorkspaceContentDeleted = (idWorkspace, idContent) => ({ type: `${SET}/${WORKSPACE_CONTENT_DELETED}`, idWorkspace, idContent })
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
-export const updateWorkspaceListData = workspaceList => ({ type: `${UPDATE}/${WORKSPACE_LIST}`, workspaceList })
+export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
 
+export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
+export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
+
+// workspace related const bellow is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
 export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPACE_DETAIL}`, workspaceDetail })
 

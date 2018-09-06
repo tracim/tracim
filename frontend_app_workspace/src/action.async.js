@@ -1,9 +1,9 @@
 import { FETCH_CONFIG } from './helper.js'
 
-export const postWorkspace = (user, apiUrl, newWorkspaceName) =>
+export const postWorkspace = (apiUrl, newWorkspaceName) =>
   fetch(`${apiUrl}/workspaces`, {
+    credentials: 'include',
     headers: {
-      'Authorization': 'Basic ' + user.auth,
       ...FETCH_CONFIG.headers
     },
     method: 'POST',

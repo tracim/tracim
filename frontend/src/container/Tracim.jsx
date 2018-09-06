@@ -12,7 +12,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { COOKIE, PAGE } from '../helper.js'
+import { PAGE } from '../helper.js'
 import {
   getAppList,
   getContentTypeList,
@@ -23,9 +23,10 @@ import {
   removeFlashMessage,
   setAppList,
   setContentTypeList,
-  setUserConnected, setWorkspaceListIsOpenInSidebar, updateWorkspaceListData
+  setUserConnected,
+  setWorkspaceListIsOpenInSidebar,
+  setWorkspaceList
 } from '../action-creator.sync.js'
-import Cookies from 'js-cookie'
 import Dashboard from './Dashboard.jsx'
 
 class Tracim extends React.Component {
@@ -45,6 +46,10 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.props.dispatch(newFlashMessage(data.msg, data.type, data.delay))
         break
+      case 'refreshWorkspaceList':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        this.loadWorkspaceList()
+        break
     }
   }
 
@@ -52,17 +57,11 @@ class Tracim extends React.Component {
     // console.log('<Tracim> did Mount')
     const { dispatch } = this.props
 
-    const userFromCookies = {
-      email: Cookies.get(COOKIE.USER_LOGIN),
-      auth: Cookies.get(COOKIE.USER_AUTH)
-    }
-
-    const fetchGetUserIsConnected = await dispatch(getUserIsConnected(userFromCookies))
+    const fetchGetUserIsConnected = await dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200:
         dispatch(setUserConnected({
           ...fetchGetUserIsConnected.json,
-          auth: userFromCookies.auth,
           logged: true
         }))
         this.loadAppConfig()
@@ -93,7 +92,7 @@ class Tracim extends React.Component {
     if (fetchGetWorkspaceList.status === 200) {
       this.setState({workspaceListLoaded: true})
 
-      props.dispatch(updateWorkspaceListData(fetchGetWorkspaceList.json))
+      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
       const idWorkspaceToOpen = (() =>
         props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
@@ -115,6 +114,12 @@ class Tracim extends React.Component {
     if (props.user.logged === false && props.location.pathname !== '/login') {
       return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
     }
+
+    if (props.location.pathname !== '/login' && (
+      !props.system.workspaceListLoaded ||
+      !props.system.appListLoaded ||
+      !props.system.contentTypeListLoaded
+    )) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
       <div className='tracim'>
@@ -175,5 +180,5 @@ class Tracim extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, appList, contentType, workspaceList, flashMessage }) => ({ user, appList, contentType, workspaceList, flashMessage })
+const mapStateToProps = ({ user, appList, contentType, workspaceList, flashMessage, system }) => ({ user, appList, contentType, workspaceList, flashMessage, system })
 export default withRouter(connect(mapStateToProps)(translate()(Tracim)))

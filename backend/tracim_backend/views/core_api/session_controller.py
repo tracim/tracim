@@ -1,20 +1,24 @@
 # coding=utf-8
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPFound
+from pyramid.security import forget
+from pyramid.security import remember
+from pyramid.response import Response
+
+from tracim_backend.extensions import hapic
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import BasicAuthSchema
+from tracim_backend.views.core_api.schemas import LoginOutputHeaders
+from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import UserSchema
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.extensions import hapic
-from tracim_backend.lib.core.user import UserApi
-from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import UserSchema
-from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.views.core_api.schemas import LoginOutputHeaders
-from tracim_backend.views.core_api.schemas import BasicAuthSchema
-from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import AuthenticationFailed
 
 SWAGGER_TAG__SESSION_ENDPOINTS = 'Session'
 
@@ -24,9 +28,7 @@ class SessionController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])
     @hapic.input_headers(LoginOutputHeaders())
     @hapic.input_body(BasicAuthSchema())
-    # TODO - G.M - 17-04-2018 - fix output header ?
-    # @hapic.output_headers()
-    @hapic.output_body(UserSchema(),)
+    @hapic.output_body(UserSchema())
     def login(self, context, request: TracimRequest, hapic_data=None):
         """
         Logs user into the system
@@ -40,6 +42,7 @@ class SessionController(Controller):
             config=app_config,
         )
         user = uapi.authenticate_user(login.email, login.password)
+        remember(request, user.email)
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])
@@ -48,7 +51,7 @@ class SessionController(Controller):
         """
         Logs out current logged in user session
         """
-
+        request.session.delete()
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])

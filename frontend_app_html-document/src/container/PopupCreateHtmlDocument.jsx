@@ -21,6 +21,10 @@ const debug = { // outdated
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
+    },
+    translation: {
+      en: {translation: {}},
+      fr: {translation: {}}
     }
   },
   loggedUser: {
@@ -79,9 +83,9 @@ class PopupCreateHtmlDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { loggedUser, config, appName, idWorkspace, idFolder, newContentName } = this.state
+    const { config, appName, idWorkspace, idFolder, newContentName } = this.state
 
-    const fetchSaveNewHtmlDoc = postHtmlDocContent(loggedUser, config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
+    const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
 
     handleFetchResult(await fetchSaveNewHtmlDoc)
       .then(resSave => {

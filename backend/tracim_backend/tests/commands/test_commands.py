@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
 import subprocess
+
 import pytest
+
 import tracim_backend
 from tracim_backend.command import TracimCLI
-from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import BadCommandError
+from tracim_backend.exceptions import DatabaseInitializationFailed
+from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
+from tracim_backend.exceptions import InvalidSettingFile
+from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.tests import CommandFunctionalTest
@@ -54,6 +59,7 @@ class TestCommands(CommandFunctionalTest):
             '-p', 'new_password',
             '--debug',
         ])
+        assert result == 0
         new_user = api.get_one_by_email('command_test@user')
         assert new_user.email == 'command_test@user'
         assert new_user.validate_password('new_password')
@@ -79,6 +85,7 @@ class TestCommands(CommandFunctionalTest):
             '-g', 'administrators',
             '--debug',
         ])
+        assert result == 0
         new_user = api.get_one_by_email('command_test@user')
         assert new_user.email == 'command_test@user'
         assert new_user.validate_password('new_password')
@@ -88,14 +95,9 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation with an unknown group
         """
-        api = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
-        )
         app = TracimCLI()
         with pytest.raises(GroupDoesNotExist):
-            result = app.run([
+            app.run([
                 'user', 'create',
                 '-c', 'tests_configs.ini#command_test',
                 '-l', 'command_test@user',
@@ -108,14 +110,9 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation with existing user login
         """
-        api = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
-        )
         app = TracimCLI()
         with pytest.raises(UserAlreadyExistError):
-            result = app.run([
+            app.run([
                 '--debug',
                 'user', 'create',
                 '-c', 'tests_configs.ini#command_test',
@@ -128,14 +125,9 @@ class TestCommands(CommandFunctionalTest):
         """
         Test User creation without filling password
         """
-        api = UserApi(
-            current_user=None,
-            session=self.session,
-            config=self.app_config,
-        )
         app = TracimCLI()
         with pytest.raises(BadCommandError):
-            result = app.run([
+            app.run([
                 '--debug',
                 'user', 'create',
                 '-c', 'tests_configs.ini#command_test',
@@ -165,6 +157,7 @@ class TestCommands(CommandFunctionalTest):
             '-p', 'new_password',
             '--debug',
         ])
+        assert result == 0
         new_user = api.get_one_by_email('admin@admin.admin')
         assert new_user.email == 'admin@admin.admin'
         assert new_user.validate_password('new_password')
@@ -193,8 +186,216 @@ class TestCommands(CommandFunctionalTest):
             '-rmg', 'administrators',
             '--debug',
         ])
+        assert result == 0
         new_user = api.get_one_by_email('admin@admin.admin')
         assert new_user.email == 'admin@admin.admin'
         assert new_user.validate_password('new_password')
         assert not new_user.validate_password('admin@admin.admin')
         assert new_user.profile.name == 'managers'
+
+    def test__init__db__ok_db_already_exist(self):
+        """
+        Test database initialisation
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        with pytest.raises(DatabaseInitializationFailed):
+            app.run([
+                'db', 'init',
+                '-c', 'tests_configs.ini#command_test',
+                '--debug',
+            ])
+
+    def test__init__db__ok_nominal_case(self):
+        """
+        Test database initialisation
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        # delete config to be sure command will work
+        app.run([
+            'db', 'delete', '--force',
+            '-c', 'tests_configs.ini#command_test',
+            '--debug',
+        ])
+        result = app.run([
+            'db', 'init',
+            '-c', 'tests_configs.ini#command_test',
+            '--debug',
+        ])
+        assert result == 0
+
+    def test__init__db__no_config_file(self):
+        """
+        Test database initialisation
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        with pytest.raises(FileNotFoundError):
+            app.run([
+                'db', 'init',
+                '-c', 'filewhonotexit.ini#command_test',
+                '--debug',
+            ])
+        result = app.run([
+                'db', 'init',
+                '-c', 'filewhonotexit.ini#command_test',
+        ])
+        assert result == 1
+
+    def test__init__db__no_sqlalchemy_url(self):
+        """
+        Test database initialisation
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        with pytest.raises(InvalidSettingFile):
+            app.run([
+                'db', 'init',
+                '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
+                '--debug',
+            ])
+        result = app.run([
+                'db', 'init',
+                '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
+        ])
+        assert result == 1
+
+    def test__delete__db__ok_nominal_case(self):
+        """
+        Test database deletion
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        result = app.run([
+            'db', 'delete', '--force',
+            '-c', 'tests_configs.ini#command_test',
+            '--debug',
+        ])
+        assert result == 0
+
+    def test__delete__db__err_no_force_param(self):
+        """
+        Test database deletion
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        with pytest.raises(ForceArgumentNeeded):
+            app.run([
+                'db', 'delete',
+                '-c', 'tests_configs.ini#command_test',
+                '--debug',
+            ])
+        result = app.run([
+            'db', 'delete',
+            '-c', 'tests_configs.ini#command_test',
+        ])
+        assert result == 1
+
+    def test__delete__db__err_no_config_file(self):
+        """
+        Test database deletion
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        with pytest.raises(FileNotFoundError):
+            app.run([
+                'db', 'delete',
+                '-c', 'donotexit.ini#command_test',
+                '--debug',
+            ])
+        result = app.run([
+            'db', 'delete',
+            '-c', 'donotexist.ini#command_test',
+        ])
+        assert result == 1
+
+    def test__delete__db__err_no_sqlalchemy_url(self):
+        """
+        Test database deletion
+        """
+        api = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        user = api.get_one_by_email('admin@admin.admin')
+        assert user.email == 'admin@admin.admin'
+        assert user.validate_password('admin@admin.admin')
+        assert not user.validate_password('new_password')
+
+        app = TracimCLI()
+        with pytest.raises(InvalidSettingFile):
+            app.run([
+                'db', 'delete',
+                '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
+                '--debug',
+            ])
+        result = app.run([
+            'db', 'delete',
+            '-c', 'tests_configs.ini#command_test_no_sqlalchemy_url',
+        ])
+        assert result == 1

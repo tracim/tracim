@@ -469,12 +469,6 @@ class RoleUpdateSchema(marshmallow.Schema):
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
     )
-    do_notify = marshmallow.fields.Bool(
-        description='has user enabled notification for this workspace',
-        example=True,
-        default=None,
-        allow_none=True,
-    )
 
     @post_load
     def make_role(self, data):
@@ -690,6 +684,10 @@ class ApplicationConfigSchema(marshmallow.Schema):
     #  TODO - G.M - 24-05-2018 - Set this
 
 
+class TimezoneSchema(marshmallow.Schema):
+    name = marshmallow.fields.String(example='Europe/London')
+
+
 class ApplicationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(example='Calendar')
     slug = marshmallow.fields.String(example='calendar')
@@ -883,6 +881,21 @@ class TextBasedDataAbstractSchema(marshmallow.Schema):
 class FileInfoAbstractSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
         description='raw text or html description of the file'
+    )
+    page_nb = marshmallow.fields.Int(
+        description='number of pages, return null value if unaivalable',
+        example=1,
+        allow_none=True,
+    )
+    mimetype = marshmallow.fields.String(
+        description='file content mimetype',
+        example='image/jpeg',
+        required=True,
+    )
+    size = marshmallow.fields.Int(
+        description='file size in byte, return null value if unaivalable',
+        example=1024,
+        allow_none=True,
     )
 
 

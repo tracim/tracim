@@ -1,4 +1,5 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import {
   Delimiter,
   PageWrapper,
@@ -22,7 +23,50 @@ export class AdminUser extends React.Component {
     displayAddMember: !prevState.displayAddMember
   }))
 
+  handleToggleUser = (e, idUser, toggle) => {
+    e.preventDefault()
+    e.stopPropagation()
+    this.props.onClickToggleUserBtn(idUser, toggle)
+  }
+
+  handleToggleProfileManager = (e, idUser, toggle) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const { props } = this
+
+    if (props.userList.find(u => u.user_id === idUser).profile === 'administrators') {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('An administrator can always create workspaces'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
+
+    if (toggle) props.onChangeProfile(idUser, 'managers')
+    else props.onChangeProfile(idUser, 'users')
+  }
+
+  handleToggleProfileAdministrator = (e, idUser, toggle) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (toggle) this.props.onChangeProfile(idUser, 'administrators')
+    else this.props.onChangeProfile(idUser, 'managers')
+  }
+
+  handleClickAddUser = (email, profile) => {
+    this.props.onClickAddUser(email, profile)
+    this.handleToggleAddMember()
+  }
+
   render () {
+    const { props } = this
+
     return (
       <PageWrapper customClass='adminUserPage'>
         <PageTitle
@@ -33,16 +77,19 @@ export class AdminUser extends React.Component {
         <PageContent parentClass='adminUserPage'>
 
           <div className='adminUserPage__description'>
-            On this page you can manage the members of your instance Tracim.
+            {props.t('On this page you can manage the members of your Tracim instance.')}
           </div>
 
           <div className='adminUserPage__adduser'>
-            <button className='adminUserPage__adduser__button btn' onClick={this.handleToggleAddMember}>
-              Add a member
+            <button className='adminUserPage__adduser__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover' onClick={this.handleToggleAddMember}>
+              {props.t('Add a member')}
             </button>
 
             {this.state.displayAddMember &&
-              <AddMemberForm />
+              <AddMemberForm
+                profile={props.profile}
+                onClickAddUser={this.handleClickAddUser}
+              />
             }
           </div>
 
@@ -52,92 +99,36 @@ export class AdminUser extends React.Component {
             <table className='table'>
               <thead>
                 <tr>
-                  <th scope='col'>Active</th>
-                  <th scope='col'>Member</th>
-                  <th scope='col'>Email</th>
-                  <th scope='col'>Member can create workspace</th>
-                  <th scope='col'>Administrator</th>
+                  <th scope='col'>{props.t('Active')}</th>
+                  <th scope='col'>{props.t('Member')}</th>
+                  <th scope='col'>{props.t('Email')}</th>
+                  <th scope='col'>{props.t('Can create workspace')}</th>
+                  <th scope='col'>{props.t('Administrator')}</th>
                 </tr>
               </thead>
+
               <tbody>
-                <tr>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <th scope='row'>Joe Delavaiga</th>
-                  <td><a href='#'>joedelavaiga@mail.com</a></td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <th scope='row'>Susie Washington</th>
-                  <td><a href='#'>susiewash@mail.com</a></td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <th scope='row'>Marty MacJoe</th>
-                  <td><a href='#'>martymac@mail.com</a></td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <th scope='row'>Joe Delavaiga</th>
-                  <td><a href='#'>joedelavaiga@mail.com</a></td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <th scope='row'>Susie Washington</th>
-                  <td><a href='#'>susiewash@mail.com</a></td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <th scope='row'>Marty MacJoe</th>
-                  <td><a href='#'>martymac@mail.com</a></td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                  <td>
-                    <BtnSwitch />
-                  </td>
-                </tr>
+                {props.userList.map(u =>
+                  <tr key={u.user_id}>
+                    <td>
+                      <BtnSwitch checked={u.is_active} onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)} />
+                    </td>
+                    <th scope='row'>{u.public_name}</th>
+                    <td>{u.email}</td>
+                    <td>
+                      <BtnSwitch
+                        checked={u.profile === 'managers' || u.profile === 'administrators'}
+                        onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'managers' || u.profile === 'administrators'))}
+                      />
+                    </td>
+                    <td>
+                      <BtnSwitch
+                        checked={u.profile === 'administrators'}
+                        onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === 'administrators'))}
+                      />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -149,4 +140,4 @@ export class AdminUser extends React.Component {
   }
 }
 
-export default AdminUser
+export default translate()(AdminUser)

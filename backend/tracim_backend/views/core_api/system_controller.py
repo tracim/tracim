@@ -1,23 +1,24 @@
 # coding=utf-8
 from pyramid.config import Configurator
-from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import InsufficientUserProfile
+
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.extensions import app_list
+from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.authorization import require_profile
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.models import Group
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import ApplicationSchema
+from tracim_backend.views.core_api.schemas import ContentTypeSchema
+from tracim_backend.views.core_api.schemas import TimezoneSchema
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.extensions import hapic
-from tracim_backend.extensions import app_list
-from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import ApplicationSchema
-from tracim_backend.views.core_api.schemas import ContentTypeSchema
 
 SWAGGER_TAG_SYSTEM_ENDPOINTS = 'System'
 
@@ -39,7 +40,7 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @require_profile(Group.TIM_USER)
-    @hapic.output_body(ContentTypeSchema(many=True),)
+    @hapic.output_body(ContentTypeSchema(many=True), )
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of alls content types availables in this tracim instance.
@@ -47,6 +48,15 @@ class SystemController(Controller):
         content_types_slugs = CONTENT_TYPES.endpoint_allowed_types_slug()
         content_types = [CONTENT_TYPES.get_one_by_slug(slug) for slug in content_types_slugs]
         return content_types
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @require_profile(Group.TIM_USER)
+    @hapic.output_body(TimezoneSchema(many=True),)
+    def timezones_list(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get List of timezones
+        """
+        return get_timezones_list()
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -62,4 +72,6 @@ class SystemController(Controller):
         configurator.add_route('content_types', '/system/content_types', request_method='GET')  # nopep8
         configurator.add_view(self.content_types, route_name='content_types')
 
-
+        # Content_types
+        configurator.add_route('timezones_list', '/system/timezones', request_method='GET')  # nopep8
+        configurator.add_view(self.timezones_list, route_name='timezones_list')

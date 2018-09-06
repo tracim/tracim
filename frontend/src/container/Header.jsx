@@ -4,7 +4,6 @@ import { withRouter } from 'react-router'
 import i18n from '../i18n.js'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
-import Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import MenuLinkList from '../component/Header/MenuLinkList.jsx'
@@ -21,9 +20,10 @@ import {
   setUserDisconnected
 } from '../action-creator.sync.js'
 import {
-  postUserLogout
+  postUserLogout,
+  putUserLang
 } from '../action-creator.async.js'
-import { COOKIE, PAGE, PROFILE } from '../helper.js'
+import { PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -35,10 +35,18 @@ class Header extends React.Component {
   handleChangeInput = e => this.setState({inputSearchValue: e.target.value})
   handleClickSubmit = () => {}
 
-  handleChangeLang = idLang => {
-    this.props.dispatch(setUserLang(idLang))
-    i18n.changeLanguage(idLang)
-    this.props.dispatchCustomEvent('allApp_changeLang', idLang)
+  handleChangeLang = async idLang => {
+    const { props } = this
+
+    const fetchPutUserLang = await props.dispatch(putUserLang(props.user, idLang))
+    switch (fetchPutUserLang.status) {
+      case 200:
+        props.dispatch(setUserLang(idLang))
+        i18n.changeLanguage(idLang)
+        props.dispatchCustomEvent('allApp_changeLang', idLang)
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
+    }
   }
 
   handleClickHelp = () => {}
@@ -48,9 +56,6 @@ class Header extends React.Component {
 
     const fetchPostUserLogout = await dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      Cookies.remove(COOKIE.USER_LOGIN)
-      Cookies.remove(COOKIE.USER_AUTH)
-
       dispatch(setUserDisconnected())
       history.push(PAGE.LOGIN)
     } else {
@@ -87,13 +92,13 @@ class Header extends React.Component {
                 onClickSubmit={this.handleClickSubmit}
               />
 
-              {user.profile === PROFILE.ADMINISTRATOR &&
+              {user.profile === PROFILE.ADMINISTRATOR.slug &&
                 <MenuActionListAdminLink t={this.props.t} />
               }
 
               <MenuActionListItemDropdownLang
                 langList={lang}
-                idLangActive={user.lang}
+                idLangActive={user.lang ? user.lang : 'en'}
                 onChangeLang={this.handleChangeLang}
               />
 
