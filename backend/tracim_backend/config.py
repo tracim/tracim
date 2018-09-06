@@ -508,8 +508,21 @@ class CFG(object):
         # INFO - G.M - 2018-08-06 - we pretend that frontend_dist_folder
         # is probably in frontend subfolder
         # of tracim_v2 parent of both backend and frontend
-        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
+        backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # nopep8
+        tracim_v2_folder = os.path.dirname(backend_folder)
+        backend_i18n_folder = os.path.join(backend_folder,'tracim_backend', 'locale')  # nopep8
 
+        self.BACKEND_I18N_FOLDER = settings.get(
+            'backend.18n_folder_path', backend_i18n_folder
+        )
+        if not os.path.isdir(self.BACKEND_I18N_FOLDER):
+            raise Exception(
+                'ERROR: {} folder does not exist as folder. '
+                'please set backend.i8n_folder_path'
+                'with a correct value'.format(self.BACKEND_I18N_FOLDER)
+            )
+
+        frontend_dist_folder = os.path.join(tracim_v2_folder, 'frontend', 'dist')  # nopep8
         self.FRONTEND_DIST_FOLDER_PATH = settings.get(
             'frontend.dist_folder_path', frontend_dist_folder
         )
