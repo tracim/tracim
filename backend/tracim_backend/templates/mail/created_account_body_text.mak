@@ -15,8 +15,7 @@ ${login_url}
 
 --------------------------------------------------------------------------------
 
-This email was sent by *Tracim*,
-a collaborative software developped by Algoo.
+${_("This email was sent by *Tracim*,\na collaborative software developped by Algoo.")}
 
 **Algoo SAS**
 340 Rue de l'Eygala

@@ -49,7 +49,8 @@ from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.lib.utils.translation import fake_translator as _
+from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import ContentInContext
@@ -144,6 +145,12 @@ class ContentApi(object):
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
         self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)  # nopep8
+        default_lang = None
+        if self._user:
+            default_lang = self._user.lang
+        if not default_lang:
+            default_lang = DEFAULT_FALLBACK_LANG
+        self.translator = Translator(app_config=self._config, default_lang=default_lang)  # nopep8
 
     @contextmanager
     def show(
@@ -1595,6 +1602,7 @@ class ContentApi(object):
         :param parent: Parent of foture folder (can be None)
         :return: Generated folder name
         """
+        _ = self.translator.get_translation
         query = self._base_query(workspace=workspace)\
             .filter(Content.label.ilike('{0}%'.format(
                 _('New folder'),

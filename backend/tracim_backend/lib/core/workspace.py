@@ -8,7 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import WorkspaceNotFound
-from tracim_backend.lib.utils.translation import fake_translator as _
+from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.models.auth import Group
@@ -29,6 +30,7 @@ class WorkspaceApi(object):
             config: CFG,
             force_role: bool=False,
             show_deleted: bool=False,
+
     ):
         """
         :param current_user: Current user of context
@@ -39,6 +41,12 @@ class WorkspaceApi(object):
         self._config = config
         self._force_role = force_role
         self.show_deleted = show_deleted
+        default_lang = None
+        if self._user:
+            default_lang = self._user.lang
+        if not default_lang:
+            default_lang = DEFAULT_FALLBACK_LANG
+        self.translator = Translator(app_config=self._config, default_lang=default_lang)  # nopep8
 
     def _base_query_without_roles(self):
         query = self._session.query(Workspace)
@@ -277,6 +285,7 @@ class WorkspaceApi(object):
         """
         :return: Generated workspace label
         """
+        _ = self.translator.get_translation
         query = self._base_query_without_roles() \
             .filter(Workspace.label.ilike('{0}%'.format(
                 _('Workspace'),
