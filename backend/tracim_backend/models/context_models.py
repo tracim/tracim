@@ -211,7 +211,7 @@ class PageQuery(object):
     """
     def __init__(
             self,
-            page: int = 0
+            page: int = 1
     ):
         self.page = page
 

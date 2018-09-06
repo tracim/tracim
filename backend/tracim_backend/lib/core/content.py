@@ -1,59 +1,58 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
-import os
 import datetime
+import os
 import re
 import typing
+from contextlib import contextmanager
 from operator import itemgetter
 
-import transaction
-from preview_generator.manager import PreviewManager
-from sqlalchemy import func
-from sqlalchemy.orm import Query
-from depot.manager import DepotManager
-from depot.io.utils import FileIntent
 import sqlalchemy
+import transaction
+from depot.io.utils import FileIntent
+from depot.manager import DepotManager
+from preview_generator.manager import PreviewManager
+from sqlalchemy import desc
+from sqlalchemy import func
+from sqlalchemy import or_
+from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
-from sqlalchemy import desc
-from sqlalchemy import distinct
-from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
 
-from tracim_backend.lib.utils.utils import cmp_to_key
-from tracim_backend.lib.core.notifications import NotifierFactory
-from tracim_backend.exceptions import SameValueError
-from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import ContentType
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
+from tracim_backend.exceptions import EmptyCommentContentNotAllowed
+from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
-from tracim_backend.exceptions import EmptyCommentContentNotAllowed
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
+from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
-from tracim_backend.app_models.contents import CONTENT_STATUS
-from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.lib.utils.utils import preview_manager_page_format
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import PreviewAllowedDim
+from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
-
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.lib.utils.translation import Translator
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
-from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.context_models import PreviewAllowedDim
-from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.revision_protection import new_revision
 
 __author__ = 'damien'
 
@@ -782,7 +781,6 @@ class ContentApi(object):
             ),
         ))
 
-
     def get_pdf_preview_path(
             self,
             content_id: int,
@@ -797,6 +795,7 @@ class ContentApi(object):
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
+        page = preview_manager_page_format(page)
         if page >= self.preview_manager.get_page_nb(file_path):
             raise PageOfPreviewNotFound(
                 'page {page} of content {content_id} does not exist'.format(
@@ -847,6 +846,7 @@ class ContentApi(object):
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
+        page = preview_manager_page_format(page)
         if page >= self.preview_manager.get_page_nb(file_path):
             raise Exception(
                 'page {page} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8

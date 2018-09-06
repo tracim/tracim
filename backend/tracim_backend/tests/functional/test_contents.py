@@ -2417,7 +2417,7 @@ class TestFiles(FunctionalTest):
             ],
             status=204,
         )
-        params = {'page': 0}
+        params = {'page': 1}
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
             status=200,
@@ -2482,7 +2482,7 @@ class TestFiles(FunctionalTest):
             ],
             status=204,
         )
-        params = {'page': 1}
+        params = {'page': 2}
         self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
             status=400,
@@ -2550,7 +2550,7 @@ class TestFiles(FunctionalTest):
             status=200
         )
         assert res.content_type == 'text/plain'
-        params = {'page': 0}
+        params = {'page': 1}
         res = self.testapp.get(
             '/api/v2/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf'.format(  # nopep8
                 content_id=content_id,
