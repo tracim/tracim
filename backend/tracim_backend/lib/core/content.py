@@ -29,7 +29,6 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import InconsistentDatabase
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -53,6 +52,7 @@ from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.lib.utils.logger import logger
 
 __author__ = 'damien'
 
@@ -451,21 +451,24 @@ class ContentApi(object):
         elif nb_content_with_the_label == 1:
             return False
         else:
-            text = 'Something is wrong in the database ! ' \
-                    'Content label should be unique'\
-                    'in a same folder in database' \
-                    'but you have {nb} content with label {label}' \
-                    'in workspace {workspace_id}'.format(
-                        nb=nb_content_with_the_label,
-                        label=label,
-                        workspace_id=workspace.workspace_id,
-                    )
+            critical_error_text = 'Something is wrong in the database ! '\
+                                  'Content label should be unique ' \
+                                  'in a same folder in database' \
+                                  'but you have {nb} content with ' \
+                                  'label {label} in workspace {workspace_id}'
+
+            critical_error_text = critical_error_text.format(
+                nb=nb_content_with_the_label,
+                label=label,
+                workspace_id=workspace.workspace_id,
+            )
             if parent:
-                text = '{text} and parent as content {parent_id}'.format(
-                    text=text,
+                critical_error_text = '{text} and parent as content {parent_id}'.format(  # nopep8
+                    text=critical_error_text,
                     parent_id=parent.parent_id
                 )
-            raise InconsistentDatabase(text)
+            logger.critical(self, critical_error_text)
+            return False
 
     def _verify_content_label_is_free(
         self,

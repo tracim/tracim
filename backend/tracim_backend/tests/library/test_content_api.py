@@ -1,33 +1,30 @@
 # -*- coding: utf-8 -*-
-import datetime
-import transaction
 import pytest
+import transaction
 
-from tracim_backend.config import CFG
-from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name  # nopep8
 # TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.exceptions import SameValueError, \
-    ContentLabelAlreadyUsedHere, InconsistentDatabase
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import UnallowedSubContent
+# TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
 # TODO - G.M - 28-03-2018 - [RoleApi] Re-enable RoleApi
 from tracim_backend.lib.core.workspace import RoleApi
-# TODO - G.M - 28-03-2018 - [WorkspaceApi] Re-enable WorkspaceApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
-
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
+from tracim_backend.models.data import Workspace
+from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
 
@@ -359,7 +356,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_content_label_is_free('test', workspace, parent=None) == False  # nopep8
+        assert api._is_content_label_is_free('test', workspace, parent=None) is False  # nopep8
         content = Content()
         content.label = 'test'
         content.owner = user
@@ -369,8 +366,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        with pytest.raises(InconsistentDatabase):
-            assert api._is_content_label_is_free('test', workspace, parent=None) == False  # nopep8
+        assert api._is_content_label_is_free('test', workspace, parent=None) is False  # nopep8
 
     def test_unit__is_content_label_is_free__ok__different_workspace(self):
         uapi = UserApi(
