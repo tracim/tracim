@@ -7,8 +7,18 @@
   "This content is archived.": "This content is archived.",
   "Restore": "Restore",
   "This content is deleted.": "This content is deleted.",
-  "latest version :": "latest version :",
   "Error while creating file": "Error while creating file",
   "Drag and drop your file here": "Drag and drop your file here",
-  "You can also import your file by clicking here": "You can also import your file by clicking here"
+  "You can also import your file by clicking here": "You can also import your file by clicking here",
+  "Cancel": "Cancel",
+  "Validate": "Validate",
+  "Download file": "Download file",
+  "Download current page as PDF": "Download current page as PDF",
+  "Download as PDF": "Download as PDF",
+  "Properties": "Properties",
+  "Size": "Size",
+  "Description": "Description",
+  "Change description": "Change description",
+  "Error while saving new description": "Error while saving new description",
+  "Error while uploading file": "Error while uploading file"
 }

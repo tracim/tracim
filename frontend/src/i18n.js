@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import { frLib, enLib } from 'tracim_frontend_lib'
+import { libFrTranslation, libEnTranslation } from 'tracim_frontend_lib'
 import en from '../i18next.scanner/en/translation.json'
 import fr from '../i18next.scanner/fr/translation.json'
 
@@ -27,7 +27,7 @@ i18n
     resources: {
       en: {
         translation: {
-          ...enLib, // fronted_lib
+          ...libEnTranslation, // fronted_lib
           ...en, // frontend
           ...htmlDocEnTranslation, // html-document
           ...threadEnTranslation, // thread
@@ -36,7 +36,7 @@ i18n
       },
       fr: {
         translation: {
-          ...frLib, // fronted_lib
+          ...libFrTranslation, // fronted_lib
           ...fr, // frontend
           ...htmlDocFrTranslation, // html-document
           ...threadFrTranslation, // thread
@@ -45,5 +45,7 @@ i18n
       }
     }
   })
+
+i18n.idTracim = 'frontend'
 
 export default i18n
