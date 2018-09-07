@@ -205,14 +205,27 @@ class AutocompleteQuery(object):
         self.acp = acp
 
 
+class FileQuery(object):
+    """
+    File query model
+    """
+    def __init__(
+        self,
+        force_download: int = 0,
+    ):
+        self.force_download = force_download
+
+
 class PageQuery(object):
     """
     Page query model
     """
     def __init__(
             self,
+            force_download: int = 0,
             page: int = 1
     ):
+        self.force_download = force_download
         self.page = page
 
 
