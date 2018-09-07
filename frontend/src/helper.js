@@ -7,13 +7,7 @@ export const FETCH_CONFIG = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   },
-  apiUrl: configEnv.apiUrl,
-  mockApiUrl: 'http://localhost:3001' // @todo: better to use one url only and use proxy on mock api to point to real api (if implemented)
-}
-
-export const COOKIE = {
-  USER_LOGIN: 'user_login',
-  USER_AUTH: 'user_auth'
+  apiUrl: configEnv.apiUrl
 }
 
 // Côme - 2018/08/02 - shouldn't this come from api ?

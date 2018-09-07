@@ -6,5 +6,10 @@
   "{{nb}} days ago": "{{nb}} days ago",
   "{{nb}} hours ago": "{{nb}} hours ago",
   "{{nb}} minutes ago": "{{nb}} minutes ago",
-  "{{nb}} seconds ago": "{{nb}} seconds ago"
+  "{{nb}} seconds ago": "{{nb}} seconds ago",
+  "Simple text": "Simple text",
+  "Rich text": "Rich text",
+  "Send": "Send",
+  "Your message...": "Your message...",
+  "Edit": "Edit"
 }

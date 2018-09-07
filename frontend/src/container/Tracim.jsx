@@ -12,7 +12,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { COOKIE, PAGE } from '../helper.js'
+import { PAGE } from '../helper.js'
 import {
   getAppList,
   getContentTypeList,
@@ -27,7 +27,6 @@ import {
   setWorkspaceListIsOpenInSidebar,
   setWorkspaceList
 } from '../action-creator.sync.js'
-import Cookies from 'js-cookie'
 import Dashboard from './Dashboard.jsx'
 
 class Tracim extends React.Component {
@@ -58,25 +57,17 @@ class Tracim extends React.Component {
     // console.log('<Tracim> did Mount')
     const { dispatch } = this.props
 
-    const userFromCookies = {
-      email: Cookies.get(COOKIE.USER_LOGIN),
-      auth: Cookies.get(COOKIE.USER_AUTH)
-    }
-
-    const fetchGetUserIsConnected = await dispatch(getUserIsConnected(userFromCookies))
+    const fetchGetUserIsConnected = await dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200:
         dispatch(setUserConnected({
           ...fetchGetUserIsConnected.json,
-          auth: userFromCookies.auth,
           logged: true
         }))
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
       case 401:
-        Cookies.remove(COOKIE.USER_LOGIN)
-        Cookies.remove(COOKIE.USER_AUTH)
         dispatch(setUserConnected({logged: false})); break
       default:
         dispatch(setUserConnected({logged: null})); break

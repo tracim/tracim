@@ -80,9 +80,9 @@ class PopupCreateWorkspace extends React.Component {
   })
 
   handleValidate = async () => {
-    const { loggedUser, config, newWorkspaceName } = this.state
+    const { config, newWorkspaceName } = this.state
 
-    const fetchSaveNewWorkspace = postWorkspace(loggedUser, config.apiUrl, newWorkspaceName)
+    const fetchSaveNewWorkspace = postWorkspace(config.apiUrl, newWorkspaceName)
 
     handleFetchResult(await fetchSaveNewWorkspace)
       .then(resSave => {

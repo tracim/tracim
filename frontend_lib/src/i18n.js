@@ -18,9 +18,15 @@ i18n
       wait: true
     },
     resources: {
-      en,
-      fr
+      en: {
+        translation: en
+      },
+      fr: {
+        translation: fr
+      }
     }
   })
+
+i18n.idTracim = 'frontend_lib'
 
 export default i18n

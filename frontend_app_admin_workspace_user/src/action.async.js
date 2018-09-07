@@ -10,7 +10,7 @@ export const getWorkspaceList = (user, apiUrl) =>
     method: 'GET'
   })
 
-export const getWorkspaceMemberList = (user, apiUrl, idWorkspace) =>
+export const getWorkspaceMemberList = (apiUrl, idWorkspace) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/members`, {
     credentials: 'include',
     headers: {
@@ -19,7 +19,7 @@ export const getWorkspaceMemberList = (user, apiUrl, idWorkspace) =>
     method: 'GET'
   })
 
-export const deleteWorkspace = (user, apiUrl, idWorkspace) =>
+export const deleteWorkspace = (apiUrl, idWorkspace) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/delete`, {
     credentials: 'include',
     headers: {
@@ -28,7 +28,7 @@ export const deleteWorkspace = (user, apiUrl, idWorkspace) =>
     method: 'PUT'
   })
 
-export const getUserList = (user, apiUrl) =>
+export const getUserList = apiUrl =>
   fetch(`${apiUrl}/users`, {
     credentials: 'include',
     headers: {
@@ -37,7 +37,7 @@ export const getUserList = (user, apiUrl) =>
     method: 'GET'
   })
 
-export const getUserDetail = (user, apiUrl, idUser) =>
+export const getUserDetail = (apiUrl, idUser) =>
   fetch(`${apiUrl}/users/${idUser}`, {
     credentials: 'include',
     headers: {
@@ -46,7 +46,7 @@ export const getUserDetail = (user, apiUrl, idUser) =>
     method: 'GET'
   })
 
-export const putUserDisable = (user, apiUrl, idUser) =>
+export const putUserDisable = (apiUrl, idUser) =>
   fetch(`${apiUrl}/users/${idUser}/disable`, {
     credentials: 'include',
     headers: {
@@ -55,7 +55,7 @@ export const putUserDisable = (user, apiUrl, idUser) =>
     method: 'PUT'
   })
 
-export const putUserEnable = (user, apiUrl, idUser) =>
+export const putUserEnable = (apiUrl, idUser) =>
   fetch(`${apiUrl}/users/${idUser}/enable`, {
     credentials: 'include',
     headers: {
@@ -64,7 +64,7 @@ export const putUserEnable = (user, apiUrl, idUser) =>
     method: 'PUT'
   })
 
-export const putUserProfile = (user, apiUrl, idUser, newProfile) =>
+export const putUserProfile = (apiUrl, idUser, newProfile) =>
   fetch(`${apiUrl}/users/${idUser}/profile`, {
     credentials: 'include',
     headers: {
@@ -76,7 +76,7 @@ export const putUserProfile = (user, apiUrl, idUser, newProfile) =>
     method: 'PUT'
   })
 
-export const postAddUser = (user, apiUrl, email, profile) =>
+export const postAddUser = (apiUrl, email, profile) =>
   fetch(`${apiUrl}/users`, {
     credentials: 'include',
     headers: {

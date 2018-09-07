@@ -29,7 +29,6 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
 
-from tracim_backend.lib.utils.translation import fake_translator as l_
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.meta import metadata
 if TYPE_CHECKING:
