@@ -3,7 +3,7 @@ import React from 'react'
 require('./MoreInfo.styl')
 
 export const MoreInfo = props =>
-  <div className='moreinfo'>
+  <div className='moreinfo ml-3 ml-md-0'>
     <div className='moreinfo__webdav genericBtnInfoDashboard'>
       <div
         className='moreinfo__webdav__btn genericBtnInfoDashboard__btn primaryColorBgHover primaryColorBorderDarkenHover'

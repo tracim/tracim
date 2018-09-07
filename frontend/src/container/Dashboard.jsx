@@ -236,7 +236,7 @@ class Dashboard extends React.Component {
               />
             </div>
 
-            <div className='dashboard__calltoaction justify-content-xl-center'>
+            <div className='dashboard__calltoaction justify-content-sm-center'>
               {props.appList.map(app => {
                 const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
                 return (

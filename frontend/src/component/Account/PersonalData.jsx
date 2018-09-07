@@ -69,6 +69,9 @@ export class PersonalData extends React.Component {
               onChange={this.handleChangeEmail}
             />
 
+          </div>
+
+          <div className='d-flex align-items-center flex-wrap mb-4'>
             <input
               className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='password'

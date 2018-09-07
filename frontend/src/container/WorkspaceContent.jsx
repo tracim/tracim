@@ -224,7 +224,7 @@ class WorkspaceContent extends React.Component {
         <PageWrapper customeClass='workspace'>
           <PageTitle
             parentClass='workspace__header'
-            customClass='justify-content-between'
+            customClass='justify-content-between align-items-center'
             title='Liste des Contenus'
             subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
@@ -286,15 +286,15 @@ class WorkspaceContent extends React.Component {
               )}
             </div>
 
-            {idRoleUserWorkspace >= 2 &&
-              <DropdownCreateButton
-                customClass='workspace__content__button'
-                idFolder={null}
-                onClickCreateContent={this.handleClickCreateContent}
-                availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
-              />
-            }
           </PageContent>
+          {idRoleUserWorkspace >= 2 &&
+            <DropdownCreateButton
+              customClass='workspace__content__button'
+              idFolder={null}
+              onClickCreateContent={this.handleClickCreateContent}
+              availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+            />
+          }
 
         </PageWrapper>
       </div>
