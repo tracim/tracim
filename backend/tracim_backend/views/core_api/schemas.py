@@ -421,6 +421,12 @@ class FilterContentQuerySchema(marshmallow.Schema):
         default=CONTENT_TYPES.Any_SLUG,
         validate=all_content_types_validator
     )
+    label = marshmallow.fields.String(
+        example='myfilename',
+        default=None,
+        allow_none=True,
+        description='Filter by content label'
+    )
 
     @post_load
     def make_content_filter(self, data):

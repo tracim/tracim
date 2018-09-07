@@ -1879,6 +1879,44 @@ class TestWorkspaceContents(FunctionalTest):
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
+    def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
+        """
+        Check obtain workspace all root contents
+        """
+        params = {
+            'parent_id': 0,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+            'label': 'ew'
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/3/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 1
+        content = res[0]
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 15
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'New Fruit Salad'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'new-fruit-salad'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'comment'}
+        assert content['workspace_id'] == 3
+
     def test_api__get_workspace_content__ok_200__get_only_active_root_content(self):  # nopep8
         """
         Check obtain workspace root active contents

@@ -386,6 +386,7 @@ class WorkspaceController(Controller):
             parent_id=content_filter.parent_id,
             workspace=request.current_workspace,
             content_type=content_filter.content_type or CONTENT_TYPES.Any_SLUG,
+            label=content_filter.label
         )
         contents = [
             api.get_content_in_context(content) for content in contents

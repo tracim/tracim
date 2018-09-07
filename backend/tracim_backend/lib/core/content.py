@@ -884,7 +884,8 @@ class ContentApi(object):
         self,
         parent_id: int = None,
         content_type_slug: str = CONTENT_TYPES.Any_SLUG,
-        workspace: Workspace = None
+        workspace: Workspace = None,
+        label:str = None
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -910,11 +911,19 @@ class ContentApi(object):
             resultset = resultset.filter(Content.parent_id==parent_id)
         if parent_id == 0 or parent_id is False:
             resultset = resultset.filter(Content.parent_id == None)
+        if label:
+            resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
 
         return resultset
 
-    def get_all(self, parent_id: int=None, content_type: str=CONTENT_TYPES.Any_SLUG, workspace: Workspace=None) -> typing.List[Content]:
-        return self._get_all_query(parent_id, content_type, workspace).all()
+    def get_all(
+            self,
+            parent_id: int=None,
+            content_type: str=CONTENT_TYPES.Any_SLUG,
+            workspace: Workspace=None,
+            label: str=None
+    ) -> typing.List[Content]:
+        return self._get_all_query(parent_id, content_type, workspace, label).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:
