@@ -44,7 +44,7 @@ class File extends React.Component {
       newComment: '',
       newFile: '',
       newFilePreview: null,
-      fileCurrentPage: 0,
+      fileCurrentPage: 1,
       timelineWysiwyg: false,
       mode: MODE.VIEW,
       displayProperty: false,
@@ -128,7 +128,7 @@ class File extends React.Component {
   })
 
   loadContent = async () => {
-    const { loggedUser, content, config } = this.state
+    const { loggedUser, content, config, fileCurrentPage } = this.state
 
     const fetchResultFile = getFileContent(config.apiUrl, content.workspace_id, content.content_id)
 
@@ -136,8 +136,8 @@ class File extends React.Component {
       .then(async resFile => this.setState({
         content: {
           ...resFile.body,
-          previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/500x500?page=${0}`,
-          contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/1920x1080?page=${0}`
+          previewUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/500x500?page=${fileCurrentPage}`,
+          contentFullScreenUrl: `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/revisions/${resFile.body.current_revision_id}/preview/jpg/1920x1080?page=${fileCurrentPage}`
         }
       }))
 
@@ -339,8 +339,8 @@ class File extends React.Component {
         contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
         is_deleted: prev.is_deleted,
-        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500?page=${0}`,
-        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080?page=${0}`
+        previewUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/500x500?page=${state.fileCurrentPage}`,
+        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${revision.workspace_id}/files/${revision.content_id}/revisions/${revision.revision_id}/preview/jpg/1920x1080?page=${state.fileCurrentPage}`
       },
       mode: MODE.REVISION
     }))
@@ -496,6 +496,8 @@ class File extends React.Component {
             mode={state.mode}
             customColor={state.config.hexcolor}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
+            filePageNb={state.content.page_nb}
+            fileCurrentPage={state.fileCurrentPage}
             displayProperty={state.displayProperty}
             onClickProperty={this.handleClickProperty}
             version={state.content.number}
@@ -510,7 +512,7 @@ class File extends React.Component {
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw`
             )(state)}
             downloadPdfPageUrl={(({config, content, mode}) =>
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${0}`
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${state.fileCurrentPage}`
             )(state)}
             downloadPdfFullUrl={(({config, content, mode}) =>
               `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full`
