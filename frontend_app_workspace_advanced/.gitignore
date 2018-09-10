@@ -2,3 +2,4 @@
 .idea/
 .git/
 node_modules/
+dist/workspace_advanced.app.js

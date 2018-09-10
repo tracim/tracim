@@ -1,13 +1,16 @@
 {
-  "Last version": "Dernière version",
-  "Validate and create": "Valider et créer",
-  "Document's title": "Titre du document",
-  "New Document": "Nouveau document",
-  "Error while archiving document": "Erreur lors de l'archivage d'un document",
-  "Error while deleting document": "Erreur lors de la suppression d'un document",
-  "Error while restoring document": "Erreur lors de la restauration du document",
-  "This content is archived.": "Ce contenu est archivé.",
-  "Restore": "Restaurer",
-  "This content is deleted.": "Ce contenu est supprimé.",
-  "latest version :": "Dernière version"
+  "Description": "Description",
+  "Validate": "Valider",
+  "Members list": "Liste des membres",
+  "Add a member": "Ajouter un membre",
+  "Error while loading workspace details": "Erreur lors du chargement de détail du workspace",
+  "Error while loading members list": "Erreur lors de chargement de la liste des membres",
+  "Save successful": "Sauvegarde réussi",
+  "Error while saving new description": "Erreur lors de la sauvegarde de la description",
+  "Error while saving new role for member": "Erreur lors de la sauvegarde du rôle",
+  "Error while fetching known members list": "Erreur lors du chargement de la liste des membres connus",
+  "Error while removing user from workspace": "Erreur lors de la suppression de l'utilisateur du workspace",
+  "Please set a name or email": "Veuillez saisir le nom ou l'email",
+  "Please set a role": "Veuillez choisir un rôle",
+  "Error while adding the member to the workspace": "Erreur lors de l'ajout du membre au workspace"
 }

@@ -1,3 +1,5 @@
+import i18n from '../../frontend/src/i18n.js'
+
 export const FETCH_CONFIG = {
   headers: {
     'Accept': 'application/json',
@@ -9,8 +11,8 @@ export const debug = {
   config: {
     label: 'Workspace Advanced',
     slug: 'workspace_advanced',
-    faIcon: 'th',
-    hexcolor: '#3f52e3',
+    faIcon: 'bank',
+    hexcolor: '#999999',
     creationLabel: '',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543/api/v2',
@@ -39,6 +41,31 @@ export const debug = {
       hexcolor: '#ababab',
       globalStatus: 'closed'
     }],
+    roleList: [{ // this is the same as ROLE from frontend
+      id: 1,
+      slug: 'reader',
+      faIcon: 'eye',
+      hexcolor: '#15d948',
+      label: i18n.t('Reader')
+    }, {
+      id: 2,
+      slug: 'contributor',
+      faIcon: 'pencil',
+      hexcolor: '#3145f7',
+      label: i18n.t('Contributor')
+    }, {
+      id: 4,
+      slug: 'content-manager',
+      faIcon: 'graduation-cap',
+      hexcolor: '#f2af2d',
+      label: i18n.t('Content manager')
+    }, {
+      id: 8,
+      slug: 'workspace-manager',
+      faIcon: 'gavel',
+      hexcolor: '#ed0007',
+      label: i18n.t('Workspace manager')
+    }],
     translation: {
       en: {
         translation: {
@@ -64,30 +91,47 @@ export const debug = {
     idRoleUserWorkspace: 8
   },
   content: {
-    author: {
-      avatar_url: null,
-      public_name: 'Global manager',
-      user_id: 1 // -1 or 1 for debug
-    },
-    content_id: 1, // 1 or 22 for debug
-    content_type: 'html-document',
-    created: '2018-06-18T14:59:26Z',
-    current_revision_id: 11,
-    is_archived: false,
+    label: 'Bonjour',
+    sidebar_entries: [
+      {
+        hexcolor: '#252525',
+        route: '/#/workspaces/1/dashboard',
+        slug: 'dashboard',
+        label: 'Dashboard',
+        fa_icon: 'signal'
+      },
+      {
+        hexcolor: '#fdfdfd',
+        route: '/#/workspaces/1/contents',
+        slug: 'contents/all',
+        label: 'All Contents',
+        fa_icon: 'th'
+      },
+      {
+        hexcolor: '#3f52e3',
+        route: '/#/workspaces/1/contents?type=html-document',
+        slug: 'contents/html-document',
+        label: 'Text Documents',
+        fa_icon: 'file-text-o'
+      },
+      {
+        hexcolor: '#ff9900',
+        route: '/#/workspaces/1/contents?type=file',
+        slug: 'contents/file',
+        label: 'Files',
+        fa_icon: 'paperclip'
+      },
+      {
+        hexcolor: '#ad4cf9',
+        route: '/#/workspaces/1/contents?type=thread',
+        slug: 'contents/thread',
+        label: 'Threads',
+        fa_icon: 'comments-o'
+      }
+    ],
+    description: '',
     is_deleted: false,
-    label: 'Current Menu',
-    last_modifier: {
-      avatar_url: null,
-      public_name: 'Global manager',
-      user_id: 1
-    },
-    modified: '2018-06-18T14:59:26Z',
-    parent_id: 2,
-    raw_content: '<div>bonjour, je suis un lapin.</div>',
-    show_in_ui: true,
-    slug: 'current-menu',
-    status: 'open',
-    sub_content_types: ['thread', 'html-document', 'file', 'folder'],
+    slug: 'bonjour',
     workspace_id: 1
   }
 }

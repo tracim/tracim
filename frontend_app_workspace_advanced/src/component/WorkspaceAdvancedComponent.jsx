@@ -1,314 +1,123 @@
 import React from 'react'
-import { BtnSwitch } from 'tracim_frontend_lib'
+import {
+  BtnSwitch,
+  generateAvatarFromPublicName,
+  NewMemberForm
+} from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
 const WorkspaceAdvancedComponent = props => {
   return (
-    <div className='wsContentHtmlDocument__contentpage__textnote workspaceadvanced__contentpage__textnote'>
-      <div className='appdashboard__content'>
-        <div className='appdashboard__content__description'>
-          <div className='appdashboard__content__description__text'>
-            <textarea placeholder='Description du Workspace' />
+    <div className='wsContentHtmlDocumentpage__textnote workspaceadvancedpage__textnote'>
+      <div className='workspaceadvanced'>
+        <div className='workspaceadvanced__description'>
+          <div className='workspaceadvanced__description__title'>
+            {props.t('Description')}
           </div>
-          <div className='appdashboard__content__description__btn d-flex justify-content-end'>
-            <button type='button' className='btn btn-outline-primary'>Valider</button>
+
+          <div className='workspaceadvanced__description__text'>
+            <textarea
+              placeholder='Description du Workspace'
+              value={props.description}
+              onChange={props.onChangeDescription}
+              rows={'3'}
+            />
+          </div>
+
+          <div className='workspaceadvanced__description__btn d-flex justify-content-end'>
+            <button
+              type='button'
+              className='btn highlightBtn'
+              onClick={props.onClickValidateNewDescription}
+              style={{backgroundColor: props.customColor}}
+            >
+              {props.t('Validate')}
+            </button>
           </div>
         </div>
-        <div className='appdashboard__content__userlist'>
+
+        <div className='workspaceadvanced__userlist'>
           {props.displayFormNewMember === false &&
           <div>
-            <div className='appdashboard__content__userlist__title'>
-              Listes des membres - modification
+            <div className='workspaceadvanced__userlist__title'>
+              {props.t('Members list')}
             </div>
-            <ul className='appdashboard__content__userlist__list'>
-              <li className='appdashboard__content__userlist__list__item'>
-                <div className='appdashboard__content__userlist__list__item__avatar mr-3'>
-                  <img src={''} alt='avatar' />
-                </div>
-                <div className='appdashboard__content__userlist__list__item__name mr-5'>
-                  Alexi Cauvin
-                </div>
-                <div className='appdashboard__content__userlist__list__item__role dropdown mr-auto'>
-                  <button className='btndropdown dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                    <div className='btndropdown__icon mr-3'>
-                      <i className='fa fa-graduation-cap' />
-                    </div>
-                    <div className='btndropdown__text mr-auto'>
-                      Gestionnaire de contenu
-                    </div>
-                  </button>
-                  <div className='subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-gavel' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Responsable
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-graduation-cap' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Gestionnaire de contenu
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-pencil' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Contributeur
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-eye' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Lecteur
-                      </div>
+
+            <ul className='workspaceadvanced__userlist__list'>
+              {props.memberList && props.memberList.filter(m => m.user).map(m =>
+                <li className='workspaceadvanced__userlist__list__item' key={`member_${m.user_id}`}>
+                  <div className='workspaceadvanced__userlist__list__item__avatar mr-3'>
+                    <img src={generateAvatarFromPublicName(m.user.public_name)} />
+                  </div>
+
+                  <div className='workspaceadvanced__userlist__list__item__name mr-5'>
+                    {m.user.public_name}
+                  </div>
+
+                  <div className='workspaceadvanced__userlist__list__item__role dropdown mr-auto'>
+                    {(() => {
+                      const role = props.roleList.find(r => r.slug === m.role) || {label: 'unknown', hexcolor: '#333', faIcon: ''}
+                      return (
+                        <button
+                          className='btndropdown dropdown-toggle'
+                          type='button'
+                          id={`dropdownMenuButton_${m.user_id}`}
+                          data-toggle='dropdown'
+                          aria-haspopup='true'
+                          aria-expanded='false'
+                        >
+                          <div className='btndropdown__icon mr-3' style={{color: role.hexcolor}}>
+                            <i className={`fa fa-${role.faIcon}`} />
+                          </div>
+
+                          <div className='btndropdown__text mr-auto'>
+                            {role.label}
+                          </div>
+                        </button>
+                      )
+                    })()}
+
+                    <div className='subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                      {props.roleList.map(r =>
+                        <div
+                          className='subdropdown__item dropdown-item'
+                          onClick={() => props.onClickNewRole(m.user_id, r.slug)}
+                          key={`role_${r.id}`}
+                        >
+                          <div className='subdropdown__item__icon' style={{color: r.hexcolor}}>
+                            <i className={`fa fa-${r.faIcon}`} />
+                          </div>
+
+                          <div className='subdropdown__item__text'>
+                            {r.label}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-                <div className='appdashboard__content__userlist__list__item__delete'>
-                  <i className='fa fa-trash-o' />
-                </div>
-              </li>
-              <li className='appdashboard__content__userlist__list__item'>
-                <div className='appdashboard__content__userlist__list__item__avatar mr-3'>
-                  <img src={''} alt='avatar' />
-                </div>
-                <div className='appdashboard__content__userlist__list__item__name mr-5'>
-                  Alexi Cauvin
-                </div>
-                <div className='appdashboard__content__userlist__list__item__role dropdown mr-auto'>
-                  <button className='btndropdown dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                    <div className='btndropdown__icon mr-3'>
-                      <i className='fa fa-gavel' />
-                    </div>
-                    <div className='btndropdown__text mr-auto'>
-                      Responsable
-                    </div>
-                  </button>
-                  <div className='appdashboard__content__userlist__list__item__role__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-gavel' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Responsable
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-graduation-cap' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Gestionnaire de contenu
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-pencil' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Contributeur
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-eye' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Lecteur
-                      </div>
-                    </div>
+
+                  <div
+                    className='workspaceadvanced__userlist__list__item__delete'
+                    onClick={() => props.onClickDeleteMember(m.user_id)}
+                  >
+                    <i className='fa fa-trash-o' />
                   </div>
-                </div>
-                <div className='appdashboard__content__userlist__list__item__delete'>
-                  <i className='fa fa-trash-o' />
-                </div>
-              </li>
-              <li className='appdashboard__content__userlist__list__item'>
-                <div className='appdashboard__content__userlist__list__item__avatar mr-3'>
-                  <img src={''} alt='avatar' />
-                </div>
-                <div className='appdashboard__content__userlist__list__item__name mr-5'>
-                  Alexi Cauvin
-                </div>
-                <div className='appdashboard__content__userlist__list__item__role dropdown mr-auto'>
-                  <button className='btndropdown dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                    <div className='btndropdown__icon mr-3'>
-                      <i className='fa fa-eye' />
-                    </div>
-                    <div className='btndropdown__text mr-auto'>
-                      Lecteur
-                    </div>
-                  </button>
-                  <div className='appdashboard__content__userlist__list__item__role__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-gavel' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Responsable
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-graduation-cap' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Gestionnaire de contenu
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-pencil' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Contributeur
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-eye' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Lecteur
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className='appdashboard__content__userlist__list__item__delete'>
-                  <i className='fa fa-trash-o' />
-                </div>
-              </li>
-              <li className='appdashboard__content__userlist__list__item'>
-                <div className='appdashboard__content__userlist__list__item__avatar mr-3'>
-                  <img src={''} alt='avatar' />
-                </div>
-                <div className='appdashboard__content__userlist__list__item__name mr-5'>
-                  Alexi Cauvin
-                </div>
-                <div className='appdashboard__content__userlist__list__item__role dropdown mr-auto'>
-                  <button className='btndropdown dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                    <div className='btndropdown__icon mr-3'>
-                      <i className='fa fa-pencil' />
-                    </div>
-                    <div className='btndropdown__text mr-auto'>
-                      Contributeur
-                    </div>
-                  </button>
-                  <div className='appdashboard__content__userlist__list__item__role__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-gavel' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Responsable
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-graduation-cap' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Gestionnaire de contenu
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-pencil' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Contributeur
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-eye' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Lecteur
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className='appdashboard__content__userlist__list__item__delete'>
-                  <i className='fa fa-trash-o' />
-                </div>
-              </li>
-              <li className='appdashboard__content__userlist__list__item'>
-                <div className='appdashboard__content__userlist__list__item__avatar mr-3'>
-                  <img src={''} alt='avatar' />
-                </div>
-                <div className='appdashboard__content__userlist__list__item__name mr-5'>
-                  Alexi Cauvin
-                </div>
-                <div className='appdashboard__content__userlist__list__item__role dropdown mr-auto'>
-                  <button className='btndropdown dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                    <div className='btndropdown__icon mr-3'>
-                      <i className='fa fa-graduation-cap' />
-                    </div>
-                    <div className='btndropdown__text mr-auto'>
-                      Gestionnaire de contenu
-                    </div>
-                  </button>
-                  <div className='appdashboard__content__userlist__list__item__role__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-gavel' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Responsable
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-graduation-cap' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Gestionnaire de contenu
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-pencil' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Contributeur
-                      </div>
-                    </div>
-                    <div className='subdropdown__item dropdown-item'>
-                      <div className='subdropdown__item__icon'>
-                        <i className='fa fa-eye' />
-                      </div>
-                      <div className='subdropdown__item__text'>
-                        Lecteur
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className='appdashboard__content__userlist__list__item__delete'>
-                  <i className='fa fa-trash-o' />
-                </div>
-              </li>
+                </li>
+              )}
             </ul>
-            <div className='appdashboard__content__userlist__adduser'>
-              <div className='appdashboard__content__userlist__adduser__button'>
-                <div className='appdashboard__content__userlist__adduser__button__avatar'>
-                  <div className='appdashboard__content__userlist__adduser__button__avatar__icon'>
+            <div className='workspaceadvanced__userlist__adduser'>
+              <div className='workspaceadvanced__userlist__adduser__button'>
+                <div className='workspaceadvanced__userlist__adduser__button__avatar'>
+                  <div className='workspaceadvanced__userlist__adduser__button__avatar__icon'>
                     <i className='fa fa-plus' />
                   </div>
                 </div>
+
                 <div
-                  className='appdashboard__content__userlist__adduser__button__text'
-                  onClick={props.onClickToggleForm}
+                  className='workspaceadvanced__userlist__adduser__button__text'
+                  onClick={props.onClickToggleFormNewMember}
                 >
-                  Ajouter un membre
+                  {props.t('Add a member')}
                 </div>
               </div>
             </div>
@@ -316,101 +125,35 @@ const WorkspaceAdvancedComponent = props => {
           }
 
           {props.displayFormNewMember === true &&
-          <form className='appdashboard__content__userlist__form'>
-            <div
-              className='appdashboard__content__userlist__form__close d-flex justify-content-end'
-              onClick={props.onClickToggleForm}
-            >
-              <i className='fa fa-times' />
-            </div>
-            <div className='appdashboard__content__userlist__form__member'>
-              <div className='appdashboard__content__userlist__form__member__name'>
-                <label className='name__label' htmlFor='addmember'>Indiquer le nom ou l'email du membre</label>
-                <input type='text' id='addmember' className='name__input form-control' placeholder='Nom ou Email' />
-              </div>
-              <div className='appdashboard__content__userlist__form__member__create'>
-                <div className='create__radiobtn mr-3'>
-                  <input type='radio' />
-                </div>
-                <div className='create__text'>
-                  Créer un compte
-                </div>
-              </div>
-            </div>
-            <div className='appdashboard__content__userlist__form__role'>
-              <div className='appdashboard__content__userlist__form__role__text'>
-                Choisissez le rôle du membre
-              </div>
-              <ul className='appdashboard__content__userlist__form__role__list'>
-                <li className='appdashboard__content__userlist__form__role__list__item'>
-                  <div className='item__radiobtn mr-3'>
-                    <input type='radio' name='role' value='responsable' />
-                  </div>
-                  <div className='item__text'>
-                    <div className='item_text_icon mr-2'>
-                      <i className='fa fa-gavel' />
-                    </div>
-                    <div className='item__text__name'>
-                      Responsable
-                    </div>
-                  </div>
-                </li>
-                <li className='appdashboard__content__userlist__form__role__list__item'>
-                  <div className='item__radiobtn mr-3'>
-                    <input type='radio' name='role' value='gestionnaire' />
-                  </div>
-                  <div className='item__text'>
-                    <div className='item_text_icon mr-2'>
-                      <i className='fa fa-graduation-cap' />
-                    </div>
-                    <div className='item__text__name'>
-                      Gestionnaire de contenu
-                    </div>
-                  </div>
-                </li>
-                <li className='appdashboard__content__userlist__form__role__list__item'>
-                  <div className='item__radiobtn mr-3'>
-                    <input type='radio' name='role' value='contributeur' />
-                  </div>
-                  <div className='item__text'>
-                    <div className='item_text_icon mr-2'>
-                      <i className='fa fa-pencil' />
-                    </div>
-                    <div className='item__text__name'>
-                      Contributeur
-                    </div>
-                  </div>
-                </li>
-                <li className='appdashboard__content__userlist__form__role__list__item'>
-                  <div className='item__radiobtn mr-3'>
-                    <input type='radio' name='role' value='lecteur' />
-                  </div>
-                  <div className='item__text'>
-                    <div className='item_text_icon mr-2'>
-                      <i className='fa fa-eye' />
-                    </div>
-                    <div className='item__text__name'>
-                      Lecteur
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div className='appdashboard__content__userlist__form__submitbtn'>
-              <button type='submit' className='btn btn-outline-primary'>Valider</button>
-            </div>
-          </form>
+            <NewMemberForm
+              onClickCloseAddMemberBtn={props.onClickToggleFormNewMember}
+              nameOrEmail={props.newMemberName}
+              onChangeNameOrEmail={props.onChangeNewMemberName}
+              searchedKnownMemberList={props.searchedKnownMemberList}
+              onClickKnownMember={props.onClickKnownMember}
+              roleList={props.roleList}
+              role={props.newMemberRole}
+              onChangeRole={props.onClickNewMemberRole}
+              onClickBtnValidate={props.onClickValidateNewMember}
+            />
           }
         </div>
-        <div className='appdashboard__content__functionality'>
-          <div className='appdashboard__content__functionality__title'>
+
+        <div
+          className='workspaceadvanced__functionality'
+          style={{display: 'none'}}
+          // Côme - 2018/09/10 - hide this div until webdav and/or visioconf is activated
+        >
+          <div className='workspaceadvanced__functionality__title'>
             Liste des fonctionnalités
           </div>
-          <div className='appdashboard__content__functionality__text'>
+
+          <div className='workspaceadvanced__functionality__text'>
             Liste des fonctionnalités présentes sur Tracim que vous pouvez désactiver :
           </div>
-          <ul className='appdashboard__content__functionality__list'>
-            <li className='appdashboard__content__functionality__list__item'>
+
+          <ul className='workspaceadvanced__functionality__list'>
+            <li className='workspaceadvanced__functionality__list__item'>
               <div className='item__text'>
                 Calendrier de l'espace de travail :
               </div>
@@ -418,7 +161,8 @@ const WorkspaceAdvancedComponent = props => {
                 <BtnSwitch />
               </div>
             </li>
-            <li className='appdashboard__content__functionality__list__item'>
+
+            <li className='workspaceadvanced__functionality__list__item'>
               <div className='item__text'>
                 Visioconférence :
               </div>
