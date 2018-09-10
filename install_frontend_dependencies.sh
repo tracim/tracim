@@ -95,10 +95,9 @@ npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 log "build-translation"
 npm run build-translation && loggood "success" || logerror "some error"
 
-
-# install app Admin Workspace User
-log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
-cd $DEFAULTDIR/frontend_app_admin_workspace_user  || exit 1
+# install app file
+log "cd $DEFAULTDIR/frontend_app_file"
+cd $DEFAULTDIR/frontend_app_file  || exit 1
 log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
@@ -107,9 +106,9 @@ log "build-translation"
 npm run build-translation && loggood "success" || logerror "some error"
 
 
-# install app file
-log "cd $DEFAULTDIR/frontend_app_file"
-cd $DEFAULTDIR/frontend_app_file  || exit 1
+# install app Admin Workspace User
+log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
+cd $DEFAULTDIR/frontend_app_admin_workspace_user  || exit 1
 log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"

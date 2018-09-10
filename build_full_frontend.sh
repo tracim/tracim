@@ -63,16 +63,16 @@ cd $DEFAULTDIR/frontend_app_workspace || exit 1
 ./build_workspace.sh
 
 
-# app Admin Workspace User
-log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
-cd $DEFAULTDIR/frontend_app_admin_workspace_user || exit 1
-./build_admin_workspace_user.sh
-
-
 # app File
 log "cd $DEFAULTDIR/frontend_app_file"
 cd $DEFAULTDIR/frontend_app_file || exit 1
 ./build_file.sh
+
+
+# app Admin Workspace User
+log "cd $DEFAULTDIR/frontend_app_admin_workspace_user"
+cd $DEFAULTDIR/frontend_app_admin_workspace_user || exit 1
+./build_admin_workspace_user.sh
 
 
 # build Tracim
