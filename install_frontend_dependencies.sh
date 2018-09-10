@@ -27,11 +27,11 @@ function logerror {
 
 # Check if not running with sudoers
 if [ $PARAM1 == "root" ]; then
-    PREFIX=""
-    PREFIXCURL=""
+    SUDO=""
+    SUDOCURL=""
 else
-    PREFIX="sudo"
-    PREFIXCURL="sudo -E"
+    SUDO="sudo"
+    SUDOCURL="sudo -E"
 fi
 
 DEFAULTDIR=$(pwd)
@@ -46,9 +46,18 @@ if [ $? -eq 0 ]; then
     loggood "nodjs is installed"
 else
     log "install nodejs"
-    $PREFIX apt install -y curl && loggood "success" || logerror "some error"
-    curl -sL https://deb.nodesource.com/setup_8.x | $PREFIXCURL bash -
-    $PREFIX apt install -y nodejs && loggood "success" || logerror "some error"
+    $SUDO apt install -y curl && loggood "success" || logerror "some error"
+    curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
+    $SUDO apt update
+    $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
+    log "verify if nodjs 8.x is now installed"
+    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '8.'
+    if [ $? -eq 0 ]; then
+        loggood "nodjs 8.x is installed"
+    else
+        logerror "nodejs 8.x is not installed"
+        exit 1
+    fi
 fi
 
 
@@ -58,7 +67,7 @@ cd $DEFAULTDIR/frontend_lib  || exit 1
 log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "$USER npm link"
-$PREFIX npm link && loggood "success" || logerror "some error"
+$SUDO npm link && loggood "success" || logerror "some error"
 log "build-translation"
 npm run build-translation && loggood "success" || logerror "some error"
 

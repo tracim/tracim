@@ -26,15 +26,15 @@ function logerror {
 
 function install_backend_system_dep {
     log "install base debian-packaged-dep for backend..."
-    $PREFIX apt update
-    $PREFIX apt install -y python3 python3-venv python3-dev python3-pip && loggood "success" || logerror "some error"
-    $PREFIX apt install -y redis-server && loggood "success" || logerror "some error"
+    $SUDO apt update
+    $SUDO apt install -y python3 python3-venv python3-dev python3-pip && loggood "success" || logerror "some error"
+    $SUDO apt install -y redis-server && loggood "success" || logerror "some error"
 
     log "install deps for dealing with most preview..."
-    $PREFIX apt install -y zlib1g-dev libjpeg-dev && loggood "success" || logerror "some error"
-    $PREFIX apt install -y imagemagick libmagickwand-dev ghostscript && loggood "success" || logerror "some error"
-    $PREFIX apt install -y libreoffice && loggood "success" || logerror "some error" # most office documents file and text format
-    $PREFIX apt install -y inkscape && loggood "success" || logerror "some error" # for .svg files.
+    $SUDO apt install -y zlib1g-dev libjpeg-dev && loggood "success" || logerror "some error"
+    $SUDO apt install -y imagemagick libmagickwand-dev ghostscript && loggood "success" || logerror "some error"
+    $SUDO apt install -y libreoffice && loggood "success" || logerror "some error" # most office documents file and text format
+    $SUDO apt install -y inkscape && loggood "success" || logerror "some error" # for .svg files.
 }
 
 function setup_pyenv {
@@ -84,9 +84,9 @@ function setup_db {
 
 # Check if not running with sudoers
 if [ $PARAM1 == "root" ]; then
-    PREFIX=""
+    SUDO=""
 else
-    PREFIX=sudo
+    SUDO=sudo
 fi
 
 DEFAULTDIR=$(pwd)
