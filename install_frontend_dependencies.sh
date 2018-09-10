@@ -5,8 +5,6 @@
 
 # Main in bottom
 
-DEFAULTDIR=$(pwd)
-
 YELLOW='\033[1;33m'
 BROWN='\033[0;33m'
 GREEN='\033[1;32m'
@@ -36,6 +34,7 @@ else
     PREFIXCURL="sudo -E"
 fi
 
+DEFAULTDIR=$(pwd)
 
 # install nodjs if not installed
 log "verify if nodjs is installed"

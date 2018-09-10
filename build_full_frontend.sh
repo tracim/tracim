@@ -5,8 +5,6 @@
 
 # Main in bottom
 
-DEFAULTDIR=$(pwd)
-
 YELLOW='\033[1;33m'
 BROWN='\033[0;33m'
 GREEN='\033[1;32m'
@@ -31,6 +29,8 @@ if  [[ $1 = "-w" ]]; then
 fi
 
 echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ ${NC}"
+
+DEFAULTDIR=$(pwd)
 
 # create folder $DEFAULTDIR/frontend/dist/app/ if no exists
 mkdir -p $DEFAULTDIR/frontend/dist/app/ && loggood "success" || logerror "some error"

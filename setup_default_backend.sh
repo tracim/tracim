@@ -4,8 +4,6 @@
 
 # Main in bottom
 
-DEFAULTDIR=$(pwd)
-
 YELLOW='\033[1;33m'
 BROWN='\033[0;33m'
 GREEN='\033[1;32m'
@@ -23,14 +21,6 @@ function loggood {
 function logerror {
     echo -e "\n${RED}[$(date +'%H:%M:%S')]${RED} $ $1${NC}"
 }
-
-# Check if not running with sudoers
-if [ $PARAM1 == "root" ]; then
-    PREFIX=""
-else
-    PREFIX=sudo
-fi
-
 
 # Function for backend
 
@@ -92,6 +82,14 @@ function setup_db {
 
 ############################################
 
+# Check if not running with sudoers
+if [ $PARAM1 == "root" ]; then
+    PREFIX=""
+else
+    PREFIX=sudo
+fi
+
+DEFAULTDIR=$(pwd)
 
 log "go to backend subdir.."
 cd $DEFAULTDIR/backend  || exit 1
