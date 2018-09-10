@@ -1,5 +1,6 @@
 # coding=utf-8
 import transaction
+from tracim_backend.error_code import *
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_timezones_list
@@ -58,6 +59,7 @@ class TestApplicationEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/applications', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -110,6 +112,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/content_types', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -152,5 +155,6 @@ class TestTimezonesEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/timezones', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()

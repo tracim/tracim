@@ -1,59 +1,60 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
-import os
 import datetime
+import os
 import re
 import typing
+from contextlib import contextmanager
 from operator import itemgetter
 
-import transaction
-from preview_generator.manager import PreviewManager
-from sqlalchemy import func
-from sqlalchemy.orm import Query
-from depot.manager import DepotManager
-from depot.io.utils import FileIntent
 import sqlalchemy
+import transaction
+from depot.io.utils import FileIntent
+from depot.manager import DepotManager
+from preview_generator.exception import UnavailablePreviewType
+from preview_generator.manager import PreviewManager
+from sqlalchemy import desc
+from sqlalchemy import distinct
+from sqlalchemy import func
+from sqlalchemy import or_
+from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
-from sqlalchemy import desc
-from sqlalchemy import distinct
-from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
 
-from tracim_backend.lib.utils.utils import cmp_to_key
-from tracim_backend.lib.core.notifications import NotifierFactory
-from tracim_backend.exceptions import SameValueError
-from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import ContentType
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
+from tracim_backend.exceptions import EmptyCommentContentNotAllowed
+from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
-from tracim_backend.exceptions import EmptyCommentContentNotAllowed
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import TracimUnavailablePreviewType
+from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
+from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
-from tracim_backend.app_models.contents import CONTENT_STATUS
-from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import PreviewAllowedDim
+from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
-
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.lib.utils.translation import Translator
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
-from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.context_models import PreviewAllowedDim
-from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.revision_protection import new_revision
 
 __author__ = 'damien'
 
@@ -782,7 +783,6 @@ class ContentApi(object):
             ),
         ))
 
-
     def get_pdf_preview_path(
             self,
             content_id: int,
@@ -803,12 +803,129 @@ class ContentApi(object):
                     page=page,
                     content_id=content_id
                 ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             )
-        jpg_preview_path = self.preview_manager.get_pdf_preview(
-            file_path,
-            page=page
-        )
-        return jpg_preview_path
+        try:
+            pdf_preview_path = self.preview_manager.get_pdf_preview(
+                file_path,
+                page=page
+            )
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
+
+        return pdf_preview_path
 
     def get_full_pdf_preview_path(self, revision_id: int) -> str:
         """
@@ -817,7 +934,10 @@ class ContentApi(object):
         :return: path of the full pdf preview of this revision
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        try:
+            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
         return pdf_preview_path
 
     def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:

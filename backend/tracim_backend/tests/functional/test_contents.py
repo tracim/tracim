@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
-import transaction
-
-from tracim_backend import models
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
 from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
 import io
 
 import transaction
@@ -14,6 +7,7 @@ from PIL import Image
 from depot.io.utils import FileIntent
 
 from tracim_backend import models
+from tracim_backend.error_code import *
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
@@ -140,10 +134,16 @@ class TestFolder(FunctionalTest):
             do_notify=False
         )
         transaction.commit()
-        self.testapp.get(
-            '/api/v2/workspaces/2/folders/7',
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=thread.content_id
+            ),
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_folder__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -175,10 +175,14 @@ class TestFolder(FunctionalTest):
             save_now=True,
         )
         transaction.commit()
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/folders/170'.format(workspace_id=test_workspace.workspace_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
+
 
     def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -228,13 +232,16 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
                 workspace_id=test_workspace2.workspace_id,
                 content_id=folder.content_id,
             ),
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api__get_folder__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -273,10 +280,13 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/folders/{content_id}'.format(content_id=folder.content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
 
     def test_api__get_folder__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -315,10 +325,13 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/folders/{content_id}'.format(content_id=folder.content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_INVALID_ID
 
     def test_api__get_folder__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -358,10 +371,13 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/folders/coucou'.format(workspace_id=test_workspace.workspace_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_INVALID_ID
 
     def test_api__update_folder__err_400__empty_label(self) -> None:  # nopep8
         """
@@ -405,7 +421,7 @@ class TestFolder(FunctionalTest):
             'raw_content': '<p> Le nouveau contenu </p>',
             'sub_content_types': [CONTENT_TYPES.Folder.slug]
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
                 workspace_id=test_workspace.workspace_id,
                 content_id=folder.content_id,
@@ -413,6 +429,10 @@ class TestFolder(FunctionalTest):
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - Handled by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_folder__ok_200__nominal_case(self) -> None:
         """
@@ -777,7 +797,7 @@ class TestFolder(FunctionalTest):
             do_notify=False
         )
         transaction.commit()
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}/status'.format(  # nopep8
                 workspace_id=test_workspace.workspace_id,
                 content_id=folder.content_id,
@@ -785,6 +805,10 @@ class TestFolder(FunctionalTest):
             params=params,
             status=400
         )
+        # TODO - G.M - 2018-09-10 - handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
 
 class TestHtmlDocuments(FunctionalTest):
@@ -937,10 +961,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_html_document__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -953,10 +980,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/170',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api__get_html_document__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -969,10 +999,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/html-documents/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api__get_html_document__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -985,10 +1018,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/html-documents/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
 
     def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1001,10 +1037,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/html-documents/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_INVALID_ID
 
     def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1017,10 +1056,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/coucou',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_INVALID_ID
 
     def test_api__update_html_document__err_400__empty_label(self) -> None:  # nopep8
         """
@@ -1037,11 +1079,15 @@ class TestHtmlDocuments(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6',
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
         """
@@ -1255,11 +1301,14 @@ class TestHtmlDocuments(FunctionalTest):
         params = {
             'status': 'unexistant-status',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6/status',
             params=params,
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
 
 class TestFiles(FunctionalTest):
@@ -1425,10 +1474,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/files/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_file__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -1441,10 +1493,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/170',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api__get_file__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -1457,10 +1512,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/9',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api__get_file__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -1473,10 +1531,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/files/9',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
 
     def test_api__get_file__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1489,10 +1550,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/files/9',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_INVALID_ID
 
     def test_api__get_file__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1505,10 +1569,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/files/coucou',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_INVALID_ID
 
     def test_api__update_file_info_err_400__empty_label(self) -> None:  # nopep8
         """
@@ -1559,11 +1626,15 @@ class TestFiles(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_file_info__ok_200__nominal_case(self) -> None:
         """
@@ -2168,10 +2239,13 @@ class TestFiles(FunctionalTest):
             ],
             status=204,
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/jpg/512x512'.format(content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_PREVIEW_DIM_NOT_ALLOWED
 
     def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:  # nopep8
         """
@@ -2355,10 +2429,13 @@ class TestFiles(FunctionalTest):
             ],
             status=204,
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_UNAIVALABLE_PREVIEW_TYPE
 
     def test_api__get_pdf_preview__ok__200__nominal_case(self) -> None:
         """
@@ -2483,11 +2560,14 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         params = {'page': 1}
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
             status=400,
             params=params,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_PAGE_OF_PREVIEW_NOT_FOUND
 
     def test_api__get_pdf_revision_preview__ok__200__nominal_case(self) -> None:
         """
@@ -2581,10 +2661,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/threads/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_thread__ok_200__nominal_case(self) -> None:
         """
@@ -2627,7 +2710,6 @@ class TestThreads(FunctionalTest):
         assert content['last_modifier']['avatar_url'] is None
         assert content['raw_content'] == 'What is the best cake?'  # nopep8
 
-
     def test_api__get_thread__err_400__content_does_not_exist(self) -> None:
         """
         Get one thread (content 170 does not exist)
@@ -2639,10 +2721,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/threads/170',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api__get_thread__err_400__content_not_in_workspace(self) -> None:
         """
@@ -2655,10 +2740,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/threads/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api__get_thread__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -2671,10 +2759,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/threads/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
 
     def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -2687,10 +2778,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/threads/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_INVALID_ID
 
     def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -2703,10 +2797,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/threads/coucou',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_INVALID_ID
 
     def test_api__update_thread__ok_200__nominal_case(self) -> None:
         """
@@ -2793,11 +2890,15 @@ class TestThreads(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7',
             params=params,
             status=400
         )
+        # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR   # nopep8
 
     def test_api__get_thread_revisions__ok_200__nominal_case(
             self
@@ -3018,8 +3119,12 @@ class TestThreads(FunctionalTest):
             'status': 'unexistant-status',
         }
 
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7/status',
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
