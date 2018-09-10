@@ -35,6 +35,8 @@ else
 fi
 
 DEFAULTDIR=$(pwd)
+export DEFAULTDIR
+echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 
 # install nodjs if not installed
 log "verify if nodjs is installed"

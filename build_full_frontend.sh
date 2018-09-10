@@ -31,6 +31,8 @@ fi
 echo -e "\n${BROWN}/!\ ${NC}this script does not run 'npm install'\n${BROWN}/!\ ${NC}"
 
 DEFAULTDIR=$(pwd)
+export DEFAULTDIR
+echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 
 # create folder $DEFAULTDIR/frontend/dist/app/ if no exists
 mkdir -p $DEFAULTDIR/frontend/dist/app/ && loggood "success" || logerror "some error"

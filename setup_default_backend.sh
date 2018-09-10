@@ -90,6 +90,8 @@ else
 fi
 
 DEFAULTDIR=$(pwd)
+export DEFAULTDIR
+echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 
 log "go to backend subdir.."
 cd $DEFAULTDIR/backend  || exit 1
