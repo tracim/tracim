@@ -734,11 +734,14 @@ class ContentMoveSchema(marshmallow.Schema):
 class ContentCreationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
         example='contract for client XXX',
-        description='Title of the content to create'
+        description='Title of the content to create',
+        validate=Length(min=1),
+        required=True
     )
     content_type = marshmallow.fields.String(
         example='html-document',
         validate=all_content_types_validator,
+        required=True,
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -916,7 +919,8 @@ class CommentSchema(marshmallow.Schema):
 
 class SetCommentSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
-        example='<p>This is just an html comment !</p>'
+        example='<p>This is just an html comment !</p>',
+        validate=Length(min=1)
     )
 
     @post_load()
@@ -928,7 +932,8 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
         required=True,
         example='contract for client XXX',
-        description='New title of the content'
+        description='New title of the content',
+        validate=Length(min=1)
     )
 
 
