@@ -30,8 +30,10 @@ function logerror {
 # Check if not running with sudoers
 if [ $PARAM1 == "root" ]; then
     PREFIX=""
+    PREFIXCURL=""
 else
-    PREFIX=sudo
+    PREFIX="sudo"
+    PREFIXCURL="sudo -E"
 fi
 
 
@@ -44,7 +46,7 @@ if [ $? -eq 0 ]; then
 else
     log "install nodejs"
     $PREFIX apt install -y curl && loggood "success" || logerror "some error"
-    curl -sL https://deb.nodesource.com/setup_8.x | $PREFIX -E bash -
+    curl -sL https://deb.nodesource.com/setup_8.x | $PREFIXCURL bash -
     $PREFIX apt install -y nodejs && loggood "success" || logerror "some error"
 fi
 
