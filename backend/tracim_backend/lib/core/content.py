@@ -848,8 +848,8 @@ class ContentApi(object):
         file_path = self.get_one_revision_filepath(revision_id)
         page_number = preview_manager_page_format(page_number)
         if page_number >= self.preview_manager.get_page_nb(file_path):
-            raise Exception(
-                'page_number {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
+            raise PageOfPreviewNotFound(
+                'page {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
                     page_number=page_number,
                     revision_id=revision_id,
                     content_id=content_id,
