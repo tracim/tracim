@@ -97,5 +97,12 @@
   "An error has happened while setting \"mark all as read\"": "Une erreur s'est produite lors du réglage de \"Tout marquer comme lu\".",
   "Create in folder": "Créer dans ce dossier ...",
   "Open advanced Dashboard": "Ouvrir le tableau de bord avancé",
-  "This workspace has no content yet. Create the first content by clicking on the button \"Create\"": "Cet espace de travail n'a pas encore de contenu. Créer le premier contenu en cliquant sur le bouton \"Créer\""
+  "Error while loading user": "Erreur lors du chargement de l'utilisateur",
+  "Name has been changed": "Le nom a été changé",
+  "Name and email has been changed": "Le nom et l'email ont été changés",
+  "Email has been changed": "L'email a été changé",
+  "Password has been changed": "Le mot de passe a été changé",
+  "Admin account page": "Administration de compte",
+  "This requires your administrator password": "Ce champs a besoin de votre mot de passe administrateur",
+  "This workspace has no content yet, create the first content by clicking on the button 'Create'": "Cet espace de travail n'a pas encore de contenu, créer le premier contenu en cliquant sur le bouton 'Créer'"
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
 import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
@@ -65,6 +66,7 @@ class Tracim extends React.Component {
           ...fetchGetUserIsConnected.json,
           logged: true
         }))
+        i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
         this.loadAppConfig()
         this.loadWorkspaceList()
         break

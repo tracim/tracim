@@ -3,7 +3,11 @@ import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
-import { PAGE, ROLE, findIdRoleUserWorkspace } from '../helper.js'
+import {
+  PAGE,
+  ROLE,
+  findIdRoleUserWorkspace
+} from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -246,7 +250,7 @@ class WorkspaceContent extends React.Component {
               {state.contentLoaded && workspaceContentList.length === 0
                 ? (
                   <div className='workspace__content__fileandfolder__empty'>
-                    {t('This workspace has no content yet. Create the first content by clicking on the button "Create"')}
+                    {t("This workspace has no content yet, create the first content by clicking on the button 'Create'")}
                   </div>
                 )
                 : filteredWorkspaceContentList.map((c, i) => c.type === 'folder'

@@ -38,7 +38,6 @@
   "Error while archiving document": "Error while archiving document",
   "Error while deleting document": "Error while deleting document",
   "List of contents": "List of contents",
-  "This workspace has no content yet. Create the first content by clicking on the button \"Create\"": "This workspace has no content yet. Create the first content by clicking on the button \"Create\"",
   "Information": "Information",
   "Warning": "Warning",
   "Error": "Error",
@@ -97,5 +96,13 @@
   "Logout": "Logout",
   "Archive Topic": "Archive Topic",
   "Deleted File": "Deleted File",
-  "Search...": "Search..."
+  "Search...": "Search...",
+  "Error while loading user": "Error while loading user",
+  "Name has been changed": "Name has been changed",
+  "Name and email has been changed": "Name and email has been changed",
+  "Email has been changed": "Email has been changed",
+  "Password has been changed": "Password has been changed",
+  "Admin account page": "Admin account page",
+  "This requires your administrator password": "This requires your administrator password",
+  "This workspace has no content yet, create the first content by clicking on the button 'Create'": "This workspace has no content yet, create the first content by clicking on the button 'Create'"
 }
