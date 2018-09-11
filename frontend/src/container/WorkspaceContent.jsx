@@ -108,7 +108,7 @@ class WorkspaceContent extends React.Component {
     const { user, dispatch } = this.props
 
     const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
-    const wsMember = await dispatch(getWorkspaceMemberList(user, idWorkspace))
+    const wsMember = await dispatch(getWorkspaceMemberList(idWorkspace))
 
     if (wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))

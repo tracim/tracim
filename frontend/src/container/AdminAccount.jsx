@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -14,13 +15,11 @@ import {
   PageContent
 } from 'tracim_frontend_lib'
 import {
-  newFlashMessage,
-  setWorkspaceListMemberList,
-  updateUserName,
-  updateUserEmail,
-  updateUserWorkspaceSubscriptionNotif
+  newFlashMessage
 } from '../action-creator.sync.js'
 import {
+  getUser,
+  getUserWorkspaceList,
   getWorkspaceMemberList,
   putUserName,
   putUserEmail,
@@ -34,6 +33,9 @@ class Account extends React.Component {
     super(props)
 
     this.state = {
+      idUserToEdit: props.match.params.iduser,
+      userToEdit: {},
+      userToEditWorkspaceList: [],
       subComponentMenu: [{
         name: 'personalData',
         menuLabel: props.t('My profil'),
@@ -59,18 +61,40 @@ class Account extends React.Component {
     }
   }
 
-  componentDidMount () {
-    const { props } = this
-    if (props.system.workspaceListLoaded && props.workspaceList.length > 0) this.loadWorkspaceListMemberList()
+  async componentDidMount () {
+    this.getUserDetail()
+    this.getUserWorkspaceList()
   }
 
-  loadWorkspaceListMemberList = async () => {
+  getUserDetail = async () => {
+    const { props, state } = this
+
+    const fetchGetUser = await props.dispatch(getUser(state.idUserToEdit))
+
+    switch (fetchGetUser.status) {
+      case 200: this.setState({userToEdit: fetchGetUser.json}); break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
+    }
+  }
+
+  getUserWorkspaceList = async () => {
+    const { props, state } = this
+
+    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(state.idUserToEdit))
+
+    switch (fetchGetUserWorkspaceList.status) {
+      case 200: this.getUserWorkspaceListMemberList(fetchGetUserWorkspaceList.json); break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
+    }
+  }
+
+  getUserWorkspaceListMemberList = async (wsList) => {
     const { props } = this
 
     const fetchWorkspaceListMemberList = await Promise.all(
-      props.workspaceList.map(async ws => ({
-        idWorkspace: ws.id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.id))
+      wsList.map(async ws => ({
+        idWorkspace: ws.workspace_id,
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
       }))
     )
 
@@ -81,7 +105,13 @@ class Account extends React.Component {
         : [] // handle error ?
     }))
 
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+    this.setState({
+      userToEditWorkspaceList: wsList.map(ws => ({
+        ...ws,
+        id: ws.workspace_id, // duplicate id to be able use <Notification /> easily
+        memberList: workspaceListMemberList.find(wsm => ws.workspace_id === wsm.idWorkspace).memberList
+      }))
+    })
   }
 
   handleClickSubComponentMenuItem = subMenuItemName => this.setState(prev => ({
@@ -89,14 +119,14 @@ class Account extends React.Component {
   }))
 
   handleSubmitNameOrEmail = async (newName, newEmail, checkPassword) => {
-    const { props } = this
+    const { props, state } = this
 
     if (newName !== '') {
-      const fetchPutUserName = await props.dispatch(putUserName(props.user, newName))
+      const fetchPutUserName = await props.dispatch(putUserName(state.userToEdit, newName))
       switch (fetchPutUserName.status) {
         case 200:
-          props.dispatch(updateUserName(newName))
-          if (newEmail === '') props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
+          this.setState(prev => ({userToEdit: {...prev.userToEdit, public_name: newName}}))
+          if (newEmail === '') props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
           // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
           break
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
@@ -104,12 +134,12 @@ class Account extends React.Component {
     }
 
     if (newEmail !== '') {
-      const fetchPutUserEmail = await props.dispatch(putUserEmail(props.user, newEmail, checkPassword))
+      const fetchPutUserEmail = await props.dispatch(putUserEmail(state.userToEdit, newEmail, checkPassword))
       switch (fetchPutUserEmail.status) {
         case 200:
-          props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
-          if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
-          else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
+          this.setState(prev => ({userToEdit: {...prev.userToEdit, email: newEmail}}))
+          if (newName !== '') props.dispatch(newFlashMessage(props.t('Name and email has been changed'), 'info'))
+          else props.dispatch(newFlashMessage(props.t('Email has been changed'), 'info'))
           break
         default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); break
       }
@@ -117,24 +147,27 @@ class Account extends React.Component {
   }
 
   handleChangeSubscriptionNotif = async (idWorkspace, doNotify) => {
-    const { props } = this
+    const { props, state } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(props.user, idWorkspace, doNotify))
+    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, idWorkspace, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify)); break
+      case 204: this.setState(prev => ({
+        userToEditWorkspaceList: prev.userToEditWorkspaceList.map(ws => ws.workspace_id === idWorkspace
+          ? {...ws, memberList: ws.memberList.map(u => u.user_id === state.userToEdit.user_id ? {...u, do_notify: doNotify} : u)}
+          : ws
+        )}))
+        break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
   handleSubmitPassword = async (oldPassword, newPassword, newPassword2) => {
-    const { props } = this
+    const { props, state } = this
 
-    const fetchPutUserPassword = await props.dispatch(putUserPassword(props.user, oldPassword, newPassword, newPassword2))
+    const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEdit, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
-      case 204:
-        props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info'))
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning')); break
+      case 204: props.dispatch(newFlashMessage(props.t('Password has been changed'), 'info')); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning'))
     }
   }
 
@@ -146,20 +179,20 @@ class Account extends React.Component {
     const subComponent = (() => {
       switch (state.subComponentMenu.find(({active}) => active).name) {
         case 'personalData':
-          return <PersonalData onClickSubmit={this.handleSubmitNameOrEmail} />
+          return <PersonalData onClickSubmit={this.handleSubmitNameOrEmail} displayAdminInfo />
 
         // case 'calendar':
         //   return <Calendar user={props.user} />
 
         case 'notification':
           return <Notification
-            idMyself={props.user.user_id}
-            workspaceList={props.workspaceList}
+            idMyself={parseInt(state.idUserToEdit)}
+            workspaceList={state.userToEditWorkspaceList}
             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
           />
 
         case 'password':
-          return <Password onClickSubmit={this.handleSubmitPassword} />
+          return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
 
         case 'timezone':
           return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
@@ -170,11 +203,11 @@ class Account extends React.Component {
       <PageWrapper customClass='account'>
         <PageTitle
           parentClass={'account'}
-          title={props.t('My account')}
+          title={props.t('Admin account page')}
         />
 
         <PageContent parentClass='account'>
-          <UserInfo user={props.user} />
+          <UserInfo user={state.userToEdit} />
 
           <Delimiter customClass={'account__delimiter'} />
 
@@ -196,4 +229,4 @@ class Account extends React.Component {
 }
 
 const mapStateToProps = ({ user, workspaceList, timezone, system }) => ({ user, workspaceList, timezone, system })
-export default connect(mapStateToProps)(translate()(Account))
+export default withRouter(connect(mapStateToProps)(translate()(Account)))

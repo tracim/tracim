@@ -5,6 +5,7 @@ import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import Account from './Account.jsx'
+import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
@@ -165,9 +166,12 @@ class Tracim extends React.Component {
               <Account />
             } />
 
-            <Route path={PAGE.ADMIN.ROOT} render={() =>
-              <AppFullscreenRouter />
+            <Route path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
+              <AdminAccount />
             } />
+
+            <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
+            <Route path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
 
             <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 

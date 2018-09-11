@@ -271,6 +271,15 @@ class AdminWorkspaceUser extends React.Component {
     })
   }
 
+  handleClickUser = idUser => {
+    GLOBAL_dispatchEvent({
+      type: 'redirect',
+      data: {
+        url: `/admin/user/${idUser}`
+      }
+    })
+  }
+
   render () {
     const { props, state } = this
 
@@ -290,6 +299,7 @@ class AdminWorkspaceUser extends React.Component {
           <AdminUser
             userList={state.content.userList}
             profile={state.content.profile}
+            onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}

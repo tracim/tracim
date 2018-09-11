@@ -78,6 +78,12 @@ export class PersonalData extends React.Component {
               placeholder={props.t('Check your password')}
               onChange={this.handleChangeCheckPassword}
             />
+            {props.displayAdminInfo &&
+              <div className='personaldata__form__txtinput__info'>
+                <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
+                {props.t('This requires your administrator password')}
+              </div>
+            }
           </div>
 
           <button
