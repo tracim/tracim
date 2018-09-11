@@ -104,6 +104,18 @@ npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 log "build-translation"
 npm run build-translation && loggood "success" || logerror "some error"
 
+
+# install app workspace advanced
+log "cd $DEFAULTDIR/frontend_app_workspace_advanced"
+cd $DEFAULTDIR/frontend_app_workspace_advanced  || exit 1
+log "npm i"
+npm i && loggood "success" || logerror "some error"
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+log "build-translation"
+npm run build-translation && loggood "success" || logerror "some error"
+
+
 # install app file
 log "cd $DEFAULTDIR/frontend_app_file"
 cd $DEFAULTDIR/frontend_app_file  || exit 1
