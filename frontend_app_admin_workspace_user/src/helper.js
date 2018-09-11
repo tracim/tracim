@@ -1,4 +1,4 @@
-import i18n from '../../frontend/src/i18n.js'
+import i18n from './i18n.js'
 
 export const FETCH_CONFIG = {
   headers: {

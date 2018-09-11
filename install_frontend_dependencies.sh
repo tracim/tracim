@@ -26,7 +26,7 @@ function logerror {
 ##################################################################
 
 # Check if not running with sudoers
-if [ $PARAM1 == "root" ]; then
+if [ "PARAM1" == "root" ]; then
     SUDO=""
     SUDOCURL=""
 else

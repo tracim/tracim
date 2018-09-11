@@ -24,5 +24,7 @@
   "Error while saving new user": "Error while saving new user",
   "Are you sure ?": "Are you sure ?",
   "Cancel": "Cancel",
-  "Delete": "Delete"
+  "Delete": "Delete",
+  "Users management": "Users management",
+  "Workspace management": "Workspace management"
 }

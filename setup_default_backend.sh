@@ -83,7 +83,7 @@ function setup_db {
 ############################################
 
 # Check if not running with sudoers
-if [ $PARAM1 == "root" ]; then
+if [ "$PARAM1" == "root" ]; then
     SUDO=""
 else
     SUDO=sudo

@@ -82,7 +82,7 @@ export const postWorkspaceMember = (apiUrl, idWorkspace, newMember) =>
     },
     method: 'POST',
     body: JSON.stringify({
-      user_id: newMember.id,
+      user_id: newMember.id || null,
       user_email_or_public_name: newMember.name,
       role: newMember.role
     })

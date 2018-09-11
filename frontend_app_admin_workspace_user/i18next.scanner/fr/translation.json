@@ -4,14 +4,14 @@
   "Email": "Email",
   "Choose the profile of the user": "Choisissez le profil de l'utilisateur",
   "Add the user": "Ajouter l'utilisateur",
-  "An administrator can always create workspaces": "Un administrateur peut toujours créer des espaces de travail",
-  "On this page you can manage the members of your Tracim instance.": "Sur cette page vous pouvez gérer les membres de votre instance Tracim.",
+  "An administrator can always create workspaces": "Un administrateur peut toujours créer un espace de travail",
+  "On this page you can manage the members of your Tracim instance.": "Cette page vous permet d'administrer les membres de votre instance de Tracim",
   "Add a member": "Ajouter un membre",
   "Active": "Actif",
   "Member": "Membre",
-  "Can create workspace": "Peut créer un espace de travail",
+  "Can create workspace": "Peut créer des espaces de travail",
   "Administrator": "Administrateur",
-  "List of every workspaces": "Liste de tous les espaces de travail",
+  "List of every workspaces": "Liste des espaces de travail",
   "Workspace": "Espace de travail",
   "Description": "Description",
   "Member count": "Nombre de membres",
@@ -24,5 +24,7 @@
   "Error while saving new user": "Erreur lors de l'enregistrement d'un nouvel utilisateur",
   "Are you sure ?": "Êtes-vous sûr ?",
   "Cancel": "Annuler",
-  "Delete": "Supprimer"
+  "Delete": "Supprimer",
+  "Users management": "Admininistration des utilisateurs",
+  "Workspace management": "Administration des espaces de travail"
 }
