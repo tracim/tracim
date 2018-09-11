@@ -795,17 +795,17 @@ class ContentApi(object):
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        page = preview_manager_page_format(page)
-        if page >= self.preview_manager.get_page_nb(file_path):
+        page_number = preview_manager_page_format(page)
+        if page_number >= self.preview_manager.get_page_nb(file_path):
             raise PageOfPreviewNotFound(
-                'page {page} of content {content_id} does not exist'.format(
-                    page=page,
+                'page {page_number} of content {content_id} does not exist'.format(
+                    page_number=page_number,
                     content_id=content_id
                 ),
             )
         jpg_preview_path = self.preview_manager.get_pdf_preview(
             file_path,
-            page=page
+            page=page_number
         )
         return jpg_preview_path
 
@@ -832,7 +832,7 @@ class ContentApi(object):
         self,
         content_id: int,
         revision_id: int,
-        page: int,
+        page_number: int,
         width: int = None,
         height: int = None,
     ) -> str:
@@ -840,17 +840,17 @@ class ContentApi(object):
         Get jpg preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage content
         :param width: width in pixel
         :param height: height in pixel
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        page = preview_manager_page_format(page)
-        if page >= self.preview_manager.get_page_nb(file_path):
+        page_number = preview_manager_page_format(page_number)
+        if page_number >= self.preview_manager.get_page_nb(file_path):
             raise Exception(
-                'page {page} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
-                    page=page,
+                'page_number {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
+                    page_number=page_number,
                     revision_id=revision_id,
                     content_id=content_id,
                 ),
@@ -874,7 +874,7 @@ class ContentApi(object):
             )
         jpg_preview_path = self.preview_manager.get_jpeg_preview(
             file_path,
-            page=page,
+            page=page_number,
             width=width,
             height=height,
         )

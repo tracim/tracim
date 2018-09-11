@@ -291,7 +291,7 @@ class FileController(Controller):
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=content.revision_id,
-            page=hapic_data.query.page,
+            page_number=hapic_data.query.page,
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
         )
@@ -328,7 +328,7 @@ class FileController(Controller):
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=content.revision_id,
-            page=hapic_data.query.page,
+            page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
@@ -369,7 +369,7 @@ class FileController(Controller):
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=revision.revision_id,
-            page=hapic_data.query.page,
+            page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
