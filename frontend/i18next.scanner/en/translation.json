@@ -31,7 +31,6 @@
   "Calendar": "Calendar",
   "Access your personal calendar": "Access your personal calendar",
   "Dashboard": "Dashboard",
-  "Active advanced Dashboard": "Active advanced Dashboard",
   "Change your status": "Change your status",
   "subscriber": "subscriber",
   "unsubscribed": "unsubscribed",
@@ -40,10 +39,6 @@
   "See more": "See more",
   "Member List": "Member List",
   "Add a member": "Add a member",
-  "Enter the name or email of the member": "Enter the name or email of the member",
-  "Create an account": "Create an account",
-  "Choose the role of the member": "Choose the role of the member",
-  "Validate": "Validate",
   "Implement Tracim in your explorer": "Implement Tracim in your explorer",
   "Find all your documents deposited online directly on your computer via the workstation, without going through the software.": "Find all your documents deposited online directly on your computer via the workstation, without going through the software.",
   "Workspace Calendar": "Workspace Calendar",
@@ -99,6 +94,13 @@
   "Email Address:": "Email Address:",
   "Check your password": "Check your password",
   "An error has happened while getting": "An error has happened while getting",
+  "Open advanced Dashboard": "Open advanced Dashboard",
+  "Error while saving new lang": "Error while saving new lang",
+  "This workspace has no content yet. Create the first content by clicking on the button \"Create\"": "This workspace has no content yet. Create the first content by clicking on the button \"Create\"",
+  "Repeat new password": "Repeat new password",
+  "Please type your password in order to change your email. (For security reasons)": "Please type your password in order to change your email. (For security reasons)",
+  "Email Address:": "Email Address:",
+  "Check your password": "Check your password"
   "An error has happened while setting \"mark all as read\"": "An error has happened while setting \"mark all as read\"",
   "Create in folder": "Create in folder"
 }
