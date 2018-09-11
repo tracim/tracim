@@ -11,5 +11,9 @@
   "Rich text": "Texte riche",
   "Send": "Envoyer",
   "Your message...": "Votre message ...",
-  "Edit": "Modifier"
+  "Edit": "Modifier",
+  "validate the title": "valider le titre",
+  "edit title": "modifier le titre",
+  "Archive": "archiver",
+  "Delete": "supprimer"
 }

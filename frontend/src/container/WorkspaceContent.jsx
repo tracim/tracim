@@ -226,7 +226,7 @@ class WorkspaceContent extends React.Component {
           <PageTitle
             parentClass='workspace__header'
             customClass='justify-content-between align-items-center'
-            title='Liste des Contenus'
+            title={this.props.t('List of contents')}
             subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
             {idRoleUserWorkspace >= 2 &&

@@ -51,7 +51,7 @@ else
     $SUDO apt update
     $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
     log "verify if nodjs 8.x is now installed"
-    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '8.'
+    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
     if [ $? -eq 0 ]; then
         loggood "nodjs 8.x is installed"
     else
@@ -103,6 +103,18 @@ log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 log "build-translation"
 npm run build-translation && loggood "success" || logerror "some error"
+
+
+# install app workspace advanced
+log "cd $DEFAULTDIR/frontend_app_workspace_advanced"
+cd $DEFAULTDIR/frontend_app_workspace_advanced  || exit 1
+log "npm i"
+npm i && loggood "success" || logerror "some error"
+log "npm link tracim_frontend_lib"
+npm link tracim_frontend_lib && loggood "success" || logerror "some error"
+log "build-translation"
+npm run build-translation && loggood "success" || logerror "some error"
+
 
 # install app file
 log "cd $DEFAULTDIR/frontend_app_file"

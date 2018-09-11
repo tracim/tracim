@@ -151,7 +151,12 @@ class Login extends React.Component {
 
                       <div className='row mt-4 mb-4'>
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
-                          <div className='connection__form__rememberme' onClick={this.handleChangeRememberMe}>
+                          <div
+                            className='connection__form__rememberme'
+                            onClick={this.handleChangeRememberMe}
+                            style={{'display': 'none'}}
+                            // AC - 10/09/2018 - not included in v2.0 roadmap
+                          >
                             <Checkbox
                               name='inputRememberMe'
                               checked={this.state.inputRememberMe}

@@ -1,6 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
+import { translate } from 'react-i18next'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -47,7 +48,7 @@ class PopinFixedHeader extends React.Component {
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
           >
-            {this.state.editTitle ? <i className='fa fa-check' title='Valider le Titre' /> : <i className='fa fa-pencil' title='Modifier le Titre' />}
+            {this.state.editTitle ? <i className='fa fa-check' title={this.props.t('validate the title')} /> : <i className='fa fa-pencil' title={this.props.t('edit title')} />}
           </div>
         }
 
@@ -62,7 +63,7 @@ class PopinFixedHeader extends React.Component {
   }
 }
 
-export default PopinFixedHeader
+export default translate()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
   faIcon: PropTypes.string.isRequired,

@@ -63,6 +63,12 @@ cd $DEFAULTDIR/frontend_app_workspace || exit 1
 ./build_workspace.sh
 
 
+# app Workspace Advanced
+log "cd $DEFAULTDIR/frontend_app_workspace_advanced"
+cd $DEFAULTDIR/frontend_app_workspace_advanced || exit 1
+./build_workspace_advanced.sh
+
+
 # app File
 log "cd $DEFAULTDIR/frontend_app_file"
 cd $DEFAULTDIR/frontend_app_file || exit 1
