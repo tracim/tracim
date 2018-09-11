@@ -84,6 +84,7 @@ class File extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.loadTimeline()
         break
     }
   }
@@ -157,7 +158,7 @@ class File extends React.Component {
       .then(([resComment, resRevision]) => {
         const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
           ...c,
-          created: (new Date(c.created)).toLocaleString(),
+          created: displayDate(c.created, loggedUser.lang),
           author: {
             ...c.author,
             avatar_url: c.author.avatar_url

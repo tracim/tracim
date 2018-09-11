@@ -71,6 +71,7 @@ class Thread extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.loadContent()
         break
     }
   }
