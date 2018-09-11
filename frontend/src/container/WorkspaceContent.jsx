@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../appFactory.js'
+import { translate } from 'react-i18next'
 import { PAGE, ROLE, findIdRoleUserWorkspace } from '../helper.js'
 import Folder from '../component/Workspace/Folder.jsx'
 import ContentItem from '../component/Workspace/ContentItem.jsx'
@@ -180,7 +181,7 @@ class WorkspaceContent extends React.Component {
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
   render () {
-    const { user, currentWorkspace, workspaceContentList, contentType } = this.props
+    const { user, currentWorkspace, workspaceContentList, contentType, t } = this.props
     const { state } = this
 
     const filterWorkspaceContent = (contentList, filter) => {
@@ -242,48 +243,55 @@ class WorkspaceContent extends React.Component {
             <div className='workspace__content__fileandfolder folder__content active'>
               <ContentItemHeader />
 
-              { filteredWorkspaceContentList.map((c, i) => c.type === 'folder'
+              {state.contentLoaded && workspaceContentList.length === 0
                 ? (
-                  <Folder
-                    availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
-                    folderData={c}
-                    onClickItem={this.handleClickContentItem}
-                    idRoleUserWorkspace={idRoleUserWorkspace}
-                    onClickExtendedAction={{
-                      edit: this.handleClickEditContentItem,
-                      move: this.handleClickMoveContentItem,
-                      download: this.handleClickDownloadContentItem,
-                      archive: this.handleClickArchiveContentItem,
-                      delete: this.handleClickDeleteContentItem
-                    }}
-                    onClickFolder={this.handleClickFolder}
-                    onClickCreateContent={this.handleClickCreateContent}
-                    isLast={i === filteredWorkspaceContentList.length - 1}
-                    key={c.id}
-                  />
+                  <div className='workspace__content__fileandfolder__empty'>
+                    {t('This workspace has no content yet. Create the first content by clicking on the button "Create"')}
+                  </div>
                 )
-                : (
-                  <ContentItem
-                    label={c.label}
-                    type={c.type}
-                    faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
-                    statusSlug={c.statusSlug}
-                    contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
-                    onClickItem={() => this.handleClickContentItem(c)}
-                    idRoleUserWorkspace={idRoleUserWorkspace}
-                    onClickExtendedAction={{
-                      edit: e => this.handleClickEditContentItem(e, c),
-                      move: e => this.handleClickMoveContentItem(e, c),
-                      download: e => this.handleClickDownloadContentItem(e, c),
-                      archive: e => this.handleClickArchiveContentItem(e, c),
-                      delete: e => this.handleClickDeleteContentItem(e, c)
-                    }}
-                    onClickCreateContent={this.handleClickCreateContent}
-                    isLast={i === filteredWorkspaceContentList.length - 1}
-                    key={c.id}
-                  />
+                : filteredWorkspaceContentList.map((c, i) => c.type === 'folder'
+                  ? (
+                    <Folder
+                      availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                      folderData={c}
+                      onClickItem={this.handleClickContentItem}
+                      idRoleUserWorkspace={idRoleUserWorkspace}
+                      onClickExtendedAction={{
+                        edit: this.handleClickEditContentItem,
+                        move: this.handleClickMoveContentItem,
+                        download: this.handleClickDownloadContentItem,
+                        archive: this.handleClickArchiveContentItem,
+                        delete: this.handleClickDeleteContentItem
+                      }}
+                      onClickFolder={this.handleClickFolder}
+                      onClickCreateContent={this.handleClickCreateContent}
+                      isLast={i === filteredWorkspaceContentList.length - 1}
+                      key={c.id}
+                    />
+                  )
+                  : (
+                    <ContentItem
+                      label={c.label}
+                      type={c.type}
+                      faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
+                      statusSlug={c.statusSlug}
+                      contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
+                      onClickItem={() => this.handleClickContentItem(c)}
+                      idRoleUserWorkspace={idRoleUserWorkspace}
+                      onClickExtendedAction={{
+                        edit: e => this.handleClickEditContentItem(e, c),
+                        move: e => this.handleClickMoveContentItem(e, c),
+                        download: e => this.handleClickDownloadContentItem(e, c),
+                        archive: e => this.handleClickArchiveContentItem(e, c),
+                        delete: e => this.handleClickDeleteContentItem(e, c)
+                      }}
+                      onClickCreateContent={this.handleClickCreateContent}
+                      isLast={i === filteredWorkspaceContentList.length - 1}
+                      key={c.id}
+                    />
+                  )
                 )
-              )}
+              }
             </div>
 
           </PageContent>
@@ -305,4 +313,4 @@ class WorkspaceContent extends React.Component {
 const mapStateToProps = ({ user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
   user, currentWorkspace, workspaceContentList, workspaceList, contentType
 })
-export default withRouter(connect(mapStateToProps)(appFactory(WorkspaceContent)))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))
