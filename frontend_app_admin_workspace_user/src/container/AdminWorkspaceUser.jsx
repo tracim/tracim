@@ -54,6 +54,18 @@ class AdminWorkspaceUser extends React.Component {
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceContent()
         break
+      case 'allApp_changeLang':
+        console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
+        else if (this.state.config.type === 'user') this.loadUserContent()
+        break
       default:
         break
     }

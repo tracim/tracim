@@ -24,5 +24,7 @@
   "Error while saving new user": "Erreur lors de la sauvegarde du nouvel utilisateur",
   "Are you sure ?": "Êtes vous sûr ?",
   "Cancel": "Annuler",
-  "Delete": "Supprimer"
+  "Delete": "Supprimer",
+  "Users management": "Admininistration des utilisateurs",
+  "Workspace management": "Administration des espaces de travail"
 }

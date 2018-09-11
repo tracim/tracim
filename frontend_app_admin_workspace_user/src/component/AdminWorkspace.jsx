@@ -11,7 +11,7 @@ const AdminWorkspace = props =>
   <PageWrapper customClass='adminWorkspacePage'>
     <PageTitle
       parentClass={'adminWorkspacePage'}
-      title={'Workspace management'}
+      title={props.t('Workspace management')}
     />
 
     <PageContent parentClass='adminWorkspacePage'>
