@@ -51,7 +51,7 @@ else
     $SUDO apt update
     $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
     log "verify if nodjs 8.x is now installed"
-    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '8.'
+    dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
     if [ $? -eq 0 ]; then
         loggood "nodjs 8.x is installed"
     else
