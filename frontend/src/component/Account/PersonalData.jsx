@@ -45,7 +45,7 @@ export class PersonalData extends React.Component {
 
         <form className='personaldata__form'>
           <div className='personaldata__form__title'>
-            {props.t('Name:')}
+            {props.t('Name')}
           </div>
 
           <div className='d-flex align-items-center flex-wrap mb-4'>
