@@ -29,7 +29,7 @@ import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
-import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
+// import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -319,13 +319,18 @@ class Dashboard extends React.Component {
               />
             </div>
 
-            <MoreInfo
-              onClickToggleWebdav={this.handleToggleWebdavBtn}
-              displayWebdavBtn={state.displayWebdavBtn}
-              onClickToggleCalendar={this.handleToggleCalendarBtn}
-              displayCalendarBtn={state.displayCalendarBtn}
-              t={props.t}
-            />
+            { /*
+              AC - 11/09/2018 - not included in v2.0 roadmap
+
+              <MoreInfo
+                onClickToggleWebdav={this.handleToggleWebdavBtn}
+                displayWebdavBtn={state.displayWebdavBtn}
+                onClickToggleCalendar={this.handleToggleCalendarBtn}
+                displayCalendarBtn={state.displayCalendarBtn}
+                t={props.t}
+              />
+            */ }
+
           </PageContent>
         </PageWrapper>
       </div>
