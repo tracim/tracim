@@ -70,7 +70,7 @@ class Account extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       props.workspaceList.map(async ws => ({
         idWorkspace: ws.id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(props.user, ws.id))
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.id))
       }))
     )
 
