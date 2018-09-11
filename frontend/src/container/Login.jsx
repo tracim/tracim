@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
-import LoginLogo from '../component/Login/LoginLogo.jsx'
-import LoginLogoImg from '../img/logoTracimWhite.svg'
+// import LoginLogo from '../component/Login/LoginLogo.jsx'
+// import LoginLogoImg from '../img/logoTracimWhite.svg'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -113,7 +113,13 @@ class Login extends React.Component {
         <section className='loginpage primaryColorBg'>
           <div className='container-fluid'>
 
-            <LoginLogo customClass='loginpage__logo' logoSrc={LoginLogoImg} />
+            { /*
+              AC - 11/09/2018 - disable the logo to leave more space for the login form
+              <LoginLogo
+                customClass='loginpage__logo'
+                logoSrc={LoginLogoImg}
+              />
+            */ }
 
             <div className='row justify-content-center'>
               <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
