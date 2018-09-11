@@ -23,7 +23,8 @@ import {
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList
 } from '../action-creator.sync.js'
-import { ROLE, PAGE } from '../helper.js'
+import appFactory from '../appFactory.js'
+import { ROLE, PAGE, findIdRoleUserWorkspace } from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -47,6 +48,19 @@ class Dashboard extends React.Component {
       displayNotifBtn: false,
       displayWebdavBtn: false,
       displayCalendarBtn: false
+    }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'refreshWorkspaceList':
+        console.log('%c<Dashboard> Custom event', 'color: #28a745', type, data)
+        this.loadWorkspaceDetail()
+        this.loadMemberList()
+        this.loadRecentActivity()
+        break
     }
   }
 
@@ -151,6 +165,7 @@ class Dashboard extends React.Component {
 
   handleChangeNewMemberNameOrEmail = newNameOrEmail => {
     if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
+    else if (newNameOrEmail.length === 0) this.setState({searchedKnownMemberList: []})
     this.setState(prev => ({newMember: {...prev.newMember, nameOrEmail: newNameOrEmail}}))
   }
 
@@ -184,7 +199,7 @@ class Dashboard extends React.Component {
     }
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
-      id: state.newMember.id,
+      id: state.newMember.id || null,
       name: state.newMember.nameOrEmail,
       role: state.newMember.role
     }))
@@ -195,6 +210,24 @@ class Dashboard extends React.Component {
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while adding the member'), 'warning')); break
     }
+  }
+
+  handleClickOpenAdvancedDashboard = () => {
+    const { props } = this
+
+    props.renderAppFeature(
+      {
+        label: 'Advanced dashboard',
+        slug: 'workspace_advanced',
+        faIcon: 'bank',
+        hexcolor: '#999999',
+        creationLabel: '',
+        roleList: ROLE
+      },
+      props.user,
+      findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
+      {...props.curWs, workspace_id: props.curWs.id}
+    )
   }
 
   render () {
@@ -209,8 +242,12 @@ class Dashboard extends React.Component {
             subtitle={''}
           >
             <div className='dashboard__header__advancedmode mr-3'>
-              <button type='button' className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'>
-                {props.t('Active advanced Dashboard')}
+              <button
+                type='button'
+                className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                onClick={this.handleClickOpenAdvancedDashboard}
+              >
+                {props.t('Open advanced Dashboard')}
               </button>
             </div>
           </PageTitle>
@@ -297,4 +334,4 @@ class Dashboard extends React.Component {
 }
 
 const mapStateToProps = ({ user, contentType, appList, currentWorkspace }) => ({ user, contentType, appList, curWs: currentWorkspace })
-export default connect(mapStateToProps)(translate()(Dashboard))
+export default connect(mapStateToProps)(appFactory(translate()(Dashboard)))
