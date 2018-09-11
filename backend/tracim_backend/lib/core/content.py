@@ -886,7 +886,7 @@ class ContentApi(object):
         content_type_slug: str = CONTENT_TYPES.Any_SLUG,
         workspace: Workspace = None,
         label:str = None,
-        order_by_label=False,
+        order_by_property=None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -915,8 +915,8 @@ class ContentApi(object):
         if label:
             resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
 
-        if order_by_label:
-            resultset = resultset.order_by(Content.label)
+        if order_by_property:
+            resultset = resultset.order_by(order_by_property)
         return resultset
 
     def get_all(
@@ -925,9 +925,9 @@ class ContentApi(object):
             content_type: str=CONTENT_TYPES.Any_SLUG,
             workspace: Workspace=None,
             label: str=None,
-            order_by_label=False
+            order_by_property=None
     ) -> typing.List[Content]:
-        return self._get_all_query(parent_id, content_type, workspace, label, order_by_label).all()
+        return self._get_all_query(parent_id, content_type, workspace, label, order_by_property).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:

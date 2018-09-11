@@ -1,60 +1,65 @@
 import typing
+
 import transaction
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 
+from tracim_backend import BASE_API_V2
+from tracim_backend import hapic
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import EmailValidationFailed
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import ParentNotFound
+from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.exceptions import UserCreationFailed
+from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.utils.authorization import \
+    require_candidate_workspace_role
+from tracim_backend.lib.utils.authorization import require_profile
+from tracim_backend.lib.utils.authorization import \
+    require_profile_or_other_profile_with_workspace_role
+from tracim_backend.lib.utils.authorization import require_same_user_or_profile
+from tracim_backend.lib.utils.authorization import require_workspace_role
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import password_generator
+from tracim_backend.models import Group
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import UserRoleWorkspaceInContext
+from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import ContentCreationSchema
+from tracim_backend.views.core_api.schemas import ContentDigestSchema
+from tracim_backend.views.core_api.schemas import ContentIdPathSchema
+from tracim_backend.views.core_api.schemas import ContentMoveSchema
+from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
+from tracim_backend.views.core_api.schemas import NoContentSchema
+from tracim_backend.views.core_api.schemas import RoleUpdateSchema
+from tracim_backend.views.core_api.schemas import \
+    WorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
+from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
+from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
+from tracim_backend.views.core_api.schemas import WorkspaceSchema
 
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import hapic
-from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend import BASE_API_V2
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.utils.authorization import require_workspace_role
-from tracim_backend.lib.utils.authorization import require_same_user_or_profile
-from tracim_backend.lib.utils.authorization import require_profile_or_other_profile_with_workspace_role
-from tracim_backend.lib.utils.authorization import require_profile
-from tracim_backend.models import Group
-from tracim_backend.lib.utils.authorization import require_candidate_workspace_role
-from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.context_models import UserRoleWorkspaceInContext
-from tracim_backend.models.context_models import ContentInContext
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import UnallowedSubContent
-from tracim_backend.exceptions import EmailValidationFailed
-from tracim_backend.exceptions import UserCreationFailed
-from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import ContentNotFound
-from tracim_backend.exceptions import WorkspacesDoNotMatch
-from tracim_backend.exceptions import ParentNotFound
-from tracim_backend.views.controllers import Controller
-from tracim_backend.lib.utils.utils import password_generator
-from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
-from tracim_backend.views.core_api.schemas import ContentIdPathSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
-from tracim_backend.views.core_api.schemas import RoleUpdateSchema
-from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
-from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
-from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
-from tracim_backend.views.core_api.schemas import ContentMoveSchema
-from tracim_backend.views.core_api.schemas import NoContentSchema
-from tracim_backend.views.core_api.schemas import ContentCreationSchema
-from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
-from tracim_backend.views.core_api.schemas import ContentDigestSchema
-from tracim_backend.views.core_api.schemas import WorkspaceSchema
-from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
 
 SWAGGER_TAG_WORKSPACE_ENDPOINTS = 'Workspaces'
 
@@ -387,7 +392,7 @@ class WorkspaceController(Controller):
             workspace=request.current_workspace,
             content_type=content_filter.content_type or CONTENT_TYPES.Any_SLUG,
             label=content_filter.label,
-            order_by_label=True
+            order_by_property=Content.label
         )
         contents = [
             api.get_content_in_context(content) for content in contents
