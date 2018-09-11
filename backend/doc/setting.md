@@ -7,6 +7,61 @@ Here is a short description of settings available in backend config files.
 This file is called'development.ini' file by default, it's located is backend
 subdir, default config is [development.ini.sample](../development.ini.sample) with some doc.
 
+## Fix URL for access to tracim from network (simple) ##
+
+To have a working tracim, you need to explicitly explain where backend and frontend are.
+If backend serve frontend or if you do not need frontend at all, you can just set :
+
+    website.base_url = http://mysuperdomainame.ndd
+    # website.server_name = mysuperdomainename.ndd
+
+or :
+
+    website.base_url = http://mysuperdomainame.ndd:8080
+    # website.server_name = mysuperdomainename.ndd
+
+or :
+
+    website.base_url = https://mysuperdomainame.ndd
+    # website.server_name = mysuperdomainename.ndd
+
+you also need to NOT set website.server_name and api.base_url
+
+## Fix URL for access to tracim from network (complex) ##
+
+If the website.base_url trick is not enough for your own configuration, you can:
+- Explicitly set backend base url different from frontend url with api.base_url
+- Override allowed access control allowed origin for cors.
+
+
+     # with this configuration, i allowed cors to work with 2 different server with 2 different port
+     # that may be needed if frontend is in another computer distinct from backend.
+     # you can add how many server you want separated by ','
+     cors.access-control-allowed-origin = http://mysuperservername.ndd:6543,http://myotherservername.ndd:8090
+
+## Activating Mail Notification feature ##
+
+to activate mail notification, smallest config is this :
+
+    email.notification.activated = True
+    # from header of mail, need to be a valid adress
+    email.notification.from.email = test_user+{user_id}@supersmtpserver.ndd
+    # reply to header of mail, need to be a valid address
+    email.notification.reply_to.email = test_user+{content_id}@supersmtpserver.ndd
+    # references header of mail, similar to mail, used to have threaded mail
+    # but do not need to be a valid email address
+    email.notification.references.email = test_user+{content_id}@supersmtpserver.ndd
+
+    email.notification.processing_mode = sync
+    email.processing_mode = async
+    email.notification.smtp.server = supersmtpserver.ndd
+    email.notification.smtp.port = 1025
+    email.notification.smtp.user = test_user
+    email.notification.smtp.password = just_a_password
+
+don't forgot to set website.base_url and website.title for frontend, as some feature use this to return
+link to frontend in email.
+
 ## Listening port (for pserve only) ##
 
 Default configuration is to listen on port 6534.
