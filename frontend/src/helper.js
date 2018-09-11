@@ -35,7 +35,8 @@ export const PAGE = {
   ADMIN: {
     ROOT: '/admin',
     WORKSPACE: '/admin/workspace',
-    USER: '/admin/user'
+    USER: '/admin/user',
+    USER_EDIT: (idUser = ':iduser') => `/admin/user/${idUser}`
   }
 }
 

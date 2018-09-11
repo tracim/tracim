@@ -39,7 +39,7 @@ export const debug = {
     slug: 'admin_workspace_user',
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
-    type: 'workspace', // 'user' or 'workspace'
+    type: 'user', // 'user' or 'workspace'
     translation: {en: {}, fr: {}},
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
