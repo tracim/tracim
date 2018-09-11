@@ -15,12 +15,12 @@ If backend serve frontend or if you do not need frontend at all, you can just se
     website.base_url = http://mysuperdomainame.ndd
     # website.server_name = mysuperdomainename.ndd
 
-or :
+or (non-default http port):
 
     website.base_url = http://mysuperdomainame.ndd:8080
     # website.server_name = mysuperdomainename.ndd
 
-or :
+or (for https):
 
     website.base_url = https://mysuperdomainame.ndd
     # website.server_name = mysuperdomainename.ndd
