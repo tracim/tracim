@@ -29,7 +29,6 @@ import {
   setWorkspaceContentDeleted,
   setWorkspaceMemberList
 } from '../action-creator.sync.js'
-import { translate } from 'react-i18next'
 
 const qs = require('query-string')
 
