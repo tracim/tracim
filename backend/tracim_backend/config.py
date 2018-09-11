@@ -100,10 +100,11 @@ class CFG(object):
                 'Set it before continuing.'
             )
 
-        self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
-            'content.update.allowed.duration',
-            0,
-        ))
+        # TODO - G.M - 2018-09-11 - Deprecated param
+        # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
+        #     'content.update.allowed.duration',
+        #     0,
+        # ))
 
         self.API_KEY = settings.get(
             'api.key',
@@ -162,36 +163,36 @@ class CFG(object):
         #     '/assets/img/bg.jpg',
         # )
         #
-        self.WEBSITE_SERVER_NAME = settings.get(
+        website_server_name = settings.get(
             'website.server_name',
             None,
         )
-
-        if not self.WEBSITE_SERVER_NAME:
-            self.WEBSITE_SERVER_NAME = urlparse(self.WEBSITE_BASE_URL).hostname
+        if not website_server_name:
+            website_server_name= urlparse(self.WEBSITE_BASE_URL).hostname
             logger.warning(
                 self,
                 'NOTE: Generated website.server_name parameter from '
                 'website.base_url parameter -> {0}'
-                .format(self.WEBSITE_SERVER_NAME)
+                .format(website_server_name)
             )
-
-        self.WEBSITE_HOME_TAG_LINE = settings.get(
-            'website.home.tag_line',
-            '',
-        )
-        self.WEBSITE_SUBTITLE = settings.get(
-            'website.home.subtitle',
-            '',
-        )
-        self.WEBSITE_HOME_BELOW_LOGIN_FORM = settings.get(
-            'website.home.below_login_form',
-            '',
-        )
-
-        self.WEBSITE_TREEVIEW_CONTENT = settings.get(
-            'website.treeview.content',
-        )
+        self.WEBSITE_SERVER_NAME = website_server_name
+        # TODO - G.M - 2018-09-11 - Deprecated params
+        # self.WEBSITE_HOME_TAG_LINE = settings.get(
+        #     'website.home.tag_line',
+        #     '',
+        # )
+        # self.WEBSITE_SUBTITLE = settings.get(
+        #     'website.home.subtitle',
+        #     '',
+        # )
+        # self.WEBSITE_HOME_BELOW_LOGIN_FORM = settings.get(
+        #     'website.home.below_login_form',
+        #     '',
+        # )
+        #
+        # self.WEBSITE_TREEVIEW_CONTENT = settings.get(
+        #     'website.treeview.content',
+        # )
 
         self.USER_AUTH_TOKEN_VALIDITY = int(settings.get(
             'user.auth_token.validity',

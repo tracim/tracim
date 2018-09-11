@@ -48,37 +48,18 @@ depot_storage_dir = %(here)s/depot/
 api.key = changethisnow!
 # base url of the backend API, default to same as website.base_url
 # api.base_url = http://localhost:6543
-# The following parameters allow to personalize the home page
-# They are html ready (you can put html tags they will be interpreted)
+# title of website, used in email
 website.title = TRACIM
-website.title.color = #555
-website.home.subtitle = Default login: email: admin@admin.admin (password: admin@admin.admin)
-website.home.tag_line = <div class="text-center" style="font-weight: bold;">Collaboration, versionning and traceability</div>
-website.home.below_login_form = in case of problem, please contact the administrator.
-# Values may be 'all' or 'folders'
-website.treeview.content = all
 # The following base_url is used for links and icons
 # integrated in the email notifcations
-website.base_url = http://localhost:8080
+website.base_url = http://localhost:6543
 # If config not provided, it will be extracted from website.base_url
-website.server_name = localhost
+# website.server_name = localhost
 
 # CORS Special config
 # you can override access control allowed origin here with list of comma separated
 # base_url, by default only website.base_url and api.base_url are allowed
 # cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
-
-
-# Specifies if the update of comments and attached files is allowed (by the owner only).
-# Examples:
-#    600 means 10 minutes (ie 600 seconds)
-#   3600 means 1 hour (60x60 seconds)
-#
-# Allowed values:
-#  -1 means that content update is allowed for ever
-#   0 means that content update is not allowed
-#   x means that content update is allowed for x seconds (with x>0)
-content.update.allowed.duration = 3600
 
 # Auth type (internal or ldap)
 auth_type = internal
