@@ -15,5 +15,11 @@
   "validate the title": "validate the title",
   "edit title": "edit title",
   "Archive": "Archive",
-  "Delete": "Delete"
+  "Delete": "Delete",
+  "Enter the name or email of the member": "Enter the name or email of the member",
+  "Create an account": "Create an account",
+  "Choose the role of the member": "Choose the role of the member",
+  "Validate": "Validate",
+  "active": "active",
+  "inactive": "inactive"
 }

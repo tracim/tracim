@@ -15,5 +15,11 @@
   "validate the title": "valider le titre",
   "edit title": "modifier le titre",
   "Archive": "archiver",
-  "Delete": "supprimer"
+  "Delete": "supprimer",
+  "Enter the name or email of the member": "Entrer le nom ou l'email du membre",
+  "Create an account": "Créer un compte",
+  "Choose the role of the member": "Choissez le role du membre",
+  "Validate": "Valider",
+  "active": "activé",
+  "inactive": "désactivé"
 }
