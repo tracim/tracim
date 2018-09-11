@@ -187,7 +187,7 @@ class FileController(Controller):
         pdf_preview_path = api.get_pdf_preview_path(
             content.content_id,
             content.revision_id,
-            page=hapic_data.query.page
+            page_number=hapic_data.query.page
         )
         response = FileResponse(pdf_preview_path)
         # INFO - G.M - 2018-09-05 - Support for force download param
@@ -255,7 +255,7 @@ class FileController(Controller):
         pdf_preview_path = api.get_pdf_preview_path(
             revision.content_id,
             revision.revision_id,
-            page=hapic_data.query.page
+            page_number=hapic_data.query.page
         )
         response = FileResponse(pdf_preview_path)
         # INFO - G.M - 2018-09-05 - Support for force download param

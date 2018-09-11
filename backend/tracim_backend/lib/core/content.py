@@ -785,20 +785,20 @@ class ContentApi(object):
             self,
             content_id: int,
             revision_id: int,
-            page: int
+            page_number: int
     ) -> str:
         """
         Get pdf preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage content
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        page_number = preview_manager_page_format(page)
+        page_number = preview_manager_page_format(page_number)
         if page_number >= self.preview_manager.get_page_nb(file_path):
             raise PageOfPreviewNotFound(
-                'page {page_number} of content {content_id} does not exist'.format(
+                'page_number {page_number} of content {content_id} does not exist'.format(
                     page_number=page_number,
                     content_id=content_id
                 ),
