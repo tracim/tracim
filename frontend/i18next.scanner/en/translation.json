@@ -57,6 +57,7 @@
   "Send": "Send",
   "Please type your password in order to change your email. (For security reasons)": "Please type your password in order to change your email. (For security reasons)",
   "Account information": "Account information",
+  "Name:": "Name:",
   "Change your name": "Change your name",
   "Email Address:": "Email Address:",
   "Change your email": "Change your email",
@@ -97,5 +98,12 @@
   "Archive Topic": "Archive Topic",
   "Deleted File": "Deleted File",
   "Search...": "Search...",
-  "Name": "Name"
+  "Error while loading user": "Error while loading user",
+  "Name has been changed": "Name has been changed",
+  "Name and email has been changed": "Name and email has been changed",
+  "Email has been changed": "Email has been changed",
+  "Password has been changed": "Password has been changed",
+  "Admin account page": "Admin account page",
+  "This requires your administrator password": "This requires your administrator password",
+  "This workspace has no content yet, create the first content by clicking on the button 'Create'": "This workspace has no content yet, create the first content by clicking on the button 'Create'"
 }
