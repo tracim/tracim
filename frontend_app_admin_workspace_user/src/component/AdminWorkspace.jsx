@@ -37,10 +37,14 @@ const AdminWorkspace = props =>
 
           <tbody>
             {props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws =>
-              <tr key={ws.slug}>
+              <tr
+                className='adminWorkspacePage__workspaceTable__tr'
+                key={ws.slug}
+                onClick={() => props.onClickWorkspace(ws.workspace_id)}
+              >
                 <th>{ws.workspace_id}</th>
                 <td>{ws.label}</td>
-                <td>"(nyi) blocked by backend"</td>
+                <td>{ws.description}</td>
                 {/*
                   <td className='d-flex align-items-center flex-wrap'>
                     <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
