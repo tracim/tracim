@@ -76,7 +76,7 @@ class Dashboard extends React.Component {
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceDetail.status) {
       case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('workspace detail')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('workspace detail')}`, 'warning')); break
     }
   }
 
@@ -86,7 +86,7 @@ class Dashboard extends React.Component {
     const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceMemberList.status) {
       case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('member list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
     }
   }
 
@@ -98,12 +98,12 @@ class Dashboard extends React.Component {
 
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('recent activity list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
     }
 
     switch (fetchWorkspaceReadStatusList.status) {
       case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('read status list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
   }
 
@@ -122,7 +122,7 @@ class Dashboard extends React.Component {
     const fetchUserWorkspaceAllRead = await props.dispatch(putUserWorkspaceRead(props.user, props.curWs.id))
     switch (fetchUserWorkspaceAllRead.status) {
       case 204: this.loadRecentActivity(); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching "mark all as read"')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while setting "mark all as read"')}`, 'warning')); break
     }
   }
 
@@ -134,7 +134,7 @@ class Dashboard extends React.Component {
     const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl, idLastRecentActivity))
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(appendWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('recent activity list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
     }
   }
 
@@ -145,7 +145,7 @@ class Dashboard extends React.Component {
       case 200:
         this.setState({searchedKnownMemberList: fetchUserKnownMemberList.json}); break
       default:
-        props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('known members list')}`, 'warning')); break
+        props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
     }
   }
 

@@ -28,6 +28,7 @@ import {
   setWorkspaceContentDeleted,
   setWorkspaceMemberList
 } from '../action-creator.sync.js'
+import { translate } from 'react-i18next'
 
 const qs = require('query-string')
 
@@ -225,7 +226,7 @@ class WorkspaceContent extends React.Component {
           <PageTitle
             parentClass='workspace__header'
             customClass='justify-content-between align-items-center'
-            title='Liste des Contenus'
+            title={this.props.t('List of contents')}
             subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
             {idRoleUserWorkspace >= 2 &&
@@ -305,4 +306,4 @@ class WorkspaceContent extends React.Component {
 const mapStateToProps = ({ user, currentWorkspace, workspaceContentList, workspaceList, contentType }) => ({
   user, currentWorkspace, workspaceContentList, workspaceList, contentType
 })
-export default withRouter(connect(mapStateToProps)(appFactory(WorkspaceContent)))
+export default withRouter(connect(mapStateToProps)(appFactory(translate()(WorkspaceContent))))
