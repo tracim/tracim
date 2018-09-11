@@ -46,7 +46,6 @@
   "Email Adress": "Adresse email",
   "Old password": "Ancien mot de passe",
   "New password": "Nouveau mot de passe",
-  "Name:": "Nom :",
   "You have subscribed to this workspace's notifications": "Vous êtes abonné aux notifications de cet espace de travail.",
   "Connection": "Connexion",
   "Forgotten password ?": "Mot de passe oublié ?",
@@ -97,5 +96,6 @@
   "An error has happened while setting \"mark all as read\"": "Une erreur s'est produite lors du réglage de \"Tout marquer comme lu\".",
   "Create in folder": "Créer dans ce dossier ...",
   "Open advanced Dashboard": "Ouvrir le tableau de bord avancé",
-  "This workspace has no content yet. Create the first content by clicking on the button \"Create\"": "Cet espace de travail n'a pas encore de contenu. Créer le premier contenu en cliquant sur le bouton \"Créer\""
+  "This workspace has no content yet. Create the first content by clicking on the button \"Create\"": "Cet espace de travail n'a pas encore de contenu. Créer le premier contenu en cliquant sur le bouton \"Créer\"",
+  "Name": "Name"
 }
