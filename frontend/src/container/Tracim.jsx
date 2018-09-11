@@ -50,7 +50,7 @@ class Tracim extends React.Component {
         break
       case 'refreshWorkspaceList':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceList()
+        this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
         break
     }
   }
@@ -87,7 +87,7 @@ class Tracim extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  loadWorkspaceList = async () => {
+  loadWorkspaceList = async (idOpenInSidebar = undefined) => {
     const { props } = this
 
     const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(props.user))
@@ -97,11 +97,11 @@ class Tracim extends React.Component {
 
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
-      const idWorkspaceToOpen = (() =>
-        props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
-          ? parseInt(props.match.params.idws)
-          : fetchGetWorkspaceList.json[0].workspace_id
-      )()
+      const idWorkspaceToOpen = (() => {
+        if (idOpenInSidebar) return idOpenInSidebar
+        if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) return parseInt(props.match.params.idws)
+        return fetchGetWorkspaceList.json[0].workspace_id
+      })()
 
       props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
     }
