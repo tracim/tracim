@@ -292,18 +292,17 @@ class WorkspaceContent extends React.Component {
                   )
                 )
               }
+
+              {idRoleUserWorkspace >= 2 &&
+                <DropdownCreateButton
+                  customClass='workspace__content__button'
+                  idFolder={null}
+                  onClickCreateContent={this.handleClickCreateContent}
+                  availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
+                />
+              }
             </div>
-
           </PageContent>
-          {idRoleUserWorkspace >= 2 &&
-            <DropdownCreateButton
-              customClass='workspace__content__button'
-              idFolder={null}
-              onClickCreateContent={this.handleClickCreateContent}
-              availableApp={contentType.filter(ct => ct.slug !== 'comment')} // @FIXME: Côme - 2018/08/21 - should use props.appList
-            />
-          }
-
         </PageWrapper>
       </div>
     )
