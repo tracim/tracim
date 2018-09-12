@@ -667,19 +667,19 @@ class ContentInContext(object):
         return self.content.status
 
     @property
-    def is_archived(self):
+    def is_archived(self) -> bool:
         return self.content.is_archived
 
     @property
-    def is_deleted(self):
+    def is_deleted(self) -> bool:
         return self.content.is_deleted
 
     @property
-    def raw_content(self):
+    def raw_content(self) -> str:
         return self.content.description
 
     @property
-    def author(self):
+    def author(self) -> UserInContext:
         return UserInContext(
             dbsession=self.dbsession,
             config=self.config,
@@ -687,23 +687,23 @@ class ContentInContext(object):
         )
 
     @property
-    def current_revision_id(self):
+    def current_revision_id(self) -> int:
         return self.content.revision_id
 
     @property
-    def created(self):
+    def created(self) -> datetime:
         return self.content.created
 
     @property
-    def modified(self):
+    def modified(self) -> datetime:
         return self.updated
 
     @property
-    def updated(self):
+    def updated(self) -> datetime:
         return self.content.updated
 
     @property
-    def last_modifier(self):
+    def last_modifier(self) -> UserInContext:
         return UserInContext(
             dbsession=self.dbsession,
             config=self.config,
@@ -712,7 +712,7 @@ class ContentInContext(object):
 
     # Context-related
     @property
-    def show_in_ui(self):
+    def show_in_ui(self) -> bool:
         # TODO - G.M - 31-05-2018 - Enable Show_in_ui params
         # if false, then do not show content in the treeview.
         # This may his maybe used for specific contents or for sub-contents.
@@ -721,16 +721,16 @@ class ContentInContext(object):
         return True
 
     @property
-    def slug(self):
+    def slug(self) -> str:
         return slugify(self.content.label)
 
     @property
-    def read_by_user(self):
+    def read_by_user(self) -> bool:
         assert self._user
         return not self.content.has_new_information_for(self._user)
 
     @property
-    def frontend_url(self):
+    def frontend_url(self) -> str:
         root_frontend_url = get_root_frontend_url(self.config)
         content_frontend_url = CONTENT_FRONTEND_URL_SCHEMA.format(
             workspace_id=self.workspace_id,
@@ -739,17 +739,68 @@ class ContentInContext(object):
         )
         return root_frontend_url + content_frontend_url
 
+    # file specific
+    @property
+    def page_nb(self) -> typing.Optional[int]:
+        """
+        :return: page_nb of content if available, None if unavailable
+        """
+        if self.content.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.get_preview_page_nb(self.content.revision_id)
+        else:
+            return None
+
+    @property
+    def mimetype(self) -> str:
+        """
+        :return: mimetype of content if available, None if unavailable
+        """
+        return self.content.file_mimetype
+
+    @property
+    def size(self) -> typing.Optional[int]:
+        """
+        :return: size of content if available, None if unavailable
+        """
+        if self.content.depot_file:
+            return self.content.depot_file.file.content_length
+        else:
+            return None
+
+    @property
+    def pdf_available(self) -> bool:
+        """
+        :return: bool about if pdf version of content is available
+        """
+        if self.content.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.has_pdf_preview(self.content.revision_id)
+        else:
+            return False
+
 
 class RevisionInContext(object):
     """
     Interface to get Content data and Content data related to context.
     """
 
-    def __init__(self, content_revision: ContentRevisionRO, dbsession: Session, config: CFG):
+    def __init__(self, content_revision: ContentRevisionRO, dbsession: Session, config: CFG,  user: User=None) -> None:  # nopep8
         assert content_revision is not None
         self.revision = content_revision
         self.dbsession = dbsession
         self.config = config
+        self._user = user
 
     # Default
     @property
@@ -891,3 +942,54 @@ class RevisionInContext(object):
     @property
     def slug(self) -> str:
         return slugify(self.revision.label)
+
+    # file specific
+    @property
+    def page_nb(self) -> typing.Optional[int]:
+        """
+        :return: page_nb of content if available, None if unavailable
+        """
+        if self.revision.depot_file:
+            # TODO - G.M - 2018-09-05 - Fix circular import better
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.get_preview_page_nb(self.revision.revision_id)
+        else:
+            return None
+
+    @property
+    def mimetype(self) -> str:
+        """
+        :return: mimetype of content if available, None if unavailable
+        """
+        return self.revision.file_mimetype
+
+    @property
+    def size(self) -> typing.Optional[int]:
+        """
+        :return: size of content if available, None if unavailable
+        """
+        if self.revision.depot_file:
+            return self.revision.depot_file.file.content_length
+        else:
+            return None
+
+    @property
+    def pdf_available(self) -> bool:
+        """
+        :return: bool about if pdf version of content is available
+        """
+        if self.revision.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.has_pdf_preview(self.revision.revision_id)
+        else:
+            return False

@@ -845,6 +845,25 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
         description='raw text or html description of the file'
     )
+    page_nb = marshmallow.fields.Int(
+        description='number of pages, return null value if unaivalable',
+        example=1,
+        allow_none=True,
+    )
+    mimetype = marshmallow.fields.String(
+        description='file content mimetype',
+        example='image/jpeg',
+        required=True,
+    )
+    size = marshmallow.fields.Int(
+        description='file size in byte, return null value if unaivalable',
+        example=1024,
+        allow_none=True,
+    )
+    pdf_available = marshmallow.fields.Bool(
+        description="Is pdf version of file available ?",
+        example=True,
+    )
 
 
 class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):

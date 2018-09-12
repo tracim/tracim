@@ -6,6 +6,7 @@ import classnames from 'classnames'
 // import PopupExtandedAction from '../../container/PopupExtandedAction.jsx'
 import SubDropdownCreateButton from '../common/Input/SubDropdownCreateButton.jsx'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
+import i18n from '../../i18n.js'
 
 class Folder extends React.Component {
   constructor (props) {
@@ -13,6 +14,7 @@ class Folder extends React.Component {
     this.state = {
       open: false
     }
+    console.log(i18n)
   }
 
   handleClickToggleFolder = () => {
@@ -66,7 +68,7 @@ class Folder extends React.Component {
                   aria-expanded='false'
                   onClick={e => e.stopPropagation()}
                 >
-                  {t('Create in folder...')}
+                  {`${t('Create in folder')}...`}
                 </button>
 
                 <div className='addbtn__subdropdown dropdown-menu' aria-labelledby='dropdownMenuButton'>

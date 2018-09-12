@@ -61,7 +61,10 @@ wsgidav.conf
 *.sqlite
 *.lock
 depot/
+sessions_data/
 
 # binary translation files
 *.mo
 .mypy_cache/
+
+backend.json

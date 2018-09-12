@@ -80,16 +80,16 @@ class PopupCreateWorkspace extends React.Component {
   })
 
   handleValidate = async () => {
-    const { loggedUser, config, newWorkspaceName } = this.state
+    const { config, newWorkspaceName } = this.state
 
-    const fetchSaveNewWorkspace = postWorkspace(loggedUser, config.apiUrl, newWorkspaceName)
+    const fetchSaveNewWorkspace = postWorkspace(config.apiUrl, newWorkspaceName)
 
     handleFetchResult(await fetchSaveNewWorkspace)
       .then(resSave => {
         if (resSave.apiResponse.status === 200) {
           this.handleClose()
 
-          GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} })
+          GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {idOpenInSidebar: resSave.body.workspace_id} })
 
           GLOBAL_dispatchEvent({
             type: 'redirect',

@@ -18,7 +18,6 @@ import {
   setWorkspaceListMemberList,
   updateUserName,
   updateUserEmail,
-  updateUserAuth,
   updateUserWorkspaceSubscriptionNotif
 } from '../action-creator.sync.js'
 import {
@@ -29,7 +28,6 @@ import {
   putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
 import { translate } from 'react-i18next'
-import { setCookie } from '../helper.js'
 
 class Account extends React.Component {
   constructor (props) {
@@ -72,7 +70,7 @@ class Account extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       props.workspaceList.map(async ws => ({
         idWorkspace: ws.id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(props.user, ws.id))
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.id))
       }))
     )
 
@@ -110,8 +108,6 @@ class Account extends React.Component {
       switch (fetchPutUserEmail.status) {
         case 200:
           props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
-          const newAuth = setCookie(fetchPutUserEmail.json.email, checkPassword)
-          props.dispatch(updateUserAuth(newAuth))
           if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           break
@@ -125,13 +121,8 @@ class Account extends React.Component {
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(props.user, idWorkspace, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      // @TODO: Côme - 2018/08/23 - uncomment this when fetch implements the right endpoint (blocked by backend)
-      // case 200:
-      //   break
-      default:
-        props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify))
-        // props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
-        break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
@@ -141,8 +132,6 @@ class Account extends React.Component {
     const fetchPutUserPassword = await props.dispatch(putUserPassword(props.user, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
       case 204:
-        const newAuth = setCookie(props.user.email, newPassword)
-        props.dispatch(updateUserAuth(newAuth))
         props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info'))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning')); break

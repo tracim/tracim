@@ -56,7 +56,7 @@ export const debug = { // copied from html-document => outdated
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
     auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`),
     lang: 'en',
-    idRoleUserWorkspace: 1
+    idRoleUserWorkspace: 8
   },
   content: {
     author: {
@@ -64,7 +64,7 @@ export const debug = { // copied from html-document => outdated
       public_name: 'Global manager',
       user_id: 1 // -1 or 1 for debug
     },
-    content_id: 48, // 1 or 22 for debug
+    content_id: 4,
     content_type: 'thread',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,

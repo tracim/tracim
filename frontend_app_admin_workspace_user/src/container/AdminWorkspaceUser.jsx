@@ -6,7 +6,7 @@ import {
   handleFetchResult,
   CardPopup
 } from 'tracim_frontend_lib'
-import { debug } from '../helper.js'
+import { debug, ROLE } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
@@ -50,6 +50,22 @@ class AdminWorkspaceUser extends React.Component {
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
         this.setState({config: data.config})
         break
+      case 'refreshWorkspaceList':
+        console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
+        this.loadWorkspaceContent()
+        break
+      case 'allApp_changeLang':
+        console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({
+          loggedUser: {
+            ...prev.loggedUser,
+            lang: data
+          }
+        }))
+        i18n.changeLanguage(data)
+        if (this.state.config.type === 'workspace') this.loadWorkspaceContent()
+        else if (this.state.config.type === 'user') this.loadUserContent()
+        break
       default:
         break
     }
@@ -87,7 +103,7 @@ class AdminWorkspaceUser extends React.Component {
       case 200:
         const fetchWorkspaceListMemberList = await Promise.all(
           workspaceList.body.map(async ws =>
-            handleFetchResult(await getWorkspaceMemberList(state.loggedUser, state.config.apiUrl, ws.workspace_id))
+            handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
           )
         )
         this.setState(prev => ({
@@ -115,13 +131,13 @@ class AdminWorkspaceUser extends React.Component {
   loadUserContent = async () => {
     const { props, state } = this
 
-    const userList = await handleFetchResult(await getUserList(state.loggedUser, state.config.apiUrl))
+    const userList = await handleFetchResult(await getUserList(state.config.apiUrl))
 
     switch (userList.apiResponse.status) {
       case 200:
         const fetchUserDetailList = await Promise.all(
           userList.body.map(async u =>
-            handleFetchResult(await getUserDetail(state.loggedUser, state.config.apiUrl, u.user_id))
+            handleFetchResult(await getUserDetail(state.config.apiUrl, u.user_id))
           )
         )
         this.setState(prev => ({
@@ -146,7 +162,7 @@ class AdminWorkspaceUser extends React.Component {
   handleDeleteWorkspace = async () => {
     const { props, state } = this
 
-    const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.loggedUser, state.config.apiUrl, state.workspaceToDelete))
+    const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
     switch (deleteWorkspaceResponse.status) {
       case 204:
         this.loadWorkspaceContent()
@@ -179,7 +195,7 @@ class AdminWorkspaceUser extends React.Component {
 
     const activateOrDelete = toggle ? putUserEnable : putUserDisable
 
-    const toggleUser = await handleFetchResult(await activateOrDelete(state.loggedUser, state.config.apiUrl, idUser))
+    const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, idUser))
     switch (toggleUser.status) {
       case 204: this.loadUserContent(); break
       default: GLOBAL_dispatchEvent({
@@ -196,7 +212,7 @@ class AdminWorkspaceUser extends React.Component {
   handleUpdateProfile = async (idUser, newProfile) => {
     const { props, state } = this
 
-    const toggleManager = await handleFetchResult(await putUserProfile(state.loggedUser, state.config.apiUrl, idUser, newProfile))
+    const toggleManager = await handleFetchResult(await putUserProfile(state.config.apiUrl, idUser, newProfile))
     switch (toggleManager.status) {
       case 204: this.loadUserContent(); break
       default: GLOBAL_dispatchEvent({
@@ -213,7 +229,7 @@ class AdminWorkspaceUser extends React.Component {
   handleClickAddUser = async (email, profile) => {
     const { props, state } = this
 
-    const newUserResult = await handleFetchResult(await postAddUser(state.loggedUser, state.config.apiUrl, email, profile))
+    const newUserResult = await handleFetchResult(await postAddUser(state.config.apiUrl, email, profile))
     switch (newUserResult.apiResponse.status) {
       case 200:
         this.loadUserContent()
@@ -230,6 +246,40 @@ class AdminWorkspaceUser extends React.Component {
     }
   }
 
+  handleClickWorkspace = idWorkspace => {
+    const { state } = this
+    GLOBAL_renderAppFeature({
+      loggedUser: {
+        ...state.loggedUser,
+        idRoleUserWorkspace: 8 // only global admin can see this app
+      },
+      config: {
+        label: 'Advanced dashboard',
+        slug: 'workspace_advanced',
+        faIcon: 'bank',
+        hexcolor: '#999999',
+        creationLabel: '',
+        roleList: ROLE,
+        domContainer: 'appFeatureContainer',
+        apiUrl: state.config.apiUrl,
+        apiHeader: state.config.apiHeader,
+        translation: state.config.translation
+      },
+      content: {
+        workspace_id: idWorkspace
+      }
+    })
+  }
+
+  handleClickUser = idUser => {
+    GLOBAL_dispatchEvent({
+      type: 'redirect',
+      data: {
+        url: `/admin/user/${idUser}`
+      }
+    })
+  }
+
   render () {
     const { props, state } = this
 
@@ -240,6 +290,7 @@ class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'workspace' &&
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
+            onClickWorkspace={this.handleClickWorkspace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
           />
         }
@@ -248,6 +299,7 @@ class AdminWorkspaceUser extends React.Component {
           <AdminUser
             userList={state.content.userList}
             profile={state.content.profile}
+            onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}

@@ -48,9 +48,16 @@
     &__icon
       font-size 20px
 
+//MEDIAQUERIES
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .content
     border-right 1px solid grey
     &__name__icons
         margin-top 5px
+
+@media (max-width: max-xs)
+
+  .content__status__icon
+    display flex
+    justify-content flex-end

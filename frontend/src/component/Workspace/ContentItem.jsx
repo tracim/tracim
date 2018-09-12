@@ -33,7 +33,7 @@ const ContentItem = props => {
       }
 
       <div
-        className='content__status d-none d-xl-flex align-items-center justify-content-between'
+        className='content__status d-sm-flex align-items-center justify-content-between'
         style={{
           color: status.hexcolor,
           ':hover': {
@@ -41,7 +41,7 @@ const ContentItem = props => {
           }
         }}
       >
-        <div className='content__status__text'>
+        <div className='content__status__text d-none d-sm-block'>
           {status.label}
         </div>
         <div className='content__status__icon'>

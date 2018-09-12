@@ -4,7 +4,6 @@ import { withRouter } from 'react-router'
 import i18n from '../i18n.js'
 import appFactory from '../appFactory.js'
 import { translate } from 'react-i18next'
-import Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import MenuLinkList from '../component/Header/MenuLinkList.jsx'
@@ -24,7 +23,7 @@ import {
   postUserLogout,
   putUserLang
 } from '../action-creator.async.js'
-import { COOKIE, PAGE, PROFILE } from '../helper.js'
+import { PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
   handleClickLogo = () => {}
@@ -57,9 +56,6 @@ class Header extends React.Component {
 
     const fetchPostUserLogout = await dispatch(postUserLogout())
     if (fetchPostUserLogout.status === 204) {
-      Cookies.remove(COOKIE.USER_LOGIN)
-      Cookies.remove(COOKIE.USER_AUTH)
-
       dispatch(setUserDisconnected())
       history.push(PAGE.LOGIN)
     } else {
@@ -75,11 +71,7 @@ class Header extends React.Component {
         <nav className='navbar navbar-expand-md navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
-          { /*
-            <div className='header__breadcrumb d-none d-lg-block ml-4'>
-              Dev Tracim - liste des contenus
-            </div>
-          */ }
+          <div className='header__breadcrumb d-none d-lg-block ml-4' />
 
           <NavbarToggler />
 

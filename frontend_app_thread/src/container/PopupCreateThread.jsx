@@ -88,9 +88,9 @@ class PopupCreateThread extends React.Component {
   })
 
   handleValidate = async () => {
-    const { loggedUser, config, appName, idWorkspace, idFolder, newContentName } = this.state
+    const { config, appName, idWorkspace, idFolder, newContentName } = this.state
 
-    const fetchSaveThreadDoc = postThreadContent(loggedUser, config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
+    const fetchSaveThreadDoc = postThreadContent(config.apiUrl, idWorkspace, idFolder, config.slug, newContentName)
 
     handleFetchResult(await fetchSaveThreadDoc)
       .then(resSave => {

@@ -33,8 +33,6 @@ export const updateUserName = newName => ({ type: `${UPDATE}/${USER_NAME}`, newN
 export const USER_EMAIL = `${USER}/Email`
 export const updateUserEmail = newEmail => ({ type: `${UPDATE}/${USER_EMAIL}`, newEmail })
 export const USER_PASSWORD = `${USER}/Password`
-export const USER_AUTH = `${USER}/Auth`
-export const updateUserAuth = newAuth => ({ type: `${UPDATE}/${USER_AUTH}`, newAuth })
 
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/Content`
@@ -53,6 +51,8 @@ export const setWorkspaceContentDeleted = (idWorkspace, idContent) => ({ type: `
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
+
+export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 
 export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
 export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
