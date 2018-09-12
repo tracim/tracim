@@ -247,10 +247,8 @@ class FileController(Controller):
         pdf_preview_path = api.get_full_pdf_preview_path(
             revision.revision_id,
         )
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(pdf_preview_path)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
