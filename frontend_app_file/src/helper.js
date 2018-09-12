@@ -96,7 +96,8 @@ export const debug = {
     status: 'open',
     sub_content_types: ['thread', 'html-document', 'file', 'folder'],
     workspace_id: 1,
-    contentFull: null
+    contentFull: null,
+    page_nb: 1
   },
   timeline: timelineDebugData,
   idWorkspace: 1

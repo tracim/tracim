@@ -11,7 +11,8 @@ import {
   PopinFixedContent,
   Timeline,
   SelectStatus,
-  ArchiveDeleteContent
+  ArchiveDeleteContent,
+  displayDate
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -70,6 +71,7 @@ class Thread extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.loadContent()
         break
     }
   }
@@ -109,13 +111,13 @@ class Thread extends React.Component {
       handleFetchResult(await fetchResultThread),
       handleFetchResult(await fetchResultThreadComment)
     ])
-      .then(([resThread, resComment]) => {
+      .then(async ([resThread, resComment]) => {
         this.setState({
           content: resThread.body,
           listMessage: resComment.body.map(c => ({
             ...c,
             timelineType: 'comment',
-            created: (new Date(c.created)).toLocaleString(),
+            created: displayDate(c.created, loggedUser.lang),
             author: {
               ...c.author,
               avatar_url: c.author.avatar_url
@@ -125,7 +127,8 @@ class Thread extends React.Component {
           }))
         })
 
-        putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+        await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+        GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
       })
       .catch(e => console.log('Error loading Thread data.', e))
   }

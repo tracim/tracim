@@ -11,36 +11,6 @@ settingText()
 .table tr:nth-child(even)
   background-color grey-hover
 
-
-/**** MENU HAMBURGER ON EXPAND BAR *****/
-
-.hamburger--spring .hamburger-inner
-  margin 4px 8px
-
-.hamburger--spring .hamburger-inner::before
-  top 7px
-
-.hamburger--spring .hamburger-inner::after
-  top 14px
-
-/***************************************/
-
-.hamburger--spring
-  .hamburger-inner
-    transition-delay 0.22s
-    background-color transparent
-    &::before
-      top -3px
-      transition top 0.1s 0.15s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
-      transform translate3d(0, 10px, 0) rotate(45deg)
-    &::after
-      top -3px
-      transition top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1)
-      transform translate3d(0, 10px, 0) rotate(-45deg)
-
-.hamburger-inner, .hamburger-inner::after, .hamburger-inner::before
-  width 30px
-
 .account
   margin 45px 0 0 0
   width 100%
@@ -79,8 +49,6 @@ settingText()
       width 20%
       min-height 600px
       background-color offWhite
-      &__responsive
-        font-size 20px
       &__list
         width 100%
         margin-bottom 20px
@@ -90,10 +58,6 @@ settingText()
           margin 10px 0 15px 0
           font-size 20px
           cursor pointer
-        &__disabled
-          padding 25px 20px 20px 16px
-          color grey
-          font-size 18px
         &__item
           margin-top 10px
           font-weight 500
@@ -137,163 +101,87 @@ settingText()
             &__icon
               margin-right 10px
 
-/***** MEDIAQUERIES *****/
+// MEDIAQUERIES
 
-/**** MEDIA 576px & 1199px ****/
+@media (min-width: min-md) and (max-width: max-md)
 
-// @TODO Côme - 2018/08/22 - dont bypass breakpoints (from sm to md)
-@media (min-width: min-sm) and (max-width: max-md)
+  .account .pageContentGeneric
+    min-height 100%
 
   .account
     &__userpreference
       display block
-      position relative
-      &__menu
-        justify-content center
-        margin-bottom 25px
-        border-radius 50%
-        width 60px
-        min-height 60px
-        &__responsive
-          &__hamburger
-            padding 0
-            &:focus
-              outline none
-            &__box
-              margin 15px 5px 0 0
-              &__icon, &__icon::before, &__icon::after
-                width 30px
-        &__list
-          display none
-      &__setting
-        padding 10px
+      padding 25px
+      .menusubcomponent
+        display flex
+        flex-direction column
+        align-items flex-start
+        justify-content flex-start
+        margin-bottom 50px
         width 100%
-
-  .activemenu
-    .account
-      &__userpreference
-        &__menu
-          justify-content start
-          position absolute
-          top 0
-          left 0
-          border-radius 10px
+        min-height auto
+        &__header
+          display flex
+          flex-direction row-reverse
+          align-items center
+          justify-content space-between
           width 100%
-          height 100%
-          z-index 2
-          background-color rgbGrey
-          &__responsive
-            display none
-          &__list
-            display block
-            border-radius 10px
-            height 100%
-            background-color offWhite
-            width 300px
-            &__close
-              display flex
-            &__disabled
-              padding 0 20px
-
-/***** MEDIA LG *****/
-
-@media (min-width: min-lg) and (max-width: max-lg)
-
-  .account
-    &__userpreference
-      padding 25px 10px
-      &__menu
-        margin-right 15px
-        width 25%
-
-/**** MEDIA SM ****/
+      &__setting
+        position relative
+        width 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
+  .account .pageContentGeneric
+    min-height 100%
+
   .account
     &__userpreference
-      padding 25px 0
-      &__menu
-        margin-left 15px
+      display block
+      padding 25px
+      .menusubcomponent
+        display flex
+        flex-direction column
+        align-items flex-start
+        justify-content flex-start
+        margin-bottom 50px
+        width 100%
+        min-height auto
+        &__header
+          display flex
+          flex-direction row-reverse
+          align-items center
+          justify-content space-between
+          width 100%
       &__setting
-        padding 30px 15px
-
-  .activemenu
-    .account__userpreference__menu
-      margin-left 0
-
-/***** MEDIA XS *****/
+        position relative
+        width 100%
 
 @media (max-width: max-xs)
 
-  .hamburger-box
-    width 45px
-    height 22px
+  .account .pageContentGeneric
+    min-height 100%
 
   .account
-    &__userinformation
-      &__avatar
-        margin 0 0 20px 0
-      &__wrapper
-        text-align center
+    .userinfo__avatar
+      margin-right 17px
     &__userpreference
       display block
-      position relative
       padding 25px 0
-      &__menu
-        justify-content center
-        margin 0 0 25px 15px
-        border-radius 30px
-        width 60px
-        min-height 60px
-        &__responsive
-          align-self center
-        &__list
-          display none
-      &__setting
-        border-radius 0
-        padding 10px 0
+      .menusubcomponent
+        display flex
+        flex-direction column
+        align-items flex-start
+        justify-content flex-start
+        margin-bottom 50px
         width 100%
-        .personaldata
-          &__form
-            margin-left 10px
-        .calendar
-          &__link
-            padding 10px 15px
-        .notification
-          &__table
-            &__wksname
-              text-overflow ellipsis
-              white-space nowrap
-              overflow hidden
-              width 175px
-              &:focus
-                overflow visible
-                width auto
-
-  .activemenu
-    .account
-      &__userpreference
-        &__menu
-          justify-content start
-          position absolute
-          top 0
-          left 0
-          margin-left 0
-          border-radius 10px
+        min-height auto
+        &__header
+          display flex
+          flex-direction row-reverse
+          align-items center
+          justify-content space-between
           width 100%
-          height 100%
-          z-index 2
-          background-color rgbGrey
-          &__responsive
-            display none
-          &__list
-            display block
-            border-radius 10px
-            height 100%
-            background-color offWhite
-            width 300px
-            &__close
-              display flex
-            &__disabled
-              padding 0 20px
+      &__setting
+        position relative
+        width 100%

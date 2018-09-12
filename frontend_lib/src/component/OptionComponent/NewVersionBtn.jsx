@@ -1,5 +1,6 @@
 import React from 'react'
 import Radium from 'radium'
+import { translate } from 'react-i18next'
 
 const NewVersionBtn = props => {
   return (
@@ -19,10 +20,10 @@ const NewVersionBtn = props => {
         }
       }}
     >
-      Modifier
+      {props.t('Edit')}
       <i className='fa fa-plus-circle ml-3' />
     </button>
   )
 }
 
-export default Radium(NewVersionBtn)
+export default translate()(Radium(NewVersionBtn))

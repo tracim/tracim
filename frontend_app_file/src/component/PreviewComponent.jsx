@@ -80,6 +80,7 @@ export class PreviewComponent extends React.Component {
             onClick={props.onClickPreviousPage}
             style={{':hover': {color: props.color}}}
             title={'Previous page'}
+            disabled={props.fileCurrentPage === 1}
             key={'file_btn_previouspage'}
           >
             <i className='fa fa-chevron-left' />
@@ -105,6 +106,7 @@ export class PreviewComponent extends React.Component {
             onClick={props.onClickNextPage}
             style={{':hover': {color: props.color}}}
             title={'Next page'}
+            disabled={props.fileCurrentPage === props.filePageNb}
             key={'file_btn_nextpage'}
           >
             <i className='fa fa-chevron-right' />
@@ -124,8 +126,12 @@ export class PreviewComponent extends React.Component {
 
           <div className='previewcomponent__property__content'>
             <div className='previewcomponent__property__content__detail'>
-              <div className='previewcomponent__property__content__detail__size'>
+              <div className='previewcomponent__property__content__detail__item'>
                 {props.t('Size')}: nyi
+              </div>
+
+              <div className='previewcomponent__property__content__detail__item'>
+                {props.t('Page number')}: {props.filePageNb}
               </div>
 
               <div className='previewcomponent__property__content__detail__description'>

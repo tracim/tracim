@@ -1327,6 +1327,10 @@ class ContentApi(object):
         nb_pages = self.preview_manager.get_page_nb(file_path)
         return nb_pages
 
+    def has_pdf_preview(self, revision_id: int) -> bool:
+        file_path = self.get_one_revision_filepath(revision_id)
+        return self.preview_manager.has_pdf_preview(file_path)
+
     def mark_read__all(
             self,
             read_datetime: datetime=None,

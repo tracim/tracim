@@ -71,7 +71,7 @@ export class AdminUser extends React.Component {
       <PageWrapper customClass='adminUserPage'>
         <PageTitle
           parentClass={'adminUserPage'}
-          title={"Member's management"}
+          title={props.t('Users management')}
         />
 
         <PageContent parentClass='adminUserPage'>
@@ -109,7 +109,11 @@ export class AdminUser extends React.Component {
 
               <tbody>
                 {props.userList.map(u =>
-                  <tr key={u.user_id}>
+                  <tr
+                    className='adminUserPage__table__tr'
+                    onClick={() => props.onClickUser(u.user_id)}
+                    key={u.user_id}
+                  >
                     <td>
                       <BtnSwitch checked={u.is_active} onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)} />
                     </td>
