@@ -35,7 +35,8 @@ export const PAGE = {
   ADMIN: {
     ROOT: '/admin',
     WORKSPACE: '/admin/workspace',
-    USER: '/admin/user'
+    USER: '/admin/user',
+    USER_EDIT: (idUser = ':iduser') => `/admin/user/${idUser}`
   }
 }
 
@@ -106,22 +107,22 @@ export const PROFILE = {
   ADMINISTRATOR: {
     id: 1,
     slug: 'administrators',
-    faIcon: 'rocket',
-    hexcolor: '#123456',
+    faIcon: 'shield',
+    hexcolor: '#ed0007',
     label: i18n.t('Administrator')
   },
   MANAGER: {
     id: 2,
     slug: 'managers',
-    faIcon: 'car',
-    hexcolor: '#654321',
+    faIcon: 'graduation-cap',
+    hexcolor: '#f2af2d',
     label: i18n.t('Manager')
   },
   USER: {
     id: 4,
     slug: 'users',
-    faIcon: 'bicycle',
-    hexcolor: '#123123',
+    faIcon: 'user',
+    hexcolor: '#3145f7',
     label: i18n.t('User')
   }
 }

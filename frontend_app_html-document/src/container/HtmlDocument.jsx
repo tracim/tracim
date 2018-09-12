@@ -130,7 +130,7 @@ class HtmlDocument extends React.Component {
       .then(([resComment, resRevision]) => {
         const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
           ...c,
-          created: (new Date(c.created)).toLocaleString(),
+          created: displayDate(c.created, loggedUser.lang),
           author: {
             ...c.author,
             avatar_url: c.author.avatar_url
@@ -142,8 +142,7 @@ class HtmlDocument extends React.Component {
         const revisionWithComment = resRevision.body
           .map((r, i) => ({
             ...r,
-            // created: (new Date(r.created)).toLocaleString(),
-            created: displayDate(r.created),
+            created: displayDate(r.created, loggedUser.lang),
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
               timelineType: 'comment',
@@ -172,7 +171,8 @@ class HtmlDocument extends React.Component {
       })
 
     await Promise.all([fetchResultHtmlDocument, fetchResultComment, fetchResultRevision])
-    putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}}) // await above makes sure that we will reload workspace content after the read status update
   }
 
   handleClickBtnCloseApp = () => {
