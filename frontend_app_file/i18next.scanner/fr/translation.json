@@ -22,5 +22,15 @@
   "Error while saving new description": "Erreur lors de l'enregistrement d'une nouvelle description",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
   "Page number": "Numéro de page",
-  "Upload a file": "Importer un fichier"
+  "Upload a file": "Importer un fichier",
+  "Error while loading timeline": "Erreur lors du chargement de l'historique",
+  "Bytes": "Octets",
+  "KB": "Ko",
+  "MB": "Mo",
+  "GB": "Go",
+  "TB": "To",
+  "PB": "Po",
+  "EB": "Eo",
+  "ZB": "Zo",
+  "YB": "Yo"
 }

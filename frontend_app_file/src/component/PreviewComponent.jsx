@@ -127,7 +127,7 @@ export class PreviewComponent extends React.Component {
           <div className='previewcomponent__property__content'>
             <div className='previewcomponent__property__content__detail'>
               <div className='previewcomponent__property__content__detail__item'>
-                {props.t('Size')}: nyi
+                {props.t('Size')}: {props.fileSize}
               </div>
 
               <div className='previewcomponent__property__content__detail__item'>
@@ -171,21 +171,21 @@ export class PreviewComponent extends React.Component {
               </div>
 
               {!state.displayFormNewDescription &&
-              <button
-                type='button'
-                className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
-                onClick={this.handleToggleFormNewDescription}
-                style={{
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
-                  borderColor: props.color,
-                  ':hover': {
-                    backgroundColor: props.color
-                  }
-                }}
-              >
-                {props.t('Change description')}
-              </button>
+                <button
+                  type='button'
+                  className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
+                  onClick={this.handleToggleFormNewDescription}
+                  style={{
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: props.color,
+                    ':hover': {
+                      backgroundColor: props.color
+                    }
+                  }}
+                >
+                  {props.t('Change description')}
+                </button>
               }
             </div>
           </div>

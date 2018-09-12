@@ -22,5 +22,15 @@
   "Error while saving new description": "Error while saving new description",
   "Error while uploading file": "Error while uploading file",
   "Page number": "Page number",
-  "Upload a file": "Upload a file"
+  "Upload a file": "Upload a file",
+  "Error while loading timeline": "Error while loading timeline",
+  "Bytes": "Bytes",
+  "KB": "KB",
+  "MB": "MB",
+  "GB": "GB",
+  "TB": "TB",
+  "PB": "PB",
+  "EB": "EB",
+  "ZB": "ZB",
+  "YB": "YB"
 }

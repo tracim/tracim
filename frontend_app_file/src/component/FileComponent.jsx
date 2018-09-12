@@ -43,6 +43,7 @@ export const FileComponent = props =>
         downloadPdfPageUrl={props.downloadPdfPageUrl}
         downloadPdfFullUrl={props.downloadPdfFullUrl}
         previewUrl={props.previewUrl}
+        fileSize={props.fileSize}
         filePageNb={props.filePageNb}
         fileCurrentPage={props.fileCurrentPage}
         contentFullScreenUrl={props.contentFullScreenUrl}
