@@ -1,0 +1,33 @@
+@import '../../css/Variable.styl'
+
+.comment
+  &__header
+    display flex
+    &__text
+      position relative
+      font-size 14px
+      color grey
+    &__avatar
+      position relative
+    ^[0].sent ^[1] // renders .comment.sent .comment__header
+      justify-content flex-end
+      &__text
+        left 20px
+      &__avatar
+        left 20px
+        top 25px
+    ^[0].received ^[1] // .comment.received .comment__header
+      flex-direction row-reverse
+      justify-content flex-end
+      &__text
+        left -20px
+      &__avatar
+        left -20px
+        top 25px
+  &__body
+    display inline-block
+    border 1px solid grey
+    border-radius 5px
+    padding 15px
+    background-color offWhite
+    font-size 15px

@@ -142,7 +142,6 @@ class HtmlDocument extends React.Component {
         const revisionWithComment = resRevision.body
           .map((r, i) => ({
             ...r,
-            // created: (new Date(r.created)).toLocaleString(),
             created: displayDate(r.created, loggedUser.lang),
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
