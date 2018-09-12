@@ -7,6 +7,7 @@ import transaction
 from depot.io.utils import FileIntent
 
 from tracim_backend import models
+from tracim_backend.error_code import *
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
@@ -2437,6 +2438,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/3/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -2454,6 +2456,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1/contents', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -2472,6 +2475,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/5/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -2581,6 +2585,9 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+
 
     def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
         """
@@ -2645,6 +2652,8 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8'
 
     def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:  # nopep8
         """
@@ -2666,6 +2675,8 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
+        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
         """
@@ -2717,7 +2728,8 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-
+        # INFO - G.M - 2018-09-10 - handled by marshmallow schema
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         # allowed_content_type
         params = {
             'label': 'GenericCreatedContent',
@@ -3011,6 +3023,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
+        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_DO_NOT_MATCH
 
     def test_api_put_delete_content__ok_200__nominal_case(self):
         """

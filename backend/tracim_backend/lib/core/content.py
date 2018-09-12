@@ -4,12 +4,12 @@ import os
 import re
 import typing
 from contextlib import contextmanager
-from operator import itemgetter
 
 import sqlalchemy
 import transaction
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
+from preview_generator.exception import UnavailablePreviewType
 from preview_generator.manager import PreviewManager
 from sqlalchemy import desc
 from sqlalchemy import func
@@ -33,6 +33,7 @@ from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
@@ -803,11 +804,15 @@ class ContentApi(object):
                     content_id=content_id
                 ),
             )
-        jpg_preview_path = self.preview_manager.get_pdf_preview(
-            file_path,
-            page=page_number
-        )
-        return jpg_preview_path
+        try:
+            pdf_preview_path = self.preview_manager.get_pdf_preview(
+                file_path,
+                page=page_number
+            )
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
+
+        return pdf_preview_path
 
     def get_full_pdf_preview_path(self, revision_id: int) -> str:
         """
@@ -816,7 +821,10 @@ class ContentApi(object):
         :return: path of the full pdf preview of this revision
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        try:
+            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
         return pdf_preview_path
 
     def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:

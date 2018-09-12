@@ -8,6 +8,7 @@ import requests
 import transaction
 
 from tracim_backend import models
+from tracim_backend.error_code import *
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
@@ -3956,11 +3957,14 @@ class TestSetEmailEndpoint(FunctionalTest):
             'email': 'admin@admin.admin',
             'loggedin_user_password': 'admin@admin.admin',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=400,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_EMAIL_ALREADY_EXIST_IN_DB
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4019,11 +4023,14 @@ class TestSetEmailEndpoint(FunctionalTest):
             'email': 'mysuperemail@email.fr',
             'loggedin_user_password': 'badpassword',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WRONG_USER_PASSWORD  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4082,11 +4089,15 @@ class TestSetEmailEndpoint(FunctionalTest):
             'email': 'thatisnotandemail',
             'loggedin_user_password': 'admin@admin.admin',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=400,
         )
+        # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4209,20 +4220,23 @@ class TestSetEmailEndpoint(FunctionalTest):
         self.testapp.authorization = (
             'Basic',
             (
-                'test@test.test',
+                'test2@test2.test2',
                 'pass'
             )
         )
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'test2@test2.test2',
+            'loggedin_user_password': 'pass',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetPasswordEndpoint(FunctionalTest):
@@ -4342,11 +4356,14 @@ class TestSetPasswordEndpoint(FunctionalTest):
             'new_password2': 'mynewpassword',
             'loggedin_user_password': 'wrongpassword',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/password'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_WRONG_USER_PASSWORD
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
             current_user=admin,
@@ -4406,11 +4423,14 @@ class TestSetPasswordEndpoint(FunctionalTest):
             'new_password2': 'mynewpassword2',
             'loggedin_user_password': 'admin@admin.admin',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/password'.format(user_id),
             params=params,
             status=400,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_PASSWORD_DO_NOT_MATCH
         # Check After
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
@@ -4530,20 +4550,23 @@ class TestSetPasswordEndpoint(FunctionalTest):
         self.testapp.authorization = (
             'Basic',
             (
-                'test@test.test',
+                'test2@test2.test2',
                 'pass'
             )
         )
         # Set password
         params = {
             'email': 'mysuperemail@email.fr',
-            'loggedin_user_password': 'test2@test2.test2',
+            'loggedin_user_password': 'pass',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/email'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserInfoEndpoint(FunctionalTest):
@@ -4745,11 +4768,14 @@ class TestSetUserInfoEndpoint(FunctionalTest):
             'timezone': 'Europe/London',
             'lang': 'en'
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserProfilEndpoint(FunctionalTest):
@@ -4871,11 +4897,14 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         params = {
             'profile': 'administrators',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/profile'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4937,11 +4966,14 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         params = {
             'profile': 'administrators',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/profile'.format(user_id),
             params=params,
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserEnableDisableEndpoints(FunctionalTest):
@@ -5119,10 +5151,14 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
                 'pass'
             )
         )
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/enable'.format(user_id),
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+
 
     def test_api_disable_user__err_403__other_account(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -5224,10 +5260,13 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         res = res.json_body
         assert res['user_id'] == user_id
         assert res['is_active'] is True
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/users/{}/disable'.format(user_id),
             status=403,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
