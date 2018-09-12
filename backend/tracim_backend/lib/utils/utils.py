@@ -143,16 +143,25 @@ COLOR_DARKEN_SCALE_FACTOR = 0.85
 COLOR_LIGHTEN_SCALE_FACTOR = 1.15
 
 
+def clamp(val: float, minimum: float = 0.0, maximum: float=1.0) -> float:
+    """ Fix value between min an max"""
+    if val < minimum:
+        return minimum
+    if val > maximum:
+        return maximum
+    return val
+
+
 class ExtendedColor(Color):
 
     @property
     def darken(self):
-        new_color = Color(self)
-        new_color.luminance = COLOR_DARKEN_SCALE_FACTOR*self.luminance
+        new_color = ExtendedColor(self)
+        new_color.luminance = clamp(COLOR_DARKEN_SCALE_FACTOR*self.luminance)
         return new_color
 
     @property
     def lighten(self):
-        new_color = Color(self)
-        new_color.luminance = COLOR_LIGHTEN_SCALE_FACTOR*self.luminance
+        new_color = ExtendedColor(self)
+        new_color.luminance = clamp(COLOR_LIGHTEN_SCALE_FACTOR*self.luminance)
         return new_color
