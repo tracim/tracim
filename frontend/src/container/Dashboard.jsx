@@ -233,6 +233,8 @@ class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
+    const idRoleUserWorkspace = findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE)
+
     return (
       <div className='dashboard'>
         <PageWrapper customeClass='dashboard'>
@@ -242,13 +244,15 @@ class Dashboard extends React.Component {
             subtitle={''}
           >
             <div className='dashboard__header__advancedmode mr-3'>
-              <button
-                type='button'
-                className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                onClick={this.handleClickOpenAdvancedDashboard}
-              >
-                {props.t('Open advanced Dashboard')}
-              </button>
+              {idRoleUserWorkspace >= 8 &&
+                <button
+                  type='button'
+                  className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                  onClick={this.handleClickOpenAdvancedDashboard}
+                >
+                  {props.t('Open advanced Dashboard')}
+                </button>
+              }
             </div>
           </PageTitle>
 

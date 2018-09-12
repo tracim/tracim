@@ -111,7 +111,7 @@ class Thread extends React.Component {
       handleFetchResult(await fetchResultThread),
       handleFetchResult(await fetchResultThreadComment)
     ])
-      .then(([resThread, resComment]) => {
+      .then(async ([resThread, resComment]) => {
         this.setState({
           content: resThread.body,
           listMessage: resComment.body.map(c => ({
@@ -127,7 +127,8 @@ class Thread extends React.Component {
           }))
         })
 
-        putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+        await putThreadRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+        GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
       })
       .catch(e => console.log('Error loading Thread data.', e))
   }

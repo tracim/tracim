@@ -24,14 +24,16 @@ import {
   getWorkspaceMemberList,
   getFolderContent,
   putWorkspaceContentArchived,
-  putWorkspaceContentDeleted
+  putWorkspaceContentDeleted,
+  getWorkspaceReadStatusList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
   setWorkspaceContentList,
   setWorkspaceContentArchived,
   setWorkspaceContentDeleted,
-  setWorkspaceMemberList
+  setWorkspaceMemberList,
+  setWorkspaceReadStatusList
 } from '../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -109,16 +111,22 @@ class WorkspaceContent extends React.Component {
   }
 
   loadContentList = async idWorkspace => {
-    const { user, dispatch } = this.props
+    const { user, dispatch, t } = this.props
 
     const wsContent = await dispatch(getWorkspaceContentList(user, idWorkspace, 0))
     const wsMember = await dispatch(getWorkspaceMemberList(idWorkspace))
+    const wsReadStatus = await dispatch(getWorkspaceReadStatusList(user, idWorkspace))
 
     if (wsContent.status === 200) dispatch(setWorkspaceContentList(wsContent.json))
     else dispatch(newFlashMessage('Error while loading workspace', 'danger'))
 
     if (wsMember.status === 200) dispatch(setWorkspaceMemberList(wsMember.json))
     else dispatch(newFlashMessage('Error while loading members list', 'warning'))
+
+    switch (wsReadStatus.status) {
+      case 200: dispatch(setWorkspaceReadStatusList(wsReadStatus.json)); break
+      default: dispatch(newFlashMessage(`${t('Error while loading read status list')}`, 'warning'))
+    }
 
     this.setState({contentLoaded: true})
   }
@@ -279,6 +287,7 @@ class WorkspaceContent extends React.Component {
                       type={c.type}
                       faIcon={contentType.length ? contentType.find(a => a.slug === c.type).faIcon : ''}
                       statusSlug={c.statusSlug}
+                      read={currentWorkspace.contentReadStatusList.includes(c.id)}
                       contentType={contentType.length ? contentType.find(ct => ct.slug === c.type) : null}
                       onClickItem={() => this.handleClickContentItem(c)}
                       idRoleUserWorkspace={idRoleUserWorkspace}

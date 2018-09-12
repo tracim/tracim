@@ -172,7 +172,8 @@ class HtmlDocument extends React.Component {
       })
 
     await Promise.all([fetchResultHtmlDocument, fetchResultComment, fetchResultRevision])
-    putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}}) // await above makes sure that we will reload workspace content after the read status update
   }
 
   handleClickBtnCloseApp = () => {

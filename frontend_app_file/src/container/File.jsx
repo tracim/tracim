@@ -142,7 +142,8 @@ class File extends React.Component {
         }
       }))
 
-    putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    await putFileRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id)
+    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}})
   }
 
   loadTimeline = async () => {

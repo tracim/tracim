@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Radium from 'radium'
 import classnames from 'classnames'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 
@@ -10,7 +9,9 @@ const ContentItem = props => {
   const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug)
   return (
     <div
-      className={classnames('content', 'align-items-center', 'primaryColorBgLightenHover', {'item-last': props.isLast}, props.customClass)}
+      className={
+        classnames('content align-items-center primaryColorBgLightenHover', {'item-last': props.isLast, 'read': props.read}, props.customClass)
+      }
       onClick={props.onClickItem}
     >
       <div className='content__type' style={{color: props.contentType.hexcolor}}>
@@ -33,13 +34,8 @@ const ContentItem = props => {
       }
 
       <div
-        className='content__status d-sm-flex align-items-center justify-content-between'
-        style={{
-          color: status.hexcolor,
-          ':hover': {
-            color: '#fdfdfd'
-          }
-        }}
+        className='content__status d-sm-flex justify-content-center'
+        style={{color: status.hexcolor}}
       >
         <div className='content__status__text d-none d-sm-block'>
           {status.label}
@@ -52,21 +48,22 @@ const ContentItem = props => {
   )
 }
 
-export default Radium(ContentItem)
+export default ContentItem
 
 ContentItem.propTypes = {
-  hexcolor: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   statusSlug: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   label: PropTypes.string,
   contentType: PropTypes.object,
   onClickItem: PropTypes.func,
-  faIcon: PropTypes.string
+  faIcon: PropTypes.string,
+  read: PropTypes.bool
 }
 
 ContentItem.defaultProps = {
   label: '',
   customClass: '',
-  onClickItem: () => {}
+  onClickItem: () => {},
+  read: false
 }
