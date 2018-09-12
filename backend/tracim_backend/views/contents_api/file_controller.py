@@ -222,6 +222,40 @@ class FileController(Controller):
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
+    @hapic.input_query(FileQuerySchema())
+    @hapic.output_file([])
+    def preview_pdf_full_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
+        """
+        Obtain full pdf preview of a specific revision of content.
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(
+            hapic_data.path.content_id,
+            content_type=CONTENT_TYPES.Any_SLUG
+        )
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id,
+            content=content
+        )
+        pdf_preview_path = api.get_full_pdf_preview_path(
+            revision.revision_id,
+        )
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
+        response = FileResponse(pdf_preview_path)
+        return response
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
+    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
     def preview_pdf_revision(self, context, request: TracimRequest, hapic_data=None):  # nopep8
@@ -598,7 +632,14 @@ class FileController(Controller):
             request_method='GET'
         )
         configurator.add_view(self.sized_preview_jpg_revision, route_name='sized_preview_jpg_revision')  # nopep8
-        # get jpg preview for revision
+        # get full pdf preview for revision
+        configurator.add_route(
+            'preview_pdf_full_revision',
+            '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full',  # nopep8
+            request_method='GET'
+        )
+        configurator.add_view(self.preview_pdf_full_revision, route_name='preview_pdf_full_revision')  # nopep8
+        # get pdf preview for revision
         configurator.add_route(
             'preview_pdf_revision',
             '/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf',  # nopep8
