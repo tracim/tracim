@@ -385,9 +385,9 @@ class FileQuerySchema(marshmallow.Schema):
 class PageQuerySchema(FileQuerySchema):
     page = marshmallow.fields.Int(
         example=2,
-        default=0,
+        default=1,
         description='allow to show a specific page of a pdf file',
-        validate=Range(min=0, error="Value must be positive or 0"),
+        validate=Range(min=1, error="Value must be positive"),
     )
 
     @post_load

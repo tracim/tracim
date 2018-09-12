@@ -223,9 +223,9 @@ class PageQuery(object):
     def __init__(
             self,
             force_download: int = 0,
-            page: int = 0
+            page: int = 1
     ):
-        self.force_download=force_download
+        self.force_download = force_download
         self.page = page
 
 

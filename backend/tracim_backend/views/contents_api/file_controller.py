@@ -119,6 +119,9 @@ class FileController(Controller):
         response = request.response
         response.content_type = file.content_type
         response.app_iter = FileIter(file)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
@@ -152,6 +155,9 @@ class FileController(Controller):
         response = request.response
         response.content_type = file.content_type
         response.app_iter = FileIter(file)
+        # INFO - G.M - 2018-09-05 - Support for force download param
+        if hapic_data.query.force_download:
+            response.content_disposition = 'attachment'
         return response
 
     # preview
@@ -183,7 +189,7 @@ class FileController(Controller):
         pdf_preview_path = api.get_pdf_preview_path(
             content.content_id,
             content.revision_id,
-            page=hapic_data.query.page
+            page_number=hapic_data.query.page
         )
         request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(pdf_preview_path)
@@ -281,7 +287,7 @@ class FileController(Controller):
         pdf_preview_path = api.get_pdf_preview_path(
             revision.content_id,
             revision.revision_id,
-            page=hapic_data.query.page
+            page_number=hapic_data.query.page
         )
         request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(pdf_preview_path)
@@ -315,7 +321,7 @@ class FileController(Controller):
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=content.revision_id,
-            page=hapic_data.query.page,
+            page_number=hapic_data.query.page,
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
         )
@@ -350,7 +356,7 @@ class FileController(Controller):
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=content.revision_id,
-            page=hapic_data.query.page,
+            page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
@@ -389,10 +395,11 @@ class FileController(Controller):
         jpg_preview_path = api.get_jpg_preview_path(
             content_id=content.content_id,
             revision_id=revision.revision_id,
-            page=hapic_data.query.page,
+            page_number=hapic_data.query.page,
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
+        
         request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(jpg_preview_path)
         return response
