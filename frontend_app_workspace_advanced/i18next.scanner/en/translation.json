@@ -12,5 +12,6 @@
   "Error while removing user from workspace": "Error while removing user from workspace",
   "Please set a name or email": "Please set a name or email",
   "Please set a role": "Please set a role",
-  "Error while adding the member to the workspace": "Error while adding the member to the workspace"
+  "Error while adding the member to the workspace": "Error while adding the member to the workspace",
+  "Error while saving new workspace label": "Error while saving new workspace label"
 }
