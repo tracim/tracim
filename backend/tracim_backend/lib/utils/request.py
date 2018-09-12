@@ -65,6 +65,8 @@ class TracimRequest(Request):
         # user
         self._candidate_user = None  # type: User
 
+        # TODO BS 2018-09-12: Must be deleted, see:
+        # https://github.com/tracim/tracim/issues/903
         self.response_content_disposition = None
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
