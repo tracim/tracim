@@ -2089,13 +2089,18 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        test_file.file_extension = '.txt'
-        test_file.depot_file = FileIntent(
-            b'Test file',
-            'Test_file.txt',
-            'text/plain',
-        )
-        content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                new_content=b'Test file',
+                new_filename='Test_file.txt',
+                new_mimetype='text/plain',
+            )
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
