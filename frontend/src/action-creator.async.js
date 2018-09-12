@@ -21,7 +21,9 @@ import {
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS,
-  USER_WORKSPACE_DO_NOTIFY
+  USER_WORKSPACE_DO_NOTIFY,
+  USER,
+  USER_WORKSPACE_LIST
 } from './action-creator.sync.js'
 
 /*
@@ -111,6 +113,36 @@ export const postUserLogout = () => async dispatch => {
       method: 'POST'
     },
     actionName: USER_LOGOUT,
+    dispatch
+  })
+}
+
+export const getUser = idUser => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USER,
+    dispatch
+  })
+}
+
+export const getUserWorkspaceList = idUser => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USER_WORKSPACE_LIST,
     dispatch
   })
 }
@@ -241,18 +273,13 @@ export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
 
 export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatch => {
   return fetchWrapper({
-    // @TODO Côme - 2018/08/23 - this is the wrong endpoint, but backend hasn't implemented it yet
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members/${user.user_id}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/${doNotify ? 'notify' : 'unnotify'}`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT',
-      body: JSON.stringify({
-        do_notify: doNotify
-      })
-
+      method: 'PUT'
     },
     actionName: USER_WORKSPACE_DO_NOTIFY,
     dispatch
@@ -289,7 +316,7 @@ export const getWorkspaceDetail = (user, idWorkspace) => dispatch => {
   })
 }
 
-export const getWorkspaceMemberList = (user, idWorkspace) => dispatch => {
+export const getWorkspaceMemberList = idWorkspace => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
     param: {
@@ -359,7 +386,7 @@ export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch =>
       },
       method: 'POST',
       body: JSON.stringify({
-        user_id: newMember.id,
+        user_id: newMember.id || null,
         user_email_or_public_name: newMember.name,
         role: newMember.role
       })

@@ -23,12 +23,13 @@ import {
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList
 } from '../action-creator.sync.js'
-import { ROLE, PAGE } from '../helper.js'
+import appFactory from '../appFactory.js'
+import { ROLE, PAGE, findIdRoleUserWorkspace } from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
-import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
+// import MoreInfo from '../component/Dashboard/MoreInfo.jsx'
 
 class Dashboard extends React.Component {
   constructor (props) {
@@ -47,6 +48,19 @@ class Dashboard extends React.Component {
       displayNotifBtn: false,
       displayWebdavBtn: false,
       displayCalendarBtn: false
+    }
+
+    document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  customEventReducer = async ({ detail: { type, data } }) => {
+    switch (type) {
+      case 'refreshWorkspaceList':
+        console.log('%c<Dashboard> Custom event', 'color: #28a745', type, data)
+        this.loadWorkspaceDetail()
+        this.loadMemberList()
+        this.loadRecentActivity()
+        break
     }
   }
 
@@ -76,17 +90,17 @@ class Dashboard extends React.Component {
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceDetail.status) {
       case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('workspace detail')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('workspace detail')}`, 'warning')); break
     }
   }
 
   loadMemberList = async () => {
     const { props, state } = this
 
-    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.user, state.workspaceIdInUrl))
+    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(state.workspaceIdInUrl))
     switch (fetchWorkspaceMemberList.status) {
       case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('member list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
     }
   }
 
@@ -98,12 +112,12 @@ class Dashboard extends React.Component {
 
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('recent activity list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
     }
 
     switch (fetchWorkspaceReadStatusList.status) {
       case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('read status list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
   }
 
@@ -122,7 +136,7 @@ class Dashboard extends React.Component {
     const fetchUserWorkspaceAllRead = await props.dispatch(putUserWorkspaceRead(props.user, props.curWs.id))
     switch (fetchUserWorkspaceAllRead.status) {
       case 204: this.loadRecentActivity(); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching "mark all as read"')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while setting "mark all as read"')}`, 'warning')); break
     }
   }
 
@@ -134,7 +148,7 @@ class Dashboard extends React.Component {
     const fetchWorkspaceRecentActivityList = await props.dispatch(getWorkspaceRecentActivityList(props.user, state.workspaceIdInUrl, idLastRecentActivity))
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(appendWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('recent activity list')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
     }
   }
 
@@ -145,12 +159,13 @@ class Dashboard extends React.Component {
       case 200:
         this.setState({searchedKnownMemberList: fetchUserKnownMemberList.json}); break
       default:
-        props.dispatch(newFlashMessage(`${props.t('An error has happened while fetching')} ${props.t('known members list')}`, 'warning')); break
+        props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
     }
   }
 
   handleChangeNewMemberNameOrEmail = newNameOrEmail => {
     if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
+    else if (newNameOrEmail.length === 0) this.setState({searchedKnownMemberList: []})
     this.setState(prev => ({newMember: {...prev.newMember, nameOrEmail: newNameOrEmail}}))
   }
 
@@ -184,7 +199,7 @@ class Dashboard extends React.Component {
     }
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
-      id: state.newMember.id,
+      id: state.newMember.id || null,
       name: state.newMember.nameOrEmail,
       role: state.newMember.role
     }))
@@ -195,6 +210,24 @@ class Dashboard extends React.Component {
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while adding the member'), 'warning')); break
     }
+  }
+
+  handleClickOpenAdvancedDashboard = () => {
+    const { props } = this
+
+    props.renderAppFeature(
+      {
+        label: 'Advanced dashboard',
+        slug: 'workspace_advanced',
+        faIcon: 'bank',
+        hexcolor: '#999999',
+        creationLabel: '',
+        roleList: ROLE
+      },
+      props.user,
+      findIdRoleUserWorkspace(props.user.user_id, props.curWs.memberList, ROLE),
+      {...props.curWs, workspace_id: props.curWs.id}
+    )
   }
 
   render () {
@@ -209,8 +242,12 @@ class Dashboard extends React.Component {
             subtitle={''}
           >
             <div className='dashboard__header__advancedmode mr-3'>
-              <button type='button' className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'>
-                {props.t('Active advanced Dashboard')}
+              <button
+                type='button'
+                className='dashboard__header__advancedmode__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                onClick={this.handleClickOpenAdvancedDashboard}
+              >
+                {props.t('Open advanced Dashboard')}
               </button>
             </div>
           </PageTitle>
@@ -236,7 +273,7 @@ class Dashboard extends React.Component {
               />
             </div>
 
-            <div className='dashboard__calltoaction justify-content-xl-center'>
+            <div className='dashboard__calltoaction justify-content-sm-center'>
               {props.appList.map(app => {
                 const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
                 return (
@@ -282,13 +319,18 @@ class Dashboard extends React.Component {
               />
             </div>
 
-            <MoreInfo
-              onClickToggleWebdav={this.handleToggleWebdavBtn}
-              displayWebdavBtn={state.displayWebdavBtn}
-              onClickToggleCalendar={this.handleToggleCalendarBtn}
-              displayCalendarBtn={state.displayCalendarBtn}
-              t={props.t}
-            />
+            { /*
+              AC - 11/09/2018 - not included in v2.0 roadmap
+
+              <MoreInfo
+                onClickToggleWebdav={this.handleToggleWebdavBtn}
+                displayWebdavBtn={state.displayWebdavBtn}
+                onClickToggleCalendar={this.handleToggleCalendarBtn}
+                displayCalendarBtn={state.displayCalendarBtn}
+                t={props.t}
+              />
+            */ }
+
           </PageContent>
         </PageWrapper>
       </div>
@@ -297,4 +339,4 @@ class Dashboard extends React.Component {
 }
 
 const mapStateToProps = ({ user, contentType, appList, currentWorkspace }) => ({ user, contentType, appList, curWs: currentWorkspace })
-export default connect(mapStateToProps)(translate()(Dashboard))
+export default connect(mapStateToProps)(appFactory(translate()(Dashboard)))

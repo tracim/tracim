@@ -126,10 +126,16 @@ folderopen()
         & > i
           margin-right 3px
 
-@media (min-width: min-sm) and (max-width: max-md)
+// MEDIAQUERIES
 
-  .folder__header__button
-    display none
+@media (min-width: min-sm) and (max-width: max-sm)
+
+  .folder
+    &__header
+      &__button__addbtn__text
+        margin-right 15px
+      &__status
+        display none
 
 @media (max-width: max-xs)
   .folder
@@ -140,6 +146,7 @@ folderopen()
           font-size 20px
         &__text
           font-size 15px
-      &__button
+      &__button__addbtn__text
+        margin-right 15px
+      &__status
         display none
-

@@ -11,7 +11,8 @@ import {
   PopinFixedContent,
   Timeline,
   SelectStatus,
-  ArchiveDeleteContent
+  ArchiveDeleteContent,
+  displayDate
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -70,6 +71,7 @@ class Thread extends React.Component {
           }
         }))
         i18n.changeLanguage(data)
+        this.loadContent()
         break
     }
   }
@@ -115,7 +117,7 @@ class Thread extends React.Component {
           listMessage: resComment.body.map(c => ({
             ...c,
             timelineType: 'comment',
-            created: (new Date(c.created)).toLocaleString(),
+            created: displayDate(c.created, loggedUser.lang),
             author: {
               ...c.author,
               avatar_url: c.author.avatar_url

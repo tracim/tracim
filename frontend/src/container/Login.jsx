@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
-import LoginLogo from '../component/Login/LoginLogo.jsx'
-import LoginLogoImg from '../img/logoTracimWhite.svg'
+// import LoginLogo from '../component/Login/LoginLogo.jsx'
+// import LoginLogoImg from '../img/logoTracimWhite.svg'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -113,7 +113,13 @@ class Login extends React.Component {
         <section className='loginpage primaryColorBg'>
           <div className='container-fluid'>
 
-            <LoginLogo customClass='loginpage__logo' logoSrc={LoginLogoImg} />
+            { /*
+              AC - 11/09/2018 - disable the logo to leave more space for the login form
+              <LoginLogo
+                customClass='loginpage__logo'
+                logoSrc={LoginLogoImg}
+              />
+            */ }
 
             <div className='row justify-content-center'>
               <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
@@ -151,7 +157,12 @@ class Login extends React.Component {
 
                       <div className='row mt-4 mb-4'>
                         <div className='col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6'>
-                          <div className='connection__form__rememberme' onClick={this.handleChangeRememberMe}>
+                          <div
+                            className='connection__form__rememberme'
+                            onClick={this.handleChangeRememberMe}
+                            style={{'display': 'none'}}
+                            // AC - 10/09/2018 - not included in v2.0 roadmap
+                          >
                             <Checkbox
                               name='inputRememberMe'
                               checked={this.state.inputRememberMe}

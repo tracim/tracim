@@ -244,14 +244,27 @@ class AutocompleteQuery(object):
         self.acp = acp
 
 
+class FileQuery(object):
+    """
+    File query model
+    """
+    def __init__(
+        self,
+        force_download: int = 0,
+    ):
+        self.force_download = force_download
+
+
 class PageQuery(object):
     """
     Page query model
     """
     def __init__(
             self,
+            force_download: int = 0,
             page: int = 0
     ):
+        self.force_download=force_download
         self.page = page
 
 
@@ -799,6 +812,22 @@ class ContentInContext(object):
         else:
             return None
 
+    @property
+    def pdf_available(self) -> bool:
+        """
+        :return: bool about if pdf version of content is available
+        """
+        if self.content.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.has_pdf_preview(self.content.revision_id)
+        else:
+            return False
+
 
 class RevisionInContext(object):
     """
@@ -987,3 +1016,19 @@ class RevisionInContext(object):
             return self.revision.depot_file.file.content_length
         else:
             return None
+
+    @property
+    def pdf_available(self) -> bool:
+        """
+        :return: bool about if pdf version of content is available
+        """
+        if self.revision.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.has_pdf_preview(self.revision.revision_id)
+        else:
+            return False

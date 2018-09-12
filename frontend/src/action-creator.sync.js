@@ -52,6 +52,8 @@ export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
 export const setWorkspaceListIsOpenInSidebar = (workspaceId, isOpenInSidebar) => ({ type: `${SET}/${WORKSPACE_LIST}/isOpenInSidebar`, workspaceId, isOpenInSidebar })
 
+export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
+
 export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
 export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
 

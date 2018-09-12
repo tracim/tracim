@@ -45,7 +45,7 @@ export class PersonalData extends React.Component {
 
         <form className='personaldata__form'>
           <div className='personaldata__form__title'>
-            {props.t('Name:')}
+            {props.t('Name')}
           </div>
 
           <div className='d-flex align-items-center flex-wrap mb-4'>
@@ -69,12 +69,21 @@ export class PersonalData extends React.Component {
               onChange={this.handleChangeEmail}
             />
 
+          </div>
+
+          <div className='d-flex align-items-center flex-wrap mb-4'>
             <input
               className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='password'
               placeholder={props.t('Check your password')}
               onChange={this.handleChangeCheckPassword}
             />
+            {props.displayAdminInfo &&
+              <div className='personaldata__form__txtinput__info'>
+                <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
+                {props.t('This requires your administrator password')}
+              </div>
+            }
           </div>
 
           <button
