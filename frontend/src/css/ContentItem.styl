@@ -17,6 +17,9 @@
   border-bottom 0
   width 100%
   cursor pointer
+  font-weight bold
+  &.read
+    font-weight normal
   &:hover > .content__name
     color offWhite
   &:hover > .content__status
@@ -42,15 +45,23 @@
     width 180px
     padding 0 15px
     text-align center
+    font-weight normal
     &__text
       margin-left 15px
       font-size 20px
     &__icon
       font-size 20px
 
+//MEDIAQUERIES
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .content
     border-right 1px solid grey
     &__name__icons
         margin-top 5px
+
+@media (max-width: max-xs)
+
+  .content__status__icon
+    display flex
+    justify-content flex-end

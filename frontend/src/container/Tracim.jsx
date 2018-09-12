@@ -1,10 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import i18n from '../i18n.js'
 import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import Account from './Account.jsx'
+import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
@@ -48,7 +50,7 @@ class Tracim extends React.Component {
         break
       case 'refreshWorkspaceList':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
-        this.loadWorkspaceList()
+        this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
         break
     }
   }
@@ -64,6 +66,7 @@ class Tracim extends React.Component {
           ...fetchGetUserIsConnected.json,
           logged: true
         }))
+        i18n.changeLanguage(fetchGetUserIsConnected.json.lang)
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
@@ -84,7 +87,7 @@ class Tracim extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  loadWorkspaceList = async () => {
+  loadWorkspaceList = async (idOpenInSidebar = undefined) => {
     const { props } = this
 
     const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList(props.user))
@@ -94,11 +97,11 @@ class Tracim extends React.Component {
 
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
-      const idWorkspaceToOpen = (() =>
-        props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)
-          ? parseInt(props.match.params.idws)
-          : fetchGetWorkspaceList.json[0].workspace_id
-      )()
+      const idWorkspaceToOpen = (() => {
+        if (idOpenInSidebar) return idOpenInSidebar
+        if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) return parseInt(props.match.params.idws)
+        return fetchGetWorkspaceList.json[0].workspace_id
+      })()
 
       props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
     }
@@ -165,9 +168,12 @@ class Tracim extends React.Component {
               <Account />
             } />
 
-            <Route path={PAGE.ADMIN.ROOT} render={() =>
-              <AppFullscreenRouter />
+            <Route path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
+              <AdminAccount />
             } />
+
+            <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
+            <Route path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
 
             <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 

@@ -18,6 +18,14 @@ CONTENT_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}/contents/{content_type}
 WORKSPACE_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}'  # nopep8
 
 
+def preview_manager_page_format(page_number: int) -> int:
+    """
+    Convert page real number of page(begin at 1) to preview_manager page
+    format(begin at 0)
+    """
+    return page_number-1
+
+
 def get_root_frontend_url(config: 'CFG') -> str:
     """
     Return website base url with always '/' at the end

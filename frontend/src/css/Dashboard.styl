@@ -39,59 +39,42 @@ flexwrap()
         &__title
           font-size 18px
   &__workspaceInfo
+    margin-bottom 50px
     flexwrap()
 
-/**** MEDIAQUERIES *****/
-
-/**** MEDIA 576px & 1199px ****/
-
-// Regroup the common rules
-
-@media (min-width min-sm) and (max-width: max-lg)
-
-  .dashboard
-    &__workspace
-      width auto
-    &__userstatut
-      width auto
-    &__calltoaction
-      justify-content center
-
-
-/**** MEDIAQUERIES ****/
-
-/**** MEDIA 992px & 1199px ****/
-
-@media (min-width: min-lg) and (max-width: max-lg)
-
-  .dashboard
-    &__workspace
-      width 100%
-
-/**** MEDIA 768px & 991px ****/
+// MEDIAQUERIES
 
 @media (min-width: min-md) and (max-width: max-md)
 
   .dashboard
     &__workspace
       width 100%
-
-/**** MEDIA 576px & 767px ****/
+    .memberlist
+      margin-left 0
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
   .dashboard
+    &__header
+      &__advancedmode
+        display none
     &__workspace
       width 100%
-
-/**** MEDIA 575px ****/
+    &__calltoaction
+      &__button:nth-child(even)
+        margin-right 0
 
 @media (max-width: max-xs)
+
+  .dashboard .pageContentGeneric
+    margin 10px 0 0 0
 
   .dashboard
     &__header
       &__advancedmode
-        margin 25px 15px
+        display none
+    &__workspace-wrapper
+      margin 0 15px
     &__workspace
       width 100%
     &__calltoaction
@@ -100,3 +83,9 @@ flexwrap()
       justify-content center
       &__button
         margin 20px 0
+    .memberlist
+      &__list__item__delete
+        display none
+      &__btnadd
+        display none
+

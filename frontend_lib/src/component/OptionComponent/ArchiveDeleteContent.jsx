@@ -1,5 +1,6 @@
 import React from 'react'
 import Radium from 'radium'
+import { translate } from 'react-i18next'
 
 const ArchiveDeleteContent = props => {
   const styleColorBtn = {
@@ -14,10 +15,10 @@ const ArchiveDeleteContent = props => {
     <div className='d-flex align-items-center'>
       <button
         type='button'
-        className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block btn iconBtn'
+        className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
         onClick={props.onClickArchiveBtn}
         disabled={props.disabled}
-        title='Archiver'
+        title={props.t('Archive')}
         style={styleColorBtn}
         key={'archiveDeleteContent__archive'}
       >
@@ -25,10 +26,10 @@ const ArchiveDeleteContent = props => {
       </button>
       <button
         type='button'
-        className='wsContentGeneric__option__menu__action optionicon d-none d-sm-block btn iconBtn'
+        className='wsContentGeneric__option__menu__action d-none d-sm-block btn iconBtn'
         onClick={props.onClickDeleteBtn}
         disabled={props.disabled}
-        title='Supprimer'
+        title={props.t('Delete')}
         style={styleColorBtn}
         key={'archiveDeleteContent__delete'}
       >
@@ -38,4 +39,4 @@ const ArchiveDeleteContent = props => {
   )
 }
 
-export default Radium(ArchiveDeleteContent)
+export default Radium(translate()((ArchiveDeleteContent)))

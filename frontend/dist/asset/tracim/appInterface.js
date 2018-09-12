@@ -13,6 +13,8 @@
         return appFile
       case 'admin_workspace_user':
         return appAdminWorkspaceUser
+      case 'workspace_advanced':
+        return appWorkspaceAdvanced
       default:
         return null
     }

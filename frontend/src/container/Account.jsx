@@ -70,7 +70,7 @@ class Account extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       props.workspaceList.map(async ws => ({
         idWorkspace: ws.id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(props.user, ws.id))
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.id))
       }))
     )
 
@@ -121,13 +121,8 @@ class Account extends React.Component {
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(props.user, idWorkspace, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      // @TODO: Côme - 2018/08/23 - uncomment this when fetch implements the right endpoint (blocked by backend)
-      // case 200:
-      //   break
-      default:
-        props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify))
-        // props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
-        break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
