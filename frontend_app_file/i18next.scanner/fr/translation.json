@@ -21,5 +21,6 @@
   "Change description": "Changer la description",
   "Error while saving new description": "Erreur lors de l'enregistrement d'une nouvelle description",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
-  "Page number": "Numéro de page"
+  "Page number": "Numéro de page",
+  "Upload a file": "Importer un fichier"
 }

@@ -286,7 +286,9 @@ class Dashboard extends React.Component {
                     hexcolor={app.hexcolor}
                     label={app.label}
                     faIcon={app.faIcon}
-                    creationLabel={contentType.creationLabel}
+                    // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
+                    // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                    creationLabel={props.t(contentType.creationLabel)}
                     onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
                     key={app.label}
                   />

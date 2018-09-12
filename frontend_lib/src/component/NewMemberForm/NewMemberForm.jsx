@@ -91,7 +91,7 @@ export const NewMemberForm = props =>
                 </div>
 
                 <div className='item__text__name'>
-                  {r.label}
+                  {props.t(r.label) /* this trad key comes from frontend/helper.js, object ROLE */}
                 </div>
               </div>
             </label>

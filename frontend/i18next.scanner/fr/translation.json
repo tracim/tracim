@@ -46,7 +46,6 @@
   "Email Adress": "Adresse email",
   "Old password": "Ancien mot de passe",
   "New password": "Nouveau mot de passe",
-  "Name:": "Nom :",
   "You have subscribed to this workspace's notifications": "Vous êtes abonné aux notifications de cet espace de travail.",
   "Connection": "Connexion",
   "Forgotten password ?": "Mot de passe oublié ?",
@@ -104,5 +103,14 @@
   "Password has been changed": "Le mot de passe a été changé",
   "Admin account page": "Administration de compte",
   "This requires your administrator password": "Ce champs a besoin de votre mot de passe administrateur",
-  "This workspace has no content yet, create the first content by clicking on the button 'Create'": "Cet espace de travail n'a pas encore de contenu, créer le premier contenu en cliquant sur le bouton 'Créer'"
+  "This workspace has no content yet, create the first content by clicking on the button 'Create'": "Cet espace de travail n'a pas encore de contenu, créer le premier contenu en cliquant sur le bouton 'Créer'",
+  "Error while loading read status list": "__NOT_TRANSLATED__",
+  "Name": "Nom",
+  "Reader": "Lecteur",
+  "Contributor": "Contributeur",
+  "Content manager": "Manageur de contenu",
+  "Workspace manager": "Manager d'espace de travail",
+  "Administrator": "Administrateur",
+  "Manager": "Manageur",
+  "User": "Utilisateur"
 }

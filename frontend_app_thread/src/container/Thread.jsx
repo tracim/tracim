@@ -38,7 +38,10 @@ class Thread extends React.Component {
       content: props.data ? props.data.content : debug.content,
       listMessage: props.data ? [] : [], // debug.listMessage,
       newComment: '',
-      timelineWysiwyg: false
+      timelineWysiwyg: false,
+      externalTradList: [
+        props.t('Discuss about a topic')
+      ]
     }
 
     // i18n has been init, add resources from frontend
