@@ -115,12 +115,10 @@ class FileController(Controller):
             content_type=CONTENT_TYPES.Any_SLUG
         )
         file = DepotManager.get().get(content.depot_file)
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = request.response
         response.content_type = file.content_type
         response.app_iter = FileIter(file)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
@@ -150,12 +148,10 @@ class FileController(Controller):
             content=content
         )
         file = DepotManager.get().get(revision.depot_file)
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = request.response
         response.content_type = file.content_type
         response.app_iter = FileIter(file)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     # preview
@@ -189,10 +185,8 @@ class FileController(Controller):
             content.revision_id,
             page=hapic_data.query.page
         )
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(pdf_preview_path)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
@@ -219,10 +213,8 @@ class FileController(Controller):
             content_type=CONTENT_TYPES.Any_SLUG
         )
         pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(pdf_preview_path)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
@@ -293,10 +285,8 @@ class FileController(Controller):
             revision.revision_id,
             page=hapic_data.query.page
         )
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(pdf_preview_path)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     # jpg
@@ -331,10 +321,8 @@ class FileController(Controller):
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
         )
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(jpg_preview_path)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
@@ -368,10 +356,8 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(jpg_preview_path)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
@@ -409,10 +395,8 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
+        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
         response = FileResponse(jpg_preview_path)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
