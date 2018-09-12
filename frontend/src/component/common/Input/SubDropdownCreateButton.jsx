@@ -1,4 +1,5 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 require('./SubDropdownCreateButton.styl')
@@ -16,7 +17,7 @@ const SubDropdownCreateButton = props => {
               />
             </div>
             <div className={`subdropdown__link__${app.slug}__text`}>
-              {app.creationLabel}
+              {props.t(app.creationLabel) /* these key comes from each apps that in property externalTradKey */}
             </div>
           </div>
         </div>
@@ -31,4 +32,4 @@ SubDropdownCreateButton.propTypes = {
   idFolder: PropTypes.number
 }
 
-export default SubDropdownCreateButton
+export default translate()(SubDropdownCreateButton)

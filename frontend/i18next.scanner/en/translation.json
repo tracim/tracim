@@ -88,7 +88,6 @@
   "Feature": "Feature",
   "Explore": "Explore",
   "About": "About",
-  "Create ...": "Create ...",
   "Admin workspace": "Admin workspace",
   "Admin user": "Admin user",
   "My Account": "My Account",
@@ -112,5 +111,6 @@
   "Workspace manager": "Workspace manager",
   "Administrator": "Administrator",
   "Manager": "Manager",
-  "User": "User"
+  "User": "User",
+  "Create": "Create"
 }

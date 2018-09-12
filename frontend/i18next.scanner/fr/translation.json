@@ -70,7 +70,6 @@
   "Admin user": "Administration des utilisateurs",
   "You will create your first workspace": "Vous allez créer votre premier espace de travail",
   "create a workspace": "créer un espace de travail",
-  "Create ...": "Créer ...",
   "Edit": "Editer",
   "Information": "Information",
   "Warning": "Alerte",
@@ -112,5 +111,6 @@
   "Workspace manager": "Responsable",
   "Administrator": "Administrateur",
   "Manager": "Manageur",
-  "User": "Utilisateur"
+  "User": "Utilisateur",
+  "Create": "Créer "
 }
