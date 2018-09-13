@@ -3,9 +3,11 @@
 .memberlist
   width calc(40% - 30px)
   margin-left 30px
-  &__title
+  &__header
+    display flex
+    justify-content space-between
+    align-items center
     margin-bottom 20px
-    padding 6px
     height 45px
   &__wrapper
     position relative
@@ -19,8 +21,8 @@
       display flex
       border-bottom 1px solid grey
       padding 10px 15px
-      // &:nth-last-child()
-      //   border-bottom 0
+      &:last-child
+        box-shadow inset 0px -3px 5px -2px #333
       &:hover > .memberlist__list__item__info
         color offWhite
       &:hover > .memberlist__list__item__delete
@@ -31,6 +33,7 @@
           width 50px
           height 50px
       &__info
+        margin-right auto
         &__name
           font-size 20px
         &__role
@@ -45,22 +48,23 @@
     &__button
       display flex
       align-items center
+      border-color grey
+      color grey
       &__avatar
         display flex
         justify-content center
         align-items center
         margin-right 20px
-        border 2px dashed grey
+        border-width 2px
+        border-style dashed
         border-radius 50%
         width 50px
         height 50px
         cursor pointer
         &__icon
-          color grey
           font-size 25px
       &__text
         font-size 18px
-        color fontColor
         cursor pointer
 
 

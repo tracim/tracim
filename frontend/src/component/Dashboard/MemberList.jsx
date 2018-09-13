@@ -34,7 +34,7 @@ export class MemberList extends React.Component {
     return (
       <div className='memberlist'>
 
-        <div className='memberlist__title subTitle'>
+        <div className='memberlist__header subTitle'>
           {props.t('Member List')}
         </div>
 
@@ -49,7 +49,7 @@ export class MemberList extends React.Component {
                         <img src={m.avatarUrl} />
                       </div>
 
-                      <div className='memberlist__list__item__info mr-auto'>
+                      <div className='memberlist__list__item__info'>
                         <div className='memberlist__list__item__info__name'>
                           {m.publicName}
                         </div>
@@ -67,14 +67,14 @@ export class MemberList extends React.Component {
                 </ul>
 
                 <div className='memberlist__btnadd' onClick={this.handleClickAddMemberBtn}>
-                  <div className='memberlist__btnadd__button'>
+                  <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
                     <div className='memberlist__btnadd__button__avatar'>
                       <div className='memberlist__btnadd__button__avatar__icon'>
                         <i className='fa fa-plus' />
                       </div>
                     </div>
 
-                    <div className='memberlist__btnadd__button__text primaryColorFontHover'>
+                    <div className='memberlist__btnadd__button__text'>
                       {props.t('Add a member')}
                     </div>
                   </div>

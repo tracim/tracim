@@ -59,7 +59,6 @@
   "Change your name": "Change your name",
   "Email Address:": "Email Address:",
   "Change your email": "Change your email",
-  "Check your password": "Check your password",
   "Change your Timezone": "Change your Timezone",
   "Member List": "Member List",
   "Add a member": "Add a member",
@@ -88,8 +87,6 @@
   "Feature": "Feature",
   "Explore": "Explore",
   "About": "About",
-  "Admin workspace": "Admin workspace",
-  "Admin user": "Admin user",
   "My Account": "My Account",
   "Logout": "Logout",
   "Archive Topic": "Archive Topic",
@@ -112,5 +109,13 @@
   "Administrator": "Administrator",
   "Manager": "Manager",
   "User": "User",
-  "Create": "Create"
+  "Create": "Create",
+  "Type your password": "Type your password",
+  "Validate": "Validate",
+  "No recent activity": "No recent activity",
+  "List of documents": "List of documents",
+  "List of files": "List of files",
+  "List of threads": "List of threads",
+  "Workspaces": "Workspaces",
+  "Users": "Users"
 }

@@ -105,18 +105,18 @@ const WorkspaceAdvancedComponent = props => {
                 </li>
               )}
             </ul>
-            <div className='workspaceadvanced__userlist__adduser'>
-              <div className='workspaceadvanced__userlist__adduser__button'>
+            <div
+              className='workspaceadvanced__userlist__adduser'
+              onClick={props.onClickToggleFormNewMember}
+            >
+              <div className='workspaceadvanced__userlist__adduser__button primaryColorFontHover primaryColorBorderHover'>
                 <div className='workspaceadvanced__userlist__adduser__button__avatar'>
                   <div className='workspaceadvanced__userlist__adduser__button__avatar__icon'>
                     <i className='fa fa-plus' />
                   </div>
                 </div>
 
-                <div
-                  className='workspaceadvanced__userlist__adduser__button__text'
-                  onClick={props.onClickToggleFormNewMember}
-                >
+                <div className='workspaceadvanced__userlist__adduser__button__text'>
                   {props.t('Add a member')}
                 </div>
               </div>

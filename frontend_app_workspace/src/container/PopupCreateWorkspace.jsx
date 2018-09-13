@@ -104,10 +104,10 @@ class PopupCreateWorkspace extends React.Component {
   render () {
     return (
       <CardPopupCreateContent
+        customColor={this.state.config.hexcolor}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         label={this.props.t('New workspace')} // @TODO get the lang of user
-        customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newWorkspaceName}
         onChangeContentName={this.handleChangeNewWorkspaceName}
