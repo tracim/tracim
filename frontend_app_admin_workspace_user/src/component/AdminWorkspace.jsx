@@ -38,7 +38,7 @@ const AdminWorkspace = props =>
           <tbody>
             {props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws =>
               <tr className='adminWorkspace__workspaceTable__tr' key={ws.slug}>
-                <th>{ws.workspace_id}</th>
+                <td>{ws.workspace_id}</td>
                 <td
                   className='adminWorkspace__workspaceTable__tr__td-link primaryColor'
                   onClick={() => props.onClickWorkspace(ws.workspace_id)}

@@ -15,16 +15,17 @@ class AppFullscreenRouter extends React.Component {
 
   componentDidMount = () => this.setState({isMounted: true})
 
+  componentWillUnmount = () => this.props.dispatchCustomEvent('unmount_app')
+
   render () {
     const { props } = this
 
     return (
       <div className='AppFullScreenManager'>
-        <div id='appFullscreenContainer' />
 
         {this.state.isMounted && (// we must wait for the component to be fully mounted to be sure the div#appFullscreenContainer exists in DOM
           <div className='emptyDivForRoute'>
-            <Route path={PAGE.ADMIN.WORKSPACE} render={() => {
+            <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => {
               if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/'}} />
 
               const content = {
@@ -36,7 +37,7 @@ class AppFullscreenRouter extends React.Component {
               return null
             }} />
 
-            <Route path={PAGE.ADMIN.USER} render={() => {
+            <Route exact path={PAGE.ADMIN.USER} render={() => {
               if (props.user.profile !== PROFILE.ADMINISTRATOR.slug) return <Redirect to={{pathname: '/'}} />
 
               const content = {
