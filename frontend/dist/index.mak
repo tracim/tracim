@@ -64,6 +64,10 @@
         font-family: 'Quicksand';
       }
     </style>
+
+    <script type='text/javascript'>
+      GLOBAL_primaryColor = '${primary.normal}'
+    </script>
   </head>
 
   <body>
