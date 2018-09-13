@@ -1,6 +1,7 @@
 .personaldata
   &__text
-    settingText()
+    margin 15px 0
+    font-size 18px
   &__form
     margin 25px 0
     &__title
@@ -8,10 +9,14 @@
       font-size 18px
     &__txtinput
       display block
-      width auto
+      width 300px
       border-width 1px
       border-style solid
       border-radius 5px
+      &:disabled
+        cursor not-allowed
+      &.email
+        margin-right 20px
       &__info
         margin-left 15px
         &__icon

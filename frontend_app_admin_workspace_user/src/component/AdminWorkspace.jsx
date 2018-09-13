@@ -8,20 +8,20 @@ import {
 } from 'tracim_frontend_lib'
 
 const AdminWorkspace = props =>
-  <PageWrapper customClass='adminWorkspacePage'>
+  <PageWrapper customClass='adminWorkspace'>
     <PageTitle
-      parentClass={'adminWorkspacePage'}
+      parentClass={'adminWorkspace'}
       title={props.t('Workspace management')}
     />
 
-    <PageContent parentClass='adminWorkspacePage'>
-      <div className='adminWorkspacePage__description'>
+    <PageContent parentClass='adminWorkspace'>
+      <div className='adminWorkspace__description'>
         {props.t('List of every workspaces')}
       </div>
 
-      <Delimiter customClass={'adminWorkspacePage__delimiter'} />
+      <Delimiter customClass={'adminWorkspace__delimiter'} />
 
-      <div className='adminWorkspacePage__workspaceTable'>
+      <div className='adminWorkspace__workspaceTable'>
 
         <table className='table'>
           <thead>
@@ -37,17 +37,18 @@ const AdminWorkspace = props =>
 
           <tbody>
             {props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws =>
-              <tr
-                className='adminWorkspacePage__workspaceTable__tr'
-                key={ws.slug}
-                onClick={() => props.onClickWorkspace(ws.workspace_id)}
-              >
+              <tr className='adminWorkspace__workspaceTable__tr' key={ws.slug}>
                 <th>{ws.workspace_id}</th>
-                <td>{ws.label}</td>
+                <td
+                  className='adminWorkspace__workspaceTable__tr__td-link primaryColor'
+                  onClick={() => props.onClickWorkspace(ws.workspace_id)}
+                >
+                  {ws.label}
+                </td>
                 <td>{ws.description}</td>
                 {/*
                   <td className='d-flex align-items-center flex-wrap'>
-                    <div className='adminWorkspacePage__workspaceTable__calendaricon mr-2'>
+                    <div className='adminWorkspace__workspaceTable__calendaricon mr-2'>
                       <i className='fa fa-fw fa-check-square-o' />
                     </div>
                     Enable
@@ -55,10 +56,10 @@ const AdminWorkspace = props =>
                 */}
                 <td>{ws.memberList.length}</td>
                 <td>
-                  <div className='adminWorkspacePage__table__delete primaryColorFont primaryColorFontDarkenHover'>
+                  <div className='adminWorkspace__table__delete primaryColorFont primaryColorFontDarkenHover'>
                     <button
                       type='button'
-                      className='adminWorkspacePage__table__delete__icon btn iconBtn mr-3'
+                      className='adminWorkspace__table__delete__icon btn iconBtn mr-3'
                       onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
                     >
                       <i className='fa fa-fw fa-trash-o' />

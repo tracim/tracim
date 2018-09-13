@@ -20,7 +20,7 @@ export const UserStatus = props =>
         return (
           <div className='userstatus__role__definition'>
             <div className='userstatus__role__definition__icon'>
-              <i className={`fa fa-${myRole.faIcon}`} />
+              <i className={`fa fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
             </div>
 
             <div className='userstatus__role__definition__text'>

@@ -6,8 +6,8 @@ require('./NewMemberForm.styl')
 
 export const NewMemberForm = props =>
   <div className='memberlist__form'>
-    <div className='memberlist__form__close d-flex justify-content-end'>
-      <i className='fa fa-times' onClick={props.onClickCloseAddMemberBtn} />
+    <div className='memberlist__form__close' onClick={props.onClickCloseAddMemberBtn}>
+      <i className='fa fa-times' />
     </div>
 
     <div className='memberlist__form__member'>
@@ -74,7 +74,7 @@ export const NewMemberForm = props =>
         {props.roleList.map(r =>
           <li key={r.slug}>
             <label className='memberlist__form__role__list__item' htmlFor={r.slug}>
-              <div className='item__radiobtn mr-3'>
+              <div className='item__radiobtn mr-2'>
                 <input
                   id={r.slug}
                   type='radio'
@@ -86,8 +86,8 @@ export const NewMemberForm = props =>
               </div>
 
               <div className='item__text'>
-                <div className='item__text__icon mr-2' style={{color: r.hexcolor}}>
-                  <i className={`fa fa-${r.faIcon}`} />
+                <div className='item__text__icon mr-1' style={{color: r.hexcolor}}>
+                  <i className={`fa fa-fw fa-${r.faIcon}`} />
                 </div>
 
                 <div className='item__text__name'>

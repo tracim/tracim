@@ -127,4 +127,6 @@ export const PROFILE = {
   }
 }
 
+export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).find(p => slug === p.slug) || {}
+
 export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route
