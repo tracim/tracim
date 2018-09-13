@@ -13,12 +13,12 @@ const AdminLink = props => {
         <div className='adminlink__setting dropdown-menu' aria-labelledby='dropdownMenuButton'>
           <Link className='setting__link primaryColorBgLightenHover dropdown-item' to={PAGE.ADMIN.WORKSPACE}>
             <i className={`fa fa-fw fa-${workspaceConfig.faIcon} mr-2`} />
-            {props.t('Workspace')}
+            {props.t('Workspaces')}
           </Link>
 
           <Link className='setting__link primaryColorBgLightenHover dropdown-item' to={PAGE.ADMIN.USER}>
             <i className='fa fa-fw fa-users mr-2' />
-            {props.t('User')}
+            {props.t('Users')}
           </Link>
         </div>
       </div>
