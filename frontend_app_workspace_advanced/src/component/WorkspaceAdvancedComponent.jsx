@@ -54,7 +54,7 @@ const WorkspaceAdvancedComponent = props => {
                     {m.user.public_name}
                   </div>
 
-                  <div className='workspaceadvanced__userlist__list__item__role dropdown mr-auto'>
+                  <div className='workspaceadvanced__userlist__list__item__role dropdown'>
                     {(() => {
                       const role = props.roleList.find(r => r.slug === m.role) || {label: 'unknown', hexcolor: '#333', faIcon: ''}
                       return (

@@ -33,6 +33,7 @@ const PopupCreateContent = props => {
                 placeholder={props.inputPlaceholder}
                 value={props.contentName}
                 onChange={props.onChangeContentName}
+                autoFocus
               />
             )
           }

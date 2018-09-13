@@ -24,7 +24,7 @@ export const UserStatus = props =>
             </div>
 
             <div className='userstatus__role__definition__text'>
-              {myRole.label}
+              {props.t(myRole.label)}
             </div>
           </div>
         )

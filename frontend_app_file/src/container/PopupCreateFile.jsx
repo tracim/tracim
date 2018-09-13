@@ -139,7 +139,7 @@ class PopupCreateFile extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={state.config.creationLabel}
+        label={props.t(state.config.creationLabel)}
         customColor={state.config.hexcolor}
         faIcon={state.config.faIcon}
         contentName={state.uploadFile ? 'allowValidate' : ''} // hack to update the "disabled" state of the button
