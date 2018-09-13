@@ -145,6 +145,7 @@ class PopupCreateFile extends React.Component {
         contentName={state.uploadFile ? 'allowValidate' : ''} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
+        customStyle={{top: 'calc(50% - 202px)'}}
       >
         <div>
           {state.progressUpload.display &&
