@@ -36,18 +36,18 @@ export class PreviewComponent extends React.Component {
     return (
       <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
         <div className='previewcomponent__dloption'>
+
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            href={props.downloadRawUrl}
+            href={props.downloadPdfFullUrl}
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
-            title={props.t('Download file')}
-            key={'file_btn_dl_raw'}
+            title={props.t('Download as PDF')}
+            key={'file_btn_dl_pdfall'}
           >
-            <i className='fa fa-download' />
+            <i className='fa fa-file-o' />
           </a>
-
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadPdfPageUrl}
@@ -62,14 +62,14 @@ export class PreviewComponent extends React.Component {
 
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            href={props.downloadPdfFullUrl}
+            href={props.downloadRawUrl}
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
-            title={props.t('Download as PDF')}
-            key={'file_btn_dl_pdfall'}
+            title={props.t('Download file')}
+            key={'file_btn_dl_raw'}
           >
-            <i className='fa fa-files-o' />
+            <i className='fa fa-download' />
           </a>
         </div>
 
