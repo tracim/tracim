@@ -14,7 +14,7 @@ export const FETCH_CONFIG = {
 export const workspaceConfig = {
   slug: 'workspace',
   faIcon: 'bank',
-  hexcolor: '#7d4e24',
+  hexcolor: GLOBAL_primaryColor,
   creationLabel: i18n.t('Create a workspace'),
   domContainer: 'appFeatureContainer'
 }
