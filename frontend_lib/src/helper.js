@@ -2,11 +2,11 @@ import i18n from './i18n.js'
 import color from 'color'
 import moment from 'moment'
 
-export const libHandleFetchResult = fetchResult => {
+export const libHandleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
     case 200:
     case 304:
-      const resultJson = fetchResult.clone().json()
+      const resultJson = await fetchResult.clone().json()
       return new Promise((resolve, reject) => resolve({
         apiResponse: fetchResult,
         body: resultJson
