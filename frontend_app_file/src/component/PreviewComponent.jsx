@@ -115,15 +115,15 @@ export class PreviewComponent extends React.Component {
 
         <div className='previewcomponent__property'>
           <div className='previewcomponent__property__button' onClick={props.onClickProperty}>
-            <div className='previewcomponent__property__button__icon'>
-              <i className='fa fa-gear' />
+            <div className='previewcomponent__property__button__arrow mt-3'>
+              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty})} />
             </div>
 
             <div className='previewcomponent__property__button__title'>
               {props.t('Properties')}
             </div>
 
-            <div className='previewcomponent__property__button__arrow'>
+            <div className='previewcomponent__property__button__arrow mb-3'>
               <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty})} />
             </div>
           </div>
