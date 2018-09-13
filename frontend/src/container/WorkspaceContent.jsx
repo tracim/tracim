@@ -133,7 +133,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickContentItem = content => {
     console.log('%c<WorkspaceContent> content clicked', 'color: #c17838', content)
-    this.props.history.push(PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id))
+    this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${this.props.location.search}`)
   }
 
   handleClickEditContentItem = (e, content) => {
