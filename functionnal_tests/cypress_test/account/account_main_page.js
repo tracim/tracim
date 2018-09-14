@@ -14,6 +14,6 @@ describe('account :: main_page', function () {
         cy.get('a.setting__link[href="/account"]').should('be.visible')
         cy.get('a.setting__link[href="/account"]').click()
         cy.url().should('include', '/account')
-        cy.get('.account__userinformation').should('be.visible')
+        cy.get('.userinfo').should('be.visible')
     })
 })
