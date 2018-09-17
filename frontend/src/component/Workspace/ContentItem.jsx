@@ -34,7 +34,7 @@ const ContentItem = props => {
       }
 
       <div
-        className='content__status d-sm-flex justify-content-center'
+        className='content__status d-sm-flex justify-content-between align-items-center'
         style={{color: status.hexcolor}}
       >
         <div className='content__status__text d-none d-sm-block'>
