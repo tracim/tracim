@@ -39,7 +39,7 @@ export class PreviewComponent extends React.Component {
 
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            href={props.downloadPdfFullUrl}
+            href={props.downloadPdfPageUrl}
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
@@ -50,7 +50,7 @@ export class PreviewComponent extends React.Component {
           </a>
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            href={props.downloadPdfPageUrl}
+            href={props.downloadPdfFullUrl}
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
