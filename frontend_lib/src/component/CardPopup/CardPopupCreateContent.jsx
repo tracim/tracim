@@ -11,6 +11,7 @@ const PopupCreateContent = props => {
       customClass='popupCreateContent'
       customColor={props.customColor}
       onClose={props.onClose}
+      customStyle={props.customStyle}
     >
       <div className='createcontent'>
         <div className='createcontent__contentname mb-4'>

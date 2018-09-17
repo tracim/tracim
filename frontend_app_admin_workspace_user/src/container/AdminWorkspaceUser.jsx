@@ -48,7 +48,7 @@ class AdminWorkspaceUser extends React.Component {
     switch (type) {
       case 'admin_workspace_user_showApp':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.setState({config: data.config})
+        this.setState(prev => ({...prev.config, config: data.config}))
         break
       case 'refreshWorkspaceList':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
@@ -81,7 +81,7 @@ class AdminWorkspaceUser extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<AdminWorkspaceUser> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
     if (prevState.config.type !== state.config.type) {
       if (state.config.type === 'workspace') this.loadWorkspaceContent()
       else if (state.config.type === 'user') this.loadUserContent()
@@ -287,15 +287,15 @@ class AdminWorkspaceUser extends React.Component {
 
     return (
       <div>
-        {state.config.type === 'workspace' &&
+        {state.config.type === 'workspace' && (
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
             onClickWorkspace={this.handleClickWorkspace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
           />
-        }
+        )}
 
-        {state.config.type === 'user' &&
+        {state.config.type === 'user' && (
           <AdminUser
             userList={state.content.userList}
             profile={state.content.profile}
@@ -304,7 +304,7 @@ class AdminWorkspaceUser extends React.Component {
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
           />
-        }
+        )}
 
         {state.popupDeleteWorkspaceDisplay &&
           <CardPopup

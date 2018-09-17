@@ -40,7 +40,7 @@ export class AddUserForm extends React.Component {
       <form className='adminUser__adduser__form'>
         <div className='adminUser__adduser__form__username'>
           <label className='username__text' htmlFor='adduser'>
-            {props.t("Entrer l'email")}
+            {props.t('Type the email')}
           </label>
 
           <input

@@ -6,7 +6,10 @@ require('./CardPopup.styl')
 
 const CardPopup = props => {
   return (
-    <div className={classnames(props.customClass, 'cardPopup')}>
+    <div
+      className={classnames(props.customClass, 'cardPopup')}
+      style={props.customStyle}
+    >
       <div className='cardPopup__container'>
         <div className={classnames(props.customHeaderClass, 'cardPopup__header')} style={{backgroundColor: props.customColor}} />
 
@@ -28,12 +31,14 @@ CardPopup.propTypes = {
   customClass: PropTypes.string,
   customHeaderClass: PropTypes.string,
   customColor: PropTypes.string,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  customStyle: PropTypes.object
 }
 
 CardPopup.defaultProps = {
   customClass: 'defaultCustomClass',
   customHeaderClass: '',
   customColor: '',
-  onClose: () => {}
+  onClose: () => {},
+  customStyle: {}
 }

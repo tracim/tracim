@@ -11,6 +11,6 @@ describe('navigation :: admin > workspace', function () {
         cy.get('.adminlink.dropdown').click()
         cy.get('a[href="/admin/workspace"]').click()
         cy.url().should('include', '/admin/workspace')
-        cy.get('.adminWorkspacePage__description').should('be.visible')
+        cy.get('.adminWorkspace__description').should('be.visible')
     })
 })

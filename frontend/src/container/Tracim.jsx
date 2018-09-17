@@ -168,16 +168,17 @@ class Tracim extends React.Component {
               <Account />
             } />
 
-            <Route path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
+            <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
               <AdminAccount />
             } />
 
             <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
-            <Route path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
+            <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
 
             <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
             <div id='appFeatureContainer' />
+            <div id='appFullscreenContainer' />
             <div id='popupCreateContentContainer' />
           </div>
         </div>

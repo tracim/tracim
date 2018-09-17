@@ -2,7 +2,6 @@
   "Please type a name and select a profile": "Veuillez saisir un nom et sélectionner un profil",
   "Add a user": "Ajouter un utilisateur",
   "Email": "Email",
-  "Choose the profile of the user": "Choisissez le profil de l'utilisateur",
   "Add the user": "Ajouter l'utilisateur",
   "An administrator can always create workspaces": "Un administrateur peut toujours créer un espace de travail",
   "Active": "Actif",
@@ -25,5 +24,7 @@
   "Users management": "Admininistration des utilisateurs",
   "Workspace management": "Administration des espaces de travail",
   "On this page you can manage the users of your Tracim instance.": "Sur cette page, vous pouvez administrer les utilisateurs de votre instance de Tracim",
-  "User": "Utilisateur"
+  "User": "Utilisateur",
+  "Choose the profile": "Choisir un profil",
+  "Type the email": "Entrer l'email"
 }
