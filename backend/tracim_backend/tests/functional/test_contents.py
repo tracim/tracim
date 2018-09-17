@@ -1960,7 +1960,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.txt"'  # nopep8
         assert res.body == b'Test file'
         assert res.content_type == 'text/plain'
         assert res.content_length == len(b'Test file')
@@ -2190,7 +2190,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1.jpg"' # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
 
@@ -2304,7 +2304,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1_256x256.jpg"'  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -2505,7 +2505,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1_256x256.jpg"'  # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
@@ -2639,7 +2639,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file.pdf"'  # nopep8
         assert res.content_type == 'application/pdf'
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(self) -> None:  # nopep8
@@ -2822,7 +2822,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.content_type == 'application/pdf'
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test_file_page_1.pdf"'  # nopep8
 
     def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(self) -> None:  # nopep8
         """
@@ -3100,7 +3100,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file.pdf"'  # nopep8
         assert res.content_type == 'application/pdf'
 
     def test_api__get_pdf_revision_preview__ok__200__force_download_case(self) -> None:
@@ -3173,7 +3173,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment'
+        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1.pdf"'  # nopep8
         assert res.content_type == 'application/pdf'
 
 
