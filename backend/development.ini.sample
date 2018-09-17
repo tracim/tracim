@@ -7,6 +7,9 @@ pipeline = tracim_web
 [app:tracim_web]
 use = egg:tracim_backend
 
+# hapic debug mode: return or not python traceback of error
+debug = True
+
 pyramid.reload_templates = true
 pyramid.debug_authorization = false
 pyramid.debug_notfound = false
