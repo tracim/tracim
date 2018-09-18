@@ -117,5 +117,8 @@
   "List of files": "List of files",
   "List of threads": "List of threads",
   "Workspaces": "Workspaces",
-  "Users": "Users"
+  "Users": "Users",
+  "Wrong old password": "Wrong old password",
+  "New password is too long": "New password is too long",
+  "New passwords are different": "New passwords are different"
 }

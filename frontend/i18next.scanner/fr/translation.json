@@ -117,5 +117,8 @@
   "List of files": "Liste des fichiers",
   "List of threads": "Liste des discussions",
   "Workspaces": "Espaces de travail",
-  "Users": "Utilisateurs"
+  "Users": "Utilisateurs",
+  "Wrong old password": "Ancien mot de passe incorrect",
+  "New password is too long": "Le nouveau mot de passe est trop long",
+  "New passwords are different": "Les nouveaux mots de passe sont différents"
 }

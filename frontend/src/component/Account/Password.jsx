@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { newFlashMessage } from '../../action-creator.sync.js'
 
@@ -21,8 +22,13 @@ export class Password extends React.Component {
   handleClickSubmit = () => {
     const { props, state } = this
 
+    if (state.newPassword.length > 30) {
+      props.dispatch(newFlashMessage(props.t('New password is too long'), 'warning'))
+      return
+    }
+
     if (state.newPassword !== state.newPassword2) {
-      props.dispatch(newFlashMessage('New passwords are differents'))
+      props.dispatch(newFlashMessage(props.t('New passwords are different'), 'warning'))
       return
     }
 
@@ -30,7 +36,7 @@ export class Password extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     return (
       <div className='account__userpreference__setting__personaldata'>
@@ -78,6 +84,7 @@ export class Password extends React.Component {
             type='button'
             className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickSubmit}
+            disabled={state.oldPassword === '' || state.newPassword === '' || state.newPassword2 === ''}
           >
             {props.t('Send')}
           </button>
@@ -88,4 +95,5 @@ export class Password extends React.Component {
   }
 }
 
-export default translate()(Password)
+const mapStateToProps = () => ({})
+export default connect(mapStateToProps)(translate()(Password))
