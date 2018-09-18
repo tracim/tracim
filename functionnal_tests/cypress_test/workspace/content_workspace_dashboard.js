@@ -26,7 +26,7 @@ describe('content :: workspace > dashbord', function () {
         cy.get('.dashboard__workspace-wrapper .dashboard__workspace').should('be.visible')
         cy.get('.pageContentGeneric .dashboard__workspace__title').should('be.visible')
         // @FIXME need to make description first @philippe 14/09/2018
-        cy.get('.dashboard__workspace .dashboard__workspace__detail').should('be.visible')
+        // cy.get('.dashboard__workspace .dashboard__workspace__detail').should('be.visible')
         cy.get('.dashboard__workspace-wrapper .userstatus').should('be.visible')
         cy.get('.userstatus .userstatus__role__msg').should('be.visible')
         cy.get('.userstatus .userstatus__role__definition').should('be.visible')
