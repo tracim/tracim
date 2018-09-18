@@ -27,6 +27,7 @@ from tracim_backend.app_models.contents import CONTENT_STATUS
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -796,18 +797,23 @@ class ContentApi(object):
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        page_number = preview_manager_page_format(page_number)
-        if page_number >= self.preview_manager.get_page_nb(file_path):
-            raise PageOfPreviewNotFound(
-                'page_number {page_number} of content {content_id} does not exist'.format(
-                    page_number=page_number,
-                    content_id=content_id
-                ),
+        try:
+            page_number = preview_manager_page_format(page_number)
+            if page_number >= self.preview_manager.get_page_nb(file_path):
+                raise PageOfPreviewNotFound(
+                    'page_number {page_number} of content {content_id} does not exist'.format(
+                        page_number=page_number,
+                        content_id=content_id
+                    ),
+                )
+            jpg_preview_path = self.preview_manager.get_pdf_preview(
+                file_path,
+                page=page_number
             )
-        jpg_preview_path = self.preview_manager.get_pdf_preview(
-            file_path,
-            page=page_number
-        )
+        except UnsupportedMimeType as exc:
+            raise UnavailablePreview(
+                'No preview available for content {}, revision {}'.format(content_id, revision_id) # nopep8
+            ) from exc
         return jpg_preview_path
 
     def get_full_pdf_preview_path(self, revision_id: int) -> str:
@@ -817,7 +823,12 @@ class ContentApi(object):
         :return: path of the full pdf preview of this revision
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        try:
+            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        except UnsupportedMimeType as exc:
+            raise UnavailablePreview(
+                'No preview available for revision {}'.format(revision_id)
+            ) from exc
         return pdf_preview_path
 
     def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:
@@ -847,38 +858,43 @@ class ContentApi(object):
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        page_number = preview_manager_page_format(page_number)
-        if page_number >= self.preview_manager.get_page_nb(file_path):
-            raise PageOfPreviewNotFound(
-                'page {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
-                    page_number=page_number,
-                    revision_id=revision_id,
-                    content_id=content_id,
-                ),
-            )
-        if not width and not height:
-            width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
-            height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
-
-        allowed_dim = False
-        for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
-            if width == preview_dim.width and height == preview_dim.height:
-                allowed_dim = True
-                break
-
-        if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
-            raise PreviewDimNotAllowed(
-                'Size {width}x{height} is not allowed for jpeg preview'.format(
-                    width=width,
-                    height=height,
+        try:
+            page_number = preview_manager_page_format(page_number)
+            if page_number >= self.preview_manager.get_page_nb(file_path):
+                raise PageOfPreviewNotFound(
+                    'page {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
+                        page_number=page_number,
+                        revision_id=revision_id,
+                        content_id=content_id,
+                    ),
                 )
+            if not width and not height:
+                width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
+                height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
+
+            allowed_dim = False
+            for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
+                if width == preview_dim.width and height == preview_dim.height:
+                    allowed_dim = True
+                    break
+
+            if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
+                raise PreviewDimNotAllowed(
+                    'Size {width}x{height} is not allowed for jpeg preview'.format(
+                        width=width,
+                        height=height,
+                    )
+                )
+            jpg_preview_path = self.preview_manager.get_jpeg_preview(
+                file_path,
+                page=page_number,
+                width=width,
+                height=height,
             )
-        jpg_preview_path = self.preview_manager.get_jpeg_preview(
-            file_path,
-            page=page_number,
-            width=width,
-            height=height,
-        )
+        except UnsupportedMimeType as exc:
+            raise UnavailablePreview(
+                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+            ) from exc
         return jpg_preview_path
 
     def _get_all_query(

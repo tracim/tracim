@@ -2271,6 +2271,59 @@ class TestFiles(FunctionalTest):
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
 
+    def test_api__get_jpeg_preview__err_400__UnavailablePreview(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.bin',
+            new_mimetype='application/octet-stream',
+            new_content=bytes(100),
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'force_download': 0,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg'.format(content_id),
+            status=400,
+            params=params
+        )
+
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(self) -> None:
         """
         get 256x256 preview of a txt file
@@ -2325,6 +2378,59 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
+
+    def test_api__get_sized_jpeg_preview__err_400__UnavailablePreview(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.bin',
+            new_mimetype='application/octet-stream',
+            new_content=bytes(100),
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'force_download': 0,
+        }
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/jpg/256x256'.format(content_id),  # nopep8
+            status=400,
+            params=params,
+        )
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(self) -> None:
         """
@@ -2770,6 +2876,55 @@ class TestFiles(FunctionalTest):
             status=400
         )
 
+    def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(self) -> None:  # nopep8
+        """
+       get full pdf preview of a png image -> error UnavailablePreviewType
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.bin',
+            new_mimetype='application/octet-stream',
+            new_content=bytes(100),
+        )
+        dbsession.flush()
+        content_id = test_file.content_id
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
+            status=400
+        )
+
     def test_api__get_pdf_preview__ok__200__nominal_case(self) -> None:
         """
         get full pdf preview of a txt file
@@ -2834,6 +2989,57 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.content_type == 'application/pdf'
+
+    def test_api__get_pdf_preview_err__400__UnavailablePreview(self) -> None:
+        """
+        get full pdf preview of a txt file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.bin',
+            new_mimetype='application/octet-stream',
+            new_content=bytes(100),
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {'page': 1}
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
+            status=400,
+            params=params,
+        )
 
     def test_api__get_pdf_preview__ok__200__force_download_case(self) -> None:
         """

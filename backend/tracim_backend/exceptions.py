@@ -243,3 +243,7 @@ class AppDoesNotExist(TracimException):
 
 class EmailAlreadyExistInDb(TracimException):
     pass
+
+
+class UnavailablePreview(TracimException):
+    pass
