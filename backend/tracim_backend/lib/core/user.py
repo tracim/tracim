@@ -377,8 +377,11 @@ class UserApi(object):
                     new_user,
                     password=password
                 )
-            except SMTPException as e:
-                raise NotificationNotSend()
+            except SMTPException as exc:
+                raise NotificationNotSend(
+                    "Notification for new created account can't be send "
+                    "(SMTP error), new account creation aborted"
+                ) from exc
         if do_save:
             self.save(new_user)
         return new_user
