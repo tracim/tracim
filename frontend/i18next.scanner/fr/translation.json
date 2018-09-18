@@ -121,5 +121,7 @@
   "New password is too long (maximum 50 characters)": "Le nouveau mot de passe est trop long (maximum 50 caractères)",
   "Administrator's password": "Mot de passe administrateur",
   "This edition requires your administrator password": "Cette modification demande votre mot passe administrateur",
-  "Type your password": "Entrer votre mot de passe"
+  "Type your password": "Entrer votre mot de passe",
+  "You have been disconnected, please login": "Vous avez été déconnecté, veuillez vous reconnecter",
+  "Remember me": "Se souvenir de moi"
 }

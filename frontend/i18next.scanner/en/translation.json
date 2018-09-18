@@ -121,5 +121,7 @@
   "New password is too long (maximum 50 characters)": "New password is too long (maximum 50 characters)",
   "Administrator's password": "Administrator's password",
   "This edition requires your administrator password": "This edition requires your administrator password",
-  "Type your password": "Type your password"
+  "Type your password": "Type your password",
+  "You have been disconnected, please login": "You have been disconnected, please login",
+  "Remember me": "Remember me"
 }
