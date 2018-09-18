@@ -10,6 +10,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
 from tracim_backend.exceptions import NoUserSetted
@@ -418,6 +419,13 @@ class UserApi(object):
         user.email = email
         user.display_name = email.split('@')[0]
 
+        if not groups:
+            gapi = GroupApi(
+                current_user=self._user,  # User
+                session=self._session,
+                config=self._config,
+            )
+            groups = [gapi.get_one(Group.TIM_USER)]
         for group in groups:
             user.groups.append(group)
 

@@ -1613,6 +1613,13 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert user_role_found['email_sent'] is True
         assert user_role_found['do_notify'] is False
 
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+        )
+        res = res.json_body
+        assert res['profile'] == 'users'
+
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
         response = response.json()
