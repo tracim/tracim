@@ -52,20 +52,16 @@ export class Password extends React.Component {
         <div className='personaldata__text ml-2 ml-sm-0' />
 
         <form className='personaldata__form mr-5'>
-          <div className='d-flex align-items-center flex-wrap mb-4'>
-            <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
-              type='password'
-              placeholder={props.t('Old password')}
-              onChange={this.handleChangeOldPassword}
-            />
-            {props.displayAdminInfo &&
-              <div className='personaldata__form__txtinput__info'>
-                <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
-                {props.t('This requires your administrator password')}
-              </div>
-            }
-          </div>
+          {props.displayAdminInfo === false && (
+            <div className='d-flex align-items-center flex-wrap mb-4'>
+              <input
+                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+                type='password'
+                placeholder={props.t('Old password')}
+                onChange={this.handleChangeOldPassword}
+              />
+            </div>
+          )}
 
           <div className='d-flex align-items-center flex-wrap mb-4'>
             <input
@@ -78,11 +74,27 @@ export class Password extends React.Component {
 
           <div className='d-flex align-items-center flex-wrap mb-4'>
             <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+              className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
               type='password'
               placeholder={props.t('Repeat new password')}
               onChange={this.handleChangeNewPassword2}
             />
+
+            {props.displayAdminInfo && (
+              <input
+                className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                type='password'
+                placeholder={props.t("Administrator's password")}
+                onChange={this.handleChangeCheckPassword}
+                disabled={state.newPassword === '' && state.newPassword2 === ''}
+              />
+            )}
+            {props.displayAdminInfo && (
+              <div className='personaldata__form__txtinput__info'>
+                <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
+                {props.t('This edition requires your administrator password')}
+              </div>
+            )}
           </div>
 
           <button
@@ -102,3 +114,7 @@ export class Password extends React.Component {
 
 const mapStateToProps = () => ({})
 export default connect(mapStateToProps)(translate()(Password))
+
+Password.defaultProps = {
+  displayAdminInfo: false
+}

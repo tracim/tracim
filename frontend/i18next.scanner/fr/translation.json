@@ -98,10 +98,8 @@
   "Email has been changed": "L'email a été changé",
   "Password has been changed": "Le mot de passe a été changé",
   "Admin account page": "Administration de compte",
-  "This requires your administrator password": "Ce champs a besoin de votre mot de passe administrateur",
   "This workspace has no content yet, create the first content by clicking on the button 'Create'": "Cet espace de travail n'a pas encore de contenu, créer le premier contenu en cliquant sur le bouton 'Créer'",
   "Error while loading read status list": "Erreur lors du chargement de l'activité récente",
-  "Name": "Nom",
   "Reader": "Lecteur",
   "Contributor": "Contributeur",
   "Content manager": "Gestionnaire de contenu",
@@ -110,7 +108,6 @@
   "Manager": "Manageur",
   "User": "Utilisateur",
   "Create": "Créer ",
-  "Type your password": "Entrer votre mot de passe",
   "Validate": "Valider",
   "No recent activity": "Aucune activité récente",
   "List of documents": "Liste des documents",
@@ -121,5 +118,8 @@
   "Wrong old password": "Ancien mot de passe incorrect",
   "New passwords are different": "Les nouveaux mots de passe sont différents",
   "New password is too short (minimum 6 characters)": "Le nouveau mot de passe est trop court (minimum 6 caractères)",
-  "New password is too long (maximum 50 characters)": "Le nouveau mot de passe est trop long (maximum 50 caractères)"
+  "New password is too long (maximum 50 characters)": "Le nouveau mot de passe est trop long (maximum 50 caractères)",
+  "Administrator's password": "Mot de passe administrateur",
+  "This edition requires your administrator password": "Cette modification demande votre mot passe administrateur",
+  "Type your password": "Entrer votre mot de passe"
 }

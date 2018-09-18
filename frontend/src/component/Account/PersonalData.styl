@@ -13,9 +13,13 @@
       border-width 1px
       border-style solid
       border-radius 5px
+      &[placeholder]
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
       &:disabled
         cursor not-allowed
-      &.email
+      &.withAdminMsg
         margin-right 20px
       &__info
         margin-left 15px
