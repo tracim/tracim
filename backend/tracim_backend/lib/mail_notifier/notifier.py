@@ -373,7 +373,7 @@ class EmailManager(object):
             self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT \
             .replace(
                 EST.WEBSITE_TITLE,
-                self.config.WEBSITE_TITLE.__str__()
+                str(self.config.WEBSITE_TITLE)
             )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
@@ -441,7 +441,7 @@ class EmailManager(object):
         )
         subject = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT.replace(
             EST.WEBSITE_TITLE,
-            self.config.WEBSITE_TITLE.__str__()
+            str(self.config.WEBSITE_TITLE)
         )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
