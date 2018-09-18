@@ -119,6 +119,7 @@
   "Workspaces": "Workspaces",
   "Users": "Users",
   "Wrong old password": "Wrong old password",
-  "New password is too long": "New password is too long",
-  "New passwords are different": "New passwords are different"
+  "New passwords are different": "New passwords are different",
+  "New password is too short (minimum 6 characters)": "New password is too short (minimum 6 characters)",
+  "New password is too long (maximum 50 characters)": "New password is too long (maximum 50 characters)"
 }

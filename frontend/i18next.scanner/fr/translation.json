@@ -119,6 +119,7 @@
   "Workspaces": "Espaces de travail",
   "Users": "Utilisateurs",
   "Wrong old password": "Ancien mot de passe incorrect",
-  "New password is too long": "Le nouveau mot de passe est trop long",
-  "New passwords are different": "Les nouveaux mots de passe sont différents"
+  "New passwords are different": "Les nouveaux mots de passe sont différents",
+  "New password is too short (minimum 6 characters)": "Le nouveau mot de passe est trop court (minimum 6 caractères)",
+  "New password is too long (maximum 50 characters)": "Le nouveau mot de passe est trop long (maximum 50 caractères)"
 }
