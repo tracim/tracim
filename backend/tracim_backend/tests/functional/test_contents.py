@@ -1416,6 +1416,83 @@ class TestFiles(FunctionalTest):
         assert content['page_nb'] is None
         assert content['pdf_available'] is False
 
+    def test_api__get_file__ok_200__binary_file(self) -> None:
+        """
+        Get one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory,
+                                   transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1,
+                                          content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.bin',
+            new_mimetype='application/octet-stream',
+            new_content=bytes(100),
+        )
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'Test file'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'test-file'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == ''
+        assert content['mimetype'] == 'application/octet-stream'
+        assert content['size'] == 100
+        assert content['page_nb'] is None
+        assert content['pdf_available'] is False
+
     def test_api__get_files__err_400__wrong_content_type(self) -> None:
         """
         Get one file of a content content

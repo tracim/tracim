@@ -10,6 +10,7 @@ import sqlalchemy
 import transaction
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
+from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlalchemy import desc
 from sqlalchemy import func
@@ -1322,14 +1323,21 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def get_preview_page_nb(self, revision_id: int) -> int:
+    def get_preview_page_nb(self, revision_id: int) -> typing.Optional[int]:
         file_path = self.get_one_revision_filepath(revision_id)
-        nb_pages = self.preview_manager.get_page_nb(file_path)
+        try:
+            nb_pages = self.preview_manager.get_page_nb(file_path)
+        except UnsupportedMimeType:
+            return None
         return nb_pages
 
     def has_pdf_preview(self, revision_id: int) -> bool:
         file_path = self.get_one_revision_filepath(revision_id)
-        return self.preview_manager.has_pdf_preview(file_path)
+        try:
+            has_pdf_preview = self.preview_manager.has_pdf_preview(file_path)
+        except UnsupportedMimeType:
+            has_pdf_preview = False
+        return has_pdf_preview
 
     def mark_read__all(
             self,
