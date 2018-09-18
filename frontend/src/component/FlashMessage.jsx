@@ -1,12 +1,33 @@
 import React from 'react'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
+
+require('./FlashMessage.styl')
 
 const FlashMessage = props => {
+  if (!props.flashMessage.length || props.flashMessage.length === 0) return null
+
+  const dataTypeArray = [{
+    id: 'info',
+    icon: 'lightbulb-o',
+    label: props.t('Information')
+  }, {
+    id: 'warning',
+    icon: 'exclamation-circle',
+    label: props.t('Warning')
+  }, {
+    id: 'danger',
+    icon: 'minus-circle',
+    label: props.t('Error')
+  }]
+
+  const dataType = dataTypeArray.find(t => t.id === props.flashMessage[0].type)
+
   return (
     <div className='flashmessage'>
       {props.flashMessage.length > 0 && (
         <div className='flashmessage__container card'>
-          <div className={classnames('flashmessage__container__header', props.flashMessage[0].type)} />
+          <div className={classnames('flashmessage__container__header', `bg-${dataType.id}`)} />
 
           <div className='card-body nopadding'>
             <div className='flashmessage__container__close'>
@@ -16,20 +37,15 @@ const FlashMessage = props => {
             </div>
 
             <div className='flashmessage__container__content'>
-              <div className={classnames('flashmessage__container__content__icon', props.flashMessage[0].type)}>
-                <i className='fa fa-times-circle' />
+              <div className={classnames('flashmessage__container__content__icon', `text-${dataType.id}`)}>
+                <i className={classnames(`fa fa-${dataType.icon}`)} />
               </div>
 
               <div className='flashmessage__container__content__text'>
                 <div className='flashmessage__container__content__text__title'>
-                  {(() => {
-                    switch (props.flashMessage[0].type) {
-                      case 'info': return props.t('Information')
-                      case 'warning': return props.t('Warning')
-                      case 'danger': return props.t('Error')
-                    }
-                  })()}
+                  {dataType.label}
                 </div>
+
                 <div className='flashmessage__container__content__text__paragraph'>
                   {props.flashMessage[0].message}
                 </div>
@@ -43,3 +59,7 @@ const FlashMessage = props => {
 }
 
 export default FlashMessage
+
+FlashMessage.propTypes = {
+  type: PropTypes.oneOf(['info', 'warning', 'danger'])
+}
