@@ -85,7 +85,7 @@ user.auth_token.validity = 604800
 
 session.type = file
 session.data_dir = %(here)s/sessions_data
-session.lock_dir = %(here)s/ssessions_lock
+session.lock_dir = %(here)s/sessions_lock
 session.key = session_key
 session.secret = change_this_value_please!
 session.save_accessed_time = True
