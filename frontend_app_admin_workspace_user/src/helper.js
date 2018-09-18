@@ -1,4 +1,4 @@
-import i18n from '../../frontend/src/i18n.js'
+import i18n from './i18n.js'
 
 export const FETCH_CONFIG = {
   headers: {
@@ -6,6 +6,32 @@ export const FETCH_CONFIG = {
     'Content-Type': 'application/json'
   }
 }
+
+export const ROLE = [{
+  id: 1,
+  slug: 'reader',
+  faIcon: 'eye',
+  hexcolor: '#15d948',
+  label: i18n.t('Reader')
+}, {
+  id: 2,
+  slug: 'contributor',
+  faIcon: 'pencil',
+  hexcolor: '#3145f7',
+  label: i18n.t('Contributor')
+}, {
+  id: 4,
+  slug: 'content-manager',
+  faIcon: 'graduation-cap',
+  hexcolor: '#f2af2d',
+  label: i18n.t('Content manager')
+}, {
+  id: 8,
+  slug: 'workspace-manager',
+  faIcon: 'gavel',
+  hexcolor: '#ed0007',
+  label: i18n.t('Workspace manager')
+}]
 
 export const debug = {
   config: {
@@ -35,22 +61,22 @@ export const debug = {
       ADMINISTRATOR: {
         id: 1,
         slug: 'administrators',
-        faIcon: 'rocket',
-        hexcolor: '#123456',
+        faIcon: 'shield',
+        hexcolor: '#ed0007',
         label: i18n.t('Administrator')
       },
       MANAGER: {
         id: 2,
         slug: 'managers',
-        faIcon: 'car',
-        hexcolor: '#654321',
+        faIcon: 'graduation-cap',
+        hexcolor: '#f2af2d',
         label: i18n.t('Manager')
       },
       USER: {
         id: 4,
         slug: 'users',
-        faIcon: 'bicycle',
-        hexcolor: '#123123',
+        faIcon: 'user',
+        hexcolor: '#3145f7',
         label: i18n.t('User')
       }
     },

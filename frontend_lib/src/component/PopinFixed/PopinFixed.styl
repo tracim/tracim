@@ -104,33 +104,76 @@
   //.wsContentGeneric__content__right
   //  width 50px // 50px is the width of the rightPart header (eg. timeline__header)
 
-@media (min-width: min-sm) and (max-width: max-lg)
+
+// MEDIAQUERIES
+
+@media (min-width: min-lg) and (max-width: max-lg)
 
   .wsContentGeneric__content
     overflow-Y auto
+    width 100%
     &__left
       margin-bottom 20px
-      width 100%
+      width calc(100% - 20px) // 20px => margin
+      height auto
+    &__right
+      width calc(100% - 20px) // 20px => margin
+
+
+@media (min-width: min-md) and (max-width: max-md)
+
+  .wsContentGeneric__content
+    overflow-Y auto
+    width 100%
+    &__left
+      margin-bottom 20px
+      width calc(100% - 20px) // 20px => margin
       height auto
       &__textnote
         height auto
         overflow-y hidden
     &__right
-      width 100%
+      width calc(100% - 20px) // 20px => margin
+      height auto
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
   .wsContentGeneric
     top 68px
+    &__content
+      overflow-Y auto
+      width 100%
+      &__left
+        margin-bottom 20px
+        width calc(100% - 20px) // 20px => margin
+        height auto
+        &__textnote
+          height auto
+          overflow-y hidden
+      &__right
+        width calc(100% - 20px) // 20px => margin
+        height auto
 
 @media (max-width: max-xs)
 
   .wsContentGeneric
     top 68px
+    &__header
+      &__edittitle
+        display none
+    &__option
+      display none
     &__content
       overflow-Y auto
+      width 100%
+      height calc(100% - 130px)
       &__left
-        width 100%
         margin-bottom 20px
+        width calc(100% - 20px) // 20px => margin
+        height auto
+        &__textnote
+          height auto
+          overflow-y hidden
       &__right
-        width 100%
+        width calc(100% - 20px) // 20px => margin
+        height auto

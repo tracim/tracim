@@ -26,7 +26,7 @@ export const Notification = props =>
             const mySelf = ws.memberList.find(u => u.user_id === props.idMyself)
             const myRole = ROLE.find(r => r.slug === mySelf.role)
             return (
-              <tr key={ws.id}>
+              <tr key={`ws_${ws.id}`}>
                 <td>
                   <div className='notification__table__wksname'>
                     {ws.label}

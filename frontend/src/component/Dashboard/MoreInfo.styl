@@ -1,7 +1,7 @@
 .moreinfo
   display flex
   justify-content space-between
-  flexwrap wrap
+  flex-wrap wrap
   &__webdav
     margin 0 15px 40px 0
     &__btn
@@ -19,11 +19,15 @@
       width 300px
 
 @media (min-width: min-sm) and (max-width: max-sm)
-  .moreinfo__webdav__information
-    width 500px
+
+  .moreinfo
+    &__webdav__information
+      width 500px
 
 @media (max-width: max-xs)
+
   .moreinfo
+    margin-left 15px
     &__webdav
       margin-left 10px
       &__information

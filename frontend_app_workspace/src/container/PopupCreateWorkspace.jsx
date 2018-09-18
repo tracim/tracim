@@ -89,7 +89,7 @@ class PopupCreateWorkspace extends React.Component {
         if (resSave.apiResponse.status === 200) {
           this.handleClose()
 
-          GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} })
+          GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {idOpenInSidebar: resSave.body.workspace_id} })
 
           GLOBAL_dispatchEvent({
             type: 'redirect',

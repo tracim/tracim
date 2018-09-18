@@ -64,7 +64,9 @@ export const libGenerateAvatarFromPublicName = publicName => {
   return canvas.toDataURL('image/png', '')
 }
 
-export const libDisplayDate = dateToDisplay => {
+export const libDisplayDate = (dateToDisplay, lang) => {
+  i18n.changeLanguage(lang)
+
   const todayMoment = moment(new Date())
   const dateToDisplayMoment = moment(new Date(dateToDisplay))
 

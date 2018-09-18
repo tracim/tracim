@@ -41,34 +41,42 @@ export class Password extends React.Component {
         <div className='personaldata__text ml-2 ml-sm-0' />
 
         <form className='personaldata__form mr-5'>
-          <div className='personaldata__form__title'>
-            {props.t('Password')}
+          <div className='d-flex align-items-center flex-wrap mb-4'>
+            <input
+              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+              type='password'
+              placeholder={props.t('Old password')}
+              onChange={this.handleChangeOldPassword}
+            />
+            {props.displayAdminInfo &&
+              <div className='personaldata__form__txtinput__info'>
+                <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
+                {props.t('This requires your administrator password')}
+              </div>
+            }
           </div>
 
-          <input
-            className='personaldata__form__txtinput primaryColorBorderLighten form-control'
-            type='password'
-            placeholder={props.t('Old password')}
-            onChange={this.handleChangeOldPassword}
-          />
+          <div className='d-flex align-items-center flex-wrap mb-4'>
+            <input
+              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+              type='password'
+              placeholder={props.t('New password')}
+              onChange={this.handleChangeNewPassword}
+            />
+          </div>
 
-          <input
-            className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-4'
-            type='password'
-            placeholder={props.t('New password')}
-            onChange={this.handleChangeNewPassword}
-          />
-
-          <input
-            className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-4'
-            type='password'
-            placeholder={props.t('Repeat new password')}
-            onChange={this.handleChangeNewPassword2}
-          />
+          <div className='d-flex align-items-center flex-wrap mb-4'>
+            <input
+              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+              type='password'
+              placeholder={props.t('Repeat new password')}
+              onChange={this.handleChangeNewPassword2}
+            />
+          </div>
 
           <button
             type='button'
-            className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover mt-4'
+            className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickSubmit}
           >
             {props.t('Send')}
