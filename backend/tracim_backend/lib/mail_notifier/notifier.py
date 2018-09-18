@@ -386,9 +386,7 @@ class EmailManager(object):
         context = {
             'user': user,
             'password': password,
-            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
             'logo_url': get_email_logo_frontend_url(self.config),
-            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
             'login_url': get_login_frontend_url(self.config),
         }
         translator = Translator(self.config, default_lang=user.lang)
@@ -453,9 +451,7 @@ class EmailManager(object):
         # TODO - G.M - 2018-08-17 - Generate token
         context = {
             'user': user,
-            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
             'logo_url': get_email_logo_frontend_url(self.config),
-            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
             'reset_password_url': get_reset_password_frontend_url(self.config, token=reset_password_token),  # nopep8
         }
         body_text = self._render_template(
