@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 
+from freezegun import freeze_time
 import transaction
 from tracim_backend.tests import BaseTest
 from tracim_backend.models.auth import User
@@ -122,3 +124,22 @@ class TestUserModel(BaseTest):
         user.email = email
 
         assert user.__unicode__() == email
+
+    def test_unit__reset_token__ok__nominal_case(self):
+        email = 'tracim@trac.im'
+
+        user = User()
+        user.email = email
+        assert user.auth_token is None
+        with freeze_time("1999-12-31 23:59:59"):
+            user.ensure_auth_token(validity_seconds=5)
+            assert user.auth_token
+            assert user.auth_token_created == datetime.now()
+            token = user.auth_token
+            token_time = user.auth_token_created
+
+        with freeze_time("2003-12-31 23:59:59"):
+            user.reset_tokens()
+            assert user.auth_token != token
+            assert user.auth_token_created != token_time
+            assert user.auth_token_created == datetime.now()

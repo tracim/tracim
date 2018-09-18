@@ -55,9 +55,47 @@ class LoginCredentials(object):
         self.password = password
 
 
+class ResetPasswordRequest(object):
+    """
+    Reset password : request to reset password of user
+    """
+    def __init__(self, email: str) -> None:
+        self.email = email
+
+
+class ResetPasswordCheckToken(object):
+    """
+    Reset password : check reset password token
+    """
+    def __init__(
+        self,
+        reset_password_token: str,
+        email: str,
+    ) -> None:
+        self.email = email
+        self.reset_password_token = reset_password_token
+
+
+class ResetPasswordModify(object):
+    """
+    Reset password : modification step
+    """
+    def __init__(
+        self,
+        reset_password_token: str,
+        email: str,
+        new_password: str,
+        new_password2: str
+    ) -> None:
+        self.email = email
+        self.reset_password_token = reset_password_token
+        self.new_password = new_password
+        self.new_password2 = new_password2
+
+
 class SetEmail(object):
     """
-    Just an email
+    Just an email and password
     """
     def __init__(self, loggedin_user_password: str, email: str) -> None:
         self.loggedin_user_password = loggedin_user_password
@@ -68,7 +106,8 @@ class SetPassword(object):
     """
     Just an password
     """
-    def __init__(self,
+    def __init__(
+        self,
         loggedin_user_password: str,
         new_password: str,
         new_password2: str

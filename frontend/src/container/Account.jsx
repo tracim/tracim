@@ -131,9 +131,8 @@ class Account extends React.Component {
 
     const fetchPutUserPassword = await props.dispatch(putUserPassword(props.user, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
-      case 204:
-        props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info'))
-        break
+      case 204: props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info')); break
+      case 403: props.dispatch(newFlashMessage(props.t('Wrong old password'), 'warning')); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning')); break
     }
   }
