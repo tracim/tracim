@@ -18,6 +18,7 @@ from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import get_login_frontend_url
+from tracim_backend.lib.utils.utils import get_reset_password_frontend_url
 from tracim_backend.lib.utils.utils import get_email_logo_frontend_url
 from tracim_backend.models.auth import User
 from tracim_backend.app_models.contents import CONTENT_TYPES
@@ -372,7 +373,7 @@ class EmailManager(object):
             self.config.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT \
             .replace(
                 EST.WEBSITE_TITLE,
-                self.config.WEBSITE_TITLE.__str__()
+                str(self.config.WEBSITE_TITLE)
             )
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
@@ -385,9 +386,7 @@ class EmailManager(object):
         context = {
             'user': user,
             'password': password,
-            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
             'logo_url': get_email_logo_frontend_url(self.config),
-            # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
             'login_url': get_login_frontend_url(self.config),
         }
         translator = Translator(self.config, default_lang=user.lang)
@@ -401,6 +400,70 @@ class EmailManager(object):
             mako_template_filepath=html_template_file_path,
             context=context,
             translator=translator
+        )
+
+        part1 = MIMEText(body_text, 'plain', 'utf-8')
+        part2 = MIMEText(body_html, 'html', 'utf-8')
+
+        # Attach parts into message container.
+        # According to RFC 2046, the last part of a multipart message,
+        # in this case the HTML message, is best and preferred.
+        message.attach(part1)
+        message.attach(part2)
+
+        send_email_through(
+            config=self.config,
+            sendmail_callable=async_email_sender.send_mail,
+            message=message
+        )
+
+    def notify_reset_password(
+            self,
+            user: User,
+            reset_password_token: str,
+    ) -> None:
+        """
+        Reset password link for user
+        :param user: user to notify
+        :param reset_password_token: token for resetting password
+        """
+        logger.debug(self, 'user: {}'.format(user.user_id))
+        logger.info(self, 'Sending asynchronous email to 1 user ({0})'.format(
+            user.email,
+        ))
+        translator = Translator(self.config, default_lang=user.lang)
+        async_email_sender = EmailSender(
+            self.config,
+            self._smtp_config,
+            self.config.EMAIL_NOTIFICATION_ACTIVATED
+        )
+        subject = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT.replace(
+            EST.WEBSITE_TITLE,
+            str(self.config.WEBSITE_TITLE)
+        )
+        message = MIMEMultipart('alternative')
+        message['Subject'] = subject
+        message['From'] = self._get_sender()
+        message['To'] = formataddr((user.get_display_name(), user.email))
+
+        text_template_file_path = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_TEXT  # nopep8
+        html_template_file_path = self.config.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML  # nopep8
+        # TODO - G.M - 2018-08-17 - Generate token
+        context = {
+            'user': user,
+            'logo_url': get_email_logo_frontend_url(self.config),
+            'reset_password_url': get_reset_password_frontend_url(self.config, token=reset_password_token),  # nopep8
+        }
+        body_text = self._render_template(
+            mako_template_filepath=text_template_file_path,
+            context=context,
+            translator=translator,
+        )
+
+        body_html = self._render_template(
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
 
         part1 = MIMEText(body_text, 'plain', 'utf-8')

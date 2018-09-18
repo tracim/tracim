@@ -105,6 +105,14 @@ class WrongUserPassword(TracimException):
     pass
 
 
+class UnvalidResetPasswordToken(TracimException):
+    pass
+
+
+class ExpiredResetPasswordToken(TracimException):
+    pass
+
+
 class NotificationNotSend(TracimException):
     pass
 
