@@ -40,7 +40,7 @@ const AdminWorkspace = props =>
               <tr className='adminWorkspace__workspaceTable__tr' key={ws.slug}>
                 <td>{ws.workspace_id}</td>
                 <td
-                  className='adminWorkspace__workspaceTable__tr__td-link primaryColor'
+                  className='adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
                   onClick={() => props.onClickWorkspace(ws.workspace_id)}
                 >
                   {ws.label}
@@ -56,10 +56,10 @@ const AdminWorkspace = props =>
                 */}
                 <td>{ws.memberList.length}</td>
                 <td>
-                  <div className='adminWorkspace__table__delete primaryColorFont primaryColorFontDarkenHover'>
+                  <div className='adminWorkspace__table__delete'>
                     <button
                       type='button'
-                      className='adminWorkspace__table__delete__icon btn iconBtn mr-3'
+                      className='adminWorkspace__table__delete__icon btn iconBtn primaryColorFont primaryColorFontDarkenHover mr-3'
                       onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
                     >
                       <i className='fa fa-fw fa-trash-o' />

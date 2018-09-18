@@ -4,7 +4,8 @@ import { translate } from 'react-i18next'
 import {
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  convertBackslashNToBr
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -24,7 +25,11 @@ import {
   setWorkspaceReadStatusList
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
-import { ROLE, PAGE, findIdRoleUserWorkspace } from '../helper.js'
+import {
+  ROLE,
+  PAGE,
+  findIdRoleUserWorkspace
+} from '../helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import RecentActivity from '../component/Dashboard/RecentActivity.jsx'
@@ -220,7 +225,7 @@ class Dashboard extends React.Component {
         label: 'Advanced dashboard',
         slug: 'workspace_advanced',
         faIcon: 'bank',
-        hexcolor: '#999999',
+        hexcolor: GLOBAL_primaryColor,
         creationLabel: '',
         roleList: ROLE
       },
@@ -263,9 +268,10 @@ class Dashboard extends React.Component {
                   {props.curWs.label}
                 </div>
 
-                <div className='dashboard__workspace__detail'>
-                  {props.curWs.description}
-                </div>
+                <div
+                  className='dashboard__workspace__detail'
+                  dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
+                />
               </div>
 
               <UserStatus

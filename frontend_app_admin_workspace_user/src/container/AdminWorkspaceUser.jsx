@@ -10,6 +10,7 @@ import { debug, ROLE } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
+  getWorkspaceDetail,
   deleteWorkspace,
   getUserList,
   getUserDetail,
@@ -34,7 +35,8 @@ class AdminWorkspaceUser extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       popupDeleteWorkspaceDisplay: false,
-      workspaceToDelete: null
+      workspaceToDelete: null,
+      workspaceIdOpened: null
     }
 
     // i18n has been init, add resources from frontend
@@ -101,17 +103,25 @@ class AdminWorkspaceUser extends React.Component {
 
     switch (workspaceList.apiResponse.status) {
       case 200:
-        const fetchWorkspaceListMemberList = await Promise.all(
+        const fetchWorkspaceListMemberList = Promise.all(
           workspaceList.body.map(async ws =>
             handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
           )
         )
+        const fetchWorkspaceListDetail = Promise.all(
+          workspaceList.body.map(async ws =>
+            handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, ws.workspace_id))
+          )
+        )
+        const [resWorkspaceListMemberList, resWorkspaceListDetail] = await Promise.all([fetchWorkspaceListMemberList, fetchWorkspaceListDetail])
+
         this.setState(prev => ({
           content: {
             ...prev.content,
             workspaceList: workspaceList.body.map(ws => ({
               ...ws,
-              memberList: (fetchWorkspaceListMemberList.find(fws => fws.body[0].workspace_id === ws.workspace_id) || {body: []}).body
+              memberList: (resWorkspaceListMemberList.find(fws => fws.body[0].workspace_id === ws.workspace_id) || {body: []}).body,
+              description: (resWorkspaceListDetail.find(fws => fws.body.workspace_id === ws.workspace_id) || {body: {description: ''}}).body.description
             }))
           }
         }))
@@ -248,27 +258,31 @@ class AdminWorkspaceUser extends React.Component {
 
   handleClickWorkspace = idWorkspace => {
     const { state } = this
-    GLOBAL_renderAppFeature({
-      loggedUser: {
-        ...state.loggedUser,
-        idRoleUserWorkspace: 8 // only global admin can see this app
-      },
-      config: {
-        label: 'Advanced dashboard',
-        slug: 'workspace_advanced',
-        faIcon: 'bank',
-        hexcolor: '#999999',
-        creationLabel: '',
-        roleList: ROLE,
-        domContainer: 'appFeatureContainer',
-        apiUrl: state.config.apiUrl,
-        apiHeader: state.config.apiHeader,
-        translation: state.config.translation
-      },
-      content: {
-        workspace_id: idWorkspace
-      }
-    })
+    if (state.workspaceIdOpened === null) {
+      GLOBAL_renderAppFeature({
+        loggedUser: {
+          ...state.loggedUser,
+          idRoleUserWorkspace: 8 // only global admin can see this app
+        },
+        config: {
+          label: 'Advanced dashboard',
+          slug: 'workspace_advanced',
+          faIcon: 'bank',
+          hexcolor: GLOBAL_primaryColor,
+          creationLabel: '',
+          roleList: ROLE,
+          domContainer: 'appFeatureContainer',
+          apiUrl: state.config.apiUrl,
+          apiHeader: state.config.apiHeader,
+          translation: state.config.translation
+        },
+        content: {
+          workspace_id: idWorkspace
+        }
+      })
+    } else GLOBAL_dispatchEvent({type: 'workspace_advanced_reloadContent', data: {workspace_id: idWorkspace}})
+
+    this.setState({workspaceIdOpened: idWorkspace})
   }
 
   handleClickUser = idUser => {

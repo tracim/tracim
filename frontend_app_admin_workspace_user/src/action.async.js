@@ -19,6 +19,15 @@ export const getWorkspaceMemberList = (apiUrl, idWorkspace) =>
     method: 'GET'
   })
 
+export const getWorkspaceDetail = (apiUrl, idWorkspace) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
 export const deleteWorkspace = (apiUrl, idWorkspace) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/delete`, {
     credentials: 'include',

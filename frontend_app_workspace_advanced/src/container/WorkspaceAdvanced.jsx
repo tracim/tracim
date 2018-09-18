@@ -44,7 +44,6 @@ class WorkspaceAdvanced extends React.Component {
     }
 
     // i18n has been init, add resources from frontend
-    console.log('translation resources', this.state.config.translation)
     addAllResourceI18n(i18n, this.state.config.translation)
     i18n.changeLanguage(this.state.loggedUser.lang)
 
@@ -60,6 +59,10 @@ class WorkspaceAdvanced extends React.Component {
       case 'workspace_advanced_hideApp':
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
         this.setState({isVisible: false})
+        break
+      case 'workspace_advanced_reloadContent':
+        console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
+        this.setState(prev => ({content: {...prev.content, ...data}, isVisible: true}))
         break
       case 'allApp_changeLang':
         console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', type, data)
@@ -83,8 +86,11 @@ class WorkspaceAdvanced extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
-
     console.log('%c<WorkspaceAdvanced> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+
+    if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
+      this.loadContent()
+    }
   }
 
   componentWillUnmount () {
@@ -144,7 +150,7 @@ class WorkspaceAdvanced extends React.Component {
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
       case 200:
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
-        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new workspace label'))
     }
@@ -162,7 +168,10 @@ class WorkspaceAdvanced extends React.Component {
     const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content.workspace_id, state.content.label, state.content.description))
 
     switch (fetchPutDescription.apiResponse.status) {
-      case 200: this.sendGlobalFlashMessage(props.t('Save successful')); break
+      case 200:
+        this.sendGlobalFlashMessage(props.t('Save successful'))
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        break
       default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
     }
   }
