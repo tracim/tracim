@@ -101,8 +101,8 @@ auth_type = internal
 # ldap_group_enabled = False
 # User auth token validity in seconds (used to interfaces like web calendars)
 user.auth_token.validity = 604800
-# user reset_password token validity (default to 600s -> 10 minutes)
-user.reset_password.validity = 600
+# user reset_password token validity (default to 900s -> 15 minutes)
+user.reset_password.validity = 900
 
 
 session.type = file

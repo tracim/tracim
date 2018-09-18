@@ -199,7 +199,7 @@ class CFG(object):
         ))
         self.USER_RESET_PASSWORD_TOKEN_VALIDITY = int(settings.get(
             'user.reset_password.validity',
-            '600'
+            '900'
         ))
 
         self.DEBUG = asbool(settings.get('debug', False))
