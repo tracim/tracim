@@ -35,6 +35,11 @@ retry.attempts = 3
 
 ### Global
 
+# app enabled explicit list
+# this allow you to explictly disable default app or enabled beta app now
+# already added to default list
+# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
+
 # Enable debug mode
 # debug = True
 cache_dir = %(here)s/data
