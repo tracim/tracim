@@ -1145,6 +1145,62 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['is_active'] is True
         assert user_role['do_notify'] is True
 
+    def test_api__get_workspace_members__ok_200__admin(self):
+        """
+        Check obtain workspace members list of a workspace where admin doesn't
+        have any right
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('managers')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        transaction.commit()
+        user_id = user.user_id
+        workspace_id = workspace.workspace_id
+        admin_id = admin.user_id
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/{}/members'.format(
+            workspace_id,
+            user_id
+        ), status=200).json_body
+        assert len(res) == 1
+        user_role = res[0]
+        assert user_role['role'] == 'reader'
+        assert user_role['user_id'] == user_id
+        assert user_role['workspace_id'] == workspace_id
+        assert user_role['is_active'] is True
+        assert user_role['do_notify'] is False
 
     def test_api__get_workspace_member__err_400__unallowed_user(self):
         """
@@ -1180,7 +1236,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
-
 
     def test_api__get_workspace_members__err_400__workspace_does_not_exist(self):  # nopep8
         """
@@ -1612,6 +1667,13 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is True
         assert user_role_found['do_notify'] is False
+
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+        )
+        res = res.json_body
+        assert res['profile'] == 'users'
 
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')

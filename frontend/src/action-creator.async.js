@@ -44,6 +44,7 @@ import {
  * It also adds, to the Response of the fetch request, the json value so that the redux action have access to the status and the data
  */
 // Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
+// 08/09/2018 - maybe not since this fetchWrapper also dispatch redux actions whether it succeed or failed
 const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) => {
   dispatch({type: `${param.method}/${actionName}/PENDING`})
 
@@ -54,7 +55,12 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       case 304:
         return fetchResult.json()
       case 204:
+        return ''
+      case 401:
+        if (!document.location.href.includes('/login')) document.location.href = '/login?dc=1'
+        return ''
       case 400:
+      case 403:
       case 404:
       case 409:
       case 500:
@@ -77,6 +83,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       break
     case 400:
     case 401:
+    case 403:
     case 404:
     case 500:
       dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})

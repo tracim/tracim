@@ -4,14 +4,13 @@ import typing
 import transaction
 from depot.manager import DepotManager
 from hapic.data import HapicFile
-from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
-from pyramid.response import FileIter
-from pyramid.response import FileResponse
+from preview_generator.exception import UnavailablePreviewType
 
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.extensions import hapic
@@ -163,6 +162,7 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -198,6 +198,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -229,6 +230,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(FileQuerySchema())
@@ -266,6 +268,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnavailablePreviewType, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(PageQuerySchema())
@@ -309,6 +312,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_query(PageQuerySchema())
@@ -350,6 +354,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
@@ -393,6 +398,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(RevisionPreviewSizedPathSchema())

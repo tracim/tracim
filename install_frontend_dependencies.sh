@@ -68,8 +68,6 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "$USER npm link"
 $SUDO npm link && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
 
 
 # install app Html Document
@@ -79,8 +77,6 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
 
 
 # install app Thread
@@ -90,8 +86,6 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
 
 
 # install app Workspace
@@ -101,8 +95,7 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
+ 
 
 
 # install app workspace advanced
@@ -112,8 +105,6 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
 
 
 # install app file
@@ -123,8 +114,6 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
 
 
 # install app Admin Workspace User
@@ -134,8 +123,6 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
 
 
 # install Tracim Frontend
@@ -147,8 +134,6 @@ log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
 log "cp configEnv.json.sample configEnv.json"
 cp configEnv.json.sample configEnv.json && loggood "success" || logerror "some error"
-log "build-translation"
-npm run build-translation && loggood "success" || logerror "some error"
 
 
 # Return to "$DEFAULTDIR/"

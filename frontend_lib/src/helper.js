@@ -82,3 +82,5 @@ export const libDisplayDate = (dateToDisplay, lang) => {
   const diffSeconde = todayMoment.diff(dateToDisplayMoment, 'seconds')
   return i18n.t('{{nb}} seconds ago', {nb: diffSeconde})
 }
+
+export const libConvertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')

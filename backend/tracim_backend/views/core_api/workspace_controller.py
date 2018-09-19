@@ -189,7 +189,11 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_profile_or_other_profile_with_workspace_role(
+        allow_all_group=Group.TIM_ADMIN,
+        allow_if_role_group=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.READER
+    )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
     def workspaces_members(

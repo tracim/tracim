@@ -3,6 +3,8 @@ import json
 from urllib.parse import urlparse
 
 import os
+
+import typing
 from paste.deploy.converters import asbool
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.extensions import app_list
@@ -74,7 +76,21 @@ class CFG(object):
                     self.COLOR_CONFIG_FILE_PATH)  # nopep8
             ) from e
 
-        self._set_default_app()
+        default_enabled_app = [
+            'contents/thread',
+            'contents/file',
+            'contents/html-document',
+        ]
+        enabled_app = []
+        enabled_app_str = settings.get('app.enabled', None)
+        if enabled_app_str:
+            for app in enabled_app_str.split(','):
+                app_name = app.strip()
+                enabled_app.append(app_name)
+        else:
+            enabled_app = default_enabled_app
+        self.ENABLED_APP = enabled_app
+        self._set_default_app(self.ENABLED_APP)
         mandatory_msg = \
             'ERROR: {} configuration is mandatory. Set it before continuing.'
         self.DEPOT_STORAGE_DIR = settings.get(
@@ -198,6 +214,10 @@ class CFG(object):
             'user.auth_token.validity',
             '604800',
         ))
+        self.USER_RESET_PASSWORD_TOKEN_VALIDITY = int(settings.get(
+            'user.reset_password.validity',
+            '900'
+        ))
 
         self.DEBUG = asbool(settings.get('debug', False))
         # TODO - G.M - 27-03-2018 - [Email] Restore email config
@@ -226,7 +246,6 @@ class CFG(object):
                 'Use instead email.notification.from.email and '
                 'email.notification.from.default_label.'
             )
-
         self.EMAIL_NOTIFICATION_FROM_EMAIL = settings.get(
             'email.notification.from.email',
             'noreply+{user_id}@trac.im'
@@ -241,12 +260,17 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_REFERENCES_EMAIL = settings.get(
             'email.notification.references.email'
         )
+        # Content update notification
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML = settings.get(
             'email.notification.content_update.template.html',
         )
         self.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT = settings.get(
             'email.notification.content_update.template.text',
         )
+        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
+            'email.notification.content_update.subject',
+        )
+        # Created account notification
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_TEMPLATE_HTML = settings.get(
             'email.notification.created_account.template.html',
             './tracim_backend/templates/mail/created_account_body_html.mak',
@@ -255,13 +279,25 @@ class CFG(object):
             'email.notification.created_account.template.text',
             './tracim_backend/templates/mail/created_account_body_text.mak',
         )
-        self.EMAIL_NOTIFICATION_CONTENT_UPDATE_SUBJECT = settings.get(
-            'email.notification.content_update.subject',
-        )
         self.EMAIL_NOTIFICATION_CREATED_ACCOUNT_SUBJECT = settings.get(
             'email.notification.created_account.subject',
             '[{website_title}] Created account',
         )
+
+        # Reset password notification
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_HTML = settings.get(
+            'email.notification.reset_password_request.template.html',
+            './tracim_backend/templates/mail/reset_password_body_html.mak',
+        )
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_TEMPLATE_TEXT = settings.get(
+            'email.notification.reset_password_request.template.text',
+            './tracim_backend/templates/mail/reset_password_body_text.mak',
+        )
+        self.EMAIL_NOTIFICATION_RESET_PASSWORD_SUBJECT = settings.get(
+            'email.notification.reset_password_request.subject',
+            '[{website_title}] Reset Password Request'
+        )
+
         self.EMAIL_NOTIFICATION_PROCESSING_MODE = settings.get(
             'email.notification.processing_mode',
         )
@@ -549,112 +585,121 @@ class CFG(object):
             depot_storage_settings,
         )
 
-    def _set_default_app(self):
-        calendar = Application(
-            label='Calendar',
-            slug='calendar',
-            fa_icon='calendar',
-            is_active=False,
-            config={},
-            main_route='/#/workspaces/{workspace_id}/calendar',
-            app_config=self
-        )
-
-        thread = Application(
-            label='Threads',
-            slug='contents/thread',
-            fa_icon='comments-o',
-            is_active=True,
-            config={},
-            main_route='/#/workspaces/{workspace_id}/contents?type=thread',
-            app_config=self
-        )
-        thread.add_content_type(
-            slug='thread',
-            label='Thread',
-            creation_label='Discuss about a topic',
-            available_statuses=CONTENT_STATUS.get_all(),
-        )
-
-        folder = Application(
-            label='Folder',
-            slug='contents/folder',
-            fa_icon='folder-open-o',
-            is_active=True,
-            config={},
-            main_route='',
-            app_config=self
-        )
-        folder.add_content_type(
-            slug='folder',
-            label='Folder',
-            creation_label='Create a folder',
-            available_statuses=CONTENT_STATUS.get_all(),
-            allow_sub_content=True,
-        )
-
-        _file = Application(
-            label='Files',
-            slug='contents/file',
-            fa_icon='paperclip',
-            is_active=True,
-            config={},
-            main_route='/#/workspaces/{workspace_id}/contents?type=file',
-            app_config=self,
-        )
-        _file.add_content_type(
-            slug='file',
-            label='File',
-            creation_label='Upload a file',
-            available_statuses=CONTENT_STATUS.get_all(),
-        )
-
-        markdownpluspage = Application(
-            label='Markdown Plus Documents',
-            # TODO - G.M - 24-05-2018 - Check label
-            slug='content/markdownpluspage',
-            fa_icon='file-code-o',
-            is_active=False,
-            config={},
-            main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
-            # nopep8
-            app_config=self,
-        )
-        markdownpluspage.add_content_type(
-            slug='markdownpage',
-            label='Rich Markdown File',
-            creation_label='Create a Markdown document',
-            available_statuses=CONTENT_STATUS.get_all(),
-        )
-
-        html_documents = Application(
-            label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
-            slug='contents/html-document',
-            fa_icon='file-text-o',
-            is_active=True,
-            config={},
-            main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
-            app_config=self
-        )
-        html_documents.add_content_type(
-            slug='html-document',
-            label='Text Document',
-            creation_label='Write a document',
-            available_statuses=CONTENT_STATUS.get_all(),
-            slug_alias=['page']
-        )
-
+    def _set_default_app(self, enabled_app_list: typing.List[str]):
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var
         app_list.clear()
-        app_list.extend([
-            html_documents,
-            markdownpluspage,
-            _file,
-            thread,
-            folder,
-            calendar,
-        ])
+        # calendar
+        if 'calendar' in enabled_app_list:
+            calendar = Application(
+                label='Calendar',
+                slug='calendar',
+                fa_icon='calendar',
+                is_active=False,
+                config={},
+                main_route='/#/workspaces/{workspace_id}/calendar',
+                app_config=self
+            )
+            app_list.append(calendar)
+
+        # thread
+        if 'contents/thread' in enabled_app_list:
+            thread = Application(
+                label='Threads',
+                slug='contents/thread',
+                fa_icon='comments-o',
+                is_active=True,
+                config={},
+                main_route='/#/workspaces/{workspace_id}/contents?type=thread',
+                app_config=self
+            )
+            thread.add_content_type(
+                slug='thread',
+                label='Thread',
+                creation_label='Discuss about a topic',
+                available_statuses=CONTENT_STATUS.get_all(),
+            )
+            app_list.append(thread)
+
+        # folder
+        if 'contents/folder' in enabled_app_list :
+            folder = Application(
+                label='Folder',
+                slug='contents/folder',
+                fa_icon='folder-open-o',
+                is_active=True,
+                config={},
+                main_route='',
+                app_config=self
+            )
+            folder.add_content_type(
+                slug='folder',
+                label='Folder',
+                creation_label='Create a folder',
+                available_statuses=CONTENT_STATUS.get_all(),
+                allow_sub_content=True,
+            )
+            app_list.append(folder)
+
+        # file
+        if 'contents/file' in enabled_app_list:
+            _file = Application(
+                label='Files',
+                slug='contents/file',
+                fa_icon='paperclip',
+                is_active=True,
+                config={},
+                main_route='/#/workspaces/{workspace_id}/contents?type=file',
+                app_config=self,
+            )
+            _file.add_content_type(
+                slug='file',
+                label='File',
+                creation_label='Upload a file',
+                available_statuses=CONTENT_STATUS.get_all(),
+            )
+            app_list.append(_file)
+
+        # markdownpluspage
+        if 'contents/markdownpluspage' in enabled_app_list:
+            markdownpluspage = Application(
+                label='Markdown Plus Documents',
+                # TODO - G.M - 24-05-2018 - Check label
+                slug='content/markdownpluspage',
+                fa_icon='file-code-o',
+                is_active=False,
+                config={},
+                main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
+                # nopep8
+                app_config=self,
+            )
+            markdownpluspage.add_content_type(
+                slug='markdownpage',
+                label='Rich Markdown File',
+                creation_label='Create a Markdown document',
+                available_statuses=CONTENT_STATUS.get_all(),
+            )
+            app_list.append(markdownpluspage)
+
+        if 'contents/html-document' in enabled_app_list:
+            html_documents = Application(
+                label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
+                slug='contents/html-document',
+                fa_icon='file-text-o',
+                is_active=True,
+                config={},
+                main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
+                app_config=self
+            )
+            html_documents.add_content_type(
+                slug='html-document',
+                label='Text Document',
+                creation_label='Write a document',
+                available_statuses=CONTENT_STATUS.get_all(),
+                slug_alias=['page']
+            )
+            app_list.append(html_documents)
+
         # TODO - G.M - 2018-08-08 - We need to update validators each time
         # app_list is updated.
         update_validators()

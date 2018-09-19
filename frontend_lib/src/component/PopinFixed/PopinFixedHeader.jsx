@@ -8,7 +8,7 @@ class PopinFixedHeader extends React.Component {
     super(props)
     this.state = {
       editTitle: false,
-      editTitleValue: ''
+      editTitleValue: props.title
     }
   }
 
@@ -28,7 +28,8 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn } = this.props
+    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn, t } = this.props
+    const { state } = this
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{backgroundColor: customColor}}>
@@ -37,8 +38,8 @@ class PopinFixedHeader extends React.Component {
         </div>
 
         <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>
-          {this.state.editTitle
-            ? <input className='wsContentGeneric__header__title__editiontitle editiontitle' value={this.state.editTitleValue} onChange={this.onChangeTitle} />
+          {state.editTitle
+            ? <input className='wsContentGeneric__header__title__editiontitle editiontitle' value={state.editTitleValue} onChange={this.onChangeTitle} />
             : <div>{title}</div>
           }
         </div>
@@ -48,7 +49,7 @@ class PopinFixedHeader extends React.Component {
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
           >
-            {this.state.editTitle ? <i className='fa fa-check' title={this.props.t('validate the title')} /> : <i className='fa fa-pencil' title={this.props.t('edit title')} />}
+            {state.editTitle ? <i className='fa fa-check' title={t('validate the title')} /> : <i className='fa fa-pencil' title={t('edit title')} />}
           </div>
         }
 

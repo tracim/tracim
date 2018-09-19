@@ -2,8 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router'
 import { translate } from 'react-i18next'
-// import LoginLogo from '../component/Login/LoginLogo.jsx'
-// import LoginLogoImg from '../img/logoTracimWhite.svg'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -26,6 +24,7 @@ import {
 } from '../action-creator.async.js'
 import { PAGE } from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
+const qs = require('query-string')
 
 class Login extends React.Component {
   constructor (props) {
@@ -41,6 +40,12 @@ class Login extends React.Component {
       },
       inputRememberMe: false
     }
+  }
+
+  componentDidMount () {
+    const { props } = this
+    const query = qs.parse(props.location.search)
+    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login', 'warning')))
   }
 
   handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
@@ -112,7 +117,6 @@ class Login extends React.Component {
       return (
         <section className='loginpage primaryColorBg'>
           <div className='container-fluid'>
-
             { /*
               AC - 11/09/2018 - disable the logo to leave more space for the login form
               <LoginLogo
@@ -123,7 +127,6 @@ class Login extends React.Component {
 
             <div className='row justify-content-center'>
               <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
-
                 <Card customClass='loginpage__connection'>
                   <CardHeader customClass='connection__header primaryColorBgLighten text-center'>{this.props.t('Connection')}</CardHeader>
 
@@ -168,7 +171,7 @@ class Login extends React.Component {
                               checked={this.state.inputRememberMe}
                               onClickCheckbox={() => {}}
                             />
-                            Se souvenir de moi
+                            {this.props.t('Remember me')}
                           </div>
 
                           <LoginBtnForgotPw
@@ -188,21 +191,17 @@ class Login extends React.Component {
                         </div>
                       </div>
                     </div>
-
                   </CardBody>
                 </Card>
-
               </div>
             </div>
-
           </div>
 
           <footer className='loginpage__footer'>
             <div className='loginpage__footer__text d-flex align-items-center flex wrap'>
-            copyright © 2013 - 2018 <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
+              copyright © 2013 - 2018 <a href='http://www.tracim.fr/' target='_blank' className='ml-3'>tracim.fr</a>
             </div>
           </footer>
-
         </section>
       )
     }
