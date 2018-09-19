@@ -53,7 +53,10 @@
       overflow-y auto
       list-style none
       &__item
+        display flex
+        position relative
         margin 15px 25px
+        width calc(100% - 50px) //50px => margin + left/right
       &__version
         display flex
         justify-content space-between
@@ -100,19 +103,6 @@
           &__icon
             display inline-block
             margin-left 20px
-
-.sent
-  text-align right
-  .timeline__body__messagelist__item
-    &__wrapper
-      display flex
-      flex-direction row-reverse
-    &__avatar
-      left 20px
-    &__authorandhour
-      margin-left 0
-      margin-right 35px
-
 
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result

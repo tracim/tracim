@@ -1,33 +1,51 @@
 @import '../../css/Variable.styl'
 
 .comment
+  &.sent
+    padding-left 5%
+  &.received
+    padding-right 5%
   &__header
-    display flex
     &__text
-      position relative
-      font-size 14px
+      display flex
+      justify-content space-between
+      width 100%
       color grey
     &__avatar
-      position relative
-    ^[0].sent ^[1] // renders .comment.sent .comment__header
-      justify-content flex-end
-      &__text
-        left 20px
+      position absolute
+      top 5px
+      left -18px
+    ^[0].received ^[1] // renders .comment.received .comment__header
       &__avatar
-        left 20px
-        top 25px
-    ^[0].received ^[1] // .comment.received .comment__header
-      flex-direction row-reverse
-      justify-content flex-end
+        right -20px
+        top 5px
       &__text
-        left -20px
+        padding-left calc(5% + 4px)
+    ^[0].sent ^[1] // .comment.sent .comment__header
+      &__text
+        padding-right calc(5% + 4px)
       &__avatar
-        left -20px
-        top 25px
+        display flex
+        flex-direction row-reverse
+        top 5px
+        right -20px
   &__body
-    display inline-block
-    border 1px solid grey
     border-radius 5px
-    padding 15px
-    background-color offWhite
-    font-size 15px
+    padding 15px 15px 15px 35px
+
+
+/*** MEDIA XS ***/
+
+@media(max-width: max-xs)
+
+  .comment
+    &__header
+      &__text
+      ^[0].received ^[1] // renders .comment.received .comment__header
+        &__text
+          padding-left calc(5% + 16px)
+          padding-right 15px
+      ^[0].sent ^[1] // .comment.sent .comment__header
+        &__text
+          padding-right calc(5% + 16px)
+          padding-left 15px
