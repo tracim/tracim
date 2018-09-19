@@ -15,6 +15,7 @@ const InputGroupText = props => {
         value={props.value}
         onChange={props.onChange}
         onKeyPress={props.onKeyPress}
+        maxLength={props.maxLength}
       />
       <div className={classnames(`${props.parentClassName}__msgerror`, 'invalid-feedback')}>
         {props.invalidMsg}
@@ -35,7 +36,8 @@ InputGroupText.propTypes = {
   invalidMsg: PropTypes.string,
   isInvalid: PropTypes.bool,
   onChange: PropTypes.func,
-  onKeyPress: PropTypes.func
+  onKeyPress: PropTypes.func,
+  maxLength: PropTypes.number
 }
 
 InputGroupText.defaultProps = {
@@ -45,5 +47,6 @@ InputGroupText.defaultProps = {
   invalidMsg: false,
   isInvalid: false,
   onChange: () => {},
-  onKeyPress: () => {}
+  onKeyPress: () => {},
+  maxLength: 512
 }
