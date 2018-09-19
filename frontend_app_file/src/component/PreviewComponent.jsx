@@ -43,7 +43,7 @@ export class PreviewComponent extends React.Component {
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
-            title={props.t('Download as PDF')}
+            title={props.t('Download current page as PDF')}
             key={'file_btn_dl_pdfall'}
           >
             <i className='fa fa-file-o' />
@@ -54,7 +54,7 @@ export class PreviewComponent extends React.Component {
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
-            title={props.t('Download current page as PDF')}
+            title={props.t('Download as PDF')}
             key={'file_btn_dl_pdfpage'}
           >
             <i className='fa fa-file-pdf-o' />
