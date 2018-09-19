@@ -40,7 +40,8 @@ class Thread extends React.Component {
       newComment: '',
       timelineWysiwyg: false,
       externalTradList: [
-        i18n.t('Discuss about a topic')
+        i18n.t('Discuss about a topic'),
+        i18n.t('Threads')
       ]
     }
 

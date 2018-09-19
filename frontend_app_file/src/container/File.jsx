@@ -42,7 +42,8 @@ class File extends React.Component {
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTradList: [
-        props.t('Upload a file')
+        props.t('Upload a file'),
+        props.t('Files')
       ],
       newComment: '',
       newFile: '',

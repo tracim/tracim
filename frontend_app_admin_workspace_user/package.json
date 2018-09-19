@@ -55,7 +55,8 @@
       "tinymce",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
-      "GLOBAL_dispatchEvent"
+      "GLOBAL_dispatchEvent",
+      "GLOBAL_primaryColor"
     ],
     "parser": "babel-eslint",
     "ignore": []

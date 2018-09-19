@@ -30,7 +30,7 @@ const ExtandedAction = props => {
           </div>
         }
 
-        {props.idRoleUserWorkspace >= 4 &&
+        {false && props.idRoleUserWorkspace >= 4 &&
           <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.move}>
             <div className='subdropdown__item__icon mr-3'>
               <i className='fa fa-fw fa-arrows-alt' />
@@ -42,14 +42,16 @@ const ExtandedAction = props => {
           </div>
         }
 
-        {/* <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.download}>
+        {/*
+        <div className='subdropdown__item dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.download}>
           <div className='subdropdown__item__icon mr-3'>
             <i className='fa fa-fw fa-download' />
           </div>
           <div className='subdropdown__item__text'>
             {props.t('Download')}
           </div>
-        </div> */ }
+        </div>
+        */}
 
         {props.idRoleUserWorkspace >= 4 &&
           <div className='subdropdown__item primaryColorBgLightenHover dropdown-item d-flex align-items-center' onClick={props.onClickExtendedAction.archive}>

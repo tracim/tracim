@@ -40,6 +40,7 @@ class WorkspaceAdvanced extends React.Component {
         role: '',
         avatarUrl: ''
       },
+      autoCompleteFormNewMemberActive: true,
       searchedKnownMemberList: []
     }
 
@@ -98,11 +99,11 @@ class WorkspaceAdvanced extends React.Component {
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+  sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
     type: 'addFlashMsg',
     data: {
       msg: msg,
-      type: 'warning',
+      type: type,
       delay: undefined
     }
   })
@@ -116,12 +117,12 @@ class WorkspaceAdvanced extends React.Component {
     const [resDetail, resMember] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember])
 
     if (resDetail.apiResponse.status !== 200) {
-      this.sendGlobalFlashMessage(props.t('Error while loading workspace details'))
+      this.sendGlobalFlashMessage(props.t('Error while loading workspace details', 'warning'))
       resDetail.body = {}
     }
 
     if (resMember.apiResponse.status !== 200) {
-      this.sendGlobalFlashMessage(props.t('Error while loading members list'))
+      this.sendGlobalFlashMessage(props.t('Error while loading members list', 'warning'))
       resMember.body = []
     }
 
@@ -152,7 +153,7 @@ class WorkspaceAdvanced extends React.Component {
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new workspace label'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new workspace label', 'warning'))
     }
   }
 
@@ -169,10 +170,10 @@ class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutDescription.apiResponse.status) {
       case 200:
-        this.sendGlobalFlashMessage(props.t('Save successful'))
+        this.sendGlobalFlashMessage(props.t('Save successful', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new description'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new description', 'warning'))
     }
   }
 
@@ -187,7 +188,7 @@ class WorkspaceAdvanced extends React.Component {
           memberList: prev.content.memberList.map(m => m.user_id === idMember ? {...m, role: slugNewRole} : m)
         }
       })); break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new role for member', 'warning'))
     }
   }
 
@@ -196,7 +197,13 @@ class WorkspaceAdvanced extends React.Component {
   handleChangeNewMemberName = newName => {
     if (newName.length >= 2) this.handleSearchUser(newName)
     else if (newName.length === 0) this.setState({searchedKnownMemberList: []})
-    this.setState(prev => ({newMember: {...prev.newMember, name: newName}}))
+    this.setState(prev => ({
+      newMember: {
+        ...prev.newMember,
+        name: newName
+      },
+      autoCompleteFormNewMemberActive: true
+    }))
   }
 
   handleSearchUser = async userNameToSearch => {
@@ -204,7 +211,7 @@ class WorkspaceAdvanced extends React.Component {
     const fetchUserKnownMemberList = await handleFetchResult(await getUserKnownMember(state.config.apiUrl, state.loggedUser.user_id, userNameToSearch))
     switch (fetchUserKnownMemberList.apiResponse.status) {
       case 200: this.setState({searchedKnownMemberList: fetchUserKnownMemberList.body}); break
-      default: this.sendGlobalFlashMessage(props.t('Error while fetching known members list'))
+      default: this.sendGlobalFlashMessage(props.t('Error while fetching known members list', 'warning'))
     }
   }
 
@@ -212,13 +219,17 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     const fetchDeleteMember = await deleteMember(state.config.apiUrl, state.content.workspace_id, idUser)
     switch (fetchDeleteMember.status) {
-      case 204: this.setState(prev => ({
-        content: {
-          ...prev.content,
-          memberList: prev.content.memberList.filter(m => m.user_id !== idUser)
-        }
-      })); break
-      default: this.sendGlobalFlashMessage(props.t('Error while removing user from workspace'))
+      case 204:
+        this.setState(prev => ({
+          content: {
+            ...prev.content,
+            memberList: prev.content.memberList.filter(m => m.user_id !== idUser)
+          }
+        }))
+        this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while removing user from workspace', 'warning'))
     }
   }
 
@@ -230,6 +241,7 @@ class WorkspaceAdvanced extends React.Component {
         name: knownMember.public_name,
         avatarUrl: knownMember.avatar_url
       },
+      autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: []
     }))
   }
@@ -238,11 +250,11 @@ class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     if (state.newMember.name === '') {
-      this.sendGlobalFlashMessage(props.t('Please set a name or email'))
+      this.sendGlobalFlashMessage(props.t('Please set a name or email', 'warning'))
       return
     }
     if (state.newMember.role === '') {
-      this.sendGlobalFlashMessage(props.t('Please set a role'))
+      this.sendGlobalFlashMessage(props.t('Please set a role', 'warning'))
       return
     }
 
@@ -253,8 +265,16 @@ class WorkspaceAdvanced extends React.Component {
     })
 
     switch (fetchWorkspaceNewMember.status) {
-      case 200: this.loadContent(); break
-      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the workspace'))
+      case 200:
+        this.loadContent()
+        this.setState({
+          displayFormNewMember: false,
+          newMember: {id: '', name: '', role: '', avatarUrl: ''}
+        })
+        this.sendGlobalFlashMessage(props.t('Member added', 'info'))
+        GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the workspace', 'warning'))
     }
   }
 
@@ -282,6 +302,7 @@ class WorkspaceAdvanced extends React.Component {
           customColor={state.config.hexcolor}
           customClass={`${state.config.slug}`}
           i18n={i18n}
+          display={false}
         />
 
         <PopinFixedContent
@@ -296,6 +317,7 @@ class WorkspaceAdvanced extends React.Component {
             onClickNewRole={this.handleClickNewRole}
             memberList={state.content.memberList}
             displayFormNewMember={state.displayFormNewMember}
+            autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
             onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
             newMemberName={state.newMember.name}
             onChangeNewMemberName={this.handleChangeNewMemberName}

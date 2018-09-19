@@ -2,11 +2,8 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import i18n from '../../i18n.js'
 
 const PopinFixedOption = props => {
-  translate.setI18n(props.i18n ? props.i18n : i18n) // mandatory to allow Apps to overrides trad
-
   return (
     <div
       className={classnames('wsContentGeneric__option', `${props.customClass}__option`)}

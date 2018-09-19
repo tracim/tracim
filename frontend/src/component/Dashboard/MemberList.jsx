@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-// import { Checkbox } from 'tracim_frontend_lib'
 import { NewMemberForm } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
@@ -23,10 +22,7 @@ export class MemberList extends React.Component {
     this.props.onChangeCreateAccount(!this.props.createAccount)
   }
 
-  handleClickBtnValidate = () => {
-    this.props.onClickValidateNewMember()
-    this.setState({displayNewMemberList: true})
-  }
+  handleClickBtnValidate = async () => await this.props.onClickValidateNewMember() && this.setState({displayNewMemberList: true})
 
   render () {
     const { props, state } = this
@@ -59,7 +55,10 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      <div className='memberlist__list__item__delete primaryColorFontHover'>
+                      <div
+                        className='memberlist__list__item__delete primaryColorFontHover'
+                        onClick={() => props.onClickRemoveMember(m.id)}
+                      >
                         <i className='fa fa-trash-o' />
                       </div>
                     </li>
@@ -87,6 +86,7 @@ export class MemberList extends React.Component {
                 nameOrEmail={props.nameOrEmail}
                 onChangeNameOrEmail={props.onChangeNameOrEmail}
                 searchedKnownMemberList={props.searchedKnownMemberList}
+                autoCompleteActive={props.autoCompleteFormNewMemberActive}
                 onClickKnownMember={props.onClickKnownMember}
                 roleList={props.roleList}
                 role={props.role}

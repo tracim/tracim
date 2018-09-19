@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { fakeLogin } from './helper.js'
-// import File from './container/File.jsx'
-import PopupCreateFile from './container/PopupCreateFile.jsx'
+import File from './container/File.jsx'
+// import PopupCreateFile from './container/PopupCreateFile.jsx'
 
 require('./css/index.styl')
 
@@ -10,14 +10,14 @@ require('./css/index.styl')
   const rez = await fakeLogin()
 
   if (rez) {
-    // ReactDOM.render(
-    //   <File data={undefined} />
-    //   , document.getElementById('content')
-    // )
-
     ReactDOM.render(
-      <PopupCreateFile />
+      <File data={undefined} />
       , document.getElementById('content')
     )
+
+    // ReactDOM.render(
+    //   <PopupCreateFile />
+    //   , document.getElementById('content')
+    // )
   } else console.log('failed to login. rez: ', rez)
 })()

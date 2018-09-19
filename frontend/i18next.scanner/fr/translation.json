@@ -105,7 +105,6 @@
   "Content manager": "Gestionnaire de contenu",
   "Workspace manager": "Responsable",
   "Administrator": "Administrateur",
-  "Manager": "Manageur",
   "User": "Utilisateur",
   "Create": "Créer ",
   "Validate": "Valider",
@@ -123,5 +122,14 @@
   "This edition requires your administrator password": "Cette modification demande votre mot passe administrateur",
   "Type your password": "Entrer votre mot de passe",
   "You have been disconnected, please login": "Vous avez été déconnecté, veuillez vous reconnecter",
-  "Remember me": "Se souvenir de moi"
+  "Remember me": "Se souvenir de moi",
+  "Member added": "Membre ajouté",
+  "Member removed": "Membre supprimé",
+  "Error while removing the member": "Erreur lors de la suppresion du membre",
+  "Manager": "Manageur",
+  "All Contents": "Tous les contenus",
+  "Open": "Ouvert",
+  "Validated": "Validé",
+  "Cancelled": "Annulé",
+  "Deprecated": "Obsolète"
 }

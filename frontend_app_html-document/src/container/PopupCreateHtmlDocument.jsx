@@ -112,7 +112,7 @@ class PopupCreateHtmlDocument extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New Document')} // @TODO get the lang of user
+        label={this.props.t('New Document')}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}

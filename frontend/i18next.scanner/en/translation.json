@@ -105,7 +105,6 @@
   "Content manager": "Content manager",
   "Workspace manager": "Workspace manager",
   "Administrator": "Administrator",
-  "Manager": "Manager",
   "User": "User",
   "Create": "Create",
   "Validate": "Validate",
@@ -123,5 +122,14 @@
   "This edition requires your administrator password": "This edition requires your administrator password",
   "Type your password": "Type your password",
   "You have been disconnected, please login": "You have been disconnected, please login",
-  "Remember me": "Remember me"
+  "Remember me": "Remember me",
+  "Member added": "Member added",
+  "Member removed": "Member removed",
+  "Error while removing the member": "Error while removing the member",
+  "Manager": "Manager",
+  "All Contents": "All Contents",
+  "Open": "Open",
+  "Validated": "Validated",
+  "Cancelled": "Cancelled",
+  "Deprecated": "Deprecated"
 }
