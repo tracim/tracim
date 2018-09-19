@@ -99,7 +99,11 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @require_profile_or_other_profile_with_workspace_role(
+        allow_all_group=Group.TIM_ADMIN,
+        allow_if_role_group=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
     @hapic.output_body(WorkspaceSchema())
@@ -219,7 +223,11 @@ class WorkspaceController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_profile_or_other_profile_with_workspace_role(
+        allow_all_group=Group.TIM_ADMIN,
+        allow_if_role_group=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.READER
+    )
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema())
     def workspaces_member_role(
@@ -245,7 +253,11 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @require_profile_or_other_profile_with_workspace_role(
+        allow_all_group=Group.TIM_ADMIN,
+        allow_if_role_group=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    )
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
     @hapic.output_body(WorkspaceMemberSchema())
@@ -277,7 +289,11 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @require_profile_or_other_profile_with_workspace_role(
+        allow_all_group=Group.TIM_ADMIN,
+        allow_if_role_group=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    )
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def delete_workspaces_members_role(
@@ -300,7 +316,11 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(UserCreationFailed, HTTPStatus.BAD_REQUEST)
-    @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
+    @require_profile_or_other_profile_with_workspace_role(
+        allow_all_group=Group.TIM_ADMIN,
+        allow_if_role_group=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceMemberInviteSchema())
     @hapic.output_body(WorkspaceMemberCreationSchema())
