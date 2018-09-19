@@ -158,7 +158,6 @@ comment_type = ContentType(
     available_statuses=CONTENT_STATUS.get_all(),
 )
 
-
 class ContentTypeList(object):
     """
     ContentType List

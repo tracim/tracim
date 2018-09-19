@@ -24,6 +24,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
 
 from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.exceptions import ContentNotFound
@@ -421,7 +422,7 @@ class ContentApi(object):
         assert content_type_slug != CONTENT_TYPES.Any_SLUG
         assert not (label and filename)
 
-        if content_type_slug == CONTENT_TYPES.Folder.slug and not label:
+        if content_type_slug == FOLDER_TYPE and not label:
             label = self.generate_folder_label(workspace, parent)
 
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
@@ -486,7 +487,7 @@ class ContentApi(object):
 
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
-        assert parent and parent.type != CONTENT_TYPES.Folder.slug
+        assert parent and parent.type != FOLDER_TYPE
         if not content:
             raise EmptyCommentContentNotAllowed()
 
