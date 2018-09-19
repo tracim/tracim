@@ -589,18 +589,45 @@ class CFG(object):
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var
         app_list.clear()
-        # calendar
-        if 'calendar' in enabled_app_list:
-            calendar = Application(
-                label='Calendar',
-                slug='calendar',
-                fa_icon='calendar',
-                is_active=False,
+
+        # html-documents
+        if 'contents/html-document' in enabled_app_list:
+            html_documents = Application(
+                label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
+                slug='contents/html-document',
+                fa_icon='file-text-o',
+                is_active=True,
                 config={},
-                main_route='/#/workspaces/{workspace_id}/calendar',
+                main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
                 app_config=self
             )
-            app_list.append(calendar)
+            html_documents.add_content_type(
+                slug='html-document',
+                label='Text Document',
+                creation_label='Write a document',
+                available_statuses=CONTENT_STATUS.get_all(),
+                slug_alias=['page']
+            )
+            app_list.append(html_documents)
+
+        # file
+        if 'contents/file' in enabled_app_list:
+            _file = Application(
+                label='Files',
+                slug='contents/file',
+                fa_icon='paperclip',
+                is_active=True,
+                config={},
+                main_route='/#/workspaces/{workspace_id}/contents?type=file',
+                app_config=self,
+            )
+            _file.add_content_type(
+                slug='file',
+                label='File',
+                creation_label='Upload a file',
+                available_statuses=CONTENT_STATUS.get_all(),
+            )
+            app_list.append(_file)
 
         # thread
         if 'contents/thread' in enabled_app_list:
@@ -641,25 +668,6 @@ class CFG(object):
             )
             app_list.append(folder)
 
-        # file
-        if 'contents/file' in enabled_app_list:
-            _file = Application(
-                label='Files',
-                slug='contents/file',
-                fa_icon='paperclip',
-                is_active=True,
-                config={},
-                main_route='/#/workspaces/{workspace_id}/contents?type=file',
-                app_config=self,
-            )
-            _file.add_content_type(
-                slug='file',
-                label='File',
-                creation_label='Upload a file',
-                available_statuses=CONTENT_STATUS.get_all(),
-            )
-            app_list.append(_file)
-
         # markdownpluspage
         if 'contents/markdownpluspage' in enabled_app_list:
             markdownpluspage = Application(
@@ -681,25 +689,18 @@ class CFG(object):
             )
             app_list.append(markdownpluspage)
 
-        if 'contents/html-document' in enabled_app_list:
-            html_documents = Application(
-                label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
-                slug='contents/html-document',
-                fa_icon='file-text-o',
-                is_active=True,
+        # calendar
+        if 'calendar' in enabled_app_list:
+            calendar = Application(
+                label='Calendar',
+                slug='calendar',
+                fa_icon='calendar',
+                is_active=False,
                 config={},
-                main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
+                main_route='/#/workspaces/{workspace_id}/calendar',
                 app_config=self
             )
-            html_documents.add_content_type(
-                slug='html-document',
-                label='Text Document',
-                creation_label='Write a document',
-                available_statuses=CONTENT_STATUS.get_all(),
-                slug_alias=['page']
-            )
-            app_list.append(html_documents)
-
+            app_list.append(calendar)
         # TODO - G.M - 2018-08-08 - We need to update validators each time
         # app_list is updated.
         update_validators()
