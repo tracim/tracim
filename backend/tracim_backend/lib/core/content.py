@@ -4,7 +4,6 @@ import os
 import re
 import typing
 from contextlib import contextmanager
-from operator import itemgetter
 
 import sqlalchemy
 import transaction
@@ -27,6 +26,7 @@ from tracim_backend.app_models.contents import CONTENT_STATUS
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import ContentType
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import ContentTypeNotExist
@@ -39,6 +39,7 @@ from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import cmp_to_key
@@ -417,6 +418,91 @@ class ContentApi(object):
     # 
     #     return result
 
+    def _is_content_label_free(
+            self,
+            label: str,
+            workspace: Workspace,
+            parent: Content = None,
+            exclude_content_id: int = None,
+    ) -> bool:
+        """
+        Check if content label is free
+        :param label: content label
+        :param workspace: workspace of the content
+        :param parent: parent of the content
+        :param exclude_content_id: exclude a specific content_id (useful
+        to verify  other content for content update)
+        :return: True if content label is available
+        """
+        # INFO - G.M - 2018-09-04 - Method should not be used by special content
+        # with empty label like comment.
+        assert label
+        assert workspace
+        query = self.get_base_query(workspace)
+
+        if parent:
+            query = query.filter(Content.parent_id == parent.content_id)
+        else:
+            query = query.filter(Content.parent_id == None)
+
+        if exclude_content_id:
+            query = query.filter(Content.content_id != exclude_content_id)
+        query = query.filter(Content.workspace_id == workspace.workspace_id)
+
+        nb_content_with_the_label = query.filter(Content.label == label).count()
+        if nb_content_with_the_label == 0:
+            return True
+        elif nb_content_with_the_label == 1:
+            return False
+        else:
+            critical_error_text = 'Something is wrong in the database ! '\
+                                  'Content label should be unique ' \
+                                  'in a same folder in database' \
+                                  'but you have {nb} content with ' \
+                                  'label {label} in workspace {workspace_id}'
+
+            critical_error_text = critical_error_text.format(
+                nb=nb_content_with_the_label,
+                label=label,
+                workspace_id=workspace.workspace_id,
+            )
+            if parent:
+                critical_error_text = '{text} and parent as content {parent_id}'.format(  # nopep8
+                    text=critical_error_text,
+                    parent_id=parent.parent_id
+                )
+            logger.critical(self, critical_error_text)
+            return False
+
+    def _is_content_label_free_or_raise(
+        self,
+        label: str,
+        workspace: Workspace,
+        parent: Content = None,
+        exclude_content_id: int = None,
+    ) -> None:
+        """
+        Same as _is_content_label_free but raise exception instead of
+        returning boolean if content label is already used
+        """
+        if not self._is_content_label_free(
+            label,
+            workspace,
+            parent,
+            exclude_content_id
+        ):
+            text = 'A Content already exist with the same label {label} ' \
+                   ' in workspace {workspace_id}'.format(
+                      label=label,
+                      workspace_id=workspace.workspace_id,
+                   )
+            if parent:
+                text = '{text} and parent as content {parent_id}'.format(
+                    text=text,
+                    parent_id=parent.parent_id
+                )
+            raise ContentLabelAlreadyUsedHere(text)
+
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
         assert content_type_slug != CONTENT_TYPES.Any_SLUG
@@ -449,9 +535,16 @@ class ContentApi(object):
                         content_id=workspace.workspace_id,
                     )
                 )
+        if filename:
+            label = os.path.splitext(filename)[0]
+        if label:
+            self._is_content_label_free_or_raise(
+                label,
+                workspace,
+                parent,
+            )
 
         content = Content()
-
         if filename:
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
@@ -596,6 +689,7 @@ class ContentApi(object):
         depot_file_path = depot_stored_file._file_path  # type: str
         return depot_file_path
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent(
             self,
             content_label: str,
@@ -615,6 +709,8 @@ class ContentApi(object):
 
         file_name, file_extension = os.path.splitext(content_label)
 
+        # TODO - G.M - 2018-09-04 - If this method is needed, it should be
+        # rewritten in order to avoid content_type hardcoded code there
         return query.filter(
             or_(
                 and_(
@@ -637,6 +733,7 @@ class ContentApi(object):
             )
         ).one()
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent_labels(
             self,
             content_label: str,
@@ -734,6 +831,7 @@ class ContentApi(object):
 
         return folder
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def filter_query_for_content_label_as_path(
             self,
             query: Query,
@@ -762,6 +860,8 @@ class ContentApi(object):
             file_extension_filter = func.lower(Content.file_extension) == \
                                     func.lower(file_extension)
 
+        # TODO - G.M - 2018-09-04 - If this method is needed, it should be
+        # rewritten in order to avoid content_type hardcoded code there
         return query.filter(or_(
             and_(
                 Content.type == CONTENT_TYPES.File.slug,
@@ -1208,6 +1308,12 @@ class ContentApi(object):
             if new_parent:
                 item.workspace = new_parent.workspace
 
+        self._is_content_label_free_or_raise(
+            item.label,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
         item.revision_type = ActionDescription.MOVE
 
     def copy(
@@ -1238,6 +1344,7 @@ class ContentApi(object):
             parent = item.parent
         label = new_label or item.label
 
+        self._is_content_label_free_or_raise(label, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1277,12 +1384,20 @@ class ContentApi(object):
         return
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
-        if item.label==new_label and item.description==new_content:
+        if item.label == new_label and item.description == new_content:
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
             # Internatization disabled in libcontent for now.
             raise SameValueError('The content did not changed')
         if not new_label:
             raise EmptyLabelNotAllowed()
+
+        self._is_content_label_free_or_raise(
+            new_label,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
+
         item.owner = self._user
         item.label = new_label
         item.description = new_content if new_content else item.description # TODO: convert urls into links

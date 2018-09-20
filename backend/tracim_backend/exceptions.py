@@ -209,6 +209,14 @@ class UserCreationFailed(TracimException):
     pass
 
 
+class InconsistentDatabase(TracimException):
+    pass
+
+
+class ContentLabelAlreadyUsedHere(TracimException):
+    pass
+
+
 class ParentNotFound(NotFound):
     pass
 
