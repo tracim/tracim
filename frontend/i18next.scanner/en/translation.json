@@ -126,10 +126,11 @@
   "Member added": "Member added",
   "Member removed": "Member removed",
   "Error while removing the member": "Error while removing the member",
-  "Manager": "Manager",
   "All Contents": "All Contents",
   "Open": "Open",
   "Validated": "Validated",
   "Cancelled": "Cancelled",
-  "Deprecated": "Deprecated"
+  "Deprecated": "Deprecated",
+  "Trusted user": "Trusted user",
+  "You are not a member of any workspace yet": "You are not a member of any workspace yet"
 }

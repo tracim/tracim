@@ -12,7 +12,7 @@ export class PreviewComponent extends React.Component {
     super(props)
     this.state = {
       displayFormNewDescription: false,
-      newDescription: '',
+      newDescription: props.description,
       displayLightbox: false
     }
   }

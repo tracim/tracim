@@ -12,7 +12,8 @@ import {
   Delimiter,
   PageWrapper,
   PageTitle,
-  PageContent
+  PageContent,
+  generateAvatarFromPublicName
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage
@@ -72,7 +73,14 @@ class Account extends React.Component {
     const fetchGetUser = await props.dispatch(getUser(state.idUserToEdit))
 
     switch (fetchGetUser.status) {
-      case 200: this.setState({userToEdit: fetchGetUser.json}); break
+      case 200:
+        this.setState({
+          userToEdit: {
+            ...fetchGetUser.json,
+            avatar_url: fetchGetUser.json.avatar_url ? fetchGetUser.json.avatar_url : generateAvatarFromPublicName(fetchGetUser.json.public_name)
+          }
+        })
+        break
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
   }

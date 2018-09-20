@@ -58,6 +58,10 @@ class PopupCreateHtmlDocument extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
       case 'allApp_changeLang':

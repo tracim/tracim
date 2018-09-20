@@ -40,6 +40,13 @@ export class Password extends React.Component {
     props.onClickSubmit(state.oldPassword, state.newPassword, state.newPassword2)
   }
 
+  isSubmitDisabled = () => {
+    const { props, state } = this
+    return props.displayAdminInfo
+      ? state.newPassword === '' || state.newPassword2 === ''
+      : state.oldPassword === '' || state.newPassword === '' || state.newPassword2 === ''
+  }
+
   render () {
     const { props, state } = this
 
@@ -104,7 +111,7 @@ export class Password extends React.Component {
             type='button'
             className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickSubmit}
-            disabled={state.oldPassword === '' || state.newPassword === '' || state.newPassword2 === ''}
+            disabled={this.isSubmitDisabled()}
           >
             {props.t('Send')}
           </button>

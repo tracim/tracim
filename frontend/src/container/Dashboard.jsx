@@ -91,6 +91,10 @@ class Dashboard extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   loadWorkspaceDetail = async () => {
     const { props, state } = this
 

@@ -1,5 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import Radium from 'radium'
+import color from 'color'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -120,14 +122,15 @@ class AdminWorkspaceUser extends React.Component {
         }))
         break
 
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading workspaces list'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default:
+        GLOBAL_dispatchEvent({
+          type: 'addFlashMsg',
+          data: {
+            msg: props.t('Error while loading workspaces list'),
+            type: 'warning',
+            delay: undefined
+          }
+        })
     }
   }
 
@@ -334,6 +337,11 @@ class AdminWorkspaceUser extends React.Component {
                   type='button'
                   className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
                   onClick={this.handleDeleteWorkspace}
+                  style={{
+                    ':hover': {
+                      backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hexString()
+                    }
+                  }}
                 >
                   {props.t('Delete')}
                 </button>
@@ -346,4 +354,4 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(AdminWorkspaceUser)
+export default translate()(Radium(AdminWorkspaceUser))

@@ -126,10 +126,11 @@
   "Member added": "Membre ajouté",
   "Member removed": "Membre supprimé",
   "Error while removing the member": "Erreur lors de la suppresion du membre",
-  "Manager": "Manageur",
   "All Contents": "Tous les contenus",
   "Open": "Ouvert",
   "Validated": "Validé",
   "Cancelled": "Annulé",
-  "Deprecated": "Obsolète"
+  "Deprecated": "Obsolète",
+  "Trusted user": "Utilisateur de confiance",
+  "You are not a member of any workspace yet": "Vous n'êtes actuellement membre d'aucun espace de travail"
 }

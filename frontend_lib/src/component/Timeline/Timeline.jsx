@@ -33,6 +33,10 @@ class Timeline extends React.Component {
     this.props.shouldScrollToBottom && this.scrollToBottom()
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})
 
   render () {

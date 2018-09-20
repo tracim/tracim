@@ -68,12 +68,28 @@ class PopupCreateFile extends React.Component {
     reader.readAsDataURL(fileToSave)
   }
 
-  handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
-    data: {
-      name: this.state.appName
+  handleClose = () => {
+    const { state, props } = this
+
+    if (state.progressUpload.display) {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('Please wait until the upload ends'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
     }
-  })
+
+    GLOBAL_dispatchEvent({
+      type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
+      data: {
+        name: state.appName
+      }
+    })
+  }
 
   handleValidate = async () => {
     const { state } = this

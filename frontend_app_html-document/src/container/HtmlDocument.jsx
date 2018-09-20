@@ -281,7 +281,7 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW})); break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -298,7 +298,7 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW})); break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -408,7 +408,7 @@ class HtmlDocument extends React.Component {
                 <NewVersionBtn
                   customColor={config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={mode !== MODE.VIEW}
+                  disabled={mode !== MODE.VIEW || content.is_archived || content.is_deleted}
                 />
               }
 
@@ -430,7 +430,7 @@ class HtmlDocument extends React.Component {
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={mode === MODE.REVISION}
+                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
 
@@ -439,7 +439,7 @@ class HtmlDocument extends React.Component {
                   customColor={config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={mode === MODE.REVISION}
+                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
             </div>
@@ -473,7 +473,7 @@ class HtmlDocument extends React.Component {
             loggedUser={loggedUser}
             timelineData={timeline}
             newComment={newComment}
-            disableComment={mode === MODE.REVISION}
+            disableComment={mode === MODE.REVISION || content.is_archived || content.is_deleted}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

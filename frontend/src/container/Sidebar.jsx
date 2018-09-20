@@ -43,6 +43,10 @@ class Sidebar extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   shouldDisplaySidebar = () => {
     const pageWithoutSidebar = [PAGE.LOGIN]
     return !pageWithoutSidebar.includes(this.props.location.pathname)

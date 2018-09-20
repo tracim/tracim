@@ -28,7 +28,7 @@ class PopinFixedHeader extends React.Component {
   }
 
   render () {
-    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn, t } = this.props
+    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
     const { state } = this
 
     return (
@@ -45,12 +45,13 @@ class PopinFixedHeader extends React.Component {
         </div>
 
         {idRoleUserWorkspace >= 2 &&
-          <div
+          <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
+            disabled={disableChangeTitle}
           >
             {state.editTitle ? <i className='fa fa-check' title={t('validate the title')} /> : <i className='fa fa-pencil' title={t('edit title')} />}
-          </div>
+          </button>
         }
 
         <div
@@ -73,7 +74,8 @@ PopinFixedHeader.propTypes = {
   customColor: PropTypes.string,
   title: PropTypes.string,
   idRoleUserWorkspace: PropTypes.number,
-  onValidateChangeTitle: PropTypes.func
+  onValidateChangeTitle: PropTypes.func,
+  disableChangeTitle: PropTypes.bool
 }
 
 PopinFixedHeader.defaultProps = {
@@ -81,5 +83,6 @@ PopinFixedHeader.defaultProps = {
   customColor: '',
   title: '',
   idRoleUserWorkspace: 1,
-  onChangeTitle: () => {}
+  onChangeTitle: () => {},
+  disableChangeTitle: false
 }

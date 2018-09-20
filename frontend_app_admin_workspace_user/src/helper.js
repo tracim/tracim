@@ -67,10 +67,10 @@ export const debug = {
       },
       MANAGER: {
         id: 2,
-        slug: 'managers',
+        slug: 'trusted-users',
         faIcon: 'graduation-cap',
         hexcolor: '#f2af2d',
-        label: i18n.t('Manager')
+        label: i18n.t('Trusted user')
       },
       USER: {
         id: 4,

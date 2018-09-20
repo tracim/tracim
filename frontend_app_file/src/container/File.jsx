@@ -201,6 +201,13 @@ class File extends React.Component {
   }
 
   handleClickBtnCloseApp = () => {
+    const { state, props } = this
+
+    if (state.progressUpload.display) {
+      this.sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
+      return
+    }
+
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
   }

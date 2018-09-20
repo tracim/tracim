@@ -25,5 +25,6 @@
   "On this page you can manage the users of your Tracim instance.": "Sur cette page, vous pouvez administrer les utilisateurs de votre instance de Tracim",
   "User": "Utilisateur",
   "Choose the profile": "Choisir un profil",
-  "Type the email": "Entrer l'email"
+  "Type the email": "Entrer l'email",
+  "There is no workspace yet": "Il n'y a pas encore d'espace de travail"
 }
