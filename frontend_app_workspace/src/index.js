@@ -6,7 +6,7 @@ import PopupCreateWorkspace from './container/PopupCreateWorkspace.jsx'
 require('./css/index.styl')
 
 const appInterface = {
-  name: 'html-document',
+  name: 'workspace',
   isRendered: false,
   renderAppFeature: data => {
     return ReactDOM.render(

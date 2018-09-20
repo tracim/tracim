@@ -31,7 +31,7 @@ const AdminWorkspace = props =>
               <th scope='col'>{props.t('Description')}</th>
               <th scope='col'>{props.t('Member count')}</th>
               {/* <th scope='col'>Calendar</th> */}
-              <th scope='col'>{props.t('Delete workspace')}</th>
+              <th scope='col'>{props.t('Delete')}</th>
             </tr>
           </thead>
 

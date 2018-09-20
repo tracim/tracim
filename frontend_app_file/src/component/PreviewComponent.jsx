@@ -36,7 +36,6 @@ export class PreviewComponent extends React.Component {
     return (
       <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
         <div className='previewcomponent__dloption'>
-
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadPdfPageUrl}
@@ -48,6 +47,7 @@ export class PreviewComponent extends React.Component {
           >
             <i className='fa fa-file-o' />
           </a>
+
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadPdfFullUrl}

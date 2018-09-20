@@ -138,7 +138,7 @@ class WorkspaceContent extends React.Component {
 
   handleClickEditContentItem = (e, content) => {
     e.stopPropagation()
-    console.log('%c<WorkspaceContent> edit nyi', 'color: #c17838', content)
+    this.handleClickContentItem(content)
   }
 
   handleClickMoveContentItem = (e, content) => {

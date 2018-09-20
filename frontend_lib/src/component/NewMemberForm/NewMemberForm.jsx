@@ -26,24 +26,35 @@ export const NewMemberForm = props =>
           autoComplete='off'
         />
 
-        {props.searchedKnownMemberList.length > 0 &&
-          <div className='autocomplete primaryColorBorder'>
-            {props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
-              <div
-                className='autocomplete__item primaryColorBgHover'
-                onClick={() => props.onClickKnownMember(u)}
-                key={u.user_id}
-              >
-                <div className='autocomplete__item__avatar'>
-                  <img src={u.avatar_url ? u.avatar_url : generateAvatarFromPublicName(u.public_name)} />
-                </div>
+        {props.searchedKnownMemberList.length > 0
+          ? (
+            <div className='autocomplete primaryColorBorder'>
+              {props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
+                <div
+                  className='autocomplete__item primaryColorBgHover'
+                  onClick={() => props.onClickKnownMember(u)}
+                  key={u.user_id}
+                >
+                  <div className='autocomplete__item__avatar'>
+                    <img src={u.avatar_url ? u.avatar_url : generateAvatarFromPublicName(u.public_name)} />
+                  </div>
 
+                  <div className='autocomplete__item__name'>
+                    {u.public_name}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+          : props.autoCompleteActive && props.searchedKnownMemberList.length === 0 && props.nameOrEmail.length >= 2 && (
+            <div className='autocomplete primaryColorBorder'>
+              <div className='autocomplete__item'>
                 <div className='autocomplete__item__name'>
-                  {u.public_name}
+                  {props.t('No result')}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )
         }
       </div>
 

@@ -11,7 +11,6 @@
   "Workspace": "Workspace",
   "Description": "Description",
   "Member count": "Member count",
-  "Delete workspace": "Delete workspace",
   "Error while loading workspaces list": "Error while loading workspaces list",
   "Error while loading users list": "Error while loading users list",
   "Error while deleting workspace": "Error while deleting workspace",

@@ -1,10 +1,12 @@
 import {
   SET,
   APPEND,
+  REMOVE,
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_RECENT_ACTIVITY_LIST
+  WORKSPACE_RECENT_ACTIVITY_LIST,
+  WORKSPACE_MEMBER
 } from '../action-creator.sync.js'
 import { handleRouteFromApi } from '../helper.js'
 import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
@@ -96,6 +98,12 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         contentReadStatusList: action.workspaceReadStatusList
           .filter(content => content.read_by_user)
           .map(content => content.content_id)
+      }
+
+    case `${REMOVE}/${WORKSPACE_MEMBER}`:
+      return {
+        ...state,
+        memberList: state.memberList.filter(m => m.id !== action.idMember)
       }
 
     default:

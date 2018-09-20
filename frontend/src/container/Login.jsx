@@ -143,6 +143,7 @@ class Login extends React.Component {
                         value={this.state.inputLogin.value}
                         onChange={this.handleChangeLogin}
                         onKeyPress={this.handleInputKeyPress}
+                        maxLength={512}
                       />
 
                       <InputGroupText
@@ -156,6 +157,7 @@ class Login extends React.Component {
                         value={this.state.inputPassword.value}
                         onChange={this.handleChangePassword}
                         onKeyPress={this.handleInputKeyPress}
+                        maxLength={512}
                       />
 
                       <div className='row mt-4 mb-4'>

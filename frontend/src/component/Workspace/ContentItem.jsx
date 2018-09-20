@@ -1,4 +1,5 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
@@ -38,7 +39,7 @@ const ContentItem = props => {
         style={{color: status.hexcolor}}
       >
         <div className='content__status__text d-none d-sm-block'>
-          {status.label}
+          {props.t(status.label)}
         </div>
         <div className='content__status__icon'>
           <i className={`fa fa-fw fa-${status.faIcon}`} />
@@ -48,7 +49,7 @@ const ContentItem = props => {
   )
 }
 
-export default ContentItem
+export default translate()(ContentItem)
 
 ContentItem.propTypes = {
   type: PropTypes.string.isRequired,

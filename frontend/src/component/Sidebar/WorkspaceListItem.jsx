@@ -47,7 +47,7 @@ const WorkspaceListItem = props => {
                   <div className='sidebar__content__navigation__workspace__item__submenu__dropdown__showdropdown'>
                     <div className='dropdown__title' id='navbarDropdown'>
                       <div className='dropdown__title__text'>
-                        {aa.label/* [props.lang.id] */}
+                        {props.t(aa.label)}
                       </div>
                     </div>
                   </div>

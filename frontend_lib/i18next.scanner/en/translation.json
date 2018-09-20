@@ -3,10 +3,6 @@
   "This content is archived.": "This content is archived.",
   "Restore": "Restore",
   "This content is deleted.": "This content is deleted.",
-  "{{nb}} days ago": "{{nb}} days ago",
-  "{{nb}} hours ago": "{{nb}} hours ago",
-  "{{nb}} minutes ago": "{{nb}} minutes ago",
-  "{{nb}} seconds ago": "{{nb}} seconds ago",
   "Simple text": "Simple text",
   "Rich text": "Rich text",
   "Send": "Send",
@@ -21,5 +17,7 @@
   "Choose the role of the member": "Choose the role of the member",
   "Validate": "Validate",
   "active": "active",
-  "inactive": "inactive"
+  "inactive": "inactive",
+  "No result": "No result",
+  "Status": "Status"
 }

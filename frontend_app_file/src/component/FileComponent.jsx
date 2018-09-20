@@ -1,6 +1,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
+import Radium from 'radium'
+import color from 'color'
 import PreviewComponent from './PreviewComponent.jsx'
 import { MODE } from '../helper.js'
 import FileDropzone from './FileDropzone.jsx'
@@ -76,7 +78,8 @@ export const FileComponent = props =>
         <div className='file__contentpage__dropzone__btn'>
           <button
             type='button'
-            className='file__contentpage__dropzone__btn__cancel btn'
+            className='file__contentpage__dropzone__btn__cancel btn outlineTextBtn'
+            style={{borderColor: props.customColor}}
             onClick={props.onClickDropzoneCancel}
           >
             {props.t('Cancel')}
@@ -84,7 +87,13 @@ export const FileComponent = props =>
 
           <button
             type='button'
-            className='file__contentpage__dropzone__btn__validate btn'
+            className='file__contentpage__dropzone__btn__validate btn highlightBtn'
+            style={{
+              backgroundColor: props.customColor,
+              ':hover': {
+                backgroundColor: color(props.customColor).darken(0.15).hexString()
+              }
+            }}
             onClick={props.onClickDropzoneValidate}
             disabled={props.newFile === ''}
           >
@@ -95,4 +104,4 @@ export const FileComponent = props =>
     }
   </div>
 
-export default translate()(FileComponent)
+export default translate()(Radium(FileComponent))

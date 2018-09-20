@@ -13,11 +13,17 @@ label()
   font-weight 500
   font-size 18px
 
-.workspaceadvanced
+.workspace_advanced
   width 1000px
   height 100%
-  padding 10px
   overflow-y auto
+  &-content
+    width 1000px
+    padding 10px 10px 0 10px
+  &__contentpage__content
+    // Côme - 2018/09/19 - the rule bellow get override by other apps including frontend_lib, so !important
+    height calc(100% - 134px) !important
+    overflow-y auto
   &__description
     backgroundrules()
     &__title

@@ -59,6 +59,7 @@ export class Password extends React.Component {
                 type='password'
                 placeholder={props.t('Old password')}
                 onChange={this.handleChangeOldPassword}
+                maxLength={512}
               />
             </div>
           )}
@@ -69,6 +70,7 @@ export class Password extends React.Component {
               type='password'
               placeholder={props.t('New password')}
               onChange={this.handleChangeNewPassword}
+              maxLength={512}
             />
           </div>
 
@@ -78,6 +80,7 @@ export class Password extends React.Component {
               type='password'
               placeholder={props.t('Repeat new password')}
               onChange={this.handleChangeNewPassword2}
+              maxLength={512}
             />
 
             {props.displayAdminInfo && (
