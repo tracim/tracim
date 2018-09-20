@@ -589,9 +589,9 @@ class UserController(Controller):
         configurator.add_view(self.set_workspace_as_read, route_name='read_workspace')  # nopep8
 
         # enable workspace notification
-        configurator.add_route('enable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/notify', request_method='PUT')  # nopep8
+        configurator.add_route('enable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/notifications/activate', request_method='PUT')  # nopep8
         configurator.add_view(self.enable_workspace_notification, route_name='enable_workspace_notification')  # nopep8
 
         # enable workspace notification
-        configurator.add_route('disable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/unnotify', request_method='PUT')  # nopep8
+        configurator.add_route('disable_workspace_notification', '/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate', request_method='PUT')  # nopep8
         configurator.add_view(self.disable_workspace_notification, route_name='disable_workspace_notification')  # nopep8
