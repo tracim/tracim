@@ -659,7 +659,7 @@ class CFG(object):
         markdownpluspage = Application(
             label='Markdown Plus Documents',
             # TODO - G.M - 24-05-2018 - Check label
-            slug='content/markdownpluspage',
+            slug='contents/markdownpluspage',
             fa_icon='file-code-o',
             is_active=False,
             config={},
