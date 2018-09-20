@@ -191,7 +191,7 @@ class TestCommands(CommandFunctionalTest):
         assert new_user.email == 'admin@admin.admin'
         assert new_user.validate_password('new_password')
         assert not new_user.validate_password('admin@admin.admin')
-        assert new_user.profile.name == 'managers'
+        assert new_user.profile.name == 'trusted-users'
 
     def test__init__db__ok_db_already_exist(self):
         """

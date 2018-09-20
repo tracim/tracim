@@ -103,7 +103,7 @@ class UserSchema(UserDigestSchema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
     )
     lang = marshmallow.fields.String(
         description="User langage in iso639 format",
@@ -178,7 +178,7 @@ class UserProfileSchema(marshmallow.Schema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
     )
     @post_load
     def create_user_profile(self, data):
@@ -197,7 +197,7 @@ class UserCreationSchema(marshmallow.Schema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
         required=False,
         default=Group.TIM_USER_GROUPNAME
     )

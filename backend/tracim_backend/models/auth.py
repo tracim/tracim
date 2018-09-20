@@ -67,7 +67,7 @@ class Group(DeclarativeBase):
 
     TIM_NOBODY_GROUPNAME = 'nobody'
     TIM_USER_GROUPNAME = 'users'
-    TIM_MANAGER_GROUPNAME = 'managers'
+    TIM_MANAGER_GROUPNAME = 'trusted-users'
     TIM_ADMIN_GROUPNAME = 'administrators'
 
     __tablename__ = 'groups'
