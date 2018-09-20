@@ -415,7 +415,7 @@ class ContentApi(object):
     # 
     #     return result
 
-    def _is_content_label_is_free(
+    def _is_content_label_free(
             self,
             label: str,
             workspace: Workspace,
@@ -471,7 +471,7 @@ class ContentApi(object):
             logger.critical(self, critical_error_text)
             return False
 
-    def _verify_content_label_is_free(
+    def _is_content_label_free_or_raise(
         self,
         label: str,
         workspace: Workspace,
@@ -479,10 +479,10 @@ class ContentApi(object):
         exclude_content_id: int = None,
     ) -> None:
         """
-        Same as _is_content_label_is_free but raise exception instead of
+        Same as _is_content_label_free but raise exception instead of
         returning boolean if content label is already used
         """
-        if not self._is_content_label_is_free(
+        if not self._is_content_label_free(
             label,
             workspace,
             parent,
@@ -535,7 +535,7 @@ class ContentApi(object):
         if filename:
             label = os.path.splitext(filename)[0]
         if label:
-            self._verify_content_label_is_free(
+            self._is_content_label_free_or_raise(
                 label,
                 workspace,
                 parent,
@@ -1290,7 +1290,7 @@ class ContentApi(object):
             if new_parent:
                 item.workspace = new_parent.workspace
 
-        self._verify_content_label_is_free(
+        self._is_content_label_free_or_raise(
             item.label,
             item.workspace,
             item.parent,
@@ -1326,7 +1326,7 @@ class ContentApi(object):
             parent = item.parent
         label = new_label or item.label
 
-        self._verify_content_label_is_free(label, workspace, parent)
+        self._is_content_label_free_or_raise(label, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1373,7 +1373,7 @@ class ContentApi(object):
         if not new_label:
             raise EmptyLabelNotAllowed()
 
-        self._verify_content_label_is_free(
+        self._is_content_label_free_or_raise(
             new_label,
             item.workspace,
             item.parent,

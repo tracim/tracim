@@ -346,7 +346,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) == True  # nopep8
         content = Content()
         content.label = 'test'
         content.owner = user
@@ -356,7 +356,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_content_label_is_free('test', workspace, parent=None) is False  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) is False  # nopep8
         content = Content()
         content.label = 'test'
         content.owner = user
@@ -366,7 +366,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_content_label_is_free('test', workspace, parent=None) is False  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) is False  # nopep8
 
     def test_unit__is_content_label_is_free__ok__different_workspace(self):
         uapi = UserApi(
@@ -400,7 +400,7 @@ class TestContentApi(DefaultTest):
             session=self.session,
             config=self.app_config,
         )
-        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) == True  # nopep8
         content = Content()
         content.label = 'test'
         content.owner = user
@@ -410,7 +410,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) == True  # nopep8
 
     def test_unit__is_content_label_is_free__ok__different_parent(self):
         uapi = UserApi(
@@ -460,7 +460,7 @@ class TestContentApi(DefaultTest):
         folder2.type = CONTENT_TYPES.Folder.slug
         folder2.revision_type = ActionDescription.CREATION
         self.session.add(folder)
-        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) == True  # nopep8
         content = Content()
         content.label = 'test'
         content.owner = user
@@ -470,7 +470,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) == True  # nopep8
         content = Content()
         content.label = 'test'
         content.owner = user
@@ -480,7 +480,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_content_label_is_free('test', workspace, parent=None) == True  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) == True  # nopep8
         content = Content()
         content.label = 'test'
         content.owner = user
@@ -490,7 +490,7 @@ class TestContentApi(DefaultTest):
         content.revision_type = ActionDescription.CREATION
         self.session.add(content)
         api.save(content, ActionDescription.CREATION, do_notify=False)
-        assert api._is_content_label_is_free('test', workspace, parent=None) == False  # nopep8
+        assert api._is_content_label_free('test', workspace, parent=None) == False  # nopep8
 
     def test_unit__set_allowed_content__ok__private_method(self):
         uapi = UserApi(
