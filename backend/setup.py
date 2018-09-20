@@ -36,6 +36,7 @@ requires = [
     'babel',
     'python-slugify',
     'preview-generator',
+    'colour',
     # mail-notifier
     'mako',
     'lxml',
