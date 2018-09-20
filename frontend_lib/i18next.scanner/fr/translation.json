@@ -19,5 +19,15 @@
   "active": "activé",
   "inactive": "désactivé",
   "No result": "Aucun résultat",
-  "Status": "Statut "
+  "Status": "Statut ",
+  "Archived": "Archivage",
+  "Comment": "Commentaire",
+  "Created": "Création",
+  "Deleted": "Suppretion",
+  "Edited": "Modification",
+  "Status updated": "Changement de status",
+  "Unarchived": "Désarchivage",
+  "Restored": "Restauration",
+  "Moved": "Déplacement",
+  "Copied": "Copie"
 }

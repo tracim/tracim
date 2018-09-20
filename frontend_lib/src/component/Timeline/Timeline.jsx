@@ -114,6 +114,7 @@ class Timeline extends React.Component {
                   return <Revision
                     customClass={props.customClass}
                     customColor={props.customColor}
+                    revisionType={content.revision_type}
                     createdAt={content.created}
                     number={content.number}
                     key={`revision_${content.revision_id}`}

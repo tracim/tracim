@@ -1,3 +1,4 @@
+import i18n from './i18n.js'
 import color from 'color'
 import { distanceInWords } from 'date-fns'
 var dateFnsLocale = {
@@ -70,3 +71,49 @@ export const libGenerateAvatarFromPublicName = publicName => {
 export const libDisplayDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
 
 export const libConvertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
+
+export const libRevisionTypeList = [{
+  id: 'archiving',
+  faIcon: 'archive',
+  label: i18n.t('Archived')
+}, {
+  id: 'content-comment',
+  faIcon: 'comment-o',
+  label: i18n.t('Comment')
+}, {
+  id: 'creation',
+  faIcon: 'magic',
+  label: i18n.t('Created')
+}, {
+  id: 'deletion',
+  faIcon: 'trash',
+  label: i18n.t('Deleted')
+}, {
+  id: 'edition',
+  faIcon: 'edit',
+  label: i18n.t('Edited')
+}, {
+  id: 'revision',
+  faIcon: 'history',
+  label: i18n.t('Edited')
+}, {
+  id: 'status-update',
+  faIcon: 'random',
+  label: i18n.t('Status updated')
+}, {
+  id: 'unarchiving',
+  faIcon: 'file-archive-o',
+  label: i18n.t('Unarchived')
+}, {
+  id: 'undeletion',
+  faIcon: 'trash-o',
+  label: i18n.t('Restored')
+}, {
+  id: 'move',
+  faIcon: 'arrows',
+  label: i18n.t('Moved')
+}, {
+  id: 'copy',
+  faIcon: 'files-o',
+  label: i18n.t('Copied')
+}]

@@ -22,13 +22,13 @@ export class Password extends React.Component {
   handleClickSubmit = () => {
     const { props, state } = this
 
-    if (state.newPassword.length <= 6) {
+    if (state.newPassword.length < 6) {
       props.dispatch(newFlashMessage(props.t('New password is too short (minimum 6 characters)'), 'warning'))
       return
     }
 
-    if (state.newPassword.length > 50) {
-      props.dispatch(newFlashMessage(props.t('New password is too long (maximum 50 characters)'), 'warning'))
+    if (state.newPassword.length > 512) {
+      props.dispatch(newFlashMessage(props.t('New password is too long (maximum 512 characters)'), 'warning'))
       return
     }
 
