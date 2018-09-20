@@ -187,6 +187,7 @@ export class PreviewComponent extends React.Component {
                       backgroundColor: props.color
                     }
                   }}
+                  disabled={props.disableChangeDescription}
                 >
                   {props.t('Change description')}
                 </button>

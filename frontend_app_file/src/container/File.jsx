@@ -450,6 +450,7 @@ class File extends React.Component {
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          disableChangeTitle={state.content.is_archived || state.content.is_deleted}
         />
 
         <PopinFixedOption
@@ -463,7 +464,7 @@ class File extends React.Component {
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== MODE.VIEW}
+                  disabled={state.mode !== MODE.VIEW || state.content.is_archived || state.content.is_deleted}
                 />
               }
 
@@ -485,7 +486,7 @@ class File extends React.Component {
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
 
@@ -494,7 +495,7 @@ class File extends React.Component {
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
             </div>
@@ -549,7 +550,7 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={state.timeline}
             newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION}
+            disableComment={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

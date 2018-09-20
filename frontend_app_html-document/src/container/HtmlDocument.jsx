@@ -395,6 +395,7 @@ class HtmlDocument extends React.Component {
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          disableChangeTitle={content.is_archived || content.is_deleted}
         />
 
         <PopinFixedOption

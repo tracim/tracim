@@ -52,6 +52,7 @@ export const FileComponent = props =>
         displayProperty={props.displayProperty}
         onClickProperty={props.onClickProperty}
         description={props.description}
+        disableChangeDescription={props.isArchived || props.isDeleted}
         onClickPreviousPage={props.onClickPreviousPage}
         onClickNextPage={props.onClickNextPage}
         onClickValidateNewDescription={props.onClickValidateNewDescription}
