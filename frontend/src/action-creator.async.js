@@ -281,7 +281,7 @@ export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
 
 export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/${doNotify ? 'notify' : 'unnotify'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
     param: {
       credentials: 'include',
       headers: {
