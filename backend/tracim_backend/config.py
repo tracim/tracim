@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
+from collections import OrderedDict
 from urllib.parse import urlparse
 
 import os
 
 import typing
+
 from paste.deploy.converters import asbool
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.extensions import app_list
@@ -586,120 +588,117 @@ class CFG(object):
         )
 
     def _set_default_app(self, enabled_app_list: typing.List[str]):
+
+        # init applications
+        html_documents = Application(
+            label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
+            slug='contents/html-document',
+            fa_icon='file-text-o',
+            is_active=True,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
+            app_config=self
+        )
+        html_documents.add_content_type(
+            slug='html-document',
+            label='Text Document',
+            creation_label='Write a document',
+            available_statuses=CONTENT_STATUS.get_all(),
+            slug_alias=['page']
+        )
+
+        _file = Application(
+            label='Files',
+            slug='contents/file',
+            fa_icon='paperclip',
+            is_active=True,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=file',
+            app_config=self,
+        )
+        _file.add_content_type(
+            slug='file',
+            label='File',
+            creation_label='Upload a file',
+            available_statuses=CONTENT_STATUS.get_all(),
+        )
+
+        thread = Application(
+            label='Threads',
+            slug='contents/thread',
+            fa_icon='comments-o',
+            is_active=True,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=thread',
+            app_config=self
+        )
+        thread.add_content_type(
+            slug='thread',
+            label='Thread',
+            creation_label='Discuss about a topic',
+            available_statuses=CONTENT_STATUS.get_all(),
+        )
+
+        folder = Application(
+            label='Folder',
+            slug='contents/folder',
+            fa_icon='folder-open-o',
+            is_active=True,
+            config={},
+            main_route='',
+            app_config=self
+        )
+        folder.add_content_type(
+            slug='folder',
+            label='Folder',
+            creation_label='Create a folder',
+            available_statuses=CONTENT_STATUS.get_all(),
+            allow_sub_content=True,
+        )
+
+        markdownpluspage = Application(
+            label='Markdown Plus Documents',
+            # TODO - G.M - 24-05-2018 - Check label
+            slug='contents/markdownpluspage',
+            fa_icon='file-code-o',
+            is_active=False,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
+            # nopep8
+            app_config=self,
+        )
+        markdownpluspage.add_content_type(
+            slug='markdownpage',
+            label='Rich Markdown File',
+            creation_label='Create a Markdown document',
+            available_statuses=CONTENT_STATUS.get_all(),
+        )
+
+        calendar = Application(
+            label='Calendar',
+            slug='calendar',
+            fa_icon='calendar',
+            is_active=False,
+            config={},
+            main_route='/#/workspaces/{workspace_id}/calendar',
+            app_config=self
+        )
+
+        # process activated app list
+        available_apps = OrderedDict([
+            (html_documents.slug, html_documents),
+            (_file.slug, _file),
+            (thread.slug, thread),
+            (folder.slug, folder),
+            (markdownpluspage.slug, markdownpluspage),
+            (calendar.slug, calendar)
+        ])
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var
         app_list.clear()
-        # calendar
-        if 'calendar' in enabled_app_list:
-            calendar = Application(
-                label='Calendar',
-                slug='calendar',
-                fa_icon='calendar',
-                is_active=False,
-                config={},
-                main_route='/#/workspaces/{workspace_id}/calendar',
-                app_config=self
-            )
-            app_list.append(calendar)
-
-        # thread
-        if 'contents/thread' in enabled_app_list:
-            thread = Application(
-                label='Threads',
-                slug='contents/thread',
-                fa_icon='comments-o',
-                is_active=True,
-                config={},
-                main_route='/#/workspaces/{workspace_id}/contents?type=thread',
-                app_config=self
-            )
-            thread.add_content_type(
-                slug='thread',
-                label='Thread',
-                creation_label='Discuss about a topic',
-                available_statuses=CONTENT_STATUS.get_all(),
-            )
-            app_list.append(thread)
-
-        # folder
-        if 'contents/folder' in enabled_app_list :
-            folder = Application(
-                label='Folder',
-                slug='contents/folder',
-                fa_icon='folder-open-o',
-                is_active=True,
-                config={},
-                main_route='',
-                app_config=self
-            )
-            folder.add_content_type(
-                slug='folder',
-                label='Folder',
-                creation_label='Create a folder',
-                available_statuses=CONTENT_STATUS.get_all(),
-                allow_sub_content=True,
-            )
-            app_list.append(folder)
-
-        # file
-        if 'contents/file' in enabled_app_list:
-            _file = Application(
-                label='Files',
-                slug='contents/file',
-                fa_icon='paperclip',
-                is_active=True,
-                config={},
-                main_route='/#/workspaces/{workspace_id}/contents?type=file',
-                app_config=self,
-            )
-            _file.add_content_type(
-                slug='file',
-                label='File',
-                creation_label='Upload a file',
-                available_statuses=CONTENT_STATUS.get_all(),
-            )
-            app_list.append(_file)
-
-        # markdownpluspage
-        if 'contents/markdownpluspage' in enabled_app_list:
-            markdownpluspage = Application(
-                label='Markdown Plus Documents',
-                # TODO - G.M - 24-05-2018 - Check label
-                slug='content/markdownpluspage',
-                fa_icon='file-code-o',
-                is_active=False,
-                config={},
-                main_route='/#/workspaces/{workspace_id}/contents?type=markdownpluspage',
-                # nopep8
-                app_config=self,
-            )
-            markdownpluspage.add_content_type(
-                slug='markdownpage',
-                label='Rich Markdown File',
-                creation_label='Create a Markdown document',
-                available_statuses=CONTENT_STATUS.get_all(),
-            )
-            app_list.append(markdownpluspage)
-
-        if 'contents/html-document' in enabled_app_list:
-            html_documents = Application(
-                label='Text Documents',  # TODO - G.M - 24-05-2018 - Check label
-                slug='contents/html-document',
-                fa_icon='file-text-o',
-                is_active=True,
-                config={},
-                main_route='/#/workspaces/{workspace_id}/contents?type=html-document',
-                app_config=self
-            )
-            html_documents.add_content_type(
-                slug='html-document',
-                label='Text Document',
-                creation_label='Write a document',
-                available_statuses=CONTENT_STATUS.get_all(),
-                slug_alias=['page']
-            )
-            app_list.append(html_documents)
-
+        for app_slug in enabled_app_list:
+            if app_slug in available_apps.keys():
+                app_list.append(available_apps[app_slug])
         # TODO - G.M - 2018-08-08 - We need to update validators each time
         # app_list is updated.
         update_validators()
