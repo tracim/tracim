@@ -292,7 +292,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
     }
   }
@@ -302,7 +305,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
     }
   }
@@ -312,7 +318,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
@@ -322,7 +331,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
