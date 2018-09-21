@@ -42,7 +42,7 @@ class SessionController(Controller):
             config=app_config,
         )
         user = uapi.authenticate_user(login.email, login.password)
-        remember(request, user.email)
+        remember(request, user.user_id)
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SESSION_ENDPOINTS])

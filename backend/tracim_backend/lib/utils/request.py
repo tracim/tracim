@@ -326,7 +326,7 @@ class TracimRequest(Request):
             login = request.authenticated_userid
             if not login:
                 raise UserNotFoundInTracimRequest('You request a current user but the context not permit to found one')  # nopep8
-            user = uapi.get_one_by_email(login)
+            user = uapi.get_one(login)
             if not user.is_active:
                 raise UserNotActive('User {} is not active'.format(login))
         except (UserDoesNotExist, UserNotFoundInTracimRequest) as exc:
