@@ -107,7 +107,10 @@ class File extends React.Component {
 
     if (!prevState.content || !state.content) return
 
-    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+    if (prevState.content.content_id !== state.content.content_id) {
+      this.loadContent()
+      this.loadTimeline()
+    }
 
     if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
       tinymce.remove('#wysiwygNewVersion')

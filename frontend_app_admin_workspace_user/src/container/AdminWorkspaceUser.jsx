@@ -12,7 +12,7 @@ import { debug, ROLE } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
-  getWorkspaceDetail,
+  // getWorkspaceDetail,
   deleteWorkspace,
   getUserList,
   getUserDetail,

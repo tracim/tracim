@@ -72,48 +72,51 @@ export const libDisplayDate = (dateToDisplay, lang) => distanceInWords(new Date(
 
 export const libConvertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
-export const libRevisionTypeList = [{
-  id: 'archiving',
-  faIcon: 'archive',
-  label: i18n.t('Archived')
-}, {
-  id: 'content-comment',
-  faIcon: 'comment-o',
-  label: i18n.t('Comment')
-}, {
-  id: 'creation',
-  faIcon: 'magic',
-  label: i18n.t('Created')
-}, {
-  id: 'deletion',
-  faIcon: 'trash',
-  label: i18n.t('Deleted')
-}, {
-  id: 'edition',
-  faIcon: 'edit',
-  label: i18n.t('Edited')
-}, {
-  id: 'revision',
-  faIcon: 'history',
-  label: i18n.t('Edited')
-}, {
-  id: 'status-update',
-  faIcon: 'random',
-  label: i18n.t('Status updated')
-}, {
-  id: 'unarchiving',
-  faIcon: 'file-archive-o',
-  label: i18n.t('Unarchived')
-}, {
-  id: 'undeletion',
-  faIcon: 'trash-o',
-  label: i18n.t('Restored')
-}, {
-  id: 'move',
-  faIcon: 'arrows',
-  label: i18n.t('Moved')
-}, {
-  id: 'copy',
-  faIcon: 'files-o',
-  label: i18n.t('Copied')
-}]
+export const libRevisionTypeList = lang => {
+  i18n.changeLanguage(lang)
+  return [{
+    id: 'archiving',
+    faIcon: 'archive',
+    label: i18n.t('Item archived')
+  }, {
+    id: 'content-comment',
+    faIcon: 'comment-o',
+    label: i18n.t('Comment')
+  }, {
+    id: 'creation',
+    faIcon: 'magic',
+    label: i18n.t('Item created')
+  }, {
+    id: 'deletion',
+    faIcon: 'trash',
+    label: i18n.t('Item deleted')
+  }, {
+    id: 'edition',
+    faIcon: 'edit',
+    label: i18n.t('New revision')
+  }, {
+    id: 'revision',
+    faIcon: 'history',
+    label: i18n.t('New revision')
+  }, {
+    id: 'status-update',
+    faIcon: 'random',
+    label: i18n.t('New status')
+  }, {
+    id: 'unarchiving',
+    faIcon: 'file-archive-o',
+    label: i18n.t('Item unarchived')
+  }, {
+    id: 'undeletion',
+    faIcon: 'trash-o',
+    label: i18n.t('Item restored')
+  }, {
+    id: 'move',
+    faIcon: 'arrows',
+    label: i18n.t('Item moved')
+  }, {
+    id: 'copy',
+    faIcon: 'files-o',
+    label: i18n.t('Item copied')
+  }]
+}

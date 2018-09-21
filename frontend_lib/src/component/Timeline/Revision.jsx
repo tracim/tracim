@@ -24,7 +24,7 @@ const Revision = props => (
       </button>
 
       {(() => {
-        const revisionType = libRevisionTypeList.find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
+        const revisionType = libRevisionTypeList(props.lang).find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
         return (
           <div
             className={classnames(`${props.customClass}__messagelist__version__action__icon`, 'timeline__body__messagelist__version__action__icon')}
