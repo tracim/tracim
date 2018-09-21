@@ -96,10 +96,16 @@ class Account extends React.Component {
       switch (fetchPutUserName.status) {
         case 200:
           props.dispatch(updateUserName(newName))
-          if (newEmail === '') props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
+          if (newEmail === '') {
+            props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
+            return true
+          }
           // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
           break
-        default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning'))
+          if (newEmail === '') return false
+          break
       }
     }
 
@@ -110,8 +116,8 @@ class Account extends React.Component {
           props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
           if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
-          break
-        default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); break
+          return true
+        default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); return false
       }
     }
   }
