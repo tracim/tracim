@@ -1,6 +1,10 @@
 import i18n from './i18n.js'
 import color from 'color'
-import moment from 'moment'
+import { distanceInWords } from 'date-fns'
+var dateFnsLocale = {
+  fr: require('date-fns/locale/fr'),
+  en: require('date-fns/locale/en')
+}
 
 export const libHandleFetchResult = async fetchResult => {
   switch (fetchResult.status) {
@@ -64,21 +68,52 @@ export const libGenerateAvatarFromPublicName = publicName => {
   return canvas.toDataURL('image/png', '')
 }
 
-export const libDisplayDate = (dateToDisplay, lang) => {
-  i18n.changeLanguage(lang)
+export const libDisplayDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
 
-  const todayMoment = moment(new Date())
-  const dateToDisplayMoment = moment(new Date(dateToDisplay))
+export const libConvertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
-  const diffDay = todayMoment.diff(dateToDisplayMoment, 'days')
-  if (diffDay > 0) return i18n.t('{{nb}} days ago', {nb: diffDay})
-
-  const diffHour = todayMoment.diff(dateToDisplayMoment, 'hours')
-  if (diffHour > 0) return i18n.t('{{nb}} hours ago', {nb: diffHour})
-
-  const diffMinute = todayMoment.diff(dateToDisplayMoment, 'minutes')
-  if (diffMinute > 0) return i18n.t('{{nb}} minutes ago', {nb: diffMinute})
-
-  const diffSeconde = todayMoment.diff(dateToDisplayMoment, 'seconds')
-  return i18n.t('{{nb}} seconds ago', {nb: diffSeconde})
-}
+export const libRevisionTypeList = [{
+  id: 'archiving',
+  faIcon: 'archive',
+  label: i18n.t('Archived')
+}, {
+  id: 'content-comment',
+  faIcon: 'comment-o',
+  label: i18n.t('Comment')
+}, {
+  id: 'creation',
+  faIcon: 'magic',
+  label: i18n.t('Created')
+}, {
+  id: 'deletion',
+  faIcon: 'trash',
+  label: i18n.t('Deleted')
+}, {
+  id: 'edition',
+  faIcon: 'edit',
+  label: i18n.t('Edited')
+}, {
+  id: 'revision',
+  faIcon: 'history',
+  label: i18n.t('Edited')
+}, {
+  id: 'status-update',
+  faIcon: 'random',
+  label: i18n.t('Status updated')
+}, {
+  id: 'unarchiving',
+  faIcon: 'file-archive-o',
+  label: i18n.t('Unarchived')
+}, {
+  id: 'undeletion',
+  faIcon: 'trash-o',
+  label: i18n.t('Restored')
+}, {
+  id: 'move',
+  faIcon: 'arrows',
+  label: i18n.t('Moved')
+}, {
+  id: 'copy',
+  faIcon: 'files-o',
+  label: i18n.t('Copied')
+}]

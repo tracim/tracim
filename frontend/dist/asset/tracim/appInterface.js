@@ -1,5 +1,6 @@
 (function () {
-  let prevSelectedApp = {name: ''}
+  let prevSelectedAppFeature = {name: ''}
+  let prevSelectedAppFullScreen = {name: ''}
 
   getSelectedApp = name => {
     switch (name) {
@@ -13,6 +14,8 @@
         return appFile
       case 'admin_workspace_user':
         return appAdminWorkspaceUser
+      case 'workspace_advanced':
+        return appWorkspaceAdvanced
       default:
         return null
     }
@@ -33,8 +36,8 @@
     } else {
       selectedApp.renderAppFeature(app)
       selectedApp.isRendered = true
-      prevSelectedApp.isRendered = false
-      prevSelectedApp = selectedApp
+      prevSelectedAppFeature.isRendered = false
+      prevSelectedAppFeature = selectedApp
     }
   }
 
@@ -48,8 +51,8 @@
     } else {
       selectedApp.renderAppFullscreen(app)
       selectedApp.isRendered = true
-      prevSelectedApp.isRendered = false
-      prevSelectedApp = selectedApp
+      prevSelectedAppFullScreen.isRendered = false
+      prevSelectedAppFullScreen = selectedApp
     }
   }
 
@@ -82,11 +85,17 @@
         break
       case 'unmount_app':
         console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
-        if (prevSelectedApp.name === '') return
 
-        prevSelectedApp.unmountApp('appFeatureContainer')
-        prevSelectedApp.unmountApp('popupCreateContentContainer')
-        prevSelectedApp.isRendered = false
+        if (prevSelectedAppFeature.name !== '') {
+          prevSelectedAppFeature.unmountApp('appFeatureContainer')
+          prevSelectedAppFeature.unmountApp('popupCreateContentContainer')
+          prevSelectedAppFeature.isRendered = false
+        }
+
+        if (prevSelectedAppFullScreen.name !== '') {
+          prevSelectedAppFullScreen.unmountApp('appFullscreenContainer')
+          prevSelectedAppFullScreen.isRendered = false
+        }
         break
     }
   }

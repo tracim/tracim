@@ -43,6 +43,10 @@ class Sidebar extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   shouldDisplaySidebar = () => {
     const pageWithoutSidebar = [PAGE.LOGIN]
     return !pageWithoutSidebar.includes(this.props.location.pathname)
@@ -63,7 +67,7 @@ class Sidebar extends React.Component {
     if (!this.shouldDisplaySidebar()) return null
 
     return (
-      <div className={classnames('sidebar primaryColorBgDarken', {'sidebarclose': sidebarClose})}>
+      <div className={classnames('sidebar primaryColorBg', {'sidebarclose': sidebarClose})}>
 
         <div className='sidebar__expand primaryColorBg' onClick={this.handleClickToggleSidebar}>
           <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
@@ -90,7 +94,7 @@ class Sidebar extends React.Component {
 
           <div className='sidebar__content__btnnewworkspace'>
             <button
-              className='sidebar__content__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBorderDarkenHover mb-5'
+              className='sidebar__content__btnnewworkspace__btn btn primaryColorBgLighten primaryColorBorderDarken primaryColorBgDarkenHover  mb-5'
               onClick={this.handleClickNewWorkspace}
             >
               {t('Create a workspace')}

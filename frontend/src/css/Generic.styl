@@ -4,6 +4,9 @@ a
     color fontColor
     text-decoration none
 
+.table td
+  vertical-align middle
+
 .tracim
   height 100%
   &__content
@@ -14,6 +17,8 @@ a
   padding 10px 15px
   background-color transparent
   cursor pointer
+  &:disabled
+    cursor not-allowed
   &:hover
     color offWhite
   &.nohover
@@ -24,6 +29,8 @@ a
   padding 10px 25px
   color offWhite
   cursor pointer
+  &:disabled
+    cursor not-allowed
 
 .iconBtn
   border-color transparent
@@ -31,6 +38,13 @@ a
   margin 2px
   padding 5px
   cursor pointer
+  &:disabled
+    cursor not-allowed
+
+div.mce-fullscreen
+  z-index 1050
+  &.mce-container
+    top 88px
 
 .sidebarpagecontainer
   display flex
@@ -105,36 +119,6 @@ a
     .setting__link
       padding 10px
       cursor pointer
-
-.fileColor
-  color fileColor
-
-.threadColor
-  color threadColor
-
-.taskColor
-  color taskColor
-
-.markdownColor
-  color markdownColor
-
-.htmlColor
-  color htmlColor
-
-.issueColor
-  color issueColor
-
-.gestionnaire
-  color gestionnaire
-
-.contributeur
-  color contributeur
-
-.responsable
-  color responsable
-
-.lecteur
-  color lecteur
 
 .subTitle
   font-size 20px

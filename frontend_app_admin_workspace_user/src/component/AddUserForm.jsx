@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 
-export class AddMemberForm extends React.Component {
+export class AddUserForm extends React.Component {
   constructor (props) {
     super(props)
 
@@ -37,10 +37,10 @@ export class AddMemberForm extends React.Component {
     const { props, state } = this
 
     return (
-      <form className='adminUserPage__adduser__form'>
-        <div className='adminUserPage__adduser__form__username'>
+      <form className='adminUser__adduser__form'>
+        <div className='adminUser__adduser__form__username'>
           <label className='username__text' htmlFor='adduser'>
-            {props.t('Add a user')}
+            {props.t('Type the email')}
           </label>
 
           <input
@@ -55,14 +55,14 @@ export class AddMemberForm extends React.Component {
           {/*
           <div className='username__createaccount'>
             <input type='radio' id='createuseraccount' />
-            <label className='ml-2' htmlFor='createuseraccount'>Create an account for this member</label>
+            <label className='ml-2' htmlFor='createuseraccount'>Create an account for this user</label>
           </div>
           */}
         </div>
 
-        <div className='adminUserPage__adduser__form__profile'>
+        <div className='adminUser__adduser__form__profile'>
           <div className='profile__text'>
-            {props.t('Choose the profile of the user')}
+            {props.t('Choose the profile')}
           </div>
 
           <div className='profile__list'>
@@ -85,13 +85,13 @@ export class AddMemberForm extends React.Component {
                   <div className='userrole__role__icon mx-2' style={{color: p.hexcolor}}>
                     <i className={`fa fa-fw fa-${p.faIcon}`} />
                   </div>
-                  {p.label}
+                  {props.t(p.label) /* this trad key is declared in frontend/helper.js, object PROFILE */}
                 </div>
               </label>
             )}
           </div>
         </div>
-        <div className='adminUserPage__adduser__form__submit'>
+        <div className='adminUser__adduser__form__submit'>
           <button
             type='button'
             className='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
@@ -105,4 +105,4 @@ export class AddMemberForm extends React.Component {
   }
 }
 
-export default translate()(AddMemberForm)
+export default translate()(AddUserForm)

@@ -7,7 +7,10 @@ import transaction
 from depot.io.utils import FileIntent
 
 from tracim_backend import models
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.extensions import app_list
+from tracim_backend.fixtures.content import Content as ContentFixtures
+from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.group import GroupApi
@@ -15,12 +18,10 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
-from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests import FunctionalTest
 from tracim_backend.tests import set_html_document_slug_to_legacy
-from tracim_backend.fixtures.content import Content as ContentFixtures
-from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 
 
 class TestWorkspaceEndpoint(FunctionalTest):
@@ -310,7 +311,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -432,7 +433,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -611,7 +612,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -735,7 +736,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1090,7 +1091,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1145,6 +1146,62 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert user_role['is_active'] is True
         assert user_role['do_notify'] is True
 
+    def test_api__get_workspace_members__ok_200__admin(self):
+        """
+        Check obtain workspace members list of a workspace where admin doesn't
+        have any right
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('trusted-users')]
+        user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        workspace = workspace_api.create_workspace('test_2', save_now=True)  # nopep8
+        rapi = RoleApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)  # nopep8
+        rapi.delete_one(admin.user_id, workspace.workspace_id)
+        transaction.commit()
+        user_id = user.user_id
+        workspace_id = workspace.workspace_id
+        admin_id = admin.user_id
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/workspaces/{}/members'.format(
+            workspace_id,
+            user_id
+        ), status=200).json_body
+        assert len(res) == 1
+        user_role = res[0]
+        assert user_role['role'] == 'reader'
+        assert user_role['user_id'] == user_id
+        assert user_role['workspace_id'] == workspace_id
+        assert user_role['is_active'] is True
+        assert user_role['do_notify'] is False
 
     def test_api__get_workspace_member__err_400__unallowed_user(self):
         """
@@ -1180,7 +1237,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         assert 'code' in res.json.keys()
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
-
 
     def test_api__get_workspace_members__err_400__workspace_does_not_exist(self):  # nopep8
         """
@@ -1477,7 +1533,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1533,7 +1589,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         groups = [gapi.get_one_with_name('users')]
         user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1612,6 +1668,13 @@ class TestUserInvitationWithMailActivatedSync(FunctionalTest):
         assert user_role_found['newly_created'] is True
         assert user_role_found['email_sent'] is True
         assert user_role_found['do_notify'] is False
+
+        res = self.testapp.get(
+            '/api/v2/users/{}'.format(user_id),
+            status=200,
+        )
+        res = res.json_body
+        assert res['profile'] == 'users'
 
         # check mail received
         response = requests.get('http://127.0.0.1:8025/api/v1/messages')
@@ -2105,7 +2168,12 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_page_legacy.type = 'page'
-        content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_page_legacy,
+        ):
+            content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
         test_html_document = content_api.create(
             content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
@@ -2113,7 +2181,12 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_content(test_html_document, 'test_page', '<p>HTML_DOCUMENT</p>')  # nopep8
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_html_document,
+        ):
+            content_api.update_content(test_html_document, 'test_page', '<p>HTML_DOCUMENT</p>')  # nopep8
         dbsession.flush()
         transaction.commit()
         # test-itself
@@ -2201,7 +2274,12 @@ class TestWorkspaceContents(FunctionalTest):
             do_notify=False,
         )
         test_page_legacy.type = 'page'
-        content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_page_legacy,
+        ):
+            content_api.update_content(test_page_legacy, 'test_page', '<p>PAGE</p>')
         test_html_document = content_api.create(
             content_type_slug=CONTENT_TYPES.Page.slug,
             workspace=business_workspace,
@@ -2210,8 +2288,13 @@ class TestWorkspaceContents(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_content(test_html_document, 'test_html_page', '<p>HTML_DOCUMENT</p>')  # nopep8
-        dbsession.flush()
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_html_document,
+        ):
+            content_api.update_content(test_html_document, 'test_html_page', '<p>HTML_DOCUMENT</p>')  # nopep8
+            dbsession.flush()
         transaction.commit()
         # test-itself
         params = {
@@ -2555,6 +2638,56 @@ class TestWorkspaceContents(FunctionalTest):
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
         assert res.json_body in active_contents
+
+    def test_api__post_content_create_generic_content__err_400__label_already_used(self) -> None:  # nopep8
+        """
+        Create generic content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'parent_id': None,
+            'label': 'GenericCreatedContent',
+            'content_type': 'html-document',
+        }
+        res = self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=200
+        )
+        assert res
+        assert res.json_body
+        assert res.json_body['status'] == 'open'
+        assert res.json_body['content_id']
+        assert res.json_body['content_type'] == 'html-document'
+        assert res.json_body['is_archived'] is False
+        assert res.json_body['is_deleted'] is False
+        assert res.json_body['workspace_id'] == 1
+        assert res.json_body['slug'] == 'genericcreatedcontent'
+        assert res.json_body['parent_id'] is None
+        assert res.json_body['show_in_ui'] is True
+        assert res.json_body['sub_content_types']
+        params_active = {
+            'parent_id': 0,
+            'show_archived': 0,
+            'show_deleted': 0,
+            'show_active': 1,
+        }
+        # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
+        active_contents = self.testapp.get('/api/v2/workspaces/1/contents', params=params_active, status=200).json_body  # nopep8
+        assert res.json_body in active_contents
+
+        # recreate same content
+        self.testapp.post_json(
+            '/api/v2/workspaces/1/contents',
+            params=params,
+            status=400
+        )
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(self) -> None:  # nopep8
         """

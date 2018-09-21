@@ -1,48 +1,53 @@
 # coding=utf-8
 import marshmallow
 from marshmallow import post_load
-from marshmallow.validate import OneOf
 from marshmallow.validate import Length
+from marshmallow.validate import OneOf
 from marshmallow.validate import Range
 
-from tracim_backend.lib.utils.utils import DATETIME_FORMAT
-from tracim_backend.models.auth import Profile
-
-from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import CONTENT_STATUS
 from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import open_status
+from tracim_backend.app_models.validator import all_content_types_validator
+from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import ResetPasswordRequest
+from tracim_backend.models.context_models import ResetPasswordCheckToken
+from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
-from tracim_backend.models.context_models import ContentIdsQuery
-from tracim_backend.models.context_models import UserWorkspaceAndContentPath
+from tracim_backend.models.context_models import CommentCreation
+from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import ContentCreation
-from tracim_backend.models.context_models import UserCreation
+from tracim_backend.models.context_models import ContentFilter
+from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentPreviewSizedPath
+from tracim_backend.models.context_models import FileQuery
+from tracim_backend.models.context_models import FolderContentUpdate
+from tracim_backend.models.context_models import LoginCredentials
+from tracim_backend.models.context_models import MoveParams
+from tracim_backend.models.context_models import PageQuery
+from tracim_backend.models.context_models import RevisionPreviewSizedPath
+from tracim_backend.models.context_models import RoleUpdate
+from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
+from tracim_backend.models.context_models import TextBasedContentUpdate
+from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserInfos
 from tracim_backend.models.context_models import UserProfile
-from tracim_backend.models.context_models import ContentPreviewSizedPath
-from tracim_backend.models.context_models import RevisionPreviewSizedPath
-from tracim_backend.models.context_models import PageQuery
-from tracim_backend.models.context_models import WorkspaceAndContentRevisionPath
+from tracim_backend.models.context_models import UserWorkspaceAndContentPath
+from tracim_backend.models.context_models import WorkspaceAndContentPath
+from tracim_backend.models.context_models import \
+    WorkspaceAndContentRevisionPath
+from tracim_backend.models.context_models import WorkspaceAndUserPath
 from tracim_backend.models.context_models import WorkspaceMemberInvitation
 from tracim_backend.models.context_models import WorkspaceUpdate
-from tracim_backend.models.context_models import RoleUpdate
-from tracim_backend.models.context_models import CommentCreation
-from tracim_backend.models.context_models import TextBasedContentUpdate
-from tracim_backend.models.context_models import SetContentStatus
-from tracim_backend.models.context_models import CommentPath
-from tracim_backend.models.context_models import MoveParams
-from tracim_backend.models.context_models import WorkspaceAndContentPath
-from tracim_backend.models.context_models import WorkspaceAndUserPath
-from tracim_backend.models.context_models import ContentFilter
-from tracim_backend.models.context_models import LoginCredentials
-from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.app_models.validator import all_content_types_validator
+from tracim_backend.models.data import UserRoleInWorkspace
 
 
 class UserDigestSchema(marshmallow.Schema):
@@ -98,7 +103,7 @@ class UserSchema(UserDigestSchema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
     )
     lang = marshmallow.fields.String(
         description="User langage in iso639 format",
@@ -173,7 +178,7 @@ class UserProfileSchema(marshmallow.Schema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
     )
     @post_load
     def create_user_profile(self, data):
@@ -192,7 +197,7 @@ class UserCreationSchema(marshmallow.Schema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
         required=False,
         default=Group.TIM_USER_GROUPNAME
     )
@@ -367,16 +372,30 @@ class AutocompleteQuerySchema(marshmallow.Schema):
         return AutocompleteQuery(**data)
 
 
-class PageQuerySchema(marshmallow.Schema):
-    page = marshmallow.fields.Int(
-        example=2,
+class FileQuerySchema(marshmallow.Schema):
+    force_download = marshmallow.fields.Int(
+        example=1,
         default=0,
-        description='allow to show a specific page of a pdf file',
-        validate=Range(min=0, error="Value must be positive or 0"),
+        description='force download of file or let browser decide if'
+                    'file can be read directly from browser',
+        validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
 
     @post_load
-    def make_page_query(self, data):
+    def make_query(self, data):
+        return FileQuery(**data)
+
+
+class PageQuerySchema(FileQuerySchema):
+    page = marshmallow.fields.Int(
+        example=2,
+        default=1,
+        description='allow to show a specific page of a pdf file',
+        validate=Range(min=1, error="Value must be positive"),
+    )
+
+    @post_load
+    def make_query(self, data):
         return PageQuery(**data)
 
 
@@ -493,6 +512,55 @@ class WorkspaceMemberInviteSchema(RoleUpdateSchema):
     @post_load
     def make_role(self, data):
         return WorkspaceMemberInvitation(**data)
+
+
+class ResetPasswordRequestSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordRequest(**data)
+
+
+class ResetPasswordCheckTokenSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    reset_password_token = marshmallow.fields.String(
+        description="token to reset password of given user",
+        required=True,
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordCheckToken(**data)
+
+
+class ResetPasswordModifySchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    reset_password_token = marshmallow.fields.String(
+        description="token to reset password of given user",
+        required=True,
+    )
+    new_password = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+    new_password2 = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordModify(**data)
 
 
 class BasicAuthSchema(marshmallow.Schema):
@@ -853,6 +921,10 @@ class FileInfoAbstractSchema(marshmallow.Schema):
         description='file size in byte, return null value if unaivalable',
         example=1024,
         allow_none=True,
+    )
+    pdf_available = marshmallow.fields.Bool(
+        description="Is pdf version of file available ?",
+        example=True,
     )
 
 

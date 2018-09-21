@@ -53,29 +53,9 @@
       overflow-y auto
       list-style none
       &__item
-        padding 0 25px 15px 35px
-        &__avatar
-          position relative
-          top 60px
-          left -20px
-          border-radius 50%
-          width 45px
-          height 45px
-          & > img
-            width 45px
-            height 45px
-            border-radius 25px
-        &__authorandhour
-          margin-left 35px
-          opacity 0.7
-          font-size 14px
-        &__content
-          display inline-block
-          border 1px solid grey
-          border-radius 5px
-          padding 15px
-          background-color offWhite
-          font-size 15px
+        position relative
+        margin 15px 25px
+        width calc(100% - 50px) //50px => margin + left/right
       &__version
         display flex
         justify-content space-between
@@ -83,16 +63,22 @@
         padding 10px 15px
         width 100%
         background-color lightGrey
-        &__btn
+        &__action
           display flex
-          justify-content center
-          border-width 1px
-          border-style solid
-          width 145px
-          font-size 17px
-          & > i
-            margin-right 10px
+          align-items center
+          &__btn
+            display flex
+            justify-content center
+            border-width 1px
+            border-style solid
+            width 145px
+            font-size 17px
+            & > i
+              margin-right 10px
+              font-size 22px
+          &__icon
             font-size 22px
+            margin-left 10px
         &__date
           color fontColor
           font-size 17px
@@ -122,19 +108,6 @@
           &__icon
             display inline-block
             margin-left 20px
-
-.sent
-  text-align right
-  .timeline__body__messagelist__item
-    &__wrapper
-      display flex
-      flex-direction row-reverse
-    &__avatar
-      left 20px
-    &__authorandhour
-      margin-left 0
-      margin-right 35px
-
 
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result

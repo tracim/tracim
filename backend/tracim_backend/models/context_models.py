@@ -55,9 +55,47 @@ class LoginCredentials(object):
         self.password = password
 
 
+class ResetPasswordRequest(object):
+    """
+    Reset password : request to reset password of user
+    """
+    def __init__(self, email: str) -> None:
+        self.email = email
+
+
+class ResetPasswordCheckToken(object):
+    """
+    Reset password : check reset password token
+    """
+    def __init__(
+        self,
+        reset_password_token: str,
+        email: str,
+    ) -> None:
+        self.email = email
+        self.reset_password_token = reset_password_token
+
+
+class ResetPasswordModify(object):
+    """
+    Reset password : modification step
+    """
+    def __init__(
+        self,
+        reset_password_token: str,
+        email: str,
+        new_password: str,
+        new_password2: str
+    ) -> None:
+        self.email = email
+        self.reset_password_token = reset_password_token
+        self.new_password = new_password
+        self.new_password2 = new_password2
+
+
 class SetEmail(object):
     """
-    Just an email
+    Just an email and password
     """
     def __init__(self, loggedin_user_password: str, email: str) -> None:
         self.loggedin_user_password = loggedin_user_password
@@ -68,7 +106,8 @@ class SetPassword(object):
     """
     Just an password
     """
-    def __init__(self,
+    def __init__(
+        self,
         loggedin_user_password: str,
         new_password: str,
         new_password2: str
@@ -205,14 +244,27 @@ class AutocompleteQuery(object):
         self.acp = acp
 
 
+class FileQuery(object):
+    """
+    File query model
+    """
+    def __init__(
+        self,
+        force_download: int = 0,
+    ):
+        self.force_download = force_download
+
+
 class PageQuery(object):
     """
     Page query model
     """
     def __init__(
             self,
-            page: int = 0
+            force_download: int = 0,
+            page: int = 1
     ):
+        self.force_download = force_download
         self.page = page
 
 
@@ -762,6 +814,22 @@ class ContentInContext(object):
         else:
             return None
 
+    @property
+    def pdf_available(self) -> bool:
+        """
+        :return: bool about if pdf version of content is available
+        """
+        if self.content.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.has_pdf_preview(self.content.revision_id)
+        else:
+            return False
+
 
 class RevisionInContext(object):
     """
@@ -950,3 +1018,19 @@ class RevisionInContext(object):
             return self.revision.depot_file.file.content_length
         else:
             return None
+
+    @property
+    def pdf_available(self) -> bool:
+        """
+        :return: bool about if pdf version of content is available
+        """
+        if self.revision.depot_file:
+            from tracim_backend.lib.core.content import ContentApi
+            content_api = ContentApi(
+                current_user=self._user,
+                session=self.dbsession,
+                config=self.config
+            )
+            return content_api.has_pdf_preview(self.revision.revision_id)
+        else:
+            return False

@@ -12,6 +12,12 @@ const threadEnTranslation = require('../dist/app/thread_en_translation.json') ||
 const threadFrTranslation = require('../dist/app/thread_fr_translation.json') || {}
 const fileEnTranslation = require('../dist/app/file_en_translation.json') || {}
 const fileFrTranslation = require('../dist/app/file_fr_translation.json') || {}
+const adminWsUserEnTranslation = require('../dist/app/admin_workspace_user_en_translation.json') || {}
+const adminWsUserFrTranslation = require('../dist/app/admin_workspace_user_fr_translation.json') || {}
+const wsAdvancedEnTranslation = require('../dist/app/workspace_advanced_en_translation.json') || {}
+const wsAdvancedFrTranslation = require('../dist/app/workspace_advanced_fr_translation.json') || {}
+const wsEnTranslation = require('../dist/app/workspace_en_translation.json')
+const wsFrTranslation = require('../dist/app/workspace_fr_translation.json')
 
 i18n
   .use(reactI18nextModule)
@@ -31,7 +37,10 @@ i18n
           ...en, // frontend
           ...htmlDocEnTranslation, // html-document
           ...threadEnTranslation, // thread
-          ...fileEnTranslation // file
+          ...fileEnTranslation, // file
+          ...wsAdvancedEnTranslation, // advanced workspace
+          ...adminWsUserEnTranslation, // admin workspace user
+          ...wsEnTranslation // workspace
         }
       },
       fr: {
@@ -40,7 +49,10 @@ i18n
           ...fr, // frontend
           ...htmlDocFrTranslation, // html-document
           ...threadFrTranslation, // thread
-          ...fileFrTranslation // file
+          ...fileFrTranslation, // file
+          ...wsAdvancedFrTranslation, // advanced workspace
+          ...adminWsUserFrTranslation, // admin workspace user
+          ...wsFrTranslation // workspace
         }
       }
     }

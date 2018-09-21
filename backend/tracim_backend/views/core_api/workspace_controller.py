@@ -7,6 +7,7 @@ from pyramid.httpexceptions import HTTPFound
 from tracim_backend import BASE_API_V2
 from tracim_backend import hapic
 from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -194,7 +195,11 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_workspace_role(UserRoleInWorkspace.READER)
+    @require_profile_or_other_profile_with_workspace_role(
+        allow_all_group=Group.TIM_ADMIN,
+        allow_if_role_group=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.READER
+    )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
     def workspaces_members(
@@ -403,6 +408,7 @@ class WorkspaceController(Controller):
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
     @hapic.output_body(ContentDigestSchema())
@@ -501,6 +507,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(WorkspacesDoNotMatch, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @require_candidate_workspace_role(UserRoleInWorkspace.CONTENT_MANAGER)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

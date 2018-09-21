@@ -2,6 +2,15 @@
 
 .thread
   width 70%
+  .comment
+    &.received
+      .comment__header__text
+        padding-left calc(5% + 4px)
+        padding-right 0
+    &.sent
+      .comment__header__text
+        padding-right calc(5% + 4px)
+        padding-left 0
   &__header
     &__editionmode
       display none
@@ -14,6 +23,7 @@
     margin 0
   .thread
     &__contentpage
+      width 100%
       &__content
         width 100%
       &__texteditor

@@ -14,31 +14,38 @@ export const RecentActivity = props =>
       <button
         className='activity__header__allread btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
         onClick={props.onClickEverythingAsRead}
+        disabled={props.recentActivityList.length === 0}
       >
         {props.t('Mark everything as read')}
       </button>
     </div>
 
     <div className='activity__wrapper'>
-      {props.recentActivityList.map(content => {
-        const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || {hexcolor: '', faIcon: ''}
-        return (
-          <div
-            className={classnames('activity__workspace primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
-            onClick={() => props.onClickRecentContent(content.id, content.type)}
-            key={content.id}
-          >
-            <div className='activity__workspace__icon' style={{color: contentType.hexcolor}}>
-              <i className={`fa fa-${contentType.faIcon}`} />
+      {props.recentActivityList.length > 0
+        ? props.recentActivityList.map(content => {
+          const contentType = props.contentTypeList.find(ct => ct.slug === content.type) || {hexcolor: '', faIcon: ''}
+          return (
+            <div
+              className={classnames('activity__workspace primaryColorBgLightenHover', {'read': props.readByUserList.includes(content.id)})}
+              onClick={() => props.onClickRecentContent(content.id, content.type)}
+              key={content.id}
+            >
+              <div className='activity__workspace__icon' style={{color: contentType.hexcolor}}>
+                <i className={`fa fa-${contentType.faIcon}`} />
+              </div>
+              <div className='activity__workspace__name'>
+                {content.label}
+              </div>
             </div>
-            <div className='activity__workspace__name'>
-              {content.label}
-            </div>
-          </div>
-        )
-      })}
+          )
+        })
+        : <div className='activity__empty'>{props.t('No recent activity')}</div>
+      }
 
-      <div className={classnames('activity__more', 'd-flex flex-row-reverse')}>
+      <div
+        className='activity__more'
+        style={{display: props.recentActivityList.length === 0 ? 'none' : 'flex'}}
+      >
         <button
           className='activity__more__btn btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
           onClick={props.onClickSeeMore}

@@ -5,7 +5,7 @@ from pyramid.config import Configurator
 from tracim_backend.extensions import app_list
 from tracim_backend.exceptions import PageNotFound
 from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.utils.utils import Color
+from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.views import BASE_API_V2
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
@@ -51,7 +51,7 @@ class FrontendController(Controller):
             self._get_index_file_path(),
             {
                 'colors': {
-                    'primary': Color(app_config.APPS_COLORS['primary']),
+                    'primary': ExtendedColor(app_config.APPS_COLORS['primary']),
                 },
                 'applications': frontend_apps,
             }

@@ -9,8 +9,8 @@ describe('operation :: workspace > create_new > html-document', function () {
     it ('dashborad > button', function(){
         var titre1='dashbord button'
         cy.url().should('include', '/workspaces/1/dashboard')
-        cy.get('.dashboard__calltoaction div:nth-child(4) .dashboard__calltoaction__button__text').should('be.visible')
-        cy.get('.dashboard__calltoaction div:nth-child(4) .dashboard__calltoaction__button__text').click()
+        cy.get('.dashboard__calltoaction div:nth-child(1) .dashboard__calltoaction__button__text').should('be.visible')
+        cy.get('.dashboard__calltoaction div:nth-child(1) .dashboard__calltoaction__button__text').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
         cy.get('.createcontent .createcontent__form__input').type(titre1)
@@ -35,7 +35,7 @@ describe('operation :: workspace > create_new > html-document', function () {
         cy.url().should('include', '/workspaces/1/contents')
         cy.get('.workspace__header__btnaddcontent__label').should('be.visible')
         cy.get('.workspace__header__btnaddcontent__label').click()
-        cy.get('.workspace__header__btnaddcontent__setting div:nth-child(4).subdropdown__link').click()
+        cy.get('.workspace__header__btnaddcontent__setting > div > div:nth-child(1).subdropdown__link').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
         cy.get('.createcontent .createcontent__form__input').type(titre2)

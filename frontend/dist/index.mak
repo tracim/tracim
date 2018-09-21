@@ -17,41 +17,46 @@
     <style>
       <%
         primary = colors['primary']
+        # color web string value
+        primary_color_str = primary.web
+        primary_color_darken_str = primary.darken.web
+        primary_color_lighten_str = primary.lighten.web
+
         html_class = '.primaryColorFont{state}'
         param = 'color'
         color_change_value = 15
       %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary_color_str}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
       <% html_class = '.primaryColorFont{state}Hover:hover' %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
 
       <%
         html_class = '.primaryColorBg{state}'
         param = 'background-color'
       %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary_color_str}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
       <% html_class = '.primaryColorBg{state}Hover:hover'%>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
 
       <%
         param = 'border-color'
         html_class = '.primaryColorBorder{state}'
       %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary_color_str}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
       <% html_class = '.primaryColorBorder{state}Hover:hover' %>
-      ${html_class.replace('{state}', '')} { ${param}: ${primary.normal}; }
-      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary.darken}; }
-      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary.lighten}; }
+      ${html_class.replace('{state}', '')} { ${param}: ${primary_color_str}; }
+      ${html_class.replace('{state}', 'Darken')} { ${param}: ${primary_color_darken_str}; }
+      ${html_class.replace('{state}', 'Lighten')} { ${param}: ${primary_color_lighten_str}; }
     </style>
 
     <style>
@@ -64,6 +69,10 @@
         font-family: 'Quicksand';
       }
     </style>
+
+    <script type='text/javascript'>
+      GLOBAL_primaryColor = '${primary_color_str}'
+    </script>
   </head>
 
   <body>
@@ -77,6 +86,7 @@
     <script type='text/javascript' src='/app/${app.minislug}.app.js'></script>
     %endfor
     <script type='text/javascript' src='/app/admin_workspace_user.app.js'></script>
+    <script type='text/javascript' src='/app/workspace_advanced.app.js'></script>
 
     <script type='text/javascript' src='/asset/bootstrap/jquery-3.2.1.js'></script>
     <script type='text/javascript' src='/asset/bootstrap/popper-1.12.3.js'></script>

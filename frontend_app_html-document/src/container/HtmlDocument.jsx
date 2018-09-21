@@ -41,6 +41,10 @@ class HtmlDocument extends React.Component {
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
+      externalTradList: [
+        props.t('Write a document'),
+        props.t('Text Documents')
+      ],
       rawContentBeforeEdit: '',
       timeline: props.data ? [] : [], // debug.timeline,
       newComment: '',
@@ -130,7 +134,7 @@ class HtmlDocument extends React.Component {
       .then(([resComment, resRevision]) => {
         const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
           ...c,
-          created: (new Date(c.created)).toLocaleString(),
+          created: displayDate(c.created, loggedUser.lang),
           author: {
             ...c.author,
             avatar_url: c.author.avatar_url
@@ -142,7 +146,6 @@ class HtmlDocument extends React.Component {
         const revisionWithComment = resRevision.body
           .map((r, i) => ({
             ...r,
-            // created: (new Date(r.created)).toLocaleString(),
             created: displayDate(r.created, loggedUser.lang),
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
@@ -172,7 +175,8 @@ class HtmlDocument extends React.Component {
       })
 
     await Promise.all([fetchResultHtmlDocument, fetchResultComment, fetchResultRevision])
-    putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    await putHtmlDocRead(loggedUser, config.apiUrl, content.workspace_id, content.content_id) // mark as read after all requests are finished
+    GLOBAL_dispatchEvent({type: 'refreshContentList', data: {}}) // await above makes sure that we will reload workspace content after the read status update
   }
 
   handleClickBtnCloseApp = () => {
@@ -277,7 +281,7 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW})); break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -294,7 +298,7 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW})); break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -391,6 +395,7 @@ class HtmlDocument extends React.Component {
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          disableChangeTitle={content.is_archived || content.is_deleted}
         />
 
         <PopinFixedOption
@@ -404,7 +409,7 @@ class HtmlDocument extends React.Component {
                 <NewVersionBtn
                   customColor={config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={mode !== MODE.VIEW}
+                  disabled={mode !== MODE.VIEW || content.is_archived || content.is_deleted}
                 />
               }
 
@@ -426,7 +431,7 @@ class HtmlDocument extends React.Component {
                   selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                   availableStatus={config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={mode === MODE.REVISION}
+                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
 
@@ -435,7 +440,7 @@ class HtmlDocument extends React.Component {
                   customColor={config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={mode === MODE.REVISION}
+                  disabled={mode === MODE.REVISION || content.is_archived || content.is_deleted}
                 />
               }
             </div>
@@ -469,7 +474,7 @@ class HtmlDocument extends React.Component {
             loggedUser={loggedUser}
             timelineData={timeline}
             newComment={newComment}
-            disableComment={mode === MODE.REVISION}
+            disableComment={mode === MODE.REVISION || content.is_archived || content.is_deleted}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

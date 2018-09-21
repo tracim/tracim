@@ -7,20 +7,19 @@ import {
   PageContent,
   BtnSwitch
 } from 'tracim_frontend_lib'
-import AddMemberForm from './AddMemberForm.jsx'
-// import { translate } from 'react-i18next'
+import AddUserForm from './AddUserForm.jsx'
 
 export class AdminUser extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      displayAddMember: false
+      displayAddUser: false
     }
   }
 
-  handleToggleAddMember = () => this.setState(prevState => ({
-    displayAddMember: !prevState.displayAddMember
+  handleToggleAddUser = () => this.setState(prevState => ({
+    displayAddUser: !prevState.displayAddUser
   }))
 
   handleToggleUser = (e, idUser, toggle) => {
@@ -47,7 +46,7 @@ export class AdminUser extends React.Component {
       return
     }
 
-    if (toggle) props.onChangeProfile(idUser, 'managers')
+    if (toggle) props.onChangeProfile(idUser, 'trusted-users')
     else props.onChangeProfile(idUser, 'users')
   }
 
@@ -56,51 +55,58 @@ export class AdminUser extends React.Component {
     e.stopPropagation()
 
     if (toggle) this.props.onChangeProfile(idUser, 'administrators')
-    else this.props.onChangeProfile(idUser, 'managers')
+    else this.props.onChangeProfile(idUser, 'trusted-users')
   }
 
   handleClickAddUser = (email, profile) => {
     this.props.onClickAddUser(email, profile)
-    this.handleToggleAddMember()
+    this.handleToggleAddUser()
+  }
+
+  handleClickUser = (e, idUser) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    this.props.onClickUser(idUser)
   }
 
   render () {
     const { props } = this
 
     return (
-      <PageWrapper customClass='adminUserPage'>
+      <PageWrapper customClass='adminUser'>
         <PageTitle
-          parentClass={'adminUserPage'}
-          title={"Member's management"}
+          parentClass={'adminUser'}
+          title={props.t('Users management')}
         />
 
-        <PageContent parentClass='adminUserPage'>
+        <PageContent parentClass='adminUser'>
 
-          <div className='adminUserPage__description'>
-            {props.t('On this page you can manage the members of your Tracim instance.')}
+          <div className='adminUser__description'>
+            {props.t('On this page you can manage the users of your Tracim instance.')}
           </div>
 
-          <div className='adminUserPage__adduser'>
-            <button className='adminUserPage__adduser__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover' onClick={this.handleToggleAddMember}>
-              {props.t('Add a member')}
+          <div className='adminUser__adduser'>
+            <button className='adminUser__adduser__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover' onClick={this.handleToggleAddUser}>
+              {props.t('Add a user')}
             </button>
 
-            {this.state.displayAddMember &&
-              <AddMemberForm
+            {this.state.displayAddUser &&
+              <AddUserForm
                 profile={props.profile}
                 onClickAddUser={this.handleClickAddUser}
               />
             }
           </div>
 
-          <Delimiter customClass={'adminUserPage__delimiter'} />
+          <Delimiter customClass={'adminUser__delimiter'} />
 
-          <div className='adminUserPage__table'>
+          <div className='adminUser__table'>
             <table className='table'>
               <thead>
                 <tr>
                   <th scope='col'>{props.t('Active')}</th>
-                  <th scope='col'>{props.t('Member')}</th>
+                  <th scope='col'>{props.t('User')}</th>
                   <th scope='col'>{props.t('Email')}</th>
                   <th scope='col'>{props.t('Can create workspace')}</th>
                   <th scope='col'>{props.t('Administrator')}</th>
@@ -109,16 +115,18 @@ export class AdminUser extends React.Component {
 
               <tbody>
                 {props.userList.map(u =>
-                  <tr key={u.user_id}>
+                  <tr className='adminUser__table__tr' key={u.user_id}>
                     <td>
                       <BtnSwitch checked={u.is_active} onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)} />
                     </td>
-                    <th scope='row'>{u.public_name}</th>
+                    <td className='adminUser__table__tr__td-link primaryColorFont' onClick={e => this.handleClickUser(e, u.user_id)}>
+                      {u.public_name}
+                    </td>
                     <td>{u.email}</td>
                     <td>
                       <BtnSwitch
-                        checked={u.profile === 'managers' || u.profile === 'administrators'}
-                        onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'managers' || u.profile === 'administrators'))}
+                        checked={u.profile === 'trusted-users' || u.profile === 'administrators'}
+                        onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'trusted-users' || u.profile === 'administrators'))}
                       />
                     </td>
                     <td>

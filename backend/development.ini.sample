@@ -7,6 +7,9 @@ pipeline = tracim_web
 [app:tracim_web]
 use = egg:tracim_backend
 
+# hapic debug mode: return python traceback of error
+debug = True
+
 pyramid.reload_templates = true
 pyramid.debug_authorization = false
 pyramid.debug_notfound = false
@@ -27,13 +30,18 @@ retry.attempts = 3
 
 # By default, the toolbar only appears for clients from IP addresses
 # '127.0.0.1' and '::1'.
-# debugtoolbar.hosts = 127.0.0.1 ::1
+# debugtoolbar.hosts = localhost ::1
 
 ###
 # TRACIM SPECIFIC CONF
 ###
 
 ### Global
+
+# app enabled explicit list
+# this allow you to explictly disable default app or enabled beta app now
+# already added to default list
+# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder
 
 # Enable debug mode
 # debug = True
@@ -47,38 +55,19 @@ depot_storage_dir = %(here)s/depot/
 # Backend API config
 api.key = changethisnow!
 # base url of the backend API, default to same as website.base_url
-# api.base_url = http://127.0.0.1:6543
-# The following parameters allow to personalize the home page
-# They are html ready (you can put html tags they will be interpreted)
+# api.base_url = http://localhost:6543
+# title of website, used in email
 website.title = TRACIM
-website.title.color = #555
-website.home.subtitle = Default login: email: admin@admin.admin (password: admin@admin.admin)
-website.home.tag_line = <div class="text-center" style="font-weight: bold;">Collaboration, versionning and traceability</div>
-website.home.below_login_form = in case of problem, please contact the administrator.
-# Values may be 'all' or 'folders'
-website.treeview.content = all
 # The following base_url is used for links and icons
 # integrated in the email notifcations
-website.base_url = http://127.0.0.1:8080
+website.base_url = http://localhost:6543
 # If config not provided, it will be extracted from website.base_url
-website.server_name = 127.0.0.1
+# website.server_name = localhost
 
 # CORS Special config
 # you can override access control allowed origin here with list of comma separated
 # base_url, by default only website.base_url and api.base_url are allowed
-# cors.access-control-allowed-origin = http://127.0.0.1:6543,http://127.0.0.1:8090
-
-
-# Specifies if the update of comments and attached files is allowed (by the owner only).
-# Examples:
-#    600 means 10 minutes (ie 600 seconds)
-#   3600 means 1 hour (60x60 seconds)
-#
-# Allowed values:
-#  -1 means that content update is allowed for ever
-#   0 means that content update is not allowed
-#   x means that content update is allowed for x seconds (with x>0)
-content.update.allowed.duration = 3600
+# cors.access-control-allowed-origin = http://localhost:6543,http://localhost:8090
 
 # Auth type (internal or ldap)
 auth_type = internal
@@ -101,27 +90,20 @@ auth_type = internal
 # ldap_group_enabled = False
 # User auth token validity in seconds (used to interfaces like web calendars)
 user.auth_token.validity = 604800
+# user reset_password token validity (default to 900s -> 15 minutes)
+user.reset_password.validity = 900
+
 
 session.type = file
 session.data_dir = %(here)s/sessions_data
-session.lock_dir = %(here)s/ssessions_lock
+session.lock_dir = %(here)s/sessions_lock
 session.key = session_key
 session.secret = change_this_value_please!
 session.save_accessed_time = True
-session.cookie_expires = 600
-session.timeout = 600
+session.cookie_expires = 604800
+session.timeout = 604800
 session.cookie_on_exception = true
-
 ### Mail
-
-# Reset password through email related configuration.
-# These emails will be sent through SMTP
-#
-resetpassword.email_sender = email@sender.com
-resetpassword.smtp_host = smtp.sender
-resetpassword.smtp_port = 25
-resetpassword.smtp_login = smtp.login
-resetpassword.smtp_passwd = smtp.password
 
 email.notification.activated = False
 # email.notification.log_file_path = /tmp/mail-notifications.log
@@ -136,6 +118,8 @@ email.notification.content_update.template.html = %(here)s/tracim_backend/templa
 email.notification.content_update.template.text = %(here)s/tracim_backend/templates/mail/content_update_body_text.mak
 email.notification.created_account.template.html = %(here)s/tracim_backend/templates/mail/created_account_body_html.mak
 email.notification.created_account.template.text = %(here)s/tracim_backend/templates/mail/created_account_body_text.mak
+email.notification.reset_password_request.template.html = %(here)s/tracim_backend/templates/mail/reset_password_body_html.mak
+email.notification.reset_password_request.template.text = %(here)s/tracim_backend/templates/mail/reset_password_body_text.mak
 # Note: items between { and } are variable names. Do not remove / rename them
 email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 email.notification.created_account.subject = [{website_title}] Created account
@@ -183,19 +167,19 @@ email.reply.lockfile_path = %(here)s/email_fetcher.lock
 radicale.server.filesystem.folder = %(here)s/radicale/collections/
 # radicale.server.allow_origin = *
 # radicale.server.realm_message = Tracim Calendar - Password Required
-## url can be extended like http://127.0.0.1:5232/calendar
+## url can be extended like http://localhost:5232/calendar
 ## in this case, you have to create your own proxy behind this url.
 ## and update following parameters
-# radicale.client.base_url.host = http://127.0.0.1:5232
+# radicale.client.base_url.host = http://localhost:5232
 # radicale.client.base_url.prefix = /
 
 ### WSGIDAV
 
 wsgidav.config_path = %(here)s/wsgidav.conf
-## url can be extended like 127.0.0.1/webdav
+## url can be extended like localhost/webdav
 ## in this case, you have to create your own proxy behind this url.
 ## Do not set http:// prefix.
-# wsgidav.client.base_url = 127.0.0.1:<WSGIDAV_PORT>
+# wsgidav.client.base_url = localhost:<WSGIDAV_PORT>
 
 ### Preview
 ## You can parametrized allowed jpg preview dimension list, if not set, default

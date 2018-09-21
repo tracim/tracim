@@ -24,7 +24,7 @@ leftside()
   min-height 100%
   background-image url('../img/applat.png')
   background-repeat repeat
-  z-index 5
+  z-index 10
   &.sidebarclose
     width 0
   &__expand
@@ -48,7 +48,9 @@ leftside()
       &__btn
         display block
         margin 0 auto
-        color offWhite
+        padding 10px 20px
+        &:hover
+          color offWhite
     &__navigation
       padding 0
       width sidebar-width

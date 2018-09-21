@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.request import Request
+from pyramid.response import Response
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.exceptions import NotAuthenticated

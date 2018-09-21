@@ -2,7 +2,9 @@ import {
   libAddAllResourceI18n,
   libHandleFetchResult,
   libGenerateAvatarFromPublicName,
-  libDisplayDate
+  libDisplayDate,
+  libConvertBackslashNToBr,
+  libRevisionTypeList
 } from './helper.js'
 
 import libPopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -29,6 +31,8 @@ import libNewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import libArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 import libSelectStatus from './component/Input/SelectStatus/SelectStatus.jsx'
 
+import libNewMemberForm from './component/NewMemberForm/NewMemberForm.jsx'
+
 export const libEnTranslation = require('../i18next.scanner/en/translation.json')
 export const libFrTranslation = require('../i18next.scanner/fr/translation.json')
 
@@ -36,6 +40,8 @@ export const addAllResourceI18n = libAddAllResourceI18n
 export const handleFetchResult = libHandleFetchResult
 export const generateAvatarFromPublicName = libGenerateAvatarFromPublicName
 export const displayDate = libDisplayDate
+export const convertBackslashNToBr = libConvertBackslashNToBr
+export const revisionTypeList = libRevisionTypeList
 
 export const PopinFixed = libPopinFixed
 export const PopinFixedHeader = libPopinFixedHeader
@@ -60,3 +66,5 @@ export const CardPopupCreateContent = libCardPopupCreateContent
 export const NewVersionBtn = libNewVersionBtn
 export const ArchiveDeleteContent = libArchiveDeleteContent
 export const SelectStatus = libSelectStatus
+
+export const NewMemberForm = libNewMemberForm
