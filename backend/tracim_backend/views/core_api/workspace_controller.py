@@ -19,7 +19,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.lib.utils.authorization import require_same_user_or_profile
-from tracim_backend.lib.utils.authorization import require_profile_or_other_profile_with_workspace_role
+from tracim_backend.lib.utils.authorization import require_profile_and_workspace_role
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.models import Group
 from tracim_backend.lib.utils.authorization import require_candidate_workspace_role
@@ -99,10 +99,10 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_profile_or_other_profile_with_workspace_role(
-        allow_all_group=Group.TIM_ADMIN,
-        allow_if_role_group=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceModifySchema())
@@ -149,10 +149,10 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_profile_or_other_profile_with_workspace_role(
-        Group.TIM_ADMIN,
-        Group.TIM_MANAGER,
-        UserRoleInWorkspace.WORKSPACE_MANAGER,
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_MANAGER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -171,10 +171,10 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @require_profile_or_other_profile_with_workspace_role(
-        Group.TIM_ADMIN,
-        Group.TIM_MANAGER,
-        UserRoleInWorkspace.WORKSPACE_MANAGER,
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_MANAGER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -193,10 +193,10 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_profile_or_other_profile_with_workspace_role(
-        allow_all_group=Group.TIM_ADMIN,
-        allow_if_role_group=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.READER
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.READER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema(many=True))
@@ -223,10 +223,10 @@ class WorkspaceController(Controller):
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_profile_or_other_profile_with_workspace_role(
-        allow_all_group=Group.TIM_ADMIN,
-        allow_if_role_group=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.READER
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.READER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(WorkspaceMemberSchema())
@@ -253,10 +253,10 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_profile_or_other_profile_with_workspace_role(
-        allow_all_group=Group.TIM_ADMIN,
-        allow_if_role_group=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
@@ -289,10 +289,10 @@ class WorkspaceController(Controller):
         return rapi.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
-    @require_profile_or_other_profile_with_workspace_role(
-        allow_all_group=Group.TIM_ADMIN,
-        allow_if_role_group=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
@@ -316,10 +316,10 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(UserCreationFailed, HTTPStatus.BAD_REQUEST)
-    @require_profile_or_other_profile_with_workspace_role(
-        allow_all_group=Group.TIM_ADMIN,
-        allow_if_role_group=Group.TIM_USER,
-        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER
+    @require_profile_and_workspace_role(
+        minimal_profile=Group.TIM_USER,
+        minimal_required_role=UserRoleInWorkspace.WORKSPACE_MANAGER,
+        allow_superadmin=True
     )
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceMemberInviteSchema())
