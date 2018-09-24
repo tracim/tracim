@@ -28,8 +28,8 @@ class Base(Fixture):
 
         g2 = models.Group()
         g2.group_id = 2
-        g2.group_name = 'managers'
-        g2.display_name = 'Global Managers'
+        g2.group_name = 'trusted-users'
+        g2.display_name = 'Trusted Users'
         g2.users.append(u)
         self._session.add(g2)
 
@@ -46,7 +46,7 @@ class Test(Fixture):
 
     def insert(self):
         g2 = self._session.query(models.Group).\
-            filter(models.Group.group_name == 'managers').one()
+            filter(models.Group.group_name == 'trusted-users').one()
 
         lawrence = models.User()
         lawrence.display_name = 'Lawrence L.'

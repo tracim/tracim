@@ -42,7 +42,8 @@ class File extends React.Component {
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
       externalTradList: [
-        props.t('Upload a file')
+        props.t('Upload a file'),
+        props.t('Files')
       ],
       newComment: '',
       newFile: '',
@@ -106,7 +107,10 @@ class File extends React.Component {
 
     if (!prevState.content || !state.content) return
 
-    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+    if (prevState.content.content_id !== state.content.content_id) {
+      this.loadContent()
+      this.loadTimeline()
+    }
 
     if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
       tinymce.remove('#wysiwygNewVersion')
@@ -200,6 +204,13 @@ class File extends React.Component {
   }
 
   handleClickBtnCloseApp = () => {
+    const { state, props } = this
+
+    if (state.progressUpload.display) {
+      this.sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
+      return
+    }
+
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
   }
@@ -281,7 +292,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
     }
   }
@@ -291,7 +305,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
     }
   }
@@ -301,7 +318,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
@@ -311,7 +331,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
@@ -442,6 +465,7 @@ class File extends React.Component {
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          disableChangeTitle={state.content.is_archived || state.content.is_deleted}
         />
 
         <PopinFixedOption
@@ -455,7 +479,7 @@ class File extends React.Component {
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== MODE.VIEW}
+                  disabled={state.mode !== MODE.VIEW || state.content.is_archived || state.content.is_deleted}
                 />
               }
 
@@ -477,7 +501,7 @@ class File extends React.Component {
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
 
@@ -486,7 +510,7 @@ class File extends React.Component {
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
             </div>
@@ -541,7 +565,7 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={state.timeline}
             newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION}
+            disableComment={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

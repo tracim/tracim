@@ -9,6 +9,7 @@ from preview_generator.exception import UnavailablePreviewType
 
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import PageOfPreviewNotFound
@@ -37,7 +38,7 @@ from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import \
     WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import \
-    WorkspaceAndContentRevisionIdPathSchema  # nopep8
+    WorkspaceAndContentRevisionIdPathSchema
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -489,6 +490,7 @@ class FileController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FILE_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

@@ -8,7 +8,7 @@ import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
-import { PAGE, workspaceConfig } from '../helper.js'
+import { PAGE, workspaceConfig, getUserProfile } from '../helper.js'
 
 const qs = require('query-string')
 
@@ -43,6 +43,10 @@ class Sidebar extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   shouldDisplaySidebar = () => {
     const pageWithoutSidebar = [PAGE.LOGIN]
     return !pageWithoutSidebar.includes(this.props.location.pathname)
@@ -58,7 +62,7 @@ class Sidebar extends React.Component {
 
   render () {
     const { sidebarClose, workspaceIdInUrl } = this.state
-    const { activeLang, workspaceList, t } = this.props
+    const { user, activeLang, workspaceList, t } = this.props
 
     if (!this.shouldDisplaySidebar()) return null
 
@@ -88,14 +92,16 @@ class Sidebar extends React.Component {
             </ul>
           </nav>
 
-          <div className='sidebar__content__btnnewworkspace'>
-            <button
-              className='sidebar__content__btnnewworkspace__btn btn primaryColorBgLighten primaryColorBorderDarken primaryColorBgDarkenHover  mb-5'
-              onClick={this.handleClickNewWorkspace}
-            >
-              {t('Create a workspace')}
-            </button>
-          </div>
+          {getUserProfile(user.profile).id <= 2 &&
+            <div className='sidebar__content__btnnewworkspace'>
+              <button
+                className='sidebar__content__btnnewworkspace__btn btn primaryColorBgLighten primaryColorBorderDarken primaryColorBgDarkenHover  mb-5'
+                onClick={this.handleClickNewWorkspace}
+              >
+                {t('Create a workspace')}
+              </button>
+            </div>
+          }
 
         </div>
 

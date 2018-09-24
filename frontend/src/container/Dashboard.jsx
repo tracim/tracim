@@ -14,7 +14,8 @@ import {
   getWorkspaceReadStatusList,
   getUserKnownMember,
   postWorkspaceMember,
-  putUserWorkspaceRead
+  putUserWorkspaceRead,
+  deleteWorkspaceMember
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -22,7 +23,8 @@ import {
   setWorkspaceMemberList,
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
-  setWorkspaceReadStatusList
+  setWorkspaceReadStatusList,
+  removeWorkspaceMember
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -45,9 +47,9 @@ class Dashboard extends React.Component {
         id: '',
         avatarUrl: '',
         nameOrEmail: '',
-        // createAccount: false, // @TODO ask DA about this checkbox if it is still usefull (since backend handles it all)
         role: ''
       },
+      autoCompleteFormNewMemberActive: true,
       searchedKnownMemberList: [],
       displayNewMemberDashboard: false,
       displayNotifBtn: false,
@@ -87,6 +89,10 @@ class Dashboard extends React.Component {
       this.loadMemberList()
       this.loadRecentActivity()
     }
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   loadWorkspaceDetail = async () => {
@@ -171,7 +177,13 @@ class Dashboard extends React.Component {
   handleChangeNewMemberNameOrEmail = newNameOrEmail => {
     if (newNameOrEmail.length >= 2) this.handleSearchUser(newNameOrEmail)
     else if (newNameOrEmail.length === 0) this.setState({searchedKnownMemberList: []})
-    this.setState(prev => ({newMember: {...prev.newMember, nameOrEmail: newNameOrEmail}}))
+    this.setState(prev => ({
+      newMember: {
+        ...prev.newMember,
+        nameOrEmail: newNameOrEmail
+      },
+      autoCompleteFormNewMemberActive: true
+    }))
   }
 
   handleClickKnownMember = knownMember => {
@@ -182,6 +194,7 @@ class Dashboard extends React.Component {
         nameOrEmail: knownMember.public_name,
         avatarUrl: knownMember.avatar_url
       },
+      autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: []
     }))
   }
@@ -195,12 +208,12 @@ class Dashboard extends React.Component {
 
     if (state.newMember.nameOrEmail === '') {
       props.dispatch(newFlashMessage(props.t('Please set a name or email'), 'warning'))
-      return
+      return false
     }
 
     if (state.newMember.role === '') {
       props.dispatch(newFlashMessage(props.t('Please set a role'), 'warning'))
-      return
+      return false
     }
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.user, props.curWs.id, {
@@ -211,9 +224,26 @@ class Dashboard extends React.Component {
 
     switch (fetchWorkspaceNewMember.status) {
       case 200:
-        this.loadMemberList(); break
+        this.loadMemberList()
+        this.setState({newMember: {id: '', avatarUrl: '', nameOrEmail: '', role: ''}})
+        props.dispatch(newFlashMessage(props.t('Member added'), 'info'))
+        return true
       default:
-        props.dispatch(newFlashMessage(props.t('An error has happened while adding the member'), 'warning')); break
+        props.dispatch(newFlashMessage(props.t('An error has happened while adding the member'), 'warning'))
+        return false
+    }
+  }
+
+  handleClickRemoveMember = async idMember => {
+    const { props } = this
+
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.user, props.curWs.id, idMember))
+    switch (fetchWorkspaceRemoveMember.status) {
+      case 204:
+        props.dispatch(removeWorkspaceMember(idMember))
+        props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while removing the member'), 'warning')); break
     }
   }
 
@@ -319,6 +349,7 @@ class Dashboard extends React.Component {
                 memberList={props.curWs.memberList}
                 roleList={ROLE}
                 searchedKnownMemberList={state.searchedKnownMemberList}
+                autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
                 nameOrEmail={state.newMember.nameOrEmail}
                 onChangeNameOrEmail={this.handleChangeNewMemberNameOrEmail}
                 onClickKnownMember={this.handleClickKnownMember}
@@ -327,6 +358,7 @@ class Dashboard extends React.Component {
                 role={state.newMember.role}
                 onChangeRole={this.handleChangeNewMemberRole}
                 onClickValidateNewMember={this.handleClickValidateNewMember}
+                onClickRemoveMember={this.handleClickRemoveMember}
                 t={props.t}
               />
             </div>

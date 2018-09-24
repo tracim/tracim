@@ -17,7 +17,10 @@ export class PreviewComponent extends React.Component {
     }
   }
 
-  handleToggleFormNewDescription = () => this.setState(prev => ({displayFormNewDescription: !prev.displayFormNewDescription}))
+  handleToggleFormNewDescription = () => this.setState(prev => ({
+    displayFormNewDescription: !prev.displayFormNewDescription,
+    newDescription: this.props.description
+  }))
 
   handleChangeDescription = e => this.setState({newDescription: e.target.value})
 
@@ -36,25 +39,25 @@ export class PreviewComponent extends React.Component {
     return (
       <div className={classnames('previewcomponent', {'closedproperty': !props.displayProperty})}>
         <div className='previewcomponent__dloption'>
-
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadPdfPageUrl}
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
-            title={props.t('Download as PDF')}
+            title={props.t('Download current page as PDF')}
             key={'file_btn_dl_pdfall'}
           >
             <i className='fa fa-file-o' />
           </a>
+
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadPdfFullUrl}
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
-            title={props.t('Download current page as PDF')}
+            title={props.t('Download as PDF')}
             key={'file_btn_dl_pdfpage'}
           >
             <i className='fa fa-file-pdf-o' />
@@ -187,6 +190,7 @@ export class PreviewComponent extends React.Component {
                       backgroundColor: props.color
                     }
                   }}
+                  disabled={props.disableChangeDescription}
                 >
                   {props.t('Change description')}
                 </button>

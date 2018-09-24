@@ -33,6 +33,10 @@ class Timeline extends React.Component {
     this.props.shouldScrollToBottom && this.scrollToBottom()
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})
 
   render () {
@@ -110,6 +114,8 @@ class Timeline extends React.Component {
                   return <Revision
                     customClass={props.customClass}
                     customColor={props.customColor}
+                    lang={props.loggedUser.lang}
+                    revisionType={content.revision_type}
                     createdAt={content.created}
                     number={content.number}
                     key={`revision_${content.revision_id}`}

@@ -12,7 +12,7 @@
   "You can also import your file by clicking here": "Vous pouvez aussi sélectionner votre fichier en cliquant ici",
   "Cancel": "Annuler",
   "Validate": "Valider",
-  "Download file": "Téléchargement du fichier",
+  "Download file": "Télécharger le fichier",
   "Download current page as PDF": "Télécharger la page actuelle au format PDF",
   "Download as PDF": "Télécharger en PDF",
   "Properties": "Propriétés",
@@ -32,5 +32,7 @@
   "PB": "Po",
   "EB": "Eo",
   "ZB": "Zo",
-  "YB": "Yo"
+  "YB": "Yo",
+  "Files": "Fichiers",
+  "Please wait until the upload ends": "Veuillez attendre la fin de l'envoi"
 }

@@ -1,5 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import Radium from 'radium'
+import color from 'color'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -10,7 +12,7 @@ import { debug, ROLE } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
-  getWorkspaceDetail,
+  // getWorkspaceDetail,
   deleteWorkspace,
   getUserList,
   getUserDetail,
@@ -103,38 +105,32 @@ class AdminWorkspaceUser extends React.Component {
 
     switch (workspaceList.apiResponse.status) {
       case 200:
-        const fetchWorkspaceListMemberList = Promise.all(
+        const fetchWorkspaceListMemberList = await Promise.all(
           workspaceList.body.map(async ws =>
             handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
           )
         )
-        const fetchWorkspaceListDetail = Promise.all(
-          workspaceList.body.map(async ws =>
-            handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, ws.workspace_id))
-          )
-        )
-        const [resWorkspaceListMemberList, resWorkspaceListDetail] = await Promise.all([fetchWorkspaceListMemberList, fetchWorkspaceListDetail])
 
         this.setState(prev => ({
           content: {
             ...prev.content,
             workspaceList: workspaceList.body.map(ws => ({
               ...ws,
-              memberList: (resWorkspaceListMemberList.find(fws => fws.body[0].workspace_id === ws.workspace_id) || {body: []}).body,
-              description: (resWorkspaceListDetail.find(fws => fws.body.workspace_id === ws.workspace_id) || {body: {description: ''}}).body.description
+              memberList: (fetchWorkspaceListMemberList.find(fws => fws.body[0].workspace_id === ws.workspace_id) || {body: []}).body
             }))
           }
         }))
         break
 
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading workspaces list'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default:
+        GLOBAL_dispatchEvent({
+          type: 'addFlashMsg',
+          data: {
+            msg: props.t('Error while loading workspaces list'),
+            type: 'warning',
+            delay: undefined
+          }
+        })
     }
   }
 
@@ -331,7 +327,7 @@ class AdminWorkspaceUser extends React.Component {
               <div className='adminworkspaceuser__popup__body__btn'>
                 <button
                   type='button'
-                  className='btn'
+                  className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
                   onClick={this.handleClosePopupDeleteWorkspace}
                 >
                   {props.t('Cancel')}
@@ -339,8 +335,13 @@ class AdminWorkspaceUser extends React.Component {
 
                 <button
                   type='button'
-                  className='btn'
+                  className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
                   onClick={this.handleDeleteWorkspace}
+                  style={{
+                    ':hover': {
+                      backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hexString()
+                    }
+                  }}
                 >
                   {props.t('Delete')}
                 </button>
@@ -353,4 +354,4 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(AdminWorkspaceUser)
+export default translate()(Radium(AdminWorkspaceUser))

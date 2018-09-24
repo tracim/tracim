@@ -45,7 +45,7 @@ class Login extends React.Component {
   componentDidMount () {
     const { props } = this
     const query = qs.parse(props.location.search)
-    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login', 'warning')))
+    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
   }
 
   handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
@@ -143,6 +143,7 @@ class Login extends React.Component {
                         value={this.state.inputLogin.value}
                         onChange={this.handleChangeLogin}
                         onKeyPress={this.handleInputKeyPress}
+                        maxLength={512}
                       />
 
                       <InputGroupText
@@ -156,6 +157,7 @@ class Login extends React.Component {
                         value={this.state.inputPassword.value}
                         onChange={this.handleChangePassword}
                         onKeyPress={this.handleInputKeyPress}
+                        maxLength={512}
                       />
 
                       <div className='row mt-4 mb-4'>

@@ -46,7 +46,7 @@ export class AdminUser extends React.Component {
       return
     }
 
-    if (toggle) props.onChangeProfile(idUser, 'managers')
+    if (toggle) props.onChangeProfile(idUser, 'trusted-users')
     else props.onChangeProfile(idUser, 'users')
   }
 
@@ -55,7 +55,7 @@ export class AdminUser extends React.Component {
     e.stopPropagation()
 
     if (toggle) this.props.onChangeProfile(idUser, 'administrators')
-    else this.props.onChangeProfile(idUser, 'managers')
+    else this.props.onChangeProfile(idUser, 'trusted-users')
   }
 
   handleClickAddUser = (email, profile) => {
@@ -125,8 +125,8 @@ export class AdminUser extends React.Component {
                     <td>{u.email}</td>
                     <td>
                       <BtnSwitch
-                        checked={u.profile === 'managers' || u.profile === 'administrators'}
-                        onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'managers' || u.profile === 'administrators'))}
+                        checked={u.profile === 'trusted-users' || u.profile === 'administrators'}
+                        onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'trusted-users' || u.profile === 'administrators'))}
                       />
                     </td>
                     <td>

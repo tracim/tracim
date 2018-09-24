@@ -13,9 +13,11 @@ const CardPopup = props => {
       <div className='cardPopup__container'>
         <div className={classnames(props.customHeaderClass, 'cardPopup__header')} style={{backgroundColor: props.customColor}} />
 
-        <div className='cardPopup__close' onClick={props.onClose}>
-          <i className='fa fa-times' />
-        </div>
+        {props.hideCloseBtn === false &&
+          <div className='cardPopup__close' onClick={props.onClose}>
+            <i className='fa fa-times' />
+          </div>
+        }
 
         <div className='cardPopup__body'>
           { props.children }
@@ -32,6 +34,7 @@ CardPopup.propTypes = {
   customHeaderClass: PropTypes.string,
   customColor: PropTypes.string,
   onClose: PropTypes.func,
+  hideCloseBtn: PropTypes.bool,
   customStyle: PropTypes.object
 }
 
@@ -40,5 +43,6 @@ CardPopup.defaultProps = {
   customHeaderClass: '',
   customColor: '',
   onClose: () => {},
+  hideCloseBtn: false,
   customStyle: {}
 }

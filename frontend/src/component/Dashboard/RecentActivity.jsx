@@ -44,7 +44,7 @@ export const RecentActivity = props =>
 
       <div
         className='activity__more'
-        style={{display: props.recentActivityList.length === 0 ? 'none' : 'block'}}
+        style={{display: props.recentActivityList.length === 0 ? 'none' : 'flex'}}
       >
         <button
           className='activity__more__btn btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'

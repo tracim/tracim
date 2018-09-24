@@ -3,7 +3,8 @@ import {
   libHandleFetchResult,
   libGenerateAvatarFromPublicName,
   libDisplayDate,
-  libConvertBackslashNToBr
+  libConvertBackslashNToBr,
+  libRevisionTypeList
 } from './helper.js'
 
 import libPopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -40,6 +41,7 @@ export const handleFetchResult = libHandleFetchResult
 export const generateAvatarFromPublicName = libGenerateAvatarFromPublicName
 export const displayDate = libDisplayDate
 export const convertBackslashNToBr = libConvertBackslashNToBr
+export const revisionTypeList = libRevisionTypeList
 
 export const PopinFixed = libPopinFixed
 export const PopinFixedHeader = libPopinFixedHeader

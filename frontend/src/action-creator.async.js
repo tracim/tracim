@@ -13,6 +13,7 @@ import {
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_ADD,
+  WORKSPACE_MEMBER_REMOVE,
   FOLDER,
   setFolderData,
   APP_LIST,
@@ -280,7 +281,7 @@ export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
 
 export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/${doNotify ? 'notify' : 'unnotify'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
     param: {
       credentials: 'include',
       headers: {
@@ -399,6 +400,19 @@ export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch =>
       })
     },
     actionName: WORKSPACE_MEMBER_ADD,
+    dispatch
+  })
+}
+
+export const deleteWorkspaceMember = (user, idWorkspace, idMember) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members/${idMember}`,
+    param: {
+      credentials: 'include',
+      headers: {...FETCH_CONFIG.headers},
+      method: 'DELETE'
+    },
+    actionName: WORKSPACE_MEMBER_REMOVE,
     dispatch
   })
 }

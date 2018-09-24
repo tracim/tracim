@@ -7,13 +7,13 @@ The other is workspace related and is called "workspace role".
 
 ## Global profile
 
-|                               | Normal User | Managers    | Admin          |
+|                               | Normal User | Trusted User    | Admin          |
 |-------------------------------|-------------|-------------|----------------|
-| slug                          | users       | managers    | administrators |
+| slug                          | users       | trusted-users    | administrators |
 |-------------------------------|-------------|-------------|---------|
 
 
-|                               | Normal User | Managers    | Admin   |
+|                               | Normal User | Trusted User    | Admin   |
 |-------------------------------|-------------|-------------|---------|
 | access to tracim apps/contents_types/timezones_list         |  yes        | yes         | yes     |
 | participate to workspaces     |  yes        | yes         | yes     |

@@ -12,7 +12,10 @@ const Comment = props => {
 
   const styleReceived = {
     color: '#333',
-    backgroundColor: '#fdfdfd'
+    backgroundColor: '#fdfdfd',
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    borderColor: props.customColor
   }
 
   return (
