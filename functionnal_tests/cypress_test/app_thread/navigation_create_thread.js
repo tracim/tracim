@@ -8,7 +8,7 @@ describe('navigate :: workspace > create_new > thread', function () {
     })
     it ('dashboard > button', function() {
         var titre1='thread1'
-        cy.get('.dashboard__calltoaction div:nth-child(3) .dashboard__calltoaction__button__text').click()
+        cy.get('.dashboard__calltoaction .fa-comments-o').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
         cy.get('.createcontent .createcontent__form__input').type(titre1)

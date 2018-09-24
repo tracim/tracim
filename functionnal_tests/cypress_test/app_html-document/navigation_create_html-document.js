@@ -8,7 +8,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
     })
     it ('dashboard > button', function() {
         var titre1='document1'
-        cy.get('.dashboard__calltoaction > div:nth-child(1) .dashboard__calltoaction__button__text').click()
+        cy.get('.dashboard__calltoaction .fa-file-text-o').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
         cy.get('.createcontent .createcontent__form__input').type(titre1)

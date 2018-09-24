@@ -9,8 +9,8 @@ describe('operation :: workspace > create_new > thread', function () {
     it ('dashborad > button', function(){
         var titre1='thread1'
         cy.url().should('include', '/workspaces/1/dashboard')
-        cy.get('.dashboard__calltoaction div:nth-child(3) .dashboard__calltoaction__button__text').should('be.visible')
-        cy.get('.dashboard__calltoaction div:nth-child(3) .dashboard__calltoaction__button__text').click()
+        cy.get('.dashboard__calltoaction .fa-comments-o').should('be.visible')
+        cy.get('.dashboard__calltoaction .fa-comments-o').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
         cy.get('.createcontent .createcontent__form__input').type(titre1)
