@@ -1,47 +1,34 @@
 import React from 'react'
 import classnames from 'classnames'
 import Radium from 'radium'
+import color from 'color'
 import { libRevisionTypeList } from '../../helper.js'
 
-const Revision = props => (
-  <li className={classnames(`${props.customClass}__messagelist__version`, 'timeline__body__messagelist__version')}>
-    <div className={classnames(`${props.customClass}__messagelist__version__action`, 'timeline__body__messagelist__version__action')}>
-      <button
-        type='button'
-        className={classnames(`${props.customClass}__messagelist__version__action__btn`, 'timeline__body__messagelist__version__action__btn btn outlineTextBtn')}
+require('./Revision.styl')
+
+const Revision = props => {
+  const revisionType = libRevisionTypeList(props.lang).find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
+  return (
+      <li
+        className={classnames(`${props.customClass}__messagelist__version`, 'revision')}
         onClick={props.onClickRevision}
         style={{
-          borderColor: props.customColor,
-          color: '#252525',
           ':hover': {
-            backgroundColor: props.customColor,
-            color: '#fdfdfd'
+            backgroundColor: color(props.customColor).lighten(0.60).hexString()
           }
         }}
       >
-        <i className='fa fa-code-fork' style={{color: '#252525'}} />
-        version {props.number}
-      </button>
+        <div className={classnames(`${props.customClass}__messagelist__version__data`, 'revision__data')}>
+          <span className='revision__data__nb'>{props.number}</span>
+          <i className={`fa fa-fw fa-${revisionType.faIcon} revision__data__icon`} style={{color: props.customColor}} />
+          {revisionType.label}
+        </div>
 
-      {(() => {
-        const revisionType = libRevisionTypeList.find(r => r.id === props.revisionType) || {id: '', faIcon: '', label: ''}
-        return (
-          <div
-            className={classnames(`${props.customClass}__messagelist__version__action__icon`, 'timeline__body__messagelist__version__action__icon')}
-            title={revisionType.label}
-            style={{color: props.customColor}}
-          >
-            <i className={`fa fa-fw fa-${revisionType.faIcon}`} />
-          </div>
-        )
-      })()}
-    </div>
-
-
-    <div className={classnames(`${props.customClass}__messagelist__version__date`, 'timeline__body__messagelist__version__date')}>
-      {props.createdAt}
-    </div>
-  </li>
-)
+        <div className={classnames(`${props.customClass}__messagelist__version__date`, 'revision__date')}>
+          {props.createdAt}
+        </div>
+      </li>
+  )
+}
 
 export default Radium(Revision)

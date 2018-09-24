@@ -27,6 +27,13 @@ class PopinFixedHeader extends React.Component {
     this.setState(prevState => ({editTitle: !prevState.editTitle}))
   }
 
+  handleInputKeyPress = e => {
+    switch (e.key) {
+      case 'Enter': this.handleClickChangeTitleBtn(); break
+      case 'Escape': this.setState({editTitle: false, editTitleValue: this.props.title}); break
+    }
+  }
+
   render () {
     const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
     const { state } = this
@@ -39,7 +46,12 @@ class PopinFixedHeader extends React.Component {
 
         <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>
           {state.editTitle
-            ? <input className='wsContentGeneric__header__title__editiontitle editiontitle' value={state.editTitleValue} onChange={this.onChangeTitle} />
+            ? <input
+              className='wsContentGeneric__header__title__editiontitle editiontitle'
+              value={state.editTitleValue}
+              onChange={this.onChangeTitle}
+              onKeyDown={this.handleInputKeyPress}
+            />
             : <div>{title}</div>
           }
         </div>

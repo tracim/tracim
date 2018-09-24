@@ -281,7 +281,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -298,7 +301,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -315,7 +321,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -332,7 +341,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {

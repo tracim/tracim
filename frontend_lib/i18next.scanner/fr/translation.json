@@ -20,14 +20,14 @@
   "inactive": "désactivé",
   "No result": "Aucun résultat",
   "Status": "Statut ",
-  "Archived": "Archivage",
   "Comment": "Commentaire",
-  "Created": "Création",
-  "Deleted": "Suppretion",
-  "Edited": "Modification",
-  "Status updated": "Changement de status",
-  "Unarchived": "Désarchivage",
-  "Restored": "Restauration",
-  "Moved": "Déplacement",
-  "Copied": "Copie"
+  "Item created": "Elément créé",
+  "Item deleted": "Elément supprimé",
+  "New revision": "Nouvelle version",
+  "New status": "Nouveau statut",
+  "Item unarchived": "Elément désarchivé",
+  "Item restored": "Elément restauré",
+  "Item moved": "Elément déplacé",
+  "Item copied": "Elément copié",
+  "Item archived": "Elément archivé"
 }

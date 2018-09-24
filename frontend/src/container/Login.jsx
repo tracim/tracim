@@ -45,7 +45,7 @@ class Login extends React.Component {
   componentDidMount () {
     const { props } = this
     const query = qs.parse(props.location.search)
-    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login', 'warning')))
+    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
   }
 
   handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
