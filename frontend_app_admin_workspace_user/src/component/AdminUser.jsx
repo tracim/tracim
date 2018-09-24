@@ -106,6 +106,7 @@ export class AdminUser extends React.Component {
               <thead>
                 <tr>
                   <th scope='col'>{props.t('Active')}</th>
+                  <th scope='col'></th>
                   <th scope='col'>{props.t('User')}</th>
                   <th scope='col'>{props.t('Email')}</th>
                   <th scope='col'>{props.t('Can create workspace')}</th>
@@ -118,6 +119,11 @@ export class AdminUser extends React.Component {
                   <tr className='adminUser__table__tr' key={u.user_id}>
                     <td>
                       <BtnSwitch checked={u.is_active} onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)} />
+                    </td>
+                    <td>
+                      <div className='adminUser__table__tr__td-link__usericon'>
+                        <i className='fa fa-fw fa-shield' />
+                      </div>
                     </td>
                     <td className='adminUser__table__tr__td-link primaryColorFont' onClick={e => this.handleClickUser(e, u.user_id)}>
                       {u.public_name}

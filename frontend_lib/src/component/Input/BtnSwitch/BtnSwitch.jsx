@@ -18,7 +18,7 @@ export const BtnSwitch = props =>
       <span className='slider round' />
     </label>
     <div className='btnswitch__text'>
-      { props.checked ? props.t('active') : props.t('inactive') }
+      { props.checked ? props.t('') : props.t('inactive') }
     </div>
   </div>
 
