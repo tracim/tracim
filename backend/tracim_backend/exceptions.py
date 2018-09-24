@@ -113,7 +113,11 @@ class ExpiredResetPasswordToken(TracimException):
     pass
 
 
-class NotificationNotSend(TracimException):
+class NotificationSendingFailed(TracimException):
+    pass
+
+
+class NotificationDisabled(TracimException):
     pass
 
 

@@ -305,6 +305,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_WORKSPACE_ENDPOINTS])
     @hapic.handle_exception(UserCreationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.WORKSPACE_MANAGER)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceMemberInviteSchema())
@@ -337,22 +338,23 @@ class WorkspaceController(Controller):
                 email=hapic_data.body.user_email_or_public_name,
                 public_name=hapic_data.body.user_email_or_public_name
             )
-        except UserDoesNotExist:
-            try:
-                # TODO - G.M - 2018-07-05 - [UserCreation] Reenable email
-                # notification for creation
-                user = uapi.create_user(
-                    email=hapic_data.body.user_email_or_public_name,
-                    password=password_generator(),
-                    do_notify=True
-                )  # nopep8
-                newly_created = True
-                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                        app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
-                    email_sent = True
+        except UserDoesNotExist as exc:
+            if app_config.EMAIL_NOTIFICATION_ACTIVATED:
+                try:
+                    user = uapi.create_user(
+                        email=hapic_data.body.user_email_or_public_name,
+                        password=password_generator(),
+                        do_notify=True
+                    )
+                    newly_created = True
+                    if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                            app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                        email_sent = True
 
-            except EmailValidationFailed:
-                raise UserCreationFailed('no valid mail given')
+                except EmailValidationFailed:
+                    raise UserCreationFailed('no valid mail given')
+            else:
+                raise exc
 
         role = rapi.create_one(
             user=user,

@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
+import typing as typing
 from smtplib import SMTPException
 
 import transaction
-import typing as typing
-
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
 from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.core.group import GroupApi
-from tracim_backend.models.auth import User
-from tracim_backend.models.auth import Group
-from tracim_backend.exceptions import NoUserSetted
-from tracim_backend.exceptions import UnvalidResetPasswordToken
-from tracim_backend.exceptions import EmailAlreadyExistInDb
-from tracim_backend.exceptions import TooShortAutocompleteString
-from tracim_backend.exceptions import PasswordDoNotMatch
-from tracim_backend.exceptions import EmailValidationFailed
-from tracim_backend.exceptions import UserDoesNotExist
-from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.exceptions import AuthenticationFailed
-from tracim_backend.exceptions import NotificationNotSend
+from tracim_backend.exceptions import EmailAlreadyExistInDb
+from tracim_backend.exceptions import EmailValidationFailed
+from tracim_backend.exceptions import NotificationDisabled
+from tracim_backend.exceptions import NotificationSendingFailed
+from tracim_backend.exceptions import NoUserSetted
+from tracim_backend.exceptions import PasswordDoNotMatch
+from tracim_backend.exceptions import TooShortAutocompleteString
+from tracim_backend.exceptions import UnvalidResetPasswordToken
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserNotActive
-from tracim_backend.models.context_models import UserInContext
+from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
+from tracim_backend.models.auth import Group
+from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import TypeUser
+from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import UserRoleInWorkspace
 
 
@@ -384,6 +384,11 @@ class UserApi(object):
         do_save: bool=True,
         do_notify: bool=True,
     ) -> User:
+        if do_notify and not self._config.EMAIL_NOTIFICATION_ACTIVATED:
+            raise NotificationDisabled(
+                "Can't create user with invitation mail because"
+                "notification are disabled."
+            )
         new_user = self.create_minimal_user(email, groups, save_now=False)
         self.update(
             user=new_user,
@@ -402,7 +407,7 @@ class UserApi(object):
                     password=password
                 )
             except SMTPException as exc:
-                raise NotificationNotSend(
+                raise NotificationSendingFailed(
                     "Notification for new created account can't be send "
                     "(SMTP error), new account creation aborted"
                 ) from exc
@@ -446,12 +451,14 @@ class UserApi(object):
         :param do_save: save update ?
         :return: reset_password_token
         """
+        if not self._config.EMAIL_NOTIFICATION_ACTIVATED:
+            raise NotificationDisabled("cant reset password with notification disabled")  # nopep8
         token = user.generate_reset_password_token()
         try:
             email_manager = get_email_manager(self._config, self._session)
             email_manager.notify_reset_password(user, token)
-        except SMTPException as e:
-            raise NotificationNotSend()
+        except SMTPException as exc:
+            raise NotificationSendingFailed("SMTP error, can't send notification") from exc
         if do_save:
             self.save(user)
         return token
