@@ -489,7 +489,7 @@ class File extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: state.config.hexcolor, color: '#fdfdfd'}}
                 >
-                  <i className='fa fa-code-fork' />
+                  <i className='fa fa-history' />
                   {props.t('Last version')}
                 </button>
               }
