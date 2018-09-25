@@ -1030,7 +1030,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1373,7 +1373,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         workspace_api = WorkspaceApi(
             current_user=admin,
             session=dbsession,
@@ -1441,7 +1441,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
             current_user=admin,
@@ -1691,7 +1691,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
@@ -1773,7 +1773,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
@@ -1909,7 +1909,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             session=dbsession,
             config=self.app_config,
         )
-        groups = [gapi.get_one_with_name('managers')]
+        groups = [gapi.get_one_with_name('trusted-users')]
         user = uapi.create_user('test@test.test', password='test@test.test', do_save=True, do_notify=False, groups=groups)  # nopep8
         user2 = uapi.create_user('test2@test2.test2', password='test2@test2.test2', do_save=True, do_notify=False, groups=groups)  # nopep8
         workspace_api = WorkspaceApi(
