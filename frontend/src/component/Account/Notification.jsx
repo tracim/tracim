@@ -57,8 +57,8 @@ export const Notification = props =>
             : (
               <tr>
                 <td>{props.t('You are not a member of any workspace yet')}</td>
-                <td></td>
-                <td></td>
+                <td />
+                <td />
               </tr>
             )
           }

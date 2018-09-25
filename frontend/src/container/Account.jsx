@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
@@ -27,7 +28,6 @@ import {
   putUserPassword,
   putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
-import { translate } from 'react-i18next'
 
 class Account extends React.Component {
   constructor (props) {
@@ -36,19 +36,15 @@ class Account extends React.Component {
     this.state = {
       subComponentMenu: [{
         name: 'personalData',
-        menuLabel: props.t('My profil'),
         active: true
       }, {
         name: 'notification',
-        menuLabel: props.t('Workspaces and notifications'),
         active: false
       }, {
         name: 'password',
-        menuLabel: props.t('Password'),
         active: false
       }, {
         name: 'timezone',
-        menuLabel: props.t('Timezone'),
         active: false
       }]
       // {
@@ -185,7 +181,7 @@ class Account extends React.Component {
 
           <div className='account__userpreference'>
             <MenuSubComponent
-              subMenuList={state.subComponentMenu}
+              activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
               onClickMenuItem={this.handleClickSubComponentMenuItem}
             />
 

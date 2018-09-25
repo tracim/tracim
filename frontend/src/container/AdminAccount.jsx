@@ -39,19 +39,15 @@ class Account extends React.Component {
       userToEditWorkspaceList: [],
       subComponentMenu: [{
         name: 'personalData',
-        menuLabel: props.t('My profil'),
         active: true
       }, {
         name: 'notification',
-        menuLabel: props.t('Workspaces and notifications'),
         active: false
       }, {
         name: 'password',
-        menuLabel: props.t('Password'),
         active: false
       }, {
         name: 'timezone',
-        menuLabel: props.t('Timezone'),
         active: false
       }]
       // {
@@ -222,7 +218,7 @@ class Account extends React.Component {
 
           <div className='account__userpreference'>
             <MenuSubComponent
-              subMenuList={state.subComponentMenu}
+              activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
               onClickMenuItem={this.handleClickSubComponentMenuItem}
             />
 

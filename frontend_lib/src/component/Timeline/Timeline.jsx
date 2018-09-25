@@ -192,7 +192,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default translate()(Radium(Timeline))
+export default Radium(translate()(Timeline))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
