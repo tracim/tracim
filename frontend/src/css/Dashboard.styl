@@ -5,11 +5,18 @@ flexwrap()
   flex-wrap wrap
 
 .dashboard
+  .pageContentGeneric
+    margin 0
+    min-height 100%
+  .pageTitleGeneric
+    margin 45px 0 15px 0
+
+.dashboard
   width 100%
+  min-height 100%
   &__header
     flexwrap()
     align-items center
-    justify-content space-between
     &__title
       width auto
       &__text
@@ -18,29 +25,31 @@ flexwrap()
     flexwrap()
   &__workspace
     margin-right 20px
-    width calc(65% - 20px) //20px => margin-right
+    width calc(70% - 20px) //20px => margin-right
     &__title
-      margin-bottom 20px
-      font-size 40px
+      margin 0 0 20px 30px
+      font-size 70px
       font-weight 500
     &__detail
-      margin-bottom 20px
+      margin-left 30px
       font-size 18px
   &__calltoaction
     flexwrap()
-    margin 100px 0
+    margin 40px 30px
     &__button
       &:active
         box-shadow inset 0px 0px 5px 2px #656565
       &__text
         color white
         &__icon
-          font-size 30px
+          font-size 40px
         &__title
           font-size 18px
   &__workspaceInfo
-    margin-bottom 50px
     flexwrap()
+    padding 30px
+    min-height 100%
+    background-color lightGrey
 
 // MEDIAQUERIES
 
@@ -48,6 +57,7 @@ flexwrap()
 
   .dashboard
     &__workspace
+      order 2
       width 100%
     .memberlist
       margin-left 0
@@ -59,10 +69,8 @@ flexwrap()
       &__advancedmode
         display none
     &__workspace
+      order 2
       width 100%
-    &__calltoaction
-      &__button:nth-child(even)
-        margin-right 0
 
 @media (max-width: max-xs)
 
@@ -76,6 +84,7 @@ flexwrap()
     &__workspace-wrapper
       margin 0 15px
     &__workspace
+      order 2
       width 100%
     &__calltoaction
       flex-direction column

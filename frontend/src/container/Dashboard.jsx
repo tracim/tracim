@@ -278,7 +278,7 @@ class Dashboard extends React.Component {
             title={props.t('Dashboard')}
             subtitle={''}
           >
-            <div className='dashboard__header__advancedmode mr-3'>
+            <div className='dashboard__header__advancedmode ml-3'>
               {idRoleUserWorkspace >= 8 &&
                 <button
                   type='button'
@@ -302,6 +302,25 @@ class Dashboard extends React.Component {
                   className='dashboard__workspace__detail'
                   dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
                 />
+
+                <div className='dashboard__calltoaction'>
+                  {props.appList.map(app => {
+                    const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+                    return (
+                      <ContentTypeBtn
+                        customClass='dashboard__calltoaction__button'
+                        hexcolor={app.hexcolor}
+                        label={app.label}
+                        faIcon={app.faIcon}
+                        // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
+                        // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                        creationLabel={props.t(contentType.creationLabel)}
+                        onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
+                        key={app.label}
+                      />
+                    )
+                  })}
+                </div>
               </div>
 
               <UserStatus
@@ -311,25 +330,6 @@ class Dashboard extends React.Component {
                 onClickToggleNotifBtn={this.handleToggleNotifBtn}
                 t={props.t}
               />
-            </div>
-
-            <div className='dashboard__calltoaction justify-content-sm-center'>
-              {props.appList.map(app => {
-                const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-                return (
-                  <ContentTypeBtn
-                    customClass='dashboard__calltoaction__button'
-                    hexcolor={app.hexcolor}
-                    label={app.label}
-                    faIcon={app.faIcon}
-                    // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
-                    // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
-                    creationLabel={props.t(contentType.creationLabel)}
-                    onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
-                    key={app.label}
-                  />
-                )
-              })}
             </div>
 
             <div className='dashboard__workspaceInfo'>

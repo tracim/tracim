@@ -150,3 +150,33 @@ div.mce-fullscreen
       border 1px solid grey
       border-radius 10px
       padding 15px
+
+.notchUp
+  position absolute
+  top 0
+  right 0
+  &__upLeft
+    width 28px
+    height 6px
+    border-radius 2px
+  &__upRight
+    width 6px
+    height 25px
+    border-radius 2px
+
+.notchDownLeftTop
+  top calc(100% - 6px)
+.notchDownRightTop
+  top calc(100% - 25px)
+
+.notchDown
+  position absolute
+  left 0
+  &__downLeft
+    width 28px
+    height 6px
+    border-radius 2px
+  &__downRight
+    width 6px
+    height 25px
+    border-radius 2px

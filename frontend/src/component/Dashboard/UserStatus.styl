@@ -1,60 +1,80 @@
 @import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
+detail()
+  margin-left calc(50% - 100px)
+  padding 25px 0
+  width 200px
+  font-size 25px
+
 .userstatus
-  width 35%
+  width 27%
+  &__wrapper
+    position relative
+    top -60px
+    border-radius 5px
+    padding 40px 0
+    width 100%
+    background-color lightGrey
+  &__username
+    text-align center
+    font-size 20px
   &__role
-    margin 20px 0
-    font-size 18px
-    &__msg
-      margin-right 15px
-    &__definition
-      display flex
-      &__icon
-        margin-right 5px
+    detail()
+    &__icon
+      margin-right 20px
   &__notification
-    font-size 18px
-    &__btn
-      margin 20px 0
-      border-width 1px
-      border-style solid
-    &__subscribe
-      &__btn
-        margin 20px 0
-        border-width 1px
-        border-style solid
-        &:focus
-          box-shadow none
-      &__submenu
-        padding 0
-        &__item
-          padding 10px
-          cursor pointer
-          &:hover
-            color offWhite
+    display flex
+    align-items center
+    detail()
+    &__text
+      cursor pointer
+    // &__btn
+    //   margin 20px 0
+    //   border-width 1px
+    //   border-style solid
+    // &__subscribe
+    //   &__btn
+    //     margin 20px 0
+    //     border-width 1px
+    //     border-style solid
+    //     &:focus
+    //       box-shadow none
+    //   &__submenu
+    //     padding 0
+    //     &__item
+    //       padding 10px
+    //       cursor pointer
+    //       &:hover
+    //         color offWhite
 
 // MEDIAQUERIES
 
 @media (min-width: min-lg) and (max-width: max-lg)
 
   .userstatus
-    width 100%
-    &__role
-      display flex
+    width 28%
 
 @media (min-width: min-md) and (max-width: max-md)
 
   .userstatus
-    width 100%
-    &__role
-      display flex
+    margin 35px auto
+    width 50%
+    &__wrapper
+      top 0
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
   .userstatus
-    width 100%
+    margin 35px auto
+    width 50%
+    &__wrapper
+      top 0
 
 @media (max-width: max-xs)
 
   .userstatus
+    margin 35px auto
     width 100%
+    &__wrapper
+      top 0
 
