@@ -183,7 +183,6 @@ class TestFolder(FunctionalTest):
         assert 'code' in res.json_body
         assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
 
-
     def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
         Get one folders of a content (content is in another workspace)
@@ -565,6 +564,10 @@ class TestFolder(FunctionalTest):
             params=params,
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+
     def test_api__get_folder_revisions__ok_200__nominal_case(
             self
     ) -> None:
@@ -1965,6 +1968,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
@@ -2135,6 +2141,44 @@ class TestFiles(FunctionalTest):
         """
         set file status
         """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
         self.testapp.authorization = (
             'Basic',
             (
@@ -2145,11 +2189,26 @@ class TestFiles(FunctionalTest):
         params = {
             'status': 'unexistant-status',
         }
-        self.testapp.put_json(
-            '/api/v2/workspaces/2/files/6/status',
+
+        # before
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['status'] == 'open'
+
+        # set status
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}/status'.format(test_file.content_id),
             params=params,
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__get_file_raw__ok_200__nominal_case(self) -> None:
         """
@@ -2553,6 +2612,9 @@ class TestFiles(FunctionalTest):
             status=400,
             params=params
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_UNAIVALABLE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(self) -> None:
         """
@@ -2661,6 +2723,9 @@ class TestFiles(FunctionalTest):
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_UNAIVALABLE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(self) -> None:
         """
@@ -3156,10 +3221,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_UNAIVALABLE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__nominal_case(self) -> None:
         """
@@ -3276,6 +3344,9 @@ class TestFiles(FunctionalTest):
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_UNAIVALABLE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__force_download_case(self) -> None:
         """

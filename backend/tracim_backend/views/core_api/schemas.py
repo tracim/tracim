@@ -584,6 +584,9 @@ class LoginOutputHeaders(marshmallow.Schema):
 class WorkspaceModifySchema(marshmallow.Schema):
     label = marshmallow.fields.String(
         example='My Workspace',
+        validate=Length(min=1),
+        required=True
+
     )
     description = marshmallow.fields.String(
         example='A super description of my workspace.',

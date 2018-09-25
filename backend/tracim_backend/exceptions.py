@@ -67,7 +67,7 @@ class NotFound(TracimException):
 
 
 class SameValueError(ValueError):
-    pass
+    error_code = ERROR_CODE_SAME_VALUE_ERROR
 
 
 class NotAuthenticated(TracimException):
@@ -107,11 +107,12 @@ class WrongUserPassword(TracimException):
 
 
 class UnvalidResetPasswordToken(TracimException):
+    error_code = ERROR_CODE_INVALID_RESET_PASSWORD_TOKEN
     pass
 
 
 class ExpiredResetPasswordToken(TracimException):
-    pass
+    error_code = ERROR_CODE_EXPIRED_RESET_PASSWORD_TOKEN
 
 
 class NotificationNotSend(TracimException):
@@ -210,20 +211,16 @@ class EmailValidationFailed(TracimException):
     error_code = ERROR_CODE_EMAIL_VALIDATION_FAILED
 
 
-class UserCreationFailed(TracimException):
-    pass
-
-
 class InconsistentDatabase(TracimException):
     pass
 
 
 class ContentLabelAlreadyUsedHere(TracimException):
-    pass
+    error_code = ERROR_CODE_CONTENT_LABEL_ALREADY_USED_THERE
 
 
 class ParentNotFound(NotFound):
-    pass
+    error_code = ERROR_CODE_PARENT_NOT_FOUND
 
 
 class RevisionDoesNotMatchThisContent(TracimException):
@@ -259,4 +256,4 @@ class EmailAlreadyExistInDb(TracimException):
 
 
 class UnavailablePreview(TracimException):
-    pass
+    error_code = ERROR_CODE_UNAIVALABLE_PREVIEW

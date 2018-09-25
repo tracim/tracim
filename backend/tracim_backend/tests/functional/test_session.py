@@ -287,6 +287,9 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
             status=401,
             headers=headers_auth
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
 
     def test_api__try_whoami_enpoint__err_401__unauthenticated(self):
         headers_auth = {
@@ -452,7 +455,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
         with freeze_time("2000-01-01 00:02:03"):
             self.testapp.reset()
             self.testapp.set_cookie('session_key', user_session_key_1)
-            res = self.testapp.get(
+            self.testapp.get(
                 '/api/v2/sessions/whoami',
                 status=200,
             )
