@@ -106,6 +106,14 @@ class WrongUserPassword(TracimException):
     error_code = ERROR_CODE_WRONG_USER_PASSWORD
 
 
+class UnvalidResetPasswordToken(TracimException):
+    pass
+
+
+class ExpiredResetPasswordToken(TracimException):
+    pass
+
+
 class NotificationNotSend(TracimException):
     pass
 
@@ -206,6 +214,14 @@ class UserCreationFailed(TracimException):
     pass
 
 
+class InconsistentDatabase(TracimException):
+    pass
+
+
+class ContentLabelAlreadyUsedHere(TracimException):
+    pass
+
+
 class ParentNotFound(NotFound):
     pass
 
@@ -240,3 +256,7 @@ class AppDoesNotExist(TracimException):
 
 class EmailAlreadyExistInDb(TracimException):
     error_code = ERROR_CODE_EMAIL_ALREADY_EXIST_IN_DB
+
+
+class UnavailablePreview(TracimException):
+    pass

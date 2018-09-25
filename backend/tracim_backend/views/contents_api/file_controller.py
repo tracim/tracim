@@ -4,11 +4,16 @@ import typing
 import transaction
 from depot.manager import DepotManager
 from pyramid.config import Configurator
-from pyramid.response import FileIter
-from pyramid.response import FileResponse
 
+from hapic.data import HapicFile
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import PageOfPreviewNotFound
+from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import TracimUnavailablePreviewType
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import require_content_types
@@ -33,11 +38,7 @@ from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import \
     WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import \
-    WorkspaceAndContentRevisionIdPathSchema  # nopep8
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import PageOfPreviewNotFound
-from tracim_backend.exceptions import PreviewDimNotAllowed
-from tracim_backend.exceptions import TracimUnavailablePreviewType
+    WorkspaceAndContentRevisionIdPathSchema
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -114,14 +115,12 @@ class FileController(Controller):
             content_type=CONTENT_TYPES.Any_SLUG
         )
         file = DepotManager.get().get(content.depot_file)
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = request.response
-        response.content_type = file.content_type
-        response.app_iter = FileIter(file)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
-        return response
+        return HapicFile(
+            file_object=file,
+            mimetype=file.content_type,
+            filename=content.file_name,
+            as_attachment=hapic_data.query.force_download
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -150,14 +149,12 @@ class FileController(Controller):
             content=content
         )
         file = DepotManager.get().get(revision.depot_file)
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = request.response
-        response.content_type = file.content_type
-        response.app_iter = FileIter(file)
-        # INFO - G.M - 2018-09-05 - Support for force download param
-        if hapic_data.query.force_download:
-            response.content_disposition = 'attachment'
-        return response
+        return HapicFile(
+            file_object=file,
+            mimetype=file.content_type,
+            filename=revision.file_name,
+            as_attachment=hapic_data.query.force_download
+        )
 
     # preview
     # pdf
@@ -165,6 +162,7 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -190,14 +188,18 @@ class FileController(Controller):
             content.revision_id,
             page_number=hapic_data.query.page
         )
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = FileResponse(pdf_preview_path)
-        return response
+        filename = "{}_page_{}.pdf".format(content.label, hapic_data.query.page)
+        return HapicFile(
+            file_path=pdf_preview_path,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_file([])
@@ -218,14 +220,18 @@ class FileController(Controller):
             content_type=CONTENT_TYPES.Any_SLUG
         )
         pdf_preview_path = api.get_full_pdf_preview_path(content.revision_id)
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = FileResponse(pdf_preview_path)
-        return response
+        filename = "{label}.pdf".format(label=content.label)
+        return HapicFile(
+            file_path=pdf_preview_path,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
@@ -252,14 +258,18 @@ class FileController(Controller):
         pdf_preview_path = api.get_full_pdf_preview_path(
             revision.revision_id,
         )
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = FileResponse(pdf_preview_path)
-        return response
+        filename = "{label}.pdf".format(label=revision.label)
+        return HapicFile(
+            file_path=pdf_preview_path,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
     @hapic.handle_exception(TracimUnavailablePreviewType, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
@@ -288,14 +298,21 @@ class FileController(Controller):
             revision.revision_id,
             page_number=hapic_data.query.page
         )
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = FileResponse(pdf_preview_path)
-        return response
+        filename = "{label}_page_{page_number}.pdf".format(
+            label=content.label,
+            page_number=hapic_data.query.page
+        )
+        return HapicFile(
+            file_path=pdf_preview_path,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download
+        )
 
     # jpg
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_query(PageQuerySchema())
@@ -324,13 +341,20 @@ class FileController(Controller):
             width=allowed_dim.dimensions[0].width,
             height=allowed_dim.dimensions[0].height,
         )
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = FileResponse(jpg_preview_path)
-        return response
+        filename = "{label}_page_{page_number}.jpg".format(
+            label=content.label,
+            page_number=hapic_data.query.page
+        )
+        return HapicFile(
+            file_path=jpg_preview_path,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(PageQuerySchema())
@@ -359,13 +383,22 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = FileResponse(jpg_preview_path)
-        return response
+        filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
+            label=content.label,
+            page_number=hapic_data.query.page,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height
+        )
+        return HapicFile(
+            file_path=jpg_preview_path,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
     @require_content_types([FILE_TYPE])
+    @hapic.handle_exception(UnavailablePreview, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PageOfPreviewNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(PreviewDimNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(RevisionPreviewSizedPathSchema())
@@ -398,10 +431,17 @@ class FileController(Controller):
             height=hapic_data.path.height,
             width=hapic_data.path.width,
         )
-        
-        request.response_download_mode(force_download=hapic_data.query.force_download)  # nopep8
-        response = FileResponse(jpg_preview_path)
-        return response
+        filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
+            label=revision.label,
+            page_number=hapic_data.query.page,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height
+        )
+        return HapicFile(
+            file_path=jpg_preview_path,
+            filename=filename,
+            as_attachment=hapic_data.query.force_download
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.READER)
@@ -449,6 +489,7 @@ class FileController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentLabelAlreadyUsedHere, HTTPStatus.BAD_REQUEST)
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FILE_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())

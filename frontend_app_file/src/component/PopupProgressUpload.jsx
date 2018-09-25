@@ -10,7 +10,8 @@ export const PopupProgressUpload = props =>
     customClass='uploadPopup'
     customHeaderClass=''
     customColor={props.color}
-    onClose={props.onClose}
+    onClose={() => {}}
+    hideCloseBtn
   >
     <div className='uploadPopup__body'>
       <ProgressBar

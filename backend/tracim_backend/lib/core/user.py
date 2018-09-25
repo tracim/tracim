@@ -10,9 +10,11 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.auth import Group
 from tracim_backend.exceptions import NoUserSetted
+from tracim_backend.exceptions import UnvalidResetPasswordToken
 from tracim_backend.exceptions import EmailAlreadyExistInDb
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import PasswordDoNotMatch
@@ -272,6 +274,28 @@ class UserApi(object):
         )
         return user
 
+    def set_password_reset_token(
+            self,
+            user: User,
+            new_password: str,
+            new_password2: str,
+            reset_token: str,
+            do_save: bool = False,
+    ):
+        self.validate_reset_password_token(user, reset_token)
+        if new_password != new_password2:
+            raise PasswordDoNotMatch('Passwords given are different')
+
+        self.update(
+            user=user,
+            password=new_password,
+            do_save=do_save,
+        )
+        user.reset_tokens()
+        if do_save:
+            self.save(user)
+        return user
+
     def _check_email(self, email: str) -> bool:
         """
         Check if email is completely ok to be used in user db table
@@ -377,8 +401,11 @@ class UserApi(object):
                     new_user,
                     password=password
                 )
-            except SMTPException as e:
-                raise NotificationNotSend()
+            except SMTPException as exc:
+                raise NotificationNotSend(
+                    "Notification for new created account can't be send "
+                    "(SMTP error), new account creation aborted"
+                ) from exc
         if do_save:
             self.save(new_user)
         return new_user
@@ -395,6 +422,13 @@ class UserApi(object):
         user.email = email
         user.display_name = email.split('@')[0]
 
+        if not groups:
+            gapi = GroupApi(
+                current_user=self._user,  # User
+                session=self._session,
+                config=self._config,
+            )
+            groups = [gapi.get_one(Group.TIM_USER)]
         for group in groups:
             user.groups.append(group)
 
@@ -405,12 +439,35 @@ class UserApi(object):
 
         return user
 
+    def reset_password_notification(self, user: User, do_save: bool=False) -> str:  # nopep8
+        """
+        Reset password notification
+        :param user: User who want is password resetted
+        :param do_save: save update ?
+        :return: reset_password_token
+        """
+        token = user.generate_reset_password_token()
+        try:
+            email_manager = get_email_manager(self._config, self._session)
+            email_manager.notify_reset_password(user, token)
+        except SMTPException as e:
+            raise NotificationNotSend()
+        if do_save:
+            self.save(user)
+        return token
+
+    def validate_reset_password_token(self, user: User, token: str) -> bool:
+        return user.validate_reset_password_token(
+            token=token,
+            validity_seconds=self._config.USER_RESET_PASSWORD_TOKEN_VALIDITY,
+        )
+
     def enable(self, user: User, do_save=False):
         user.is_active = True
         if do_save:
             self.save(user)
 
-    def disable(self, user:User, do_save=False):
+    def disable(self, user: User, do_save=False):
         user.is_active = False
         if do_save:
             self.save(user)
@@ -442,7 +499,6 @@ class UserApi(object):
         # Check if this is already needed with
         # new auth system
         created_user.ensure_auth_token(
-            session=self._session,
             validity_seconds=self._config.USER_AUTH_TOKEN_VALIDITY
         )
 

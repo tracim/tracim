@@ -12,7 +12,7 @@
   "You can also import your file by clicking here": "Vous pouvez aussi sélectionner votre fichier en cliquant ici",
   "Cancel": "Annuler",
   "Validate": "Valider",
-  "Download file": "Téléchargement du fichier",
+  "Download file": "Télécharger le fichier",
   "Download current page as PDF": "Télécharger la page actuelle au format PDF",
   "Download as PDF": "Télécharger en PDF",
   "Properties": "Propriétés",
@@ -21,5 +21,18 @@
   "Change description": "Changer la description",
   "Error while saving new description": "Erreur lors de l'enregistrement d'une nouvelle description",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
-  "Page number": "Numéro de page"
+  "Page number": "Numéro de page",
+  "Upload a file": "Importer un fichier",
+  "Error while loading timeline": "Erreur lors du chargement de l'historique",
+  "Bytes": "Octets",
+  "KB": "Ko",
+  "MB": "Mo",
+  "GB": "Go",
+  "TB": "To",
+  "PB": "Po",
+  "EB": "Eo",
+  "ZB": "Zo",
+  "YB": "Yo",
+  "Files": "Fichiers",
+  "Please wait until the upload ends": "Veuillez attendre la fin de l'envoi"
 }

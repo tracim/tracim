@@ -14,7 +14,7 @@ require('./css/index.styl')
       <File data={undefined} />
       , document.getElementById('content')
     )
-    //
+
     // ReactDOM.render(
     //   <PopupCreateFile />
     //   , document.getElementById('content')

@@ -77,6 +77,10 @@ class Tracim extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   loadAppConfig = async () => {
     const { props } = this
 
@@ -100,10 +104,10 @@ class Tracim extends React.Component {
       const idWorkspaceToOpen = (() => {
         if (idOpenInSidebar) return idOpenInSidebar
         if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) return parseInt(props.match.params.idws)
-        return fetchGetWorkspaceList.json[0].workspace_id
+        return fetchGetWorkspaceList.json.length > 0 ? fetchGetWorkspaceList.json[0].workspace_id : null
       })()
 
-      props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
+      idWorkspaceToOpen && props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
     }
   }
 
@@ -168,16 +172,18 @@ class Tracim extends React.Component {
               <Account />
             } />
 
-            <Route path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
+            <Route exact path={PAGE.ADMIN.USER_EDIT(':iduser')} render={() =>
               <AdminAccount />
             } />
 
             <Route exact path={PAGE.ADMIN.USER} render={() => <AppFullscreenRouter />} />
-            <Route path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
+            <Route exact path={PAGE.ADMIN.WORKSPACE} render={() => <AppFullscreenRouter />} />
 
             <Route path={'/wip/:cp'} component={WIPcomponent} /> {/* for testing purpose only */}
 
+            {/* the 3 divs bellow must stay here so that they always exists in the DOM regardless of the route */}
             <div id='appFeatureContainer' />
+            <div id='appFullscreenContainer' />
             <div id='popupCreateContentContainer' />
           </div>
         </div>

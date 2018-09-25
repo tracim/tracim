@@ -8,7 +8,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
     })
     it ('dashboard > button', function() {
         var titre1='document1'
-        cy.get('.dashboard__calltoaction div:nth-child(4) .dashboard__calltoaction__button__text').click()
+        cy.get('.dashboard__calltoaction .fa-file-text-o').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
         cy.get('.createcontent .createcontent__form__input').type(titre1)
@@ -18,6 +18,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
     })
     it ('all content > header button', function () {
         var titre1='document1'
+        cy.get('#dropdownCreateBtn.workspace__header__btnaddcontent__label').should('be.visible')
         cy.get('#dropdownCreateBtn.workspace__header__btnaddcontent__label').click()
         cy.get('.show .subdropdown__link__html-document__icon').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
@@ -29,7 +30,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
     })
     it ('all content > content button', function () {
         var titre1='document1'
-        cy.get('.workspace__content__button.dropdownCreateBtn .btn-primary').click()
+        cy.get('.workspace__content__button.dropdownCreateBtn .__label').click()
         cy.get('.show .subdropdown__link__html-document__icon').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')

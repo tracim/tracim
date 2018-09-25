@@ -68,7 +68,8 @@
       "GLOBAL_renderAppFullscreen",
       "GLOBAL_renderAppPopupCreation",
       "GLOBAL_dispatchEvent",
-      "GLOBAL_hideApp"
+      "GLOBAL_hideApp",
+      "GLOBAL_primaryColor"
     ],
     "parser": "babel-eslint",
     "ignore": []

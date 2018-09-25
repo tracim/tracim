@@ -65,12 +65,8 @@ class TracimRequest(Request):
         # user
         self._candidate_user = None  # type: User
 
-        # TODO BS 2018-09-12: Must be deleted, see:
-        # https://github.com/tracim/tracim/issues/903
-        self.response_content_disposition = None
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(self._cleanup)
-        self.add_response_callback(self._set_responses_headers)
 
     @property
     def current_workspace(self) -> Workspace:
@@ -183,10 +179,6 @@ class TracimRequest(Request):
             )
         return self._candidate_workspace
 
-    def response_download_mode(self, force_download: bool = False) -> None:
-        if force_download:
-            self.response_content_disposition = 'attachment'
-
     def _cleanup(self, request: 'TracimRequest') -> None:
         """
         Close dbsession at the end of the request in order to avoid exception
@@ -199,10 +191,6 @@ class TracimRequest(Request):
         self._current_user = None
         self._current_workspace = None
         self.dbsession.close()
-
-    def _set_responses_headers(self, request: 'TracimRequest', response: Response):  # nopep8
-        if request.response_content_disposition:
-            response.content_disposition = request.response_content_disposition
 
     @candidate_user.setter
     def candidate_user(self, user: User) -> None:

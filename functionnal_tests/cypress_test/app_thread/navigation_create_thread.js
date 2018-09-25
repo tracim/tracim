@@ -8,7 +8,7 @@ describe('navigate :: workspace > create_new > thread', function () {
     })
     it ('dashboard > button', function() {
         var titre1='thread1'
-        cy.get('.dashboard__calltoaction div:nth-child(2) .dashboard__calltoaction__button__text').click()
+        cy.get('.dashboard__calltoaction .fa-comments-o').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')
         cy.get('.createcontent .createcontent__form__input').type(titre1)
@@ -29,7 +29,7 @@ describe('navigate :: workspace > create_new > thread', function () {
     })
     it ('content button', function () {
         var titre1='thread1'
-        cy.get('.workspace__content__button.dropdownCreateBtn .btn-primary').click()
+        cy.get('.workspace__content__button.dropdownCreateBtn .__label').click()
         cy.get('.show .subdropdown__link__thread__icon').click()
         cy.get('.createcontent .createcontent__contentname').should('be.visible')
         cy.get('.createcontent .createcontent__form__input').should('have.attr', 'placeholder')

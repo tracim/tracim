@@ -17,7 +17,10 @@ export class PreviewComponent extends React.Component {
     }
   }
 
-  handleToggleFormNewDescription = () => this.setState(prev => ({displayFormNewDescription: !prev.displayFormNewDescription}))
+  handleToggleFormNewDescription = () => this.setState(prev => ({
+    displayFormNewDescription: !prev.displayFormNewDescription,
+    newDescription: this.props.description
+  }))
 
   handleChangeDescription = e => this.setState({newDescription: e.target.value})
 
@@ -38,26 +41,14 @@ export class PreviewComponent extends React.Component {
         <div className='previewcomponent__dloption'>
           <a
             className='previewcomponent__dloption__icon btn iconBtn'
-            href={props.downloadRawUrl}
-            target='_blank'
-            download
-            style={{':hover': {color: props.color}}}
-            title={props.t('Download file')}
-            key={'file_btn_dl_raw'}
-          >
-            <i className='fa fa-download' />
-          </a>
-
-          <a
-            className='previewcomponent__dloption__icon btn iconBtn'
             href={props.downloadPdfPageUrl}
             target='_blank'
             download
             style={{':hover': {color: props.color}}}
             title={props.t('Download current page as PDF')}
-            key={'file_btn_dl_pdfpage'}
+            key={'file_btn_dl_pdfall'}
           >
-            <i className='fa fa-file-pdf-o' />
+            <i className='fa fa-file-o' />
           </a>
 
           <a
@@ -67,9 +58,21 @@ export class PreviewComponent extends React.Component {
             download
             style={{':hover': {color: props.color}}}
             title={props.t('Download as PDF')}
-            key={'file_btn_dl_pdfall'}
+            key={'file_btn_dl_pdfpage'}
           >
-            <i className='fa fa-files-o' />
+            <i className='fa fa-file-pdf-o' />
+          </a>
+
+          <a
+            className='previewcomponent__dloption__icon btn iconBtn'
+            href={props.downloadRawUrl}
+            target='_blank'
+            download
+            style={{':hover': {color: props.color}}}
+            title={props.t('Download file')}
+            key={'file_btn_dl_raw'}
+          >
+            <i className='fa fa-download' />
           </a>
         </div>
 
@@ -115,19 +118,23 @@ export class PreviewComponent extends React.Component {
 
         <div className='previewcomponent__property'>
           <div className='previewcomponent__property__button' onClick={props.onClickProperty}>
-            <div className='previewcomponent__property__button__icon'>
-              <i className='fa fa-gear' />
+            <div className='previewcomponent__property__button__arrow mt-3'>
+              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty})} />
             </div>
 
             <div className='previewcomponent__property__button__title'>
               {props.t('Properties')}
+            </div>
+
+            <div className='previewcomponent__property__button__arrow mb-3'>
+              <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.displayProperty, 'fa-angle-double-left': !props.displayProperty})} />
             </div>
           </div>
 
           <div className='previewcomponent__property__content'>
             <div className='previewcomponent__property__content__detail'>
               <div className='previewcomponent__property__content__detail__item'>
-                {props.t('Size')}: nyi
+                {props.t('Size')}: {props.fileSize}
               </div>
 
               <div className='previewcomponent__property__content__detail__item'>
@@ -171,21 +178,22 @@ export class PreviewComponent extends React.Component {
               </div>
 
               {!state.displayFormNewDescription &&
-              <button
-                type='button'
-                className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
-                onClick={this.handleToggleFormNewDescription}
-                style={{
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
-                  borderColor: props.color,
-                  ':hover': {
-                    backgroundColor: props.color
-                  }
-                }}
-              >
-                {props.t('Change description')}
-              </button>
+                <button
+                  type='button'
+                  className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
+                  onClick={this.handleToggleFormNewDescription}
+                  style={{
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: props.color,
+                    ':hover': {
+                      backgroundColor: props.color
+                    }
+                  }}
+                  disabled={props.disableChangeDescription}
+                >
+                  {props.t('Change description')}
+                </button>
               }
             </div>
           </div>

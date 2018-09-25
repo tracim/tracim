@@ -16,7 +16,7 @@ import {
   SelectStatus,
   displayDate
 } from 'tracim_frontend_lib'
-import { MODE, debug } from '../helper.js'
+import { MODE, displayFileSize, debug } from '../helper.js'
 import {
   getFileContent,
   getFileComment,
@@ -41,6 +41,10 @@ class File extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       timeline: props.data ? [] : [], // debug.timeline,
+      externalTradList: [
+        props.t('Upload a file'),
+        props.t('Files')
+      ],
       newComment: '',
       newFile: '',
       newFilePreview: null,
@@ -103,7 +107,10 @@ class File extends React.Component {
 
     if (!prevState.content || !state.content) return
 
-    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+    if (prevState.content.content_id !== state.content.content_id) {
+      this.loadContent()
+      this.loadTimeline()
+    }
 
     if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
       tinymce.remove('#wysiwygNewVersion')
@@ -147,60 +154,63 @@ class File extends React.Component {
   }
 
   loadTimeline = async () => {
-    const { loggedUser, content, config } = this.state
+    const { loggedUser, content, config, t } = this.state
 
-    const fetchResultComment = getFileComment(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultRevision = getFileRevision(config.apiUrl, content.workspace_id, content.content_id)
-
-    Promise.all([
-      handleFetchResult(await fetchResultComment),
-      handleFetchResult(await fetchResultRevision)
+    const [resComment, resRevision] = await Promise.all([
+      handleFetchResult(await getFileComment(config.apiUrl, content.workspace_id, content.content_id)),
+      handleFetchResult(await getFileRevision(config.apiUrl, content.workspace_id, content.content_id))
     ])
-      .then(([resComment, resRevision]) => {
-        const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
-          ...c,
-          created: displayDate(c.created, loggedUser.lang),
-          author: {
-            ...c.author,
-            avatar_url: c.author.avatar_url
-              ? c.author.avatar_url
-              : generateAvatarFromPublicName(c.author.public_name)
-          }
+
+    if (resComment.apiResponse.status !== 200 && resRevision.apiResponse.status !== 200) {
+      this.sendGlobalFlashMessage(t('Error while loading timeline'))
+      console.log('Error loading timeline', 'comments', resComment, 'revisions', resRevision)
+      return
+    }
+
+    const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
+      ...c,
+      created: displayDate(c.created, loggedUser.lang),
+      author: {
+        ...c.author,
+        avatar_url: c.author.avatar_url ? c.author.avatar_url : generateAvatarFromPublicName(c.author.public_name)
+      }
+    }))
+
+    const revisionWithComment = resRevision.body
+      .map((r, i) => ({
+        ...r,
+        created: displayDate(r.created, loggedUser.lang),
+        timelineType: 'revision',
+        commentList: r.comment_ids.map(ci => ({
+          timelineType: 'comment',
+          ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
+        })),
+        number: i + 1
+      }))
+      .reduce((acc, rev) => [
+        ...acc,
+        rev,
+        ...rev.commentList.map(comment => ({
+          ...comment,
+          customClass: '',
+          loggedUser: config.loggedUser
         }))
+      ], [])
 
-        const revisionWithComment = resRevision.body
-          .map((r, i) => ({
-            ...r,
-            created: displayDate(r.created, loggedUser.lang),
-            timelineType: 'revision',
-            commentList: r.comment_ids.map(ci => ({
-              timelineType: 'comment',
-              ...resCommentWithProperDateAndAvatar.find(c => c.content_id === ci)
-            })),
-            number: i + 1
-          }))
-          .reduce((acc, rev) => [
-            ...acc,
-            rev,
-            ...rev.commentList.map(comment => ({
-              ...comment,
-              customClass: '',
-              loggedUser: config.loggedUser
-            }))
-          ], [])
-
-        this.setState({
-          timeline: revisionWithComment,
-          mode: resRevision.body.length === 1 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
-        })
-      })
-      .catch(e => {
-        console.log('Error loading Timeline.', e)
-        this.setState({timeline: []})
-      })
+    this.setState({
+      timeline: revisionWithComment,
+      mode: resRevision.body.length === 1 ? MODE.EDIT : MODE.VIEW // first time editing the doc, open in edit mode
+    })
   }
 
   handleClickBtnCloseApp = () => {
+    const { state, props } = this
+
+    if (state.progressUpload.display) {
+      this.sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
+      return
+    }
+
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({type: 'appClosed', data: {}}) // handled by tracim_front::src/container/WorkspaceContent.jsx
   }
@@ -228,7 +238,7 @@ class File extends React.Component {
     const { props, state } = this
 
     const fetchResultSaveFile = await handleFetchResult(
-      await putFileContent(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
+      await putFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
     )
     switch (fetchResultSaveFile.apiResponse.status) {
       case 200: this.setState(prev => ({content: {...prev.content, raw_content: newDescription}})); break
@@ -282,7 +292,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
     }
   }
@@ -292,7 +305,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
     }
   }
@@ -302,7 +318,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
@@ -312,7 +331,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
@@ -374,7 +396,7 @@ class File extends React.Component {
     const formData = new FormData()
     formData.append('files', state.newFile)
 
-    // fetch still doesn't handle event progress. So we need to use old school xhr object
+    // fetch still doesn't handle event progress. So we need to use old school xhr object :scream:
     const xhr = new XMLHttpRequest()
     xhr.upload.addEventListener('loadstart', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
     const uploadInProgress = e => e.lengthComputable && this.setState({progressUpload: {display: true, percent: Math.round(e.loaded / e.total * 100)}})
@@ -410,15 +432,19 @@ class File extends React.Component {
 
     if (!['previous', 'next'].includes(previousNext)) return
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
-    // if (previousNext === 'next' && state.fileCurrentPage > 999) return // @TODO set proper max page (from api => api doesn't return that info yet)
+    if (previousNext === 'next' && state.fileCurrentPage > state.content.page_nb) return
 
     const revisionString = state.mode === MODE.REVISION ? `revisions/${state.content.current_revision_id}` : ''
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
-    this.setState({
-      previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500?page=${nextPageNumber}`,
-      contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/1920x1080?page=${nextPageNumber}`
-    })
+    this.setState(prev => ({
+      fileCurrentPage: nextPageNumber,
+      content: {
+        ...prev.content,
+        previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/500x500?page=${nextPageNumber}`,
+        contentFullScreenUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/${revisionString}preview/jpg/1920x1080?page=${nextPageNumber}`
+      }
+    }))
   }
 
   render () {
@@ -439,6 +465,7 @@ class File extends React.Component {
           idRoleUserWorkspace={state.loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          disableChangeTitle={state.content.is_archived || state.content.is_deleted}
         />
 
         <PopinFixedOption
@@ -452,7 +479,7 @@ class File extends React.Component {
                 <NewVersionBtn
                   customColor={state.config.hexcolor}
                   onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== MODE.VIEW}
+                  disabled={state.mode !== MODE.VIEW || state.content.is_archived || state.content.is_deleted}
                 />
               }
 
@@ -474,7 +501,7 @@ class File extends React.Component {
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
                   availableStatus={state.config.availableStatuses}
                   onChangeStatus={this.handleChangeStatus}
-                  disabled={state.mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
 
@@ -483,7 +510,7 @@ class File extends React.Component {
                   customColor={state.config.hexcolor}
                   onClickArchiveBtn={this.handleClickArchive}
                   onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.mode === MODE.REVISION}
+                  disabled={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
                 />
               }
             </div>
@@ -498,6 +525,7 @@ class File extends React.Component {
             mode={state.mode}
             customColor={state.config.hexcolor}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
+            fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}
             fileCurrentPage={state.fileCurrentPage}
             displayProperty={state.displayProperty}
@@ -510,14 +538,15 @@ class File extends React.Component {
             isDeleted={state.content.is_deleted}
             onClickRestoreArchived={this.handleClickRestoreArchived}
             onClickRestoreDeleted={this.handleClickRestoreDeleted}
-            downloadRawUrl={(({config, content, mode}) =>
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw`
-            )(state)}
+            downloadRawUrl={
+              (({config, content, mode}) =>
+                `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}raw?force_download=1`
+              )(state)}
             downloadPdfPageUrl={(({config, content, mode}) =>
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${state.fileCurrentPage}`
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf?page=${state.fileCurrentPage}&force_download=1`
             )(state)}
             downloadPdfFullUrl={(({config, content, mode}) =>
-              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full`
+              `${config.apiUrl}/workspaces/${content.workspace_id}/files/${content.content_id}/${mode === MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''}preview/pdf/full?force_download=1`
             )(state)}
             contentFullScreenUrl={state.content.contentFullScreenUrl}
             onChangeFile={this.handleChangeFile}
@@ -536,7 +565,7 @@ class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={state.timeline}
             newComment={state.newComment}
-            disableComment={state.mode === MODE.REVISION}
+            disableComment={state.mode === MODE.REVISION || state.content.is_archived || state.content.is_deleted}
             wysiwyg={state.timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

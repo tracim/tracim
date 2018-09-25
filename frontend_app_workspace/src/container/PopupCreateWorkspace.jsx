@@ -15,11 +15,10 @@ const debug = { // outdated
     hexcolor: '#7d4e24',
     creationLabel: 'Create a workspace',
     domContainer: 'appFeatureContainer',
-    apiUrl: 'http://localhost:3001',
+    apiUrl: 'http://localhost:6543',
     apiHeader: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
     },
     translation: {
       en: {},
@@ -32,7 +31,7 @@ const debug = { // outdated
     firstname: 'Côme',
     lastname: 'Stoilenom',
     email: 'osef@algoo.fr',
-    avatar: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+    avatar: ''
   },
   idWorkspace: 1,
   idFolder: null
@@ -53,6 +52,10 @@ class PopupCreateWorkspace extends React.Component {
     i18n.changeLanguage(this.state.loggedUser.lang)
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
@@ -102,17 +105,18 @@ class PopupCreateWorkspace extends React.Component {
   }
 
   render () {
+    const { props, state } = this
     return (
       <CardPopupCreateContent
+        customColor={state.config.hexcolor}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New workspace')} // @TODO get the lang of user
-        customColor={this.state.config.hexcolor}
-        faIcon={this.state.config.faIcon}
-        contentName={this.state.newWorkspaceName}
+        label={props.t('New workspace')}
+        faIcon={state.config.faIcon}
+        contentName={state.newWorkspaceName}
         onChangeContentName={this.handleChangeNewWorkspaceName}
-        btnValidateLabel={this.props.t('Validate and create')}
-        inputPlaceholder={this.props.t("Workspace's name")}
+        btnValidateLabel={props.t('Validate and create')}
+        inputPlaceholder={props.t("Workspace's name")}
       />
     )
   }

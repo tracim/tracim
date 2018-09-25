@@ -62,6 +62,7 @@ wsgidav.conf
 *.lock
 depot/
 sessions_data/
+sessions_lock/
 
 # binary translation files
 *.mo

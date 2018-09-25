@@ -13,5 +13,8 @@
   "Please set a name or email": "Veuillez saisir le nom ou l'email",
   "Please set a role": "Veuillez choisir un rôle",
   "Error while adding the member to the workspace": "Erreur lors de l'ajout du membre à l'espace de travail",
-  "Error while saving new workspace label": "Erreur lors de la sauvegarde du nom de l'espace de travail"
+  "Error while saving new workspace label": "Erreur lors de la sauvegarde du nom de l'espace de travail",
+  "Workspace's description": "Description de l'espace de travail",
+  "Member removed": "Membre supprimé",
+  "Member added": "Membre ajouté"
 }

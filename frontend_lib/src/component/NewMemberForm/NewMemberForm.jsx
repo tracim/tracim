@@ -6,8 +6,8 @@ require('./NewMemberForm.styl')
 
 export const NewMemberForm = props =>
   <div className='memberlist__form'>
-    <div className='memberlist__form__close d-flex justify-content-end'>
-      <i className='fa fa-times' onClick={props.onClickCloseAddMemberBtn} />
+    <div className='memberlist__form__close' onClick={props.onClickCloseAddMemberBtn}>
+      <i className='fa fa-times' />
     </div>
 
     <div className='memberlist__form__member'>
@@ -26,24 +26,35 @@ export const NewMemberForm = props =>
           autoComplete='off'
         />
 
-        {props.searchedKnownMemberList.length > 0 &&
-          <div className='autocomplete primaryColorBorder'>
-            {props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
-              <div
-                className='autocomplete__item primaryColorBgHover'
-                onClick={() => props.onClickKnownMember(u)}
-                key={u.user_id}
-              >
-                <div className='autocomplete__item__avatar'>
-                  <img src={u.avatar_url ? u.avatar_url : generateAvatarFromPublicName(u.public_name)} />
-                </div>
+        {props.searchedKnownMemberList.length > 0
+          ? (
+            <div className='autocomplete primaryColorBorder'>
+              {props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
+                <div
+                  className='autocomplete__item primaryColorBgHover'
+                  onClick={() => props.onClickKnownMember(u)}
+                  key={u.user_id}
+                >
+                  <div className='autocomplete__item__avatar'>
+                    <img src={u.avatar_url ? u.avatar_url : generateAvatarFromPublicName(u.public_name)} />
+                  </div>
 
+                  <div className='autocomplete__item__name'>
+                    {u.public_name}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+          : props.autoCompleteActive && props.searchedKnownMemberList.length === 0 && props.nameOrEmail.length >= 2 && (
+            <div className='autocomplete primaryColorBorder'>
+              <div className='autocomplete__item'>
                 <div className='autocomplete__item__name'>
-                  {u.public_name}
+                  {props.t('No result')}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )
         }
       </div>
 
@@ -74,7 +85,7 @@ export const NewMemberForm = props =>
         {props.roleList.map(r =>
           <li key={r.slug}>
             <label className='memberlist__form__role__list__item' htmlFor={r.slug}>
-              <div className='item__radiobtn mr-3'>
+              <div className='item__radiobtn mr-2'>
                 <input
                   id={r.slug}
                   type='radio'
@@ -86,12 +97,12 @@ export const NewMemberForm = props =>
               </div>
 
               <div className='item__text'>
-                <div className='item__text__icon mr-2' style={{color: r.hexcolor}}>
-                  <i className={`fa fa-${r.faIcon}`} />
+                <div className='item__text__icon mr-1' style={{color: r.hexcolor}}>
+                  <i className={`fa fa-fw fa-${r.faIcon}`} />
                 </div>
 
                 <div className='item__text__name'>
-                  {r.label}
+                  {props.t(r.label) /* this trad key comes from frontend/helper.js, object ROLE */}
                 </div>
               </div>
             </label>

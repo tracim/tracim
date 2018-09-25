@@ -58,6 +58,10 @@ class PopupCreateHtmlDocument extends React.Component {
     document.addEventListener('appCustomEvent', this.customEventReducer)
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   customEventReducer = ({ detail: { type, data } }) => { // action: { type: '', data: {} }
     switch (type) {
       case 'allApp_changeLang':
@@ -112,7 +116,7 @@ class PopupCreateHtmlDocument extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New Document')} // @TODO get the lang of user
+        label={this.props.t('New Document')}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}

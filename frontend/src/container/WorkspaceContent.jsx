@@ -133,12 +133,12 @@ class WorkspaceContent extends React.Component {
 
   handleClickContentItem = content => {
     console.log('%c<WorkspaceContent> content clicked', 'color: #c17838', content)
-    this.props.history.push(PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id))
+    this.props.history.push(`${PAGE.WORKSPACE.CONTENT(content.idWorkspace, content.type, content.id)}${this.props.location.search}`)
   }
 
   handleClickEditContentItem = (e, content) => {
     e.stopPropagation()
-    console.log('%c<WorkspaceContent> edit nyi', 'color: #c17838', content)
+    this.handleClickContentItem(content)
   }
 
   handleClickMoveContentItem = (e, content) => {
@@ -192,8 +192,18 @@ class WorkspaceContent extends React.Component {
 
   handleUpdateAppOpenedType = openedAppType => this.setState({appOpenedType: openedAppType})
 
+  getTitle = urlFilter => {
+    const { props } = this
+    switch (urlFilter) {
+      case undefined: return props.t('List of contents')
+      case 'html-document': return props.t('List of documents')
+      case 'file': return props.t('List of files')
+      case 'thread': return props.t('List of threads')
+    }
+  }
+
   render () {
-    const { user, currentWorkspace, workspaceContentList, contentType, t } = this.props
+    const { user, currentWorkspace, workspaceContentList, contentType, location, t } = this.props
     const { state } = this
 
     const filterWorkspaceContent = (contentList, filter) => {
@@ -205,7 +215,7 @@ class WorkspaceContent extends React.Component {
     }
     // .filter(c => c.type !== 'folder' || c.content.length > 0) // remove empty folder => 2018/05/21 - since we load only one lvl of content, don't remove empty
 
-    const urlFilter = qs.parse(this.props.location.search).type
+    const urlFilter = qs.parse(location.search).type
 
     const filteredWorkspaceContentList = workspaceContentList.length > 0
       ? filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
@@ -238,7 +248,7 @@ class WorkspaceContent extends React.Component {
           <PageTitle
             parentClass='workspace__header'
             customClass='justify-content-between align-items-center'
-            title={this.props.t('List of contents')}
+            title={this.getTitle(urlFilter)}
             subtitle={workspaceContentList.label ? workspaceContentList.label : ''}
           >
             {idRoleUserWorkspace >= 2 &&

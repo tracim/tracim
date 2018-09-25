@@ -38,6 +38,12 @@ class Header extends React.Component {
   handleChangeLang = async idLang => {
     const { props } = this
 
+    if (props.user.user_id === -1) {
+      props.dispatch(setUserLang(idLang))
+      i18n.changeLanguage(idLang)
+      return
+    }
+
     const fetchPutUserLang = await props.dispatch(putUserLang(props.user, idLang))
     switch (fetchPutUserLang.status) {
       case 200:

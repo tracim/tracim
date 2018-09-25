@@ -85,7 +85,8 @@ ReactDOM.render(
             firstname: 'Côme',
             lastname: 'Stoilenom',
             email: 'osef@algoo.fr',
-            avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+            avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
+            idRoleUserWorkspace: 8
           }}
           timelineData={TimelineDebugData.map(item => item.timelineType === 'comment'
             ? {

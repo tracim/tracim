@@ -8,17 +8,11 @@ export const FETCH_CONFIG = {
 }
 
 export const ROLE = [{
-  id: 1,
-  slug: 'reader',
-  faIcon: 'eye',
-  hexcolor: '#15d948',
-  label: i18n.t('Reader')
-}, {
-  id: 2,
-  slug: 'contributor',
-  faIcon: 'pencil',
-  hexcolor: '#3145f7',
-  label: i18n.t('Contributor')
+  id: 8,
+  slug: 'workspace-manager',
+  faIcon: 'gavel',
+  hexcolor: '#ed0007',
+  label: i18n.t('Workspace manager')
 }, {
   id: 4,
   slug: 'content-manager',
@@ -26,11 +20,17 @@ export const ROLE = [{
   hexcolor: '#f2af2d',
   label: i18n.t('Content manager')
 }, {
-  id: 8,
-  slug: 'workspace-manager',
-  faIcon: 'gavel',
-  hexcolor: '#ed0007',
-  label: i18n.t('Workspace manager')
+  id: 2,
+  slug: 'contributor',
+  faIcon: 'pencil',
+  hexcolor: '#3145f7',
+  label: i18n.t('Contributor')
+}, {
+  id: 1,
+  slug: 'reader',
+  faIcon: 'eye',
+  hexcolor: '#15d948',
+  label: i18n.t('Reader')
 }]
 
 export const debug = {
@@ -39,7 +39,7 @@ export const debug = {
     slug: 'admin_workspace_user',
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
-    type: 'user', // 'user' or 'workspace'
+    type: 'workspace', // 'user' or 'workspace'
     translation: {en: {}, fr: {}},
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
@@ -67,10 +67,10 @@ export const debug = {
       },
       MANAGER: {
         id: 2,
-        slug: 'managers',
+        slug: 'trusted-users',
         faIcon: 'graduation-cap',
         hexcolor: '#f2af2d',
-        label: i18n.t('Manager')
+        label: i18n.t('Trusted user')
       },
       USER: {
         id: 4,

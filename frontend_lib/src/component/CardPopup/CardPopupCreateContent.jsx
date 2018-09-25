@@ -11,6 +11,7 @@ const PopupCreateContent = props => {
       customClass='popupCreateContent'
       customColor={props.customColor}
       onClose={props.onClose}
+      customStyle={props.customStyle}
     >
       <div className='createcontent'>
         <div className='createcontent__contentname mb-4'>
@@ -33,6 +34,7 @@ const PopupCreateContent = props => {
                 placeholder={props.inputPlaceholder}
                 value={props.contentName}
                 onChange={props.onChangeContentName}
+                autoFocus
               />
             )
           }

@@ -1,5 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import Radium from 'radium'
+import color from 'color'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
@@ -10,6 +12,7 @@ import { debug, ROLE } from '../helper.js'
 import {
   getWorkspaceList,
   getWorkspaceMemberList,
+  // getWorkspaceDetail,
   deleteWorkspace,
   getUserList,
   getUserDetail,
@@ -34,7 +37,8 @@ class AdminWorkspaceUser extends React.Component {
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       content: props.data ? props.data.content : debug.content,
       popupDeleteWorkspaceDisplay: false,
-      workspaceToDelete: null
+      workspaceToDelete: null,
+      workspaceIdOpened: null
     }
 
     // i18n has been init, add resources from frontend
@@ -48,7 +52,7 @@ class AdminWorkspaceUser extends React.Component {
     switch (type) {
       case 'admin_workspace_user_showApp':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
-        this.setState({config: data.config})
+        this.setState(prev => ({...prev.config, config: data.config}))
         break
       case 'refreshWorkspaceList':
         console.log('%c<AdminWorkspaceUser> Custom event', 'color: #28a745', type, data)
@@ -81,7 +85,7 @@ class AdminWorkspaceUser extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
-    console.log('%c<AdminWorkspaceUser> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
+    console.log('%c<AdminWorkspaceUser> did update', `color: ${state.config.hexcolor}`, prevState, state)
     if (prevState.config.type !== state.config.type) {
       if (state.config.type === 'workspace') this.loadWorkspaceContent()
       else if (state.config.type === 'user') this.loadUserContent()
@@ -106,6 +110,7 @@ class AdminWorkspaceUser extends React.Component {
             handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
           )
         )
+
         this.setState(prev => ({
           content: {
             ...prev.content,
@@ -117,14 +122,15 @@ class AdminWorkspaceUser extends React.Component {
         }))
         break
 
-      default: GLOBAL_dispatchEvent({
-        type: 'addFlashMsg',
-        data: {
-          msg: props.t('Error while loading workspaces list'),
-          type: 'warning',
-          delay: undefined
-        }
-      })
+      default:
+        GLOBAL_dispatchEvent({
+          type: 'addFlashMsg',
+          data: {
+            msg: props.t('Error while loading workspaces list'),
+            type: 'warning',
+            delay: undefined
+          }
+        })
     }
   }
 
@@ -248,27 +254,31 @@ class AdminWorkspaceUser extends React.Component {
 
   handleClickWorkspace = idWorkspace => {
     const { state } = this
-    GLOBAL_renderAppFeature({
-      loggedUser: {
-        ...state.loggedUser,
-        idRoleUserWorkspace: 8 // only global admin can see this app
-      },
-      config: {
-        label: 'Advanced dashboard',
-        slug: 'workspace_advanced',
-        faIcon: 'bank',
-        hexcolor: '#999999',
-        creationLabel: '',
-        roleList: ROLE,
-        domContainer: 'appFeatureContainer',
-        apiUrl: state.config.apiUrl,
-        apiHeader: state.config.apiHeader,
-        translation: state.config.translation
-      },
-      content: {
-        workspace_id: idWorkspace
-      }
-    })
+    if (state.workspaceIdOpened === null) {
+      GLOBAL_renderAppFeature({
+        loggedUser: {
+          ...state.loggedUser,
+          idRoleUserWorkspace: 8 // only global admin can see this app
+        },
+        config: {
+          label: 'Advanced dashboard',
+          slug: 'workspace_advanced',
+          faIcon: 'bank',
+          hexcolor: GLOBAL_primaryColor,
+          creationLabel: '',
+          roleList: ROLE,
+          domContainer: 'appFeatureContainer',
+          apiUrl: state.config.apiUrl,
+          apiHeader: state.config.apiHeader,
+          translation: state.config.translation
+        },
+        content: {
+          workspace_id: idWorkspace
+        }
+      })
+    } else GLOBAL_dispatchEvent({type: 'workspace_advanced_reloadContent', data: {workspace_id: idWorkspace}})
+
+    this.setState({workspaceIdOpened: idWorkspace})
   }
 
   handleClickUser = idUser => {
@@ -287,15 +297,15 @@ class AdminWorkspaceUser extends React.Component {
 
     return (
       <div>
-        {state.config.type === 'workspace' &&
+        {state.config.type === 'workspace' && (
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
             onClickWorkspace={this.handleClickWorkspace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
           />
-        }
+        )}
 
-        {state.config.type === 'user' &&
+        {state.config.type === 'user' && (
           <AdminUser
             userList={state.content.userList}
             profile={state.content.profile}
@@ -304,7 +314,7 @@ class AdminWorkspaceUser extends React.Component {
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
           />
-        }
+        )}
 
         {state.popupDeleteWorkspaceDisplay &&
           <CardPopup
@@ -317,7 +327,7 @@ class AdminWorkspaceUser extends React.Component {
               <div className='adminworkspaceuser__popup__body__btn'>
                 <button
                   type='button'
-                  className='btn'
+                  className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
                   onClick={this.handleClosePopupDeleteWorkspace}
                 >
                   {props.t('Cancel')}
@@ -325,8 +335,13 @@ class AdminWorkspaceUser extends React.Component {
 
                 <button
                   type='button'
-                  className='btn'
+                  className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
                   onClick={this.handleDeleteWorkspace}
+                  style={{
+                    ':hover': {
+                      backgroundColor: color(GLOBAL_primaryColor).darken(0.15).hexString()
+                    }
+                  }}
                 >
                   {props.t('Delete')}
                 </button>
@@ -339,4 +354,4 @@ class AdminWorkspaceUser extends React.Component {
   }
 }
 
-export default translate()(AdminWorkspaceUser)
+export default translate()(Radium(AdminWorkspaceUser))

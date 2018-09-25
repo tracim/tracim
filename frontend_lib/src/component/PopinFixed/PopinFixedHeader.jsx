@@ -8,7 +8,7 @@ class PopinFixedHeader extends React.Component {
     super(props)
     this.state = {
       editTitle: false,
-      editTitleValue: ''
+      editTitleValue: props.title
     }
   }
 
@@ -27,8 +27,16 @@ class PopinFixedHeader extends React.Component {
     this.setState(prevState => ({editTitle: !prevState.editTitle}))
   }
 
+  handleInputKeyPress = e => {
+    switch (e.key) {
+      case 'Enter': this.handleClickChangeTitleBtn(); break
+      case 'Escape': this.setState({editTitle: false, editTitleValue: this.props.title}); break
+    }
+  }
+
   render () {
-    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn } = this.props
+    const { customClass, customColor, faIcon, title, idRoleUserWorkspace, onClickCloseBtn, disableChangeTitle, t } = this.props
+    const { state } = this
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)} style={{backgroundColor: customColor}}>
@@ -37,19 +45,25 @@ class PopinFixedHeader extends React.Component {
         </div>
 
         <div className={classnames('wsContentGeneric__header__title mr-auto', `${customClass}__header__title`)}>
-          {this.state.editTitle
-            ? <input className='wsContentGeneric__header__title__editiontitle editiontitle' value={this.state.editTitleValue} onChange={this.onChangeTitle} />
+          {state.editTitle
+            ? <input
+              className='wsContentGeneric__header__title__editiontitle editiontitle'
+              value={state.editTitleValue}
+              onChange={this.onChangeTitle}
+              onKeyDown={this.handleInputKeyPress}
+            />
             : <div>{title}</div>
           }
         </div>
 
         {idRoleUserWorkspace >= 2 &&
-          <div
+          <button
             className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
             onClick={this.handleClickChangeTitleBtn}
+            disabled={disableChangeTitle}
           >
-            {this.state.editTitle ? <i className='fa fa-check' title={this.props.t('validate the title')} /> : <i className='fa fa-pencil' title={this.props.t('edit title')} />}
-          </div>
+            {state.editTitle ? <i className='fa fa-check' title={t('validate the title')} /> : <i className='fa fa-pencil' title={t('edit title')} />}
+          </button>
         }
 
         <div
@@ -72,7 +86,8 @@ PopinFixedHeader.propTypes = {
   customColor: PropTypes.string,
   title: PropTypes.string,
   idRoleUserWorkspace: PropTypes.number,
-  onValidateChangeTitle: PropTypes.func
+  onValidateChangeTitle: PropTypes.func,
+  disableChangeTitle: PropTypes.bool
 }
 
 PopinFixedHeader.defaultProps = {
@@ -80,5 +95,6 @@ PopinFixedHeader.defaultProps = {
   customColor: '',
   title: '',
   idRoleUserWorkspace: 1,
-  onChangeTitle: () => {}
+  onChangeTitle: () => {},
+  disableChangeTitle: false
 }

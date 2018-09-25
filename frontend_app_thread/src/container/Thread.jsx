@@ -38,7 +38,11 @@ class Thread extends React.Component {
       content: props.data ? props.data.content : debug.content,
       listMessage: props.data ? [] : [], // debug.listMessage,
       newComment: '',
-      timelineWysiwyg: false
+      timelineWysiwyg: false,
+      externalTradList: [
+        i18n.t('Discuss about a topic'),
+        i18n.t('Threads')
+      ]
     }
 
     // i18n has been init, add resources from frontend
@@ -276,6 +280,7 @@ class Thread extends React.Component {
           idRoleUserWorkspace={loggedUser.idRoleUserWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          disableChangeTitle={content.is_archived || content.is_deleted}
         />
 
         <PopinFixedOption
@@ -289,7 +294,7 @@ class Thread extends React.Component {
                 selectedStatus={config.availableStatuses.find(s => s.slug === content.status)}
                 availableStatus={config.availableStatuses}
                 onChangeStatus={this.handleChangeStatus}
-                disabled={false}
+                disabled={content.is_archived || content.is_deleted}
               />
             }
 
@@ -298,7 +303,7 @@ class Thread extends React.Component {
                 customColor={config.hexcolor}
                 onClickArchiveBtn={this.handleClickArchive}
                 onClickDeleteBtn={this.handleClickDelete}
-                disabled={false}
+                disabled={content.is_archived || content.is_deleted}
               />
             }
           </div>
@@ -311,7 +316,7 @@ class Thread extends React.Component {
             loggedUser={loggedUser}
             timelineData={listMessage}
             newComment={newComment}
-            disableComment={false}
+            disableComment={content.is_archived || content.is_deleted}
             wysiwyg={timelineWysiwyg}
             onChangeNewComment={this.handleChangeNewComment}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

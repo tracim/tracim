@@ -2385,7 +2385,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
 
 class TestUserEnableWorkspaceNotification(FunctionalTest):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notify
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate
     """
     def test_api_enable_user_workspace_notification__ok__200__admin(self):
         # init DB
@@ -2444,7 +2444,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=204)
@@ -2514,7 +2514,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
                 'pass',
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=204)
@@ -2596,7 +2596,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
                 'pass',
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notify'.format(  # nopep8
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/activate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=403)
@@ -2604,7 +2604,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
 
 class TestUserDisableWorkspaceNotification(FunctionalTest):
     """
-    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify
+    Tests for /api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate  # nopep8
     """
     def test_api_disable_user_workspace_notification__ok__200__admin(self):
         # init DB
@@ -2663,7 +2663,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=204)
@@ -2734,7 +2734,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
                 'pass',
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=204)
@@ -2815,7 +2815,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
                 'pass',
             )
         )
-        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/unnotify'.format(  # nopep8
+        self.testapp.put_json('/api/v2/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate'.format(  # nopep8
             user_id=test_user.user_id,
             workspace_id=workspace.workspace_id
         ), status=403)

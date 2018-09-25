@@ -14,6 +14,10 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Group
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.context_models import ActiveContentFilter
+from tracim_backend.models.context_models import ResetPasswordRequest
+from tracim_backend.models.context_models import ResetPasswordCheckToken
+from tracim_backend.models.context_models import ResetPasswordModify
+from tracim_backend.models.context_models import FolderContentUpdate
 from tracim_backend.models.context_models import AutocompleteQuery
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
@@ -99,7 +103,7 @@ class UserSchema(UserDigestSchema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
     )
     lang = marshmallow.fields.String(
         description="User langage in iso639 format",
@@ -174,7 +178,7 @@ class UserProfileSchema(marshmallow.Schema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
     )
     @post_load
     def create_user_profile(self, data):
@@ -193,7 +197,7 @@ class UserCreationSchema(marshmallow.Schema):
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
-        example='managers',
+        example='trusted-users',
         required=False,
         default=Group.TIM_USER_GROUPNAME
     )
@@ -502,6 +506,55 @@ class WorkspaceMemberInviteSchema(RoleUpdateSchema):
     @post_load
     def make_role(self, data):
         return WorkspaceMemberInvitation(**data)
+
+
+class ResetPasswordRequestSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordRequest(**data)
+
+
+class ResetPasswordCheckTokenSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    reset_password_token = marshmallow.fields.String(
+        description="token to reset password of given user",
+        required=True,
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordCheckToken(**data)
+
+
+class ResetPasswordModifySchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True,
+        example='suri.cate@algoo.fr'
+    )
+    reset_password_token = marshmallow.fields.String(
+        description="token to reset password of given user",
+        required=True,
+    )
+    new_password = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+    new_password2 = marshmallow.fields.String(
+        example='8QLa$<w',
+        required=True
+    )
+
+    @post_load
+    def make_object(self, data):
+        return ResetPasswordModify(**data)
 
 
 class BasicAuthSchema(marshmallow.Schema):

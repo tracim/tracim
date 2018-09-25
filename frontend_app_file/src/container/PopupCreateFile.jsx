@@ -68,12 +68,28 @@ class PopupCreateFile extends React.Component {
     reader.readAsDataURL(fileToSave)
   }
 
-  handleClose = () => GLOBAL_dispatchEvent({
-    type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
-    data: {
-      name: this.state.appName
+  handleClose = () => {
+    const { state, props } = this
+
+    if (state.progressUpload.display) {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t('Please wait until the upload ends'),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
     }
-  })
+
+    GLOBAL_dispatchEvent({
+      type: 'hide_popupCreateContent', // handled by tracim_front:dist/index.html
+      data: {
+        name: state.appName
+      }
+    })
+  }
 
   handleValidate = async () => {
     const { state } = this
@@ -100,7 +116,7 @@ class PopupCreateFile extends React.Component {
         xhr.upload.addEventListener('progress', uploadInProgress, false)
         xhr.upload.addEventListener('load', () => this.setState({progressUpload: {display: false, percent: 0}}), false)
 
-        xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/raw`, true)
+        xhr.open('PUT', `${state.config.apiUrl}/workspaces/${state.idWorkspace}/files/${fetchPostContent.body.content_id}/raw`, true)
         // xhr.setRequestHeader('Authorization', 'Basic ' + state.loggedUser.auth)
         xhr.setRequestHeader('Accept', 'application/json')
         xhr.withCredentials = true
@@ -139,12 +155,13 @@ class PopupCreateFile extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={state.config.creationLabel}
+        label={props.t(state.config.creationLabel)}
         customColor={state.config.hexcolor}
         faIcon={state.config.faIcon}
         contentName={state.uploadFile ? 'allowValidate' : ''} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
         btnValidateLabel={props.t('Validate and create')}
+        customStyle={{top: 'calc(50% - 202px)'}}
       >
         <div>
           {state.progressUpload.display &&
