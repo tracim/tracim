@@ -1411,9 +1411,15 @@ class ContentApi(object):
         return item
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
-        if new_mimetype == item.file_mimetype and \
-                new_content == item.depot_file.file.read():
-            raise SameValueError('The content did not changed')
+        # FIXME - G.M - 2018-09-25 - Repair and do a better same content check,
+        # as pyramid behaviour use buffered object
+        # new_content == item.depot_file.file.read() case cannot happened using
+        # whenever new_content.read() == item.depot_file.file.read().
+        # as this behaviour can create struggle with big file, simple solution
+        # using read can be used everytime.
+        # if new_mimetype == item.file_mimetype and \
+        #         new_content == item.depot_file.file.read():
+        #     raise SameValueError('The content did not changed')
         item.owner = self._user
         item.file_name = new_filename
         item.file_mimetype = new_mimetype

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pytest
 from tracim_backend.app_models.contents import CONTENT_TYPES
 import io
 
@@ -506,6 +507,92 @@ class TestFolder(FunctionalTest):
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
         assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
+
+    def test_api__update_folder__err_400__not_modified(self) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_SAME_VALUE_ERROR
 
     def test_api__update_folder__err_400__label_already_used(self) -> None:
         """
@@ -1219,6 +1306,85 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
 
+    def test_api__update_html_document__err_400__not_modified(self) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6',
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/6',
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_SAME_VALUE_ERROR
+
     def test_api__get_html_document_revisions__ok_200__nominal_case(
             self
     ) -> None:
@@ -1901,6 +2067,132 @@ class TestFiles(FunctionalTest):
         assert content['page_nb'] == 1
         assert content['pdf_available'] is True
 
+    def test_api__update_file_info__err_400__not_modified(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.txt',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['mimetype'] == 'plain/text'
+        assert content['size'] == len(b'Test file')
+        assert content['page_nb'] == 1
+        assert content['pdf_available'] is True
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['mimetype'] == 'plain/text'
+        assert content['size'] == len(b'Test file')
+        assert content['page_nb'] == 1
+        assert content['pdf_available'] is True
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_SAME_VALUE_ERROR
+
     def test_api__update_file_info__err_400__label_already_used(self) -> None:
         """
         Update(put) one file, failed because label already used
@@ -2384,6 +2676,76 @@ class TestFiles(FunctionalTest):
         assert res.body == image.getvalue()
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
+
+    @pytest.mark.xfail(
+        raises=AssertionError,
+        reason='Broken feature dues to pyramid behaviour'
+    )
+    def test_api__set_file_raw__err_400_not_modified(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            status=200
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == 'image/png'
+        assert res.content_length == len(image.getvalue())
+
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status='*',
+        )
+        assert res.status == 400
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == ERROR_CODE_CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -4002,6 +4364,85 @@ class TestThreads(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+    def test_api__update_thread__err_400__not_modified(self) -> None:
+        """
+        Update(put) thread
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7',
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'thread'
+        assert content['content_id'] == 7
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/threads/7',
+            status=200
+        )   # nopep8
+        content = res.json_body
+        assert content['content_type'] == 'thread'
+        assert content['content_id'] == 7
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == ERROR_CODE_SAME_VALUE_ERROR
 
     def test_api__update_thread__err_400__empty_label(self) -> None:
         """
