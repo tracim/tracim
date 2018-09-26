@@ -191,12 +191,12 @@ class UserCommand(AppContextCommand):
                     password=parsed_args.password,
                     do_notify=parsed_args.send_email,
                 )
-            except UserAlreadyExistError:
-                raise UserAlreadyExistError("Error: User already exist (use `user update` command instead)")  # nopep8
-            except NotificationSendingFailed:
-                raise NotificationSendingFailed("Error: Cannot send email notification due to error, user not created.")  # nopep8
-            except NotificationDisabled:
-                raise NotificationSendingFailed("Error: Email notification disabled but notification required, user not created.")  # nopep8
+            except UserAlreadyExistError as exc:
+                raise UserAlreadyExistError("Error: User already exist (use `user update` command instead)") from exc # nopep8
+            except NotificationSendingFailed as exc:
+                raise NotificationSendingFailed("Error: Cannot send email notification due to error, user not created.") from exc  # nopep8
+            except NotificationDisabled as exc:
+                raise NotificationDisabled("Error: Email notification disabled but notification required, user not created.") from exc  # nopep8
         else:
             if parsed_args.password:
                 self._update_password_for_login(
