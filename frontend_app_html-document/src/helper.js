@@ -77,7 +77,7 @@ export const debug = {
       public_name: 'Global manager',
       user_id: 1 // -1 or 1 for debug
     },
-    content_id: 2,
+    content_id: 7,
     content_type: 'html-document',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,
@@ -96,7 +96,7 @@ export const debug = {
     slug: 'current-menu',
     status: 'open',
     sub_content_types: ['thread', 'html-document', 'file', 'folder'],
-    workspace_id: 1
+    workspace_id: 2
   },
   timeline: timelineDebugData
 }

@@ -13,7 +13,7 @@ import {
   Timeline,
   SelectStatus,
   ArchiveDeleteContent,
-  displayDate
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -122,7 +122,8 @@ class Thread extends React.Component {
           listMessage: resComment.body.map(c => ({
             ...c,
             timelineType: 'comment',
-            created: displayDate(c.created, loggedUser.lang),
+            created_raw: c.created,
+            created: displayDistanceDate(c.created, loggedUser.lang),
             author: {
               ...c.author,
               avatar_url: c.author.avatar_url
