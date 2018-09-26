@@ -15,7 +15,8 @@ import {
   getUserKnownMember,
   postWorkspaceMember,
   putUserWorkspaceRead,
-  deleteWorkspaceMember
+  deleteWorkspaceMember,
+  putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -24,7 +25,8 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
-  removeWorkspaceMember
+  removeWorkspaceMember,
+  updateUserWorkspaceSubscriptionNotif
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -199,8 +201,6 @@ class Dashboard extends React.Component {
     }))
   }
 
-  // handleChangeNewMemberCreateAccount = newCreateAccount => this.setState(prev => ({newMember: {...prev.newMember, createAccount: newCreateAccount}}))
-
   handleChangeNewMemberRole = newRole => this.setState(prev => ({newMember: {...prev.newMember, role: newRole}}))
 
   handleClickValidateNewMember = async () => {
@@ -265,6 +265,24 @@ class Dashboard extends React.Component {
     )
   }
 
+  handleClickAddNotification = async () => {
+    const { props } = this
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putUserWorkspaceDoNotify(props.user, props.curWs.id, true))
+    switch (fetchWorkspaceUserAddNotification.status) {
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, true)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    }
+  }
+
+  handleClickRemoveNotification = async () => {
+    const { props } = this
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putUserWorkspaceDoNotify(props.user, props.curWs.id, false))
+    switch (fetchWorkspaceUserAddNotification.status) {
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, false)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -309,6 +327,8 @@ class Dashboard extends React.Component {
                 curWs={props.curWs}
                 displayNotifBtn={state.displayNotifBtn}
                 onClickToggleNotifBtn={this.handleToggleNotifBtn}
+                onClickAddNotify={this.handleClickAddNotification}
+                onClickRemoveNotify={this.handleClickRemoveNotification}
                 t={props.t}
               />
             </div>

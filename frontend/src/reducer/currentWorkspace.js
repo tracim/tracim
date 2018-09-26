@@ -6,7 +6,7 @@ import {
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_RECENT_ACTIVITY_LIST,
-  WORKSPACE_MEMBER
+  WORKSPACE_MEMBER, UPDATE, USER_WORKSPACE_DO_NOTIFY
 } from '../action-creator.sync.js'
 import { handleRouteFromApi } from '../helper.js'
 import { generateAvatarFromPublicName } from 'tracim_frontend_lib'
@@ -51,7 +51,8 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
             ? m.user.avatar_url
             : m.user.public_name ? generateAvatarFromPublicName(m.user.public_name) : '',
           role: m.role,
-          isActive: m.is_active
+          isActive: m.is_active,
+          doNotify: m.do_notify
         }))
       }
 
@@ -105,6 +106,17 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         memberList: state.memberList.filter(m => m.id !== action.idMember)
       }
+
+    case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
+      return action.idWorkspace === state.id
+        ? {
+          ...state,
+          memberList: state.memberList.map(u => u.id === action.idUser
+            ? {...u, doNotify: action.doNotify}
+            : u
+          )
+        }
+        : state
 
     default:
       return state
