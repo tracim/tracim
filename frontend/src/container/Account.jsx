@@ -5,9 +5,9 @@ import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 // import Calendar from '../component/Account/Calendar.jsx'
+// import Timezone from '../component/Account/Timezone.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
-import Timezone from '../component/Account/Timezone.jsx'
 import {
   Delimiter,
   PageWrapper,
@@ -43,11 +43,11 @@ class Account extends React.Component {
       }, {
         name: 'password',
         active: false
-      }, {
-        name: 'timezone',
-        active: false
       }]
       // {
+      //   name: 'timezone',
+      //   active: false
+      // }, {
       //   name: 'calendar',
       //   menuLabel: 'Calendrier personnel',
       //   active: false
@@ -162,8 +162,8 @@ class Account extends React.Component {
         case 'password':
           return <Password onClickSubmit={this.handleSubmitPassword} />
 
-        case 'timezone':
-          return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
+        // case 'timezone':
+        //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
       }
     })()
 

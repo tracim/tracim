@@ -43,6 +43,7 @@ export const MenuSubComponent = props => {
           <div className='menusubcomponent__list__item__link nav-link'>{props.t('Password')}</div>
         </li>
 
+        {/*
         <li
           className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'timezone'})}
           onClick={() => props.onClickMenuItem('timezone')}
@@ -50,6 +51,7 @@ export const MenuSubComponent = props => {
         >
           <div className='menusubcomponent__list__item__link nav-link'>{props.t('Timezone')}</div>
         </li>
+        */}
       </ul>
     </nav>
   )
