@@ -133,5 +133,6 @@
   "You are not a member of any workspace yet": "Vous n'êtes actuellement membre d'aucun espace de travail",
   "Wrong administrator's password": "Mauvais mot de passe administrateur",
   "You have been disconnected, please login again": "Vous avez été déconnecté. Veuillez vous reconnecter",
-  "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)"
+  "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)",
+  "Password cannot exceed 512 characters": "Mot de passe trop long (maximum 512 caractères)"
 }

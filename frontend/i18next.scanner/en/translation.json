@@ -133,5 +133,6 @@
   "You are not a member of any workspace yet": "You are not a member of any workspace yet",
   "Wrong administrator's password": "Wrong administrator's password",
   "You have been disconnected, please login again": "You have been disconnected, please login again",
-  "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)"
+  "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)",
+  "Password cannot exceed 512 characters": "Password cannot exceed 512 characters"
 }

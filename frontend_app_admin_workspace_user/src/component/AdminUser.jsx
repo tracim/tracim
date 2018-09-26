@@ -138,7 +138,7 @@ export class AdminUser extends React.Component {
                         <i
                           className={`fa fa-fw fa-${userProfile.faIcon}`}
                           style={{color: userProfile.hexcolor}}
-                          title={userProfile.label}
+                          title={props.t(userProfile.label)}
                         />
                       </td>
 
@@ -155,8 +155,8 @@ export class AdminUser extends React.Component {
                         <BtnSwitch
                           checked={u.profile === 'trusted-users' || u.profile === 'administrators'}
                           onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'trusted-users' || u.profile === 'administrators'))}
-                          activeLabel={props.t('Active')}
-                          inactiveLabel={props.t('Inactive')}
+                          activeLabel={props.t('Activated')}
+                          inactiveLabel={props.t('Deactivated')}
                           disabled={!u.is_active}
                         />
                       </td>
@@ -165,8 +165,8 @@ export class AdminUser extends React.Component {
                         <BtnSwitch
                           checked={u.profile === 'administrators'}
                           onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === 'administrators'))}
-                          activeLabel={props.t('Active')}
-                          inactiveLabel={props.t('Inactive')}
+                          activeLabel={props.t('Activated')}
+                          inactiveLabel={props.t('Deactivated')}
                           disabled={!u.is_active}
                         />
                       </td>
