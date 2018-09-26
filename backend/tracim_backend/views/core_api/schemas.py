@@ -704,6 +704,18 @@ class TimezoneSchema(marshmallow.Schema):
     name = marshmallow.fields.String(example='Europe/London')
 
 
+class AboutSchema(marshmallow.Schema):
+    name = marshmallow.fields.String(example='Tracim', description='Software name')  # nopep8
+    version = marshmallow.fields.String(example='2.0', allow_none=True, description='Version of Tracim')  # nopep8
+    datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    license = marshmallow.fields.String(description='Software License')  # nopep8
+    website = marshmallow.fields.URL(allow_none=True)
+
+
+class ConfigSchema(marshmallow.Schema):
+    email_notification_activated = marshmallow.fields.Bool()
+
+
 class ApplicationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(example='Calendar')
     slug = marshmallow.fields.String(example='calendar')

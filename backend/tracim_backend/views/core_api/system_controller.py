@@ -7,10 +7,14 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.utils.utils import get_about_dict
+from tracim_backend.lib.utils.utils import get_config_dict
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.models import Group
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import AboutSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
+from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 
@@ -58,11 +62,38 @@ class SystemController(Controller):
         """
         return get_timezones_list()
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @require_profile(Group.TIM_USER)
+    @hapic.output_body(AboutSchema(),)
+    def about(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get some info about Tracim
+        """
+        return get_about_dict()
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @require_profile(Group.TIM_USER)
+    @hapic.output_body(ConfigSchema(),)
+    def config(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get some config info of tracim instance
+        """
+        app_config = request.registry.settings['CFG']
+        return get_config_dict(app_config)
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
         for this controller
         """
+
+        # About
+        configurator.add_route('about', '/system/about', request_method='GET')  # nopep8
+        configurator.add_view(self.about, route_name='about')
+
+        # Config
+        configurator.add_route('config', '/system/config', request_method='GET')  # nopep8
+        configurator.add_view(self.config, route_name='config')
 
         # Applications
         configurator.add_route('applications', '/system/applications', request_method='GET')  # nopep8

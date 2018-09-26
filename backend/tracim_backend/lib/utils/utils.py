@@ -25,6 +25,23 @@ def preview_manager_page_format(page_number: int) -> int:
     return page_number-1
 
 
+def get_about_dict() -> dict:
+    # TODO - G.M - 2018-09-26 - Set correctly version
+    return {
+        'name': 'Tracim',
+        'version': None,
+        'datetime': datetime.datetime.now(),
+        'license': 'MIT',
+        'website': 'https://www.tracim.fr'
+    }
+
+
+def get_config_dict(config: 'CFG') -> dict:
+    return {
+        'email_notification_activated': config.EMAIL_NOTIFICATION_ACTIVATED
+    }
+
+
 def get_root_frontend_url(config: 'CFG') -> str:
     """
     Return website base url with always '/' at the end
