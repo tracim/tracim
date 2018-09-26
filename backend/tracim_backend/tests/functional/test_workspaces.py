@@ -1174,7 +1174,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        print(str(user_id) + '##' + str(workspace_id))
         res = self.testapp.get('/api/v2/workspaces/{}/members/{}'.format(
             workspace_id,
             user_id
@@ -1229,7 +1228,6 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        print(str(user_id) + '##' + str(workspace_id))
         res = self.testapp.get('/api/v2/workspaces/{}/members/{}'.format(
             workspace_id,
             user_id
