@@ -6,11 +6,15 @@ import CardPopup from './CardPopup.jsx'
 require('./CardPopupCreateContent.styl')
 
 class PopupCreateContent extends React.Component {
-  handleInputKeyPress = e => {
+  handleInputKeyDown = e => {
     switch (e.key) {
       case 'Enter':
         e.preventDefault()
         this.props.onValidate()
+        break
+      case 'Escape':
+        e.preventDefault()
+        this.props.onClose()
         break
     }
   }
@@ -45,7 +49,7 @@ class PopupCreateContent extends React.Component {
                   placeholder={props.inputPlaceholder}
                   value={props.contentName}
                   onChange={props.onChangeContentName}
-                  onKeyPress={this.handleInputKeyPress}
+                  onKeyDown={this.handleInputKeyDown}
                   autoFocus
                 />
               )
