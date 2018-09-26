@@ -25,11 +25,37 @@ from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.app_models.contents import CONTENT_TYPES
 
 
+class AboutModel(object):
+
+    def __init__(
+        self,
+        name: str,
+        version: typing.Optional[str],
+        datetime: datetime,
+        license: str,
+        website: str,
+    ):
+        self.name = name
+        self.version = version
+        self.datetime = datetime
+        self.license = license
+        self.website = website
+
+
+class ConfigModel(object):
+
+    def __init__(
+        self,
+        email_notification_activated: bool
+    ):
+        self.email_notification_activated = email_notification_activated
+
+
 class PreviewAllowedDim(object):
 
     def __init__(
             self,
-            restricted:bool,
+            restricted: bool,
             dimensions: typing.List[PreviewDim]
     ) -> None:
         self.restricted = restricted

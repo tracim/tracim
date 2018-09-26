@@ -1,16 +1,19 @@
 # coding=utf-8
+import datetime
+
 from pyramid.config import Configurator
 
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.core.system import SystemApi
 from tracim_backend.lib.utils.authorization import require_profile
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.utils import get_about_dict
-from tracim_backend.lib.utils.utils import get_config_dict
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.models import Group
+from tracim_backend.models.context_models import AboutModel
+from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
@@ -69,7 +72,9 @@ class SystemController(Controller):
         """
         Get some info about Tracim
         """
-        return get_about_dict()
+        app_config = request.registry.settings['CFG']
+        system_api = SystemApi(app_config)
+        return system_api.get_about()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @require_profile(Group.TIM_USER)
@@ -79,7 +84,8 @@ class SystemController(Controller):
         Get some config info of tracim instance
         """
         app_config = request.registry.settings['CFG']
-        return get_config_dict(app_config)
+        system_api = SystemApi(app_config)
+        return system_api.get_config()
 
     def bind(self, configurator: Configurator) -> None:
         """
