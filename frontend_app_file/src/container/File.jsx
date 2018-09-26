@@ -524,6 +524,7 @@ class File extends React.Component {
           <FileComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
+            loggedUser={state.loggedUser}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
             fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}

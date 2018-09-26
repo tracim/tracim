@@ -177,7 +177,7 @@ export class PreviewComponent extends React.Component {
                 }
               </div>
 
-              {!state.displayFormNewDescription &&
+              {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
                 <button
                   type='button'
                   className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'
