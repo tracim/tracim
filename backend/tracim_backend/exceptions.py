@@ -196,7 +196,7 @@ class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
 
 
 class UserNotActive(TracimException):
-    error_code = ERROR_CODE_USER_NOT_ACTIVE
+    error_code = ERROR_CODE_AUTHENTICATION_FAILED
 
 
 class NoUserSetted(TracimException):

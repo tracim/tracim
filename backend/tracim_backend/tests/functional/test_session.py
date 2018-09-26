@@ -103,7 +103,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_USER_NOT_ACTIVE
+        assert res.json_body['code'] == ERROR_CODE_AUTHENTICATION_FAILED
 
     def test_api__try_login_enpoint__err_403__bad_password(self):
         params = {
