@@ -1532,7 +1532,7 @@ class TestFiles(FunctionalTest):
         assert content['content_id'] == test_file.content_id
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
-        assert content['label'] == 'Test file'
+        assert content['label'] == 'Test_file'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
         assert content['slug'] == 'test-file'
@@ -2426,7 +2426,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1.jpg"' # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1.jpg"'  # nopep8
         assert res.body != image.getvalue()
         assert res.content_type == 'image/jpeg'
 
@@ -2646,7 +2646,7 @@ class TestFiles(FunctionalTest):
             params=params,
         )
         assert res.body != image.getvalue()
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1_256x256.jpg"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1_256x256.jpg"'  # nopep8
         assert res.content_type == 'image/jpeg'
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
@@ -3615,7 +3615,7 @@ class TestFiles(FunctionalTest):
             status=200,
             params=params,
         )
-        assert res.headers['Content-Disposition'] == 'attachment; filename="Test file_page_1.pdf"'  # nopep8
+        assert res.headers['Content-Disposition'] == 'attachment; filename="test_image_page_1.pdf"'  # nopep8
         assert res.content_type == 'application/pdf'
 
 
