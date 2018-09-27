@@ -113,7 +113,11 @@ class ExpiredResetPasswordToken(TracimException):
     pass
 
 
-class NotificationNotSend(TracimException):
+class NotificationSendingFailed(TracimException):
+    pass
+
+
+class NotificationDisabled(TracimException):
     pass
 
 
@@ -186,6 +190,26 @@ class EmptyLabelNotAllowed(EmptyValueNotAllowed):
 
 
 class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
+    pass
+
+
+class EmptyEmailBody(EmptyValueNotAllowed):
+    pass
+
+
+class NoSpecialKeyFound(EmptyValueNotAllowed):
+    pass
+
+
+class UnsupportedRequestMethod(TracimException):
+    pass
+
+
+class CommentRequestCreationFailed(TracimException):
+    pass
+
+
+class BadStatusCode(TracimException):
     pass
 
 

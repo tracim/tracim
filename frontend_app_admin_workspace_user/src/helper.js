@@ -12,7 +12,7 @@ export const ROLE = [{
   slug: 'workspace-manager',
   faIcon: 'gavel',
   hexcolor: '#ed0007',
-  label: i18n.t('Workspace manager')
+  label: i18n.t('Shared space manager')
 }, {
   id: 4,
   slug: 'content-manager',

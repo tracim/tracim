@@ -9,71 +9,37 @@ export const UserStatus = props => {
   const myRole = ROLE.find(r => r.slug === mySelf.role) || {faIcon: '', hexcolor: '', label: ''}
 
   return (
-    <div className='userstatus'>
-      <div className='userstatus__role'>
-        <div className='userstatus__role__msg'>
-          {props.t('Hi {{name}} ! Currently, you are ', {name: props.user.public_name})}
-        </div>
+    <div className='userstatus notched primaryColorBorder'>
+      <div className='userstatus__username'>
+        {props.user.public_name}
+      </div>
 
-        <div className='userstatus__role__definition'>
-          <div className='userstatus__role__definition__icon'>
-            <i className={`fa fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}}/>
+      <div className='userstatus__role'>
+        <div className='d-flex align-items-center'>
+          <div className='userstatus__role__icon'>
+            <i className={`fa fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
           </div>
 
-          <div className='userstatus__role__definition__text'>
+          <div className='userstatus__role__text' style={{color: myRole.hexcolor}}>
             {props.t(myRole.label)}
           </div>
         </div>
       </div>
 
-      <div className='userstatus__notification'>
-        <div className='userstatus__notification__text'>
-          {mySelf.doNotify
-            ? props.t("You have subscribed to this workspace's notifications")
-            : props.t("You have not subscribed to this workspace's notifications")
-          }
+      <div
+        className='userstatus__notification'
+        onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
+      >
+        <div className='userstatus__notification__icon'>
+          <i className={`fa fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}-o`} />
         </div>
 
-        {props.displayNotifBtn
-          ? (
-            <div className='userstatus__notification__subscribe dropdown'>
-              <button
-                className='userstatus__notification__subscribe__btn btn outlineTextBtn dropdown-toggle primaryColorBorder primaryColorBgHover primaryColorBorderDarken'
-                type='button'
-                id='dropdownMenuButton'
-                data-toggle='dropdown'
-                aria-haspopup='true'
-                aria-expanded='false'
-              >
-                {mySelf.doNotify ? props.t('Subscribed') : props.t('Unsubscribed')}
-              </button>
-
-              <div className='userstatus__notification__subscribe__submenu dropdown-menu'>
-                <div
-                  className='userstatus__notification__subscribe__submenu__item dropdown-item primaryColorBgLightenHover'
-                  onClick={props.onClickAddNotify}
-                >
-                  {props.t('Subscribe')}
-                </div>
-
-                <div
-                  className='userstatus__notification__subscribe__submenu__item dropdown-item dropdown-item primaryColorBgLightenHover'
-                  onClick={props.onClickRemoveNotify}
-                >
-                  {props.t('Unsubscribe')}
-                </div>
-              </div>
-            </div>
-          )
-          : (
-            <div
-              className='userstatus__notification__btn btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-              onClick={props.onClickToggleNotifBtn}
-            >
-              {props.t('Change your status')}
-            </div>
-          )
-        }
+        <div className='userstatus__notification__text ml-3'>
+          {mySelf.doNotify
+            ? props.t("Subscribed")
+            : props.t("Unsubscribed")
+          }
+        </div>
       </div>
     </div>
   )

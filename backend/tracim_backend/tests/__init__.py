@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 import unittest
 
 import plaster
@@ -71,9 +72,19 @@ class FunctionalTest(unittest.TestCase):
     config_uri = 'tests_configs.ini'
     config_section = 'functional_test'
 
-    def setUp(self):
-        logger._logger.setLevel('WARNING')
+    def _set_logger(self):
+        """
+        Set all logger to a high level to avoid getting too much noise for tests
+        """
+        logger._logger.setLevel('ERROR')
+        logging.getLogger().setLevel('ERROR')
+        logging.getLogger('sqlalchemy').setLevel('ERROR')
+        logging.getLogger('txn').setLevel('ERROR')
+        logging.getLogger('cliff').setLevel('ERROR')
+        logging.getLogger('_jb_pytest_runner').setLevel('ERROR')
 
+    def setUp(self):
+        self._set_logger()
         DepotManager._clear()
         self.settings = plaster.get_settings(
             self.config_uri,
@@ -100,14 +111,14 @@ class FunctionalTest(unittest.TestCase):
                 fixtures_loader = FixturesLoader(dbsession, self.app_config)
                 fixtures_loader.loads(self.fixtures)
                 transaction.commit()
-                print("Database initialized.")
+                logger.info(self,"Database initialized.")
             except IntegrityError:
-                print('Warning, there was a problem when adding default data'
-                      ', it may have already been added:')
+                logger.error(self,'Warning, there was a problem when adding default data'  # nopep8
+                               ', it may have already been added:')
                 import traceback
-                print(traceback.format_exc())
+                logger.error(self, traceback.format_exc())
                 transaction.abort()
-                print('Database initialization failed')
+                logger.error(self, 'Database initialization failed')
 
     def tearDown(self):
         logger.debug(self, 'TearDown Test...')
@@ -144,8 +155,19 @@ class BaseTest(unittest.TestCase):
     config_uri = 'tests_configs.ini'
     config_section = 'base_test'
 
+    def _set_logger(self):
+        """
+        Set all logger to a high level to avoid getting too much noise for tests
+        """
+        logger._logger.setLevel('ERROR')
+        logging.getLogger().setLevel('ERROR')
+        logging.getLogger('sqlalchemy').setLevel('ERROR')
+        logging.getLogger('txn').setLevel('ERROR')
+        logging.getLogger('cliff').setLevel('ERROR')
+        logging.getLogger('_jb_pytest_runner').setLevel('ERROR')
+
     def setUp(self):
-        logger._logger.setLevel('WARNING')
+        self._set_logger()
         logger.debug(self, 'Setup Test...')
         self.settings = plaster.get_settings(
             self.config_uri,

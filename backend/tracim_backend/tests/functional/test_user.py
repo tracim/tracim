@@ -2644,7 +2644,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
             timezone='Europe/Paris',
             lang='fr',
             do_save=True,
-            do_notify=True,
+            do_notify=False,
         )
         rapi = RoleApi(
             current_user=admin,

@@ -15,7 +15,7 @@ export const workspaceConfig = {
   slug: 'workspace',
   faIcon: 'bank',
   hexcolor: GLOBAL_primaryColor,
-  creationLabel: i18n.t('Create a workspace'),
+  creationLabel: i18n.t('Create a shared space'),
   domContainer: 'appFeatureContainer'
 }
 
@@ -45,7 +45,7 @@ export const ROLE = [{
   slug: 'workspace-manager',
   faIcon: 'gavel',
   hexcolor: '#ed0007',
-  label: i18n.t('Workspace manager')
+  label: i18n.t('Shared space manager')
 }, {
   id: 4,
   slug: 'content-manager',
@@ -99,7 +99,7 @@ export const ROLE2 = {
     slug: 'workspace-manager',
     faIcon: 'gavel',
     hexcolor: '#ed0007',
-    label: i18n.t('Workspace manager')
+    label: i18n.t('Shared space manager')
   }
 }
 

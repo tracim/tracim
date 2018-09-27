@@ -42,6 +42,11 @@ requires = [
     'lxml',
     'redis',
     'rq',
+    # mail-fetcher
+    'markdown',
+    'email_reply_parser',
+    'filelock',
+    'imapclient',
     # auth
     'pyramid_multiauth',
     'beaker',
@@ -59,6 +64,8 @@ tests_require = [
     'pep8',
     'mypy',
     'requests',
+    'responses',
+    'mock',
     'Pillow',
     'freezegun'
 ]

@@ -129,6 +129,8 @@ class RoleApi(object):
         with_notif: bool,
         flush: bool=True
     ) -> UserRoleInWorkspace:
+
+        # TODO - G.M - 2018-08-24 - Check if role already exist
         role = UserRoleInWorkspace()
         role.user_id = user.user_id
         role.workspace = workspace

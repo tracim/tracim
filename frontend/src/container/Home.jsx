@@ -22,10 +22,10 @@ class Home extends Component {
                 </div>
                 <div className='homepagecard__delimiter delimiter' />
                 <div className='homepagecard__text text-center mb-5'>
-                  {this.props.t('You will create your first workspace')}
+                  {this.props.t('You will create your first shared space')}
                 </div>
                 <div className='homepagecard__btn btn btn-outline-primary'>
-                  {this.props.t('create a workspace')}
+                  {this.props.t('create a shared space')}
                 </div>
                 <div className='homepagecard__logo mt-5 mb-3'>
                   <img src={LogoHomepage} alt='logo homepage' />

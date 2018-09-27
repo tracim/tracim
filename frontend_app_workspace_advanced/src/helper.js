@@ -64,7 +64,7 @@ export const debug = {
       slug: 'workspace-manager',
       faIcon: 'gavel',
       hexcolor: '#ed0007',
-      label: i18n.t('Workspace manager')
+      label: i18n.t('Shared space manager')
     }],
     translation: {
       en: {

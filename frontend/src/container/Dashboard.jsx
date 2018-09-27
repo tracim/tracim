@@ -103,7 +103,7 @@ class Dashboard extends React.Component {
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceDetail.status) {
       case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('workspace detail')}`, 'warning')); break
+      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
     }
   }
 
@@ -296,7 +296,7 @@ class Dashboard extends React.Component {
             title={props.t('Dashboard')}
             subtitle={''}
           >
-            <div className='dashboard__header__advancedmode mr-3'>
+            <div className='dashboard__header__advancedmode ml-3'>
               {idRoleUserWorkspace >= 8 &&
                 <button
                   type='button'
@@ -310,16 +310,37 @@ class Dashboard extends React.Component {
           </PageTitle>
 
           <PageContent>
-            <div className='dashboard__workspace-wrapper'>
-              <div className='dashboard__workspace'>
-                <div className='dashboard__workspace__title primaryColorFont'>
+            <div className='dashboard__workspace'>
+              <div className='dashboard__workspace__detail'>
+                <div className='dashboard__workspace__detail__title primaryColorFont'>
                   {props.curWs.label}
                 </div>
 
                 <div
-                  className='dashboard__workspace__detail'
+                  className='dashboard__workspace__detail__description'
                   dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
                 />
+
+                {idRoleUserWorkspace >= 2 && (
+                  <div className='dashboard__calltoaction'>
+                    {props.appList.map(app => {
+                      const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+                      return (
+                        <ContentTypeBtn
+                          customClass='dashboard__calltoaction__button'
+                          hexcolor={app.hexcolor}
+                          label={app.label}
+                          faIcon={app.faIcon}
+                          // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
+                          // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                          creationLabel={props.t(contentType.creationLabel)}
+                          onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
+                          key={app.label}
+                        />
+                      )
+                    })}
+                  </div>
+                )}
               </div>
 
               <UserStatus
@@ -332,27 +353,6 @@ class Dashboard extends React.Component {
                 t={props.t}
               />
             </div>
-
-            {idRoleUserWorkspace >= 2 && (
-              <div className='dashboard__calltoaction justify-content-sm-center'>
-                {props.appList.map(app => {
-                  const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-                  return (
-                    <ContentTypeBtn
-                      customClass='dashboard__calltoaction__button'
-                      hexcolor={app.hexcolor}
-                      label={app.label}
-                      faIcon={app.faIcon}
-                      // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
-                      // every apps has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
-                      creationLabel={props.t(contentType.creationLabel)}
-                      onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
-                      key={app.label}
-                    />
-                  )
-                })}
-              </div>
-            )}
 
             <div className='dashboard__workspaceInfo'>
               <RecentActivity
@@ -387,9 +387,8 @@ class Dashboard extends React.Component {
               />
             </div>
 
-            { /*
+            {/*
               AC - 11/09/2018 - not included in v2.0 roadmap
-
               <MoreInfo
                 onClickToggleWebdav={this.handleToggleWebdavBtn}
                 displayWebdavBtn={state.displayWebdavBtn}
@@ -397,7 +396,7 @@ class Dashboard extends React.Component {
                 displayCalendarBtn={state.displayCalendarBtn}
                 t={props.t}
               />
-            */ }
+            */}
 
           </PageContent>
         </PageWrapper>

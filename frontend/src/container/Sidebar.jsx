@@ -68,7 +68,6 @@ class Sidebar extends React.Component {
 
     return (
       <div className={classnames('sidebar primaryColorBg', {'sidebarclose': sidebarClose})}>
-
         <div className='sidebar__expand primaryColorBg' onClick={this.handleClickToggleSidebar}>
           <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
         </div>
@@ -98,11 +97,10 @@ class Sidebar extends React.Component {
                 className='sidebar__content__btnnewworkspace__btn btn primaryColorBgLighten primaryColorBorderDarken primaryColorBgDarkenHover  mb-5'
                 onClick={this.handleClickNewWorkspace}
               >
-                {t('Create a workspace')}
+                {t('Create a shared space')}
               </button>
             </div>
           }
-
         </div>
 
         <div className='sidebar__footer mb-2'>

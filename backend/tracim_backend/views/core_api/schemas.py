@@ -488,6 +488,7 @@ class ContentIdsQuerySchema(marshmallow.Schema):
 
 class RoleUpdateSchema(marshmallow.Schema):
     role = marshmallow.fields.String(
+        required=True,
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
     )
@@ -497,7 +498,11 @@ class RoleUpdateSchema(marshmallow.Schema):
         return RoleUpdate(**data)
 
 
-class WorkspaceMemberInviteSchema(RoleUpdateSchema):
+class WorkspaceMemberInviteSchema(marshmallow.Schema):
+    role = marshmallow.fields.String(
+        example='contributor',
+        validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+    )
     user_id = marshmallow.fields.Int(
         example=5,
         default=None,
@@ -589,9 +594,11 @@ class LoginOutputHeaders(marshmallow.Schema):
 
 class WorkspaceModifySchema(marshmallow.Schema):
     label = marshmallow.fields.String(
+        required=True,
         example='My Workspace',
     )
     description = marshmallow.fields.String(
+        required=True,
         example='A super description of my workspace.',
     )
 
@@ -710,6 +717,17 @@ class TimezoneSchema(marshmallow.Schema):
     name = marshmallow.fields.String(example='Europe/London')
 
 
+class AboutSchema(marshmallow.Schema):
+    name = marshmallow.fields.String(example='Tracim', description='Software name')  # nopep8
+    version = marshmallow.fields.String(example='2.0', allow_none=True, description='Version of Tracim')  # nopep8
+    datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
+    website = marshmallow.fields.URL(allow_none=True)
+
+
+class ConfigSchema(marshmallow.Schema):
+    email_notification_activated = marshmallow.fields.Bool()
+
+
 class ApplicationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(example='Calendar')
     slug = marshmallow.fields.String(example='calendar')
@@ -801,12 +819,14 @@ class ContentMoveSchema(marshmallow.Schema):
 
 class ContentCreationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
+        required=True,
         example='contract for client XXX',
         description='Title of the content to create',
         validate=Length(min=1),
         required=True
     )
     content_type = marshmallow.fields.String(
+        required=True,
         example='html-document',
         validate=all_content_types_validator,
         required=True,
@@ -993,6 +1013,7 @@ class SetCommentSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
         example='<p>This is just an html comment !</p>',
         validate=Length(min=1)
+        required=True,
     )
 
     @post_load()
