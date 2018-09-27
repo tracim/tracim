@@ -19,7 +19,6 @@ class SystemApi(object):
             name='Tracim',
             version=None,
             datetime=datetime.datetime.now(),
-            license='MIT',
             website='https://www.tracim.fr'
         )
 

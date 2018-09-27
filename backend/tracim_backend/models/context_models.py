@@ -32,13 +32,11 @@ class AboutModel(object):
         name: str,
         version: typing.Optional[str],
         datetime: datetime,
-        license: str,
         website: str,
     ):
         self.name = name
         self.version = version
         self.datetime = datetime
-        self.license = license
         self.website = website
 
 

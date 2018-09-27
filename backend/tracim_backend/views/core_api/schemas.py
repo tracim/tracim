@@ -708,7 +708,6 @@ class AboutSchema(marshmallow.Schema):
     name = marshmallow.fields.String(example='Tracim', description='Software name')  # nopep8
     version = marshmallow.fields.String(example='2.0', allow_none=True, description='Version of Tracim')  # nopep8
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
-    license = marshmallow.fields.String(description='Software License')  # nopep8
     website = marshmallow.fields.URL(allow_none=True)
 
 
