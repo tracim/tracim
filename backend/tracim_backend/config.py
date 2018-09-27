@@ -641,7 +641,7 @@ class CFG(object):
         thread.add_content_type(
             slug='thread',
             label='Thread',
-            creation_label='Discuss about a topic',
+            creation_label='Start a topic',
             available_statuses=CONTENT_STATUS.get_all(),
         )
 
