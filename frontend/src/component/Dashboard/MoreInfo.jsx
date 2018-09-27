@@ -3,7 +3,7 @@ import React from 'react'
 require('./MoreInfo.styl')
 
 export const MoreInfo = props =>
-  <div className='moreinfo'>
+  <div className='moreinfo ml-3 ml-md-0'>
     <div className='moreinfo__webdav genericBtnInfoDashboard'>
       <div
         className='moreinfo__webdav__btn genericBtnInfoDashboard__btn primaryColorBgHover primaryColorBorderDarkenHover'
@@ -42,7 +42,7 @@ export const MoreInfo = props =>
           </div>
 
           <div className='moreinfo__calendar__btn__text genericBtnInfoDashboard__btn__text d-flex align-self-center'>
-            {props.t('Workspace Calendar')}
+            {props.t('Shared space calendar')}
           </div>
         </div>
       </div>
@@ -51,7 +51,7 @@ export const MoreInfo = props =>
         {props.displayCalendarBtn === true &&
         <div className='moreinfo__calendar__information genericBtnInfoDashboard__info'>
           <div className='moreinfo__calendar__information__text genericBtnInfoDashboard__info__text'>
-            {props.t('Each workspace has its own calendar.')}
+            {props.t('Each shared space has its own calendar.')}
           </div>
 
           <div className='moreinfo__calendar__information__link genericBtnInfoDashboard__info__link'>

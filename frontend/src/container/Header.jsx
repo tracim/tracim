@@ -38,6 +38,12 @@ class Header extends React.Component {
   handleChangeLang = async idLang => {
     const { props } = this
 
+    if (props.user.user_id === -1) {
+      props.dispatch(setUserLang(idLang))
+      i18n.changeLanguage(idLang)
+      return
+    }
+
     const fetchPutUserLang = await props.dispatch(putUserLang(props.user, idLang))
     switch (fetchPutUserLang.status) {
       case 200:
@@ -71,11 +77,7 @@ class Header extends React.Component {
         <nav className='navbar navbar-expand-md navbar-light bg-light'>
           <Logo logoSrc={logoHeader} onClickImg={this.handleClickLogo} />
 
-          { /*
-            <div className='header__breadcrumb d-none d-lg-block ml-4'>
-              Dev Tracim - liste des contenus
-            </div>
-          */ }
+          <div className='header__breadcrumb d-none d-lg-block ml-4' />
 
           <NavbarToggler />
 

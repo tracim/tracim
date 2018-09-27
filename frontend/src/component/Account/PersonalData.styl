@@ -1,6 +1,7 @@
 .personaldata
   &__text
-    settingText()
+    margin 15px 0
+    font-size 18px
   &__form
     margin 25px 0
     &__title
@@ -8,12 +9,22 @@
       font-size 18px
     &__txtinput
       display block
-      width auto
+      width 300px
       border-width 1px
       border-style solid
       border-radius 5px
-      &.checkPassword
+      &[placeholder]
+        white-space nowrap
+        overflow hidden
+        text-overflow ellipsis
+      &:disabled
+        cursor not-allowed
+      &.withAdminMsg
+        margin-right 20px
+      &__info
         margin-left 15px
+        &__icon
+          margin-right 8px
     &__button
       vertical-align top
       border-width 1px

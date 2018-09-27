@@ -14,8 +14,8 @@ export const FETCH_CONFIG = {
 export const workspaceConfig = {
   slug: 'workspace',
   faIcon: 'bank',
-  hexcolor: '#7d4e24',
-  creationLabel: i18n.t('Create a workspace'),
+  hexcolor: GLOBAL_primaryColor,
+  creationLabel: i18n.t('Create a shared space'),
   domContainer: 'appFeatureContainer'
 }
 
@@ -35,22 +35,17 @@ export const PAGE = {
   ADMIN: {
     ROOT: '/admin',
     WORKSPACE: '/admin/workspace',
-    USER: '/admin/user'
+    USER: '/admin/user',
+    USER_EDIT: (idUser = ':iduser') => `/admin/user/${idUser}`
   }
 }
 
 export const ROLE = [{
-  id: 1,
-  slug: 'reader',
-  faIcon: 'eye',
-  hexcolor: '#15d948',
-  label: i18n.t('Reader')
-}, {
-  id: 2,
-  slug: 'contributor',
-  faIcon: 'pencil',
-  hexcolor: '#3145f7',
-  label: i18n.t('Contributor')
+  id: 8,
+  slug: 'workspace-manager',
+  faIcon: 'gavel',
+  hexcolor: '#ed0007',
+  label: i18n.t('Shared space manager')
 }, {
   id: 4,
   slug: 'content-manager',
@@ -58,11 +53,17 @@ export const ROLE = [{
   hexcolor: '#f2af2d',
   label: i18n.t('Content manager')
 }, {
-  id: 8,
-  slug: 'workspace-manager',
-  faIcon: 'gavel',
-  hexcolor: '#ed0007',
-  label: i18n.t('Workspace manager')
+  id: 2,
+  slug: 'contributor',
+  faIcon: 'pencil',
+  hexcolor: '#3145f7',
+  label: i18n.t('Contributor')
+}, {
+  id: 1,
+  slug: 'reader',
+  faIcon: 'eye',
+  hexcolor: '#15d948',
+  label: i18n.t('Reader')
 }]
 
 export const findIdRoleUserWorkspace = (idUser, memberList, roleList) => {
@@ -98,7 +99,7 @@ export const ROLE2 = {
     slug: 'workspace-manager',
     faIcon: 'gavel',
     hexcolor: '#ed0007',
-    label: i18n.t('Workspace manager')
+    label: i18n.t('Shared space manager')
   }
 }
 
@@ -106,24 +107,39 @@ export const PROFILE = {
   ADMINISTRATOR: {
     id: 1,
     slug: 'administrators',
-    faIcon: 'rocket',
-    hexcolor: '#123456',
+    faIcon: 'shield',
+    hexcolor: '#ed0007',
     label: i18n.t('Administrator')
   },
   MANAGER: {
     id: 2,
-    slug: 'managers',
-    faIcon: 'car',
-    hexcolor: '#654321',
-    label: i18n.t('Manager')
+    slug: 'trusted-users',
+    faIcon: 'graduation-cap',
+    hexcolor: '#f2af2d',
+    label: i18n.t('Trusted user')
   },
   USER: {
     id: 4,
     slug: 'users',
-    faIcon: 'bicycle',
-    hexcolor: '#123123',
+    faIcon: 'user',
+    hexcolor: '#3145f7',
     label: i18n.t('User')
   }
 }
 
+export const getUserProfile = slug => Object.keys(PROFILE).map(p => PROFILE[p]).find(p => slug === p.slug) || {}
+
 export const handleRouteFromApi = route => route.startsWith('/#') ? route.slice(2) : route
+
+// Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
+// and are returned through api.
+// We will later implement a better solution
+// this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
+const translationKeyFromBackend = [
+  i18n.t('Dashboard'),
+  i18n.t('All Contents'),
+  i18n.t('Open'),
+  i18n.t('Validated'),
+  i18n.t('Cancelled'),
+  i18n.t('Deprecated')
+]

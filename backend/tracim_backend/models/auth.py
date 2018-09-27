@@ -16,6 +16,7 @@ from hashlib import sha256
 from typing import TYPE_CHECKING
 
 import sqlalchemy
+import typing
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence
@@ -28,6 +29,8 @@ from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
+from tracim_backend.exceptions import ExpiredResetPasswordToken
+from tracim_backend.exceptions import UnvalidResetPasswordToken
 
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.meta import metadata
@@ -64,7 +67,7 @@ class Group(DeclarativeBase):
 
     TIM_NOBODY_GROUPNAME = 'nobody'
     TIM_USER_GROUPNAME = 'users'
-    TIM_MANAGER_GROUPNAME = 'managers'
+    TIM_MANAGER_GROUPNAME = 'trusted-users'
     TIM_ADMIN_GROUPNAME = 'administrators'
 
     __tablename__ = 'groups'
@@ -143,8 +146,12 @@ class User(DeclarativeBase):
     lang = Column(Unicode(3), nullable=True, default=None)
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
+    # TODO - G.M - 2018-08-22 - Think about hash instead of direct token
     auth_token = Column(Unicode(255))
     auth_token_created = Column(DateTime)
+
+    reset_password_token_hash = Column(Unicode(255), nullable=True, default=None)  # nopep8
+    reset_password_token_created = Column(DateTime, nullable=True, default=None)
 
     @hybrid_property
     def email_address(self):
@@ -191,26 +198,6 @@ class User(DeclarativeBase):
         """Return the user object whose user name is ``username``."""
         return dbsession.query(cls).filter_by(email=username).first()
 
-    @classmethod
-    def _hash_password(cls, cleartext_password: str) -> str:
-        salt = sha256()
-        salt.update(os.urandom(60))
-        salt = salt.hexdigest()
-
-        hash = sha256()
-        # Make sure password is a str because we cannot hash unicode objects
-        hash.update((cleartext_password + salt).encode('utf-8'))
-        hash = hash.hexdigest()
-
-        ciphertext_password = salt + hash
-
-        # Make sure the hashed password is a unicode object at the end of the
-        # process because SQLAlchemy _wants_ unicode objects for Unicode cols
-        # FIXME - D.A. - 2013-11-20 - The following line has been removed since using python3. Is this normal ?!
-        # password = password.decode('utf-8')
-
-        return ciphertext_password
-
     def _set_password(self, cleartext_password: str) -> None:
         """
         Set ciphertext password from cleartext password.
@@ -218,7 +205,7 @@ class User(DeclarativeBase):
         Hash cleartext password on the fly,
         Store its ciphertext version,
         """
-        self._password = self._hash_password(cleartext_password)
+        self._password = self._hash(cleartext_password)
 
     def _get_password(self) -> str:
         """Return the hashed version of the password."""
@@ -239,12 +226,7 @@ class User(DeclarativeBase):
         :rtype: bool
 
         """
-        result = False
-        if self.password:
-            hash = sha256()
-            hash.update((cleartext_password + self.password[:64]).encode('utf-8'))
-            result = self.password[64:] == hash.hexdigest()
-        return result
+        return self._validate_hash(self.password, cleartext_password)
 
     def get_display_name(self, remove_email_part: bool=False) -> str:
         """
@@ -279,30 +261,107 @@ class User(DeclarativeBase):
                 roles.append(role)
         return roles
 
+    # Tokens ###
+
+    def reset_tokens(self):
+        self._generate_auth_token()
+        # disable reset_password token
+        self.reset_password_token_hash = None
+        self.reset_password_token_created = None
+
+    # Reset Password Tokens #
+    def generate_reset_password_token(self) -> str:
+        reset_password_token, self.reset_password_token_created, self.reset_password_token_hash = self._generate_token(
+            create_hash=True)  # nopep8
+        return reset_password_token
+
+    def validate_reset_password_token(self, token, validity_seconds) -> bool:
+        if not self._validate_date(self.reset_password_token_created, validity_seconds):  # nopep8
+            raise ExpiredResetPasswordToken('reset password token has expired')
+        if not self._validate_hash(self.reset_password_token_hash, token):
+            raise UnvalidResetPasswordToken('reset password token is unvalid')
+        return True
+
+    # Auth Token #
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
-    def ensure_auth_token(self, validity_seconds, session) -> None:
+
+    def _generate_auth_token(self) -> str:
+        self.auth_token, self.auth_token_created, _ = self._generate_token()
+        return self.auth_token
+
+    # TODO - G.M - 2018-08-23 - Should we store hash instead of direct stored
+    # auth token ?
+    def validate_auth_token(self, token, validity_seconds) -> bool:
+        return self.ensure_auth_token(validity_seconds) == token
+
+    def ensure_auth_token(self, validity_seconds) -> str:
         """
         Create auth_token if None, regenerate auth_token if too much old.
-
         auth_token validity is set in
-        :return:
+        :return: actual valid auth token
         """
 
         if not self.auth_token or not self.auth_token_created:
-            self.auth_token = str(uuid.uuid4())
-            self.auth_token_created = datetime.utcnow()
-            session.flush()
-            return
+            self._generate_auth_token()
+            return self.auth_token
 
+        if not self._validate_date(self.auth_token_created, validity_seconds):
+            self._generate_auth_token()
+
+        return self.auth_token
+
+    # Utils functions #
+
+    @classmethod
+    def _hash(cls, cleartext_password_or_token: str) -> str:
+        salt = sha256()
+        salt.update(os.urandom(60))
+        salt = salt.hexdigest()
+
+        hashed = sha256()
+        # Make sure password is a str because we cannot hash unicode objects
+        hashed.update((cleartext_password_or_token + salt).encode('utf-8'))
+        hashed = hashed.hexdigest()
+
+        ciphertext_password = salt + hashed
+
+        # Make sure the hashed password is a unicode object at the end of the
+        # process because SQLAlchemy _wants_ unicode objects for Unicode cols
+        # FIXME - D.A. - 2013-11-20 - The following line has been removed since using python3. Is this normal ?!
+        # password = password.decode('utf-8')
+
+        return ciphertext_password
+
+    @classmethod
+    def _validate_hash(cls, hashed: str, cleartext_password_or_token: str) -> bool:  # nopep8
+        result = False
+        if hashed:
+            new_hash = sha256()
+            new_hash.update((cleartext_password_or_token + hashed[:64]).encode('utf-8'))
+            result = hashed[64:] == new_hash.hexdigest()
+        return result
+
+    @classmethod
+    def _generate_token(cls, create_hash=False) -> typing.Union[str, datetime, typing.Optional[str]]:  # nopep8
+        token = str(uuid.uuid4())
+        creation_datetime = datetime.utcnow()
+        hashed_token = None
+        if create_hash:
+            hashed_token = cls._hash(token)
+        return token, creation_datetime, hashed_token
+
+    @classmethod
+    def _validate_date(cls, date: datetime, validity_seconds: int) -> bool:
+        if not date:
+            return False
         now_seconds = time.mktime(datetime.utcnow().timetuple())
-        auth_token_seconds = time.mktime(self.auth_token_created.timetuple())
+        auth_token_seconds = time.mktime(date.timetuple())
         difference = now_seconds - auth_token_seconds
 
         if difference > validity_seconds:
-            self.auth_token = str(uuid.uuid4())
-            self.auth_token_created = datetime.utcnow()
-            session.flush()
+            return False
+        return True
 
 
 class Permission(DeclarativeBase):

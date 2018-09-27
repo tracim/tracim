@@ -2,7 +2,7 @@
   position fixed
   width 100%
   border-bottom 1px solid grey
-  z-index 6
+  z-index 30
   &__logo
     &__img
       width 150px
@@ -102,11 +102,14 @@
               &__text
                 padding 10px;
 
+// MEDIAQUERIES
 
 @media (min-width: min-lg) and (max-width: max-lg)
   .header
     &__menu
       &__rightside
+        display flex
+        justify-content flex-end
         width 100%
 
 @media (min-width: min-md) and (max-width: max-md)
@@ -136,7 +139,8 @@
       &__rightside
         flex-wrap wrap
         padding-left 0
-        width 418px
+        &__itemlanguage
+          margin-bottom 20px
         &__itemquestion
           display none
         &__itemprofil

@@ -1,13 +1,10 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import i18n from '../../../i18n.js'
 import Radium from 'radium'
 
 require('./SelectStatus.styl')
 
 export const SelectStatus = props => {
-  translate.setI18n(props.i18n ? props.i18n : i18n) // mandatory to allow Apps to overrides trad
-
   return (
     <div className='selectStatus dropdown'>
       <button
@@ -20,8 +17,8 @@ export const SelectStatus = props => {
         style={{color: props.selectedStatus ? props.selectedStatus.hexcolor : 'transparent'}}
         disabled={props.disabled}
       >
-        <span className='selectStatus__dropdownbtn__label'>Status :</span>
-        {props.selectedStatus ? props.selectedStatus.label : ''}
+        <span className='selectStatus__dropdownbtn__label'>{props.t('Status')}:</span>
+        {props.selectedStatus ? props.t(props.selectedStatus.label) : ''}
         <div className='selectStatus__dropdownbtn__icon'>
           <i className={`fa fa-${props.selectedStatus ? props.selectedStatus.faIcon : ''}`} />
         </div>
@@ -40,7 +37,7 @@ export const SelectStatus = props => {
               }
             }}
           >
-            {s.label}
+            {props.t(s.label)}
             <div className='selectStatus__submenu__item__icon'>
               <i
                 className={`fa fa-fw fa-${s.faIcon}`}

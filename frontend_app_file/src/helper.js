@@ -1,4 +1,5 @@
 import { timelineDebugData } from './timelineDebugData.js'
+import i18n from './i18n.js'
 
 export const FETCH_CONFIG = {
   headers: {
@@ -11,6 +12,15 @@ export const MODE = {
   VIEW: 'view',
   EDIT: 'edit',
   REVISION: 'revision'
+}
+
+export const displayFileSize = (bytes, decimals) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const dm = decimals <= 0 ? 0 : decimals || 2
+  const sizes = [i18n.t('Bytes'), i18n.t('KB'), i18n.t('MB'), i18n.t('GB'), i18n.t('TB'), i18n.t('PB'), i18n.t('EB'), i18n.t('ZB'), i18n.t('YB')]
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
 export const debug = {
@@ -65,10 +75,10 @@ export const debug = {
     firstname: 'Côme',
     lastname: 'Stoilenom',
     email: 'osef@algoo.fr',
-    lang: 'en',
+    lang: 'fr',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
     auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`),
-    idRoleUserWorkspace: 8
+    idRoleUserWorkspace: 1
   },
   content: {
     author: {
@@ -76,7 +86,7 @@ export const debug = {
       public_name: 'Global manager',
       user_id: 1 // -1 or 1 for debug
     },
-    content_id: 2,
+    content_id: 1,
     content_type: 'file',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,
@@ -96,7 +106,8 @@ export const debug = {
     status: 'open',
     sub_content_types: ['thread', 'html-document', 'file', 'folder'],
     workspace_id: 1,
-    contentFull: null
+    contentFull: null,
+    page_nb: 1
   },
   timeline: timelineDebugData,
   idWorkspace: 1

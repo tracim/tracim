@@ -16,7 +16,7 @@ const DropdownCreateButton = props => {
         aria-expanded='false'
       >
         <div className={classnames(`${props.parentClass}__label__text`, 'dropdownCreateBtn__label__text')}>
-          {props.t('Create ...')}
+          {props.t('Create')}...
         </div>
       </button>
 

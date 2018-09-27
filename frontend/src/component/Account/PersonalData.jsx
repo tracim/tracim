@@ -22,7 +22,7 @@ export class PersonalData extends React.Component {
 
   handleChangeCheckPassword = e => this.setState({checkPassword: e.target.value})
 
-  handleClickSubmit = () => {
+  handleClickSubmit = async () => {
     const { props, state } = this
 
     if (state.newEmail !== '' && state.checkPassword === '') {
@@ -30,11 +30,15 @@ export class PersonalData extends React.Component {
       return
     }
 
-    props.onClickSubmit(state.newName, state.newEmail, state.checkPassword)
+    await props.onClickSubmit(state.newName, state.newEmail, state.checkPassword) && this.setState({
+      newName: '',
+      newEmail: '',
+      checkPassword: ''
+    })
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
@@ -44,15 +48,12 @@ export class PersonalData extends React.Component {
         <div className='personaldata__text ml-2 ml-sm-0' />
 
         <form className='personaldata__form'>
-          <div className='personaldata__form__title'>
-            {props.t('Name:')}
-          </div>
-
           <div className='d-flex align-items-center flex-wrap mb-4'>
             <input
               className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='text'
               placeholder={props.t('Change your name')}
+              value={state.newName}
               onChange={this.handleChangeName}
             />
           </div>
@@ -63,18 +64,27 @@ export class PersonalData extends React.Component {
 
           <div className='d-flex align-items-center flex-wrap mb-4'>
             <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control mt-3 mt-sm-0'
+              className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='email'
               placeholder={props.t('Change your email')}
+              value={state.newEmail}
               onChange={this.handleChangeEmail}
             />
 
             <input
               className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
               type='password'
-              placeholder={props.t('Check your password')}
+              placeholder={props.displayAdminInfo ? props.t("Administrator's password") : props.t('Type your password')}
+              value={state.checkPassword}
               onChange={this.handleChangeCheckPassword}
+              disabled={state.newEmail === ''}
             />
+            {props.displayAdminInfo &&
+              <div className='personaldata__form__txtinput__info'>
+                <i className='personaldata__form__txtinput__info__icon fa fa-lightbulb-o' />
+                {props.t('This edition requires your administrator password')}
+              </div>
+            }
           </div>
 
           <button
@@ -82,7 +92,7 @@ export class PersonalData extends React.Component {
             className='personaldata__form__button btn outlineTextBtn primaryColorBorderLighten primaryColorBgHover primaryColorBorderDarkenHover'
             onClick={this.handleClickSubmit}
           >
-            {props.t('Send')}
+            {props.t('Validate')}
           </button>
         </form>
       </div>

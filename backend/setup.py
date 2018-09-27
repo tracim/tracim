@@ -24,7 +24,7 @@ requires = [
     'zope.sqlalchemy',
     'alembic',
     # API
-    'hapic>=0.41',
+    'hapic>=0.52',
     'marshmallow <3.0.0a1,>2.0.0',
     # CLI
     'cliff',
@@ -36,6 +36,7 @@ requires = [
     'babel',
     'python-slugify',
     'preview-generator',
+    'colour',
     # mail-notifier
     'mako',
     'lxml',

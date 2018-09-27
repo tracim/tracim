@@ -33,6 +33,10 @@ class Timeline extends React.Component {
     this.props.shouldScrollToBottom && this.scrollToBottom()
   }
 
+  componentWillUnmount () {
+    document.removeEventListener('appCustomEvent', this.customEventReducer)
+  }
+
   scrollToBottom = () => this.timelineBottom.scrollIntoView({behavior: 'instant'})
 
   render () {
@@ -54,7 +58,7 @@ class Timeline extends React.Component {
               <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
             </div>
             <div className='timeline__header__title'>
-              {this.props.t('Timeline')}
+              {props.t('Timeline')}
             </div>
             <div className='timeline__header__icon mb-3 mt-auto'>
               <i className={classnames('fa fa-fw', {'fa-angle-double-right': props.rightPartOpen, 'fa-angle-double-left': !props.rightPartOpen})} />
@@ -66,12 +70,12 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-archive' />
-              {this.props.t('This content is archived.')}
+              {props.t('This content is archived.')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreArchived}>
               <i className='fa fa-fw fa-archive' />
-              {this.props.t('Restore')}
+              {props.t('Restore')}
             </button>
           </div>
         }
@@ -80,12 +84,12 @@ class Timeline extends React.Component {
           <div className='timeline__info'>
             <div className='timeline__info__msg'>
               <i className='fa fa-fw fa-trash' />
-              {this.props.t('This content is deleted.')}
+              {props.t('This content is deleted.')}
             </div>
 
             <button className='timeline__info__btnrestore btn' onClick={props.onClickRestoreDeleted}>
               <i className='fa fa-fw fa-trash' />
-              {this.props.t('Restore')}
+              {props.t('Restore')}
             </button>
           </div>
         }
@@ -100,7 +104,8 @@ class Timeline extends React.Component {
                     customColor={props.customColor}
                     author={content.author.public_name}
                     avatar={content.author.avatar_url}
-                    createdAt={content.created}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
                     text={content.raw_content}
                     fromMe={props.loggedUser.user_id === content.author.user_id}
                     key={`comment_${content.content_id}`}
@@ -110,7 +115,10 @@ class Timeline extends React.Component {
                   return <Revision
                     customClass={props.customClass}
                     customColor={props.customColor}
-                    createdAt={content.created}
+                    lang={props.loggedUser.lang}
+                    revisionType={content.revision_type}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
                     number={content.number}
                     key={`revision_${content.revision_id}`}
                     onClickRevision={() => props.onClickRevisionBtn(content)}
@@ -125,7 +133,7 @@ class Timeline extends React.Component {
               <div className={classnames(`${props.customClass}__texteditor__textinput`, 'timeline__body__texteditor__textinput')}>
                 <textarea
                   id='wysiwygTimelineComment'
-                  placeholder='Votre message ...'
+                  placeholder={props.t('Your message...')}
                   value={props.newComment}
                   onChange={props.onChangeNewComment}
                   disabled={props.disableComment}
@@ -151,7 +159,7 @@ class Timeline extends React.Component {
                     }}
                     key={'timeline__comment__advancedtext'}
                   >
-                    {props.wysiwyg ? 'Texte simple' : 'Texte riche'}
+                    {props.wysiwyg ? props.t('Simple text') : props.t('Rich text')}
                   </button>
                 </div>
 
@@ -170,7 +178,7 @@ class Timeline extends React.Component {
                     }}
                     key={'timeline__comment__send'}
                   >
-                    Envoyer
+                    {props.t('Send')}
                     <div
                       className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__body__texteditor__submit__btn__icon')}>
                       <i className='fa fa-paper-plane-o' />

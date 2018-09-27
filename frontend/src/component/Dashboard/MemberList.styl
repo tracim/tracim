@@ -1,27 +1,31 @@
 @import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
 .memberlist
-  margin 0 0 50px 10px
-  width 37%
-  &__title
+  margin-left 30px
+  width calc(40% - 30px)
+  &__header
+    display flex
+    justify-content space-between
+    align-items center
     margin-bottom 20px
-    padding 6px
     height 45px
   &__wrapper
     position relative
     border 1px solid grey
-    min-height 480px
+    background-color offWhite
   &__list
     margin 0
     padding 0
     list-style none
-    min-height 400px
+    min-height 477px
+    &.withAddBtn
+      min-height 397px
     &__item
       display flex
       border-bottom 1px solid grey
       padding 10px 15px
-      // &:nth-last-child()
-      //   border-bottom 0
+      &:last-child
+        box-shadow inset 0px -3px 5px -2px #333
       &:hover > .memberlist__list__item__info
         color offWhite
       &:hover > .memberlist__list__item__delete
@@ -32,6 +36,7 @@
           width 50px
           height 50px
       &__info
+        margin-right auto
         &__name
           font-size 20px
         &__role
@@ -46,122 +51,37 @@
     &__button
       display flex
       align-items center
+      border-color grey
+      color grey
       &__avatar
         display flex
         justify-content center
         align-items center
         margin-right 20px
-        border 2px dashed grey
+        border-width 2px
+        border-style dashed
         border-radius 50%
         width 50px
         height 50px
         cursor pointer
         &__icon
-          color grey
           font-size 25px
       &__text
         font-size 18px
-        color fontColor
         cursor pointer
-  &__form
-    padding 15px
-    flex-direction column
-    height 100%
-    width 100%
-    background-color offWhite
-    &__close
-      font-size 20px
-      & > i
-        cursor pointer
-    &__member
-      &__name
-        position relative
-        margin 0 0 20px 0
-        .name__label
-          margin 30px 0 20px 0
-          label()
-        .autocomplete
-          position absolute
-          min-width 300px
-          background-color offWhite
-          border-radius 10px
-          border-width 1px
-          border-style solid
-          &__item
-            display flex
-            align-items center
-            cursor pointer
-            padding 5px 8px
-            &:first-child
-              border-top-left-radius 10px
-              border-top-right-radius 10px
-            &:last-child
-              border-bottom-left-radius 10px
-              border-bottom-right-radius 10px
-            &__avatar
-              width 45px
-              height 45px
-              border-radius 50%
-            &__name
-              margin-left 15px
-      .name__input
-        border 1px solid grey
-        border-radius 10px
-        padding 10px
-        width 300px
-      &__create
-        display flex
-        align-items center
-        margin 15px 0
-        line-height 23px
-        &__checkbox
-          padding-top 6px
-    &__role
-      margin-bottom 15px
-      coloricon()
-      &__text
-        margin 15px 0
-        label()
-      &__list
-        margin 0
-        padding 0
-        list-style none
-        &__item
-          display flex
-          align-items center
-          margin 10px 25px 10px 0
-          cursor pointer
-          .item
-            &__text
-              display flex
-    &__submitbtn
-      display flex
-      justify-content flex-end
 
-/***** MEDIAQUERIES *****/
 
-/*** MEDIA 992px and 1199px ***/
-
-@media (min-width: min-lg) and (max-width: max-lg)
-
-  .memberlist
-    width 50%
-
-/*** MEDIA 768px and 991px ***/
+// MEDIAQUERIES
 
 @media (min-width: min-md) and (max-width: max-md)
 
   .memberlist
-    width 50%
-
-/*** MEDIA 576px and 767px ***/
+    width 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .memberlist
     margin 50px 0
     width 100%
-
-/*** MEDIA 575px ***/
 
 @media (max-width: max-xs)
   .memberlist

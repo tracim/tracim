@@ -73,6 +73,9 @@ Create [configuration file](doc/setting.md) for a development environment:
 
     cp development.ini.sample development.ini
 
+default configuration given is correct for local-test, if you need to run tracim
+over network, check [configuration file documentation](doc/setting.md)
+
 Initialize the database using [tracimcli](doc/cli.md) tool
 
     tracimcli db init

@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import File from './container/File.jsx'
 import { fakeLogin } from './helper.js'
+import File from './container/File.jsx'
 // import PopupCreateFile from './container/PopupCreateFile.jsx'
 
 require('./css/index.styl')

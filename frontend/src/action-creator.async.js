@@ -13,6 +13,7 @@ import {
   WORKSPACE_DETAIL,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_ADD,
+  WORKSPACE_MEMBER_REMOVE,
   FOLDER,
   setFolderData,
   APP_LIST,
@@ -21,7 +22,9 @@ import {
   WORKSPACE_CONTENT_DELETED,
   WORKSPACE_RECENT_ACTIVITY,
   WORKSPACE_READ_STATUS,
-  USER_WORKSPACE_DO_NOTIFY
+  USER_WORKSPACE_DO_NOTIFY,
+  USER,
+  USER_WORKSPACE_LIST
 } from './action-creator.sync.js'
 
 /*
@@ -42,6 +45,7 @@ import {
  * It also adds, to the Response of the fetch request, the json value so that the redux action have access to the status and the data
  */
 // Côme - 2018/08/02 - fetchWrapper should come from tracim_lib so that all apps uses the same
+// 08/09/2018 - maybe not since this fetchWrapper also dispatch redux actions whether it succeed or failed
 const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) => {
   dispatch({type: `${param.method}/${actionName}/PENDING`})
 
@@ -52,7 +56,12 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       case 304:
         return fetchResult.json()
       case 204:
+        return ''
+      case 401:
+        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
+        return ''
       case 400:
+      case 403:
       case 404:
       case 409:
       case 500:
@@ -75,6 +84,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       break
     case 400:
     case 401:
+    case 403:
     case 404:
     case 500:
       dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
@@ -111,6 +121,36 @@ export const postUserLogout = () => async dispatch => {
       method: 'POST'
     },
     actionName: USER_LOGOUT,
+    dispatch
+  })
+}
+
+export const getUser = idUser => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USER,
+    dispatch
+  })
+}
+
+export const getUserWorkspaceList = idUser => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${idUser}/workspaces`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USER_WORKSPACE_LIST,
     dispatch
   })
 }
@@ -241,18 +281,13 @@ export const putUserWorkspaceRead = (user, idWorkspace) => dispatch => {
 
 export const putUserWorkspaceDoNotify = (user, idWorkspace, doNotify) => dispatch => {
   return fetchWrapper({
-    // @TODO Côme - 2018/08/23 - this is the wrong endpoint, but backend hasn't implemented it yet
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members/${user.user_id}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.user_id}/workspaces/${idWorkspace}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT',
-      body: JSON.stringify({
-        do_notify: doNotify
-      })
-
+      method: 'PUT'
     },
     actionName: USER_WORKSPACE_DO_NOTIFY,
     dispatch
@@ -289,7 +324,7 @@ export const getWorkspaceDetail = (user, idWorkspace) => dispatch => {
   })
 }
 
-export const getWorkspaceMemberList = (user, idWorkspace) => dispatch => {
+export const getWorkspaceMemberList = idWorkspace => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members`,
     param: {
@@ -359,12 +394,25 @@ export const postWorkspaceMember = (user, idWorkspace, newMember) => dispatch =>
       },
       method: 'POST',
       body: JSON.stringify({
-        user_id: newMember.id,
+        user_id: newMember.id || null,
         user_email_or_public_name: newMember.name,
         role: newMember.role
       })
     },
     actionName: WORKSPACE_MEMBER_ADD,
+    dispatch
+  })
+}
+
+export const deleteWorkspaceMember = (user, idWorkspace, idMember) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${idWorkspace}/members/${idMember}`,
+    param: {
+      credentials: 'include',
+      headers: {...FETCH_CONFIG.headers},
+      method: 'DELETE'
+    },
+    actionName: WORKSPACE_MEMBER_REMOVE,
     dispatch
   })
 }

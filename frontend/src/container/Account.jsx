@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 // import Calendar from '../component/Account/Calendar.jsx'
+// import Timezone from '../component/Account/Timezone.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
-import Timezone from '../component/Account/Timezone.jsx'
 import {
   Delimiter,
   PageWrapper,
@@ -27,7 +28,6 @@ import {
   putUserPassword,
   putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
-import { translate } from 'react-i18next'
 
 class Account extends React.Component {
   constructor (props) {
@@ -36,22 +36,18 @@ class Account extends React.Component {
     this.state = {
       subComponentMenu: [{
         name: 'personalData',
-        menuLabel: props.t('My profil'),
         active: true
       }, {
         name: 'notification',
-        menuLabel: props.t('Workspaces and notifications'),
         active: false
       }, {
         name: 'password',
-        menuLabel: props.t('Password'),
-        active: false
-      }, {
-        name: 'timezone',
-        menuLabel: props.t('Timezone'),
         active: false
       }]
       // {
+      //   name: 'timezone',
+      //   active: false
+      // }, {
       //   name: 'calendar',
       //   menuLabel: 'Calendrier personnel',
       //   active: false
@@ -70,7 +66,7 @@ class Account extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       props.workspaceList.map(async ws => ({
         idWorkspace: ws.id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(props.user, ws.id))
+        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.id))
       }))
     )
 
@@ -96,10 +92,16 @@ class Account extends React.Component {
       switch (fetchPutUserName.status) {
         case 200:
           props.dispatch(updateUserName(newName))
-          if (newEmail === '') props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
+          if (newEmail === '') {
+            props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
+            return true
+          }
           // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
           break
-        default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning'))
+          if (newEmail === '') return false
+          break
       }
     }
 
@@ -110,8 +112,8 @@ class Account extends React.Component {
           props.dispatch(updateUserEmail(fetchPutUserEmail.json.email))
           if (newName !== '') props.dispatch(newFlashMessage(props.t('Your name and email has been changed'), 'info'))
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
-          break
-        default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); break
+          return true
+        default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); return false
       }
     }
   }
@@ -121,13 +123,8 @@ class Account extends React.Component {
 
     const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(props.user, idWorkspace, doNotify))
     switch (fetchPutUserWorkspaceDoNotify.status) {
-      // @TODO: Côme - 2018/08/23 - uncomment this when fetch implements the right endpoint (blocked by backend)
-      // case 200:
-      //   break
-      default:
-        props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify))
-        // props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
-        break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, idWorkspace, doNotify)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
@@ -136,10 +133,9 @@ class Account extends React.Component {
 
     const fetchPutUserPassword = await props.dispatch(putUserPassword(props.user, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
-      case 204:
-        props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info'))
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning')); break
+      case 204: props.dispatch(newFlashMessage(props.t('Your password has been changed'), 'info')); return true
+      case 403: props.dispatch(newFlashMessage(props.t('Wrong old password'), 'warning')); return false
+      default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning')); return false
     }
   }
 
@@ -166,8 +162,8 @@ class Account extends React.Component {
         case 'password':
           return <Password onClickSubmit={this.handleSubmitPassword} />
 
-        case 'timezone':
-          return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
+        // case 'timezone':
+        //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
       }
     })()
 
@@ -185,7 +181,7 @@ class Account extends React.Component {
 
           <div className='account__userpreference'>
             <MenuSubComponent
-              subMenuList={state.subComponentMenu}
+              activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
               onClickMenuItem={this.handleClickSubComponentMenuItem}
             />
 

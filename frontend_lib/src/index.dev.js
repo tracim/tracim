@@ -25,7 +25,7 @@ import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteConte
 
 ReactDOM.render(
   <div style={{width: '1200px'}}>
-    <PopinFixed customClass={`${'randomClass'}`}>
+    <PopinFixed customClass={`${'randomClass'}`} style={{width: '1200px'}}>
       <PopinFixedHeader
         customClass={`${'randomClass'}`}
         faIcon={'fa fa-file-word-o'}
@@ -73,7 +73,7 @@ ReactDOM.render(
         onClickDelete={() => console.log('btn delete clicked')}
       />
 
-      <PopinFixedContent customClass={`${'randomClass'}__contentpage`}>
+      <PopinFixedContent customClass={`${'randomClass'}__contentpage`} style={{width: '100%'}}>
 
         <Timeline
           showHeader={false}
@@ -85,7 +85,8 @@ ReactDOM.render(
             firstname: 'Côme',
             lastname: 'Stoilenom',
             email: 'osef@algoo.fr',
-            avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4'
+            avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
+            idRoleUserWorkspace: 8
           }}
           timelineData={TimelineDebugData.map(item => item.timelineType === 'comment'
             ? {

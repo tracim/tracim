@@ -7,6 +7,7 @@ import pytest
 import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import BadCommandError
+from tracim_backend.exceptions import NotificationDisabled
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
@@ -121,6 +122,22 @@ class TestCommands(CommandFunctionalTest):
                 '--debug',
             ])
 
+    def test_func__user_create_command__err__with_email_notification_disabled(self) -> None:  # nopep8
+        """
+        Test User creation with email with notification disable
+        """
+        app = TracimCLI()
+        with pytest.raises(NotificationDisabled):
+            app.run([
+                '--debug',
+                'user', 'create',
+                '-c', 'tests_configs.ini#command_test',
+                '-l', 'pof@pof.pof',
+                '-p', 'new_password',
+                '--send-email',
+                '--debug',
+            ])
+
     def test_func__user_create_command__err__password_required(self) -> None:
         """
         Test User creation without filling password
@@ -191,7 +208,7 @@ class TestCommands(CommandFunctionalTest):
         assert new_user.email == 'admin@admin.admin'
         assert new_user.validate_password('new_password')
         assert not new_user.validate_password('admin@admin.admin')
-        assert new_user.profile.name == 'managers'
+        assert new_user.profile.name == 'trusted-users'
 
     def test__init__db__ok_db_already_exist(self):
         """

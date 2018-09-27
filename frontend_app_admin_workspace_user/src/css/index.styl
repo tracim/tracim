@@ -1,12 +1,6 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-.table
-  th
-    vertical-align middle
-  td a:hover
-    text-decoration underline
-
-.adminWorkspacePage
+.adminWorkspace
   &__createworkspace
     &__btncreate
       margin 25px 15px
@@ -21,9 +15,15 @@
       display flex
       align-items center
       flex-wrap wrap
+  &__workspaceTable__tr
+    &:hover, &:nth-child(even):hover
+      background-color grey-hover
+    &__td-link
       cursor pointer
+      &:not(:hover)
+        color inherit
 
-.adminUserPage
+.adminUser
   &__description
     margin-bottom 40px
   &__adduser
@@ -36,8 +36,8 @@
       padding 20px
       &__username
         .username
-        &__text
-          font-weight bold
+          &__text
+            font-weight bold
         &__input
           margin 15px 0 20px 0
           width 40%
@@ -53,13 +53,25 @@
               align-items center
               margin-top 10px
               cursor pointer
+              & > input
+                cursor pointer
   &__delimiter
     margin 50px auto
   &__table
     margin-bottom 100px
+    &__tr
+      &:hover, &:nth-child(even):hover
+        background-color grey-hover
+      &.user-deactivated
+        color #bbb
+      &__td-link
+        cursor pointer
+        &:not(:hover)
+          color inherit
+        & > i
+          margin-right 5px
 
 .adminworkspaceuser__popup
-  top 0
   .cardPopup__container
     width 400px
   &__body

@@ -1,8 +1,7 @@
 import { FETCH_CONFIG } from './helper.js'
 
 export const getWorkspaceList = (user, apiUrl) =>
-  // @FIXME - Côme - 2018/08/23 - wrong end point, this one only returns workspaces of logged user
-  fetch(`${apiUrl}/users/${user.user_id}/workspaces`, {
+  fetch(`${apiUrl}/workspaces`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers
@@ -12,6 +11,15 @@ export const getWorkspaceList = (user, apiUrl) =>
 
 export const getWorkspaceMemberList = (apiUrl, idWorkspace) =>
   fetch(`${apiUrl}/workspaces/${idWorkspace}/members`, {
+    credentials: 'include',
+    headers: {
+      ...FETCH_CONFIG.headers
+    },
+    method: 'GET'
+  })
+
+export const getWorkspaceDetail = (apiUrl, idWorkspace) =>
+  fetch(`${apiUrl}/workspaces/${idWorkspace}`, {
     credentials: 'include',
     headers: {
       ...FETCH_CONFIG.headers

@@ -1,59 +1,62 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager
-import os
 import datetime
+import os
 import re
 import typing
-from operator import itemgetter
+from contextlib import contextmanager
 
-import transaction
-from preview_generator.manager import PreviewManager
-from sqlalchemy import func
-from sqlalchemy.orm import Query
-from depot.manager import DepotManager
-from depot.io.utils import FileIntent
 import sqlalchemy
+import transaction
+from depot.io.utils import FileIntent
+from depot.manager import DepotManager
+from preview_generator.exception import UnsupportedMimeType
+from preview_generator.manager import PreviewManager
+from sqlalchemy import desc
+from sqlalchemy import func
+from sqlalchemy import or_
+from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
-from sqlalchemy import desc
-from sqlalchemy import distinct
-from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
 
-from tracim_backend.lib.utils.utils import cmp_to_key
-from tracim_backend.lib.core.notifications import NotifierFactory
-from tracim_backend.exceptions import SameValueError
-from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import ContentType
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import ContentTypeNotExist
+from tracim_backend.exceptions import EmptyCommentContentNotAllowed
+from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
-from tracim_backend.exceptions import EmptyCommentContentNotAllowed
-from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.lib.core.notifications import NotifierFactory
+from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
+from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import cmp_to_key
 from tracim_backend.lib.utils.utils import current_date_for_filename
-from tracim_backend.app_models.contents import CONTENT_STATUS
-from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.lib.utils.utils import preview_manager_page_format
 from tracim_backend.models.auth import User
+from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.context_models import PreviewAllowedDim
+from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Content
-
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import NodeTreeItem
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.lib.utils.translation import Translator
-from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
-from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.context_models import PreviewAllowedDim
-from tracim_backend.models.context_models import ContentInContext
+from tracim_backend.models.revision_protection import new_revision
 
 __author__ = 'damien'
 
@@ -415,12 +418,97 @@ class ContentApi(object):
     # 
     #     return result
 
+    def _is_content_label_free(
+            self,
+            label: str,
+            workspace: Workspace,
+            parent: Content = None,
+            exclude_content_id: int = None,
+    ) -> bool:
+        """
+        Check if content label is free
+        :param label: content label
+        :param workspace: workspace of the content
+        :param parent: parent of the content
+        :param exclude_content_id: exclude a specific content_id (useful
+        to verify  other content for content update)
+        :return: True if content label is available
+        """
+        # INFO - G.M - 2018-09-04 - Method should not be used by special content
+        # with empty label like comment.
+        assert label
+        assert workspace
+        query = self.get_base_query(workspace)
+
+        if parent:
+            query = query.filter(Content.parent_id == parent.content_id)
+        else:
+            query = query.filter(Content.parent_id == None)
+
+        if exclude_content_id:
+            query = query.filter(Content.content_id != exclude_content_id)
+        query = query.filter(Content.workspace_id == workspace.workspace_id)
+
+        nb_content_with_the_label = query.filter(Content.label == label).count()
+        if nb_content_with_the_label == 0:
+            return True
+        elif nb_content_with_the_label == 1:
+            return False
+        else:
+            critical_error_text = 'Something is wrong in the database ! '\
+                                  'Content label should be unique ' \
+                                  'in a same folder in database' \
+                                  'but you have {nb} content with ' \
+                                  'label {label} in workspace {workspace_id}'
+
+            critical_error_text = critical_error_text.format(
+                nb=nb_content_with_the_label,
+                label=label,
+                workspace_id=workspace.workspace_id,
+            )
+            if parent:
+                critical_error_text = '{text} and parent as content {parent_id}'.format(  # nopep8
+                    text=critical_error_text,
+                    parent_id=parent.parent_id
+                )
+            logger.critical(self, critical_error_text)
+            return False
+
+    def _is_content_label_free_or_raise(
+        self,
+        label: str,
+        workspace: Workspace,
+        parent: Content = None,
+        exclude_content_id: int = None,
+    ) -> None:
+        """
+        Same as _is_content_label_free but raise exception instead of
+        returning boolean if content label is already used
+        """
+        if not self._is_content_label_free(
+            label,
+            workspace,
+            parent,
+            exclude_content_id
+        ):
+            text = 'A Content already exist with the same label {label} ' \
+                   ' in workspace {workspace_id}'.format(
+                      label=label,
+                      workspace_id=workspace.workspace_id,
+                   )
+            if parent:
+                text = '{text} and parent as content {parent_id}'.format(
+                    text=text,
+                    parent_id=parent.parent_id
+                )
+            raise ContentLabelAlreadyUsedHere(text)
+
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
         assert content_type_slug != CONTENT_TYPES.Any_SLUG
         assert not (label and filename)
 
-        if content_type_slug == CONTENT_TYPES.Folder.slug and not label:
+        if content_type_slug == FOLDER_TYPE and not label:
             label = self.generate_folder_label(workspace, parent)
 
         # TODO BS 2018-08-13: Despite that workspace is required, create_comment
@@ -447,9 +535,16 @@ class ContentApi(object):
                         content_id=workspace.workspace_id,
                     )
                 )
+        if filename:
+            label = os.path.splitext(filename)[0]
+        if label:
+            self._is_content_label_free_or_raise(
+                label,
+                workspace,
+                parent,
+            )
 
         content = Content()
-
         if filename:
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
@@ -485,7 +580,7 @@ class ContentApi(object):
 
     def create_comment(self, workspace: Workspace=None, parent: Content=None, content:str ='', do_save=False) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
-        assert parent and parent.type != CONTENT_TYPES.Folder.slug
+        assert parent and parent.type != FOLDER_TYPE
         if not content:
             raise EmptyCommentContentNotAllowed()
 
@@ -594,6 +689,7 @@ class ContentApi(object):
         depot_file_path = depot_stored_file._file_path  # type: str
         return depot_file_path
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent(
             self,
             content_label: str,
@@ -613,6 +709,8 @@ class ContentApi(object):
 
         file_name, file_extension = os.path.splitext(content_label)
 
+        # TODO - G.M - 2018-09-04 - If this method is needed, it should be
+        # rewritten in order to avoid content_type hardcoded code there
         return query.filter(
             or_(
                 and_(
@@ -635,6 +733,7 @@ class ContentApi(object):
             )
         ).one()
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def get_one_by_label_and_parent_labels(
             self,
             content_label: str,
@@ -732,6 +831,7 @@ class ContentApi(object):
 
         return folder
 
+    # TODO - G.M - 2018-09-04 - [Cleanup] Is this method already needed ?
     def filter_query_for_content_label_as_path(
             self,
             query: Query,
@@ -760,6 +860,8 @@ class ContentApi(object):
             file_extension_filter = func.lower(Content.file_extension) == \
                                     func.lower(file_extension)
 
+        # TODO - G.M - 2018-09-04 - If this method is needed, it should be
+        # rewritten in order to avoid content_type hardcoded code there
         return query.filter(or_(
             and_(
                 Content.type == CONTENT_TYPES.File.slug,
@@ -782,32 +884,37 @@ class ContentApi(object):
             ),
         ))
 
-
     def get_pdf_preview_path(
             self,
             content_id: int,
             revision_id: int,
-            page: int
+            page_number: int
     ) -> str:
         """
         Get pdf preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage content
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        if page >= self.preview_manager.get_page_nb(file_path):
-            raise PageOfPreviewNotFound(
-                'page {page} of content {content_id} does not exist'.format(
-                    page=page,
-                    content_id=content_id
-                ),
+        try:
+            page_number = preview_manager_page_format(page_number)
+            if page_number >= self.preview_manager.get_page_nb(file_path):
+                raise PageOfPreviewNotFound(
+                    'page_number {page_number} of content {content_id} does not exist'.format(
+                        page_number=page_number,
+                        content_id=content_id
+                    ),
+                )
+            jpg_preview_path = self.preview_manager.get_pdf_preview(
+                file_path,
+                page=page_number
             )
-        jpg_preview_path = self.preview_manager.get_pdf_preview(
-            file_path,
-            page=page
-        )
+        except UnsupportedMimeType as exc:
+            raise UnavailablePreview(
+                'No preview available for content {}, revision {}'.format(content_id, revision_id) # nopep8
+            ) from exc
         return jpg_preview_path
 
     def get_full_pdf_preview_path(self, revision_id: int) -> str:
@@ -817,7 +924,12 @@ class ContentApi(object):
         :return: path of the full pdf preview of this revision
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        try:
+            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        except UnsupportedMimeType as exc:
+            raise UnavailablePreview(
+                'No preview available for revision {}'.format(revision_id)
+            ) from exc
         return pdf_preview_path
 
     def get_jpg_preview_allowed_dim(self) -> PreviewAllowedDim:
@@ -833,7 +945,7 @@ class ContentApi(object):
         self,
         content_id: int,
         revision_id: int,
-        page: int,
+        page_number: int,
         width: int = None,
         height: int = None,
     ) -> str:
@@ -841,43 +953,49 @@ class ContentApi(object):
         Get jpg preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage content
         :param width: width in pixel
         :param height: height in pixel
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
-        if page >= self.preview_manager.get_page_nb(file_path):
-            raise Exception(
-                'page {page} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
-                    page=page,
-                    revision_id=revision_id,
-                    content_id=content_id,
-                ),
-            )
-        if not width and not height:
-            width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
-            height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
-
-        allowed_dim = False
-        for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
-            if width == preview_dim.width and height == preview_dim.height:
-                allowed_dim = True
-                break
-
-        if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
-            raise PreviewDimNotAllowed(
-                'Size {width}x{height} is not allowed for jpeg preview'.format(
-                    width=width,
-                    height=height,
+        try:
+            page_number = preview_manager_page_format(page_number)
+            if page_number >= self.preview_manager.get_page_nb(file_path):
+                raise PageOfPreviewNotFound(
+                    'page {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
+                        page_number=page_number,
+                        revision_id=revision_id,
+                        content_id=content_id,
+                    ),
                 )
+            if not width and not height:
+                width = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].width
+                height = self._config.PREVIEW_JPG_ALLOWED_DIMS[0].height
+
+            allowed_dim = False
+            for preview_dim in self._config.PREVIEW_JPG_ALLOWED_DIMS:
+                if width == preview_dim.width and height == preview_dim.height:
+                    allowed_dim = True
+                    break
+
+            if not allowed_dim and self._config.PREVIEW_JPG_RESTRICTED_DIMS:
+                raise PreviewDimNotAllowed(
+                    'Size {width}x{height} is not allowed for jpeg preview'.format(
+                        width=width,
+                        height=height,
+                    )
+                )
+            jpg_preview_path = self.preview_manager.get_jpeg_preview(
+                file_path,
+                page=page_number,
+                width=width,
+                height=height,
             )
-        jpg_preview_path = self.preview_manager.get_jpeg_preview(
-            file_path,
-            page=page,
-            width=width,
-            height=height,
-        )
+        except UnsupportedMimeType as exc:
+            raise UnavailablePreview(
+                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
+            ) from exc
         return jpg_preview_path
 
     def _get_all_query(
@@ -1190,6 +1308,12 @@ class ContentApi(object):
             if new_parent:
                 item.workspace = new_parent.workspace
 
+        self._is_content_label_free_or_raise(
+            item.label,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
         item.revision_type = ActionDescription.MOVE
 
     def copy(
@@ -1220,6 +1344,7 @@ class ContentApi(object):
             parent = item.parent
         label = new_label or item.label
 
+        self._is_content_label_free_or_raise(label, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1259,12 +1384,20 @@ class ContentApi(object):
         return
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
-        if item.label==new_label and item.description==new_content:
+        if item.label == new_label and item.description == new_content:
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
             # Internatization disabled in libcontent for now.
             raise SameValueError('The content did not changed')
         if not new_label:
             raise EmptyLabelNotAllowed()
+
+        self._is_content_label_free_or_raise(
+            new_label,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
+
         item.owner = self._user
         item.label = new_label
         item.description = new_content if new_content else item.description # TODO: convert urls into links
@@ -1322,10 +1455,21 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def get_preview_page_nb(self, revision_id: int) -> int:
+    def get_preview_page_nb(self, revision_id: int) -> typing.Optional[int]:
         file_path = self.get_one_revision_filepath(revision_id)
-        nb_pages = self.preview_manager.get_page_nb(file_path)
+        try:
+            nb_pages = self.preview_manager.get_page_nb(file_path)
+        except UnsupportedMimeType:
+            return None
         return nb_pages
+
+    def has_pdf_preview(self, revision_id: int) -> bool:
+        file_path = self.get_one_revision_filepath(revision_id)
+        try:
+            has_pdf_preview = self.preview_manager.has_pdf_preview(file_path)
+        except UnsupportedMimeType:
+            has_pdf_preview = False
+        return has_pdf_preview
 
     def mark_read__all(
             self,

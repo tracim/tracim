@@ -2,12 +2,12 @@
 import datetime
 import random
 import string
-from enum import Enum
-import colorsys
+from colour import Color
 import pytz
 from redis import Redis
 from rq import Queue
 import typing
+
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
@@ -16,6 +16,14 @@ DEFAULT_WEBDAV_CONFIG_FILE = "wsgidav.conf"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
 CONTENT_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}/contents/{content_type}/{content_id}'  # nopep8
 WORKSPACE_FRONTEND_URL_SCHEMA = 'workspaces/{workspace_id}'  # nopep8
+
+
+def preview_manager_page_format(page_number: int) -> int:
+    """
+    Convert page real number of page(begin at 1) to preview_manager page
+    format(begin at 0)
+    """
+    return page_number-1
 
 
 def get_root_frontend_url(config: 'CFG') -> str:
@@ -35,6 +43,14 @@ def get_login_frontend_url(config: 'CFG'):
     Return login page url
     """
     return get_root_frontend_url(config) + 'login'
+
+
+def get_reset_password_frontend_url(config: 'CFG', token: str):
+    """
+    Return reset password url
+    """
+    # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
+    return get_root_frontend_url(config) + 'reset-password-request/{token}'.format(token=token)  # nopep8
 
 
 def get_email_logo_frontend_url(config: 'CFG'):
@@ -140,62 +156,29 @@ def password_generator(
     return ''.join(random.choice(chars) for char_number in range(length))
 
 
-def clamp(val: float, minimum: float = 0.0, maximum: float= 255.0) -> int:
-    """ Fix value between min an max"""
-    if val < minimum:
-        return int(minimum)
-    if val > maximum:
-        return int(maximum)
-    return int(val)
-
-
 COLOR_DARKEN_SCALE_FACTOR = 0.85
 COLOR_LIGHTEN_SCALE_FACTOR = 1.15
 
 
-class Color(object):
-    def __init__(self, base_hex_code: str):
-        """
-        :param base_hex_code: hex color like '#FFFFFF'
-        """
+def clamp(val: float, minimum: float = 0.0, maximum: float=1.0) -> float:
+    """ Fix value between min an max"""
+    if val < minimum:
+        return minimum
+    if val > maximum:
+        return maximum
+    return val
 
-        assert len(base_hex_code) == 7
-        assert base_hex_code[0] == '#'
-        self._base_hex_code = base_hex_code
 
-    # INFO - G.M - 2018-08-10 - get_hexcolor, inspired by
-    # https://thadeusb.com/weblog/2010/10/10/python_scale_hex_color/
-
-    def get_hexcolor(self, scalefactor: float) -> str:
-        """
-
-        :param scalefactor: factor of scaling,
-        value between 0 and 1 darken the color,
-        value >1 lighten the color.
-        :return: new hex_color
-        """
-
-        hex_color = self._base_hex_code.strip('#')
-        assert scalefactor >= 0
-
-        r = int(hex_color[:2], 16)
-        g = int(hex_color[2:4], 16)
-        b = int(hex_color[4:], 16)
-
-        h, l, s = colorsys.rgb_to_hls(r, g, b)
-        l = scalefactor * l
-        r, g, b = colorsys.hls_to_rgb(h, l, s)
-
-        return "#%02x%02x%02x" % (clamp(r), clamp(g), clamp(b))
-
-    @property
-    def normal(self):
-        return self._base_hex_code
+class ExtendedColor(Color):
 
     @property
     def darken(self):
-        return self.get_hexcolor(COLOR_DARKEN_SCALE_FACTOR)
+        new_color = ExtendedColor(self)
+        new_color.luminance = clamp(COLOR_DARKEN_SCALE_FACTOR*self.luminance)
+        return new_color
 
     @property
     def lighten(self):
-        return self.get_hexcolor(COLOR_LIGHTEN_SCALE_FACTOR)
+        new_color = ExtendedColor(self)
+        new_color.luminance = clamp(COLOR_LIGHTEN_SCALE_FACTOR*self.luminance)
+        return new_color

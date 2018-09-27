@@ -2,14 +2,11 @@
 
 .popupCreateContent
   position fixed
-  top 0
   left 0
   display flex
   justify-content center
   width 100%
-  z-index 5
   .cardPopup__container
-    margin-top 120px
     border 0
     border-radius 10px
     width 400px
@@ -45,3 +42,10 @@
           cursor pointer
         &:disabled
           cursor not-allowed
+
+// MEDIAQUERIES
+
+@media (max-width: max-xs)
+
+  .popupCreateContent
+    padding 15px

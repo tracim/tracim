@@ -1,37 +1,60 @@
 import React from 'react'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
 
 require('./MenuSubComponent.styl')
 
 export const MenuSubComponent = props => {
   return (
-    <nav className='menusubcomponent navbar d-flex align-items-start'>
-      <div className='menusubcomponent__responsive d-lg-none'>
-        <button className='hamburger hamburger--spring menusubcomponent__responsive__hamburger' type='button'>
-          <span className='hamburger-box menusubcomponent__responsive__hamburger__box'>
-            <span className='hamburger-inner menusubcomponent__responsive__hamburger__box__icon' />
-          </span>
-        </button>
+    <nav className='menusubcomponent navbar'>
+
+      <div className='menusubcomponent__header'>
+        <div className='menusubcomponent__responsive d-lg-none'>
+          <button className='menusubcomponent__responsive__button iconBtn' type='button'>
+            <i className='fa fa-fw fa-bars' />
+          </button>
+        </div>
+
+        <div className='menusubcomponent__menutitle primaryColorFontDarken'>Menu</div>
       </div>
 
       <ul className='menusubcomponent__list nav flex-column'>
-        <li className='menusubcomponent__list__close nav-link'>
-          <i className='fa fa-times' />
+        <li
+          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'personalData'})}
+          onClick={() => props.onClickMenuItem('personalData')}
+          key={'personalData'}
+        >
+          <div className='menusubcomponent__list__item__link nav-link'>{props.t('My profil')}</div>
         </li>
 
-        <li className='menusubcomponent__list__disabled'>Menu</li>
-        { props.subMenuList.map(sm =>
-          <li
-            className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': sm.active})}
-            onClick={() => props.onClickMenuItem(sm.name)}
-            key={sm.name}
-          >
-            <div className='menusubcomponent__list__item__link nav-link'>{sm.menuLabel}</div>
-          </li>
-        )}
+        <li
+          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'notification'})}
+          onClick={() => props.onClickMenuItem('notification')}
+          key={'notification'}
+        >
+          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Shared spaces and notifications')}</div>
+        </li>
+
+        <li
+          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'password'})}
+          onClick={() => props.onClickMenuItem('password')}
+          key={'password'}
+        >
+          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Password')}</div>
+        </li>
+
+        {/*
+        <li
+          className={classnames('menusubcomponent__list__item nav-item', {'active primaryColorBgLighten': props.activeSubMenu.name === 'timezone'})}
+          onClick={() => props.onClickMenuItem('timezone')}
+          key={'timezone'}
+        >
+          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Timezone')}</div>
+        </li>
+        */}
       </ul>
     </nav>
   )
 }
 
-export default MenuSubComponent
+export default translate()(MenuSubComponent)

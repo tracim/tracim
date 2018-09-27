@@ -1,4 +1,6 @@
 import React from 'react'
+import { translate } from 'react-i18next'
+import { getUserProfile } from '../../helper.js'
 
 require('./UserInfo.styl')
 
@@ -18,9 +20,13 @@ export const UserInfo = props =>
       </a>
 
       <div className='userinfo__profile mb-3'>
-        {props.user.profile}
+        <i
+          className={`fa fa-${getUserProfile(props.user.profile).faIcon} mr-2`}
+          style={{color: getUserProfile(props.user.profile).hexcolor}}
+        />
+        {props.t(getUserProfile(props.user.profile).label)}
       </div>
     </div>
   </div>
 
-export default UserInfo
+export default translate()(UserInfo)

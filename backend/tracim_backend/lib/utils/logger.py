@@ -43,6 +43,11 @@ class Logger(object):
             Logger.TPL.format(cls=self._txt(instance_or_class), msg=message)
         )
 
+    def critical(self, instance_or_class, message):
+        self._logger.critical(
+            Logger.TPL.format(cls=self._txt(instance_or_class), msg=message)
+        )
+
     def exception(self, instance_or_class, message):
         self._logger.exception(
             Logger.TPL.format(cls=self._txt(instance_or_class), msg=message)
