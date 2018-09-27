@@ -12,6 +12,10 @@ class MailFetcherDaemon(FakeDaemon):
     send http request to a tracim endpoint to handle them.
     """
     def __init__(self, config: 'CFG', burst=True, *args, **kwargs):
+        """
+        :param config: Tracim Config
+        :param burst: if true, run one time, if false, run continously
+        """
         super().__init__(*args, **kwargs)
         self.config = config
         self._fetcher = None  # type: MailFetcher

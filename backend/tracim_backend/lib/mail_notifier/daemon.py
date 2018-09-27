@@ -13,6 +13,10 @@ class MailSenderDaemon(FakeDaemon):
     # NOTE: use *args and **kwargs because parent __init__ use strange
     # * parameter
     def __init__(self, config: 'CFG', burst=True, *args, **kwargs):
+        """
+        :param config: tracim config
+        :param burst: if true, run one time, if false, run continously
+        """
         super().__init__(*args, **kwargs)
         self.config = config
         self.worker = None  # type: RQWorker

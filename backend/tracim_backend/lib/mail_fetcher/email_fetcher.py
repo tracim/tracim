@@ -200,6 +200,8 @@ class MailFetcher(object):
         :param api_key: tracim api key
         :param use_html_parsing: parse html mail
         :param use_txt_parsing: parse txt mail
+        :param burst: if true, run only one time,
+        if false run as continous daemon.
         """
         self.host = host
         self.port = port
