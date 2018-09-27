@@ -304,6 +304,7 @@ class ContentFilter(object):
             show_deleted: int = 0,
             show_active: int = 1,
             content_type: str = None,
+            label: str = None,
             offset: int = None,
             limit: int = None,
     ) -> None:
@@ -314,6 +315,7 @@ class ContentFilter(object):
         self.show_active = bool(show_active)
         self.limit = limit
         self.offset = offset
+        self.label = label
         self.content_type = content_type
 
 

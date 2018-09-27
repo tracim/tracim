@@ -2100,18 +2100,16 @@ class TestWorkspaceContents(FunctionalTest):
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 3
         content = res[0]
-        assert content['content_id'] == 1
-        assert content['content_type'] == 'folder'
+        assert content['content_id'] == 11
+        assert content['content_type'] == 'html-document'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
-        assert content['label'] == 'Tools'
-        assert content['parent_id'] is None
+        assert content['label'] == 'Current Menu'
+        assert content['parent_id'] == 2
         assert content['show_in_ui'] is True
-        assert content['slug'] == 'tools'
+        assert content['slug'] == 'current-menu'
         assert content['status'] == 'open'
-        assert len(content['sub_content_types']) > 1
-        assert 'comment' in content['sub_content_types']
-        assert 'folder' in content['sub_content_types']
+        assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 1
         content = res[1]
         assert content['content_id'] == 2
@@ -2128,16 +2126,18 @@ class TestWorkspaceContents(FunctionalTest):
         assert 'folder' in content['sub_content_types']
         assert content['workspace_id'] == 1
         content = res[2]
-        assert content['content_id'] == 11
-        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 1
+        assert content['content_type'] == 'folder'
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
-        assert content['label'] == 'Current Menu'
-        assert content['parent_id'] == 2
+        assert content['label'] == 'Tools'
+        assert content['parent_id'] is None
         assert content['show_in_ui'] is True
-        assert content['slug'] == 'current-menu'
+        assert content['slug'] == 'tools'
         assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'comment'}
+        assert len(content['sub_content_types']) > 1
+        assert 'comment' in content['sub_content_types']
+        assert 'folder' in content['sub_content_types']
         assert content['workspace_id'] == 1
 
     def test_api__get_workspace_content__ok_200__get_default_html_documents(self):
@@ -2196,20 +2196,20 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body  # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
-        content = res[1]
+        content = res[0]
         assert content['content_type'] == 'html-document'
-        assert content['content_id'] == 15
+        assert content['content_id'] == 17
         assert content['is_archived'] is False
-        assert content['is_deleted'] is False
-        assert content['label'] == 'New Fruit Salad'
+        assert content['is_deleted'] is True
+        assert content['label'].startswith('Bad Fruit Salad')
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
-        assert content['slug'] == 'new-fruit-salad'
+        assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
-        content = res[2]
+        content = res[1]
         assert content['content_type'] == 'html-document'
         assert content['content_id'] == 16
         assert content['is_archived'] is True
@@ -2224,13 +2224,13 @@ class TestWorkspaceContents(FunctionalTest):
 
         content = res[3]
         assert content['content_type'] == 'html-document'
-        assert content['content_id'] == 17
+        assert content['content_id'] == 15
         assert content['is_archived'] is False
-        assert content['is_deleted'] is True
-        assert content['label'].startswith('Bad Fruit Salad')
+        assert content['is_deleted'] is False
+        assert content['label'] == 'New Fruit Salad'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
-        assert content['slug'].startswith('bad-fruit-salad')
+        assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
@@ -2259,20 +2259,20 @@ class TestWorkspaceContents(FunctionalTest):
         ).json_body  # nopep8
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
-        content = res[1]
+        content = res[0]
         assert content['content_type'] == 'html-document'
-        assert content['content_id'] == 15
+        assert content['content_id'] == 17
         assert content['is_archived'] is False
-        assert content['is_deleted'] is False
-        assert content['label'] == 'New Fruit Salad'
+        assert content['is_deleted'] is True
+        assert content['label'].startswith('Bad Fruit Salad')
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
-        assert content['slug'] == 'new-fruit-salad'
+        assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
 
-        content = res[2]
+        content = res[1]
         assert content['content_type'] == 'html-document'
         assert content['content_id'] == 16
         assert content['is_archived'] is True
@@ -2287,13 +2287,51 @@ class TestWorkspaceContents(FunctionalTest):
 
         content = res[3]
         assert content['content_type'] == 'html-document'
-        assert content['content_id'] == 17
+        assert content['content_id'] == 15
         assert content['is_archived'] is False
-        assert content['is_deleted'] is True
-        assert content['label'].startswith('Bad Fruit Salad')
+        assert content['is_deleted'] is False
+        assert content['label'] == 'New Fruit Salad'
         assert content['parent_id'] is None
         assert content['show_in_ui'] is True
-        assert content['slug'].startswith('bad-fruit-salad')
+        assert content['slug'] == 'new-fruit-salad'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'comment'}
+        assert content['workspace_id'] == 3
+
+    def test_api__get_workspace_content__ok_200__get_all_root_content_filter_by_label(self):  # nopep8
+        """
+        Check obtain workspace all root contents
+        """
+        params = {
+            'parent_id': 0,
+            'show_archived': 1,
+            'show_deleted': 1,
+            'show_active': 1,
+            'label': 'ew'
+        }
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'bob@fsf.local',
+                'foobarbaz'
+            )
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/3/contents',
+            status=200,
+            params=params,
+        ).json_body  # nopep8
+        # TODO - G.M - 30-05-2018 - Check this test
+        assert len(res) == 1
+        content = res[0]
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 15
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'New Fruit Salad'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}
         assert content['workspace_id'] == 3
@@ -2640,18 +2678,6 @@ class TestWorkspaceContents(FunctionalTest):
         assert content['content_id']
         assert content['is_archived'] is False
         assert content['is_deleted'] is False
-        assert content['label'] == 'test_page'
-        assert content['parent_id'] == 1
-        assert content['show_in_ui'] is True
-        assert content['slug'] == 'test-page'
-        assert content['status'] == 'open'
-        assert set(content['sub_content_types']) == {'comment'}  # nopep8
-        assert content['workspace_id'] == 1
-        content = res[1]
-        assert content['content_type'] == 'html-document'
-        assert content['content_id']
-        assert content['is_archived'] is False
-        assert content['is_deleted'] is False
         assert content['label'] == 'test_html_page'
         assert content['parent_id'] == 1
         assert content['show_in_ui'] is True
@@ -2660,6 +2686,18 @@ class TestWorkspaceContents(FunctionalTest):
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 1
         assert res[0]['content_id'] != res[1]['content_id']
+        content = res[1]
+        assert content['content_type'] == 'html-document'
+        assert content['content_id']
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'test_page'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'test-page'
+        assert content['status'] == 'open'
+        assert set(content['sub_content_types']) == {'comment'}  # nopep8
+        assert content['workspace_id'] == 1
 
     def test_api__get_workspace_content__ok_200__get_all_folder_content(self):
         """
@@ -2687,13 +2725,13 @@ class TestWorkspaceContents(FunctionalTest):
         assert len(res) == 3
         content = res[0]
         assert content['content_type'] == 'html-document'
-        assert content['content_id'] == 12
+        assert content['content_id'] == 14
         assert content['is_archived'] is False
-        assert content['is_deleted'] is False
-        assert content['label'] == 'New Fruit Salad'
+        assert content['is_deleted'] is True
+        assert content['label'].startswith('Bad Fruit Salad')
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
-        assert content['slug'] == 'new-fruit-salad'
+        assert content['slug'].startswith('bad-fruit-salad')
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
@@ -2713,13 +2751,13 @@ class TestWorkspaceContents(FunctionalTest):
 
         content = res[2]
         assert content['content_type'] == 'html-document'
-        assert content['content_id'] == 14
+        assert content['content_id'] == 12
         assert content['is_archived'] is False
-        assert content['is_deleted'] is True
-        assert content['label'].startswith('Bad Fruit Salad')
+        assert content['is_deleted'] is False
+        assert content['label'] == 'New Fruit Salad'
         assert content['parent_id'] == 10
         assert content['show_in_ui'] is True
-        assert content['slug'].startswith('bad-fruit-salad')
+        assert content['slug'] == 'new-fruit-salad'
         assert content['status'] == 'open'
         assert set(content['sub_content_types']) == {'comment'}  # nopep8
         assert content['workspace_id'] == 2
