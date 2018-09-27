@@ -1627,7 +1627,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
             params=params,
         )
 
-    def test_api__create_workspace_member_role__ok_200__new_user(self):  # nopep8
+    def test_api__create_workspace_member_role__err_400__notification_disabled_user_not_found(self):  # nopep8
         """
         Create workspace member role
         :return:
@@ -1647,29 +1647,9 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/workspaces/1/members',
-            status=200,
+            status=400,
             params=params,
         )
-        user_role_found = res.json_body
-        assert user_role_found['role'] == 'content-manager'
-        assert user_role_found['user_id']
-        user_id = user_role_found['user_id']
-        assert user_role_found['workspace_id'] == 1
-        assert user_role_found['newly_created'] is True
-        assert user_role_found['email_sent'] is False
-        assert user_role_found['do_notify'] is False
-
-        res = self.testapp.get('/api/v2/workspaces/1/members',
-                               status=200).json_body  # nopep8
-        assert len(res) == 2
-        user_role = res[0]
-        assert user_role['role'] == 'workspace-manager'
-        assert user_role['user_id'] == 1
-        assert user_role['workspace_id'] == 1
-        user_role = res[1]
-        assert user_role_found['role'] == user_role['role']
-        assert user_role_found['user_id'] == user_role['user_id']
-        assert user_role_found['workspace_id'] == user_role['workspace_id']
 
     def test_api__update_workspace_member_role__ok_200__nominal_case(self):
         """
