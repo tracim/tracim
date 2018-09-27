@@ -84,11 +84,11 @@ const WorkspaceAdvancedComponent = props => {
                         key={`role_${r.id}`}
                       >
                         <div className='subdropdown__item__icon' style={{color: r.hexcolor}}>
-                          <i className={`fa fa-${r.faIcon}`} />
+                          <i className={`fa fa-fw fa-${r.faIcon}`} />
                         </div>
 
                         <div className='subdropdown__item__text'>
-                          {r.label}
+                          {props.t(r.label)}
                         </div>
                       </div>
                     )}

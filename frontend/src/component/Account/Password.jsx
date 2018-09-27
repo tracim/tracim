@@ -14,11 +14,32 @@ export class Password extends React.Component {
     }
   }
 
-  handleChangeOldPassword = e => this.setState({oldPassword: e.target.value})
+  handleChangeOldPassword = e => {
+    const { props } = this
+    if (e.target.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
+      return
+    }
+    this.setState({oldPassword: e.target.value})
+  }
 
-  handleChangeNewPassword = e => this.setState({newPassword: e.target.value})
+  handleChangeNewPassword = e => {
+    const { props } = this
+    if (e.target.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
+      return
+    }
+    this.setState({newPassword: e.target.value})
+  }
 
-  handleChangeNewPassword2 = e => this.setState({newPassword2: e.target.value})
+  handleChangeNewPassword2 = e => {
+    const { props } = this
+    if (e.target.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
+      return
+    }
+    this.setState({newPassword2: e.target.value})
+  }
 
   handleChangeCheckAdminPassword = e => this.setState({checkAdminPassword: e.target.value})
 
@@ -77,7 +98,7 @@ export class Password extends React.Component {
                 placeholder={props.t('Old password')}
                 value={state.oldPassword}
                 onChange={this.handleChangeOldPassword}
-                maxLength={512}
+                maxLength={513}
               />
             </div>
           )}
@@ -89,7 +110,7 @@ export class Password extends React.Component {
               placeholder={props.t('New password')}
               value={state.newPassword}
               onChange={this.handleChangeNewPassword}
-              maxLength={512}
+              maxLength={513}
             />
           </div>
 
@@ -100,7 +121,7 @@ export class Password extends React.Component {
               placeholder={props.t('Repeat new password')}
               value={state.newPassword2}
               onChange={this.handleChangeNewPassword2}
-              maxLength={512}
+              maxLength={513}
             />
 
             {props.displayAdminInfo && (

@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   Delimiter,
@@ -8,6 +9,7 @@ import {
   BtnSwitch
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
+import { getUserProfile } from '../helper.js'
 
 export class AdminUser extends React.Component {
   constructor (props) {
@@ -106,6 +108,7 @@ export class AdminUser extends React.Component {
               <thead>
                 <tr>
                   <th scope='col'>{props.t('Active')}</th>
+                  <th />
                   <th scope='col'>{props.t('User')}</th>
                   <th scope='col'>{props.t('Email')}</th>
                   <th scope='col'>{props.t('Can create workspace')}</th>
@@ -113,30 +116,63 @@ export class AdminUser extends React.Component {
                 </tr>
               </thead>
 
+
               <tbody>
-                {props.userList.map(u =>
-                  <tr className='adminUser__table__tr' key={u.user_id}>
-                    <td>
-                      <BtnSwitch checked={u.is_active} onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)} />
-                    </td>
-                    <td className='adminUser__table__tr__td-link primaryColorFont' onClick={e => this.handleClickUser(e, u.user_id)}>
-                      {u.public_name}
-                    </td>
-                    <td>{u.email}</td>
-                    <td>
-                      <BtnSwitch
-                        checked={u.profile === 'trusted-users' || u.profile === 'administrators'}
-                        onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'trusted-users' || u.profile === 'administrators'))}
-                      />
-                    </td>
-                    <td>
-                      <BtnSwitch
-                        checked={u.profile === 'administrators'}
-                        onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === 'administrators'))}
-                      />
-                    </td>
-                  </tr>
-                )}
+                {props.userList.map(u => {
+                  const userProfile = getUserProfile(props.profile, u.profile)
+                  return (
+                    <tr
+                      className={classnames('adminUser__table__tr', {'user-deactivated': !u.is_active})}
+                      key={u.user_id}
+                    >
+                      <td>
+                        <BtnSwitch
+                          checked={u.is_active}
+                          onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)}
+                          activeLabel=''
+                          inactiveLabel={props.t('Account deactivated')}
+                        />
+                      </td>
+
+                      <td>
+                        <i
+                          className={`fa fa-fw fa-${userProfile.faIcon}`}
+                          style={{color: userProfile.hexcolor}}
+                          title={props.t(userProfile.label)}
+                        />
+                      </td>
+
+                      <td
+                        className='adminUser__table__tr__td-link primaryColorFont'
+                        onClick={e => this.handleClickUser(e, u.user_id)}
+                      >
+                        {u.public_name}
+                      </td>
+
+                      <td>{u.email}</td>
+
+                      <td>
+                        <BtnSwitch
+                          checked={u.profile === 'trusted-users' || u.profile === 'administrators'}
+                          onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === 'trusted-users' || u.profile === 'administrators'))}
+                          activeLabel={props.t('Activated')}
+                          inactiveLabel={props.t('Deactivated')}
+                          disabled={!u.is_active}
+                        />
+                      </td>
+
+                      <td>
+                        <BtnSwitch
+                          checked={u.profile === 'administrators'}
+                          onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === 'administrators'))}
+                          activeLabel={props.t('Activated')}
+                          inactiveLabel={props.t('Deactivated')}
+                          disabled={!u.is_active}
+                        />
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

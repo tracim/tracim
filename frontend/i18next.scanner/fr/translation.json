@@ -32,8 +32,6 @@
   "Access your personal calendar": "Accéder à votre calendrier personnel",
   "Dashboard": "Tableau de bord",
   "Change your status": "Changer de status",
-  "subscriber": "Abonné(e)",
-  "unsubscribed": "Non Abonné(e)",
   "Recent activity": "Activité récente",
   "Mark everything as read": "Tout marquer comme lu",
   "See more": "Voir plus",
@@ -62,7 +60,6 @@
   "Thank you for trusting us and using our collaborative tool": "Merci de nous faire confiance et d'utiliser notre outil collaboratif.",
   "Error while archiving document": "Erreur lors de l'archivage d'un document",
   "Error while deleting document": "Erreur lors de la suppression d'un document",
-  "subscribed": "Abonné(e)",
   "Feature": "Fonctionnalité",
   "Explore": "Explorer",
   "About": "A propos",
@@ -133,5 +130,11 @@
   "You are not a member of any workspace yet": "Vous n'êtes actuellement membre d'aucun espace de travail",
   "Wrong administrator's password": "Mauvais mot de passe administrateur",
   "You have been disconnected, please login again": "Vous avez été déconnecté. Veuillez vous reconnecter",
-  "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)"
+  "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)",
+  "Password cannot exceed 512 characters": "Mot de passe trop long (maximum 512 caractères)",
+  "You have not subscribed to this workspace's notifications": "Vous n'êtes pas abonné aux notifications de cet espace de travail.",
+  "Subscribed": "Abonné",
+  "Unsubscribed": "Non abonné",
+  "Subscribe": "S'abonner",
+  "Unsubscribe": "Se désabonner"
 }

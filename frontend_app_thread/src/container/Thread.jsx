@@ -1,5 +1,6 @@
 import React from 'react'
 import i18n from '../i18n.js'
+import { translate } from 'react-i18next'
 import { debug } from '../helper.js'
 import {
   addAllResourceI18n,
@@ -12,7 +13,7 @@ import {
   Timeline,
   SelectStatus,
   ArchiveDeleteContent,
-  displayDate
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -121,7 +122,8 @@ class Thread extends React.Component {
           listMessage: resComment.body.map(c => ({
             ...c,
             timelineType: 'comment',
-            created: displayDate(c.created, loggedUser.lang),
+            created_raw: c.created,
+            created: displayDistanceDate(c.created, loggedUser.lang),
             author: {
               ...c.author,
               avatar_url: c.author.avatar_url
@@ -335,4 +337,4 @@ class Thread extends React.Component {
   }
 }
 
-export default Thread
+export default translate()(Thread)

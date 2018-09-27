@@ -30,8 +30,11 @@ const Comment = props => {
               {props.author}
             </div>
 
-            <div className={classnames(`${props.customClass}__header__text__date`, 'comment__header__text__date')}>
-              {props.createdAt}
+            <div
+              className={classnames(`${props.customClass}__header__text__date`, 'comment__header__text__date')}
+              title={props.createdFormated}
+            >
+              {props.createdDistance}
             </div>
           </div>
 

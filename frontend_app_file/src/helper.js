@@ -78,7 +78,7 @@ export const debug = {
     lang: 'fr',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
     auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`),
-    idRoleUserWorkspace: 8
+    idRoleUserWorkspace: 1
   },
   content: {
     author: {
@@ -86,7 +86,7 @@ export const debug = {
       public_name: 'Global manager',
       user_id: 1 // -1 or 1 for debug
     },
-    content_id: 2,
+    content_id: 1,
     content_type: 'file',
     created: '2018-06-18T14:59:26Z',
     current_revision_id: 11,

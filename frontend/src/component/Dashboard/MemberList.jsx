@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { NewMemberForm } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
@@ -38,7 +39,7 @@ export class MemberList extends React.Component {
           {state.displayNewMemberList
             ? (
               <div>
-                <ul className='memberlist__list'>
+                <ul className={classnames('memberlist__list', {'withAddBtn': props.displayAddMemberBtn})}>
                   {props.memberList.map(m =>
                     <li className='memberlist__list__item  primaryColorBgLightenHover' key={m.id}>
                       <div className='memberlist__list__item__avatar'>
@@ -55,29 +56,33 @@ export class MemberList extends React.Component {
                         </div>
                       </div>
 
-                      <div
-                        className='memberlist__list__item__delete primaryColorFontHover'
-                        onClick={() => props.onClickRemoveMember(m.id)}
-                      >
-                        <i className='fa fa-trash-o' />
-                      </div>
+                      {props.displayRemoveMemberBtn && (
+                        <div
+                          className='memberlist__list__item__delete primaryColorFontHover'
+                          onClick={() => props.onClickRemoveMember(m.id)}
+                        >
+                          <i className='fa fa-trash-o' />
+                        </div>
+                      )}
                     </li>
                   )}
                 </ul>
 
-                <div className='memberlist__btnadd' onClick={this.handleClickAddMemberBtn}>
-                  <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
-                    <div className='memberlist__btnadd__button__avatar'>
-                      <div className='memberlist__btnadd__button__avatar__icon'>
-                        <i className='fa fa-plus' />
+                {props.displayAddMemberBtn && (
+                  <div className='memberlist__btnadd' onClick={this.handleClickAddMemberBtn}>
+                    <div className='memberlist__btnadd__button primaryColorFontHover primaryColorBorderHover'>
+                      <div className='memberlist__btnadd__button__avatar'>
+                        <div className='memberlist__btnadd__button__avatar__icon'>
+                          <i className='fa fa-plus' />
+                        </div>
+                      </div>
+
+                      <div className='memberlist__btnadd__button__text'>
+                        {props.t('Add a member')}
                       </div>
                     </div>
-
-                    <div className='memberlist__btnadd__button__text'>
-                      {props.t('Add a member')}
-                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )
             : (

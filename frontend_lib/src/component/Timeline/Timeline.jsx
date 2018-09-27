@@ -104,7 +104,8 @@ class Timeline extends React.Component {
                     customColor={props.customColor}
                     author={content.author.public_name}
                     avatar={content.author.avatar_url}
-                    createdAt={content.created}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
                     text={content.raw_content}
                     fromMe={props.loggedUser.user_id === content.author.user_id}
                     key={`comment_${content.content_id}`}
@@ -116,7 +117,8 @@ class Timeline extends React.Component {
                     customColor={props.customColor}
                     lang={props.loggedUser.lang}
                     revisionType={content.revision_type}
-                    createdAt={content.created}
+                    createdFormated={(new Date(content.created_raw)).toLocaleString(props.loggedUser.lang)}
+                    createdDistance={content.created}
                     number={content.number}
                     key={`revision_${content.revision_id}`}
                     onClickRevision={() => props.onClickRevisionBtn(content)}
@@ -192,7 +194,7 @@ class Timeline extends React.Component {
   }
 }
 
-export default translate()(Radium(Timeline))
+export default Radium(translate()(Timeline))
 
 Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
