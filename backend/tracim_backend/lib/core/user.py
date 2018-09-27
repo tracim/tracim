@@ -386,7 +386,7 @@ class UserApi(object):
     ) -> User:
         if do_notify and not self._config.EMAIL_NOTIFICATION_ACTIVATED:
             raise NotificationDisabled(
-                "Can't create user with invitation mail because"
+                "Can't create user with invitation mail because "
                 "notification are disabled."
             )
         new_user = self.create_minimal_user(email, groups, save_now=False)

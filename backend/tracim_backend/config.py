@@ -310,7 +310,7 @@ class CFG(object):
         if not self.EMAIL_NOTIFICATION_ACTIVATED:
             logger.warning(
                 self,
-                'Notification by email mecanism is disabled !'
+                'Notification by email mecanism is disabled ! '
                 'Notification and mail invitation mecanisms will not work.'
             )
         self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(

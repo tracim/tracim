@@ -339,22 +339,22 @@ class WorkspaceController(Controller):
                 public_name=hapic_data.body.user_email_or_public_name
             )
         except UserDoesNotExist as exc:
-            if app_config.EMAIL_NOTIFICATION_ACTIVATED:
-                try:
-                    user = uapi.create_user(
-                        email=hapic_data.body.user_email_or_public_name,
-                        password=password_generator(),
-                        do_notify=True
-                    )
-                    newly_created = True
-                    if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
-                            app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
-                        email_sent = True
-
-                except EmailValidationFailed:
-                    raise UserCreationFailed('no valid mail given')
-            else:
+            if not app_config.EMAIL_NOTIFICATION_ACTIVATED:
                 raise exc
+
+            try:
+                user = uapi.create_user(
+                    email=hapic_data.body.user_email_or_public_name,
+                    password=password_generator(),
+                    do_notify=True
+                )
+                newly_created = True
+                if app_config.EMAIL_NOTIFICATION_ACTIVATED and \
+                    app_config.EMAIL_NOTIFICATION_PROCESSING_MODE.lower() == 'sync':
+                    email_sent = True
+
+            except EmailValidationFailed:
+                raise UserCreationFailed('no valid mail given')
 
         role = rapi.create_one(
             user=user,
