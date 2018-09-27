@@ -151,28 +151,24 @@ div.mce-fullscreen
       border-radius 10px
       padding 15px
 
-.notchUp
-  position absolute
-  top 0
-  right 0
-  &__upLeft
+.notched // Côme - 2018/09/27 - this class requires a border-color to be defined (eg. with primaryColorBorder)
+  &::before
+    content ''
+    position absolute
     width 28px
-    height 6px
-    border-radius 2px
-  &__upRight
-    width 6px
     height 25px
-    border-radius 2px
-
-.notchDown
-  position absolute
-  bottom 0
-  left 0
-  &__downLeft
+    border-style solid
+    top 0
+    right 0
+    border-width 6px 6px 0 0
+    border-color inherit
+  &::after
+    content ''
+    position absolute
     width 28px
-    height 6px
-    border-radius 2px
-  &__downRight
-    width 6px
     height 25px
-    border-radius 2px
+    border-style solid
+    bottom 0
+    left 0
+    border-width 0 0 6px 6px
+    border-color inherit

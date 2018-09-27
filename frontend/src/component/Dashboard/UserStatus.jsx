@@ -9,15 +9,7 @@ export const UserStatus = props => {
   const myRole = ROLE.find(r => r.slug === mySelf.role) || {faIcon: '', hexcolor: '', label: ''}
 
   return (
-    <div className='userstatus'>
-      <div className='notchUp'>
-        <div className='notchUp__upLeft primaryColorBg' />
-      </div>
-
-      <div className='notchUp'>
-        <div className='notchUp__upRight primaryColorBg' />
-      </div>
-
+    <div className='userstatus notched primaryColorBorder'>
       <div className='userstatus__username'>
         {props.user.public_name}
       </div>
@@ -48,14 +40,6 @@ export const UserStatus = props => {
             : props.t("Unsubscribed")
           }
         </div>
-      </div>
-
-      <div className='notchDown notchDownLeftTop'>
-        <div className='notchDown__downLeft primaryColorBg' />
-      </div>
-
-      <div className='notchDown notchDownRightTop'>
-        <div className='notchDown__downRight primaryColorBg' />
       </div>
     </div>
   )
