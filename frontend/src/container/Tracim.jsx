@@ -10,11 +10,12 @@ import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
+import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { PAGE } from '../helper.js'
+import { PAGE, getUserProfile } from '../helper.js'
 import {
   getAppList,
   getContentTypeList,
@@ -51,6 +52,10 @@ class Tracim extends React.Component {
       case 'refreshWorkspaceList':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
+        break
+      case 'disconnectedFromApi':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
         break
     }
   }
@@ -139,14 +144,13 @@ class Tracim extends React.Component {
           <div className='tracim__content'>
             <Route path={PAGE.LOGIN} component={Login} />
 
-            <Route exact path='/' component={() => {
+            <Route exact path={PAGE.HOME} component={() => {
               switch (props.user.logged) {
-                case true:
-                  return <Redirect to={{pathname: PAGE.WORKSPACE.ROOT, state: {from: props.location}}} />
-                case false:
-                  return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
-                case null:
-                  return null
+                case true: return props.workspaceList.length > 0
+                  ? <Redirect to={{pathname: PAGE.WORKSPACE.ROOT, state: {from: props.location}}} />
+                  : <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />
+                case false: return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+                case null: return null
               }
             }} />
 
