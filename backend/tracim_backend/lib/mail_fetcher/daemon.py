@@ -40,7 +40,6 @@ class MailFetcherDaemon(FakeDaemon):
             heartbeat=self.config.EMAIL_REPLY_CHECK_HEARTBEAT,
             use_idle=self.config.EMAIL_REPLY_IMAP_USE_IDLE,
             connection_max_lifetime=self.config.EMAIL_REPLY_CONNECTION_MAX_LIFETIME,  # nopep8
-            # FIXME - G.M - 2017-11-15 - proper tracim url formatting
             api_base_url=self.config.WEBSITE_BASE_URL + BASE_API_V2,
             api_key=self.config.API_KEY,
             use_html_parsing=self.config.EMAIL_REPLY_USE_HTML_PARSING,
