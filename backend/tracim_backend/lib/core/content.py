@@ -1005,7 +1005,7 @@ class ContentApi(object):
         content_type_slug: str = CONTENT_TYPES.Any_SLUG,
         workspace: Workspace = None,
         label:str = None,
-        order_by_properties: typing.List[str] = (),
+        order_by_properties: typing.List[typing.Union[str, QueryableAttribute]] = (),
     ) -> Query:
         """
         Extended filter for better "get all data" query
