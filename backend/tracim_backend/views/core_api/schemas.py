@@ -1012,7 +1012,7 @@ class CommentSchema(marshmallow.Schema):
 class SetCommentSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
         example='<p>This is just an html comment !</p>',
-        validate=Length(min=1)
+        validate=Length(min=1),
         required=True,
     )
 
