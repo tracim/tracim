@@ -1013,8 +1013,9 @@ class ContentApi(object):
         :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
         :param order_by_properties: filter by properties can be both string of
-        attribute or attribute of Model object from sqlalchemy.
-        :return:
+        attribute or attribute of Model object from sqlalchemy(preferred way,
+        QueryableAttribute object)
+        :return: Query object
         """
         assert parent_id is None or isinstance(parent_id, int)
         assert content_type_slug is not None
@@ -1049,6 +1050,16 @@ class ContentApi(object):
             label: str=None,
             order_by_properties: typing.List[typing.Union[str, QueryableAttribute]] = ()  # nopep8
     ) -> typing.List[Content]:
+        """
+        Return all content using some filters
+        :param parent_id: filter by parent_id
+        :param content_type: filter by content_type slug
+        :param workspace: filter by workspace
+        :param order_by_properties: filter by properties can be both string of
+        attribute or attribute of Model object from sqlalchemy(preferred way,
+        QueryableAttribute object)
+        :return: List of contents
+        """
         return self._get_all_query(parent_id, content_type, workspace, label, order_by_properties).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
