@@ -269,7 +269,7 @@ class WorkspaceContent extends React.Component {
               {state.contentLoaded && workspaceContentList.length === 0
                 ? (
                   <div className='workspace__content__fileandfolder__empty'>
-                    {t("This workspace has no content yet, create the first content by clicking on the button 'Create'")}
+                    {t("This shared space has no content yet, create the first content by clicking on the button 'Create'")}
                   </div>
                 )
                 : filteredWorkspaceContentList.map((c, i) => c.type === 'folder'

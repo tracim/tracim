@@ -16,7 +16,7 @@ const WorkspaceAdvancedComponent = props => {
 
         <div className='workspace_advanced__description__text'>
           <textarea
-            placeholder={props.t("Workspace's description")}
+            placeholder={props.t("Shared space's description")}
             value={props.description}
             onChange={props.onChangeDescription}
             rows={'3'}

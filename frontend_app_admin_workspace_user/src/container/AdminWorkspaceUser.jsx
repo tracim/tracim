@@ -126,7 +126,7 @@ class AdminWorkspaceUser extends React.Component {
         GLOBAL_dispatchEvent({
           type: 'addFlashMsg',
           data: {
-            msg: props.t('Error while loading workspaces list'),
+            msg: props.t('Error while loading shared spaces list'),
             type: 'warning',
             delay: undefined
           }
@@ -180,7 +180,7 @@ class AdminWorkspaceUser extends React.Component {
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
-          msg: props.t('Error while deleting workspace'),
+          msg: props.t('Error while deleting shared space'),
           type: 'warning',
           delay: undefined
         }

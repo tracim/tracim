@@ -40,7 +40,7 @@ export class AdminUser extends React.Component {
       GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
-          msg: props.t('An administrator can always create workspaces'),
+          msg: props.t('An administrator can always create shared spaces'),
           type: 'warning',
           delay: undefined
         }
@@ -111,7 +111,7 @@ export class AdminUser extends React.Component {
                   <th />
                   <th scope='col'>{props.t('User')}</th>
                   <th scope='col'>{props.t('Email')}</th>
-                  <th scope='col'>{props.t('Can create workspace')}</th>
+                  <th scope='col'>{props.t('Can create shared space')}</th>
                   <th scope='col'>{props.t('Administrator')}</th>
                 </tr>
               </thead>

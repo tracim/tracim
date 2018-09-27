@@ -11,12 +11,12 @@ const AdminWorkspace = props =>
   <PageWrapper customClass='adminWorkspace'>
     <PageTitle
       parentClass={'adminWorkspace'}
-      title={props.t('Workspace management')}
+      title={props.t('Shared space management')}
     />
 
     <PageContent parentClass='adminWorkspace'>
       <div className='adminWorkspace__description'>
-        {props.t('List of every workspaces')}
+        {props.t('List of every shared spaces')}
       </div>
 
       <Delimiter customClass={'adminWorkspace__delimiter'} />
@@ -27,7 +27,7 @@ const AdminWorkspace = props =>
           <thead>
             <tr>
               <th scope='col'>Id</th>
-              <th scope='col'>{props.t('Workspace')}</th>
+              <th scope='col'>{props.t('Shared space')}</th>
               <th scope='col'>{props.t('Description')}</th>
               <th scope='col'>{props.t('Member count')}</th>
               {/* <th scope='col'>Calendar</th> */}
@@ -72,7 +72,7 @@ const AdminWorkspace = props =>
               : (
                 <tr>
                   <td />
-                  <td>{props.t('There is no workspace yet')}</td>
+                  <td>{props.t('There is no shared space yet')}</td>
                   <td />
                   <td />
                   <td />
