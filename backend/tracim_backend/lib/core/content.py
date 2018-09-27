@@ -18,6 +18,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
@@ -1002,15 +1003,21 @@ class ContentApi(object):
         self,
         parent_id: int = None,
         content_type_slug: str = CONTENT_TYPES.Any_SLUG,
-        workspace: Workspace = None
+        workspace: Workspace = None,
+        label:str = None,
+        order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
     ) -> Query:
         """
         Extended filter for better "get all data" query
         :param parent_id: filter by parent_id
         :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
-        :return:
+        :param order_by_properties: filter by properties can be both string of
+        attribute or attribute of Model object from sqlalchemy(preferred way,
+        QueryableAttribute object)
+        :return: Query object
         """
+        order_by_properties = order_by_properties or []  # FDV
         assert parent_id is None or isinstance(parent_id, int)
         assert content_type_slug is not None
         resultset = self._base_query(workspace)
@@ -1028,11 +1035,34 @@ class ContentApi(object):
             resultset = resultset.filter(Content.parent_id==parent_id)
         if parent_id == 0 or parent_id is False:
             resultset = resultset.filter(Content.parent_id == None)
+        if label:
+            resultset = resultset.filter(Content.label.ilike('%{}%'.format(label)))  # nopep8
+
+        for _property in order_by_properties:
+            resultset = resultset.order_by(_property)
 
         return resultset
 
-    def get_all(self, parent_id: int=None, content_type: str=CONTENT_TYPES.Any_SLUG, workspace: Workspace=None) -> typing.List[Content]:
-        return self._get_all_query(parent_id, content_type, workspace).all()
+    def get_all(
+            self,
+            parent_id: int=None,
+            content_type: str=CONTENT_TYPES.Any_SLUG,
+            workspace: Workspace=None,
+            label: str=None,
+            order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
+    ) -> typing.List[Content]:
+        """
+        Return all content using some filters
+        :param parent_id: filter by parent_id
+        :param content_type: filter by content_type slug
+        :param workspace: filter by workspace
+        :param order_by_properties: filter by properties can be both string of
+        attribute or attribute of Model object from sqlalchemy(preferred way,
+        QueryableAttribute object)
+        :return: List of contents
+        """
+        order_by_properties = order_by_properties or []  # FDV
+        return self._get_all_query(parent_id, content_type, workspace, label, order_by_properties).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
     # def get_children(self, parent_id: int, content_types: list, workspace: Workspace=None) -> typing.List[Content]:

@@ -440,6 +440,12 @@ class FilterContentQuerySchema(marshmallow.Schema):
         default=CONTENT_TYPES.Any_SLUG,
         validate=all_content_types_validator
     )
+    label = marshmallow.fields.String(
+        example='myfilename',
+        default=None,
+        allow_none=True,
+        description='Filter by content label'
+    )
 
     @post_load
     def make_content_filter(self, data):
@@ -815,7 +821,8 @@ class ContentCreationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
         required=True,
         example='contract for client XXX',
-        description='Title of the content to create'
+        description='Title of the content to create',
+        validate=Length(min=1),
     )
     content_type = marshmallow.fields.String(
         required=True,
@@ -1002,8 +1009,9 @@ class CommentSchema(marshmallow.Schema):
 
 class SetCommentSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
+        example='<p>This is just an html comment !</p>',
+        validate=Length(min=1),
         required=True,
-        example='<p>This is just an html comment !</p>'
     )
 
     @post_load()
@@ -1015,7 +1023,8 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
         required=True,
         example='contract for client XXX',
-        description='New title of the content'
+        description='New title of the content',
+        validate=Length(min=1)
     )
 
 
