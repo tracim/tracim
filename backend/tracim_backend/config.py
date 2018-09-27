@@ -307,6 +307,12 @@ class CFG(object):
         self.EMAIL_NOTIFICATION_ACTIVATED = asbool(settings.get(
             'email.notification.activated',
         ))
+        if not self.EMAIL_NOTIFICATION_ACTIVATED:
+            logger.warning(
+                self,
+                'Notification by email mecanism is disabled ! '
+                'Notification and mail invitation mecanisms will not work.'
+            )
         self.EMAIL_NOTIFICATION_SMTP_SERVER = settings.get(
             'email.notification.smtp.server',
         )

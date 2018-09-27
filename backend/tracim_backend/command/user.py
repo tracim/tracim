@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 import argparse
-from pyramid.scripting import AppEnvironment
+
 import transaction
+from pyramid.scripting import AppEnvironment
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend import CFG
 from tracim_backend.command import AppContextCommand
 from tracim_backend.command import Extender
-from tracim_backend.exceptions import UserAlreadyExistError
-from tracim_backend.exceptions import GroupDoesNotExist
-from tracim_backend.exceptions import NotificationNotSend
 from tracim_backend.exceptions import BadCommandError
+from tracim_backend.exceptions import GroupDoesNotExist
+from tracim_backend.exceptions import NotificationDisabled
+from tracim_backend.exceptions import NotificationSendingFailed
+from tracim_backend.exceptions import UserAlreadyExistError
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.models import User
 from tracim_backend.models import Group
+from tracim_backend.models import User
 
 
 class UserCommand(AppContextCommand):
@@ -144,10 +146,9 @@ class UserCommand(AppContextCommand):
         except IntegrityError as exception:
             self._session.rollback()
             raise UserAlreadyExistError() from exception
-        except NotificationNotSend as exception:
+        except (NotificationSendingFailed, NotificationDisabled) as exception:
             self._session.rollback()
             raise exception from exception
-
         return user
 
     def _update_password_for_login(self, login: str, password: str) -> None:
@@ -190,18 +191,12 @@ class UserCommand(AppContextCommand):
                     password=parsed_args.password,
                     do_notify=parsed_args.send_email,
                 )
-            except UserAlreadyExistError:
-                raise UserAlreadyExistError("Error: User already exist (use `user update` command instead)")
-            except NotificationNotSend:
-                raise NotificationNotSend("Error: Cannot send email notification, user not created.")
-            # TODO - G.M - 04-04-2018 - [Email] Check this code
-            # if parsed_args.send_email:
-            #     email_manager = get_email_manager()
-            #     email_manager.notify_created_account(
-            #         user=user,
-            #         password=parsed_args.password,
-            #     )
-
+            except UserAlreadyExistError as exc:
+                raise UserAlreadyExistError("Error: User already exist (use `user update` command instead)") from exc # nopep8
+            except NotificationSendingFailed as exc:
+                raise NotificationSendingFailed("Error: Cannot send email notification due to error, user not created.") from exc  # nopep8
+            except NotificationDisabled as exc:
+                raise NotificationDisabled("Error: Email notification disabled but notification required, user not created.") from exc  # nopep8
         else:
             if parsed_args.password:
                 self._update_password_for_login(
