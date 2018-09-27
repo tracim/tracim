@@ -823,13 +823,11 @@ class ContentCreationSchema(marshmallow.Schema):
         example='contract for client XXX',
         description='Title of the content to create',
         validate=Length(min=1),
-        required=True
     )
     content_type = marshmallow.fields.String(
         required=True,
         example='html-document',
         validate=all_content_types_validator,
-        required=True,
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
