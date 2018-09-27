@@ -18,6 +18,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
@@ -1044,7 +1045,7 @@ class ContentApi(object):
             content_type: str=CONTENT_TYPES.Any_SLUG,
             workspace: Workspace=None,
             label: str=None,
-            order_by_properties: typing.List[str] = ()
+            order_by_properties: typing.List[typing.Union[str, QueryableAttribute]] = ()  # nopep8
     ) -> typing.List[Content]:
         return self._get_all_query(parent_id, content_type, workspace, label, order_by_properties).all()
 
