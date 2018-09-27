@@ -1012,6 +1012,8 @@ class ContentApi(object):
         :param parent_id: filter by parent_id
         :param content_type_slug: filter by content_type slug
         :param workspace: filter by workspace
+        :param order_by_properties: filter by properties can be both string of
+        attribute or attribute of Model object from sqlalchemy.
         :return:
         """
         assert parent_id is None or isinstance(parent_id, int)
