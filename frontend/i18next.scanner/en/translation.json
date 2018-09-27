@@ -70,9 +70,6 @@
   "Mark everything as read": "Mark everything as read",
   "See more": "See more",
   "You have subscribed to this workspace's notifications": "You have subscribed to this workspace's notifications",
-  "subscribed": "subscribed",
-  "subscriber": "subscriber",
-  "unsubscribed": "unsubscribed",
   "Change your status": "Change your status",
   "Edit": "Edit",
   "Move": "Move",
@@ -132,5 +129,11 @@
   "You are not a member of any workspace yet": "You are not a member of any workspace yet",
   "Wrong administrator's password": "Wrong administrator's password",
   "You have been disconnected, please login again": "You have been disconnected, please login again",
-  "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)"
+  "New password is too long (maximum 512 characters)": "New password is too long (maximum 512 characters)",
+  "Password cannot exceed 512 characters": "Password cannot exceed 512 characters",
+  "You have not subscribed to this workspace's notifications": "You have not subscribed to this workspace's notifications",
+  "Subscribed": "Subscribed",
+  "Unsubscribed": "Unsubscribed",
+  "Subscribe": "Subscribe",
+  "Unsubscribe": "Unsubscribe"
 }

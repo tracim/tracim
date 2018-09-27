@@ -15,7 +15,8 @@ import {
   getUserKnownMember,
   postWorkspaceMember,
   putUserWorkspaceRead,
-  deleteWorkspaceMember
+  deleteWorkspaceMember,
+  putUserWorkspaceDoNotify
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -24,7 +25,8 @@ import {
   setWorkspaceRecentActivityList,
   appendWorkspaceRecentActivityList,
   setWorkspaceReadStatusList,
-  removeWorkspaceMember
+  removeWorkspaceMember,
+  updateUserWorkspaceSubscriptionNotif
 } from '../action-creator.sync.js'
 import appFactory from '../appFactory.js'
 import {
@@ -199,8 +201,6 @@ class Dashboard extends React.Component {
     }))
   }
 
-  // handleChangeNewMemberCreateAccount = newCreateAccount => this.setState(prev => ({newMember: {...prev.newMember, createAccount: newCreateAccount}}))
-
   handleChangeNewMemberRole = newRole => this.setState(prev => ({newMember: {...prev.newMember, role: newRole}}))
 
   handleClickValidateNewMember = async () => {
@@ -265,6 +265,24 @@ class Dashboard extends React.Component {
     )
   }
 
+  handleClickAddNotification = async () => {
+    const { props } = this
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putUserWorkspaceDoNotify(props.user, props.curWs.id, true))
+    switch (fetchWorkspaceUserAddNotification.status) {
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, true)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    }
+  }
+
+  handleClickRemoveNotification = async () => {
+    const { props } = this
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putUserWorkspaceDoNotify(props.user, props.curWs.id, false))
+    switch (fetchWorkspaceUserAddNotification.status) {
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.user_id, props.curWs.id, false)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -292,35 +310,37 @@ class Dashboard extends React.Component {
           </PageTitle>
 
           <PageContent>
-            <div className='dashboard__workspace-wrapper'>
-              <div className='dashboard__workspace'>
-                <div className='dashboard__workspace__title primaryColorFont'>
+            <div className='dashboard__workspace'>
+              <div className='dashboard__workspace__detail'>
+                <div className='dashboard__workspace__detail__title primaryColorFont'>
                   {props.curWs.label}
                 </div>
 
                 <div
-                  className='dashboard__workspace__detail'
+                  className='dashboard__workspace__detail__description'
                   dangerouslySetInnerHTML={{__html: convertBackslashNToBr(props.curWs.description)}}
                 />
 
-                <div className='dashboard__calltoaction'>
-                  {props.appList.map(app => {
-                    const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
-                    return (
-                      <ContentTypeBtn
-                        customClass='dashboard__calltoaction__button'
-                        hexcolor={app.hexcolor}
-                        label={app.label}
-                        faIcon={app.faIcon}
-                        // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
-                        // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
-                        creationLabel={props.t(contentType.creationLabel)}
-                        onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
-                        key={app.label}
-                      />
-                    )
-                  })}
-                </div>
+                {idRoleUserWorkspace >= 2 && (
+                  <div className='dashboard__calltoaction'>
+                    {props.appList.map(app => {
+                      const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || {creationLabel: '', slug: ''}
+                      return (
+                        <ContentTypeBtn
+                          customClass='dashboard__calltoaction__button'
+                          hexcolor={app.hexcolor}
+                          label={app.label}
+                          faIcon={app.faIcon}
+                          // @fixme Côme - 2018/09/12 - trad key bellow is a little hacky. The creation label comes from api but since there is no translation in backend
+                          // every files has a 'externalTradList' array just to generate the translation key in the json files through i18n.scanner
+                          creationLabel={props.t(contentType.creationLabel)}
+                          onClickBtn={() => props.history.push(`${PAGE.WORKSPACE.NEW(props.curWs.id, contentType.slug)}?parent_id=null`)}
+                          key={app.label}
+                        />
+                      )
+                    })}
+                  </div>
+                )}
               </div>
 
               <UserStatus
@@ -328,6 +348,8 @@ class Dashboard extends React.Component {
                 curWs={props.curWs}
                 displayNotifBtn={state.displayNotifBtn}
                 onClickToggleNotifBtn={this.handleToggleNotifBtn}
+                onClickAddNotify={this.handleClickAddNotification}
+                onClickRemoveNotify={this.handleClickRemoveNotification}
                 t={props.t}
               />
             </div>
@@ -359,13 +381,14 @@ class Dashboard extends React.Component {
                 onChangeRole={this.handleChangeNewMemberRole}
                 onClickValidateNewMember={this.handleClickValidateNewMember}
                 onClickRemoveMember={this.handleClickRemoveMember}
+                displayRemoveMemberBtn={idRoleUserWorkspace >= 8}
+                displayAddMemberBtn={idRoleUserWorkspace >= 8}
                 t={props.t}
               />
             </div>
 
-            { /*
+            {/*
               AC - 11/09/2018 - not included in v2.0 roadmap
-
               <MoreInfo
                 onClickToggleWebdav={this.handleToggleWebdavBtn}
                 displayWebdavBtn={state.displayWebdavBtn}
@@ -373,7 +396,7 @@ class Dashboard extends React.Component {
                 displayCalendarBtn={state.displayCalendarBtn}
                 t={props.t}
               />
-            */ }
+            */}
 
           </PageContent>
         </PageWrapper>

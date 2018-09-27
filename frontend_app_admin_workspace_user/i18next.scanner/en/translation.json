@@ -26,5 +26,8 @@
   "User": "User",
   "Choose the profile": "Choose the profile",
   "Type the email": "Type the email",
-  "There is no workspace yet": "There is no workspace yet"
+  "There is no workspace yet": "There is no workspace yet",
+  "Account deactivated": "Account deactivated",
+  "Activated": "Activated",
+  "Deactivated": "Deactivated"
 }

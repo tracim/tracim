@@ -1,9 +1,5 @@
 @import "../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
-flexwrap()
-  display flex
-  flex-wrap wrap
-
 .dashboard
   .pageContentGeneric
     margin 0
@@ -15,26 +11,30 @@ flexwrap()
   width 100%
   min-height 100%
   &__header
-    flexwrap()
+    display flex
+    flex-wrap wrap
     align-items center
     &__title
       width auto
       &__text
         margin 0
-  &__workspace-wrapper
-    flexwrap()
   &__workspace
-    margin-right 20px
-    width calc(70% - 20px) //20px => margin-right
-    &__title
-      margin 0 0 20px 30px
-      font-size 70px
-      font-weight 500
+    display flex
+    flex-wrap wrap
+    align-items flex-start
     &__detail
-      margin-left 30px
-      font-size 18px
+      margin-right 20px
+      width calc(70% - 20px) //20px => margin-right
+      &__title
+        margin 0 0 20px 30px
+        font-size 70px
+        font-weight 500
+      &__description
+        margin-left 30px
+        font-size 18px
   &__calltoaction
-    flexwrap()
+    display flex
+    flex-wrap wrap
     margin 40px 30px
     &__button
       &:active
@@ -46,15 +46,13 @@ flexwrap()
         &__title
           font-size 18px
   &__workspaceInfo
-    flexwrap()
+    display flex
+    flex-wrap wrap
     padding 30px
     min-height 100%
     background-color lightGrey
 
-// MEDIAQUERIES
-
 @media (min-width: min-md) and (max-width: max-md)
-
   .dashboard
     &__workspace
       order 2
@@ -63,7 +61,6 @@ flexwrap()
       margin-left 0
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
   .dashboard
     &__header
       &__advancedmode
@@ -73,7 +70,6 @@ flexwrap()
       width 100%
 
 @media (max-width: max-xs)
-
   .dashboard .pageContentGeneric
     margin 10px 0 0 0
 
