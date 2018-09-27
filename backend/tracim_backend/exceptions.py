@@ -71,7 +71,7 @@ class SameValueError(ValueError):
 
 
 class NotAuthenticated(TracimException):
-    error_code = ERROR_CODE_NOT_AUTHENTICATED
+    pass
 
 
 class WorkspaceNotFound(NotFound):

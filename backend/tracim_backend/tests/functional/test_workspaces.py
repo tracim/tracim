@@ -888,7 +888,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1008,7 +1008,7 @@ class TestWorkspacesEndpoints(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1081,7 +1081,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1/members', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1275,7 +1275,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1/members/1', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -2589,7 +2589,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1/contents', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 

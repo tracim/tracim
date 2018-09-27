@@ -41,8 +41,8 @@ class ResetPasswordController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS])
-    @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
-    @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
+    @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_body(ResetPasswordCheckTokenSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def reset_password_check_token(self, context, request: TracimRequest, hapic_data=None):   # nopep8
@@ -60,8 +60,8 @@ class ResetPasswordController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__RESET_PASSWORD_ENDPOINTS])
-    @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
-    @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.UNAUTHORIZED)  # nopep8
+    @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
+    @hapic.handle_exception(UnvalidResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.handle_exception(PasswordDoNotMatch, http_code=HTTPStatus.BAD_REQUEST)  # nopep8
     @hapic.input_body(ResetPasswordModifySchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8

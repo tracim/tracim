@@ -209,7 +209,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -224,7 +224,7 @@ class TestWhoamiEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/sessions/whoami', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -289,7 +289,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
 
     def test_api__try_whoami_enpoint__err_401__unauthenticated(self):
         headers_auth = {
@@ -303,7 +303,7 @@ class TestWhoamiEndpointWithApiKey(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -396,7 +396,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             assert 'Set-Cookie' in res.headers
             assert isinstance(res.json, dict)
             assert 'code' in res.json.keys()
-            assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+            assert res.json_body['code'] is None
             assert 'message' in res.json.keys()
             assert 'details' in res.json.keys()
 
@@ -410,7 +410,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             )
             assert isinstance(res.json, dict)
             assert 'code' in res.json.keys()
-            assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+            assert res.json_body['code'] is None
             assert 'message' in res.json.keys()
             assert 'details' in res.json.keys()
 
@@ -470,6 +470,6 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             )
             assert isinstance(res.json, dict)
             assert 'code' in res.json.keys()
-            assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+            assert res.json_body['code'] is None
             assert 'message' in res.json.keys()
             assert 'details' in res.json.keys()

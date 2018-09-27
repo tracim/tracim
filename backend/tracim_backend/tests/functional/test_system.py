@@ -59,7 +59,7 @@ class TestApplicationEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/applications', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -112,7 +112,7 @@ class TestContentsTypesEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/content_types', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -155,6 +155,6 @@ class TestTimezonesEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/system/timezones', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()

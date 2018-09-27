@@ -93,7 +93,7 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/reset_password/check_token',
-            status=401,
+            status=400,
             params=params,
         )
         assert isinstance(res.json, dict)
@@ -145,7 +145,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         }
         res = self.testapp.post_json(
             '/api/v2/reset_password/modify',
-            status=401,
+            status=400,
             params=params,
         )
         assert isinstance(res.json, dict)
@@ -177,7 +177,7 @@ class TestResetPasswordModifyEndpoint(FunctionalTest):
         with freeze_time("2000-01-01 00:00:05"):
             res = self.testapp.post_json(
                 '/api/v2/reset_password/modify',
-                status=401,
+                status=400,
                 params=params,
             )
             assert isinstance(res.json, dict)

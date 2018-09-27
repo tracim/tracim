@@ -2943,7 +2943,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/users/1/workspaces', status=401)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_NOT_AUTHENTICATED
+        assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
