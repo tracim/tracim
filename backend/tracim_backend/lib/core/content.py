@@ -1005,7 +1005,7 @@ class ContentApi(object):
         content_type_slug: str = CONTENT_TYPES.Any_SLUG,
         workspace: Workspace = None,
         label:str = None,
-        order_by_properties: typing.List[typing.Union[str, QueryableAttribute]] = (),
+        order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -1017,6 +1017,7 @@ class ContentApi(object):
         QueryableAttribute object)
         :return: Query object
         """
+        order_by_properties = order_by_properties or []  # FDV
         assert parent_id is None or isinstance(parent_id, int)
         assert content_type_slug is not None
         resultset = self._base_query(workspace)
@@ -1048,7 +1049,7 @@ class ContentApi(object):
             content_type: str=CONTENT_TYPES.Any_SLUG,
             workspace: Workspace=None,
             label: str=None,
-            order_by_properties: typing.List[typing.Union[str, QueryableAttribute]] = ()  # nopep8
+            order_by_properties: typing.Optional[typing.List[typing.Union[str, QueryableAttribute]]] = None,  # nopep8
     ) -> typing.List[Content]:
         """
         Return all content using some filters
@@ -1060,6 +1061,7 @@ class ContentApi(object):
         QueryableAttribute object)
         :return: List of contents
         """
+        order_by_properties = order_by_properties or []  # FDV
         return self._get_all_query(parent_id, content_type, workspace, label, order_by_properties).all()
 
     # TODO - G.M - 2018-07-17 - [Cleanup] Drop this method if unneeded
