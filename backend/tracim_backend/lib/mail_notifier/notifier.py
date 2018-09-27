@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import traceback
 import typing
 
 from email.mime.multipart import MIMEMultipart
@@ -130,7 +129,7 @@ class EmailNotifier(INotifier):
         except Exception as e:
             # TODO - G.M - 2018-08-27 - Do Better catching for exception here
             logger.error(self, 'Exception catched during email notification: {}'.format(e.__str__()))
-            logger.error(self, traceback.format_exc())
+            logger.exception(self, e)
 
 
 class EmailManager(object):
