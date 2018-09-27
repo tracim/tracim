@@ -482,6 +482,7 @@ class ContentIdsQuerySchema(marshmallow.Schema):
 
 class RoleUpdateSchema(marshmallow.Schema):
     role = marshmallow.fields.String(
+        required=True,
         example='contributor',
         validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
     )
@@ -491,7 +492,11 @@ class RoleUpdateSchema(marshmallow.Schema):
         return RoleUpdate(**data)
 
 
-class WorkspaceMemberInviteSchema(RoleUpdateSchema):
+class WorkspaceMemberInviteSchema(marshmallow.Schema):
+    role = marshmallow.fields.String(
+        example='contributor',
+        validate=OneOf(UserRoleInWorkspace.get_all_role_slug())
+    )
     user_id = marshmallow.fields.Int(
         example=5,
         default=None,
@@ -583,9 +588,11 @@ class LoginOutputHeaders(marshmallow.Schema):
 
 class WorkspaceModifySchema(marshmallow.Schema):
     label = marshmallow.fields.String(
+        required=True,
         example='My Workspace',
     )
     description = marshmallow.fields.String(
+        required=True,
         example='A super description of my workspace.',
     )
 
@@ -806,10 +813,12 @@ class ContentMoveSchema(marshmallow.Schema):
 
 class ContentCreationSchema(marshmallow.Schema):
     label = marshmallow.fields.String(
+        required=True,
         example='contract for client XXX',
         description='Title of the content to create'
     )
     content_type = marshmallow.fields.String(
+        required=True,
         example='html-document',
         validate=all_content_types_validator,
     )
@@ -993,6 +1002,7 @@ class CommentSchema(marshmallow.Schema):
 
 class SetCommentSchema(marshmallow.Schema):
     raw_content = marshmallow.fields.String(
+        required=True,
         example='<p>This is just an html comment !</p>'
     )
 
