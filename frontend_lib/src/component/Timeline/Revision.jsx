@@ -28,7 +28,7 @@ const Revision = props => {
           className={classnames(`${props.customClass}__messagelist__version__date`, 'revision__date')}
           title={props.createdFormated}
         >
-          {props.createdAt}
+          {props.createdDistance}
         </div>
       </li>
   )
