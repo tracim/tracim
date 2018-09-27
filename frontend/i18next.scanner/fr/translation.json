@@ -115,8 +115,9 @@
   "You have been disconnected, please login again": "Vous avez été déconnecté. Veuillez vous reconnecter",
   "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)",
   "Password cannot exceed 512 characters": "Mot de passe trop long (maximum 512 caractères)",
-  "Subscribed": "Abonné",
-  "Unsubscribed": "Non abonné",
+  "your role in the shared space": "votre rôle dans l'espace partagé",
+  "you can change your notification status by clicking here": "vous pouvez changer votre statut de notification en cliquant ici",
+  "Subscribed to the notifications": "Abonné(e) aux notifications",
   "Create a shared space": "Créer un espace partagé",
   "Shared space manager": "Manager",
   "Create your own collaborative shared space on trac.im": "Créer votre espace partagé collaboratif sur trac.im",
@@ -128,5 +129,6 @@
   "Shared space": "Espace partagé",
   "You are not a member of any shared space yet": "Vous n'êtes membre d'aucun espace partagé",
   "Shared space calendar": "Calendrier de l'espace partagé",
-  "Each shared space has its own calendar.": "Chaque espace partagé a son propre calendrier"
+  "Each shared space has its own calendar.": "Chaque espace partagé a son propre calendrier",
+  "Unsubscribed to the notifications": "Désabonné(e) aux notifications"
 }

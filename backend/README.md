@@ -88,11 +88,12 @@ create wsgidav configuration file for webdav:
 
     cp wsgidav.conf.sample wsgidav.conf
 
+
+## Run Tracim_backend web services With Uwsgi : great for production ##
+
 if not did before, you need to create a color.json file at root of tracim_v2 :
    
     cp ../color.json.sample ../color.json
-
-## Run Tracim_backend With Uwsgi : great for production ##
 
 #### Install Uwsgi
 
@@ -109,8 +110,9 @@ or on debian 9 :
 ### All in terminal way ###
 
 
-Run all services with uwsgi
-
+Run all web services with uwsgi
+    
+    ## UWSGI SERVICES
     # set tracim_conf_file path
     export TRACIM_CONF_PATH="$(pwd)/development.ini"
     export TRACIM_WEBDAV_CONF_PATH="$(pwd)/wsgidav.conf"
@@ -118,6 +120,7 @@ Run all services with uwsgi
     uwsgi -d /tmp/tracim_web.log --http-socket :6543 --plugin python3 --wsgi-file wsgi/web.py -H env --pidfile /tmp/tracim_web.pid
     # webdav wsgidav server
     uwsgi -d /tmp/tracim_webdav.log --http-socket :3030 --plugin python3 --wsgi-file wsgi/webdav.py -H env --pidfile /tmp/tracim_webdav.pid
+    
 
 to stop them:
 
@@ -166,6 +169,65 @@ run wsgidav server:
 
     tracimcli webdav start
 
+## Run daemons according to your config
+
+Feature such as async email notification and email reply system need additional
+daemons to work correctly.
+
+### python way
+
+#### Run
+    # set tracim_conf_file path
+    export TRACIM_CONF_PATH="$(pwd)/development.ini"
+    ## DAEMONS SERVICES
+    # email notifier (if async email notification is enabled)
+    python3 daemons/mail_notifier.py &
+    # email fetcher (if email reply is enabled)
+    python3 daemons/mail_fetcher.py &
+
+### STOP
+
+    # email notifier
+    killall python3 daemons/mail_notifier.py
+    # email fetcher
+    killall python3 daemons/mail_fetcher.py
+
+### Using Supervisor
+
+#### Install supervisor
+
+    sudo apt install supervisor
+
+#### Configure supervisord.conf file
+
+example of supervisord.conf file
+
+    [supervisord]
+    ; You need to replace <PATH> with correct absolute path
+
+    ; email notifier (if async email notification is enabled)
+    [program:tracim_mail_notifier]
+    directory=<PATH>/tracim_v2/backend/
+    command=<PATH>/tracim_v2/backend/env/bin/python <PATH>/tracim_v2/backend/daemons/mail_notifier.py
+    stdout_logfile =/tmp/mail_notifier.log
+    redirect_stderr=true
+    autostart=true
+    autorestart=true
+    environment=TRACIM_CONF_PATH=<PATH>/tracim_v2/backend/development.ini
+
+    ; email fetcher (if email reply is enabled)
+    [program:tracim_mail_fetcher]
+    directory=<PATH>/tracim_v2/backend/
+    command=<PATH>/tracim_v2/backend/env/bin/python <PATH>/tracim_v2/backend/daemons/mail_fetcher.py
+    stdout_logfile =/tmp/mail_fetcher.log
+    redirect_stderr=true
+    autostart=true
+    autorestart=true
+    environment=TRACIM_CONF_PATH=<PATH>/tracim_v2/backend/development.ini
+
+run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
+
+    supervisord
 
 ## Run Tests and others checks ##
 

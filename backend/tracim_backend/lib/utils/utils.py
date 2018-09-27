@@ -7,6 +7,7 @@ import pytz
 from redis import Redis
 from rq import Queue
 import typing
+
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
