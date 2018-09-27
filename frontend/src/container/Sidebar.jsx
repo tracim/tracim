@@ -48,7 +48,7 @@ class Sidebar extends React.Component {
   }
 
   shouldDisplaySidebar = () => {
-    const pageWithoutSidebar = [PAGE.LOGIN]
+    const pageWithoutSidebar = [PAGE.LOGIN, PAGE.HOME]
     return !pageWithoutSidebar.includes(this.props.location.pathname)
   }
 

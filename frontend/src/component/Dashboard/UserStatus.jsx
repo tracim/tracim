@@ -36,8 +36,8 @@ export const UserStatus = props => {
 
         <div className='userstatus__notification__text ml-3'>
           {mySelf.doNotify
-            ? props.t("Subscribed")
-            : props.t("Unsubscribed")
+            ? props.t('Subscribed')
+            : props.t('Unsubscribed')
           }
         </div>
       </div>
