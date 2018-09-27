@@ -53,6 +53,10 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
         break
+      case 'disconnectedFromApi':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
+        break
     }
   }
 

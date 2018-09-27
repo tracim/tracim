@@ -17,6 +17,8 @@ export const libHandleFetchResult = async fetchResult => {
       }))
     case 204:
       return fetchResult
+    case 401:
+      GLOBAL_dispatchEvent({type: 'disconnectedFromApi', date: {}}) // no break/return to return the promise
     case 400:
     case 404:
     case 409:
