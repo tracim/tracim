@@ -7,6 +7,7 @@ import pytest
 import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import BadCommandError
+from tracim_backend.exceptions import NotificationDisabled
 from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.exceptions import GroupDoesNotExist
@@ -118,6 +119,22 @@ class TestCommands(CommandFunctionalTest):
                 '-c', 'tests_configs.ini#command_test',
                 '-l', 'admin@admin.admin',
                 '-p', 'new_password',
+                '--debug',
+            ])
+
+    def test_func__user_create_command__err__with_email_notification_disabled(self) -> None:  # nopep8
+        """
+        Test User creation with email with notification disable
+        """
+        app = TracimCLI()
+        with pytest.raises(NotificationDisabled):
+            app.run([
+                '--debug',
+                'user', 'create',
+                '-c', 'tests_configs.ini#command_test',
+                '-l', 'pof@pof.pof',
+                '-p', 'new_password',
+                '--send-email',
                 '--debug',
             ])
 

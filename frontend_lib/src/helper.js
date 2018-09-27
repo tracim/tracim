@@ -68,7 +68,7 @@ export const libGenerateAvatarFromPublicName = publicName => {
   return canvas.toDataURL('image/png', '')
 }
 
-export const libDisplayDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
+export const libDisplayDistanceDate = (dateToDisplay, lang) => distanceInWords(new Date(), dateToDisplay, {locale: dateFnsLocale[lang], addSuffix: true})
 
 export const libConvertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 

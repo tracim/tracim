@@ -52,7 +52,25 @@ class TestResetPasswordRequestEndpointMailSync(FunctionalTest):
         requests.delete('http://127.0.0.1:8025/api/v1/messages')
 
 
+class TestResetPasswordRequestEndpointMailDisabled(FunctionalTest):
+
+    fixtures = [BaseFixture]
+
+    def test_api__reset_password_request__ok__nominal_case(self):
+        requests.delete('http://127.0.0.1:8025/api/v1/messages')
+        params = {
+            'email': 'admin@admin.admin'
+        }
+        self.testapp.post_json(
+            '/api/v2/reset_password/request',
+            status=400,
+            params=params,
+        )
+
+
 class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
+    config_section = 'functional_test_with_mail_test_sync'
+
     def test_api__reset_password_check_token__ok_204__nominal_case(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \
@@ -102,6 +120,8 @@ class TestResetPasswordCheckTokenEndpoint(FunctionalTest):
 
 
 class TestResetPasswordModifyEndpoint(FunctionalTest):
+    config_section = 'functional_test_with_mail_test_sync'
+
     def test_api__reset_password_reset__ok_204__nominal_case(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \

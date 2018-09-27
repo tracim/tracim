@@ -62,10 +62,14 @@
     &__tr
       &:hover, &:nth-child(even):hover
         background-color grey-hover
+      &.user-deactivated
+        color #bbb
       &__td-link
         cursor pointer
         &:not(:hover)
           color inherit
+        & > i
+          margin-right 5px
 
 .adminworkspaceuser__popup
   .cardPopup__container

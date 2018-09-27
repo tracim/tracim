@@ -1,8 +1,8 @@
 @import "../../../node_modules/tracim_frontend_lib/src/css/Variable.styl"
 
 .memberlist
-  width calc(40% - 30px)
   margin-left 30px
+  width calc(40% - 30px)
   &__header
     display flex
     justify-content space-between
@@ -12,11 +12,14 @@
   &__wrapper
     position relative
     border 1px solid grey
+    background-color offWhite
   &__list
     margin 0
     padding 0
     list-style none
-    min-height 397px // 480 - 83px => 83px height of btn add member
+    min-height 477px
+    &.withAddBtn
+      min-height 397px
     &__item
       display flex
       border-bottom 1px solid grey
@@ -73,7 +76,7 @@
 @media (min-width: min-md) and (max-width: max-md)
 
   .memberlist
-    width 50%
+    width 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .memberlist

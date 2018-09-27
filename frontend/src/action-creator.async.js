@@ -58,7 +58,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       case 204:
         return ''
       case 401:
-        if (!document.location.href.includes('/login')) document.location.href = '/login?dc=1'
+        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
         return ''
       case 400:
       case 403:

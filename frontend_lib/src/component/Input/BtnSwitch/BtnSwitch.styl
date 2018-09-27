@@ -3,7 +3,6 @@
 .btnswitch
   display flex
   align-items center
-  width 140px
   &__text
     margin-left 10px
 
@@ -24,7 +23,6 @@
   left 0
   right 0
   bottom 0
-  background-color #ccc
   -webkit-transition .4s
   transition .4s
 
@@ -39,8 +37,8 @@
   -webkit-transition .4s
   transition .4s
 
-input:checked + .slider
-  background-color thirdColor
+.slider.defaultBg
+  background-color #ccc
 
 input:focus + .slider
   box-shadow 0 0 1px offWhite

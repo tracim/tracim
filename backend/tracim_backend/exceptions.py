@@ -115,7 +115,11 @@ class ExpiredResetPasswordToken(TracimException):
     error_code = ERROR_CODE_EXPIRED_RESET_PASSWORD_TOKEN
 
 
-class NotificationNotSend(TracimException):
+class NotificationSendingFailed(TracimException):
+    pass
+
+
+class NotificationDisabled(TracimException):
     pass
 
 
