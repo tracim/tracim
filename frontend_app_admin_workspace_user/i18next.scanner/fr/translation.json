@@ -26,5 +26,8 @@
   "User": "Utilisateur",
   "Choose the profile": "Choisir un profil",
   "Type the email": "Entrer l'email",
-  "There is no workspace yet": "Il n'y a pas encore d'espace de travail"
+  "There is no workspace yet": "Il n'y a pas encore d'espace de travail",
+  "Account deactivated": "Compte désactivé",
+  "Activated": "Activé",
+  "Deactivated": "Désactivé"
 }

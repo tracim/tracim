@@ -150,3 +150,25 @@ div.mce-fullscreen
       border 1px solid grey
       border-radius 10px
       padding 15px
+
+.notched // Côme - 2018/09/27 - this class requires a border-color to be defined (eg. with primaryColorBorder)
+  &::before
+    content ''
+    position absolute
+    width 28px
+    height 25px
+    border-style solid
+    top 0
+    right 0
+    border-width 6px 6px 0 0
+    border-color inherit
+  &::after
+    content ''
+    position absolute
+    width 28px
+    height 25px
+    border-style solid
+    bottom 0
+    left 0
+    border-width 0 0 6px 6px
+    border-color inherit

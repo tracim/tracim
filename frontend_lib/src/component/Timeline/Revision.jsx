@@ -24,7 +24,10 @@ const Revision = props => {
           {revisionType.label}
         </div>
 
-        <div className={classnames(`${props.customClass}__messagelist__version__date`, 'revision__date')}>
+        <div
+          className={classnames(`${props.customClass}__messagelist__version__date`, 'revision__date')}
+          title={props.createdFormated}
+        >
           {props.createdAt}
         </div>
       </li>

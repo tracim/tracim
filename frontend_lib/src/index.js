@@ -2,7 +2,7 @@ import {
   libAddAllResourceI18n,
   libHandleFetchResult,
   libGenerateAvatarFromPublicName,
-  libDisplayDate,
+  libDisplayDistanceDate,
   libConvertBackslashNToBr,
   libRevisionTypeList
 } from './helper.js'
@@ -39,7 +39,7 @@ export const libFrTranslation = require('../i18next.scanner/fr/translation.json'
 export const addAllResourceI18n = libAddAllResourceI18n
 export const handleFetchResult = libHandleFetchResult
 export const generateAvatarFromPublicName = libGenerateAvatarFromPublicName
-export const displayDate = libDisplayDate
+export const displayDistanceDate = libDisplayDistanceDate
 export const convertBackslashNToBr = libConvertBackslashNToBr
 export const revisionTypeList = libRevisionTypeList
 

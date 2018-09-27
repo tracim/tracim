@@ -33,13 +33,39 @@ export const ROLE = [{
   label: i18n.t('Reader')
 }]
 
+export const PROFILE = {
+  ADMINISTRATOR: {
+    id: 1,
+    slug: 'administrators',
+    faIcon: 'shield',
+    hexcolor: '#ed0007',
+    label: i18n.t('Administrator')
+  },
+  MANAGER: {
+    id: 2,
+    slug: 'trusted-users',
+    faIcon: 'graduation-cap',
+    hexcolor: '#f2af2d',
+    label: i18n.t('Trusted user')
+  },
+  USER: {
+    id: 4,
+    slug: 'users',
+    faIcon: 'user',
+    hexcolor: '#3145f7',
+    label: i18n.t('User')
+  }
+}
+
+export const getUserProfile = (profileObj, slug) => Object.keys(profileObj).map(p => profileObj[p]).find(p => slug === p.slug) || {}
+
 export const debug = {
   config: {
     label: 'Admin workspace user',
     slug: 'admin_workspace_user',
     faIcon: 'file-text-o',
     hexcolor: '#7d4e24',
-    type: 'workspace', // 'user' or 'workspace'
+    type: 'user', // 'user' or 'workspace'
     translation: {en: {}, fr: {}},
     apiUrl: 'http://localhost:6543/api/v2',
     apiHeader: {
