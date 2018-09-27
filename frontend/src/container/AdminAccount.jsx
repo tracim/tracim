@@ -5,9 +5,9 @@ import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 // import Calendar from '../component/Account/Calendar.jsx'
+// import Timezone from '../component/Account/Timezone.jsx'
 import Notification from '../component/Account/Notification.jsx'
 import Password from '../component/Account/Password.jsx'
-import Timezone from '../component/Account/Timezone.jsx'
 import {
   Delimiter,
   PageWrapper,
@@ -39,22 +39,18 @@ class Account extends React.Component {
       userToEditWorkspaceList: [],
       subComponentMenu: [{
         name: 'personalData',
-        menuLabel: props.t('My profil'),
         active: true
       }, {
         name: 'notification',
-        menuLabel: props.t('Workspaces and notifications'),
         active: false
       }, {
         name: 'password',
-        menuLabel: props.t('Password'),
-        active: false
-      }, {
-        name: 'timezone',
-        menuLabel: props.t('Timezone'),
         active: false
       }]
       // {
+      //   name: 'timezone',
+      //   active: false
+      // }, {
       //   name: 'calendar',
       //   menuLabel: 'Calendrier personnel',
       //   active: false
@@ -174,8 +170,9 @@ class Account extends React.Component {
 
     const fetchPutUserPassword = await props.dispatch(putUserPassword(state.userToEdit, oldPassword, newPassword, newPassword2))
     switch (fetchPutUserPassword.status) {
-      case 204: props.dispatch(newFlashMessage(props.t('Password has been changed'), 'info')); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning'))
+      case 204: props.dispatch(newFlashMessage(props.t('Password has been changed'), 'info')); return true
+      case 403: props.dispatch(newFlashMessage(props.t("Wrong administrator's password"), 'warning')); return false
+      default: props.dispatch(newFlashMessage(props.t('Error while changing password'), 'warning')); return false
     }
   }
 
@@ -202,8 +199,8 @@ class Account extends React.Component {
         case 'password':
           return <Password onClickSubmit={this.handleSubmitPassword} displayAdminInfo />
 
-        case 'timezone':
-          return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
+        // case 'timezone':
+        //   return <Timezone timezone={props.timezone} onChangeTimezone={this.handleChangeTimezone} />
       }
     })()
 
@@ -221,7 +218,7 @@ class Account extends React.Component {
 
           <div className='account__userpreference'>
             <MenuSubComponent
-              subMenuList={state.subComponentMenu}
+              activeSubMenu={state.subComponentMenu.find(scm => scm.active) || {name: ''}}
               onClickMenuItem={this.handleClickSubComponentMenuItem}
             />
 

@@ -14,7 +14,7 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
-  displayDate
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 import { MODE, displayFileSize, debug } from '../helper.js'
 import {
@@ -107,7 +107,10 @@ class File extends React.Component {
 
     if (!prevState.content || !state.content) return
 
-    if (prevState.content.content_id !== state.content.content_id) this.loadContent()
+    if (prevState.content.content_id !== state.content.content_id) {
+      this.loadContent()
+      this.loadTimeline()
+    }
 
     if (state.mode === MODE.EDIT && prevState.mode !== state.mode) {
       tinymce.remove('#wysiwygNewVersion')
@@ -166,7 +169,8 @@ class File extends React.Component {
 
     const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
       ...c,
-      created: displayDate(c.created, loggedUser.lang),
+      created_raw: c.created,
+      created: displayDistanceDate(c.created, loggedUser.lang),
       author: {
         ...c.author,
         avatar_url: c.author.avatar_url ? c.author.avatar_url : generateAvatarFromPublicName(c.author.public_name)
@@ -176,7 +180,8 @@ class File extends React.Component {
     const revisionWithComment = resRevision.body
       .map((r, i) => ({
         ...r,
-        created: displayDate(r.created, loggedUser.lang),
+        created_raw: r.created,
+        created: displayDistanceDate(r.created, loggedUser.lang),
         timelineType: 'revision',
         commentList: r.comment_ids.map(ci => ({
           timelineType: 'comment',
@@ -289,7 +294,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while archiving document'))
     }
   }
@@ -299,7 +307,10 @@ class File extends React.Component {
 
     const fetchResultArchive = await putFileIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
     }
   }
@@ -309,7 +320,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
@@ -319,7 +333,10 @@ class File extends React.Component {
 
     const fetchResultRestore = await putFileRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadTimeline()
+        break
       default: this.sendGlobalFlashMessage(this.props.t('Error while restoring document'))
     }
   }
@@ -474,7 +491,7 @@ class File extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: state.config.hexcolor, color: '#fdfdfd'}}
                 >
-                  <i className='fa fa-code-fork' />
+                  <i className='fa fa-history' />
                   {props.t('Last version')}
                 </button>
               }
@@ -509,6 +526,7 @@ class File extends React.Component {
           <FileComponent
             mode={state.mode}
             customColor={state.config.hexcolor}
+            loggedUser={state.loggedUser}
             previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
             fileSize={displayFileSize(state.content.size)}
             filePageNb={state.content.page_nb}

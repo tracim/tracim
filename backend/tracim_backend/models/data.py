@@ -887,8 +887,7 @@ class Content(DeclarativeBase):
     @file_name.setter
     def file_name(self, value: str) -> None:
         file_name, file_extension = os.path.splitext(value)
-        if not self.revision.label:
-            self.revision.label = file_name
+        self.revision.label = file_name
         self.revision.file_extension = file_extension
 
     @file_name.expression

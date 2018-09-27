@@ -9,17 +9,41 @@ export class Password extends React.Component {
     this.state = {
       oldPassword: '',
       newPassword: '',
-      newPassword2: ''
+      newPassword2: '',
+      checkAdminPassword: ''
     }
   }
 
-  handleChangeOldPassword = e => this.setState({oldPassword: e.target.value})
+  handleChangeOldPassword = e => {
+    const { props } = this
+    if (e.target.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
+      return
+    }
+    this.setState({oldPassword: e.target.value})
+  }
 
-  handleChangeNewPassword = e => this.setState({newPassword: e.target.value})
+  handleChangeNewPassword = e => {
+    const { props } = this
+    if (e.target.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
+      return
+    }
+    this.setState({newPassword: e.target.value})
+  }
 
-  handleChangeNewPassword2 = e => this.setState({newPassword2: e.target.value})
+  handleChangeNewPassword2 = e => {
+    const { props } = this
+    if (e.target.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('Password cannot exceed 512 characters')))
+      return
+    }
+    this.setState({newPassword2: e.target.value})
+  }
 
-  handleClickSubmit = () => {
+  handleChangeCheckAdminPassword = e => this.setState({checkAdminPassword: e.target.value})
+
+  handleClickSubmit = async () => {
     const { props, state } = this
 
     if (state.newPassword.length < 6) {
@@ -37,7 +61,14 @@ export class Password extends React.Component {
       return
     }
 
-    props.onClickSubmit(state.oldPassword, state.newPassword, state.newPassword2)
+    const validationPassword = props.displayAdminInfo ? state.checkAdminPassword : state.oldPassword
+
+    await props.onClickSubmit(validationPassword, state.newPassword, state.newPassword2) && this.setState({
+      oldPassword: '',
+      newPassword: '',
+      newPassword2: '',
+      checkAdminPassword: ''
+    })
   }
 
   isSubmitDisabled = () => {
@@ -65,8 +96,9 @@ export class Password extends React.Component {
                 className='personaldata__form__txtinput primaryColorBorderLighten form-control'
                 type='password'
                 placeholder={props.t('Old password')}
+                value={state.oldPassword}
                 onChange={this.handleChangeOldPassword}
-                maxLength={512}
+                maxLength={513}
               />
             </div>
           )}
@@ -76,8 +108,9 @@ export class Password extends React.Component {
               className='personaldata__form__txtinput primaryColorBorderLighten form-control'
               type='password'
               placeholder={props.t('New password')}
+              value={state.newPassword}
               onChange={this.handleChangeNewPassword}
-              maxLength={512}
+              maxLength={513}
             />
           </div>
 
@@ -86,8 +119,9 @@ export class Password extends React.Component {
               className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
               type='password'
               placeholder={props.t('Repeat new password')}
+              value={state.newPassword2}
               onChange={this.handleChangeNewPassword2}
-              maxLength={512}
+              maxLength={513}
             />
 
             {props.displayAdminInfo && (
@@ -95,7 +129,8 @@ export class Password extends React.Component {
                 className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
                 type='password'
                 placeholder={props.t("Administrator's password")}
-                onChange={this.handleChangeCheckPassword}
+                value={state.checkAdminPassword}
+                onChange={this.handleChangeCheckAdminPassword}
                 disabled={state.newPassword === '' && state.newPassword2 === ''}
               />
             )}

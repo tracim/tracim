@@ -20,8 +20,8 @@ const NewVersionBtn = props => {
         }
       }}
     >
+      <i className='fa fa-plus-circle mr-3' />
       {props.t('Edit')}
-      <i className='fa fa-plus-circle ml-3' />
     </button>
   )
 }

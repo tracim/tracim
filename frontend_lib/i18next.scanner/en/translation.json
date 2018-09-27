@@ -20,14 +20,14 @@
   "inactive": "inactive",
   "No result": "No result",
   "Status": "Status",
-  "Archived": "Archived",
   "Comment": "Comment",
-  "Created": "Created",
-  "Deleted": "Deleted",
-  "Edited": "Edited",
-  "Status updated": "Status updated",
-  "Unarchived": "Unarchived",
-  "Restored": "Restored",
-  "Moved": "Moved",
-  "Copied": "Copied"
+  "Item created": "Item created",
+  "Item deleted": "Item deleted",
+  "New revision": "New revision",
+  "New status": "New status",
+  "Item unarchived": "Item unarchived",
+  "Item restored": "Item restored",
+  "Item moved": "Item moved",
+  "Item copied": "Item copied",
+  "Item archived": "Item archived"
 }

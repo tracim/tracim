@@ -12,12 +12,15 @@ export class PreviewComponent extends React.Component {
     super(props)
     this.state = {
       displayFormNewDescription: false,
-      newDescription: props.description,
+      newDescription: '',
       displayLightbox: false
     }
   }
 
-  handleToggleFormNewDescription = () => this.setState(prev => ({displayFormNewDescription: !prev.displayFormNewDescription}))
+  handleToggleFormNewDescription = () => this.setState(prev => ({
+    displayFormNewDescription: !prev.displayFormNewDescription,
+    newDescription: this.props.description
+  }))
 
   handleChangeDescription = e => this.setState({newDescription: e.target.value})
 
@@ -174,7 +177,7 @@ export class PreviewComponent extends React.Component {
                 }
               </div>
 
-              {!state.displayFormNewDescription &&
+              {props.displayChangeDescriptionBtn && !state.displayFormNewDescription &&
                 <button
                   type='button'
                   className='previewcomponent__property__content__detail__btndesc btn outlineTextBtn'

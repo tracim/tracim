@@ -71,11 +71,11 @@ const AdminWorkspace = props =>
               ))
               : (
                 <tr>
-                  <td></td>
+                  <td />
                   <td>{props.t('There is no workspace yet')}</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td />
+                  <td />
+                  <td />
                 </tr>
               )
             }

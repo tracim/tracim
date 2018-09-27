@@ -45,7 +45,7 @@ class Login extends React.Component {
   componentDidMount () {
     const { props } = this
     const query = qs.parse(props.location.search)
-    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login', 'warning')))
+    if (query.dc && query.dc === '1') props.dispatch(newFlashMessage(props.t('You have been disconnected, please login again', 'warning')))
   }
 
   handleChangeLogin = e => this.setState({inputLogin: {...this.state.inputLogin, value: e.target.value}})
@@ -56,7 +56,7 @@ class Login extends React.Component {
     this.setState(prev => ({inputRememberMe: !prev.inputRememberMe}))
   }
 
-  handleInputKeyPress = e => e.key === 'Enter' && this.handleClickSubmit()
+  handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
   handleClickSubmit = async () => {
     const { history, dispatch, t } = this.props
@@ -142,7 +142,7 @@ class Login extends React.Component {
                         isInvalid={this.state.inputLogin.isInvalid}
                         value={this.state.inputLogin.value}
                         onChange={this.handleChangeLogin}
-                        onKeyPress={this.handleInputKeyPress}
+                        onKeyDown={this.handleInputKeyDown}
                         maxLength={512}
                       />
 
@@ -156,7 +156,7 @@ class Login extends React.Component {
                         isInvalid={this.state.inputPassword.isInvalid}
                         value={this.state.inputPassword.value}
                         onChange={this.handleChangePassword}
-                        onKeyPress={this.handleInputKeyPress}
+                        onKeyDown={this.handleInputKeyDown}
                         maxLength={512}
                       />
 

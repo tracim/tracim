@@ -44,6 +44,7 @@ function setup_pyenv {
 }
 
 function install_backend_python_packages {
+    log "install pip and setuptools"
     pip install --upgrade pip setuptools && loggood "success" || logerror "some error"
 
     log "install tracim-backend (sqlite_backend)..."
@@ -66,9 +67,20 @@ function setup_config_file {
        log "generate missing color.json ..."
        cp ../color.json.sample ../color.json && loggood "success" || logerror "some error"
     fi
+
+    if [ -d "$DEFAULTDIR/backend/sessions_data/" ]; then
+        log "remove folder \"sessions_data\" in \"$DEFAULTDIR/backend\" if exist"
+        rm -R $DEFAULTDIR/backend/sessions_data/ && loggood "success" || logerror "some error"
+    fi
+
+    if [ -d "$DEFAULTDIR/backend/sessions_lock/" ]; then
+        log "remove folder \"sessions_lock\" in \"$DEFAULTDIR/backend\" if exist"
+        rm -R $DEFAULTDIR/backend/sessions_lock/ && loggood "success" || logerror "some error"
+    fi
 }
 
 function setup_db {
+    log "check if bdd exist"
     result=$(alembic -c development.ini current)
     if [ $? -eq 0 ] && [ ! "$result" == '' ]; then
        log "check database migration..."
@@ -78,6 +90,36 @@ function setup_db {
        tracimcli db init && loggood "success" || logerror "some error"
        alembic -c development.ini stamp head && loggood "success" || logerror "some error"
     fi
+}
+
+function install_nodejs {
+    log "verify if nodjs is installed"
+    dpkg -l | grep '^ii' | grep 'nodejs\s'
+
+    if [ $? -eq 0 ]; then
+        loggood "nodjs is installed"
+    else
+        log "install nodejs"
+        $SUDO apt install -y curl && loggood "success" || logerror "some error"
+        curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
+        $SUDO apt update
+        $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
+        log "verify if nodjs 8.x is now installed"
+        dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
+        if [ $? -eq 0 ]; then
+            loggood "nodjs 8.x is installed"
+        else
+            logerror "nodejs 8.x is not installed"
+            exit 1
+        fi
+    fi
+
+}
+
+function translate_email {
+    log "translate email"
+    $SUDO npm install i18next-conv -g && loggood "success" || logerror "some error"
+    ./update_i18n_json_file.sh
 }
 
 ############################################
@@ -91,8 +133,9 @@ fi
 
 DEFAULTDIR=$(pwd)
 export DEFAULTDIR
-echo "This is DEFAULTDIR \"$DEFAULTDIR\""
+log "This is DEFAULTDIR of tracim_v2 => \"$DEFAULTDIR\""
 
+install_nodejs
 log "go to backend subdir.."
 cd $DEFAULTDIR/backend  || exit 1
 install_backend_system_dep
@@ -100,6 +143,7 @@ setup_pyenv
 install_backend_python_packages
 setup_config_file
 setup_db
+translate_email
 loggood "backend of tracim was correctly set-up."
 
 

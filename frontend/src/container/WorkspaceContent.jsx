@@ -51,21 +51,22 @@ class WorkspaceContent extends React.Component {
   }
 
   customEventReducer = async ({ detail: { type, data } }) => {
+    const { props, state } = this
     switch (type) {
       case 'refreshContentList':
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        this.loadContentList(this.state.workspaceIdInUrl)
+        this.loadContentList(state.workspaceIdInUrl)
         break
 
       case 'openContentUrl':
         console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data)
-        this.props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent))
+        props.history.push(PAGE.WORKSPACE.CONTENT(data.idWorkspace, data.contentType, data.idContent))
         break
 
       case 'appClosed':
       case 'hide_popupCreateContent':
-        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, this.state.workspaceIdInUrl)
-        this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(this.state.workspaceIdInUrl))
+        console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', type, data, state.workspaceIdInUrl)
+        props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + props.location.search)
         this.setState({appOpenedType: false})
         break
     }

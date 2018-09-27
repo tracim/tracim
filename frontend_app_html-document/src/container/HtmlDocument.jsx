@@ -14,7 +14,7 @@ import {
   NewVersionBtn,
   ArchiveDeleteContent,
   SelectStatus,
-  displayDate
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 import { MODE, debug } from '../helper.js'
 import {
@@ -134,7 +134,8 @@ class HtmlDocument extends React.Component {
       .then(([resComment, resRevision]) => {
         const resCommentWithProperDateAndAvatar = resComment.body.map(c => ({
           ...c,
-          created: displayDate(c.created, loggedUser.lang),
+          created_raw: c.created,
+          created: displayDistanceDate(c.created, loggedUser.lang),
           author: {
             ...c.author,
             avatar_url: c.author.avatar_url
@@ -146,7 +147,8 @@ class HtmlDocument extends React.Component {
         const revisionWithComment = resRevision.body
           .map((r, i) => ({
             ...r,
-            created: displayDate(r.created, loggedUser.lang),
+            created_raw: r.created,
+            created: displayDistanceDate(r.created, loggedUser.lang),
             timelineType: 'revision',
             commentList: r.comment_ids.map(ci => ({
               timelineType: 'comment',
@@ -281,7 +283,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: true}, mode: MODE.VIEW}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -298,7 +303,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultArchive = await putHtmlDocIsDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultArchive.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: true}, mode: MODE.VIEW}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -315,7 +323,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultRestore = await putHtmlDocRestoreArchived(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_archived: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_archived: false}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -332,7 +343,10 @@ class HtmlDocument extends React.Component {
 
     const fetchResultRestore = await putHtmlDocRestoreDeleted(config.apiUrl, content.workspace_id, content.content_id)
     switch (fetchResultRestore.status) {
-      case 204: this.setState(prev => ({content: {...prev.content, is_deleted: false}})); break
+      case 204:
+        this.setState(prev => ({content: {...prev.content, is_deleted: false}}))
+        this.loadContent()
+        break
       default: GLOBAL_dispatchEvent({
         type: 'addFlashMsg',
         data: {
@@ -419,7 +433,7 @@ class HtmlDocument extends React.Component {
                   onClick={this.handleClickLastVersion}
                   style={{backgroundColor: config.hexcolor, color: '#fdfdfd'}}
                 >
-                  <i className='fa fa-code-fork' />
+                  <i className='fa fa-history' />
                   {t('Last version')}
                 </button>
               }
