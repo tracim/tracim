@@ -2,38 +2,32 @@ describe('content :: workspace > dashbord', function () {
     before(function () {
         //login
         cy.visit('/login')
+        cy.get('input[type=email]').should('be.visible')
         cy.get('input[type=email]').type('admin@admin.admin')
         cy.get('input[type=password]').type('admin@admin.admin')
         cy.get('form').find('button').get('.connection__form__btnsubmit').click()
         cy.url().should('include', '/workspaces/1/dashboard')
     })
+    after(function() {
+        cy.get('#dropdownMenuButton').click()
+        cy.get('div.setting__link').click()
+        cy.url().should('include', '/login')
+    })
     it ('part of dashbord', function () {
         cy.get('.dashboard.pageWrapperGeneric').should('be.visible')
         cy.get('.dashboard__header.pageTitleGeneric').should('be.visible')
         cy.get('.dashboard .pageContentGeneric').should('be.visible')
-        cy.get('.pageContentGeneric .dashboard__workspace-wrapper').should('be.visible')
-        cy.get('.pageContentGeneric .dashboard__calltoaction').should('be.visible')
-        cy.get('.pageContentGeneric .dashboard__workspaceInfo').should('be.visible')
-        cy.get('.dashboard__workspaceInfo .activity').should('be.visible')
-        cy.get('.dashboard__workspaceInfo .memberlist').should('be.visible')
     })
-    it ('header', function() {
+    it ('dashboard__header__title', function() {
         cy.get('.pageTitleGeneric .dashboard__header__title').should('be.visible')
         cy.get('.pageTitleGeneric .dashboard__header__advancedmode').should('be.visible')
         cy.get('.pageTitleGeneric .dashboard__header__advancedmode__button').should('have.attr', 'type', 'button').should('be.visible')
     })
-    it ('workspace-wrapper', function() {
-        cy.get('.dashboard__workspace-wrapper .dashboard__workspace').should('be.visible')
-        cy.get('.pageContentGeneric .dashboard__workspace__title').should('be.visible')
-        // @FIXME need to make description first @philippe 14/09/2018
-        // cy.get('.dashboard__workspace .dashboard__workspace__detail').should('be.visible')
-        cy.get('.dashboard__workspace-wrapper .userstatus').should('be.visible')
-        cy.get('.userstatus .userstatus__role__msg').should('be.visible')
-        cy.get('.userstatus .userstatus__role__definition').should('be.visible')
-        cy.get('.userstatus .userstatus__notification__text').should('be.visible')
-        cy.get('.userstatus .userstatus__notification__btn').should('be.visible')
+    it ('dashboard__workspace > dashboard__workspace__detail', function() {
+        cy.get('.pageContentGeneric .dashboard__workspace__detail__title').should('be.visible')
+        cy.get('.pageContentGeneric .dashboard__workspace__detail__description').should('not.be.visible')
     })
-    it ('calltoaction', function() {
+    it ('dashboard__workspace > calltoaction', function() {
         cy.get('.dashboard__calltoaction').should('be.visible')
         cy.get('.dashboard__calltoaction > div:nth-child(1)').should('be.visible')
         cy.get('.dashboard__calltoaction > div:nth-child(1) .dashboard__calltoaction__button__text__icon').should('be.visible')
@@ -48,22 +42,37 @@ describe('content :: workspace > dashbord', function () {
         cy.get('.dashboard__calltoaction__button i.fa-paperclip').should('be.visible')
         cy.get('.dashboard__calltoaction__button i.fa-file-text-o').should('be.visible')
     })
-    it ('activity', function() {
+    it ('dashboard__workspace > userstatus', function() {
+        cy.get('.dashboard__workspace .userstatus').should('be.visible')
+        cy.get('.userstatus .userstatus__username').should('be.visible')
+        cy.get('.userstatus .userstatus__role').should('be.visible')
+        cy.get('.userstatus .userstatus__notification').should('be.visible')
+        cy.get('.userstatus .userstatus__notification__icon').should('be.visible')
+        cy.get('.userstatus .userstatus__notification__icon .fa-envelope-open-o').should('be.visible')
+        cy.get('.userstatus .userstatus__notification__text').should('be.visible')
+    })
+    it ('dashboard__workspaceInfo > activity', function() {
         cy.get('.activity .activity__header__title').should('be.visible')
         cy.get('.activity .activity__header__allread').should('be.visible')
         cy.get('.activity .activity__wrapper').should('be.visible')
-        // @FIXME make better solution to test more_button without activity @philippe 14/09/2018
-        // cy.get('.activity .activity__more__btn').should('be.visible')
+        cy.get('.activity .activity__wrapper .activity__empty').should('be.visible')
+        cy.get('.activity .activity__wrapper .activity__more__btn').should('have.attr', 'type', 'button').should('not.be.visible')
     })
-    it ('members', function() {
-        cy.get('.memberlist .memberlist__header.subTitle').should('be.visible')
+    it ('dashboard__workspaceInfo > memberlist', function() {
         cy.get('.memberlist .memberlist__list').should('be.visible')
+        cy.get('.memberlist .memberlist__header.subTitle').should('be.visible')
+        cy.get('.memberlist .memberlist__wrapper').should('be.visible')
+        cy.get('.memberlist .memberlist__list.withAddBtn').should('be.visible')
+        cy.get('.memberlist .memberlist__btnadd').should('be.visible')
         cy.get('.memberlist .memberlist__list__item').should('be.visible')
         cy.get('.memberlist .memberlist__list__item__avatar').should('be.visible')
         cy.get('.memberlist .memberlist__list__item__info').should('be.visible')
+        cy.get('.memberlist .memberlist__list__item__info__name').should('be.visible')
+        cy.get('.memberlist .memberlist__list__item__info__role').should('be.visible')
         cy.get('.memberlist .memberlist__list__item__delete').should('be.visible')
-        cy.get('.memberlist .memberlist__btnadd').should('be.visible')
+        cy.get('.memberlist .fa-trash-o').should('be.visible')
     })
+//    Not implemented in Tracim_V2.0
 //    it ('link_webdav', function() {
 //        cy.get('.moreinfo .moreinfo__webdav').should('be.visible')
 //        cy.get('.moreinfo .moreinfo__webdav__btn').should('be.visible')
@@ -77,6 +86,4 @@ describe('content :: workspace > dashbord', function () {
 //        cy.get('.moreinfo moreinfo__calendar__btn__icon').should('be.visible')
 //        cy.get('.moreinfo moreinfo__calendar__btn__text').should('be.visible')
 //    })
-
-
 })
