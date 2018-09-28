@@ -51,7 +51,6 @@
   "Open advanced Dashboard": "Open advanced Dashboard",
   "Error while saving new lang": "Error while saving new lang",
   "Disconnection error": "Disconnection error",
-  "Welcome on Tracim": "Welcome on Tracim",
   "Thank you for trusting us and using our collaborative tool": "Thank you for trusting us and using our collaborative tool",
   "You will create your first shared space": "You will create your first shared space",
   "create a shared space": "create a shared space",
@@ -130,5 +129,8 @@
   "Logout": "Logout",
   "Archive Topic": "Archive Topic",
   "Deleted File": "Deleted File",
-  "Search...": "Search..."
+  "Search...": "Search...",
+  "Welcome to Tracim": "Welcome to Tracim",
+  "You aren't member of any shared space yet": "You aren't member of any shared space yet",
+  "Please refer to an administrator or a trusted user": "Please refer to an administrator or a trusted user"
 }

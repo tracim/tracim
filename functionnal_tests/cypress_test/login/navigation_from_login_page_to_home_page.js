@@ -2,7 +2,13 @@ describe('logging in tracim', function () {
     before(function () {
         cy.visit('/login')
     })
+    after(function() {
+        cy.get('#dropdownMenuButton').click()
+        cy.get('div.setting__link').click()
+        cy.url().should('include', '/login')
+    })
     it('', function () {
+        cy.get('input[type=email]').should('be.visible')
         cy.get('input[type=email]').type('admin@admin.admin').should('have.value','admin@admin.admin')
         cy.get('input[type=password]').type('admin@admin.admin').should('have.value','admin@admin.admin')
         cy.get('form').find('button').get('.connection__form__btnsubmit').click()

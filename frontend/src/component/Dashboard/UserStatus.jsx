@@ -17,11 +17,11 @@ export const UserStatus = props => {
       <div className='userstatus__role'>
         <div className='d-flex align-items-center'>
           <div className='userstatus__role__icon'>
-            <i className={`fa fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
+            <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
           </div>
 
           <div
-            className='userstatus__role__text'
+            className='userstatus__role__text ml-3'
             title={props.t('your role in the shared space')}
             style={{color: myRole.hexcolor}}
           >

@@ -1,11 +1,17 @@
 describe('content :: account', function () {
     before(function () {
         cy.visit('/login')
+        cy.get('input[type=email]').should('be.visible')
         cy.get('input[type=email]').type('admin@admin.admin')
         cy.get('input[type=password]').type('admin@admin.admin')
         cy.get('form').find('button').get('.connection__form__btnsubmit').click()
         cy.get('#dropdownMenuButton').click()
         cy.get('a.setting__link[href="/account"]').click()
+    })
+    after(function() {
+        cy.get('#dropdownMenuButton').click()
+        cy.get('div.setting__link').click()
+        cy.url().should('include', '/login')
     })
     it('content :: account exist', function () {
         cy.get('.account__title').should('be.visible')
@@ -70,4 +76,5 @@ describe('content :: account', function () {
 //        cy.get('.calendar__title').should('be.visible')
 //        cy.get('.calendar__link').should('be.visible')
 //    })
+
 })
