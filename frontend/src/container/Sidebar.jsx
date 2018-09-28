@@ -10,15 +10,11 @@ import {
 } from '../action-creator.sync.js'
 import { PAGE, workspaceConfig, getUserProfile } from '../helper.js'
 
-const qs = require('query-string')
-
 class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      sidebarClose: false,
-      workspaceListLoaded: false,
-      workspaceIdInUrl: props.match && props.match.params.idws ? parseInt(props.match.params.idws) : null
+      sidebarClose: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -36,10 +32,12 @@ class Sidebar extends React.Component {
 
     if (!this.shouldDisplaySidebar()) return
 
-    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
-    if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) {
-      const newWorkspaceId = parseInt(props.match.params.idws)
-      if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
+    if (
+      props.match.params &&
+      props.match.params.idws &&
+      props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined
+    ) {
+      props.dispatch(setWorkspaceListIsOpenInSidebar(parseInt(props.match.params.idws), true))
     }
   }
 
@@ -61,7 +59,7 @@ class Sidebar extends React.Component {
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   render () {
-    const { sidebarClose, workspaceIdInUrl } = this.state
+    const { sidebarClose } = this.state
     const { user, activeLang, workspaceList, t } = this.props
 
     if (!this.shouldDisplaySidebar()) return null
@@ -81,7 +79,7 @@ class Sidebar extends React.Component {
                   label={ws.label}
                   allowedApp={ws.sidebarEntry}
                   lang={activeLang}
-                  activeFilterList={ws.id === workspaceIdInUrl ? [qs.parse(this.props.location.search).type] : []}
+                  activeFilterList={[]} // @fixme
                   isOpenInSidebar={ws.isOpenInSidebar}
                   onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
                   onClickAllContent={this.handleClickAllContent}
@@ -116,9 +114,10 @@ class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, workspaceList }) => ({
+const mapStateToProps = ({ lang, user, workspaceList, system }) => ({
   activeLang: lang.find(l => l.active) || {id: 'en'},
   user,
-  workspaceList
+  workspaceList,
+  system
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))

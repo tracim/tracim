@@ -106,13 +106,7 @@ class Tracim extends React.Component {
 
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
-      const idWorkspaceToOpen = (() => {
-        if (idOpenInSidebar) return idOpenInSidebar
-        if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) return parseInt(props.match.params.idws)
-        return fetchGetWorkspaceList.json.length > 0 ? fetchGetWorkspaceList.json[0].workspace_id : null
-      })()
-
-      idWorkspaceToOpen && props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
+      idOpenInSidebar && props.dispatch(setWorkspaceListIsOpenInSidebar(idOpenInSidebar, true))
     }
   }
 
@@ -139,7 +133,12 @@ class Tracim extends React.Component {
         <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
 
         <div className='sidebarpagecontainer'>
-          <Sidebar />
+          <Route
+            // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
+            // able to access props.match.params.idws
+            // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
+            path='/:first?/:idws?/*' render={() => <Sidebar />}
+          />
 
           <div className='tracim__content'>
             <Route path={PAGE.LOGIN} component={Login} />
