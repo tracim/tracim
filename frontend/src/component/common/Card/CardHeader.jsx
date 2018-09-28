@@ -4,7 +4,10 @@ import classnames from 'classnames'
 
 const CardHeader = props => {
   return (
-    <div className={classnames('card-header', props.customClass)}>
+    <div
+      className={classnames('card-header', props.customClass)}
+      style={props.displayHeader ? undefined : {display: 'none'}}
+    >
       {props.children}
     </div>
   )
@@ -16,10 +19,12 @@ CardHeader.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.element,
     PropTypes.string
-  ]).isRequired,
+  ]),
+  displayHeader: PropTypes.bool,
   customClass: PropTypes.string
 }
 
 CardHeader.defaultProps = {
-  customClass: ''
+  customClass: '',
+  displayHeader: true
 }

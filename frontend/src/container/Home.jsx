@@ -1,34 +1,67 @@
-import React, { Component } from 'react'
+import React from 'react'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import appFactory from '../appFactory.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
-import LogoHomepage from '../img/logoHeader.svg'
+import logoHeader from '../img/logo-tracim.png'
 import { translate } from 'react-i18next'
+import { workspaceConfig } from '../helper.js'
 
-class Home extends Component {
+class Home extends React.Component {
+  handleClickCreateWorkspace = e => {
+    e.preventDefault()
+    const { props } = this
+    props.renderAppPopupCreation(workspaceConfig, props.user, null, null)
+  }
+
   render () {
+    const { props } = this
+
     return (
-      <section className='homepage'>
+      <section className='homepage primaryColorBg'>
         <div className='container-fluid nopadding'>
           <Card customClass='homepagecard'>
-            <CardHeader /> {/* @TODO fix architecture of this component */}
+            <CardHeader displayHeader={false} />
+
             <CardBody customClass='homepagecard'>
               <div>
-                <div className='homepagecard__title text-center my-4'>
-                  {this.props.t('Welcome on Tracim')}
+                <div className='homepagecard__title primaryColorFont'>
+                  {props.t('Welcome to Tracim')}
                 </div>
-                <div className='homepagecard__thanks text-center'>
-                  {this.props.t('Thank you for trusting us and using our collaborative tool')}
+
+                <div className='homepagecard__thanks'>
+                  {props.t('Thank you for trusting us and using our collaborative tool')}
                 </div>
-                <div className='homepagecard__delimiter delimiter' />
-                <div className='homepagecard__text text-center mb-5'>
-                  {this.props.t('You will create your first workspace')}
+
+                <div className='homepagecard__delimiter delimiter primaryColorBg' />
+
+                <div className='homepagecard__text'>
+                  {props.canCreateWorkspace
+                    ? props.t('You will create your first shared space')
+                    : (
+                      <div className='homepagecard__text__user'>
+                        <div className='homepagecard__text__user__top'>
+                          {props.t("You aren't member of any shared space yet")}
+                        </div>
+                        <div>{props.t('Please refer to an administrator or a trusted user')}</div>
+                      </div>
+                    )
+                  }
                 </div>
-                <div className='homepagecard__btn btn btn-outline-primary'>
-                  {this.props.t('create a workspace')}
-                </div>
-                <div className='homepagecard__logo mt-5 mb-3'>
-                  <img src={LogoHomepage} alt='logo homepage' />
+
+                {props.canCreateWorkspace && (
+                  <button
+                    className='homepagecard__btn btn highlightBtn primaryColorBg'
+                    onClick={this.handleClickCreateWorkspace}
+                  >
+                    {props.t('create a shared space')}
+                  </button>
+                )}
+
+                <div className='homepagecard__logo'>
+                  <img src={logoHeader} alt='logo homepage' />
                 </div>
               </div>
             </CardBody>
@@ -39,4 +72,5 @@ class Home extends Component {
   }
 }
 
-export default translate()(Home)
+const mapStateToProps = ({ user }) => ({ user })
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(Home))))

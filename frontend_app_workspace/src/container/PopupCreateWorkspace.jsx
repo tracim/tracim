@@ -13,7 +13,7 @@ const debug = { // outdated
     slug: 'workspace',
     faIcon: 'bank',
     hexcolor: '#7d4e24',
-    creationLabel: 'Create a workspace',
+    creationLabel: 'Create a shared space',
     domContainer: 'appFeatureContainer',
     apiUrl: 'http://localhost:6543',
     apiHeader: {
@@ -111,12 +111,12 @@ class PopupCreateWorkspace extends React.Component {
         customColor={state.config.hexcolor}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={props.t('New workspace')}
+        label={props.t('New shared space')}
         faIcon={state.config.faIcon}
         contentName={state.newWorkspaceName}
         onChangeContentName={this.handleChangeNewWorkspaceName}
         btnValidateLabel={props.t('Validate and create')}
-        inputPlaceholder={props.t("Workspace's name")}
+        inputPlaceholder={props.t("Shared space's name")}
       />
     )
   }

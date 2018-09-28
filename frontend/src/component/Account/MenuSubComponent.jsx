@@ -32,7 +32,7 @@ export const MenuSubComponent = props => {
           onClick={() => props.onClickMenuItem('notification')}
           key={'notification'}
         >
-          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Workspaces and notifications')}</div>
+          <div className='menusubcomponent__list__item__link nav-link'>{props.t('Shared spaces and notifications')}</div>
         </li>
 
         <li

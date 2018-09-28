@@ -25,11 +25,35 @@ from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.app_models.contents import CONTENT_TYPES
 
 
+class AboutModel(object):
+
+    def __init__(
+        self,
+        name: str,
+        version: typing.Optional[str],
+        datetime: datetime,
+        website: str,
+    ):
+        self.name = name
+        self.version = version
+        self.datetime = datetime
+        self.website = website
+
+
+class ConfigModel(object):
+
+    def __init__(
+        self,
+        email_notification_activated: bool
+    ):
+        self.email_notification_activated = email_notification_activated
+
+
 class PreviewAllowedDim(object):
 
     def __init__(
             self,
-            restricted:bool,
+            restricted: bool,
             dimensions: typing.List[PreviewDim]
     ) -> None:
         self.restricted = restricted
@@ -280,6 +304,7 @@ class ContentFilter(object):
             show_deleted: int = 0,
             show_active: int = 1,
             content_type: str = None,
+            label: str = None,
             offset: int = None,
             limit: int = None,
     ) -> None:
@@ -290,6 +315,7 @@ class ContentFilter(object):
         self.show_active = bool(show_active)
         self.limit = limit
         self.offset = offset
+        self.label = label
         self.content_type = content_type
 
 
@@ -328,9 +354,9 @@ class WorkspaceMemberInvitation(object):
     """
     def __init__(
         self,
-        user_id: int,
-        user_email_or_public_name: str,
-        role: str,
+        user_id: int = None,
+        user_email_or_public_name: str = None,
+        role: str = None,
     ):
         self.role = role
         self.user_email_or_public_name = user_email_or_public_name

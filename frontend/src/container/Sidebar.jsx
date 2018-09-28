@@ -10,15 +10,11 @@ import {
 } from '../action-creator.sync.js'
 import { PAGE, workspaceConfig, getUserProfile } from '../helper.js'
 
-const qs = require('query-string')
-
 class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      sidebarClose: false,
-      workspaceListLoaded: false,
-      workspaceIdInUrl: props.match && props.match.params.idws ? parseInt(props.match.params.idws) : null
+      sidebarClose: false
     }
 
     document.addEventListener('appCustomEvent', this.customEventReducer)
@@ -36,10 +32,12 @@ class Sidebar extends React.Component {
 
     if (!this.shouldDisplaySidebar()) return
 
-    // console.log('%c<Sidebar> Did Update', 'color: #c17838')
-    if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) {
-      const newWorkspaceId = parseInt(props.match.params.idws)
-      if (prevState.workspaceIdInUrl !== newWorkspaceId) this.setState({workspaceIdInUrl: newWorkspaceId})
+    if (
+      props.match.params &&
+      props.match.params.idws &&
+      props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined
+    ) {
+      props.dispatch(setWorkspaceListIsOpenInSidebar(parseInt(props.match.params.idws), true))
     }
   }
 
@@ -48,7 +46,7 @@ class Sidebar extends React.Component {
   }
 
   shouldDisplaySidebar = () => {
-    const pageWithoutSidebar = [PAGE.LOGIN]
+    const pageWithoutSidebar = [PAGE.LOGIN, PAGE.HOME]
     return !pageWithoutSidebar.includes(this.props.location.pathname)
   }
 
@@ -61,14 +59,13 @@ class Sidebar extends React.Component {
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   render () {
-    const { sidebarClose, workspaceIdInUrl } = this.state
+    const { sidebarClose } = this.state
     const { user, activeLang, workspaceList, t } = this.props
 
     if (!this.shouldDisplaySidebar()) return null
 
     return (
       <div className={classnames('sidebar primaryColorBg', {'sidebarclose': sidebarClose})}>
-
         <div className='sidebar__expand primaryColorBg' onClick={this.handleClickToggleSidebar}>
           <i className={classnames('fa fa-chevron-left', {'fa-chevron-right': sidebarClose, 'fa-chevron-left': !sidebarClose})} />
         </div>
@@ -82,7 +79,7 @@ class Sidebar extends React.Component {
                   label={ws.label}
                   allowedApp={ws.sidebarEntry}
                   lang={activeLang}
-                  activeFilterList={ws.id === workspaceIdInUrl ? [qs.parse(this.props.location.search).type] : []}
+                  activeFilterList={[]} // @fixme
                   isOpenInSidebar={ws.isOpenInSidebar}
                   onClickTitle={() => this.handleClickWorkspace(ws.id, !ws.isOpenInSidebar)}
                   onClickAllContent={this.handleClickAllContent}
@@ -98,11 +95,10 @@ class Sidebar extends React.Component {
                 className='sidebar__content__btnnewworkspace__btn btn primaryColorBgLighten primaryColorBorderDarken primaryColorBgDarkenHover  mb-5'
                 onClick={this.handleClickNewWorkspace}
               >
-                {t('Create a workspace')}
+                {t('Create a shared space')}
               </button>
             </div>
           }
-
         </div>
 
         <div className='sidebar__footer mb-2'>
@@ -118,9 +114,10 @@ class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ lang, user, workspaceList }) => ({
+const mapStateToProps = ({ lang, user, workspaceList, system }) => ({
   activeLang: lang.find(l => l.active) || {id: 'en'},
   user,
-  workspaceList
+  workspaceList,
+  system
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(Sidebar))))

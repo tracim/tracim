@@ -158,3 +158,80 @@ class TestTimezonesEndpoint(FunctionalTest):
         assert res.json_body['code'] is None
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
+
+
+class TestAboutEndpoint(FunctionalTest):
+    """
+    Tests for /api/v2/system/about
+    """
+
+    def test_api__get_about__ok_200__nominal_case(self):
+        """
+        Get information about Tracim
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/system/about', status=200)
+        assert res.json_body['name'] == 'Tracim'
+        assert res.json_body['version'] is None
+        assert res.json_body['datetime']
+        assert res.json_body['website'] == 'https://www.tracim.fr'
+
+    def test_api__get_about__err_401__unregistered_user(self):
+        """
+        Get information about Tracim with unregistered user
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/system/about', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()
+
+
+class TestConfigEndpoint(FunctionalTest):
+    """
+    Tests for /api/v2/system/config
+    """
+
+    def test_api__get_config__ok_200__nominal_case(self):
+        """
+        Get some config info about tracim
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.get('/api/v2/system/config', status=200)
+        assert res.json_body['email_notification_activated'] is False
+
+    def test_api__get_config__err_401__unregistered_user(self):
+        """
+        Get some config info about tracim with an unregistered user (bad auth)
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'john@doe.doe',
+                'lapin'
+            )
+        )
+        res = self.testapp.get('/api/v2/system/config', status=401)
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert 'message' in res.json.keys()
+        assert 'details' in res.json.keys()

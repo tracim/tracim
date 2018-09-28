@@ -10,11 +10,12 @@ import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
+import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { PAGE } from '../helper.js'
+import { PAGE, getUserProfile } from '../helper.js'
 import {
   getAppList,
   getContentTypeList,
@@ -51,6 +52,10 @@ class Tracim extends React.Component {
       case 'refreshWorkspaceList':
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         this.loadWorkspaceList(data.idOpenInSidebar ? data.idOpenInSidebar : undefined)
+        break
+      case 'disconnectedFromApi':
+        console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
+        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
         break
     }
   }
@@ -101,13 +106,7 @@ class Tracim extends React.Component {
 
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
-      const idWorkspaceToOpen = (() => {
-        if (idOpenInSidebar) return idOpenInSidebar
-        if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) return parseInt(props.match.params.idws)
-        return fetchGetWorkspaceList.json.length > 0 ? fetchGetWorkspaceList.json[0].workspace_id : null
-      })()
-
-      idWorkspaceToOpen && props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
+      idOpenInSidebar && props.dispatch(setWorkspaceListIsOpenInSidebar(idOpenInSidebar, true))
     }
   }
 
@@ -134,19 +133,23 @@ class Tracim extends React.Component {
         <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
 
         <div className='sidebarpagecontainer'>
-          <Sidebar />
+          <Route
+            // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
+            // able to access props.match.params.idws
+            // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
+            path='/:first?/:idws?/*' render={() => <Sidebar />}
+          />
 
           <div className='tracim__content'>
             <Route path={PAGE.LOGIN} component={Login} />
 
-            <Route exact path='/' component={() => {
+            <Route exact path={PAGE.HOME} component={() => {
               switch (props.user.logged) {
-                case true:
-                  return <Redirect to={{pathname: PAGE.WORKSPACE.ROOT, state: {from: props.location}}} />
-                case false:
-                  return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
-                case null:
-                  return null
+                case true: return props.workspaceList.length > 0
+                  ? <Redirect to={{pathname: PAGE.WORKSPACE.ROOT, state: {from: props.location}}} />
+                  : <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />
+                case false: return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+                case null: return null
               }
             }} />
 

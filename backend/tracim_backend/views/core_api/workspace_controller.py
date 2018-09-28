@@ -31,6 +31,7 @@ from tracim_backend.models import Group
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -411,6 +412,8 @@ class WorkspaceController(Controller):
             parent_id=content_filter.parent_id,
             workspace=request.current_workspace,
             content_type=content_filter.content_type or CONTENT_TYPES.Any_SLUG,
+            label=content_filter.label,
+            order_by_properties=[Content.label]
         )
         contents = [
             api.get_content_in_context(content) for content in contents

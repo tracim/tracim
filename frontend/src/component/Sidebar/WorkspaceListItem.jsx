@@ -26,10 +26,7 @@ const WorkspaceListItem = props => {
       </div>
 
       <AnimateHeight duration={500} height={props.isOpenInSidebar ? 'auto' : 0}>
-        <ul
-          className='sidebar__content__navigation__workspace__item__submenu'
-          id={`sidebarSubMenu_${props.number}`}
-        >
+        <ul className='sidebar__content__navigation__workspace__item__submenu'>
           { props.allowedApp.map(aa =>
             <li
               // onClick={() => props.onClickContentFilter(props.idWs, aa.slug)}

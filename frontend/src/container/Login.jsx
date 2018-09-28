@@ -75,7 +75,7 @@ class Login extends React.Component {
       this.loadAppConfig(loggedUser)
       this.loadWorkspaceList(loggedUser)
 
-      history.push(PAGE.WORKSPACE.ROOT)
+      history.push(PAGE.HOME)
     } else if (fetchPostUserLogin.status === 403) {
       dispatch(newFlashMessage(t('Email or password invalid'), 'danger'))
     }

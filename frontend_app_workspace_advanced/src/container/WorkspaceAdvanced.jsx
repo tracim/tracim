@@ -117,7 +117,7 @@ class WorkspaceAdvanced extends React.Component {
     const [resDetail, resMember] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember])
 
     if (resDetail.apiResponse.status !== 200) {
-      this.sendGlobalFlashMessage(props.t('Error while loading workspace details', 'warning'))
+      this.sendGlobalFlashMessage(props.t('Error while loading shared space details', 'warning'))
       resDetail.body = {}
     }
 
@@ -153,7 +153,7 @@ class WorkspaceAdvanced extends React.Component {
         this.setState(prev => ({content: {...prev.content, label: newLabel}}))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new workspace label', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while saving new shared space label', 'warning'))
     }
   }
 
@@ -229,7 +229,7 @@ class WorkspaceAdvanced extends React.Component {
         this.sendGlobalFlashMessage(props.t('Member removed', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while removing user from workspace', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while removing user from shared space', 'warning'))
     }
   }
 
@@ -274,7 +274,7 @@ class WorkspaceAdvanced extends React.Component {
         this.sendGlobalFlashMessage(props.t('Member added', 'info'))
         GLOBAL_dispatchEvent({ type: 'refreshWorkspaceList', data: {} }) // for sidebar and dashboard and admin workspace
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the workspace', 'warning'))
+      default: this.sendGlobalFlashMessage(props.t('Error while adding the member to the shared space', 'warning'))
     }
   }
 

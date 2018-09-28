@@ -17,27 +17,34 @@ export const UserStatus = props => {
       <div className='userstatus__role'>
         <div className='d-flex align-items-center'>
           <div className='userstatus__role__icon'>
-            <i className={`fa fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
+            <i className={`fa fa-fw fa-${myRole.faIcon}`} style={{color: myRole.hexcolor}} />
           </div>
 
-          <div className='userstatus__role__text' style={{color: myRole.hexcolor}}>
+          <div
+            className='userstatus__role__text ml-3'
+            title={props.t('your role in the shared space')}
+            style={{color: myRole.hexcolor}}
+          >
             {props.t(myRole.label)}
           </div>
         </div>
       </div>
 
       <div
-        className='userstatus__notification'
+        className='userstatus__notification primaryColorFontHover'
         onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
       >
         <div className='userstatus__notification__icon'>
           <i className={`fa fa-fw fa-envelope${mySelf.doNotify ? '-open' : ''}-o`} />
         </div>
 
-        <div className='userstatus__notification__text ml-3'>
+        <div
+          className='userstatus__notification__text ml-3'
+          title={props.t('you can change your notification status by clicking here')}
+        >
           {mySelf.doNotify
-            ? props.t("Subscribed")
-            : props.t("Unsubscribed")
+            ? props.t('Subscribed to the notifications')
+            : props.t('Unsubscribed to the notifications')
           }
         </div>
       </div>

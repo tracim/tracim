@@ -199,6 +199,26 @@ class EmptyCommentContentNotAllowed(EmptyValueNotAllowed):
     pass
 
 
+class EmptyEmailBody(EmptyValueNotAllowed):
+    pass
+
+
+class NoSpecialKeyFound(EmptyValueNotAllowed):
+    pass
+
+
+class UnsupportedRequestMethod(TracimException):
+    pass
+
+
+class CommentRequestCreationFailed(TracimException):
+    pass
+
+
+class BadStatusCode(TracimException):
+    pass
+
+
 class UserNotActive(TracimException):
     error_code = ERROR_CODE_AUTHENTICATION_FAILED
 
