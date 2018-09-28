@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pytest
 import transaction
 
 from tracim_backend import models
@@ -2200,6 +2201,47 @@ class TestFiles(FunctionalTest):
         assert res.body == b'Test file'
         assert res.content_type == 'text/plain'
         assert res.content_length == len(b'Test file')
+
+    def test_api__create_file__ok__200__nominal_case(self) -> None:
+        """
+        create one file of a content
+        """
+
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        image = create_1000px_png_test_image()
+        self.testapp.post(
+            '/api/v2/workspaces/{}/files'.format(business_workspace.workspace_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=200,
+        )
+
+    @pytest.mark.skip(reason='Feature Not Implemented')
+    def test_api__create_file__ok__200__in_folder(self) -> None:
+        pass
 
     def test_api__set_file_raw__ok_200__nominal_case(self) -> None:
         """

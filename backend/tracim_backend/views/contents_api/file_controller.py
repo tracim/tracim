@@ -9,7 +9,8 @@ from preview_generator.exception import UnavailablePreviewType
 
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere, \
+    ContentNotFound, ParentNotFound
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import PageOfPreviewNotFound
@@ -21,10 +22,11 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserRoleInWorkspace, ActionDescription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
+from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema, \
+    WorkspaceIdPathSchema, ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
@@ -55,6 +57,61 @@ class FileController(Controller):
     """
 
     # File data
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
+    @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.output_body(ContentDigestSchema())
+    # TODO - G.M - 2018-07-24 - Use hapic for input file
+    def create_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Create a file .This will create 2 new
+        revision.
+        """
+        app_config = request.registry.settings['CFG']
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        file = request.POST['files']
+        api = ContentApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config
+        )
+
+        parent = None
+        # TODO - G.M - 2018-09-28 - Support parent for file creation
+        # if creation_data.parent_id:
+        #     try:
+        #         parent = api.get_one(content_id=creation_data.parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+        #     except ContentNotFound as exc:
+        #         raise ParentNotFound(
+        #             'Parent with content_id {} not found'.format(creation_data.parent_id)
+        #         ) from exc
+        content = api.create(
+            filename=file.filename,
+            content_type_slug=FILE_TYPE,
+            workspace=request.current_workspace,
+            parent=parent,
+        )
+        api.save(content, ActionDescription.CREATION)
+        with new_revision(
+                session=request.dbsession,
+                tm=transaction.manager,
+                content=content
+        ):
+            api.update_file_data(
+                content,
+                new_filename=file.filename,
+                new_mimetype=file.type,
+                new_content=file.file,
+            )
+
+        return api.get_content_in_context(content)
+
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FILE_TYPE])
@@ -615,6 +672,13 @@ class FileController(Controller):
         configurator.add_view(self.update_file_info, route_name='update_file_info')  # nopep8
 
         # raw file #
+        # create file
+        configurator.add_route(
+            'create_file',
+            '/workspaces/{workspace_id}/files',  # nopep8
+            request_method='POST'
+        )
+        configurator.add_view(self.create_file, route_name='create_file')  # nopep8
         # upload raw file
         configurator.add_route(
             'upload_file',
