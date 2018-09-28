@@ -7,7 +7,7 @@ try:  # Python 3.5+
 except ImportError:
     from http import client as HTTPStatus
 
-from tracim_backend import hapic
+from tracim_backend.extensions import hapic
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models import Group
 from tracim_backend.lib.core.group import GroupApi
