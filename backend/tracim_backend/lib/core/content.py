@@ -886,47 +886,52 @@ class ContentApi(object):
         ))
 
     def get_pdf_preview_path(
-            self,
-            content_id: int,
-            revision_id: int,
-            page_number: int
+        self,
+        content_id: int,
+        revision_id: int,
+        page_number: int,
+        file_extension: str,
     ) -> str:
         """
         Get pdf preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page_number: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage
+        content
+        :param file_extension: file extension of the file
         :return: preview_path as string
         """
         file_path = self.get_one_revision_filepath(revision_id)
         try:
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path):
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
-                    'page_number {page_number} of content {content_id} does not exist'.format(
+                    'page_number {page_number} of content {content_id} does not exist'.format(  # nopep8
                         page_number=page_number,
                         content_id=content_id
                     ),
                 )
             jpg_preview_path = self.preview_manager.get_pdf_preview(
                 file_path,
-                page=page_number
+                page=page_number,
+                file_ext=file_extension,
             )
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
-                'No preview available for content {}, revision {}'.format(content_id, revision_id) # nopep8
+                'No preview available for content {}, revision {}'.format(content_id, revision_id)  # nopep8
             ) from exc
         return jpg_preview_path
 
-    def get_full_pdf_preview_path(self, revision_id: int) -> str:
+    def get_full_pdf_preview_path(self, revision_id: int, file_extension: str) -> str:
         """
         Get full(multiple page) pdf preview of revision of content
         :param revision_id: id of revision
+                :param file_extension: file extension of the file
         :return: path of the full pdf preview of this revision
         """
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+            pdf_preview_path = self.preview_manager.get_pdf_preview(file_path, file_ext=file_extension)  # nopep8
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
                 'No preview available for revision {}'.format(revision_id)
@@ -947,6 +952,7 @@ class ContentApi(object):
         content_id: int,
         revision_id: int,
         page_number: int,
+        file_extension: str,
         width: int = None,
         height: int = None,
     ) -> str:
@@ -954,7 +960,9 @@ class ContentApi(object):
         Get jpg preview of revision of content
         :param content_id: id of content
         :param revision_id: id of content revision
-        :param page_number: page number of the preview, useful for multipage content
+        :param page_number: page number of the preview, useful for multipage
+        content
+        :param file_extension: file extension of the file
         :param width: width in pixel
         :param height: height in pixel
         :return: preview_path as string
@@ -962,7 +970,7 @@ class ContentApi(object):
         file_path = self.get_one_revision_filepath(revision_id)
         try:
             page_number = preview_manager_page_format(page_number)
-            if page_number >= self.preview_manager.get_page_nb(file_path):
+            if page_number >= self.preview_manager.get_page_nb(file_path, file_ext=file_extension):  # nopep8
                 raise PageOfPreviewNotFound(
                     'page {page_number} of revision {revision_id} of content {content_id} does not exist'.format(  # nopep8
                         page_number=page_number,
@@ -992,6 +1000,7 @@ class ContentApi(object):
                 page=page_number,
                 width=width,
                 height=height,
+                file_ext=file_extension,
             )
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
@@ -1485,18 +1494,24 @@ class ContentApi(object):
         content.is_deleted = False
         content.revision_type = ActionDescription.UNDELETION
 
-    def get_preview_page_nb(self, revision_id: int) -> typing.Optional[int]:
+    def get_preview_page_nb(self, revision_id: int, file_extension: str) -> typing.Optional[int]:  # nopep8
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            nb_pages = self.preview_manager.get_page_nb(file_path)
+            nb_pages = self.preview_manager.get_page_nb(
+                file_path,
+                file_ext=file_extension
+            )
         except UnsupportedMimeType:
             return None
         return nb_pages
 
-    def has_pdf_preview(self, revision_id: int) -> bool:
+    def has_pdf_preview(self, revision_id: int, file_extension: str) -> bool:
         file_path = self.get_one_revision_filepath(revision_id)
         try:
-            has_pdf_preview = self.preview_manager.has_pdf_preview(file_path)
+            has_pdf_preview = self.preview_manager.has_pdf_preview(
+                file_path,
+                file_ext=file_extension
+            )
         except UnsupportedMimeType:
             has_pdf_preview = False
         return has_pdf_preview
