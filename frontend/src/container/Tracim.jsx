@@ -57,6 +57,10 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
         break
+      case 'refreshWorkspaceList_then_redirect': // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
+        await this.loadWorkspaceList()
+        this.props.history.push(data.url)
+        break
     }
   }
 
@@ -107,7 +111,10 @@ class Tracim extends React.Component {
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
       idOpenInSidebar && props.dispatch(setWorkspaceListIsOpenInSidebar(idOpenInSidebar, true))
+
+      return true
     }
+    return false
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))

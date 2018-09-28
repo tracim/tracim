@@ -37,7 +37,11 @@ class Sidebar extends React.Component {
       props.match.params.idws &&
       props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined
     ) {
-      props.dispatch(setWorkspaceListIsOpenInSidebar(parseInt(props.match.params.idws), true))
+      const idWorkspaceInUrl = parseInt(props.match.params.idws)
+
+      if (props.workspaceList.find(ws => ws.id === idWorkspaceInUrl) !== undefined) {
+        props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceInUrl, true))
+      }
     }
   }
 

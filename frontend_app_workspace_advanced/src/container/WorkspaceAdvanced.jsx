@@ -20,7 +20,8 @@ import {
   putMemberRole,
   deleteMember,
   getUserKnownMember,
-  postWorkspaceMember
+  postWorkspaceMember,
+  deleteWorkspace
 } from '../action.async.js'
 import Radium from 'radium'
 
@@ -41,7 +42,8 @@ class WorkspaceAdvanced extends React.Component {
         avatarUrl: ''
       },
       autoCompleteFormNewMemberActive: true,
-      searchedKnownMemberList: []
+      searchedKnownMemberList: [],
+      displayPopupValidateDeleteWorkspace: false
     }
 
     // i18n has been init, add resources from frontend
@@ -278,6 +280,24 @@ class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  handleClickDeleteWorkspaceBtn = () => this.setState({displayPopupValidateDeleteWorkspace: true})
+
+  handleClickClosePopupDeleteWorkspace = () => this.setState({displayPopupValidateDeleteWorkspace: false})
+
+  handleClickValidateDeleteWorkspace = async () => {
+    const { props, state } = this
+
+    const fetchDeleteWorkspace = await deleteWorkspace(state.config.apiUrl, state.content.workspace_id)
+    switch (fetchDeleteWorkspace.status) {
+      case 204:
+        GLOBAL_dispatchEvent({type: 'refreshWorkspaceList_then_redirect', data: {url: '/'}})
+        // GLOBAL_dispatchEvent({type: 'refreshWorkspaceList', data: {}})
+        this.handleClickBtnCloseApp()
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while deleting shared space', 'warning'))
+    }
+  }
+
   render () {
     const { state } = this
 
@@ -327,6 +347,10 @@ class WorkspaceAdvanced extends React.Component {
             searchedKnownMemberList={state.searchedKnownMemberList}
             onClickKnownMember={this.handleClickKnownMember}
             onClickValidateNewMember={this.handleClickValidateNewMember}
+            displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
+            onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
+            onClickDelteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
+            onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
             key={'workspace_advanced'}
           />
         </PopinFixedContent>
