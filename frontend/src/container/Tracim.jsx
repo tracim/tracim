@@ -57,6 +57,10 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
         break
+      case 'refreshWorkspaceList_then_redirect': // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
+        await this.loadWorkspaceList()
+        this.props.history.push(data.url)
+        break
     }
   }
 
@@ -106,14 +110,11 @@ class Tracim extends React.Component {
 
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
-      const idWorkspaceToOpen = (() => {
-        if (idOpenInSidebar) return idOpenInSidebar
-        if (props.match && props.match.params.idws !== undefined && !isNaN(props.match.params.idws)) return parseInt(props.match.params.idws)
-        return fetchGetWorkspaceList.json.length > 0 ? fetchGetWorkspaceList.json[0].workspace_id : null
-      })()
+      idOpenInSidebar && props.dispatch(setWorkspaceListIsOpenInSidebar(idOpenInSidebar, true))
 
-      idWorkspaceToOpen && props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceToOpen, true))
+      return true
     }
+    return false
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
@@ -139,7 +140,12 @@ class Tracim extends React.Component {
         <FlashMessage flashMessage={props.flashMessage} removeFlashMessage={this.handleRemoveFlashMessage} t={props.t} />
 
         <div className='sidebarpagecontainer'>
-          <Sidebar />
+          <Route
+            // Côme - 2018/09/27 - path bellow is a little hacky. The point is to always match this route but still be
+            // able to access props.match.params.idws
+            // in <Sidebar>, I test :first and if it is equals to 'workspaces' then I know idws has the value I need
+            path='/:first?/:idws?/*' render={() => <Sidebar />}
+          />
 
           <div className='tracim__content'>
             <Route path={PAGE.LOGIN} component={Login} />

@@ -16,5 +16,9 @@
   "Error while saving new shared space label": "Erreur lors de la sauvegarde du titre de l'espace partagé",
   "Error while removing user from shared space": "Erreur lors de la suppression du membre de l'espace partagé",
   "Error while adding the member to the shared space": "Erreur lors de l'ajout du membre de l'espace partagé",
-  "Shared space's description": "Description de l'espace partagé"
+  "Shared space's description": "Description de l'espace partagé",
+  "Delete shared space": "Supprimer l'espace partagé",
+  "Delete": "Supprimer",
+  "Are you sure ?": "Êtes vous sûr ?",
+  "Cancel": "Annuler"
 }
