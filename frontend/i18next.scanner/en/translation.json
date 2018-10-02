@@ -109,8 +109,6 @@
   "See more": "See more",
   "your role in the shared space": "your role in the shared space",
   "you can change your notification status by clicking here": "you can change your notification status by clicking here",
-  "Subscribed to the notifications": "Subscribed to the notifications",
-  "Unsubscribed to the notifications": "Unsubscribed to the notifications",
   "Feature": "Feature",
   "Explore": "Explore",
   "About": "About",
@@ -132,5 +130,8 @@
   "Search...": "Search...",
   "Welcome to Tracim": "Welcome to Tracim",
   "You aren't member of any shared space yet": "You aren't member of any shared space yet",
-  "Please refer to an administrator or a trusted user": "Please refer to an administrator or a trusted user"
+  "Please refer to an administrator or a trusted user": "Please refer to an administrator or a trusted user",
+  "Subscribed to notifications": "Subscribed to notifications",
+  "Not subscribed to notifications": "Not subscribed to notifications",
+  "Have a good day !": "Have a good day !"
 }
