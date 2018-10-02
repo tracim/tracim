@@ -238,7 +238,7 @@ class TestMailFetcher(object):
         content_json = {
           "author": {
             "avatar_url": None,
-            "public_name": "Suri Cate",
+            "public_name": "John Doe",
             "user_id": 3
           },
           "content_id": 2,

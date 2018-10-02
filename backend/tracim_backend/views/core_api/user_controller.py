@@ -25,9 +25,9 @@ from tracim_backend.views.core_api.schemas import AutocompleteQuerySchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
-from tracim_backend.views.core_api.schemas import UserInfosSchema
+from tracim_backend.views.core_api.schemas import SetUserInfoSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
-from tracim_backend.views.core_api.schemas import UserProfileSchema
+from tracim_backend.views.core_api.schemas import SetUserProfileSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import ReadStatusSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
@@ -174,7 +174,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_same_user_or_profile(Group.TIM_ADMIN)
-    @hapic.input_body(UserInfosSchema())
+    @hapic.input_body(SetUserInfoSchema())
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(UserSchema())
     def set_user_infos(self, context, request: TracimRequest, hapic_data=None):
@@ -301,7 +301,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @require_profile(Group.TIM_ADMIN)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.input_body(UserProfileSchema())
+    @hapic.input_body(SetUserProfileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def set_profile(self, context, request: TracimRequest, hapic_data=None):
         """
