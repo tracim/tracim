@@ -53,15 +53,15 @@ class Home extends React.Component {
 
                 {props.canCreateWorkspace && (
                   <button
-                    className='homepagecard__btn btn highlightBtn primaryColorBg'
+                    className='homepagecard__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
                     onClick={this.handleClickCreateWorkspace}
                   >
                     {props.t('create a shared space')}
                   </button>
                 )}
 
-                <div className='homepagecard__logo'>
-                  <img src={logoHeader} alt='logo homepage' />
+                <div className='homepagecard__endtext'>
+                  {props.t('Have a good day !')}
                 </div>
               </div>
             </CardBody>
