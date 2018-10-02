@@ -3,18 +3,19 @@ import typing
 
 import transaction
 from depot.manager import DepotManager
-from hapic.data import HapicFile
-from pyramid.config import Configurator
 from preview_generator.exception import UnavailablePreviewType
+from pyramid.config import Configurator
 
+from hapic.data import HapicFile
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.exceptions import ContentLabelAlreadyUsedHere, \
-    ContentNotFound, ParentNotFound
+from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmptyLabelNotAllowed
-from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import PageOfPreviewNotFound
+from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import require_content_types
@@ -22,11 +23,12 @@ from tracim_backend.lib.utils.authorization import require_workspace_role
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.data import UserRoleInWorkspace, ActionDescription
+from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema, \
-    WorkspaceIdPathSchema, ContentDigestSchema
+from tracim_backend.views.core_api.schemas import AllowedJpgPreviewDimSchema
+from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
@@ -41,6 +43,7 @@ from tracim_backend.views.core_api.schemas import \
     WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import \
     WorkspaceAndContentRevisionIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 try:  # Python 3.5+
     from http import HTTPStatus
