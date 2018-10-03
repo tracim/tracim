@@ -93,10 +93,10 @@ class Tracim extends React.Component {
   loadAppConfig = async () => {
     const { props } = this
 
-    const fetchGetAppList = await props.dispatch(getAppList(props.user))
+    const fetchGetAppList = await props.dispatch(getAppList())
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
 
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList(props.user))
+    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
