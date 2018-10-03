@@ -421,16 +421,16 @@ class ContentApi(object):
     # 
     #     return result
 
-    def _is_content_label_free(
+    def _is_filename_free(
             self,
-            label: str,
+            filename: str,
             workspace: Workspace,
             parent: Content = None,
             exclude_content_id: int = None,
     ) -> bool:
         """
         Check if content label is free
-        :param label: content label
+        :param filename: content label
         :param workspace: workspace of the content
         :param parent: parent of the content
         :param exclude_content_id: exclude a specific content_id (useful
@@ -438,9 +438,10 @@ class ContentApi(object):
         :return: True if content label is available
         """
         # INFO - G.M - 2018-09-04 - Method should not be used by special content
-        # with empty label like comment.
-        assert label
+        # with empty filename like comment.
+        assert filename
         assert workspace
+        label, file_extension = os.path.splitext(filename)
         query = self.get_base_query(workspace)
 
         if parent:
@@ -452,21 +453,25 @@ class ContentApi(object):
             query = query.filter(Content.content_id != exclude_content_id)
         query = query.filter(Content.workspace_id == workspace.workspace_id)
 
-        nb_content_with_the_label = query.filter(Content.label == label).count()
-        if nb_content_with_the_label == 0:
+        nb_content_with_the_filename = query.\
+            filter(Content.label == label).\
+            filter(Content.file_extension == file_extension).\
+            count()
+        if nb_content_with_the_filename == 0:
             return True
-        elif nb_content_with_the_label == 1:
+        elif nb_content_with_the_filename == 1:
             return False
         else:
             critical_error_text = 'Something is wrong in the database ! '\
-                                  'Content label should be unique ' \
+                                  'Content filename should be unique ' \
                                   'in a same folder in database' \
                                   'but you have {nb} content with ' \
-                                  'label {label} in workspace {workspace_id}'
+                                  'filename {filename} ' \
+                                  'in workspace {workspace_id}'
 
             critical_error_text = critical_error_text.format(
-                nb=nb_content_with_the_label,
-                label=label,
+                nb=nb_content_with_the_filename,
+                filename=filename,
                 workspace_id=workspace.workspace_id,
             )
             if parent:
@@ -477,26 +482,26 @@ class ContentApi(object):
             logger.critical(self, critical_error_text)
             return False
 
-    def _is_content_label_free_or_raise(
+    def _is_filename_free_or_raise(
         self,
-        label: str,
+        filename: str,
         workspace: Workspace,
         parent: Content = None,
         exclude_content_id: int = None,
     ) -> None:
         """
-        Same as _is_content_label_free but raise exception instead of
-        returning boolean if content label is already used
+        Same as _is_filename_free but raise exception instead of
+        returning boolean if content filename is already used
         """
-        if not self._is_content_label_free(
-            label,
+        if not self._is_filename_free(
+            filename,
             workspace,
             parent,
             exclude_content_id
         ):
-            text = 'A Content already exist with the same label {label} ' \
+            text = 'A Content already exist with the same filename {filename} ' \
                    ' in workspace {workspace_id}'.format(
-                      label=label,
+                      filename=filename,
                       workspace_id=workspace.workspace_id,
                    )
             if parent:
@@ -538,29 +543,34 @@ class ContentApi(object):
                         content_id=workspace.workspace_id,
                     )
                 )
-        if filename:
-            label = os.path.splitext(filename)[0]
-        if label:
-            self._is_content_label_free_or_raise(
-                label,
+        content = None
+        if filename or label:
+            if label:
+                file_extension = ''
+                if content_type.slug in (
+                        CONTENT_TYPES.Page.slug,
+                        CONTENT_TYPES.Thread.slug,
+                ):
+                    file_extension = '.html'
+                filename = '{}{}'.format(label, file_extension)
+            self._is_filename_free_or_raise(
+                filename,
                 workspace,
                 parent,
             )
-
-        content = Content()
-        if filename:
+            content = Content()
             # INFO - G.M - 2018-07-04 - File_name setting automatically
             # set label and file_extension
-            content.file_name = label
-        elif label:
-            content.label = label
+            content.file_name = filename
         else:
             if content_type_slug == CONTENT_TYPES.Comment.slug:
+                content = Content()
                 # INFO - G.M - 2018-07-16 - Default label for comments is
                 # empty string.
                 content.label = ''
             else:
-                raise EmptyLabelNotAllowed('Content of this type should have a valid label')  # nopep8
+                raise EmptyLabelNotAllowed(
+                    'Content of this type should have a valid label')  # nopep8
 
         content.owner = self._user
         content.parent = parent
@@ -569,12 +579,6 @@ class ContentApi(object):
         content.type = content_type.slug
         content.is_temporary = is_temporary
         content.revision_type = ActionDescription.CREATION
-
-        if content.type in (
-                CONTENT_TYPES.Page.slug,
-                CONTENT_TYPES.Thread.slug,
-        ):
-            content.file_extension = '.html'
 
         if do_save:
             self._session.add(content)
@@ -1344,8 +1348,8 @@ class ContentApi(object):
             if new_parent:
                 item.workspace = new_parent.workspace
 
-        self._is_content_label_free_or_raise(
-            item.label,
+        self._is_filename_free_or_raise(
+            item.file_name,
             item.workspace,
             item.parent,
             exclude_content_id=item.content_id
@@ -1379,8 +1383,10 @@ class ContentApi(object):
             workspace = item.workspace
             parent = item.parent
         label = new_label or item.label
+        file_extension = item.file_extension
+        filename = '{}{}'.format(label, file_extension)
 
-        self._is_content_label_free_or_raise(label, workspace, parent)
+        self._is_filename_free_or_raise(filename, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1427,8 +1433,11 @@ class ContentApi(object):
         if not new_label:
             raise EmptyLabelNotAllowed()
 
-        self._is_content_label_free_or_raise(
-            new_label,
+        label = new_label or item.label
+        file_extension = item.file_extension
+        filename = '{}{}'.format(label, file_extension)
+        self._is_filename_free_or_raise(
+            filename,
             item.workspace,
             item.parent,
             exclude_content_id=item.content_id

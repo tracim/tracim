@@ -2220,7 +2220,7 @@ class TestFiles(FunctionalTest):
             content_type_slug=CONTENT_TYPES.File.slug,
             workspace=business_workspace,
             parent=tool_folder,
-            label='already_used',
+            label='folder_used',
             do_save=True,
             do_notify=False,
         )
@@ -2238,6 +2238,20 @@ class TestFiles(FunctionalTest):
             'Test_file.txt',
             'text/plain',
         )
+        test_file2 = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            filename='already_used.txt',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file2.file_extension = '.txt'
+        test_file2.depot_file = FileIntent(
+            b'Test file',
+            'already_used.txt',
+            'text/plain',
+        )
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -2253,6 +2267,15 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin',
                 'admin@admin.admin'
             )
+        )
+        params = {
+            'label': 'folder_used',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=200
         )
         params = {
             'label': 'already_used',
