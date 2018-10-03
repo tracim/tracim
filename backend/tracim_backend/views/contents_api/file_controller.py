@@ -87,7 +87,6 @@ class FileController(Controller):
         )
 
         parent = None
-        # TODO - G.M - 2018-09-28 - Support parent for file creation
         if parent_id:
             try:
                 parent = api.get_one(content_id=parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
