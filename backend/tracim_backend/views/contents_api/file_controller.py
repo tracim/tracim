@@ -79,6 +79,7 @@ class FileController(Controller):
             config=app_config,
         )
         file = request.POST['files']
+        parent_id = request.POST.get('parent_id') or 0  # FDV
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -87,13 +88,13 @@ class FileController(Controller):
 
         parent = None
         # TODO - G.M - 2018-09-28 - Support parent for file creation
-        # if creation_data.parent_id:
-        #     try:
-        #         parent = api.get_one(content_id=creation_data.parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
-        #     except ContentNotFound as exc:
-        #         raise ParentNotFound(
-        #             'Parent with content_id {} not found'.format(creation_data.parent_id)
-        #         ) from exc
+        if parent_id:
+            try:
+                parent = api.get_one(content_id=parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+            except ContentNotFound as exc:
+                raise ParentNotFound(
+                    'Parent with content_id {} not found'.format(parent_id)
+                ) from exc
         content = api.create(
             filename=file.filename,
             content_type_slug=FILE_TYPE,
