@@ -57,6 +57,7 @@ export class ResetPassword extends React.Component {
                       type='password'
                       placeHolder={props.t('Password')}
                       value={state.newPassword}
+                      invalidMsg=''
                       onChange={this.handleChangePassword}
                       onKeyDown={this.handleInputKeyDown}
                       maxLength={512}
@@ -69,6 +70,7 @@ export class ResetPassword extends React.Component {
                       type='password'
                       placeHolder={props.t('Confirm password')}
                       value={state.newPassword2}
+                      invalidMsg=''
                       onChange={this.handleChangePassword2}
                       onKeyDown={this.handleInputKeyDown}
                       maxLength={512}
