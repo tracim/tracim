@@ -5,6 +5,7 @@ import i18n from '../i18n.js'
 import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
+import ResetPassword from './ResetPassword.jsx'
 import Account from './Account.jsx'
 import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
@@ -15,7 +16,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { PAGE, getUserProfile } from '../helper.js'
+import { PAGE, unLoggedAllowedPage, getUserProfile } from '../helper.js'
 import {
   getAppList,
   getContentTypeList,
@@ -124,15 +125,17 @@ class Tracim extends React.Component {
 
     if (props.user.logged === null) return null // @TODO show loader
 
-    if (props.user.logged === false && props.location.pathname !== '/login') {
-      return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+    if (props.user.logged === false && !unLoggedAllowedPage.includes(props.location.pathname)) {
+      return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
     }
 
-    if (props.location.pathname !== '/login' && (
-      !props.system.workspaceListLoaded ||
-      !props.system.appListLoaded ||
-      !props.system.contentTypeListLoaded
-    )) return null // @TODO Côme - 2018/08/22 - should show loader here
+    if (
+      !unLoggedAllowedPage.includes(props.location.pathname) && (
+        !props.system.workspaceListLoaded ||
+        !props.system.appListLoaded ||
+        !props.system.contentTypeListLoaded
+      )
+    ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
       <div className='tracim'>
@@ -149,6 +152,11 @@ class Tracim extends React.Component {
 
           <div className='tracim__content'>
             <Route path={PAGE.LOGIN} component={Login} />
+
+            <Route exact path={PAGE.RESET_PASSWORD} component={() => {
+              console.log('route matched')
+              return <ResetPassword />
+            }} />
 
             <Route exact path={PAGE.HOME} component={() => {
               switch (props.user.logged) {

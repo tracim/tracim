@@ -18,6 +18,7 @@ export const removeFlashMessage = msg => ({ type: `${REMOVE}/${FLASH_MESSAGE}`, 
 export const USER = 'User'
 export const USER_LOGIN = `${USER}/Login`
 export const USER_LOGOUT = `${USER}/Logout`
+export const USER_REQUEST_PASSWORD = `${USER}/RequestPassword`
 export const USER_CONNECTED = `${USER}/Connected`
 export const USER_DISCONNECTED = `${USER}/Disconnected`
 export const setUserConnected = user => ({ type: `${SET}/${USER}/Connected`, user })

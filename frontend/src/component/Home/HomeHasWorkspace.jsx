@@ -9,10 +9,11 @@ export const HomeHasWorkspace = props =>
       {props.t('Welcome to Tracim')}
     </div>
 
-    <div className='homepagecard__user primaryColorFont'>
+    <div className='homepagecard__user'>
       <div className='homepagecard__user__avatar'>
         <img src={props.user.avatar_url} />
       </div>
+
       <div className='homepagecard__user__publicname'>
         {props.user.public_name}
       </div>
@@ -20,7 +21,7 @@ export const HomeHasWorkspace = props =>
 
     <div className='homepagecard__delimiter delimiter primaryColorBg' />
 
-    <div className='homepagecard__text primaryColorFont'>
+    <div className='homepagecard__text'>
       {props.t('Please select a shared space in the left sidebar by clicking on it')}
     </div>
 

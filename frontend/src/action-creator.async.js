@@ -1,7 +1,8 @@
-import { FETCH_CONFIG } from './helper.js'
+import {FETCH_CONFIG, PAGE, unLoggedAllowedPage} from './helper.js'
 import {
   USER_LOGIN,
   USER_LOGOUT,
+  USER_REQUEST_PASSWORD,
   USER_CONNECTED,
   USER_KNOWN_MEMBER_LIST,
   USER_NAME,
@@ -58,7 +59,9 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       case 204:
         return ''
       case 401:
-        if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
+        if (!unLoggedAllowedPage.includes(document.location.pathname) && document.location.pathname !== PAGE.HOME) {
+          document.location.href = `${PAGE.LOGIN}?dc=1`
+        }
         return ''
       case 400:
       case 403:
@@ -96,7 +99,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
 
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/login`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/login`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -112,9 +115,25 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
   })
 }
 
+export const postRequestPassword = email => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/reset_password/request`,
+    param: {
+      credentials: 'include',
+      headers: {...FETCH_CONFIG.headers},
+      method: 'POST',
+      body: JSON.stringify({
+        email: email
+      })
+    },
+    actionName: USER_REQUEST_PASSWORD,
+    dispatch
+  })
+}
+
 export const postUserLogout = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/logout`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/logout`,
     param: {
       credentials: 'include',
       headers: {...FETCH_CONFIG.headers},
@@ -157,7 +176,7 @@ export const getUserWorkspaceList = idUser => async dispatch => {
 
 export const getUserIsConnected = () => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`, // FETCH_CONFIG.apiUrl
+    url: `${FETCH_CONFIG.apiUrl}/sessions/whoami`,
     param: {
       credentials: 'include',
       headers: {

@@ -2,22 +2,25 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-const LoginBtnForgotPw = props => {
+const ResetPasswordBtn = props => {
   return (
-    <div className={classnames(props.customClass)}>
+    <div
+      className={classnames(props.customClass)}
+      onClick={props.onClickForgotPasswordBtn}
+    >
       {props.label}
     </div>
   )
 }
 
-export default LoginBtnForgotPw
+export default ResetPasswordBtn
 
-LoginBtnForgotPw.propTypes = {
+ResetPasswordBtn.propTypes = {
   customClass: PropTypes.string,
   label: PropTypes.string
 }
 
-LoginBtnForgotPw.defaultProps = {
+ResetPasswordBtn.defaultProps = {
   customClass: '',
   label: ''
 }

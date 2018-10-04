@@ -31,6 +31,7 @@ export const PAGE = {
     ADMIN: (idws = ':idws') => `/workspaces/${idws}/admin`
   },
   LOGIN: '/login',
+  RESET_PASSWORD: '/reset_password',
   ACCOUNT: '/account',
   ADMIN: {
     ROOT: '/admin',
@@ -39,6 +40,8 @@ export const PAGE = {
     USER_EDIT: (idUser = ':iduser') => `/admin/user/${idUser}`
   }
 }
+
+export const unLoggedAllowedPage = [PAGE.LOGIN, PAGE.RESET_PASSWORD]
 
 export const ROLE = [{
   id: 8,
