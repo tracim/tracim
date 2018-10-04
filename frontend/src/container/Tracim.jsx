@@ -5,7 +5,7 @@ import i18n from '../i18n.js'
 import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
-import ResetPassword from './ResetPassword.jsx'
+import ForgotPassword from './ForgotPassword.jsx'
 import Account from './Account.jsx'
 import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
@@ -155,7 +155,7 @@ class Tracim extends React.Component {
 
             <Route exact path={PAGE.RESET_PASSWORD} component={() => {
               console.log('route matched')
-              return <ResetPassword />
+              return <ForgotPassword />
             }} />
 
             <Route exact path={PAGE.HOME} component={() => {

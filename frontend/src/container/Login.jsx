@@ -7,7 +7,6 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
-import ResetPasswordBtn from '../component/Login/ResetPasswordBtn.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   newFlashMessage,
@@ -25,6 +24,7 @@ import {
 } from '../action-creator.async.js'
 import { PAGE } from '../helper.js'
 import { Checkbox } from 'tracim_frontend_lib'
+
 const qs = require('query-string')
 
 class Login extends React.Component {
@@ -182,11 +182,12 @@ class Login extends React.Component {
                           {props.t('Remember me')}
                         </div>
 
-                        <ResetPasswordBtn
-                          customClass='connection__form__pwforgot'
-                          label={props.t('Forgotten password ?')}
-                          onClickForgotPasswordBtn={this.handleClickForgotPassword}
-                        />
+                        <div
+                          className='connection__form__pwforgot'
+                          onClick={this.handleClickForgotPassword}
+                        >
+                          {props.t('Forgotten password ?')}
+                        </div>
                       </div>
 
                       <div className='col-12 col-sm-6 d-flex align-items-end'>

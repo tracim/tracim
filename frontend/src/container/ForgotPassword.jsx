@@ -8,9 +8,9 @@ import FooterLogin from '../component/Login/FooterLogin.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { postRequestPassword } from '../action-creator.async.js'
-import {newFlashMessage} from '../action-creator.sync.js'
+import { newFlashMessage } from '../action-creator.sync.js'
 
-export class ResetPassword extends React.Component {
+export class ForgotPassword extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -38,23 +38,23 @@ export class ResetPassword extends React.Component {
     const { props, state } = this
 
     return (
-      <section className='unLoggedPage resetpassword primaryColorBg'>
+      <section className='unLoggedPage forgotpassword primaryColorBg'>
         <div className='container-fluid'>
           <div className='row justify-content-center'>
             <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
-              <Card customClass='resetpassword__card'>
-                <CardHeader customClass='resetpassword__card__header primaryColorBgLighten text-center'>
+              <Card customClass='forgotpassword__card'>
+                <CardHeader customClass='forgotpassword__card__header primaryColorBgLighten text-center'>
                   {props.t('Reset password')}
                 </CardHeader>
 
-                <CardBody formClass='resetpassword__card__body'>
+                <CardBody formClass='forgotpassword__card__body'>
                   <div>
-                    <div className='resetpassword__card__body__title'>
+                    <div className='forgotpassword__card__body__title'>
                       {props.t('Did you forget your password ?')}
                     </div>
 
                     <InputGroupText
-                      parentClassName='resetpassword__card__body__groupemail'
+                      parentClassName='forgotpassword__card__body__groupemail'
                       customClass=''
                       icon='fa-envelope-open-o'
                       type='email'
@@ -67,7 +67,7 @@ export class ResetPassword extends React.Component {
                       maxLength={512}
                     />
 
-                    <div className='resetpassword__card__body__submsg'>
+                    <div className='forgotpassword__card__body__submsg'>
                       {props.t('We are going to send you an email containing a link to reset your password.')}
                     </div>
 
@@ -75,7 +75,7 @@ export class ResetPassword extends React.Component {
                       <Button
                         htmlType='button'
                         bootstrapType='primary'
-                        customClass='btnSubmit resetpassword__card__body__btnsubmit ml-auto'
+                        customClass='btnSubmit forgotpassword__card__body__btnsubmit ml-auto'
                         label={props.t('Connection')}
                         onClick={this.handleClickSubmit}
                       />
@@ -94,4 +94,4 @@ export class ResetPassword extends React.Component {
 }
 
 const mapStateToProps = () => ({})
-export default connect(mapStateToProps)(translate()(ResetPassword))
+export default connect(mapStateToProps)(translate()(ForgotPassword))
