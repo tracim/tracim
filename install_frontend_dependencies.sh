@@ -42,8 +42,9 @@ echo "This is DEFAULTDIR \"$DEFAULTDIR\""
 log "verify if npm is installed"
 npm -v
 if [ $? -eq 0 ]; then
-    loggood "npm and nodejs are installed"
+    loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
 else
+    logerror "npm not installed"
     log "install npm with nodejs"
     $SUDO apt install -y curl && loggood "success" || logerror "some error"
     curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
@@ -52,17 +53,16 @@ else
     log "verify if nodejs 8.x is now installed"
     dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
     if [ $? -eq 0 ]; then
-        loggood "nodjs 8.x is installed"
-        log "verify if npm is installed"
+        loggood "node \"$(node -v)\" is correctly installed"
         npm -v
         if [ $? -eq 0 ]; then
-            loggood "npm correctly installed"
+            loggood  "npm \"$(npm -v)\" is correctly installed"
         else
-            logerror "npm is not installed - tracim install stopped"
-            exit 1
+            logerror "npm is not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
+        exit 1
         fi
     else
-        logerror "nodejs 8.x is not installed - tracim install stopped"
+        logerror "nodejs 8.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
         exit 1
     fi
 fi
