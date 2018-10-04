@@ -112,7 +112,7 @@ class Login extends React.Component {
     }
   }
 
-  handleClickForgotPassword = async () => this.props.history.push(PAGE.RESET_PASSWORD)
+  handleClickForgotPassword = async () => this.props.history.push(PAGE.FORGOT_PASSWORD)
 
   render () {
     const { props, state } = this

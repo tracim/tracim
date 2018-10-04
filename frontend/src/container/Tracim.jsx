@@ -6,6 +6,7 @@ import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
 import ForgotPassword from './ForgotPassword.jsx'
+import ResetPassword from './ResetPassword.jsx'
 import Account from './Account.jsx'
 import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
@@ -16,7 +17,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { PAGE, unLoggedAllowedPage, getUserProfile } from '../helper.js'
+import { PAGE, unLoggedAllowedPageList, getUserProfile } from '../helper.js'
 import {
   getAppList,
   getContentTypeList,
@@ -125,12 +126,12 @@ class Tracim extends React.Component {
 
     if (props.user.logged === null) return null // @TODO show loader
 
-    if (props.user.logged === false && !unLoggedAllowedPage.includes(props.location.pathname)) {
+    if (props.user.logged === false && !unLoggedAllowedPageList.includes(props.location.pathname)) {
       return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
     }
 
     if (
-      !unLoggedAllowedPage.includes(props.location.pathname) && (
+      !unLoggedAllowedPageList.includes(props.location.pathname) && (
         !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
@@ -153,10 +154,9 @@ class Tracim extends React.Component {
           <div className='tracim__content'>
             <Route path={PAGE.LOGIN} component={Login} />
 
-            <Route exact path={PAGE.RESET_PASSWORD} component={() => {
-              console.log('route matched')
-              return <ForgotPassword />
-            }} />
+            <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
+
+            <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
 
             <Route exact path={PAGE.HOME} component={() => {
               switch (props.user.logged) {

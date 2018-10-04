@@ -8,7 +8,7 @@ import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
-import {PAGE, workspaceConfig, getUserProfile, unLoggedAllowedPage} from '../helper.js'
+import {PAGE, workspaceConfig, getUserProfile, unLoggedAllowedPageList} from '../helper.js'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -51,7 +51,7 @@ class Sidebar extends React.Component {
 
   shouldDisplaySidebar = () => {
     return ![
-      ...unLoggedAllowedPage,
+      ...unLoggedAllowedPageList,
       ...this.props.workspaceList.length > 0 ? [] : [PAGE.HOME]
     ]
       .includes(this.props.location.pathname)

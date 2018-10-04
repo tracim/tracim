@@ -7,7 +7,7 @@ import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
-import { postRequestPassword } from '../action-creator.async.js'
+import { postForgotPassword } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 
 export class ForgotPassword extends React.Component {
@@ -21,12 +21,14 @@ export class ForgotPassword extends React.Component {
     }
   }
 
+  handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
+
   handleChangeBackupEmail = e => this.setState({backupEmail: {value: e.target.value, isInvalid: false}})
 
   handleClickSubmit = async () => {
     const { props, state } = this
 
-    const fetchPostResetPassword = await props.dispatch(postRequestPassword(state.backupEmail.value))
+    const fetchPostResetPassword = await props.dispatch(postForgotPassword(state.backupEmail.value))
     switch (fetchPostResetPassword.status) {
       case 200: props.dispatch(newFlashMessage(props.t("Email sent. Don't forget to check your spam."), 'info')); break
       case 400: props.dispatch(newFlashMessage(props.t('Email unknown'), 'warning')); break
@@ -44,7 +46,7 @@ export class ForgotPassword extends React.Component {
             <div className='col-12 col-sm-11 col-md-8 col-lg-6 col-xl-4'>
               <Card customClass='forgotpassword__card'>
                 <CardHeader customClass='forgotpassword__card__header primaryColorBgLighten text-center'>
-                  {props.t('Reset password')}
+                  {props.t('Forgot password')}
                 </CardHeader>
 
                 <CardBody formClass='forgotpassword__card__body'>

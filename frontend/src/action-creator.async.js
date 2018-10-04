@@ -1,4 +1,4 @@
-import {FETCH_CONFIG, PAGE, unLoggedAllowedPage} from './helper.js'
+import {FETCH_CONFIG, PAGE, unLoggedAllowedPageList} from './helper.js'
 import {
   USER_LOGIN,
   USER_LOGOUT,
@@ -59,7 +59,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
       case 204:
         return ''
       case 401:
-        if (!unLoggedAllowedPage.includes(document.location.pathname) && document.location.pathname !== PAGE.HOME) {
+        if (!unLoggedAllowedPageList.includes(document.location.pathname) && document.location.pathname !== PAGE.HOME) {
           document.location.href = `${PAGE.LOGIN}?dc=1`
         }
         return ''
@@ -115,7 +115,7 @@ export const postUserLogin = (login, password, rememberMe) => async dispatch => 
   })
 }
 
-export const postRequestPassword = email => async dispatch => {
+export const postForgotPassword = email => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/reset_password/request`,
     param: {
@@ -124,6 +124,25 @@ export const postRequestPassword = email => async dispatch => {
       method: 'POST',
       body: JSON.stringify({
         email: email
+      })
+    },
+    actionName: USER_REQUEST_PASSWORD,
+    dispatch
+  })
+}
+
+export const postResetPassword = (newPassword, newPassword2, email, token) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/reset_password/modify`,
+    param: {
+      credentials: 'include',
+      headers: {...FETCH_CONFIG.headers},
+      method: 'POST',
+      body: JSON.stringify({
+        email: email,
+        new_password: newPassword,
+        new_password2: newPassword2,
+        reset_password_token: token
       })
     },
     actionName: USER_REQUEST_PASSWORD,
