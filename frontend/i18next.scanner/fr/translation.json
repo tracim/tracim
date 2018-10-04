@@ -134,5 +134,15 @@
   "Subscribed to notifications": "Abonné(e) aux notifications",
   "Not subscribed to notifications": "Non abonné(e) aux notifications",
   "Have a good day !": "Bonne journée !",
-  "Please select a shared space in the left sidebar by clicking on it": "Veuillez sélectionner un espace partagé présent dans la barre latérale en cliquant dessus"
+  "Please select a shared space in the left sidebar by clicking on it": "Veuillez sélectionner un espace partagé présent dans la barre latérale en cliquant dessus",
+  "Email sent. Don't forget to check your spam.": "Email envoyé. Pensez à vérifier votre dossier spam.",
+  "Email unknown": "Email inconnu",
+  "An error has happened. Please try again.": "Une erreur est survenue. Veuillez réessayer.",
+  "Forgot password": "Mot de passe oublié",
+  "Did you forget your password ?": "Vous avez oublié votre mot de passe ?",
+  "Email": "Email",
+  "Your password has been changed. You can now login.": "Votre mot de passe a été changé, vous pouvez vous connecter.",
+  "Reset password": "Réinitialiser votre mot de passe",
+  "Confirm password": "Confirmer le mot de passe",
+  "We are going to send you an email containing a link to reset your password": "Nous allons vous envoyer un email contenant un lien pour réinitialiser votre mot de passe"
 }

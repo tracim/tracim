@@ -70,7 +70,7 @@ export class ForgotPassword extends React.Component {
                     />
 
                     <div className='forgotpassword__card__body__submsg'>
-                      {props.t('We are going to send you an email containing a link to reset your password.')}
+                      {props.t('We are going to send you an email containing a link to reset your password')}
                     </div>
 
                     <div className='d-flex align-items-end'>
@@ -78,7 +78,7 @@ export class ForgotPassword extends React.Component {
                         htmlType='button'
                         bootstrapType='primary'
                         customClass='btnSubmit forgotpassword__card__body__btnsubmit ml-auto'
-                        label={props.t('Connection')}
+                        label={props.t('Validate')}
                         onClick={this.handleClickSubmit}
                       />
                     </div>

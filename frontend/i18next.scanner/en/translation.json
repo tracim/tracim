@@ -134,5 +134,15 @@
   "Subscribed to notifications": "Subscribed to notifications",
   "Not subscribed to notifications": "Not subscribed to notifications",
   "Have a good day !": "Have a good day !",
-  "Please select a shared space in the left sidebar by clicking on it": "Please select a shared space in the left sidebar by clicking on it"
+  "Please select a shared space in the left sidebar by clicking on it": "Please select a shared space in the left sidebar by clicking on it",
+  "Email sent. Don't forget to check your spam.": "Email sent. Don't forget to check your spam.",
+  "Email unknown": "Email unknown",
+  "An error has happened. Please try again.": "An error has happened. Please try again.",
+  "Forgot password": "Forgot password",
+  "Did you forget your password ?": "Did you forget your password ?",
+  "Email": "Email",
+  "Your password has been changed. You can now login.": "Your password has been changed. You can now login.",
+  "Reset password": "Reset password",
+  "Confirm password": "Confirm password",
+  "We are going to send you an email containing a link to reset your password": "We are going to send you an email containing a link to reset your password"
 }
