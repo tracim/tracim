@@ -431,7 +431,7 @@ export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
   if (fetchGetFolderContent.status === 200) dispatch(setFolderData(idFolder, fetchGetFolderContent.json))
 }
 
-export const getAppList = user => dispatch => {
+export const getAppList = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/applications`,
     param: {
@@ -446,7 +446,7 @@ export const getAppList = user => dispatch => {
   })
 }
 
-export const getContentTypeList = user => dispatch => {
+export const getContentTypeList = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/system/content_types`,
     param: {

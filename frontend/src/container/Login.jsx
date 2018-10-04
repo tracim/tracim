@@ -72,7 +72,7 @@ class Login extends React.Component {
 
       dispatch(setUserConnected(loggedUser))
 
-      this.loadAppConfig(loggedUser)
+      this.loadAppConfig()
       this.loadWorkspaceList(loggedUser)
 
       history.push(PAGE.HOME)
@@ -82,13 +82,13 @@ class Login extends React.Component {
   }
 
   // @FIXME Côme - 2018/08/22 - this function is duplicated from Tracim.jsx
-  loadAppConfig = async user => {
+  loadAppConfig = async () => {
     const { props } = this
 
-    const fetchGetAppList = await props.dispatch(getAppList(user))
+    const fetchGetAppList = await props.dispatch(getAppList())
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
 
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList(user))
+    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 

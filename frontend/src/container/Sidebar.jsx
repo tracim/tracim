@@ -50,7 +50,10 @@ class Sidebar extends React.Component {
   }
 
   shouldDisplaySidebar = () => {
-    const pageWithoutSidebar = [PAGE.LOGIN, PAGE.HOME]
+    const pageWithoutSidebar = [
+      ...[PAGE.LOGIN],
+      ...this.props.workspaceList.length > 0 ? [] : [PAGE.HOME]
+    ]
     return !pageWithoutSidebar.includes(this.props.location.pathname)
   }
 

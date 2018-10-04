@@ -50,6 +50,10 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import UserRoleInWorkspace
 
 
+FIELD_LANG_DESC = "User langage in ISO 639 format. See https://fr.wikipedia.org/wiki/ISO_639"
+FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
+FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
+
 class UserDigestSchema(marshmallow.Schema):
     """
     Simple user schema
@@ -57,13 +61,13 @@ class UserDigestSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     avatar_url = marshmallow.fields.Url(
         allow_none=True,
-        example="/api/v2/asset/avatars/suri-cate.jpg",
-        description="avatar_url is the url to the image file. "
-                    "If no avatar, then set it to null "
-                    "(and frontend will interpret this with a default avatar)",
+        example="/api/v2/asset/avatars/john-doe.jpg",
+        description="avatar_url is the url of the image file. "
+                    "If no avatar, then set it to an empty string "
+                    "(frontend should interpret an empty url as default avatar)",
     )
     public_name = marshmallow.fields.String(
-        example='Suri Cate',
+        example='John Doe',
     )
 
 
@@ -73,23 +77,23 @@ class UserSchema(UserDigestSchema):
     """
     email = marshmallow.fields.Email(
         required=True,
-        example='suri.cate@algoo.fr'
+        example='hello@tracim.fr'
     )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
-        description='User account creation date',
+        description='Date of creation of the user account',
     )
     is_active = marshmallow.fields.Bool(
         example=True,
-        description='Is user account activated ?'
+        description='true if the user is active, false if the user has been deactivated by an admin. Default is true'
     )
     is_deleted = marshmallow.fields.Bool(
         example=False,
-        description='Is user account deleted ?'
+        description='true if the user account has been deleted. Default is false'
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = marshmallow.fields.String(
-        description="Timezone as tz database format",
+        description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
     )
     # TODO - G.M - 17-04-2018 - check this, relative url allowed ?
@@ -98,15 +102,16 @@ class UserSchema(UserDigestSchema):
         relative=True,
         attribute='calendar_url',
         example="/api/v2/calendar/user/3.ics/",
-        description="The url for calendar CalDAV direct access",
+        description="CalDAV url of the user dedicated calendar",
     )
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
         example='trusted-users',
+        description=FIELD_PROFILE_DESC,
     )
     lang = marshmallow.fields.String(
-        description="User langage in iso639 format",
+        description=FIELD_LANG_DESC,
         example='en',
         required=False,
         validate=Length(min=2, max=3),
@@ -115,7 +120,7 @@ class UserSchema(UserDigestSchema):
     )
 
     class Meta:
-        description = 'User account of Tracim'
+        description = 'Representation of a tracim user account'
 
 
 class LoggedInUserPasswordSchema(marshmallow.Schema):
@@ -127,7 +132,7 @@ class LoggedInUserPasswordSchema(marshmallow.Schema):
 class SetEmailSchema(LoggedInUserPasswordSchema):
     email = marshmallow.fields.Email(
         required=True,
-        example='suri.cate@algoo.fr'
+        example='hello@tracim.fr'
     )
 
     @post_load
@@ -150,18 +155,22 @@ class SetPasswordSchema(LoggedInUserPasswordSchema):
         return SetPassword(**data)
 
 
-class UserInfosSchema(marshmallow.Schema):
+class SetUserInfoSchema(marshmallow.Schema):
+    """
+    Schema used for setting user information. This schema is for write access only
+    """
+
     timezone = marshmallow.fields.String(
-        description="Timezone as tz database format",
+        description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         required=True,
     )
     public_name = marshmallow.fields.String(
-        example='Suri Cate',
+        example='John Doe',
         required=True,
     )
     lang = marshmallow.fields.String(
-        description="User langage in iso639 format",
+        description=FIELD_LANG_DESC,
         example='en',
         required=True,
         validate=Length(min=2, max=3),
@@ -174,11 +183,15 @@ class UserInfosSchema(marshmallow.Schema):
         return UserInfos(**data)
 
 
-class UserProfileSchema(marshmallow.Schema):
+class SetUserProfileSchema(marshmallow.Schema):
+    """
+    Schema used for setting user profile. This schema is for write access only
+    """
     profile = marshmallow.fields.String(
         attribute='profile',
         validate=OneOf(Profile._NAME),
         example='trusted-users',
+        description=FIELD_PROFILE_DESC,
     )
     @post_load
     def create_user_profile(self, data):
@@ -188,7 +201,7 @@ class UserProfileSchema(marshmallow.Schema):
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='suri.cate@algoo.fr'
+        example='hello@tracim.fr'
     )
     password = marshmallow.fields.String(
         example='8QLa$<w',
@@ -199,21 +212,22 @@ class UserCreationSchema(marshmallow.Schema):
         validate=OneOf(Profile._NAME),
         example='trusted-users',
         required=False,
-        default=Group.TIM_USER_GROUPNAME
+        default=Group.TIM_USER_GROUPNAME,
+        description=FIELD_PROFILE_DESC,
     )
     timezone = marshmallow.fields.String(
-        description="Timezone as tz database format",
+        description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         required=False,
         default=''
     )
     public_name = marshmallow.fields.String(
-        example='Suri Cate',
+        example='John Doe',
         required=False,
         default=None,
     )
     lang = marshmallow.fields.String(
-        description="User langage in iso639 format",
+        description=FIELD_LANG_DESC,
         example='en',
         required=False,
         validate=Length(min=2, max=3),
@@ -522,7 +536,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='suri.cate@algoo.fr'
+        example='hello@tracim.fr'
     )
 
     @post_load
@@ -533,7 +547,7 @@ class ResetPasswordRequestSchema(marshmallow.Schema):
 class ResetPasswordCheckTokenSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='suri.cate@algoo.fr'
+        example='hello@tracim.fr'
     )
     reset_password_token = marshmallow.fields.String(
         description="token to reset password of given user",
@@ -548,7 +562,7 @@ class ResetPasswordCheckTokenSchema(marshmallow.Schema):
 class ResetPasswordModifySchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=True,
-        example='suri.cate@algoo.fr'
+        example='hello@tracim.fr'
     )
     reset_password_token = marshmallow.fields.String(
         description="token to reset password of given user",
@@ -571,7 +585,7 @@ class ResetPasswordModifySchema(marshmallow.Schema):
 class BasicAuthSchema(marshmallow.Schema):
 
     email = marshmallow.fields.Email(
-        example='suri.cate@algoo.fr',
+        example='hello@tracim.fr',
         required=True
     )
     password = marshmallow.fields.String(

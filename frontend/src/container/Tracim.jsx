@@ -93,10 +93,10 @@ class Tracim extends React.Component {
   loadAppConfig = async () => {
     const { props } = this
 
-    const fetchGetAppList = await props.dispatch(getAppList(props.user))
+    const fetchGetAppList = await props.dispatch(getAppList())
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
 
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList(props.user))
+    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
@@ -152,19 +152,16 @@ class Tracim extends React.Component {
 
             <Route exact path={PAGE.HOME} component={() => {
               switch (props.user.logged) {
-                case true: return props.workspaceList.length > 0
-                  ? <Redirect to={{pathname: PAGE.WORKSPACE.ROOT, state: {from: props.location}}} />
-                  : <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />
-                case false: return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+                case true: return <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />
+                case false: return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
                 case null: return null
               }
             }} />
 
             <Route path='/workspaces/:idws?' render={() => // Workspace Router
               <div>
-                <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
-                  ? null // @FIXME this needs to be handled in case of new user that has no workspace
-                  : <Redirect to={{pathname: PAGE.WORKSPACE.DASHBOARD(props.workspaceList[0].id), state: {from: props.location}}} />
+                <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
+                  <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
                 } />
 
                 <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'
