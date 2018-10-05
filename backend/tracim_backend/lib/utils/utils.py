@@ -45,12 +45,20 @@ def get_login_frontend_url(config: 'CFG'):
     return get_root_frontend_url(config) + 'login'
 
 
-def get_reset_password_frontend_url(config: 'CFG', token: str):
+def get_reset_password_frontend_url(
+    config: 'CFG',
+    token: str,
+    email: str,
+) -> str:
     """
     Return reset password url
     """
-    # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for login_url  # nopep8
-    return get_root_frontend_url(config) + 'reset-password-request/{token}'.format(token=token)  # nopep8
+    return '{base_url}{path}?token={token}&email={email}'.format(
+        base_url=get_root_frontend_url(config),
+        path='reset-password',
+        token=token,
+        email=email,
+    )
 
 
 def get_email_logo_frontend_url(config: 'CFG'):
