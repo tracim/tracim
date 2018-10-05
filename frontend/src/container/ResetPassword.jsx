@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import { withRouter } from 'react-router-dom'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -9,6 +10,7 @@ import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { postResetPassword } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
+import { PAGE } from '../helper.js'
 
 const qs = require('query-string')
 
@@ -19,8 +21,8 @@ export class ResetPassword extends React.Component {
     this.state = {
       newPassword: '',
       newPassword2: '',
-      userEmail: query.email,
-      userToken: query.token
+      userEmail: query.email || '',
+      userToken: query.token || ''
     }
   }
 
@@ -33,9 +35,32 @@ export class ResetPassword extends React.Component {
   handleClickSubmit = async () => {
     const { props, state } = this
 
+    if (state.newPassword.length < 6) {
+      props.dispatch(newFlashMessage(props.t('New password is too short (minimum 6 characters)'), 'warning'))
+      return
+    }
+
+    if (state.newPassword.length > 512) {
+      props.dispatch(newFlashMessage(props.t('New password is too long (maximum 512 characters)'), 'warning'))
+      return
+    }
+
+    if (state.newPassword !== state.newPassword2) {
+      props.dispatch(newFlashMessage(props.t('New passwords are different'), 'warning'))
+      return
+    }
+
+    if (state.userEmail === '' || state.userToken === '') {
+      props.dispatch(newFlashMessage(props.t('Information are missing, please use the link in the email your should have received to reset your password'), 'warning'))
+      return
+    }
+
     const fetchPostResetPassword = await props.dispatch(postResetPassword(state.newPassword, state.newPassword2, state.userEmail, state.userToken))
     switch (fetchPostResetPassword.status) {
-      case 204: props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login.'), 'info')); break
+      case 204:
+        props.history.push(PAGE.LOGIN)
+        props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login'), 'info'))
+        break
       default: props.dispatch(newFlashMessage(props.t('An error has happened. Please try again.'), 'warning'))
     }
   }
@@ -84,7 +109,7 @@ export class ResetPassword extends React.Component {
                     <div className='d-flex align-items-end'>
                       <Button
                         htmlType='button'
-                        bootstrapType='primary'
+                        bootstrapType=''
                         customClass='btnSubmit resetpassword__card__body__btnsubmit ml-auto'
                         label={props.t('Validate')}
                         onClick={this.handleClickSubmit}
@@ -104,4 +129,4 @@ export class ResetPassword extends React.Component {
 }
 
 const mapStateToProps = () => ({})
-export default connect(mapStateToProps)(translate()(ResetPassword))
+export default connect(mapStateToProps)(withRouter(translate()(ResetPassword)))

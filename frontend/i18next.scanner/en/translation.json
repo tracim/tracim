@@ -144,5 +144,7 @@
   "Reset password": "Reset password",
   "Confirm password": "Confirm password",
   "We are going to send you an email containing a link to reset your password": "We are going to send you an email containing a link to reset your password",
-  "Your password has been changed, you can now login.": "Your password has been changed, you can now login."
+  "Cancel": "Cancel",
+  "Information are missing, please use the link in the email your should have received to reset your password": "Information are missing, please use the link in the email your should have received to reset your password",
+  "Your password has been changed, you can now login": "Your password has been changed, you can now login"
 }

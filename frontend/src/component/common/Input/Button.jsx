@@ -19,7 +19,7 @@ export default Button
 Button.propTypes = {
   htmlType: PropTypes.oneOf(['button', 'submit', 'reset']).isRequired,
   bootstrapType: PropTypes.oneOf(
-    ['primary', 'default', 'default', 'success', 'danger', 'warning', 'info', 'light', 'dark']
+    ['primary', 'default', 'default', 'success', 'danger', 'warning', 'info', 'light', 'dark', '']
   ).isRequired,
   customClass: PropTypes.string,
   label: PropTypes.string,

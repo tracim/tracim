@@ -9,6 +9,7 @@ import InputGroupText from '../component/common/Input/InputGroupText.jsx'
 import Button from '../component/common/Input/Button.jsx'
 import { postForgotPassword } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
+import { PAGE } from '../helper.js'
 
 export class ForgotPassword extends React.Component {
   constructor (props) {
@@ -24,6 +25,8 @@ export class ForgotPassword extends React.Component {
   handleInputKeyDown = e => e.key === 'Enter' && this.handleClickSubmit()
 
   handleChangeBackupEmail = e => this.setState({backupEmail: {value: e.target.value, isInvalid: false}})
+
+  handleClickCancel = () => this.props.history.push(PAGE.LOGIN)
 
   handleClickSubmit = async () => {
     const { props, state } = this
@@ -73,11 +76,19 @@ export class ForgotPassword extends React.Component {
                       {props.t('We are going to send you an email containing a link to reset your password')}
                     </div>
 
-                    <div className='d-flex align-items-end'>
+                    <div className='forgotpassword__card__body__btn'>
                       <Button
                         htmlType='button'
-                        bootstrapType='primary'
-                        customClass='btnSubmit forgotpassword__card__body__btnsubmit ml-auto'
+                        bootstrapType=''
+                        customClass='outlineTextBtn nohover forgotpassword__card__body__btncancel btn primaryColorFont primaryColorBorder'
+                        label={props.t('Cancel')}
+                        onClick={this.handleClickCancel}
+                      />
+
+                      <Button
+                        htmlType='button'
+                        bootstrapType=''
+                        customClass='btnSubmit forgotpassword__card__body__btnsubmit'
                         label={props.t('Validate')}
                         onClick={this.handleClickSubmit}
                       />
