@@ -19,7 +19,7 @@ from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticat
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_EMAIL_LOGIN_HEADER
-from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
+from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM, LDAPBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.cors import add_cors_support
@@ -79,6 +79,32 @@ def web(global_config, **local_settings):
             realm=BASIC_AUTH_WEBUI_REALM
         ),
     ]
+
+    # Hack for ldap
+    if app_config.AUTH_TYPE=='ldap':
+        import ldap
+        configurator.include('pyramid_ldap')
+        configurator.ldap_setup(
+            app_config.LDAP_URL,
+            bind=app_config.LDAP_BIND_DN,
+            passwd=app_config.LDAP_BIND_PASS
+        )
+        configurator.ldap_set_login_query(
+            base_dn=app_config.LDAP_USER_BASE_DN,
+            filter_tmpl='(mail=%(login)s)',
+            scope=ldap.SCOPE_ONELEVEL,
+        )
+        configurator.ldap_set_groups_query(
+            base_dn=app_config.LDAP_GROUP_BASE_DN,
+            filter_tmpl=app_config.LDAP_GROUP_FILTER,
+            scope=ldap.SCOPE_SUBTREE,
+            cache_period=600,
+        )
+        policies.insert(0, LDAPBasicAuthAuthenticationPolicy(
+            realm=BASIC_AUTH_WEBUI_REALM
+        ))
+        print(policies)
+
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()

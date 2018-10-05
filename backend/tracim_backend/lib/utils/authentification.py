@@ -8,7 +8,7 @@ from pyramid.authentication import extract_http_basic_credentials
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from zope.interface import implementer
-
+import transaction
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models import User
@@ -70,6 +70,64 @@ class TracimBasicAuthAuthenticationPolicy(
                 or user.is_deleted \
                 or not credentials \
                 or not user.validate_password(credentials.password):
+            return None
+        return user.user_id
+
+from pyramid_ldap import (
+    get_ldap_connector,
+    groupfinder,
+    )
+
+@implementer(IAuthenticationPolicy)
+class LDAPBasicAuthAuthenticationPolicy(BasicAuthAuthenticationPolicy):
+
+    def __init__(self, realm):
+        BasicAuthAuthenticationPolicy.__init__(self, check=None, realm=realm)
+        # TODO - G.M - 2018-09-21 - Disable callback is needed to have BasicAuth
+        # correctly working, if enabled, callback method will try check method
+        # who is now disabled (uneeded because we use directly
+        # authenticated_user_id) and failed.
+        self.callback = None
+
+    def authenticated_userid(self, request):
+        # check if user is correct
+        credentials = extract_http_basic_credentials(request)
+
+        connector = get_ldap_connector(request)
+        print(vars(connector))
+        data = connector.authenticate(
+            request.unauthenticated_userid,
+            credentials.password
+        )
+        user = None
+        print(data)
+        #print (data is not None and isinstance(data[1], dict))
+        if data:
+            ldap_data = data[1]
+
+            user = _get_auth_unsafe_user(
+                request,
+                email=request.unauthenticated_userid
+            )
+            if not user:
+                app_config = request.registry.settings['CFG']
+                uapi = UserApi(None, session=request.dbsession, config=app_config)
+                user = uapi.create_user(
+                    email = ldap_data['mail'][0],
+                    password = ldap_data['userpassword'][0],
+                    name = ldap_data['givenname'][0],
+                    do_save = True,
+                    do_notify = False
+                )
+                transaction.commit()
+
+        # or not user.validate_password(credentials.password)
+        if not user \
+                or user.email != request.unauthenticated_userid \
+                or not user.is_active \
+                or user.is_deleted \
+                or not credentials:
+
             return None
         return user.user_id
 

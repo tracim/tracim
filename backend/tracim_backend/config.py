@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from urllib.parse import urlparse
 
 import os
@@ -118,6 +118,9 @@ class CFG(object):
                 'ERROR: preview_cache_dir configuration is mandatory. '
                 'Set it before continuing.'
             )
+        self.AUTH_TYPE = settings.get(
+            'auth_type', 'internal'
+        )
 
         # TODO - G.M - 2018-09-11 - Deprecated param
         # self.DATA_UPDATE_ALLOWED_DURATION = int(settings.get(
@@ -582,6 +585,45 @@ class CFG(object):
                 'please set frontend.dist_folder.path'
                 'with a correct value'.format(self.FRONTEND_DIST_FOLDER_PATH)
             )
+        self.load_ldap_settings(settings)
+
+
+    def load_ldap_settings(self, settings):
+        """
+        Will parse config file to setup new matching attribute in the instance
+        :param settings:
+        :return:
+        """
+        param = namedtuple('parameter', 'ini_name cfg_name default_value adapter')
+
+        ldap_parameters = [
+            param('ldap_url',                   'LDAP_URL',           'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_base_dn',               'LDAP_BASE_DN',       'dc=directory,dc=fsf,dc=org', None),
+            param('ldap_bind_dn',               'LDAP_BIND_DN',       'cn = admin, dc = directory,dc=fsf,dc=org', None),
+            param('ldap_bind_pass',             'LDAP_BIND_PASS',     'default value', None),
+            param('ldap_ldap_naming_attribute', 'LDAP_NAMING_ATTR',   'default value', None),
+            param('ldap_user_attributes',       'LDAP_USER_ATTR',     'default value', None),
+            param('ldap_tls',                   'LDAP_TLS',           'default value', asbool),
+            param('ldap_group_enabled',         'LDAP_GROUP_ENABLED', 'default value', None),
+            param('ldap_user_base_dn',          'LDAP_USER_BASE_DN',  'default value', None),
+            param('ldap_user_filter',           'LDAP_USER_FILTER',   'default value', None),
+            param('ldap_group_base_dn',         'LDAP_GROUP_BASE_DN', 'default value', None),
+            param('ldap_group_filter',          'LDAP_GROUP_FILTER',  'default value', None),
+        ]
+
+        for prm in ldap_parameters:
+            if prm.adapter:
+                # Apply given function as a data modifier before setting value
+                setattr(self,
+                        prm.cfg_name,
+                        prm.adapter( settings.get( prm.ini_name, prm.default_value) )
+                        )
+            else:
+                setattr(self,
+                        prm.cfg_name,
+                        settings.get( prm.ini_name, prm.default_value )
+                        )
+
 
     def configure_filedepot(self):
 
