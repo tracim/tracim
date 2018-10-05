@@ -92,28 +92,34 @@ function setup_db {
     fi
 }
 
-function install_nodejs {
-    log "verify if nodjs is installed"
-    dpkg -l | grep '^ii' | grep 'nodejs\s'
-
+function install_npm_and_nodejs {
+    log "verify if npm is installed"
+    npm -v
     if [ $? -eq 0 ]; then
-        loggood "nodjs is installed"
+        loggood "npm \"$(npm -v)\" and node \"$(node -v)\" are installed"
     else
-        log "install nodejs"
+        logerror "npm not installed"
+        log "install npm with nodejs"
         $SUDO apt install -y curl && loggood "success" || logerror "some error"
         curl -sL https://deb.nodesource.com/setup_8.x | $SUDOCURL bash -
         $SUDO apt update
         $SUDO apt install -y nodejs && loggood "success" || logerror "some error"
-        log "verify if nodjs 8.x is now installed"
+        log "verify if nodejs 8.x is now installed"
         dpkg -l | grep '^ii' | grep 'nodejs\s' | grep '\s8.'
         if [ $? -eq 0 ]; then
-            loggood "nodjs 8.x is installed"
+            loggood "node \"$(node -v)\" is correctly installed"
+            npm -v
+            if [ $? -eq 0 ]; then
+                loggood  "npm \"$(npm -v)\" is correctly installed"
+            else
+                logerror "npm is not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
+            exit 1
+            fi
         else
-            logerror "nodejs 8.x is not installed"
+            logerror "nodejs 8.x and npm are not installed - you use node \"$(node -v)\" - Please re-install manually your version of nodejs - tracim install stopped"
             exit 1
         fi
     fi
-
 }
 
 function translate_email {
@@ -133,9 +139,9 @@ fi
 
 DEFAULTDIR=$(pwd)
 export DEFAULTDIR
-log "This is DEFAULTDIR of tracim_v2 => \"$DEFAULTDIR\""
+echo "This is DEFAULTDIR of tracim_v2 => \"$DEFAULTDIR\""
 
-install_nodejs
+install_npm_and_nodejs
 log "go to backend subdir.."
 cd $DEFAULTDIR/backend  || exit 1
 install_backend_system_dep
