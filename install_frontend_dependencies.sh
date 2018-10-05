@@ -141,9 +141,13 @@ log "npm i"
 npm i && loggood "success" || logerror "some error"
 log "npm link tracim_frontend_lib"
 npm link tracim_frontend_lib && loggood "success" || logerror "some error"
-log "cp configEnv.json.sample configEnv.json"
-cp configEnv.json.sample configEnv.json && loggood "success" || logerror "some error"
-
+log "check if configEnv.json exist"
+if [ ! -f configEnv.json ]; then
+    log "cp configEnv.json.sample configEnv.json ..."
+    cp configEnv.json.sample configEnv.json && loggood "success" || logerror "some error"
+else
+    loggood "configEnv.json already exist"
+fi
 
 # Return to "$DEFAULTDIR/"
 log "cd $DEFAULTDIR"
