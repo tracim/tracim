@@ -48,15 +48,15 @@
     "style-loader": "^0.19.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "tracim_lib": "git://github.com/tracim/tracim_lib.git",
+    "tracim_lib": "https://github.com/tracim/tracim_lib.git",
     "url-loader": "^0.6.2",
-    "webpack": "^3.8.1",
+    "webpack": "^3.12.0",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "i18next-scanner": "^2.6.1",
     "json-server": "^0.12.0",
-    "webpack-dashboard": "^1.0.2",
+    "webpack-dashboard": "^1.1.1",
     "webpack-dev-server": "^2.9.2"
   },
   "standard": {
