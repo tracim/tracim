@@ -455,7 +455,11 @@ class EmailManager(object):
         context = {
             'user': user,
             'logo_url': get_email_logo_frontend_url(self.config),
-            'reset_password_url': get_reset_password_frontend_url(self.config, token=reset_password_token),  # nopep8
+            'reset_password_url': get_reset_password_frontend_url(
+                self.config,
+                token=reset_password_token,
+                email=user.email,
+            ),
         }
         body_text = self._render_template(
             mako_template_filepath=text_template_file_path,
