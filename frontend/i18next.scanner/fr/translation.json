@@ -141,8 +141,8 @@
   "Forgot password": "Mot de passe oublié",
   "Did you forget your password ?": "Vous avez oublié votre mot de passe ?",
   "Email": "Email",
-  "Your password has been changed. You can now login.": "Votre mot de passe a été changé, vous pouvez vous connecter.",
   "Reset password": "Réinitialiser votre mot de passe",
   "Confirm password": "Confirmer le mot de passe",
-  "We are going to send you an email containing a link to reset your password": "Nous allons vous envoyer un email contenant un lien pour réinitialiser votre mot de passe"
+  "We are going to send you an email containing a link to reset your password": "Nous allons vous envoyer un email contenant un lien pour réinitialiser votre mot de passe",
+  "Your password has been changed, you can now login.": "__NOT_TRANSLATED__"
 }

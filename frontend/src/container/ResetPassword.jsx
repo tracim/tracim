@@ -30,7 +30,7 @@ export class ResetPassword extends React.Component {
 
     const fetchPostResetPassword = await props.dispatch(postResetPassword(state.backupEmail.value))
     switch (fetchPostResetPassword.status) {
-      case 200: props.dispatch(newFlashMessage(props.t('Your password has been changed. You can now login.'), 'info')); break
+      case 200: props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login.'), 'info')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened. Please try again.'), 'warning'))
     }
   }
