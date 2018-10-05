@@ -10,12 +10,17 @@ import Button from '../component/common/Input/Button.jsx'
 import { postResetPassword } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 
+const qs = require('query-string')
+
 export class ResetPassword extends React.Component {
   constructor (props) {
     super(props)
+    const query = qs.parse(props.location.search)
     this.state = {
       newPassword: '',
-      newPassword2: ''
+      newPassword2: '',
+      userEmail: query.email,
+      userToken: query.token
     }
   }
 
@@ -28,9 +33,9 @@ export class ResetPassword extends React.Component {
   handleClickSubmit = async () => {
     const { props, state } = this
 
-    const fetchPostResetPassword = await props.dispatch(postResetPassword(state.backupEmail.value))
+    const fetchPostResetPassword = await props.dispatch(postResetPassword(state.newPassword, state.newPassword2, state.userEmail, state.userToken))
     switch (fetchPostResetPassword.status) {
-      case 200: props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login.'), 'info')); break
+      case 204: props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login.'), 'info')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened. Please try again.'), 'warning'))
     }
   }

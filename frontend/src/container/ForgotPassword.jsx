@@ -30,7 +30,7 @@ export class ForgotPassword extends React.Component {
 
     const fetchPostResetPassword = await props.dispatch(postForgotPassword(state.backupEmail.value))
     switch (fetchPostResetPassword.status) {
-      case 200: props.dispatch(newFlashMessage(props.t("Email sent. Don't forget to check your spam."), 'info')); break
+      case 204: props.dispatch(newFlashMessage(props.t("Email sent. Don't forget to check your spam."), 'info')); break
       case 400: props.dispatch(newFlashMessage(props.t('Email unknown'), 'warning')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened. Please try again.'), 'warning'))
     }

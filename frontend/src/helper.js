@@ -31,8 +31,8 @@ export const PAGE = {
     ADMIN: (idws = ':idws') => `/workspaces/${idws}/admin`
   },
   LOGIN: '/login',
-  FORGOT_PASSWORD: '/forgot_password',
-  RESET_PASSWORD: '/reset_password',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
   ACCOUNT: '/account',
   ADMIN: {
     ROOT: '/admin',
