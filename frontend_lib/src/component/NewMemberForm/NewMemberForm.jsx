@@ -13,7 +13,7 @@ export const NewMemberForm = props =>
     <div className='memberlist__form__member'>
       <div className='memberlist__form__member__name'>
         <label className='name__label' htmlFor='addmember'>
-          {props.t('Enter the name or email of the member')}
+          {props.t('Enter the name or email of the user')}
         </label>
 
         <input
