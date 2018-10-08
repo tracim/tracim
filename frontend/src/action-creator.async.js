@@ -1,4 +1,5 @@
 import {FETCH_CONFIG, PAGE, unLoggedAllowedPageList} from './helper.js'
+import i18n from './i18n.js'
 import {
   USER_LOGIN,
   USER_LOGOUT,
@@ -25,7 +26,8 @@ import {
   WORKSPACE_READ_STATUS,
   USER_WORKSPACE_DO_NOTIFY,
   USER,
-  USER_WORKSPACE_LIST
+  USER_WORKSPACE_LIST,
+  newFlashMessage
 } from './action-creator.sync.js'
 
 /*
@@ -50,51 +52,60 @@ import {
 const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) => {
   dispatch({type: `${param.method}/${actionName}/PENDING`})
 
-  const fetchResult = await fetch(url, param)
-  fetchResult.json = await (async () => {
+  try {
+    const fetchResult = await fetch(url, param)
+    fetchResult.json = await (async () => {
+      switch (fetchResult.status) {
+        case 200:
+        case 304:
+          return fetchResult.json()
+        case 204:
+          return ''
+        case 401:
+          if (!unLoggedAllowedPageList.includes(document.location.pathname) && document.location.pathname !== PAGE.HOME) {
+            document.location.href = `${PAGE.LOGIN}?dc=1`
+          }
+          return ''
+        case 400:
+        case 403:
+        case 404:
+        case 409:
+        case 500:
+        case 501:
+        case 502:
+        case 503:
+        case 504:
+          return '' // @TODO : handle errors
+      }
+    })()
+    if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
+
+    // if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+    // else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
     switch (fetchResult.status) {
       case 200:
-      case 304:
-        return fetchResult.json()
       case 204:
-        return ''
-      case 401:
-        if (!unLoggedAllowedPageList.includes(document.location.pathname) && document.location.pathname !== PAGE.HOME) {
-          document.location.href = `${PAGE.LOGIN}?dc=1`
-        }
-        return ''
+      case 304:
+        dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
+        break
       case 400:
+      case 401:
       case 403:
       case 404:
-      case 409:
       case 500:
-      case 501:
-      case 502:
-      case 503:
-      case 504:
-        return '' // @TODO : handle errors
+        dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
+        break
     }
-  })()
-  if (debug) console.log(`fetch ${param.method}/${actionName} result: `, fetchResult)
 
-  // if ([200, 204, 304].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
-  // else if ([400, 404, 500].includes(fetchResult.status)) dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
-  switch (fetchResult.status) {
-    case 200:
-    case 204:
-    case 304:
-      dispatch({type: `${param.method}/${actionName}/SUCCESS`, data: fetchResult.json})
-      break
-    case 400:
-    case 401:
-    case 403:
-    case 404:
-    case 500:
-      dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
-      break
+    return fetchResult
+
+  } catch (e) {
+    if (e instanceof TypeError) {
+      dispatch(newFlashMessage(i18n.t('Server unreachable'), 'danger'))
+      console.error(e)
+    }
+    return {status: 'failedToFetch'} // Côme - 2018/10/08 - this status is unused, the point is only to return an object with a status attribute
   }
-
-  return fetchResult
 }
 
 export const postUserLogin = (login, password, rememberMe) => async dispatch => {

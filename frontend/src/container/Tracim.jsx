@@ -68,12 +68,12 @@ class Tracim extends React.Component {
 
   async componentDidMount () {
     // console.log('<Tracim> did Mount')
-    const { dispatch } = this.props
+    const { props } = this
 
-    const fetchGetUserIsConnected = await dispatch(getUserIsConnected())
+    const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200:
-        dispatch(setUserConnected({
+        props.dispatch(setUserConnected({
           ...fetchGetUserIsConnected.json,
           logged: true
         }))
@@ -81,10 +81,8 @@ class Tracim extends React.Component {
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
-      case 401:
-        dispatch(setUserConnected({logged: false})); break
-      default:
-        dispatch(setUserConnected({logged: null})); break
+      case 401: props.dispatch(setUserConnected({logged: false})); break
+      default: props.dispatch(setUserConnected({logged: false})); break
     }
   }
 
