@@ -144,5 +144,7 @@
   "Reset password": "Réinitialiser votre mot de passe",
   "Confirm password": "Confirmer le mot de passe",
   "We are going to send you an email containing a link to reset your password": "Nous allons vous envoyer un email contenant un lien pour réinitialiser votre mot de passe",
-  "Your password has been changed, you can now login.": "__NOT_TRANSLATED__"
+  "Your password has been changed, you can now login": "Votre mot de passe a été changé, vous pouvez vous connecter",
+  "Information are missing, please use the link in the email your should have received to reset your password": "Informations manquantes, veuillez utiliser le lien de l'email que vous devez avoir reçu pour changer votre mot de passe",
+  "Cancel": "Annuler"
 }
