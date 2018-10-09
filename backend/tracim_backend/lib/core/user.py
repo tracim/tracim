@@ -38,16 +38,20 @@ class UserApi(object):
             session: Session,
             config: CFG,
             show_deleted: bool = False,
+            show_deactivated: bool = True,
     ) -> None:
         self._session = session
         self._user = current_user
         self._config = config
         self._show_deleted = show_deleted
+        self._show_deactivated = show_deactivated
 
     def _base_query(self):
         query = self._session.query(User)
         if not self._show_deleted:
             query = query.filter(User.is_deleted == False)
+        if not self._show_deactivated:
+            query = query.filter(User.is_active == True)
         return query
 
     def get_user_with_context(self, user: User) -> UserInContext:
@@ -126,7 +130,7 @@ class UserApi(object):
             raise TooShortAutocompleteString(
                 '"{acp}" is a too short string, acp string need to have more than one character'.format(acp=acp)  # nopep8
             )
-        query = self._get_all_query()
+        query = self._base_query().order_by(User.display_name)
         query = query.filter(or_(User.display_name.ilike('%{}%'.format(acp)), User.email.ilike('%{}%'.format(acp))))  # nopep8
 
         # INFO - G.M - 2018-07-27 - if user is set and is simple user, we

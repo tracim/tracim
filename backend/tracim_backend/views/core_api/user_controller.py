@@ -114,6 +114,7 @@ class UserController(Controller):
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
+            show_deactivated=False,
         )
         users = uapi.get_known_user(acp=hapic_data.query.acp)
         context_users = [
