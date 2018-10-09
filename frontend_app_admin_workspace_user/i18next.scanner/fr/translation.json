@@ -29,5 +29,6 @@
   "Shared space": "Espace partagé",
   "There is no shared space yet": "Il n'y a aucun espace partagé",
   "Error while loading shared spaces list": "Erreur lors du chargemetn des espaces partagés",
-  "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé"
+  "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
+  "You can't remove yourself from Administrator": "Vous ne pouvez pas vous retirer le profil administrateur"
 }

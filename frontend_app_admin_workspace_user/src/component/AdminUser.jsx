@@ -56,6 +56,20 @@ export class AdminUser extends React.Component {
     e.preventDefault()
     e.stopPropagation()
 
+    const { props } = this
+
+    if (!toggle && props.idLoggedUser === idUser) {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t("You can't remove yourself from Administrator"),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
+
     if (toggle) this.props.onChangeProfile(idUser, 'administrators')
     else this.props.onChangeProfile(idUser, 'trusted-users')
   }

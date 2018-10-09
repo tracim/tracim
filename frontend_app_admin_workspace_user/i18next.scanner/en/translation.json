@@ -29,5 +29,6 @@
   "Shared space": "Shared space",
   "There is no shared space yet": "There is no shared space yet",
   "Error while loading shared spaces list": "Error while loading shared spaces list",
-  "Error while deleting shared space": "Error while deleting shared space"
+  "Error while deleting shared space": "Error while deleting shared space",
+  "You can't remove yourself from Administrator": "You can't remove yourself from Administrator"
 }
