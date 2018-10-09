@@ -87,15 +87,16 @@
 
 // MEDIAQUERIES
 
-@media (min-width: min-lg) and (max-width: max-lg)
-
+columnTimeline()
   .timeline
-    display block
+    display flex
+    flex-direction column
     margin 0
     &__header
       flex-direction row
       border-radius 10px 10px 0 0
       width 100%
+      cursor auto
       &__icon
         display none
       &__title
@@ -105,65 +106,21 @@
         transform none
         width 100%
         height 50px
+
+
+@media (min-width: min-lg) and (max-width: max-lg)
+  columnTimeline()
 
 @media (min-width: min-md) and (max-width: max-md)
-
-    .timeline
-      display flex
-      flex-direction column
-      margin 0
-      &__header
-        flex-direction row
-        border-radius 10px 10px 0 0
-        width 100%
-        &__icon
-          display none
-        &__title
-          display flex
-          justify-content center
-          align-items center
-          transform none
-          width 100%
-          height 50px
+  columnTimeline()
 
 @media (min-width: min-sm) and (max-width: max-sm)
-
-  .timeline
-    display block
-    margin 0
-    &__header
-      flex-direction row
-      border-radius 10px 10px 0 0
-      width 100%
-      &__icon
-        display none
-      &__title
-        display flex
-        justify-content center
-        align-items center
-        transform none
-        width 100%
-        height 50px
+  columnTimeline()
 
 
 @media (max-width: max-xs)
-
+  columnTimeline()
   .timeline
-    display block
-    margin 0
-    &__header
-      flex-direction row
-      border-radius 10px 10px 0 0
-      width 100%
-      &__icon
-        display none
-      &__title
-        display flex
-        justify-content center
-        align-items center
-        transform none
-        width 100%
-        height 50px
     &__body
       &__messagelist
         &__version__date

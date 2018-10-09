@@ -6,22 +6,22 @@ import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
 import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 
-import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
-import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
-import Checkbox from './component/Input/Checkbox.jsx'
+// import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
+// import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
+// import Checkbox from './component/Input/Checkbox.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import TimelineDebugData from './component/Timeline/debugData.js'
 
-import Delimiter from './component/Delimiter/Delimiter.jsx'
-
-import CardPopup from './component/CardPopup/CardPopup.jsx'
-import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
+// import Delimiter from './component/Delimiter/Delimiter.jsx'
+//
+// import CardPopup from './component/CardPopup/CardPopup.jsx'
+// import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
 import { libGenerateAvatarFromPublicName } from './helper.js'
 
-import NewVersionButton from './component/OptionComponent/NewVersionBtn.jsx'
-import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
+// import NewVersionButton from './component/OptionComponent/NewVersionBtn.jsx'
+// import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
 
 ReactDOM.render(
   <div style={{width: '1200px'}}>
@@ -74,9 +74,10 @@ ReactDOM.render(
       />
 
       <PopinFixedContent customClass={`${'randomClass'}__contentpage`} style={{width: '100%'}}>
+        <div className='wsContentGeneric__content__left' />
 
         <Timeline
-          showHeader={false}
+          showHeader
           customClass={`${'randomClass'}__contentpage`}
           customColor={'#3f52e3'}
           loggedUser={{
