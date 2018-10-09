@@ -126,6 +126,21 @@ class SetEmail(object):
         self.email = email
 
 
+class SimpleFile(object):
+    """
+    Simple file object
+    """
+    def __init__(self, files):
+        self.files = files
+
+
+class FileCreation(object):
+    """
+    Simple parent_id object
+    """
+    def __init__(self, parent_id: int = 0):
+        self.parent_id = parent_id
+
 class SetPassword(object):
     """
     Just an password

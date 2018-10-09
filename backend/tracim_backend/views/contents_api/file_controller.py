@@ -3,10 +3,10 @@ import typing
 
 import transaction
 from depot.manager import DepotManager
+from hapic.data import HapicFile
 from preview_generator.exception import UnavailablePreviewType
 from pyramid.config import Configurator
 
-from hapic.data import HapicFile
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
@@ -32,6 +32,7 @@ from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileContentModifySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FileRevisionSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
@@ -39,6 +40,7 @@ from tracim_backend.views.core_api.schemas import PageQuerySchema
 from tracim_backend.views.core_api.schemas import \
     RevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import \
     WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import \
@@ -64,7 +66,8 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.output_body(ContentDigestSchema())
-    # TODO - G.M - 2018-07-24 - Use hapic for input file
+    @hapic.input_forms(FileCreationFormSchema())
+    @hapic.input_files(SimpleFileSchema())
     def create_file(self, context, request: TracimRequest, hapic_data=None):
         """
         Create a file .This will create 2 new
@@ -78,8 +81,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        file = request.POST['files']
-        parent_id = request.POST.get('parent_id') or 0  # FDV
+        file = hapic_data.files.files
+        parent_id = hapic_data.forms.parent_id
         api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
@@ -119,7 +122,7 @@ class FileController(Controller):
     @require_workspace_role(UserRoleInWorkspace.CONTRIBUTOR)
     @require_content_types([FILE_TYPE])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    # TODO - G.M - 2018-07-24 - Use hapic for input file
+    @hapic.input_files(SimpleFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)  # nopep8
     def upload_file(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -138,7 +141,7 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=CONTENT_TYPES.Any_SLUG
         )
-        file = request.POST['files']
+        file = hapic_data.files.files
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
