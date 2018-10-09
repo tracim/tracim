@@ -376,7 +376,7 @@ class Dashboard extends React.Component {
 
               <MemberList
                 customClass='dashboard__memberlist'
-                memberList={props.curWs.memberList}
+                memberList={props.curWs.memberList.filter(u => u.isActive)}
                 roleList={ROLE}
                 searchedKnownMemberList={state.searchedKnownMemberList}
                 autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
