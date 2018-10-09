@@ -27,6 +27,21 @@ export class AdminUser extends React.Component {
   handleToggleUser = (e, idUser, toggle) => {
     e.preventDefault()
     e.stopPropagation()
+
+    const { props } = this
+
+    if (props.idLoggedUser === idUser) {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t("You can't deactivate your own account"),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
+
     this.props.onClickToggleUserBtn(idUser, toggle)
   }
 
