@@ -96,9 +96,7 @@ const fetchWrapper = async ({url, param, actionName, dispatch, debug = false}) =
         dispatch({type: `${param.method}/${actionName}/FAILED`, data: fetchResult.json})
         break
     }
-
     return fetchResult
-
   } catch (e) {
     if (e instanceof TypeError) {
       dispatch(newFlashMessage(i18n.t('Server unreachable'), 'danger'))

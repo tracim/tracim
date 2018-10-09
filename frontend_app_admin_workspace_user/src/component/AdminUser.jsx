@@ -130,7 +130,6 @@ export class AdminUser extends React.Component {
                 </tr>
               </thead>
 
-
               <tbody>
                 {props.userList.map(u => {
                   const userProfile = getUserProfile(props.profile, u.profile)
