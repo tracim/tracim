@@ -2,14 +2,17 @@
 import pytest
 import transaction
 
+from tracim_backend.app_models.contents import CONTENT_STATUS
 from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.exceptions import ContentClosed
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.fixtures.users_and_groups import Test as FixtureTest
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name  # nopep8
+from tracim_backend.lib.core.content import \
+    compare_content_for_sorting_by_type_and_name  # nopep8
 # TODO - G.M - 28-03-2018 - [GroupApi] Re-enable GroupApi
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
@@ -1983,6 +1986,118 @@ class TestContentApi(DefaultTest):
         eq_('new content', updated.description)
         eq_(ActionDescription.EDITION, updated.revision_type)
 
+    def test_unit__update__err__status_closed(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user1 = uapi.create_minimal_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True
+        )
+
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = workspace_api.create_workspace(
+            'test workspace',
+            save_now=True
+        )
+
+        wid = workspace.workspace_id
+
+        user2 = uapi.create_minimal_user('this.is@another.user')
+        uapi.save(user2)
+
+        RoleApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+            flush=True
+        )
+
+        # Test starts here
+
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+
+        p = api.create(
+            content_type_slug=CONTENT_TYPES.Page.slug,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=False
+        )
+        p.status = 'closed-validated'
+        api.save(p)
+        u1id = user1.user_id
+        u2id = user2.user_id
+        pcid = p.content_id
+        poid = p.owner_id
+
+        transaction.commit()
+
+        # Refresh instances after commit
+        user1 = uapi.get_one(u1id)
+        workspace = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        ).get_one(wid)
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        eq_(u1id, content.owner_id)
+        eq_(poid, content.owner_id)
+
+        u2 = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        ).get_one(u2id)
+        api2 = ContentApi(
+            current_user=u2,
+            session=self.session,
+            config=self.app_config,
+        )
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        with new_revision(
+                session=self.session,
+                tm=transaction.manager,
+                content=content2,
+        ):
+            with pytest.raises(ContentClosed):
+                api2.update_content(
+                    content2,
+                    'this is an updated page',
+                    'new content'
+                )
+
     def test_unit__update__err__label_already_used(self):
         uapi = UserApi(
             session=self.session,
@@ -2304,7 +2419,7 @@ class TestContentApi(DefaultTest):
         content3 = api2.get_one(page.content_id, CONTENT_TYPES.Any_SLUG, workspace)
         assert content3.label == 'same_content'
 
-    def test_update_file_data(self):
+    def test_update_file_data__ok_nominal(self):
         uapi = UserApi(
             session=self.session,
             config=self.app_config,
@@ -2432,6 +2547,119 @@ class TestContentApi(DefaultTest):
         eq_('text/html', updated.file_mimetype)
         eq_(b'<html>hello world</html>', updated.depot_file.file.read())
         eq_(ActionDescription.REVISION, updated.revision_type)
+
+    def test_update_file_data__err__content_closed(self):
+        uapi = UserApi(
+            session=self.session,
+            config=self.app_config,
+            current_user=None,
+        )
+        group_api = GroupApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        )
+        groups = [group_api.get_one(Group.TIM_USER),
+                  group_api.get_one(Group.TIM_MANAGER),
+                  group_api.get_one(Group.TIM_ADMIN)]
+
+        user1 = uapi.create_minimal_user(
+            email='this.is@user',
+            groups=groups,
+            save_now=True
+        )
+
+        workspace_api = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = workspace_api.create_workspace(
+            'test workspace',
+            save_now=True
+        )
+        wid = workspace.workspace_id
+
+        user2 = uapi.create_minimal_user('this.is@another.user')
+        uapi.save(user2)
+
+        RoleApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        ).create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=True,
+            flush=True
+        )
+
+        # Test starts here
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+        p = api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=workspace,
+            parent=None,
+            label='this_is_a_page',
+            do_save=False
+        )
+        p.status = 'closed-validated'
+        api.save(p)
+
+        u1id = user1.user_id
+        u2id = user2.user_id
+        pcid = p.content_id
+        poid = p.owner_id
+
+        api.save(p)
+        transaction.commit()
+
+        # Refresh instances after commit
+        user1 = uapi.get_one(u1id)
+        workspace_api2 = WorkspaceApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+        workspace = workspace_api2.get_one(wid)
+        api = ContentApi(
+            current_user=user1,
+            session=self.session,
+            config=self.app_config,
+        )
+
+        content = api.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        eq_(u1id, content.owner_id)
+        eq_(poid, content.owner_id)
+
+        u2 = UserApi(
+            current_user=None,
+            session=self.session,
+            config=self.app_config,
+        ).get_one(u2id)
+        api2 = ContentApi(
+            current_user=u2,
+            session=self.session,
+            config=self.app_config,
+        )
+        content2 = api2.get_one(pcid, CONTENT_TYPES.Any_SLUG, workspace)
+        with new_revision(
+            session=self.session,
+            tm=transaction.manager,
+            content=content2,
+        ):
+            with pytest.raises(ContentClosed):
+                api2.update_file_data(
+                    content2,
+                    'index.html',
+                    'text/html',
+                    b'<html>hello world</html>'
+                )
 
     def test_update_no_change(self):
         uapi = UserApi(

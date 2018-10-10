@@ -1830,6 +1830,69 @@ class TestFiles(FunctionalTest):
         assert content['page_nb'] == 1
         assert content['pdf_available'] is True
 
+    def test_api__update_file_info__ok_400__content_closed(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.txt',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        test_file.status = 'closed-validated'
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        # TODO - G.M - 2018-10-10 - Check result
+
     def test_api__update_file_info__err_400__label_already_used(self) -> None:
         """
         Update(put) one file, failed because label already used
@@ -2229,7 +2292,7 @@ class TestFiles(FunctionalTest):
             workspace=business_workspace,
             parent=tool_folder,
             label='Test file',
-            do_save=True,
+            do_save=False,
             do_notify=False,
         )
         dbsession.flush()
@@ -2257,6 +2320,56 @@ class TestFiles(FunctionalTest):
         assert res.body == image.getvalue()
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
+
+    def test_api__set_file_raw__err_400__closed_file(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.status = 'closed-validated'
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=400,
+        )
+        # TODO - G.M - 2018-10-10 - check res
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)

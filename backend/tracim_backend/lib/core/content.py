@@ -1417,7 +1417,7 @@ class ContentApi(object):
         return
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
-        if CONTENT_STATUS.get_one_by_slug(item.status).global_status == GlobalStatus.CLOSED:  # nopep8
+        if item.status and CONTENT_STATUS.get_one_by_slug(item.status).global_status == GlobalStatus.CLOSED.value:  # nopep8
             raise ContentClosed("Can't update closed file, you need to change his status before any change.")  # nopep8
         if item.label == new_label and item.description == new_content:
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
@@ -1440,7 +1440,7 @@ class ContentApi(object):
         return item
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
-        if CONTENT_STATUS.get_one_by_slug(item.status).global_status == GlobalStatus.CLOSED:  # nopep8
+        if item.status and CONTENT_STATUS.get_one_by_slug(item.status).global_status == GlobalStatus.CLOSED.value:  # nopep8
             raise ContentClosed("Can't update closed file, you need to change his status before any change.")  # nopep8
         if new_mimetype == item.file_mimetype and \
                 new_content == item.depot_file.file.read():
