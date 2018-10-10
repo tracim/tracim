@@ -930,6 +930,9 @@ class ContentDigestSchema(marshmallow.Schema):
                     'for sub-contents. Default is True. '
                     'In first version of the API, this field is always True',
     )
+    file_extension = marshmallow.fields.String(
+        example='.txt'
+    )
 
 
 class ReadStatusSchema(marshmallow.Schema):
@@ -985,9 +988,6 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     pdf_available = marshmallow.fields.Bool(
         description="Is pdf version of file available ?",
         example=True,
-    )
-    file_extension = marshmallow.fields.String(
-        example='.txt'
     )
 
 
