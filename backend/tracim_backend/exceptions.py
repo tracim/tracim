@@ -283,3 +283,7 @@ class UnavailablePreview(TracimException):
 
 class EmptyNotificationError(TracimException):
     pass
+
+
+class ContentClosed(TracimException):
+    pass

@@ -17,19 +17,21 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.attributes import QueryableAttribute
+from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import and_
 
 from tracim_backend.app_models.contents import CONTENT_STATUS
-from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
+from tracim_backend.app_models.contents import GlobalStatus
+from tracim_backend.exceptions import ContentClosed
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
-from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -38,6 +40,7 @@ from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
+from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.utils.logger import logger
@@ -1414,6 +1417,8 @@ class ContentApi(object):
         return
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
+        if CONTENT_STATUS.get_one_by_slug(item.status).global_status == GlobalStatus.CLOSED:  # nopep8
+            raise ContentClosed("Can't update closed file, you need to change his status before any change.")  # nopep8
         if item.label == new_label and item.description == new_content:
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
             # Internatization disabled in libcontent for now.
@@ -1435,6 +1440,8 @@ class ContentApi(object):
         return item
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
+        if CONTENT_STATUS.get_one_by_slug(item.status).global_status == GlobalStatus.CLOSED:  # nopep8
+            raise ContentClosed("Can't update closed file, you need to change his status before any change.")  # nopep8
         if new_mimetype == item.file_mimetype and \
                 new_content == item.depot_file.file.read():
             raise SameValueError('The content did not changed')
