@@ -359,4 +359,4 @@ class WorkspaceAdvanced extends React.Component {
   }
 }
 
-export default Radium(translate()(WorkspaceAdvanced))
+export default translate()(Radium(WorkspaceAdvanced))

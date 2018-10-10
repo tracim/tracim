@@ -5,7 +5,7 @@ import Radium from 'radium'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
 
-require('./Previewcomponent.styl')
+require('./PreviewComponent.styl')
 
 export class PreviewComponent extends React.Component {
   constructor (props) {

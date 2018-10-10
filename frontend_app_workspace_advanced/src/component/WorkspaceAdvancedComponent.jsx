@@ -226,4 +226,4 @@ const WorkspaceAdvancedComponent = props => {
   )
 }
 
-export default Radium(translate()(WorkspaceAdvancedComponent))
+export default translate()(Radium(WorkspaceAdvancedComponent))

@@ -1,9 +1,13 @@
 const webpack = require('webpack')
 const path = require('path')
+const glob = require('glob')
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
-  entry: isProduction ? './src/index.js' : './src/index.dev.js',
+  entry: {
+    libJs: isProduction ? './src/index.js' : './src/index.dev.js',
+    libStyle: glob.sync('./src/**/*.styl')
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: isProduction ? 'tracim_frontend_lib.js' : 'tracim_frontend_lib.dev.js',
@@ -72,7 +76,12 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   plugins:[
-    ...[], // generic plugins always present
+    ...[
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'libStyle',
+        filename: 'tracim_frontend_lib.style.js'
+      })
+    ], // generic plugins always present
     ...(isProduction
       ? [ // production specific plugins
         new webpack.DefinePlugin({
