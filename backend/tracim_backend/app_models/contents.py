@@ -124,6 +124,7 @@ class ContentType(object):
             available_statuses: typing.List[ContentStatus],
             slug_alias: typing.List[str] = None,
             allow_sub_content: bool = False,
+            default_file_extension: typing.Optional[str] = None,
     ):
         self.slug = slug
         self.fa_icon = fa_icon
@@ -133,6 +134,7 @@ class ContentType(object):
         self.available_statuses = available_statuses
         self.slug_alias = slug_alias
         self.allow_sub_content = allow_sub_content
+        self.default_file_extension = default_file_extension
 
 
 THREAD_TYPE = 'thread'

@@ -609,7 +609,8 @@ class CFG(object):
             label='Text Document',
             creation_label='Write a document',
             available_statuses=content_status_list.get_all(),
-            slug_alias=['page']
+            slug_alias=['page'],
+            default_file_extension='.document.html',
         )
 
         _file = Application(
@@ -642,6 +643,7 @@ class CFG(object):
             label='Thread',
             creation_label='Start a topic',
             available_statuses=content_status_list.get_all(),
+            default_file_extension='.thread.html'
         )
 
         folder = Application(
