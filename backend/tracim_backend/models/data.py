@@ -762,19 +762,6 @@ class ContentRevisionRO(DeclarativeBase):
 
         return False
 
-    def get_label_as_file(self):
-        file_extension = self.file_extension or ''
-
-        if self.type == content_type_list.Thread.slug:
-            file_extension = '.html'
-        elif self.type == content_type_list.Page.slug:
-            file_extension = '.html'
-
-        return '{0}{1}'.format(
-            self.label,
-            file_extension,
-        )
-
 # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
 Index('idx__content_revisions__owner_id', ContentRevisionRO.owner_id)
 Index('idx__content_revisions__parent_id', ContentRevisionRO.parent_id)
@@ -1230,12 +1217,6 @@ class Content(DeclarativeBase):
 
     def get_label(self):
         return self.label or self.file_name or ''
-
-    def get_label_as_file(self) -> str:
-        """
-        :return: Return content label in file representation context
-        """
-        return self.revision.get_label_as_file()
 
     def get_status(self) -> ContentStatus:
         return self.revision.get_status()

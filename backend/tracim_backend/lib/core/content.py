@@ -873,7 +873,7 @@ class ContentApi(object):
         Apply normalised filters to found Content corresponding as given label.
         :param query: query to modify
         :param content_label_as_file: label in this
-        FILE version, use Content.get_label_as_file().
+        FILE version, use Content.file_name.
         :param is_case_sensitive: Take care about case or not
         :return: modified query
         """
