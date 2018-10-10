@@ -1,4 +1,6 @@
 // Not connected
+import { login } from '../helpers/index.js'
+
 //describe('navigate :: workspace > create_new > folder', function () {
 //    before(function () {
 //    //login
@@ -6,7 +8,7 @@
 //        cy.get('input[type=email]').should('be.visible')
 //        cy.get('input[type=email]').type('admin@admin.admin')
 //        cy.get('input[type=password]').type('admin@admin.admin')
-//        cy.get('form').find('button').get('.connection__form__btnsubmit').click()
+//        cy.get('.connection__form__btnsubmit').click()
 //    })
 //    after(function() {
 //        cy.get('#dropdownMenuButton').click()

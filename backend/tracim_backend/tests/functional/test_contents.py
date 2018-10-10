@@ -1406,6 +1406,7 @@ class TestFiles(FunctionalTest):
         assert content['raw_content'] == '<p>description</p>'  # nopep8
         assert content['mimetype'] == 'plain/text'
         assert content['size'] == len(b'Test file')
+        assert content['file_extension'] == '.txt'
         assert content['page_nb'] == 1
         assert content['pdf_available'] is True
 
@@ -1474,6 +1475,7 @@ class TestFiles(FunctionalTest):
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == ''
         assert content['mimetype'] == ''
+        assert content['file_extension'] == ''
         assert content['size'] is None
         assert content['page_nb'] is None
         assert content['pdf_available'] is False
@@ -1552,6 +1554,7 @@ class TestFiles(FunctionalTest):
         assert content['raw_content'] == ''
         assert content['mimetype'] == 'application/octet-stream'
         assert content['size'] == 100
+        assert content['file_extension'] == '.bin'
         assert content['page_nb'] is None
         assert content['pdf_available'] is False
 

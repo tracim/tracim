@@ -153,7 +153,7 @@ class FileController(Controller):
                 new_mimetype=file.type,
                 new_content=file.file,
             )
-
+        api.save(content)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__FILE_ENDPOINTS])

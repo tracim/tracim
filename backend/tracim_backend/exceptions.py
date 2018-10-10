@@ -279,3 +279,7 @@ class EmailAlreadyExistInDb(TracimException):
 
 class UnavailablePreview(TracimException):
     pass
+
+
+class EmptyNotificationError(TracimException):
+    pass

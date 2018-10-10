@@ -2,15 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
+require('./InputGroupText.styl')
+
 const InputGroupText = props => {
   return (
-    <div className={classnames(`${props.parentClassName}`, props.customClass, 'form-group')}>
-      <div className={classnames(`${props.parentClassName}__icon`)}>
+    <div className={classnames(`inputGroupText ${props.parentClassName}`, props.customClass, 'form-group')}>
+      <div className={classnames(`inputGroupText__icon ${props.parentClassName}__icon`)}>
         <i className={classnames('fa fa-fw', props.icon)} />
       </div>
       <input
         type={props.type}
-        className={classnames(`${props.parentClassName}__input`, 'form-control', {'is-invalid': props.isInvalid})}
+        className={classnames(`inputGroupText__input ${props.parentClassName}__input`, 'form-control', {'is-invalid': props.isInvalid})}
         placeholder={props.placeHolder}
         value={props.value}
         onChange={props.onChange}

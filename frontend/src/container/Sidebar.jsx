@@ -8,7 +8,7 @@ import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import {
   setWorkspaceListIsOpenInSidebar
 } from '../action-creator.sync.js'
-import { PAGE, workspaceConfig, getUserProfile } from '../helper.js'
+import {PAGE, workspaceConfig, getUserProfile, unLoggedAllowedPageList} from '../helper.js'
 
 class Sidebar extends React.Component {
   constructor (props) {
@@ -37,7 +37,11 @@ class Sidebar extends React.Component {
       props.match.params.idws &&
       props.workspaceList.find(ws => ws.isOpenInSidebar) === undefined
     ) {
-      props.dispatch(setWorkspaceListIsOpenInSidebar(parseInt(props.match.params.idws), true))
+      const idWorkspaceInUrl = parseInt(props.match.params.idws)
+
+      if (props.workspaceList.find(ws => ws.id === idWorkspaceInUrl) !== undefined) {
+        props.dispatch(setWorkspaceListIsOpenInSidebar(idWorkspaceInUrl, true))
+      }
     }
   }
 
@@ -46,8 +50,11 @@ class Sidebar extends React.Component {
   }
 
   shouldDisplaySidebar = () => {
-    const pageWithoutSidebar = [PAGE.LOGIN, PAGE.HOME]
-    return !pageWithoutSidebar.includes(this.props.location.pathname)
+    return ![
+      ...unLoggedAllowedPageList,
+      ...this.props.workspaceList.length > 0 ? [] : [PAGE.HOME]
+    ]
+      .includes(this.props.location.pathname)
   }
 
   handleClickWorkspace = (idWs, newIsOpenInSidebar) => this.props.dispatch(setWorkspaceListIsOpenInSidebar(idWs, newIsOpenInSidebar))

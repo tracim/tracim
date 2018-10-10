@@ -18,7 +18,6 @@ export const debug = { // copied from html-document => outdated
     apiHeader: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
-      // 'Authorization': 'Basic ' + btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`)
     },
     availableStatuses: [{
       label: 'Open',
@@ -54,7 +53,6 @@ export const debug = { // copied from html-document => outdated
     lastname: 'Stoilenom',
     email: 'osef@algoo.fr',
     avatar_url: 'https://avatars3.githubusercontent.com/u/11177014?s=460&v=4',
-    auth: btoa(`${'admin@admin.admin'}:${'admin@admin.admin'}`),
     lang: 'en',
     idRoleUserWorkspace: 8
   },

@@ -308,6 +308,7 @@ class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'user' && (
           <AdminUser
             userList={state.content.userList}
+            idLoggedUser={state.loggedUser.user_id}
             profile={state.content.profile}
             onClickUser={this.handleClickUser}
             onClickToggleUserBtn={this.handleToggleUser}

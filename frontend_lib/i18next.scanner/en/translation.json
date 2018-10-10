@@ -12,12 +12,9 @@
   "edit title": "edit title",
   "Archive": "Archive",
   "Delete": "Delete",
-  "Enter the name or email of the member": "Enter the name or email of the member",
   "Create an account": "Create an account",
   "Choose the role of the member": "Choose the role of the member",
   "Validate": "Validate",
-  "active": "active",
-  "inactive": "inactive",
   "No result": "No result",
   "Status": "Status",
   "Comment": "Comment",
@@ -29,5 +26,6 @@
   "Item restored": "Item restored",
   "Item moved": "Item moved",
   "Item copied": "Item copied",
-  "Item archived": "Item archived"
+  "Item archived": "Item archived",
+  "Enter the name or email of the user": "Enter the name or email of the user"
 }

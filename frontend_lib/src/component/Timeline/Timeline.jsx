@@ -215,6 +215,7 @@ Timeline.propTypes = {
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
   onClickRestoreDeleted: PropTypes.func
+  // toggleRightPart: PropsTypes.func // this props comes from PopinFixedContent
 }
 
 Timeline.defaultProps = {

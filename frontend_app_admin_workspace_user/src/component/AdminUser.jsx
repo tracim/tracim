@@ -27,6 +27,21 @@ export class AdminUser extends React.Component {
   handleToggleUser = (e, idUser, toggle) => {
     e.preventDefault()
     e.stopPropagation()
+
+    const { props } = this
+
+    if (props.idLoggedUser === idUser) {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t("You can't deactivate your own account"),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
+
     this.props.onClickToggleUserBtn(idUser, toggle)
   }
 
@@ -55,6 +70,20 @@ export class AdminUser extends React.Component {
   handleToggleProfileAdministrator = (e, idUser, toggle) => {
     e.preventDefault()
     e.stopPropagation()
+
+    const { props } = this
+
+    if (!toggle && props.idLoggedUser === idUser) {
+      GLOBAL_dispatchEvent({
+        type: 'addFlashMsg',
+        data: {
+          msg: props.t("You can't remove yourself from Administrator"),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
 
     if (toggle) this.props.onChangeProfile(idUser, 'administrators')
     else this.props.onChangeProfile(idUser, 'trusted-users')
@@ -115,7 +144,6 @@ export class AdminUser extends React.Component {
                   <th scope='col'>{props.t('Administrator')}</th>
                 </tr>
               </thead>
-
 
               <tbody>
                 {props.userList.map(u => {

@@ -5,9 +5,9 @@ import classnames from 'classnames'
 const CardBody = props => {
   return (
     <div className='card-body'>
-      <form className={classnames(props.formClass)}>
+      <div className={classnames(props.formClass)}>
         {props.children}
-      </form>
+      </div>
     </div>
   )
 }

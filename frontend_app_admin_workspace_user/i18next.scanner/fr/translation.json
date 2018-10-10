@@ -24,10 +24,12 @@
   "Deactivated": "Désactivé",
   "An administrator can always create shared spaces": "Un administrateur peut toujours créer des espaces partagés",
   "Can create shared space": "Peut créer des espaces partagés",
-  "Shared space management": "Manager",
-  "List of every shared spaces": "List de tous les espaces partagés",
+  "Shared space management": "Management des espaces partagés",
+  "List of every shared spaces": "Liste de tous les espaces partagés",
   "Shared space": "Espace partagé",
   "There is no shared space yet": "Il n'y a aucun espace partagé",
   "Error while loading shared spaces list": "Erreur lors du chargemetn des espaces partagés",
-  "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé"
+  "Error while deleting shared space": "Erreur lors de la suppression de l'espace partagé",
+  "You can't remove yourself from Administrator": "Vous ne pouvez pas vous retirer le profil administrateur",
+  "You can't deactivate your own account": "Vous ne pouvez pas désactiver votre propre compte"
 }
