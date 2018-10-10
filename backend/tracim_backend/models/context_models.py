@@ -854,6 +854,13 @@ class ContentInContext(object):
         else:
             return False
 
+    @property
+    def file_extension(self) -> str:
+        """
+        :return: file extension with "." at the beginning, example : .txt
+        """
+        return self.content.file_extension
+
 
 class RevisionInContext(object):
     """
@@ -1058,3 +1065,10 @@ class RevisionInContext(object):
             return content_api.has_pdf_preview(self.revision.revision_id)
         else:
             return False
+
+    @property
+    def file_extension(self) -> str:
+        """
+        :return: file extension with "." at the beginning, example : .txt
+        """
+        return self.revision.file_extension

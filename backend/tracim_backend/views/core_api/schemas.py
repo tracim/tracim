@@ -958,6 +958,9 @@ class FileInfoAbstractSchema(marshmallow.Schema):
         description="Is pdf version of file available ?",
         example=True,
     )
+    file_extension = marshmallow.fields.String(
+        example='.txt'
+    )
 
 
 class TextBasedContentSchema(ContentSchema, TextBasedDataAbstractSchema):
