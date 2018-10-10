@@ -30,6 +30,7 @@ class Timeline extends React.Component {
   }
 
   componentDidUpdate () {
+    if (window.innerWidth < 1200) return
     this.props.shouldScrollToBottom && this.scrollToBottom()
   }
 
