@@ -3670,6 +3670,69 @@ class TestKnownMembersEndpoint(FunctionalTest):
         assert res[1]['public_name'] == test_user2.display_name
         assert res[1]['avatar_url'] is None
 
+    def test_api__get_user__ok_200__admin__by_name__deactivated_members(self):
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        uapi = UserApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        gapi = GroupApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+        )
+        groups = [gapi.get_one_with_name('users')]
+        test_user = uapi.create_user(
+            email='test@test.test',
+            password='pass',
+            name='bob',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email='test2@test2.test2',
+            password='pass',
+            name='bob2',
+            groups=groups,
+            timezone='Europe/Paris',
+            lang='fr',
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2.is_active = False
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        transaction.commit()
+        user_id = int(admin.user_id)
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'acp': 'bob',
+        }
+        res = self.testapp.get(
+            '/api/v2/users/{user_id}/known_members'.format(user_id=user_id),
+            status=200,
+            params=params,
+        )
+        res = res.json_body
+        assert len(res) == 1
+        assert res[0]['user_id'] == test_user.user_id
+        assert res[0]['public_name'] == test_user.display_name
+        assert res[0]['avatar_url'] is None
+
     def test_api__get_user__ok_200__admin__by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         admin = dbsession.query(models.User) \

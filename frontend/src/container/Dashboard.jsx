@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import { withRouter } from 'react-router-dom'
 import {
   PageWrapper,
   PageTitle,
@@ -103,6 +104,10 @@ class Dashboard extends React.Component {
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.user, state.workspaceIdInUrl))
     switch (fetchWorkspaceDetail.status) {
       case 200: props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json)); break
+      case 400:
+        props.history.push(PAGE.HOME)
+        props.dispatch(newFlashMessage('Unknown shared space'))
+        break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('shared space detail')}`, 'warning')); break
     }
   }
@@ -113,6 +118,7 @@ class Dashboard extends React.Component {
     const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(state.workspaceIdInUrl))
     switch (fetchWorkspaceMemberList.status) {
       case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
+      case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
     }
   }
@@ -125,11 +131,13 @@ class Dashboard extends React.Component {
 
     switch (fetchWorkspaceRecentActivityList.status) {
       case 200: props.dispatch(setWorkspaceRecentActivityList(fetchWorkspaceRecentActivityList.json)); break
+      case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('recent activity list')}`, 'warning')); break
     }
 
     switch (fetchWorkspaceReadStatusList.status) {
       case 200: props.dispatch(setWorkspaceReadStatusList(fetchWorkspaceReadStatusList.json)); break
+      case 400: break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('read status list')}`, 'warning')); break
     }
   }
@@ -368,7 +376,7 @@ class Dashboard extends React.Component {
 
               <MemberList
                 customClass='dashboard__memberlist'
-                memberList={props.curWs.memberList}
+                memberList={props.curWs.memberList.filter(u => u.isActive)}
                 roleList={ROLE}
                 searchedKnownMemberList={state.searchedKnownMemberList}
                 autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
@@ -406,4 +414,4 @@ class Dashboard extends React.Component {
 }
 
 const mapStateToProps = ({ user, contentType, appList, currentWorkspace }) => ({ user, contentType, appList, curWs: currentWorkspace })
-export default connect(mapStateToProps)(appFactory(translate()(Dashboard)))
+export default connect(mapStateToProps)(withRouter(appFactory(translate()(Dashboard))))

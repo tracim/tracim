@@ -1,11 +1,8 @@
+import { login } from '../helpers/index.js'
+
 describe('navigation :: admin > user', function () {
     before(function () {
-        //login
-        cy.visit('/login')
-        cy.get('input[type=email]').should('be.visible')
-        cy.get('input[type=email]').type('admin@admin.admin')
-        cy.get('input[type=password]').type('admin@admin.admin')
-        cy.get('form').find('button').get('.connection__form__btnsubmit').click()
+        login(cy)
     })
     after(function() {
         cy.get('#dropdownMenuButton').click()

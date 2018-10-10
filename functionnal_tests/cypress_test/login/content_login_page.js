@@ -1,6 +1,8 @@
+import { login } from '../helpers/index.js'
+
 describe('content :: login_page', function () {
     before(function () {
-        cy.visit('/')
+        login(cy)
     })
     it('check all content', function () {
         cy.url().should('include', '/login')

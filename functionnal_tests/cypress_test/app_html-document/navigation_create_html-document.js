@@ -1,11 +1,9 @@
+import { login } from '../helpers/index.js'
+
 describe('navigate :: workspace > create_new > html-document', function () {
     before(function () {
-        cy.visit('/login')
-        cy.get('input[type=email]').should('be.visible')
-        cy.get('input[type=email]').type('admin@admin.admin')
-        cy.get('input[type=password]').type('admin@admin.admin')
-        cy.get('form').find('button').get('.connection__form__btnsubmit').click()
-        cy.url().should('include', '/workspaces/1/dashboard')
+        login(cy)
+        cy.get('.homepagecard.card').should('be.visible')
     })
     after(function() {
         cy.get('#dropdownMenuButton').click()
@@ -13,6 +11,8 @@ describe('navigate :: workspace > create_new > html-document', function () {
         cy.url().should('include', '/login')
     })
     it ('dashboard > button', function() {
+        cy.get('a.[href="/workspaces/1/dashboard"]').should('be.visible')
+        cy.get('a.[href="/workspaces/1/dashboard"]').click()
         var titre1='document1'
         cy.get('.dashboard__calltoaction .fa-file-text-o').should('be.visible')
         cy.get('.dashboard__calltoaction .fa-file-text-o').click()

@@ -25,16 +25,16 @@ leftside()
   background-image url('../img/applat.png')
   background-repeat repeat
   z-index 10
+  box-shadow 0px 0px 2px 1px #333
   &.sidebarclose
     width 0
   &__expand
     position absolute
-    right -42px
+    right -43px
     display flex
     justify-content center
     align-items center
-    border-left-width 1px
-    border-left-style solid
+    border 1px solid #333
     border-bottom-right-radius 15px
     padding 8px 15px
     cursor pointer
@@ -140,8 +140,7 @@ leftside()
 
   .sidebar
     position absolute
-    height calc(100% - 88px)
-    min-height auto
+    min-height calc(100% - 88px)
 
 @media (min-width: min-md) and (max-width: max-md)
 
@@ -150,8 +149,7 @@ leftside()
 
   .sidebar
     position absolute
-    height calc(100% - 88px)
-    min-height auto
+    min-height calc(100% - 88px)
 
 @media (min-width: min-sm) and (max-width: max-sm)
 
@@ -161,8 +159,7 @@ leftside()
 
   .sidebar
     position absolute
-    height calc(100% - 88px)
-    min-height auto
+    min-height calc(100% - 69px)
 
 @media (max-width: 575px)
 
@@ -172,5 +169,4 @@ leftside()
 
   .sidebar
     position absolute
-    height calc(100% - 88px)
-    min-height auto
+    min-height calc(100% - 69px)

@@ -422,8 +422,8 @@
   }],
   "putHtmlDoc": {
     "author": {
-      "avatar_url": "/api/v2/assets/avatars/suri-cate.jpg",
-      "public_name": "Suri Cate",
+      "avatar_url": "/api/v2/assets/avatars/suricate.jpg",
+      "public_name": "John Doe",
       "user_id": 3
     },
     "content_id": 6,
@@ -434,8 +434,8 @@
     "is_deleted": false,
     "label": "Intervention Report 12",
     "last_modifier": {
-      "avatar_url": "/api/v2/assets/avatars/suri-cate.jpg",
-      "public_name": "Suri Cate",
+      "avatar_url": "/api/v2/assets/avatars/suricate.jpg",
+      "public_name": "John Doe",
       "user_id": 3
     },
     "modified": "2018-06-28T08:46:58.690Z",

@@ -5,6 +5,8 @@ import i18n from '../i18n.js'
 import Sidebar from './Sidebar.jsx'
 import Header from './Header.jsx'
 import Login from './Login.jsx'
+import ForgotPassword from './ForgotPassword.jsx'
+import ResetPassword from './ResetPassword.jsx'
 import Account from './Account.jsx'
 import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
@@ -15,7 +17,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
-import { PAGE, getUserProfile } from '../helper.js'
+import { PAGE, unLoggedAllowedPageList, getUserProfile } from '../helper.js'
 import {
   getAppList,
   getContentTypeList,
@@ -57,17 +59,21 @@ class Tracim extends React.Component {
         console.log('%c<Tracim> Custom event', 'color: #28a745', type, data)
         if (document.location.pathname !== '/login' && document.location.pathname !== '/') document.location.href = '/login?dc=1'
         break
+      case 'refreshWorkspaceList_then_redirect': // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
+        await this.loadWorkspaceList()
+        this.props.history.push(data.url)
+        break
     }
   }
 
   async componentDidMount () {
     // console.log('<Tracim> did Mount')
-    const { dispatch } = this.props
+    const { props } = this
 
-    const fetchGetUserIsConnected = await dispatch(getUserIsConnected())
+    const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
       case 200:
-        dispatch(setUserConnected({
+        props.dispatch(setUserConnected({
           ...fetchGetUserIsConnected.json,
           logged: true
         }))
@@ -75,10 +81,8 @@ class Tracim extends React.Component {
         this.loadAppConfig()
         this.loadWorkspaceList()
         break
-      case 401:
-        dispatch(setUserConnected({logged: false})); break
-      default:
-        dispatch(setUserConnected({logged: null})); break
+      case 401: props.dispatch(setUserConnected({logged: false})); break
+      default: props.dispatch(setUserConnected({logged: false})); break
     }
   }
 
@@ -89,10 +93,10 @@ class Tracim extends React.Component {
   loadAppConfig = async () => {
     const { props } = this
 
-    const fetchGetAppList = await props.dispatch(getAppList(props.user))
+    const fetchGetAppList = await props.dispatch(getAppList())
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
 
-    const fetchGetContentTypeList = await props.dispatch(getContentTypeList(props.user))
+    const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
@@ -107,7 +111,10 @@ class Tracim extends React.Component {
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
 
       idOpenInSidebar && props.dispatch(setWorkspaceListIsOpenInSidebar(idOpenInSidebar, true))
+
+      return true
     }
+    return false
   }
 
   handleRemoveFlashMessage = msg => this.props.dispatch(removeFlashMessage(msg))
@@ -117,15 +124,17 @@ class Tracim extends React.Component {
 
     if (props.user.logged === null) return null // @TODO show loader
 
-    if (props.user.logged === false && props.location.pathname !== '/login') {
-      return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+    if (props.user.logged === false && !unLoggedAllowedPageList.includes(props.location.pathname)) {
+      return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
     }
 
-    if (props.location.pathname !== '/login' && (
-      !props.system.workspaceListLoaded ||
-      !props.system.appListLoaded ||
-      !props.system.contentTypeListLoaded
-    )) return null // @TODO Côme - 2018/08/22 - should show loader here
+    if (
+      !unLoggedAllowedPageList.includes(props.location.pathname) && (
+        !props.system.workspaceListLoaded ||
+        !props.system.appListLoaded ||
+        !props.system.contentTypeListLoaded
+      )
+    ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
       <div className='tracim'>
@@ -143,21 +152,22 @@ class Tracim extends React.Component {
           <div className='tracim__content'>
             <Route path={PAGE.LOGIN} component={Login} />
 
+            <Route path={PAGE.FORGOT_PASSWORD} component={ForgotPassword} />
+
+            <Route path={PAGE.RESET_PASSWORD} component={ResetPassword} />
+
             <Route exact path={PAGE.HOME} component={() => {
               switch (props.user.logged) {
-                case true: return props.workspaceList.length > 0
-                  ? <Redirect to={{pathname: PAGE.WORKSPACE.ROOT, state: {from: props.location}}} />
-                  : <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />
-                case false: return <Redirect to={{pathname: '/login', state: {from: props.location}}} />
+                case true: return <Home canCreateWorkspace={getUserProfile(props.user.profile).id <= 2} />
+                case false: return <Redirect to={{pathname: PAGE.LOGIN, state: {from: props.location}}} />
                 case null: return null
               }
             }} />
 
             <Route path='/workspaces/:idws?' render={() => // Workspace Router
               <div>
-                <Route exact path={PAGE.WORKSPACE.ROOT} render={() => props.workspaceList.length === 0 // handle '/' and redirect to first workspace
-                  ? null // @FIXME this needs to be handled in case of new user that has no workspace
-                  : <Redirect to={{pathname: PAGE.WORKSPACE.DASHBOARD(props.workspaceList[0].id), state: {from: props.location}}} />
+                <Route exact path={PAGE.WORKSPACE.ROOT} render={() =>
+                  <Redirect to={{pathname: PAGE.HOME, state: {from: props.location}}} />
                 } />
 
                 <Route exact path={`${PAGE.WORKSPACE.ROOT}/:idws`} render={props2 => // handle '/workspaces/:id' and add '/contents'

@@ -26,7 +26,7 @@ import {
 import { PAGE, PROFILE } from '../helper.js'
 
 class Header extends React.Component {
-  handleClickLogo = () => {}
+  handleClickLogo = () => this.props.history.push(PAGE.HOME)
 
   handleClickFeature = () => {}
   handleClickExplore = () => {}

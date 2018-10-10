@@ -281,3 +281,7 @@ class EmailAlreadyExistInDb(TracimException):
 
 class UnavailablePreview(TracimException):
     error_code = ERROR_CODE_UNAIVALABLE_PREVIEW
+
+
+class EmptyNotificationError(TracimException):
+    pass

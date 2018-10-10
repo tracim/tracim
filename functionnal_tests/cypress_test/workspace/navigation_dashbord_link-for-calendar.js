@@ -1,5 +1,7 @@
 // Not implemented in Tracim_V2.0
 //
+import { login } from '../helpers/index.js'
+
 //describe('navigation :: workspace > dashbord > link-for-calendar', function () {
 //    before(function () {
 //        //login
@@ -7,7 +9,7 @@
 //        cy.get('input[type=email]').should('be.visible')
 //        cy.get('input[type=email]').type('admin@admin.admin')
 //        cy.get('input[type=password]').type('admin@admin.admin')
-//        cy.get('form').find('button').get('.connection__form__btnsubmit').click()
+//        cy.get('.connection__form__btnsubmit').click()
 //    })
 //    after(function() {
 //        cy.get('#dropdownMenuButton').click()

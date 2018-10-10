@@ -5,7 +5,7 @@ from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 
 from tracim_backend import BASE_API_V2
-from tracim_backend import hapic
+from tracim_backend.extensions import hapic
 from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
 import typing
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
@@ -11,24 +10,26 @@ from lxml.html.diff import htmldiff
 from mako.template import Template
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import EmptyNotificationError
 from tracim_backend.lib.core.notifications import INotifier
-from tracim_backend.lib.mail_notifier.sender import EmailSender
-from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration, EST
-from tracim_backend.lib.mail_notifier.sender import send_email_through
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.mail_notifier.sender import EmailSender
+from tracim_backend.lib.mail_notifier.sender import send_email_through
+from tracim_backend.lib.mail_notifier.utils import EST
+from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.utils import get_email_logo_frontend_url
 from tracim_backend.lib.utils.utils import get_login_frontend_url
 from tracim_backend.lib.utils.utils import get_reset_password_frontend_url
-from tracim_backend.lib.utils.utils import get_email_logo_frontend_url
 from tracim_backend.models.auth import User
-from tracim_backend.app_models.contents import CONTENT_TYPES
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
-from tracim_backend.lib.utils.translation import Translator
 
 
 class EmailNotifier(INotifier):
@@ -311,21 +312,26 @@ class EmailManager(object):
             # in reference who contain the content_id.
             message['References'] = formataddr(('', reference_addr))
             content_in_context = content_api.get_content_in_context(content)
+            parent_in_context = None
+            if content.parent_id:
+                parent_in_context = content_api.get_content_in_context(content.parent) # nopep8
             body_text = self._build_email_body_for_content(
                 self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_TEXT,
                 role,
                 content_in_context,
+                parent_in_context,
                 workpace_in_context,
                 user,
-                translator
+                translator,
             )
             body_html = self._build_email_body_for_content(
                 self.config.EMAIL_NOTIFICATION_CONTENT_UPDATE_TEMPLATE_HTML,
                 role,
                 content_in_context,
+                parent_in_context,
                 workpace_in_context,
                 user,
-                translator
+                translator,
             )
 
             part1 = MIMEText(body_text, 'plain', 'utf-8')
@@ -455,7 +461,11 @@ class EmailManager(object):
         context = {
             'user': user,
             'logo_url': get_email_logo_frontend_url(self.config),
-            'reset_password_url': get_reset_password_frontend_url(self.config, token=reset_password_token),  # nopep8
+            'reset_password_url': get_reset_password_frontend_url(
+                self.config,
+                token=reset_password_token,
+                email=user.email,
+            ),
         }
         body_text = self._render_template(
             mako_template_filepath=text_template_file_path,
@@ -505,47 +515,38 @@ class EmailManager(object):
             **context
         )
 
-    def _build_email_body_for_content(
+    def _build_context_for_content_update(
             self,
-            mako_template_filepath: str,
             role: UserRoleInWorkspace,
             content_in_context: ContentInContext,
+            parent_in_context: typing.Optional[ContentInContext],
             workspace_in_context: WorkspaceInContext,
             actor: User,
             translator: Translator
-    ) -> str:
-        """
-        Build an email body and return it as a string
-        :param mako_template_filepath: the absolute path to the mako template to be used for email body building
-        :param role: the role related to user to whom the email must be sent. The role is required (and not the user only) in order to show in the mail why the user receive the notification
-        :param content: the content item related to the notification
-        :param actor: the user at the origin of the action / notification (for example the one who wrote a comment
-        :return: the built email body as string. In case of multipart email, this method must be called one time for text and one time for html
-        """
-        _ = translator.get_translation
-        logger.debug(self, 'Building email content from MAKO template {}'.format(mako_template_filepath))
-        content = content_in_context.content
-        main_title = content.label
-        content_intro = ''
-        content_text = ''
-        call_to_action_text = ''
+    ):
 
-        call_to_action_url = content_in_context.frontend_url
+        _ = translator.get_translation
+        content = content_in_context.content
+        action = content.get_last_action().id
+
+        # default values
+        user = role.user
+        workspace = role.workspace
+        workspace_url = workspace_in_context.frontend_url
+        main_title = content.label
+        status_label = content.get_status().label
         # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for status_icon_url  # nopep8
         status_icon_url = ''
-        workspace_url = workspace_in_context.frontend_url
-        # TODO - G.M - 11-06-2018 - [emailTemplateURL] correct value for logo_url  # nopep8
+        role_label = role.role_as_label()
+        content_intro = '<span id="content-intro-username">{}</span> did something.'.format(actor.display_name)  # nopep8
+        content_text = content.description
+        call_to_action_text = 'See more'
+        call_to_action_url = content_in_context.frontend_url
         logo_url = get_email_logo_frontend_url(self.config)
-        action = content.get_last_action().id
-        if ActionDescription.COMMENT == action:
-            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)
-            content_text = content.description
-            call_to_action_text = _('Answer')
 
-        elif ActionDescription.CREATION == action:
-            # Default values (if not overriden)
-            content_text = content.description
+        if ActionDescription.CREATION == action:
             call_to_action_text = _('View online')
+            content_intro = _('<span id="content-intro-username">{}</span> create a content:').format(actor.display_name)  # nopep8
 
             if CONTENT_TYPES.Thread.slug == content.type:
                 if content.get_last_comment_from(actor):
@@ -572,19 +573,15 @@ class EmailManager(object):
 
             if CONTENT_TYPES.File.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> uploaded a new revision.').format(actor.display_name)
-                content_text = ''
+                content_text = content.description
 
-            elif CONTENT_TYPES.Page.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
-                previous_revision = content.get_previous_revision()
-                title_diff = ''
-                if previous_revision.label != content.label:
-                    title_diff = htmldiff(previous_revision.label, content.label)
-                content_text = str('<p id="content-body-intro">{}</p> {text}</p> {title_diff} {content_diff}').format(
-                    text=_('Here is an overview of the changes:'),
-                    title_diff=title_diff,
-                    content_diff=htmldiff(previous_revision.description, content.description)
-                )
+        elif ActionDescription.EDITION == action:
+            call_to_action_text = _('View online')
+
+            if CONTENT_TYPES.File.slug == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
+                content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + content.description  # nopep8
+
             elif CONTENT_TYPES.Thread.slug == content.type:
                 content_intro = _('<span id="content-intro-username">{}</span> updated the thread description.').format(actor.display_name)
                 previous_revision = content.get_previous_revision()
@@ -596,54 +593,115 @@ class EmailManager(object):
                     title_diff=title_diff,
                     content_diff=htmldiff(previous_revision.description, content.description)
                 )
-        elif ActionDescription.EDITION == action:
-            call_to_action_text = _('View online')
-
-            if CONTENT_TYPES.File.slug == content.type:
-                content_intro = _('<span id="content-intro-username">{}</span> updated the file description.').format(actor.display_name)
-                content_text = '<p id="content-body-intro">{}</p>'.format(content.get_label()) + \
-                    content.description
+            elif CONTENT_TYPES.Page.slug == content.type:
+                content_intro = _('<span id="content-intro-username">{}</span> updated this page.').format(actor.display_name)
+                previous_revision = content.get_previous_revision()
+                title_diff = ''
+                if previous_revision.label != content.label:
+                    title_diff = htmldiff(previous_revision.label, content.label)  # nopep8
+                content_text = str('<p id="content-body-intro">{}</p> {text}</p> {title_diff} {content_diff}').format(  # nopep8
+                    actor.display_name,
+                    text=_('Here is an overview of the changes:'),
+                    title_diff=title_diff,
+                    content_diff=htmldiff(previous_revision.description, content.description)
+                )
 
         elif ActionDescription.STATUS_UPDATE == action:
-            call_to_action_text = _('View online')
             intro_user_msg = _(
                 '<span id="content-intro-username">{}</span> '
                 'updated the following status:'
             )
-            content_intro = intro_user_msg.format(actor.display_name)
             intro_body_msg = '<p id="content-body-intro">{}: {}</p>'
+
+            call_to_action_text = _('View online')
+            content_intro = intro_user_msg.format(actor.display_name)
             content_text = intro_body_msg.format(
                 content.get_label(),
                 content.get_status().label,
             )
 
-        if '' == content_intro and content_text == '':
+        elif ActionDescription.COMMENT == action:
+            call_to_action_text = _('Answer')
+            main_title = parent_in_context.label
+            content_intro = _('<span id="content-intro-username">{}</span> added a comment:').format(actor.display_name)  # nopep8
+            call_to_action_url = parent_in_context.frontend_url
+
+        if not content_intro and not content_text:
             # Skip notification, but it's not normal
             logger.error(
-                self, 'A notification is being sent but no content. '
-                      'Here are some debug informations: [content_id: {cid}]'
-                      '[action: {act}][author: {actor}]'.format(
-                    cid=content.content_id, act=action, actor=actor
+                self,
+                'A notification is being sent but no content. '
+                'Here are some debug informations: [content_id: {cid}]'
+                '[action: {act}][author: {actor}]'.format(
+                    cid=content.content_id,
+                    act=action,
+                    actor=actor
                 )
             )
-            raise ValueError('Unexpected empty notification')
+            raise EmptyNotificationError('Unexpected empty notification')
 
-        context = {
+        # FIXME: remove/readapt assert to debug easily broken case
+        assert user
+        assert workspace
+        assert main_title
+        assert status_label
+        # assert status_icon_url
+        assert role_label
+        assert content_intro
+        assert content_text or content_text == content.description
+        assert call_to_action_text
+        assert call_to_action_url
+        assert logo_url
+
+        return {
             'user': role.user,
             'workspace': role.workspace,
             'workspace_url': workspace_url,
             'main_title': main_title,
-            'status_label': content.get_status().label,
+            'status_label': status_label,
             'status_icon_url': status_icon_url,
-            'role_label': role.role_as_label(),
+            'role_label': role_label,
             'content_intro': content_intro,
             'content_text': content_text,
             'call_to_action_text': call_to_action_text,
             'call_to_action_url': call_to_action_url,
             'logo_url': logo_url,
         }
-        user = role.user
-        workspace = role.workspace
+
+    def _build_email_body_for_content(
+            self,
+            mako_template_filepath: str,
+            role: UserRoleInWorkspace,
+            content_in_context: ContentInContext,
+            parent_in_context: typing.Optional[ContentInContext],
+            workspace_in_context: WorkspaceInContext,
+            actor: User,
+            translator: Translator
+    ) -> str:
+        """
+        Build an email body and return it as a string
+        :param mako_template_filepath: the absolute path to the mako template
+        to be used for email body building
+        :param role: the role related to user to whom the email must be sent.
+        The role is required (and not the user only) in order to show in the
+         mail why the user receive the notification
+        :param content_in_context: the content item related to the notification
+        :param parent_in_context: parent of the content item related to the
+        notification
+        :param actor: the user at the origin of the action / notification
+        (for example the one who wrote a comment
+        :return: the built email body as string. In case of multipart email,
+         this method must be called one time for text and one time for html
+        """
+        logger.debug(self, 'Building email content from MAKO template {}'.format(mako_template_filepath))  # nopep8
+        context = self._build_context_for_content_update(
+            role=role,
+            content_in_context=content_in_context,
+            parent_in_context=parent_in_context,
+            workspace_in_context=workspace_in_context,
+            actor=actor,
+            translator=translator
+        )
         body_content = self._render_template(
             mako_template_filepath=mako_template_filepath,
             context=context,
