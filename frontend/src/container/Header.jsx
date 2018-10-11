@@ -88,7 +88,7 @@ class Header extends React.Component {
               onClickAbout={this.handleClickAbout}
             />
 
-            {!props.system.config.email_notification_activated && (
+            {props.location.pathname !== PAGE.LOGIN && !props.system.config.email_notification_activated && (
               <div className='header__menu__system' title={props.t('email notification not activated')}>
                 <i className='header__menu__system__icon slowblink fa fa-warning' />
                 <span className='header__menu__system__text d-none d-xl-block'>
