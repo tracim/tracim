@@ -573,7 +573,8 @@ class ContentApi(object):
                 content.label = ''
             else:
                 raise EmptyLabelNotAllowed(
-                    'Content of this type should have a valid label')  # nopep8
+                    'Content of type {} should have a valid label'.format(content_type_slug)  # nopep8
+                )
 
         content.owner = self._user
         content.parent = parent
