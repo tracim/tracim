@@ -1,8 +1,11 @@
-import { login } from '../helpers/index.js'
+import { login, logout } from '../helpers/index.js'
 
 describe('account :: main_page', function () {
     before(function () {
         login(cy)
+    })
+    after(function() {
+        logout (cy)
     })
     it('', function () {
         cy.get('#dropdownMenuButton').should('be.visible')
@@ -11,10 +14,5 @@ describe('account :: main_page', function () {
         cy.get('a.setting__link[href="/account"]').click()
         cy.url().should('include', '/account')
         cy.get('.userinfo').should('be.visible')
-    })
-    after(function() {
-        cy.get('#dropdownMenuButton').click()
-        cy.get('div.setting__link').click()
-        cy.url().should('include', '/login')
     })
 })
