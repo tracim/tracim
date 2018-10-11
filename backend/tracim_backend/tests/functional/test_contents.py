@@ -1573,12 +1573,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.txt',
-            new_mimetype='plain/text',
-            new_content=b'Test file',
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -1727,12 +1732,18 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.bin',
-            new_mimetype='application/octet-stream',
-            new_content=bytes(100),
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.bin',
+                new_mimetype='application/octet-stream',
+                new_content=bytes(100),
+            )
+        content_api.save(test_file)
         dbsession.flush()
         transaction.commit()
 
@@ -1917,12 +1928,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.txt',
-            new_mimetype='plain/text',
-            new_content=b'Test file',
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -2098,12 +2114,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.txt',
-            new_mimetype='plain/text',
-            new_content=b'Test file',
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -2320,12 +2341,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.txt',
-            new_mimetype='plain/text',
-            new_content=b'Test file',
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
@@ -2976,12 +3002,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.bin',
-            new_mimetype='application/octet-stream',
-            new_content=bytes(100),
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.bin',
+                new_mimetype='application/octet-stream',
+                new_content=bytes(100),
+            )
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -3087,12 +3118,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.bin',
-            new_mimetype='application/octet-stream',
-            new_content=bytes(100),
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.bin',
+                new_mimetype='application/octet-stream',
+                new_content=bytes(100),
+            )
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
@@ -3593,12 +3629,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.bin',
-            new_mimetype='application/octet-stream',
-            new_content=bytes(100),
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.bin',
+                new_mimetype='application/octet-stream',
+                new_content=bytes(100),
+            )
         dbsession.flush()
         content_id = test_file.content_id
         transaction.commit()
@@ -3710,12 +3751,17 @@ class TestFiles(FunctionalTest):
             do_save=False,
             do_notify=False,
         )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.bin',
-            new_mimetype='application/octet-stream',
-            new_content=bytes(100),
-        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_file_data(
+                test_file,
+                'Test_file.bin',
+                new_mimetype='application/octet-stream',
+                new_content=bytes(100),
+            )
         dbsession.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
