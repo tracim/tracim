@@ -482,6 +482,23 @@ class ContentApi(object):
             logger.critical(self, critical_error_text)
             return False
 
+    def _prepare_filename(
+            self,
+            label: str,
+            file_extension: str,
+    ) -> str:
+        """
+        generate correct file_name from label and file_extension
+        :return: valid
+        """
+        # TODO - G.M - 2018-10-11 - Find a way to
+        # Refactor this in order to use same method
+        # in both contentLib and .file_name of content
+        return '{label}{file_extension}'.format(
+            label=label,
+            file_extension=file_extension
+        )
+
     def _is_filename_available_or_raise(
         self,
         filename: str,
@@ -555,7 +572,7 @@ class ContentApi(object):
                         CONTENT_TYPES.Thread.slug,
                 ):
                     file_extension = '.html'
-                filename = '{}{}'.format(label, file_extension)
+                filename = self._prepare_filename(label, file_extension)
             self._is_filename_available_or_raise(
                 filename,
                 workspace,
@@ -1387,9 +1404,7 @@ class ContentApi(object):
             workspace = item.workspace
             parent = item.parent
         label = new_label or item.label
-        file_extension = item.file_extension
-        filename = '{}{}'.format(label, file_extension)
-
+        filename = self._prepare_filename(label, item.file_extension)
         self._is_filename_available_or_raise(filename, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
@@ -1401,7 +1416,7 @@ class ContentApi(object):
         ) as rev:
             rev.parent = parent
             rev.workspace = workspace
-            rev.label = label
+            rev.file_name = filename
             rev.revision_type = ActionDescription.COPY
             rev.properties['origin'] = {
                 'content': item.id,
@@ -1438,8 +1453,7 @@ class ContentApi(object):
             raise EmptyLabelNotAllowed()
 
         label = new_label or item.label
-        file_extension = item.file_extension
-        filename = '{}{}'.format(label, file_extension)
+        filename = self._prepare_filename(label, item.file_extension)
         self._is_filename_available_or_raise(
             filename,
             item.workspace,
@@ -1464,6 +1478,12 @@ class ContentApi(object):
         #         new_content == item.depot_file.file.read():
         #     raise SameValueError('The content did not changed')
         item.owner = self._user
+        self._is_filename_available_or_raise(
+            new_filename,
+            item.workspace,
+            item.parent,
+            exclude_content_id=item.content_id
+        )
         item.file_name = new_filename
         item.file_mimetype = new_mimetype
         item.depot_file = FileIntent(
@@ -1480,11 +1500,19 @@ class ContentApi(object):
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
         # un-archiving file.
-        content.label = '{label}-{action}-{date}'.format(
+        label = '{label}-{action}-{date}'.format(
             label=content.label,
             action='archived',
             date=current_date_for_filename()
         )
+        filename = self._prepare_filename(label, content.file_extension)
+        self._is_filename_available_or_raise(
+            filename,
+            content.workspace,
+            content.parent,
+            exclude_content_id=content.content_id
+        )
+        content.file_name = filename
         content.revision_type = ActionDescription.ARCHIVING
 
     def unarchive(self, content: Content):
@@ -1498,11 +1526,19 @@ class ContentApi(object):
         # TODO - G.M - 12-03-2018 - Inspect possible label conflict problem
         # INFO - G.M - 12-03-2018 - Set label name to avoid trouble when
         # un-deleting file.
-        content.label = '{label}-{action}-{date}'.format(
+        label = '{label}-{action}-{date}'.format(
             label=content.label,
             action='deleted',
             date=current_date_for_filename()
         )
+        filename = self._prepare_filename(label, content.file_extension)
+        self._is_filename_available_or_raise(
+            filename,
+            content.workspace,
+            content.parent,
+            exclude_content_id=content.content_id
+        )
+        content.file_name = filename
         content.revision_type = ActionDescription.DELETION
 
     def undelete(self, content: Content):
