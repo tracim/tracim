@@ -357,7 +357,7 @@ class TestSessionEndpointWithCookieAuthToken(FunctionalTest):
             )
             assert 'Set-Cookie' in res.headers
 
-    def test_api__test_cookie_auth_token__ok__change_email(self):
+    def test_api__test_cookie_auth_token__ok__change_email_dont_break_cookie(self):  # nopep8
         """
         Test if email change doesn't break cookie auth
         :return:
