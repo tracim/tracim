@@ -37,7 +37,7 @@ from tracim_backend.views.core_api.reset_password_controller import ResetPasswor
 from tracim_backend.views.frontend import FrontendController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.exceptions import NotAuthenticated
-from tracim_backend.exceptions import ContentClosed
+from tracim_backend.exceptions import ContentInReadOnlyState
 from tracim_backend.exceptions import PageNotFound
 from tracim_backend.exceptions import UserNotActive
 from tracim_backend.exceptions import InvalidId
@@ -110,7 +110,7 @@ def web(global_config, **local_settings):
     context.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
     context.handle_exception(UserDoesNotExist, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
-    context.handle_exception(ContentClosed, HTTPStatus.BAD_REQUEST)
+    context.handle_exception(ContentInReadOnlyState, HTTPStatus.BAD_REQUEST)
     context.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
     context.handle_exception(InvalidId, HTTPStatus.BAD_REQUEST)
     # Auth exception
