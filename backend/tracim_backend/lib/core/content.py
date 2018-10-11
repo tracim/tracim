@@ -1416,8 +1416,13 @@ class ContentApi(object):
                 self.move_recursively(child, item, new_workspace)
         return
 
+    def is_editable(self, item: Content) -> bool:
+        return not item.is_readonly \
+               and item.is_active \
+               and item.get_status().is_editable()
+
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
-        if not item.is_editable:
+        if not self.is_editable(item):
             raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
         if item.label == new_label and item.description == new_content:
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
@@ -1440,7 +1445,7 @@ class ContentApi(object):
         return item
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
-        if not item.is_editable:
+        if not self.is_editable(item):
             raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
         if new_mimetype == item.file_mimetype and \
                 new_content == item.depot_file.file.read():

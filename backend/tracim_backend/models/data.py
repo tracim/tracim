@@ -729,12 +729,6 @@ class ContentRevisionRO(DeclarativeBase):
         super().__setattr__(key, value)
 
     @property
-    def is_editable(self) -> bool:
-        return not self.is_readonly \
-               and self.is_active \
-               and self.get_status().is_editable()
-
-    @property
     def is_active(self) -> bool:
         return not self.is_deleted and not self.is_archived
 
@@ -1143,12 +1137,8 @@ class Content(DeclarativeBase):
         return self.revisions[-1]
 
     @property
-    def is_editable(self) -> bool:
-        return self.revision.is_editable
-
-    @property
     def is_readonly(self) -> bool:
-        return not self.revision.is_readonly
+        return self.revision.is_readonly
 
     @property
     def is_active(self) -> bool:
