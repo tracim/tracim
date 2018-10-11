@@ -5,7 +5,7 @@ from sqlalchemy import inspect
 
 from tracim_backend.models import ContentRevisionRO
 from tracim_backend.models import User
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.tests import DefaultTest
 from tracim_backend.tests import eq_
 
@@ -48,14 +48,14 @@ class TestContentRevision(DefaultTest):
         folder = self._create_content_and_test(
             name='folder_1',
             workspace=workspace,
-            type=CONTENT_TYPES.Folder.slug
+            type=content_type_list.Folder.slug
         )
         page = self._create_content_and_test(
             workspace=workspace,
             parent=folder,
             name='file_1',
             description='content of file_1',
-            type=CONTENT_TYPES.Page.slug,
+            type=content_type_list.Page.slug,
             owner=admin
         )
 

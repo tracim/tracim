@@ -7,7 +7,7 @@ from tracim_backend.models import Group
 from zope.interface import implementer
 
 from tracim_backend.app_models.contents import ContentType
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 
 try:
     from json.decoder import JSONDecodeError
@@ -178,7 +178,7 @@ def require_content_types(content_types_slug: typing.List[str]) -> typing.Callab
         @functools.wraps(func)
         def wrapper(self, context, request: 'TracimRequest') -> typing.Callable:
             content = request.current_content
-            current_content_type_slug = CONTENT_TYPES.get_one_by_slug(content.type).slug  # nopep8
+            current_content_type_slug = content_type_list.get_one_by_slug(content.type).slug  # nopep8
             if current_content_type_slug in content_types_slug:
                 return func(self, context, request)
             raise ContentTypeNotAllowed()

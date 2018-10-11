@@ -37,7 +37,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceDigestSchema
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 
 SWAGGER_TAG__USER_ENDPOINTS = 'Users'
 
@@ -356,7 +356,7 @@ class UserController(Controller):
             before_content = api.get_one(
                 content_id=content_filter.before_content_id,
                 workspace=workspace,
-                content_type=CONTENT_TYPES.Any_SLUG
+                content_type=content_type_list.Any_SLUG
             )
         last_actives = api.get_last_active(
             workspace=workspace,

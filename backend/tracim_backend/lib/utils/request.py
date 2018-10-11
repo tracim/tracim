@@ -16,7 +16,7 @@ from tracim_backend.exceptions import UserNotFoundInTracimRequest
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import ImmutableAttribute
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -236,7 +236,7 @@ class TracimRequest(Request):
             )
             comment = api.get_one(
                 comment_id,
-                content_type=CONTENT_TYPES.Comment.slug,
+                content_type=content_type_list.Comment.slug,
                 workspace=workspace,
                 parent=content,
             )
@@ -276,7 +276,7 @@ class TracimRequest(Request):
                 session=request.dbsession,
                 config=request.registry.settings['CFG']
             )
-            content = api.get_one(content_id=content_id, workspace=workspace, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+            content = api.get_one(content_id=content_id, workspace=workspace, content_type=content_type_list.Any_SLUG)  # nopep8
         except NoResultFound as exc:
             raise ContentNotFound(
                 'Content {} does not exist '

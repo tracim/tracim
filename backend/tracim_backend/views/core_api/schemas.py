@@ -5,8 +5,8 @@ from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
 
-from tracim_backend.app_models.contents import CONTENT_STATUS
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.validator import all_content_types_validator
@@ -450,8 +450,8 @@ class FilterContentQuerySchema(marshmallow.Schema):
         validate=Range(min=0, max=1, error="Value must be 0 or 1"),
     )
     content_type = marshmallow.fields.String(
-        example=CONTENT_TYPES.Any_SLUG,
-        default=CONTENT_TYPES.Any_SLUG,
+        example=content_type_list.Any_SLUG,
+        default=content_type_list.Any_SLUG,
         validate=all_content_types_validator
     )
     label = marshmallow.fields.String(
@@ -889,7 +889,7 @@ class ContentDigestSchema(marshmallow.Schema):
     )
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(CONTENT_STATUS.get_all_slugs_values()),
+        validate=OneOf(content_status_list.get_all_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status
     )
@@ -1075,7 +1075,7 @@ class FileContentModifySchema(TextBasedContentModifySchema):
 class SetContentStatusSchema(marshmallow.Schema):
     status = marshmallow.fields.Str(
         example='closed-deprecated',
-        validate=OneOf(CONTENT_STATUS.get_all_slugs_values()),
+        validate=OneOf(content_status_list.get_all_slugs_values()),
         description='this slug is found in content_type available statuses',
         default=open_status,
         required=True,

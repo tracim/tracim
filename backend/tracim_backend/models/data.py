@@ -86,7 +86,7 @@ class Workspace(DeclarativeBase):
 
     def get_allowed_content_types(self):
         # @see Content.get_allowed_content_types()
-        return CONTENT_TYPES.endpoint_allowed_types_slug()
+        return content_type_list.endpoint_allowed_types_slug()
 
     def get_valid_children(
             self,
@@ -281,9 +281,9 @@ class ActionDescription(object):
                 ]
 
 
-from tracim_backend.app_models.contents import CONTENT_STATUS
+from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import ContentStatus
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
 # is lost .
 
@@ -342,9 +342,9 @@ from tracim_backend.app_models.contents import CONTENT_TYPES
 #         # self.icon = ContentStatus._ICONS[id]
 #         # self.css = ContentStatus._CSS[id]
 #         #
-#         # if type==CONTENT_TYPES.Thread.slug:
+#         # if type==content_type_list.Thread.slug:
 #         #     self.label = ContentStatus._LABELS_THREAD[id]
-#         # elif type==CONTENT_TYPES.File.slug:
+#         # elif type==content_type_list.File.slug:
 #         #     self.label = ContentStatus._LABELS_FILE[id]
 #         # else:
 #         #     self.label = ContentStatus._LABELS[id]
@@ -490,13 +490,13 @@ from tracim_backend.app_models.contents import CONTENT_TYPES
 #     #     # TODO - DYNDATATYPE - D.A. - 2014-12-02
 #     #     # Make this code dynamic loading data types
 #     #
-#     #     if content.type==CONTENT_TYPES.Folder.slug:
+#     #     if content.type==content_type_list.Folder.slug:
 #     #         return '/workspaces/{}/folders/{}'.format(content.workspace_id, content.content_id)
-#     #     elif content.type==CONTENT_TYPES.File.slug:
+#     #     elif content.type==content_type_list.File.slug:
 #     #         return '/workspaces/{}/folders/{}/files/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-#     #     elif content.type==CONTENT_TYPES.Thread.slug:
+#     #     elif content.type==content_type_list.Thread.slug:
 #     #         return '/workspaces/{}/folders/{}/threads/{}'.format(content.workspace_id, content.parent_id, content.content_id)
-#     #     elif content.type==CONTENT_TYPES.Page.slug:
+#     #     elif content.type==content_type_list.Page.slug:
 #     #         return '/workspaces/{}/folders/{}/pages/{}'.format(content.workspace_id, content.parent_id, content.content_id)
 #     #
 #     # @classmethod
@@ -536,7 +536,7 @@ class ContentChecker(object):
     @classmethod
     def check_properties(cls, item):
         properties = item.properties
-        if item.type == CONTENT_TYPES.Event.slug:
+        if item.type == content_type_list.Event.slug:
             if 'name' not in properties.keys():
                 return False
             if 'raw' not in properties.keys():
@@ -551,7 +551,7 @@ class ContentChecker(object):
                 for content_slug, value in properties['allowed_content'].items():  # nopep8
                     if not isinstance(value, bool):
                         return False
-                    if not content_slug in CONTENT_TYPES.endpoint_allowed_types_slug():  # nopep8
+                    if not content_slug in content_type_list.endpoint_allowed_types_slug():  # nopep8
                         return False
             if 'origin' in properties.keys():
                 pass
@@ -587,7 +587,7 @@ class ContentRevisionRO(DeclarativeBase):
     properties = Column('properties', Text(), unique=False, nullable=False, default='')
 
     type = Column(Unicode(32), unique=False, nullable=False)
-    status = Column(Unicode(32), unique=False, nullable=False, default=str(CONTENT_STATUS.get_default_status().slug))
+    status = Column(Unicode(32), unique=False, nullable=False, default=str(content_status_list.get_default_status().slug))
     created = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     updated = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
@@ -725,7 +725,7 @@ class ContentRevisionRO(DeclarativeBase):
         super().__setattr__(key, value)
 
     def get_status(self) -> ContentStatus:
-        return CONTENT_STATUS.get_one_by_slug(self.status)
+        return content_status_list.get_one_by_slug(self.status)
 
     def get_label(self) -> str:
         return self.label or self.file_name or ''
@@ -750,9 +750,9 @@ class ContentRevisionRO(DeclarativeBase):
     def get_label_as_file(self):
         file_extension = self.file_extension or ''
 
-        if self.type == CONTENT_TYPES.Thread.slug:
+        if self.type == content_type_list.Thread.slug:
             file_extension = '.html'
-        elif self.type == CONTENT_TYPES.Page.slug:
+        elif self.type == content_type_list.Page.slug:
             file_extension = '.html'
 
         return '{0}{1}'.format(
@@ -1178,9 +1178,9 @@ class Content(DeclarativeBase):
             properties = {}
         else:
             properties = json.loads(self._properties)
-        if CONTENT_TYPES.get_one_by_slug(self.type) != CONTENT_TYPES.Event:
+        if content_type_list.get_one_by_slug(self.type) != content_type_list.Event:
             if not 'allowed_content' in properties:
-                properties['allowed_content'] = CONTENT_TYPES.default_allowed_content_properties(self.type)  # nopep8
+                properties['allowed_content'] = content_type_list.default_allowed_content_properties(self.type)  # nopep8
         return properties
 
     @properties.setter
@@ -1206,7 +1206,7 @@ class Content(DeclarativeBase):
     def get_child_nb(self, content_type: str, content_status = ''):
         child_nb = 0
         for child in self.get_valid_children():
-            if child.type == content_type or content_type.slug == CONTENT_TYPES.Any_SLUG:
+            if child.type == content_type or content_type.slug == content_type_list.Any_SLUG:
                 if not content_status:
                     child_nb = child_nb+1
                 elif content_status==child.status:
@@ -1223,7 +1223,7 @@ class Content(DeclarativeBase):
         return self.revision.get_label_as_file()
 
     def get_status(self) -> ContentStatus:
-        return CONTENT_STATUS.get_one_by_slug(
+        return content_status_list.get_one_by_slug(
             self.status,
         )
 
@@ -1281,7 +1281,7 @@ class Content(DeclarativeBase):
     def get_comments(self):
         children = []
         for child in self.children:
-            if CONTENT_TYPES.Comment.slug == child.type and not child.is_deleted and not child.is_archived:
+            if content_type_list.Comment.slug == child.type and not child.is_deleted and not child.is_archived:
                 children.append(child.node)
         return children
 
@@ -1323,7 +1323,7 @@ class Content(DeclarativeBase):
             for type_label, is_allowed in allowed_types.items():
                 if is_allowed:
                    types.append(
-                        CONTENT_TYPES.get_one_by_slug(type_label)
+                        content_type_list.get_one_by_slug(type_label)
                    )
         # TODO BS 2018-08-13: This try/except is not correct: except exception
         # if we know what to except.
@@ -1427,7 +1427,7 @@ class VirtualEvent(object):
     def create_from_content(cls, content: Content):
 
         label = content.get_label()
-        if content.type == CONTENT_TYPES.Comment.slug:
+        if content.type == content_type_list.Comment.slug:
             # TODO - G.M  - 10-04-2018 - [Cleanup] Remove label param
             # from this object ?
             # TODO - G.M - 2018-08-20 - [I18n] fix trad of this

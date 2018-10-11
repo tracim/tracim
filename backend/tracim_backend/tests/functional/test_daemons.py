@@ -3,7 +3,7 @@ from tracim_backend.fixtures.users_and_groups import Base as BaseFixture
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.lib.mail_notifier.daemon import MailSenderDaemon
 
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
@@ -69,7 +69,7 @@ class TestMailNotifyDaemon(MailHogTest):
             config=self.app_config,
         )
         item = api.create(
-            CONTENT_TYPES.Folder.slug,
+            content_type_list.Folder.slug,
             workspace,
             None,
             'parent',
@@ -77,7 +77,7 @@ class TestMailNotifyDaemon(MailHogTest):
             do_notify=False,
         )
         item2 = api.create(
-            CONTENT_TYPES.File.slug,
+            content_type_list.File.slug,
             workspace,
             item,
             'file1',

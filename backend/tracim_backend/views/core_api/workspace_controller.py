@@ -6,7 +6,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from tracim_backend import BASE_API_V2
 from tracim_backend.extensions import hapic
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import EmailValidationFailed
@@ -416,7 +416,7 @@ class WorkspaceController(Controller):
         contents = api.get_all(
             parent_id=content_filter.parent_id,
             workspace=request.current_workspace,
-            content_type=content_filter.content_type or CONTENT_TYPES.Any_SLUG,
+            content_type=content_filter.content_type or content_type_list.Any_SLUG,
             label=content_filter.label,
             order_by_properties=[Content.label]
         )
@@ -452,7 +452,7 @@ class WorkspaceController(Controller):
         parent = None
         if creation_data.parent_id:
             try:
-                parent = api.get_one(content_id=creation_data.parent_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+                parent = api.get_one(content_id=creation_data.parent_id, content_type=content_type_list.Any_SLUG)  # nopep8
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     'Parent with content_id {} not found'.format(creation_data.parent_id)
@@ -482,7 +482,7 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings['CFG']
         content = request.current_content
-        content_type = CONTENT_TYPES.get_one_by_slug(content.type).slug
+        content_type = content_type_list.get_one_by_slug(content.type).slug
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
@@ -513,9 +513,9 @@ class WorkspaceController(Controller):
         )
         content = api.get_one(
             content_id=hapic_data.path['content_id'],
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
-        content_type = CONTENT_TYPES.get_one_by_slug(content.type).slug
+        content_type = content_type_list.get_one_by_slug(content.type).slug
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
@@ -556,10 +556,10 @@ class WorkspaceController(Controller):
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         new_parent = api.get_one(
-            move_data.new_parent_id, content_type=CONTENT_TYPES.Any_SLUG
+            move_data.new_parent_id, content_type=content_type_list.Any_SLUG
         )
 
         new_workspace = request.candidate_workspace
@@ -577,7 +577,7 @@ class WorkspaceController(Controller):
             )
         updated_content = api.get_one(
             path_data.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         return api.get_content_in_context(updated_content)
 
@@ -605,7 +605,7 @@ class WorkspaceController(Controller):
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -639,7 +639,7 @@ class WorkspaceController(Controller):
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,
@@ -671,7 +671,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=CONTENT_TYPES.Any_SLUG)  # nopep8
+        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)  # nopep8
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
@@ -704,7 +704,7 @@ class WorkspaceController(Controller):
         )
         content = api.get_one(
             path_data.content_id,
-            content_type=CONTENT_TYPES.Any_SLUG
+            content_type=content_type_list.Any_SLUG
         )
         with new_revision(
                 session=request.dbsession,

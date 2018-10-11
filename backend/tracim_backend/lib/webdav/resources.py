@@ -19,7 +19,7 @@ from tracim_backend.lib.webdav.utils import transform_to_display, HistoryType, \
     FakeFileStream
 from tracim_backend.lib.webdav.utils import transform_to_bdd
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.app_models.contents import CONTENT_TYPES
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.models.data import User, ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import Content
@@ -237,7 +237,7 @@ class WorkspaceResource(DAVCollection):
 
         for content in children:
             # the purpose is to display .history only if there's at least one content's type that has a history
-            if content.type != CONTENT_TYPES.Folder.slug:
+            if content.type != content_type_list.Folder.slug:
                 self._file_count += 1
             retlist.append(content.get_label_as_file())
 
@@ -289,7 +289,7 @@ class WorkspaceResource(DAVCollection):
             raise DAVError(HTTP_FORBIDDEN)
 
         folder = self.content_api.create(
-            content_type_slug=CONTENT_TYPES.Folder.slug,
+            content_type_slug=content_type_list.Folder.slug,
             workspace=self.workspace,
             label=label,
             parent=self.content
@@ -324,12 +324,12 @@ class WorkspaceResource(DAVCollection):
     def getMemberList(self) -> [_DAVResource]:
         members = []
 
-        children = self.content_api.get_all(False, CONTENT_TYPES.Any_SLUG, self.workspace)
+        children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
 
         for content in children:
             content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
-            if content.type == CONTENT_TYPES.Folder.slug:
+            if content.type == content_type_list.Folder.slug:
                 members.append(
                     FolderResource(
                         path=content_path,
@@ -340,7 +340,7 @@ class WorkspaceResource(DAVCollection):
                         session=self.session,
                     )
                 )
-            elif content.type == CONTENT_TYPES.File.slug:
+            elif content.type == content_type_list.File.slug:
                 self._file_count += 1
                 members.append(
                     FileResource(
@@ -546,7 +546,7 @@ class FolderResource(WorkspaceResource):
         )
         visible_children = content_api.get_all(
             self.content.content_id,
-            CONTENT_TYPES.Any_SLUG,
+            content_type_list.Any_SLUG,
             self.workspace,
         )
 
@@ -554,7 +554,7 @@ class FolderResource(WorkspaceResource):
             content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
             try:
-                if content.type == CONTENT_TYPES.Folder.slug:
+                if content.type == content_type_list.Folder.slug:
                     members.append(
                         FolderResource(
                             path=content_path,
@@ -565,7 +565,7 @@ class FolderResource(WorkspaceResource):
                             session=self.session,
                         )
                     )
-                elif content.type == CONTENT_TYPES.File.slug:
+                elif content.type == content_type_list.File.slug:
                     self._file_count += 1
                     members.append(
                         FileResource(
@@ -703,11 +703,11 @@ class HistoryFolderResource(FolderResource):
         ret = []
 
         content_id = None if self.content is None else self.content.id
-        for content in self.content_api.get_all(content_id, CONTENT_TYPES.Any_SLUG, self.workspace):
+        for content in self.content_api.get_all(content_id, content_type_list.Any_SLUG, self.workspace):
             if (self._is_archived and content.is_archived or
                 self._is_deleted and content.is_deleted or
                 not (content.is_archived or self._is_archived or content.is_deleted or self._is_deleted))\
-                    and content.type != CONTENT_TYPES.Folder.slug:
+                    and content.type != content_type_list.Folder.slug:
                 ret.append(content.get_label_as_file())
 
         return ret
@@ -736,7 +736,7 @@ class HistoryFolderResource(FolderResource):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(False, CONTENT_TYPES.Any_SLUG, self.workspace)
+            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
         
         for content in children:
             if content.is_archived == self._is_archived and content.is_deleted == self._is_deleted:
@@ -807,13 +807,13 @@ class DeletedFolderResource(HistoryFolderResource):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(False, CONTENT_TYPES.Any_SLUG, self.workspace)
+            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
 
         for content in children:
             if content.is_deleted:
                 retlist.append(content.get_label_as_file())
 
-                if content.type != CONTENT_TYPES.Folder.slug:
+                if content.type != content_type_list.Folder.slug:
                     self._file_count += 1
 
         return retlist
@@ -824,13 +824,13 @@ class DeletedFolderResource(HistoryFolderResource):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(False, CONTENT_TYPES.Any_SLUG, self.workspace)
+            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
 
         for content in children:
             if content.is_deleted:
                 content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
-                if content.type == CONTENT_TYPES.Folder.slug:
+                if content.type == content_type_list.Folder.slug:
                     members.append(
                         FolderResource(
                             content_path,
@@ -840,7 +840,7 @@ class DeletedFolderResource(HistoryFolderResource):
                             user=self.user,
                             session=self.session,
                         ))
-                elif content.type == CONTENT_TYPES.File.slug:
+                elif content.type == content_type_list.File.slug:
                     self._file_count += 1
                     members.append(
                         FileResource(
@@ -931,10 +931,10 @@ class ArchivedFolderResource(HistoryFolderResource):
         retlist = []
 
         for content in self.content_api.get_all_with_filter(
-                self.content if self.content is None else self.content.id, CONTENT_TYPES.Any_SLUG):
+                self.content if self.content is None else self.content.id, content_type_list.Any_SLUG):
             retlist.append(content.get_label_as_file())
 
-            if content.type != CONTENT_TYPES.Folder.slug:
+            if content.type != content_type_list.Folder.slug:
                 self._file_count += 1
 
         return retlist
@@ -945,13 +945,13 @@ class ArchivedFolderResource(HistoryFolderResource):
         if self.content:
             children = self.content.children
         else:
-            children = self.content_api.get_all(False, CONTENT_TYPES.Any_SLUG, self.workspace)
+            children = self.content_api.get_all(False, content_type_list.Any_SLUG, self.workspace)
 
         for content in children:
             if content.is_archived:
                 content_path = '%s/%s' % (self.path, transform_to_display(content.get_label_as_file()))
 
-                if content.type == CONTENT_TYPES.Folder.slug:
+                if content.type == content_type_list.Folder.slug:
                     members.append(
                         FolderResource(
                             content_path,
@@ -961,7 +961,7 @@ class ArchivedFolderResource(HistoryFolderResource):
                             user=self.user,
                             session=self.session,
                         ))
-                elif content.type == CONTENT_TYPES.File.slug:
+                elif content.type == content_type_list.File.slug:
                     self._file_count += 1
                     members.append(
                         FileResource(
@@ -1048,7 +1048,7 @@ class HistoryFileFolderResource(HistoryFolderResource):
 
         left_side = '%s/(%d - %s) ' % (self.path, revision.revision_id, revision.revision_type)
 
-        if self.content.type == CONTENT_TYPES.File.slug:
+        if self.content.type == content_type_list.File.slug:
             return HistoryFileResource(
                 path='%s%s' % (left_side, transform_to_display(revision.file_name)),
                 environ=self.environ,
@@ -1074,7 +1074,7 @@ class HistoryFileFolderResource(HistoryFolderResource):
 
             left_side = '%s/(%d - %s) ' % (self.path, content.revision_id, content.revision_type)
 
-            if self.content.type == CONTENT_TYPES.File.slug:
+            if self.content.type == content_type_list.File.slug:
                 members.append(HistoryFileResource(
                     path='%s%s' % (left_side, transform_to_display(content.file_name)),
                     environ=self.environ,
@@ -1420,13 +1420,13 @@ class OtherFileResource(FileResource):
         return filestream
 
     def design(self):
-        if self.content.type == CONTENT_TYPES.Page.slug:
+        if self.content.type == content_type_list.Page.slug:
             return designPage(self.content, self.content_revision)
         else:
             return designThread(
                 self.content,
                 self.content_revision,
-                self.content_api.get_all(self.content.content_id, CONTENT_TYPES.Comment.slug)
+                self.content_api.get_all(self.content.content_id, content_type_list.Comment.slug)
             )
 
 
