@@ -18,6 +18,7 @@ import {
   WORKSPACE_MEMBER_REMOVE,
   FOLDER,
   setFolderData,
+  CONFIG,
   APP_LIST,
   CONTENT_TYPE_LIST,
   WORKSPACE_CONTENT_ARCHIVED,
@@ -476,6 +477,21 @@ export const getFolderContent = (idWorkspace, idFolder) => async dispatch => {
     dispatch
   })
   if (fetchGetFolderContent.status === 200) dispatch(setFolderData(idFolder, fetchGetFolderContent.json))
+}
+
+export const getConfig = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/config`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: CONFIG,
+    dispatch
+  })
 }
 
 export const getAppList = () => dispatch => {

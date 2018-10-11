@@ -19,7 +19,7 @@ const Revision = props => {
         }}
       >
         <div className={classnames(`${props.customClass}__messagelist__version__data`, 'revision__data')}>
-          <span className='revision__data__nb'>{props.number}</span>
+          <div className='revision__data__nb'>{props.number}</div>
           <i className={`fa fa-fw fa-${revisionType.faIcon} revision__data__icon`} style={{color: props.customColor}} />
           {revisionType.label}
         </div>

@@ -126,7 +126,7 @@ const WorkspaceAdvancedComponent = props => {
           </div>
         }
 
-        {props.displayFormNewMember === true &&
+        {props.displayFormNewMember === true && (
           <NewMemberForm
             onClickCloseAddMemberBtn={props.onClickToggleFormNewMember}
             nameOrEmail={props.newMemberName}
@@ -139,7 +139,7 @@ const WorkspaceAdvancedComponent = props => {
             onClickBtnValidate={props.onClickValidateNewMember}
             autoCompleteActive={props.autoCompleteFormNewMemberActive}
           />
-        }
+        )}
       </div>
 
       <div className='workspace_advanced__delete'>

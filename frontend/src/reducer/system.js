@@ -2,13 +2,15 @@ import {
   APP_LIST,
   CONTENT_TYPE_LIST,
   SET,
-  WORKSPACE_LIST
+  WORKSPACE_LIST,
+  CONFIG
 } from '../action-creator.sync.js'
 
 const defaultSystem = {
   workspaceListLoaded: false,
   appListLoaded: false,
-  contentTypeListLoaded: false
+  contentTypeListLoaded: false,
+  config: {}
 }
 
 export function system (state = defaultSystem, action) {
@@ -21,6 +23,9 @@ export function system (state = defaultSystem, action) {
 
     case `${SET}/${CONTENT_TYPE_LIST}`:
       return {...state, contentTypeListLoaded: true}
+
+    case `${SET}/${CONFIG}`:
+      return {...state, config: action.config}
 
     default:
       return state

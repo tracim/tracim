@@ -19,6 +19,7 @@ import {
 } from 'react-router-dom'
 import { PAGE, unLoggedAllowedPageList, getUserProfile } from '../helper.js'
 import {
+  getConfig,
   getAppList,
   getContentTypeList,
   getUserIsConnected, getWorkspaceList
@@ -26,6 +27,7 @@ import {
 import {
   newFlashMessage,
   removeFlashMessage,
+  setConfig,
   setAppList,
   setContentTypeList,
   setUserConnected,
@@ -92,6 +94,9 @@ class Tracim extends React.Component {
 
   loadAppConfig = async () => {
     const { props } = this
+
+    const fetchGetConfig = await props.dispatch(getConfig())
+    if (fetchGetConfig.status === 200) props.dispatch(setConfig(fetchGetConfig.json))
 
     const fetchGetAppList = await props.dispatch(getAppList())
     if (fetchGetAppList.status === 200) props.dispatch(setAppList(fetchGetAppList.json))
