@@ -729,14 +729,17 @@ class ContentRevisionRO(DeclarativeBase):
         super().__setattr__(key, value)
 
     @property
-    def is_editable(self):
+    def is_editable(self) -> bool:
         return not self.is_readonly \
-                and not self.is_deleted \
-                and not self.is_archived \
-                and self.get_status().is_editable()
+               and self.is_active \
+               and self.get_status().is_editable()
 
     @property
-    def is_readonly(self):
+    def is_active(self) -> bool:
+        return not self.is_deleted and not self.is_archived
+
+    @property
+    def is_readonly(self) -> bool:
         return False
 
     def get_status(self) -> ContentStatus:
@@ -1149,7 +1152,7 @@ class Content(DeclarativeBase):
 
     @property
     def is_active(self) -> bool:
-        return self.is_editable
+        return self.revision.is_active
 
     @property
     def depot_file(self) -> UploadedFile:
