@@ -488,28 +488,31 @@ class ContentApi(object):
         workspace: Workspace,
         parent: Content = None,
         exclude_content_id: int = None,
-    ) -> None:
+    ) -> bool:
         """
         Same as _is_filename_available but raise exception instead of
         returning boolean if content filename is already used
         """
-        if not self._is_filename_available(
+        if self._is_filename_available(
             filename,
             workspace,
             parent,
             exclude_content_id
         ):
-            text = 'A Content already exist with the same filename {filename} ' \
-                   ' in workspace {workspace_id}'.format(
-                      filename=filename,
-                      workspace_id=workspace.workspace_id,
-                   )
-            if parent:
-                text = '{text} and parent as content {parent_id}'.format(
-                    text=text,
-                    parent_id=parent.parent_id
-                )
-            raise ContentLabelAlreadyUsedHere(text)
+            return True
+        # INFO - G.M - 2018-10-11 - prepare exception message
+        exception_message = 'A Content already exist with the same filename ' \
+            '{filename}  in workspace {workspace_id}'
+        exception_message = exception_message.format(
+            filename=filename,
+            workspace_id=workspace.workspace_id,
+        )
+        if parent:
+            exception_message = '{text} and parent as content {parent_id}'.format(
+                text=exception_message,
+                parent_id=parent.parent_id
+            )
+        raise ContentLabelAlreadyUsedHere(exception_message)
 
     def create(self, content_type_slug: str, workspace: Workspace, parent: Content=None, label: str = '', filename: str = '', do_save=False, is_temporary: bool=False, do_notify=True) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
