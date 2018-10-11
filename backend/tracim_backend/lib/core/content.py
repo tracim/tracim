@@ -9,6 +9,7 @@ import sqlalchemy
 import transaction
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
+from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlalchemy import desc
@@ -37,6 +38,7 @@ from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
@@ -908,15 +910,17 @@ class ContentApi(object):
                         content_id=content_id
                     ),
                 )
-            jpg_preview_path = self.preview_manager.get_pdf_preview(
+            pdf_preview_path = self.preview_manager.get_pdf_preview(
                 file_path,
                 page=page_number
             )
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
                 'No preview available for content {}, revision {}'.format(content_id, revision_id) # nopep8
             ) from exc
-        return jpg_preview_path
+        return pdf_preview_path
 
     def get_full_pdf_preview_path(self, revision_id: int) -> str:
         """
@@ -927,6 +931,8 @@ class ContentApi(object):
         file_path = self.get_one_revision_filepath(revision_id)
         try:
             pdf_preview_path = self.preview_manager.get_pdf_preview(file_path)
+        except UnavailablePreviewType as exc:
+            raise TracimUnavailablePreviewType() from exc
         except UnsupportedMimeType as exc:
             raise UnavailablePreview(
                 'No preview available for revision {}'.format(revision_id)
@@ -1435,9 +1441,15 @@ class ContentApi(object):
         return item
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
-        if new_mimetype == item.file_mimetype and \
-                new_content == item.depot_file.file.read():
-            raise SameValueError('The content did not changed')
+        # FIXME - G.M - 2018-09-25 - Repair and do a better same content check,
+        # as pyramid behaviour use buffered object
+        # new_content == item.depot_file.file.read() case cannot happened using
+        # whenever new_content.read() == item.depot_file.file.read().
+        # as this behaviour can create struggle with big file, simple solution
+        # using read can be used everytime.
+        # if new_mimetype == item.file_mimetype and \
+        #         new_content == item.depot_file.file.read():
+        #     raise SameValueError('The content did not changed')
         item.owner = self._user
         item.file_name = new_filename
         item.file_mimetype = new_mimetype

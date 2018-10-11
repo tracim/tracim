@@ -276,6 +276,8 @@ class User(DeclarativeBase):
         return reset_password_token
 
     def validate_reset_password_token(self, token, validity_seconds) -> bool:
+        if not self.reset_password_token_created:
+            raise UnvalidResetPasswordToken('reset password token is unvalid due to unknown creation date')  # nopep8
         if not self._validate_date(self.reset_password_token_created, validity_seconds):  # nopep8
             raise ExpiredResetPasswordToken('reset password token has expired')
         if not self._validate_hash(self.reset_password_token_hash, token):

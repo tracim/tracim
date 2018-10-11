@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
-import transaction
-
-from tracim_backend import models
-from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.models import get_tm_session
+import pytest
 from tracim_backend.app_models.contents import CONTENT_TYPES
-from tracim_backend.models.revision_protection import new_revision
 import io
 
 import transaction
@@ -14,6 +8,7 @@ from PIL import Image
 from depot.io.utils import FileIntent
 
 from tracim_backend import models
+from tracim_backend import error
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models import get_tm_session
@@ -140,10 +135,16 @@ class TestFolder(FunctionalTest):
             do_notify=False
         )
         transaction.commit()
-        self.testapp.get(
-            '/api/v2/workspaces/2/folders/7',
+        res = self.testapp.get(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=thread.content_id
+            ),
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_folder__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -175,10 +176,13 @@ class TestFolder(FunctionalTest):
             save_now=True,
         )
         transaction.commit()
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/folders/170'.format(workspace_id=test_workspace.workspace_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_folder__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -228,13 +232,16 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
                 workspace_id=test_workspace2.workspace_id,
                 content_id=folder.content_id,
             ),
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_folder__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -273,10 +280,13 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/folders/{content_id}'.format(content_id=folder.content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api__get_folder__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -315,10 +325,13 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/folders/{content_id}'.format(content_id=folder.content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
 
     def test_api__get_folder__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -358,10 +371,13 @@ class TestFolder(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/folders/coucou'.format(workspace_id=test_workspace.workspace_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_INVALID_ID
 
     def test_api__update_folder__err_400__empty_label(self) -> None:  # nopep8
         """
@@ -405,7 +421,7 @@ class TestFolder(FunctionalTest):
             'raw_content': '<p> Le nouveau contenu </p>',
             'sub_content_types': [CONTENT_TYPES.Folder.slug]
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
                 workspace_id=test_workspace.workspace_id,
                 content_id=folder.content_id,
@@ -413,6 +429,10 @@ class TestFolder(FunctionalTest):
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - Handled by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_folder__ok_200__nominal_case(self) -> None:
         """
@@ -488,6 +508,92 @@ class TestFolder(FunctionalTest):
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
         assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
 
+    def test_api__update_folder__err_400__not_modified(self) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        test_workspace = workspace_api.create_workspace(
+            label='test',
+            save_now=True,
+        )
+        folder = content_api.create(
+            label='test_folder',
+            content_type_slug=CONTENT_TYPES.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False
+        )
+        transaction.commit()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+            'sub_content_types': [CONTENT_TYPES.Folder.slug]
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'folder'
+        assert content['content_id'] == folder.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] is None
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == test_workspace.workspace_id
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['sub_content_types'] == [CONTENT_TYPES.Folder.slug]
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/{workspace_id}/folders/{content_id}'.format(
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
+            ),
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.SAME_VALUE_ERROR
+
     def test_api__update_folder__err_400__label_already_used(self) -> None:
         """
         Update(put) one html document of a content
@@ -545,6 +651,10 @@ class TestFolder(FunctionalTest):
             params=params,
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
+
     def test_api__get_folder_revisions__ok_200__nominal_case(
             self
     ) -> None:
@@ -834,7 +944,7 @@ class TestFolder(FunctionalTest):
             do_notify=False
         )
         transaction.commit()
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/{workspace_id}/folders/{content_id}/status'.format(  # nopep8
                 workspace_id=test_workspace.workspace_id,
                 content_id=folder.content_id,
@@ -842,6 +952,10 @@ class TestFolder(FunctionalTest):
             params=params,
             status=400
         )
+        # TODO - G.M - 2018-09-10 - handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
 
 class TestHtmlDocuments(FunctionalTest):
@@ -994,10 +1108,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_html_document__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -1010,10 +1127,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/170',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_html_document__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -1026,10 +1146,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/html-documents/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_html_document__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -1042,10 +1165,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/html-documents/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api__get_html_document__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1058,10 +1184,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/html-documents/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
 
     def test_api__get_html_document__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1074,10 +1203,13 @@ class TestHtmlDocuments(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/html-documents/coucou',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_INVALID_ID
 
     def test_api__update_html_document__err_400__empty_label(self) -> None:  # nopep8
         """
@@ -1094,11 +1226,15 @@ class TestHtmlDocuments(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6',
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_html_document__ok_200__nominal_case(self) -> None:
         """
@@ -1169,6 +1305,85 @@ class TestHtmlDocuments(FunctionalTest):
         assert content['modified']
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+    def test_api__update_html_document__err_400__not_modified(self) -> None:
+        """
+        Update(put) one html document of a content
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6',
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/html-documents/6',
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'html-document'
+        assert content['content_id'] == 6
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/html-documents/6',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.SAME_VALUE_ERROR
 
     def test_api__get_html_document_revisions__ok_200__nominal_case(
             self
@@ -1312,11 +1527,14 @@ class TestHtmlDocuments(FunctionalTest):
         params = {
             'status': 'unexistant-status',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/html-documents/6/status',
             params=params,
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
 
 class TestFiles(FunctionalTest):
@@ -1568,10 +1786,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/files/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_file__err_400__content_does_not_exist(self) -> None:  # nopep8
         """
@@ -1584,10 +1805,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/170',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_file__err_400__content_not_in_workspace(self) -> None:  # nopep8
         """
@@ -1600,10 +1824,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/9',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_file__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -1616,10 +1843,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/files/9',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api__get_file__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1632,10 +1862,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/files/9',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
 
     def test_api__get_file__err_400__content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -1648,10 +1881,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/files/coucou',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_INVALID_ID
 
     def test_api__update_file_info_err_400__empty_label(self) -> None:  # nopep8
         """
@@ -1707,11 +1943,15 @@ class TestFiles(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__update_file_info__ok_200__nominal_case(self) -> None:
         """
@@ -1830,6 +2070,132 @@ class TestFiles(FunctionalTest):
         assert content['page_nb'] == 1
         assert content['pdf_available'] is True
 
+    def test_api__update_file_info__err_400__not_modified(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.txt',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['mimetype'] == 'plain/text'
+        assert content['size'] == len(b'Test file')
+        assert content['page_nb'] == 1
+        assert content['pdf_available'] is True
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 1
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 1
+        assert content['current_revision_id']
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+        assert content['mimetype'] == 'plain/text'
+        assert content['size'] == len(b'Test file')
+        assert content['page_nb'] == 1
+        assert content['pdf_available'] is True
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.SAME_VALUE_ERROR
+
     def test_api__update_file_info__err_400__label_already_used(self) -> None:
         """
         Update(put) one file, failed because label already used
@@ -1897,6 +2263,9 @@ class TestFiles(FunctionalTest):
             params=params,
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
 
     def test_api__get_file_revisions__ok_200__nominal_case(
             self
@@ -2067,6 +2436,44 @@ class TestFiles(FunctionalTest):
         """
         set file status
         """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        test_file.file_extension = '.txt'
+        test_file.depot_file = FileIntent(
+            b'Test file',
+            'Test_file.txt',
+            'text/plain',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+        dbsession.flush()
+        transaction.commit()
         self.testapp.authorization = (
             'Basic',
             (
@@ -2077,11 +2484,26 @@ class TestFiles(FunctionalTest):
         params = {
             'status': 'unexistant-status',
         }
-        self.testapp.put_json(
-            '/api/v2/workspaces/2/files/6/status',
+
+        # before
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'file'
+        assert content['content_id'] == test_file.content_id
+        assert content['status'] == 'open'
+
+        # set status
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}/status'.format(test_file.content_id),
             params=params,
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__get_file_raw__ok_200__nominal_case(self) -> None:
         """
@@ -2257,6 +2679,76 @@ class TestFiles(FunctionalTest):
         assert res.body == image.getvalue()
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
+
+    @pytest.mark.xfail(
+        raises=AssertionError,
+        reason='Broken feature dues to pyramid behaviour'
+    )
+    def test_api__set_file_raw__err_400_not_modified(self) -> None:
+        """
+        Set one file of a content
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=CONTENT_TYPES.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=True,
+            do_notify=False,
+        )
+        dbsession.flush()
+        transaction.commit()
+        content_id = int(test_file.content_id)
+        image = create_1000px_png_test_image()
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status=204,
+        )
+        res = self.testapp.get(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            status=200
+        )
+        assert res.body == image.getvalue()
+        assert res.content_type == 'image/png'
+        assert res.content_length == len(image.getvalue())
+
+        res = self.testapp.put(
+            '/api/v2/workspaces/1/files/{}/raw'.format(content_id),
+            upload_files=[
+                ('files', image.name, image.getvalue())
+            ],
+            status='*',
+        )
+        assert res.status == 400
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE  # nopep8
 
     def test_api__get_allowed_size_dim__ok__nominal_case(self) -> None:
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -2485,6 +2977,9 @@ class TestFiles(FunctionalTest):
             status=400,
             params=params
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(self) -> None:
         """
@@ -2593,6 +3088,9 @@ class TestFiles(FunctionalTest):
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(self) -> None:
         """
@@ -2700,10 +3198,13 @@ class TestFiles(FunctionalTest):
             ],
             status=204,
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/jpg/512x512'.format(content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.PREVIEW_DIM_NOT_ALLOWED
 
     def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(self) -> None:  # nopep8
         """
@@ -3033,10 +3534,13 @@ class TestFiles(FunctionalTest):
             ],
             status=204,
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.UNAVAILABLE_PREVIEW_TYPE
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(self) -> None:  # nopep8
         """
@@ -3082,10 +3586,13 @@ class TestFiles(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf/full'.format(content_id),  # nopep8
             status=400
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__nominal_case(self) -> None:
         """
@@ -3202,6 +3709,9 @@ class TestFiles(FunctionalTest):
             status=400,
             params=params,
         )
+        assert isinstance(res.json, dict)
+        assert 'code' in res.json.keys()
+        assert res.json_body['code'] == error.UNAIVALABLE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__force_download_case(self) -> None:
         """
@@ -3327,11 +3837,14 @@ class TestFiles(FunctionalTest):
             status=204,
         )
         params = {'page': 2}
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/files/{}/preview/pdf'.format(content_id),
             status=400,
             params=params,
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.PAGE_OF_PREVIEW_NOT_FOUND
 
     def test_api__get_pdf_revision_preview__ok__200__nominal_case(self) -> None:
         """
@@ -3641,10 +4154,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/threads/6',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_TYPE_NOT_ALLOWED
 
     def test_api__get_thread__ok_200__nominal_case(self) -> None:
         """
@@ -3698,10 +4214,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/threads/170',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_thread__err_400__content_not_in_workspace(self) -> None:
         """
@@ -3714,10 +4233,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/1/threads/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_NOT_FOUND
 
     def test_api__get_thread__err_400__workspace_does_not_exist(self) -> None:  # nopep8
         """
@@ -3730,10 +4252,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/40/threads/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api__get_thread__err_400__workspace_id_is_not_int(self) -> None:  # nopep8
         """
@@ -3746,10 +4271,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/coucou/threads/7',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.WORKSPACE_INVALID_ID
 
     def test_api__get_thread__err_400_content_id_is_not_int(self) -> None:  # nopep8
         """
@@ -3762,10 +4290,13 @@ class TestThreads(FunctionalTest):
                 'admin@admin.admin'
             )
         )
-        self.testapp.get(
+        res = self.testapp.get(
             '/api/v2/workspaces/2/threads/coucou',
             status=400
         )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.CONTENT_INVALID_ID
 
     def test_api__update_thread__ok_200__nominal_case(self) -> None:
         """
@@ -3837,6 +4368,85 @@ class TestThreads(FunctionalTest):
         assert content['last_modifier'] == content['author']
         assert content['raw_content'] == '<p> Le nouveau contenu </p>'
 
+    def test_api__update_thread__err_400__not_modified(self) -> None:
+        """
+        Update(put) thread
+        """
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7',
+            params=params,
+            status=200
+        )
+        content = res.json_body
+        assert content['content_type'] == 'thread'
+        assert content['content_id'] == 7
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.get(
+            '/api/v2/workspaces/2/threads/7',
+            status=200
+        )   # nopep8
+        content = res.json_body
+        assert content['content_type'] == 'thread'
+        assert content['content_id'] == 7
+        assert content['is_archived'] is False
+        assert content['is_deleted'] is False
+        assert content['label'] == 'My New label'
+        assert content['parent_id'] == 3
+        assert content['show_in_ui'] is True
+        assert content['slug'] == 'my-new-label'
+        assert content['status'] == 'open'
+        assert content['workspace_id'] == 2
+        assert content['current_revision_id'] == 28
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['created']
+        assert content['author']
+        assert content['author']['user_id'] == 1
+        assert content['author']['avatar_url'] is None
+        assert content['author']['public_name'] == 'Global manager'
+        # TODO - G.M - 2018-06-173 - check date format
+        assert content['modified']
+        assert content['last_modifier'] == content['author']
+        assert content['raw_content'] == '<p> Le nouveau contenu </p>'
+
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/2/threads/7',
+            params=params,
+            status=400
+        )
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.SAME_VALUE_ERROR
+
     def test_api__update_thread__err_400__empty_label(self) -> None:
         """
         Update(put) thread
@@ -3852,11 +4462,15 @@ class TestThreads(FunctionalTest):
             'label': '',
             'raw_content': '<p> Le nouveau contenu </p>',
         }
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7',
             params=params,
             status=400
         )
+        # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR   # nopep8
 
     def test_api__get_thread_revisions__ok_200__nominal_case(
             self
@@ -4077,8 +4691,12 @@ class TestThreads(FunctionalTest):
             'status': 'unexistant-status',
         }
 
-        self.testapp.put_json(
+        res = self.testapp.put_json(
             '/api/v2/workspaces/2/threads/7/status',
             params=params,
             status=400
         )
+        # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
+        assert res.json_body
+        assert 'code' in res.json_body
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
