@@ -421,7 +421,7 @@ class ContentApi(object):
     # 
     #     return result
 
-    def _is_filename_free(
+    def _is_filename_available(
             self,
             filename: str,
             workspace: Workspace,
@@ -482,7 +482,7 @@ class ContentApi(object):
             logger.critical(self, critical_error_text)
             return False
 
-    def _is_filename_free_or_raise(
+    def _is_filename_available_or_raise(
         self,
         filename: str,
         workspace: Workspace,
@@ -490,10 +490,10 @@ class ContentApi(object):
         exclude_content_id: int = None,
     ) -> None:
         """
-        Same as _is_filename_free but raise exception instead of
+        Same as _is_filename_available but raise exception instead of
         returning boolean if content filename is already used
         """
-        if not self._is_filename_free(
+        if not self._is_filename_available(
             filename,
             workspace,
             parent,
@@ -553,7 +553,7 @@ class ContentApi(object):
                 ):
                     file_extension = '.html'
                 filename = '{}{}'.format(label, file_extension)
-            self._is_filename_free_or_raise(
+            self._is_filename_available_or_raise(
                 filename,
                 workspace,
                 parent,
@@ -1348,7 +1348,7 @@ class ContentApi(object):
             if new_parent:
                 item.workspace = new_parent.workspace
 
-        self._is_filename_free_or_raise(
+        self._is_filename_available_or_raise(
             item.file_name,
             item.workspace,
             item.parent,
@@ -1386,7 +1386,7 @@ class ContentApi(object):
         file_extension = item.file_extension
         filename = '{}{}'.format(label, file_extension)
 
-        self._is_filename_free_or_raise(filename, workspace, parent)
+        self._is_filename_available_or_raise(filename, workspace, parent)
         content = item.copy(parent)
         # INFO - GM - 15-03-2018 - add "copy" revision
         with new_revision(
@@ -1436,7 +1436,7 @@ class ContentApi(object):
         label = new_label or item.label
         file_extension = item.file_extension
         filename = '{}{}'.format(label, file_extension)
-        self._is_filename_free_or_raise(
+        self._is_filename_available_or_raise(
             filename,
             item.workspace,
             item.parent,
