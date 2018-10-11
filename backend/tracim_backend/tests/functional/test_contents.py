@@ -3540,7 +3540,7 @@ class TestFiles(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.ERROR_CODE_UNAIVALABLE_PREVIEW_TYPE
+        assert res.json_body['code'] == error.ERROR_CODE_UNAVAILABLE_PREVIEW_TYPE
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(self) -> None:  # nopep8
         """
