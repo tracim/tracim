@@ -81,7 +81,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        file = hapic_data.files.files
+        _file = hapic_data.files.files
         parent_id = hapic_data.forms.parent_id
         api = ContentApi(
             current_user=request.current_user,
@@ -98,7 +98,7 @@ class FileController(Controller):
                     'Parent with content_id {} not found'.format(parent_id)
                 ) from exc
         content = api.create(
-            filename=file.filename,
+            filename=_file.filename,
             content_type_slug=FILE_TYPE,
             workspace=request.current_workspace,
             parent=parent,
@@ -111,9 +111,9 @@ class FileController(Controller):
         ):
             api.update_file_data(
                 content,
-                new_filename=file.filename,
-                new_mimetype=file.type,
-                new_content=file.file,
+                new_filename=_file.filename,
+                new_mimetype=_file.type,
+                new_content=_file.file,
             )
 
         return api.get_content_in_context(content)
@@ -141,7 +141,7 @@ class FileController(Controller):
             hapic_data.path.content_id,
             content_type=CONTENT_TYPES.Any_SLUG
         )
-        file = hapic_data.files.files
+        _file = hapic_data.files.files
         with new_revision(
                 session=request.dbsession,
                 tm=transaction.manager,
@@ -149,9 +149,9 @@ class FileController(Controller):
         ):
             api.update_file_data(
                 content,
-                new_filename=file.filename,
-                new_mimetype=file.type,
-                new_content=file.file,
+                new_filename=_file.filename,
+                new_mimetype=_file.type,
+                new_content=_file.file,
             )
         api.save(content)
         return

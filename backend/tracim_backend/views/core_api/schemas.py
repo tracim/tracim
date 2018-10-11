@@ -77,7 +77,7 @@ class FileCreationFormSchema(marshmallow.Schema):
     )
 
     @post_load
-    def create_set_email_object(self, data):
+    def file_creation_object(self, data):
         return FileCreation(**data)
 
 
