@@ -1830,7 +1830,7 @@ class TestFiles(FunctionalTest):
         assert content['page_nb'] == 1
         assert content['pdf_available'] is True
 
-    def test_api__update_file_info__ok_400__content_closed(self) -> None:
+    def test_api__update_file_info__err_400__content_status_closed(self) -> None:
         """
         Update(put) one file
         """
@@ -1871,6 +1871,134 @@ class TestFiles(FunctionalTest):
         ):
             content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
         test_file.status = 'closed-validated'
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        # TODO - G.M - 2018-10-10 - Check result
+
+    def test_api__update_file_info__err_400__content_deleted(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.txt',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            test_file.is_deleted = True
+        content_api.save(test_file)
+        dbsession.flush()
+        transaction.commit()
+
+        self.testapp.authorization = (
+            'Basic',
+            (
+                'admin@admin.admin',
+                'admin@admin.admin'
+            )
+        )
+        params = {
+            'label': 'My New label',
+            'raw_content': '<p> Le nouveau contenu </p>',
+        }
+        res = self.testapp.put_json(
+            '/api/v2/workspaces/1/files/{}'.format(test_file.content_id),
+            params=params,
+            status=400
+        )
+        # TODO - G.M - 2018-10-10 - Check result
+
+    def test_api__update_file_info__err_400__content_archived(self) -> None:
+        """
+        Update(put) one file
+        """
+        dbsession = get_tm_session(self.session_factory, transaction.manager)
+        admin = dbsession.query(models.User) \
+            .filter(models.User.email == 'admin@admin.admin') \
+            .one()
+        workspace_api = WorkspaceApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config
+        )
+        content_api = ContentApi(
+            current_user=admin,
+            session=dbsession,
+            config=self.app_config,
+            show_deleted=True,
+        )
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label='Test file',
+            do_save=False,
+            do_notify=False,
+        )
+        content_api.update_file_data(
+            test_file,
+            'Test_file.txt',
+            new_mimetype='plain/text',
+            new_content=b'Test file',
+        )
+        with new_revision(
+            session=dbsession,
+            tm=transaction.manager,
+            content=test_file,
+        ):
+            content_api.update_content(test_file, 'Test_file', '<p>description</p>')  # nopep8
+            test_file.is_archived = True
         content_api.save(test_file)
         dbsession.flush()
         transaction.commit()
@@ -2321,7 +2449,7 @@ class TestFiles(FunctionalTest):
         assert res.content_type == 'image/png'
         assert res.content_length == len(image.getvalue())
 
-    def test_api__set_file_raw__err_400__closed_file(self) -> None:
+    def test_api__set_file_raw__err_400__closed_status_file(self) -> None:
         """
         Set one file of a content
         """
