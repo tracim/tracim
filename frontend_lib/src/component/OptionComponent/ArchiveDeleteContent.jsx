@@ -39,4 +39,4 @@ const ArchiveDeleteContent = props => {
   )
 }
 
-export default Radium(translate()((ArchiveDeleteContent)))
+export default translate()(Radium(ArchiveDeleteContent))
