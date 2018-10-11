@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
-import typing
 import datetime as datetime_root
 import json
 import os
+import typing
 from datetime import datetime
 
 from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
-from sqlalchemy import Column, inspect, Index
+from depot.fields.sqlalchemy import UploadedFileField
+from depot.fields.upload import UploadedFile
+from depot.io.utils import FileIntent
+from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Sequence
+from sqlalchemy import inspect
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
@@ -21,14 +26,16 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
-from depot.fields.sqlalchemy import UploadedFileField
-from depot.fields.upload import UploadedFile
-from depot.io.utils import FileIntent
 
-from tracim_backend.lib.utils.translation import get_locale, Translator
+from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import content_status_list
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
-from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.exceptions import ContentStatusNotExist
+from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models.auth import User
+from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -281,9 +288,6 @@ class ActionDescription(object):
                 ]
 
 
-from tracim_backend.app_models.contents import content_status_list
-from tracim_backend.app_models.contents import ContentStatus
-from tracim_backend.app_models.contents import content_type_list
 # TODO - G.M - 30-05-2018 - Drop this old code when whe are sure nothing
 # is lost .
 
@@ -724,8 +728,20 @@ class ContentRevisionRO(DeclarativeBase):
 
         super().__setattr__(key, value)
 
+    @property
+    def is_editable(self):
+        return not self.is_deleted \
+               and not self.is_archived \
+               and self.get_status().is_editable()
+    @property
+    def is_readonly(self):
+        return not self.is_editable and self.get_status().is_readonly()
+
     def get_status(self) -> ContentStatus:
-        return content_status_list.get_one_by_slug(self.status)
+        try:
+            return content_status_list.get_one_by_slug(self.status)
+        except ContentStatusNotExist as exc:
+            return content_status_list.get_default_status()
 
     def get_label(self) -> str:
         return self.label or self.file_name or ''
@@ -1123,7 +1139,11 @@ class Content(DeclarativeBase):
 
     @property
     def is_editable(self) -> bool:
-        return not self.is_archived and not self.is_deleted
+        return self.revision.is_editable
+
+    @property
+    def is_readonly(self) -> bool:
+        return not self.revision.is_readonly
 
     @property
     def is_active(self) -> bool:
@@ -1223,9 +1243,7 @@ class Content(DeclarativeBase):
         return self.revision.get_label_as_file()
 
     def get_status(self) -> ContentStatus:
-        return content_status_list.get_one_by_slug(
-            self.status,
-        )
+        return self.revision.get_status()
 
     def get_last_action(self) -> ActionDescription:
         return ActionDescription(self.revision_type)
