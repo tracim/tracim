@@ -730,12 +730,14 @@ class ContentRevisionRO(DeclarativeBase):
 
     @property
     def is_editable(self):
-        return not self.is_deleted \
-               and not self.is_archived \
-               and self.get_status().is_editable()
+        return not self.is_readonly \
+                and not self.is_deleted \
+                and not self.is_archived \
+                and self.get_status().is_editable()
+
     @property
     def is_readonly(self):
-        return not self.is_editable and self.get_status().is_readonly()
+        return False
 
     def get_status(self) -> ContentStatus:
         try:

@@ -29,7 +29,7 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentType
 from tracim_backend.app_models.contents import GlobalStatus
-from tracim_backend.exceptions import ContentInReadOnlyState
+from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
@@ -1418,7 +1418,7 @@ class ContentApi(object):
 
     def update_content(self, item: Content, new_label: str, new_content: str=None) -> Content:
         if not item.is_editable:
-            raise ContentInReadOnlyState("Can't update read-only file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
+            raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
         if item.label == new_label and item.description == new_content:
             # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
             # Internatization disabled in libcontent for now.
@@ -1441,7 +1441,7 @@ class ContentApi(object):
 
     def update_file_data(self, item: Content, new_filename: str, new_mimetype: str, new_content: bytes) -> Content:
         if not item.is_editable:
-            raise ContentInReadOnlyState("Can't update read-only file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
+            raise ContentInNotEditableState("Can't update not editable file, you need to change his status or state (deleted/archived) before any change.")  # nopep8
         if new_mimetype == item.file_mimetype and \
                 new_content == item.depot_file.file.read():
             raise SameValueError('The content did not changed')

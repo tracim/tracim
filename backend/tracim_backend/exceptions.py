@@ -285,5 +285,5 @@ class EmptyNotificationError(TracimException):
     pass
 
 
-class ContentInReadOnlyState(TracimException):
+class ContentInNotEditableState(TracimException):
     pass

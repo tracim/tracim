@@ -4,7 +4,7 @@ import transaction
 
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.exceptions import ContentInReadOnlyState
+from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentLabelAlreadyUsedHere
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
@@ -2091,7 +2091,7 @@ class TestContentApi(DefaultTest):
                 tm=transaction.manager,
                 content=content2,
         ):
-            with pytest.raises(ContentInReadOnlyState):
+            with pytest.raises(ContentInNotEditableState):
                 api2.update_content(
                     content2,
                     'this is an updated page',
@@ -2653,7 +2653,7 @@ class TestContentApi(DefaultTest):
             tm=transaction.manager,
             content=content2,
         ):
-            with pytest.raises(ContentInReadOnlyState):
+            with pytest.raises(ContentInNotEditableState):
                 api2.update_file_data(
                     content2,
                     'index.html',
@@ -2769,7 +2769,7 @@ class TestContentApi(DefaultTest):
             tm=transaction.manager,
             content=content2,
         ):
-            with pytest.raises(ContentInReadOnlyState):
+            with pytest.raises(ContentInNotEditableState):
                 api2.update_file_data(
                     content2,
                     'index.html',
@@ -2885,7 +2885,7 @@ class TestContentApi(DefaultTest):
             tm=transaction.manager,
             content=content2,
         ):
-            with pytest.raises(ContentInReadOnlyState):
+            with pytest.raises(ContentInNotEditableState):
                 api2.update_file_data(
                     content2,
                     'index.html',

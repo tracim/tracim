@@ -35,22 +35,3 @@ class TestContentStatus(object):
             '#3f52e3'
         )
         assert status2.is_editable() is False
-
-    def test_content_status__is_readonly__ok__nominal_case(self):
-        status = ContentStatus(
-            'open-test',
-            GlobalStatus.OPEN.value,
-            'Open-Test',
-            'square-o',
-            '#3f52e3'
-        )
-        assert status.is_readonly() is False
-
-        status2 = ContentStatus(
-            'open-test',
-            GlobalStatus.CLOSED.value,
-            'Open-Test',
-            'square-o',
-            '#3f52e3'
-        )
-        assert status2.is_readonly() is True

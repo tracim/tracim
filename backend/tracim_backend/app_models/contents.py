@@ -39,9 +39,6 @@ class ContentStatus(object):
     def is_editable(self):
         return self.global_status == GlobalStatus.OPEN.value
 
-    def is_readonly(self):
-        return self.global_status == GlobalStatus.CLOSED.value
-
 
 open_status = ContentStatus(
     slug='open',
