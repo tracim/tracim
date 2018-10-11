@@ -8,7 +8,7 @@ import requests
 import transaction
 
 from tracim_backend import models
-from tracim_backend.error_code import *
+from tracim_backend import error
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
@@ -248,7 +248,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         ), status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
 
     def test_api__get_recently_active_content__ok__200__user_itself(self):
 
@@ -474,7 +474,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         ), status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
     def test_api__get_recently_active_content__ok__200__limit_2_multiple(self):
         # TODO - G.M - 2018-07-20 - Better fix for this test, do not use sleep()
@@ -665,7 +665,7 @@ class TestUserRecentlyActiveContentEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
+        assert res.json_body['code'] == error.ERROR_CODE_CONTENT_NOT_FOUND
 
 
 class TestUserReadStatusEndpoint(FunctionalTest):
@@ -1020,7 +1020,7 @@ class TestUserReadStatusEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestUserSetContentAsRead(FunctionalTest):
@@ -1218,7 +1218,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
 
     def test_api_set_content_as_read__ok__200__admin_content_do_not_exist(self):
         # init DB
@@ -1303,7 +1303,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
+        assert res.json_body['code'] == error.ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api_set_content_as_read__ok__200__user_itself(self):
         # init DB
@@ -1488,7 +1488,7 @@ class TestUserSetContentAsRead(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
     def test_api_set_content_as_read__ok__200__admin_with_comments(self):
         # init DB
@@ -1801,7 +1801,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
 
     def test_api_set_content_as_unread__err__400__admin_content_do_not_exist(self):
         # init DB
@@ -1887,7 +1887,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_CONTENT_NOT_FOUND
+        assert res.json_body['code'] == error.ERROR_CODE_CONTENT_NOT_FOUND
 
     def test_api_set_content_as_unread__ok__200__user_itself(self):
         # init DB
@@ -2069,7 +2069,7 @@ class TestUserSetContentAsUnread(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
     def test_api_set_content_as_unread__ok__200__with_comments(self):
         # init DB
@@ -2413,7 +2413,7 @@ class TestUserSetWorkspaceAsRead(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestUserEnableWorkspaceNotification(FunctionalTest):
@@ -2635,7 +2635,7 @@ class TestUserEnableWorkspaceNotification(FunctionalTest):
         ), status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestUserDisableWorkspaceNotification(FunctionalTest):
@@ -2857,7 +2857,7 @@ class TestUserDisableWorkspaceNotification(FunctionalTest):
         ), status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestUserWorkspaceEndpoint(FunctionalTest):
@@ -2924,7 +2924,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/users/1/workspaces', status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -2963,7 +2963,7 @@ class TestUserWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/users/5/workspaces', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_USER_NOT_FOUND
+        assert res.json_body['code'] == error.ERROR_CODE_USER_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -3131,7 +3131,7 @@ class TestUserEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
     def test_api__create_user__ok_200__full_admin(self):
         self.testapp.authorization = (
@@ -3270,7 +3270,7 @@ class TestUserEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body['code'] == error.ERROR_CODE_EMAIL_ALREADY_EXIST_IN_DB
 
     def test_api__create_user__err_403__other_user(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -3323,7 +3323,7 @@ class TestUserEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestUserWithNotificationEndpoint(FunctionalTest):
@@ -3594,7 +3594,7 @@ class TestUsersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestKnownMembersEndpoint(FunctionalTest):
@@ -3856,7 +3856,7 @@ class TestKnownMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__get_user__ok_200__normal_user_by_email(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -4084,7 +4084,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_EMAIL_ALREADY_EXIST_IN_DB
+        assert res.json_body['code'] == error.ERROR_CODE_EMAIL_ALREADY_EXIST_IN_DB
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4150,7 +4150,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_WRONG_USER_PASSWORD  # nopep8
+        assert res.json_body['code'] == error.ERROR_CODE_WRONG_USER_PASSWORD  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4217,7 +4217,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -4356,7 +4356,7 @@ class TestSetEmailEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetPasswordEndpoint(FunctionalTest):
@@ -4483,7 +4483,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_WRONG_USER_PASSWORD
+        assert res.json_body['code'] == error.ERROR_CODE_WRONG_USER_PASSWORD
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
             current_user=admin,
@@ -4550,7 +4550,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_PASSWORD_DO_NOT_MATCH
+        assert res.json_body['code'] == error.ERROR_CODE_PASSWORD_DO_NOT_MATCH
         # Check After
         dbsession = get_tm_session(self.session_factory, transaction.manager)
         uapi = UserApi(
@@ -4686,7 +4686,7 @@ class TestSetPasswordEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserInfoEndpoint(FunctionalTest):
@@ -4895,7 +4895,7 @@ class TestSetUserInfoEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserProfilEndpoint(FunctionalTest):
@@ -5024,7 +5024,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),
@@ -5093,7 +5093,7 @@ class TestSetUserProfilEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
 
 class TestSetUserEnableDisableEndpoints(FunctionalTest):
@@ -5277,7 +5277,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__err_403__other_account(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -5334,7 +5334,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
 
     def test_api_disable_user__ok_200__user_itself(self):
         dbsession = get_tm_session(self.session_factory, transaction.manager)
@@ -5388,7 +5388,7 @@ class TestSetUserEnableDisableEndpoints(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
         # Check After
         res = self.testapp.get(
             '/api/v2/users/{}'.format(user_id),

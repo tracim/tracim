@@ -3,7 +3,7 @@ import datetime
 import transaction
 from freezegun import freeze_time
 from tracim_backend import models
-from tracim_backend.error_code import *
+from tracim_backend import error
 from tracim_backend.lib.core.group import GroupApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models import get_tm_session
@@ -103,7 +103,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == ERROR_CODE_AUTHENTICATION_FAILED
+        assert res.json_body['code'] == error.ERROR_CODE_AUTHENTICATION_FAILED
 
     def test_api__try_login_enpoint__err_403__bad_password(self):
         params = {
@@ -117,7 +117,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_AUTHENTICATION_FAILED  # nopep8
+        assert res.json_body['code'] == error.ERROR_CODE_AUTHENTICATION_FAILED  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -133,7 +133,7 @@ class TestLoginEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == ERROR_CODE_AUTHENTICATION_FAILED
+        assert res.json_body['code'] == error.ERROR_CODE_AUTHENTICATION_FAILED
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -142,7 +142,7 @@ class TestLoginEndpoint(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - Handled by marshmallow_schema
-        assert res.json_body['code'] == ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 

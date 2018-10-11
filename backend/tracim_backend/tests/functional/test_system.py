@@ -1,6 +1,6 @@
 # coding=utf-8
 import transaction
-from tracim_backend.error_code import *
+from tracim_backend import error
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.utils import get_timezones_list

@@ -1,6 +1,6 @@
 from hapic.error import DefaultErrorBuilder
 from hapic.processor import ProcessValidationError
-from tracim_backend.error_code import ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR
+from tracim_backend.error import ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR
 
 
 class ErrorSchema(DefaultErrorBuilder):
