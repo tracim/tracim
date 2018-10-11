@@ -27,7 +27,7 @@ class ConfigurationError(TracimError):
 
 
 class UserAlreadyExistError(TracimError):
-    error_code = error.ERROR_CODE_USER_ALREADY_EXIST
+    error_code = error.USER_ALREADY_EXIST
 
 
 class ForceArgumentNeeded(TracimException):
@@ -67,7 +67,7 @@ class NotFound(TracimException):
 
 
 class SameValueError(ValueError):
-    error_code = error.ERROR_CODE_SAME_VALUE_ERROR
+    error_code = error.SAME_VALUE_ERROR
 
 
 class NotAuthenticated(TracimException):
@@ -75,19 +75,19 @@ class NotAuthenticated(TracimException):
 
 
 class WorkspaceNotFound(NotFound):
-    error_code = error.ERROR_CODE_WORKSPACE_NOT_FOUND
+    error_code = error.WORKSPACE_NOT_FOUND
 
 
 class WorkspaceNotFoundInTracimRequest(NotFound):
-    error_code = error.ERROR_CODE_WORKSPACE_NOT_IN_TRACIM_REQUEST
+    error_code = error.WORKSPACE_NOT_IN_TRACIM_REQUEST
 
 
 class InsufficientUserRoleInWorkspace(TracimException):
-    error_code = error.ERROR_CODE_INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+    error_code = error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
 
 
 class InsufficientUserProfile(TracimException):
-    error_code = error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
+    error_code = error.INSUFFICIENT_USER_PROFILE
 
 
 class ImmutableAttribute(TracimException):
@@ -99,20 +99,20 @@ class DigestAuthNotImplemented(Exception):
 
 
 class AuthenticationFailed(TracimException):
-    error_code = error.ERROR_CODE_AUTHENTICATION_FAILED
+    error_code = error.AUTHENTICATION_FAILED
 
 
 class WrongUserPassword(TracimException):
-    error_code = error.ERROR_CODE_WRONG_USER_PASSWORD
+    error_code = error.WRONG_USER_PASSWORD
 
 
 class UnvalidResetPasswordToken(TracimException):
-    error_code = error.ERROR_CODE_INVALID_RESET_PASSWORD_TOKEN
+    error_code = error.INVALID_RESET_PASSWORD_TOKEN
     pass
 
 
 class ExpiredResetPasswordToken(TracimException):
-    error_code = error.ERROR_CODE_EXPIRED_RESET_PASSWORD_TOKEN
+    error_code = error.EXPIRED_RESET_PASSWORD_TOKEN
 
 
 class NotificationSendingFailed(TracimException):
@@ -136,15 +136,15 @@ class ContentTypeNotExist(TracimError):
 
 
 class UserDoesNotExist(TracimException):
-    error_code = error.ERROR_CODE_USER_NOT_FOUND
+    error_code = error.USER_NOT_FOUND
 
 
 class UserNotFoundInTracimRequest(TracimException):
-    error_code = error.ERROR_CODE_USER_NOT_IN_TRACIM_REQUEST
+    error_code = error.USER_NOT_IN_TRACIM_REQUEST
 
 
 class ContentNotFoundInTracimRequest(TracimException):
-    error = error.ERROR_CODE_CONTENT_NOT_IN_TRACIM_REQUEST
+    error = error.CONTENT_NOT_IN_TRACIM_REQUEST
 
 
 class InvalidId(TracimException):
@@ -152,35 +152,35 @@ class InvalidId(TracimException):
 
 
 class InvalidContentId(InvalidId):
-    error_code = error.ERROR_CODE_CONTENT_INVALID_ID
+    error_code = error.CONTENT_INVALID_ID
 
 
 class InvalidCommentId(InvalidId):
-    error_code = error.ERROR_CODE_COMMENT_INVALID_ID
+    error_code = error.COMMENT_INVALID_ID
 
 
 class InvalidWorkspaceId(InvalidId):
-    error_code = error.ERROR_CODE_WORKSPACE_INVALID_ID
+    error_code = error.WORKSPACE_INVALID_ID
 
 
 class InvalidUserId(InvalidId):
-    error_code = error.ERROR_CODE_USER_INVALID_USER_ID
+    error_code = error.USER_INVALID_USER_ID
 
 
 class ContentNotFound(TracimException):
-    error_code = error.ERROR_CODE_CONTENT_NOT_FOUND
+    error_code = error.CONTENT_NOT_FOUND
 
 
 class ContentTypeNotAllowed(TracimException):
-    error_code = error.ERROR_CODE_CONTENT_TYPE_NOT_ALLOWED
+    error_code = error.CONTENT_TYPE_NOT_ALLOWED
 
 
 class WorkspacesDoNotMatch(TracimException):
-    error_code = error.ERROR_CODE_WORKSPACE_DO_NOT_MATCH
+    error_code = error.WORKSPACE_DO_NOT_MATCH
 
 
 class PasswordDoNotMatch(TracimException):
-    error_code = error.ERROR_CODE_PASSWORD_DO_NOT_MATCH
+    error_code = error.PASSWORD_DO_NOT_MATCH
 
 
 class EmptyValueNotAllowed(TracimException):
@@ -188,7 +188,7 @@ class EmptyValueNotAllowed(TracimException):
 
 
 class TracimUnavailablePreviewType(TracimException):
-    error_code = error.ERROR_CODE_UNAVAILABLE_PREVIEW_TYPE
+    error_code = error.UNAVAILABLE_PREVIEW_TYPE
 
 
 class EmptyLabelNotAllowed(EmptyValueNotAllowed):
@@ -220,7 +220,7 @@ class BadStatusCode(TracimException):
 
 
 class UserNotActive(TracimException):
-    error_code = error.ERROR_CODE_AUTHENTICATION_FAILED
+    error_code = error.AUTHENTICATION_FAILED
 
 
 class NoUserSetted(TracimException):
@@ -232,7 +232,7 @@ class RoleDoesNotExist(TracimException):
 
 
 class EmailValidationFailed(TracimException):
-    error_code = error.ERROR_CODE_EMAIL_VALIDATION_FAILED
+    error_code = error.EMAIL_VALIDATION_FAILED
 
 
 class InconsistentDatabase(TracimException):
@@ -240,11 +240,11 @@ class InconsistentDatabase(TracimException):
 
 
 class ContentLabelAlreadyUsedHere(TracimException):
-    error_code = error.ERROR_CODE_CONTENT_LABEL_ALREADY_USED_THERE
+    error_code = error.CONTENT_LABEL_ALREADY_USED_THERE
 
 
 class ParentNotFound(NotFound):
-    error_code = error.ERROR_CODE_PARENT_NOT_FOUND
+    error_code = error.PARENT_NOT_FOUND
 
 
 class RevisionDoesNotMatchThisContent(TracimException):
@@ -252,15 +252,15 @@ class RevisionDoesNotMatchThisContent(TracimException):
 
 
 class PageOfPreviewNotFound(NotFound):
-    error_code = error.ERROR_CODE_PAGE_OF_PREVIEW_NOT_FOUND
+    error_code = error.PAGE_OF_PREVIEW_NOT_FOUND
 
 
 class PreviewDimNotAllowed(TracimException):
-    error_code = error.ERROR_CODE_PREVIEW_DIM_NOT_ALLOWED
+    error_code = error.PREVIEW_DIM_NOT_ALLOWED
 
 
 class UnallowedSubContent(TracimException):
-    error_code = error.ERROR_CODE_EMAIL_UNALLOWED_SUBCONTENT
+    error_code = error.EMAIL_UNALLOWED_SUBCONTENT
 
 
 class TooShortAutocompleteString(TracimException):
@@ -276,11 +276,11 @@ class AppDoesNotExist(TracimException):
 
 
 class EmailAlreadyExistInDb(TracimException):
-    error_code = error.ERROR_CODE_EMAIL_ALREADY_EXIST_IN_DB
+    error_code = error.EMAIL_ALREADY_EXIST_IN_DB
 
 
 class UnavailablePreview(TracimException):
-    error_code = error.ERROR_CODE_UNAIVALABLE_PREVIEW
+    error_code = error.UNAIVALABLE_PREVIEW
 
 
 class EmptyNotificationError(TracimException):

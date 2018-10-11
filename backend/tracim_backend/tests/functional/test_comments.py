@@ -117,7 +117,7 @@ class TestCommentsEndpoint(FunctionalTest):
         # INFO - G.M - 2018-09-10 - error handle by marshmallow validator.
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__delete_content_comment__ok_200__user_is_owner_and_workspace_manager(self) -> None:  # nopep8
         """
@@ -249,7 +249,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
 
     def test_api__delete_content_comment__err_403__user_is_owner_and_reader(self) -> None:
         """
@@ -282,7 +282,7 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
 
     def test_api__delete_content_comment__err_403__user_is_reader(self) -> None:
         """
@@ -315,4 +315,4 @@ class TestCommentsEndpoint(FunctionalTest):
         )
         assert res.json_body
         assert 'code' in res.json_body
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8

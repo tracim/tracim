@@ -1,6 +1,6 @@
 from hapic.error import DefaultErrorBuilder
 from hapic.processor import ProcessValidationError
-from tracim_backend.error import ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR
+from tracim_backend.error import GENERIC_SCHEMA_VALIDATION_ERROR
 
 
 class ErrorSchema(DefaultErrorBuilder):
@@ -28,5 +28,5 @@ class ErrorSchema(DefaultErrorBuilder):
         error: ProcessValidationError,
     ) -> dict:
         error_dict = DefaultErrorBuilder.build_from_validation_error(self, error)  # nopep8
-        error_dict['code'] = ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR
+        error_dict['code'] = GENERIC_SCHEMA_VALIDATION_ERROR
         return error_dict

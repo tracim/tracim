@@ -171,7 +171,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__create_workspace__ok_200__nominal_case(self) -> None:
         """
@@ -225,7 +225,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__delete_workspace__ok_200__admin(self) -> None:
         """
@@ -281,7 +281,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
         self.testapp.authorization = (
             'Basic',
             (
@@ -413,7 +413,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -477,7 +477,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -537,7 +537,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api__undelete_workspace__ok_200__admin(self) -> None:
         """
@@ -594,7 +594,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
 
         self.testapp.authorization = (
             'Basic',
@@ -729,7 +729,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -794,7 +794,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         res = self.testapp.get(
             '/api/v2/workspaces/{}'.format(workspace_id),
             status=200
@@ -854,7 +854,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
 
     def test_api__get_workspace__err_400__unallowed_user(self) -> None:
         """
@@ -870,7 +870,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/1', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -906,7 +906,7 @@ class TestWorkspaceEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/5', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -989,7 +989,7 @@ class TestWorkspacesEndpoints(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces', status=403)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_PROFILE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_PROFILE
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1120,7 +1120,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/3/members', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1311,7 +1311,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/3/members/1', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1348,7 +1348,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/5/members', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -1646,7 +1646,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_USER_NOT_FOUND
+        assert res.json_body['code'] == error.USER_NOT_FOUND
 
     def test_api__create_workspace_member_role__err_400__wrong_user_id_and_not_notification(self):
         """
@@ -1673,7 +1673,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_USER_NOT_FOUND
+        assert res.json_body['code'] == error.USER_NOT_FOUND
 
     def test_api__create_workspace_member_role__err_400__notification_disabled_user_not_found(self):  # nopep8
         """
@@ -1700,7 +1700,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_USER_NOT_FOUND
+        assert res.json_body['code'] == error.USER_NOT_FOUND
 
     def test_api__update_workspace_member_role__ok_200__nominal_case(self):
         """
@@ -2030,7 +2030,7 @@ class TestWorkspaceMembersEndpoint(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_INSUFFICIENT_USER_ROLE_IN_WORKSPACE
+        assert res.json_body['code'] == error.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         # after
         roles = self.testapp.get(
             '/api/v2/workspaces/{workspace_id}/members'.format(
@@ -2968,7 +2968,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/3/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -3005,7 +3005,7 @@ class TestWorkspaceContents(FunctionalTest):
         res = self.testapp.get('/api/v2/workspaces/5/contents', status=400)
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_NOT_FOUND
+        assert res.json_body['code'] == error.WORKSPACE_NOT_FOUND
         assert 'message' in res.json.keys()
         assert 'details' in res.json.keys()
 
@@ -3103,7 +3103,7 @@ class TestWorkspaceContents(FunctionalTest):
         )
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
-        assert res.json_body['code'] == error.ERROR_CODE_CONTENT_LABEL_ALREADY_USED_THERE
+        assert res.json_body['code'] == error.CONTENT_LABEL_ALREADY_USED_THERE
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(self) -> None:  # nopep8
         """
@@ -3171,7 +3171,7 @@ class TestWorkspaceContents(FunctionalTest):
         assert isinstance(res.json, dict)
         assert 'code' in res.json.keys()
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
 
     def test_api__post_content_create_generic_content__ok_200__in_folder(self) -> None:  # nopep8
@@ -3238,7 +3238,7 @@ class TestWorkspaceContents(FunctionalTest):
             status=400
         )
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8'
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8'
 
     def test_api__post_content_create_generic_content__err_400__wrong_content_type(self) -> None:  # nopep8
         """
@@ -3261,7 +3261,7 @@ class TestWorkspaceContents(FunctionalTest):
             status=400,
         )
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(self) -> None:  # nopep8
         """
@@ -3314,7 +3314,7 @@ class TestWorkspaceContents(FunctionalTest):
             status=400,
         )
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
-        assert res.json_body['code'] == error.ERROR_CODE_GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
+        assert res.json_body['code'] == error.GENERIC_SCHEMA_VALIDATION_ERROR  # nopep8
         # allowed_content_type
         params = {
             'label': 'GenericCreatedContent',
@@ -3608,7 +3608,7 @@ class TestWorkspaceContents(FunctionalTest):
             params=params,
             status=400,
         )
-        assert res.json_body['code'] == error.ERROR_CODE_WORKSPACE_DO_NOT_MATCH
+        assert res.json_body['code'] == error.WORKSPACE_DO_NOT_MATCH
 
     def test_api_put_delete_content__ok_200__nominal_case(self):
         """
