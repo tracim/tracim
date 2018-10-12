@@ -176,23 +176,22 @@ class FakeFileStream(object):
         """
 
         is_temporary = self._file_name.startswith('.~') or self._file_name.startswith('~')
-
-        file = self._api.create(
-            filename=self._file_name,
-            content_type_slug=CONTENT_TYPES.File.slug,
-            workspace=self._workspace,
-            parent=self._parent,
-            is_temporary=is_temporary
-        )
-
-        self._api.update_file_data(
-            file,
-            self._file_name,
-            util.guessMimeType(self._file_name),
-            self._file_stream.read()
-        )
-
-        self._api.save(file, ActionDescription.CREATION)
+        with self._session.no_autoflush:
+            file = self._api.create(
+                filename=self._file_name,
+                content_type_slug=CONTENT_TYPES.File.slug,
+                workspace=self._workspace,
+                parent=self._parent,
+                is_temporary=is_temporary,
+                do_save=False,
+            )
+            self._api.update_file_data(
+                file,
+                self._file_name,
+                util.guessMimeType(self._file_name),
+                self._file_stream.read()
+            )
+        self._api.save(file)
 
     def update_file(self):
         """
