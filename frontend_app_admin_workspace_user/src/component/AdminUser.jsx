@@ -108,7 +108,7 @@ export class AdminUser extends React.Component {
       <PageWrapper customClass='adminUser'>
         <PageTitle
           parentClass={'adminUser'}
-          title={props.t('Users management')}
+          title={props.t('User account management')}
         />
 
         <PageContent parentClass='adminUser'>
