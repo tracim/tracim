@@ -1989,20 +1989,21 @@ class TestFiles(FunctionalTest):
         )
         business_workspace = workspace_api.get_one(1)
         tool_folder = content_api.get_one(1, content_type=CONTENT_TYPES.Any_SLUG)
-        test_file = content_api.create(
-            content_type_slug=CONTENT_TYPES.File.slug,
-            workspace=business_workspace,
-            parent=tool_folder,
-            label='Test file',
-            do_save=False,
-            do_notify=False,
-        )
-        content_api.update_file_data(
-            test_file,
-            'Test_file.txt',
-            new_mimetype='plain/text',
-            new_content=b'Test file',
-        )
+        with dbsession.no_autoflush:
+            test_file = content_api.create(
+                content_type_slug=CONTENT_TYPES.File.slug,
+                workspace=business_workspace,
+                parent=tool_folder,
+                label='Test file',
+                do_save=False,
+                do_notify=False,
+            )
+            content_api.update_file_data(
+                test_file,
+                'Test_file.txt',
+                new_mimetype='plain/text',
+                new_content=b'Test file',
+            )
         with new_revision(
             session=dbsession,
             tm=transaction.manager,
